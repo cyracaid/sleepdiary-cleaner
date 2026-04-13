@@ -1,0 +1,25 @@
+# R session files
+.RData
+.Rhistory
+.Rapp.history
+.Rproj.user/
+*.Rproj
+
+# Raw input data (not included — IRB protected)
+*.rds
+output/data/
+
+# Work logs (internal only)
+logs/
+
+# Working directories (intermediate files)
+working/
+
+# OS
+.DS_Store
+
+# Sensitivity analysis (unused/experimental)
+sensitivity_analysis/
+
+# Archives
+*.zip

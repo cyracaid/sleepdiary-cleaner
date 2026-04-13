@@ -1,0 +1,361 @@
+---
+title: "R01_sleepdiaryema_cleaning"
+author: "Maia ten Brink"
+date: "5/10/2022"
+output: html_document
+---
+
+Last updated: Maia, 02/07/2025
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+```
+
+## Outline
+
+### Completed
+
+Link IDs and date of observation to release EMA dataset
+Run function process_time to do first-pass cleaning on time variables of interest
+processes both timestamps and intervals
+identifies and fixes AM/PM errors
+Saves time processed data
+Creates separate dataframes for AM, PM, and midday pings
+
+
+### Remains to be completed for data share 2025
+
+### Remains to be completed for later data share: processing and cleaning timestamps - Maia do this task
+
+Preprocess the time variables - check what “still under construction” means??
+Calculate calculated (not self-reported) sleep vars (see calculate_sleep_time_vars.R) and creates checks in find_time_errors.R (not finished) (e.g. distribution plots, outliers, etc) to identify potential time entry errors: the goal is to create this in such a way that future me and other researchers can use it as a general tool:
+negative time duration
+far outside typical distribution
+AM/PM entry errors (already mostly corrected in first pass cleaning)
+
+
+## Load filepaths
+
+This sources custom code and filepaths.
+```{r}
+source(here::here("file_paths.R"))
+
+source(here::here("R", "calculate_sleep_time_vars.R"))
+source(here::here("R", "separate_ping_occasions.R"))
+
+source(here::here("R", "process_timestamp_emadatarelease.R"))
+source(here::here("R", "process_interval_emadatarelease.R"))
+
+#Archived:
+# source(here::here("R", "process_time.R"))
+# source(here::here("R", "process_time_emadatarelease.R"))
+# source(here::here("R", "process_timestamp.R"))
+# source(here::here("R", "process_interval.R"))
+```
+
+## Load libraries
+
+If you are just running locally, you can also load packages with this code.
+```{r libraries}
+# install.packages("devtools")
+# devtools::install_github("amehtaSF/rsurveyutils")
+
+library(rsurveyutils)
+library(tidyverse)
+library(tidylog)
+library(here)
+library(broom)
+library(janitor)
+library(stringi)
+library(stringr)
+library(furrr)
+```
+
+## Load files
+
+```{r Load final_EMA_data_release}
+ema_data_release <- read_csv(file = paste0(dir_data, "/processed/from_data_release/sber_ema_anon_20240429.csv"))
+```
+
+# Recode the time variables
+
+Note: This is still under construction!
+
+**Timestamp variables:**
+time_bed_am
+time_sleep_am
+time_awake_am
+time_getup_am
+caffeinetoday_PM
+alcoholtoday_PM
+nicotine_amount_pm
+cannabis_amount_pm
+
+**Time interval variables:**
+duration_totalmin_sol_estimate_am (hh:min --> total minutes)
+duration_totalmin_waso_estimate_am (hh:min --> minutes)
+duration_totalmin_napstoday_PM (hh:min --> minutes)
+exercisetoday_PM_totalmin_Light (hh:min --> minutes)
+exercisetoday_PM_totalmin_Moderate (hh:min --> minutes)
+exercisetoday_PM_totalmin_Vigorous (hh:min --> minutes)
+exercisetoday_PM_totalmin_Strength (hh:min --> minutes)
+
+**Unknown format timestamp variables:**
+medicines_x_time
+acti_time_remove
+vital_time_remove
+= For now, these variables will remain unprocessed until someone wants to make use of the data
+
+## Run function `process_time` to do first-pass cleaning on time variables of interest:
+
+```{r}
+tstamp.vars.to.proc = c("time_bed_am",
+"time_sleep_am",
+"time_awake_am",
+"time_getup_am",
+"caffeinetoday_PM",
+"alcoholtoday_PM",
+"nicotine_amount_pm",
+"cannabis_amount_pm")
+
+interval.vars.to.proc = c("duration_totalmin_sol_estimate_am", 
+"duration_totalmin_waso_estimate_am",
+"duration_totalmin_napstoday_PM",
+"exercisetoday_PM_totalmin_Light",
+"exercisetoday_PM_totalmin_Moderate",
+"exercisetoday_PM_totalmin_Vigorous",
+"exercisetoday_PM_totalmin_Strength")
+```
+
+Do time processing on released EMA data:
+
+```{r}
+#Create copies of df to save all processed time variables
+ema_data_release_timeproc <- ema_data_release %>% 
+	#rename so that time processing scripts work
+	rename(duration_totalmin_sol_estimate_am = duration_sol_estimate_am_hhmm,
+				 exercisetoday_PM_totalmin_Light = exercisetoday_PM_Light,
+				 exercisetoday_PM_totalmin_Moderate = exercisetoday_PM_Moderate, 
+				 exercisetoday_PM_totalmin_Vigorous = exercisetoday_PM_Vigorous,
+				 exercisetoday_PM_totalmin_Strength = exercisetoday_PM_Strength) %>% 
+	#remove the trailing :00 from interval duration 
+	mutate(across(
+    all_of(interval.vars.to.proc),
+    ~ gsub(":00$", "", .x)
+  )) %>%
+	#change l,C to PM, AM so that time processing scripts work
+	mutate(across(ends_with("_ampm"), 
+                ~ case_when(
+                  . == "l" ~ "PM",
+                  . == "C" ~ "AM",
+                  TRUE ~ .  # Keeps NA, AM, and PM unchanged
+                )))
+
+#check 
+names(ema_data_release_timeproc)
+```
+
+Process timestamp and interval columns:
+```{r}
+#Process timestamp variables
+for (varname.count in 1:length(tstamp.vars.to.proc)) {
+	ema_data_release_timeproc <- process_timestamp(df = ema_data_release_timeproc, varname = tstamp.vars.to.proc[varname.count], format = "timestamp")
+}
+rm(varname.count)
+
+#Process interval variables -- Maia's old, dysfunctional code
+# for (varname.count in 1:length(interval.vars.to.proc)) {
+# 	ema_data_release_timeproc <- process_interval(df = ema_data_release_timeproc, varname = interval.vars.to.proc[varname.count], format = "interval_hhmm")
+# }
+# rm(varname.count)
+
+#Process interval variables -- Cyra's new, functional code = NOTE: requires /cyra_code/process_interval
+for (varname.count in 1:length(interval.vars.to.proc)) {
+  cat("Processing:", interval.vars.to.proc[varname.count], "\n")
+  ema_data_release_timeproc <- process_interval(df = ema_data_release_timeproc, varname = interval.vars.to.proc[varname.count], format = "interval_hhmm")
+}
+rm(varname.count)
+```
+
+Plan: Cyra will identify where in the process_interval and process_timestamp function these are going wrong, using deidentified data
+```{r}
+#de-identified for Cyra 10/02/25 (intervals); 11/13/25 (all)
+ema_data_release_timeproc %>%
+	select(pid, day_num, survey_type, all_of(interval.vars.to.proc), all_of(starts_with(tstamp.vars.to.proc))) %>%
+	saveRDS(., file = paste0(dir_data, "/processed/from_data_release/deidentified_intervalvars_forCD_111325.rds"))
+
+cyra_df <- readRDS(file = paste0(dir_data, "/processed/from_data_release/deidentified_intervalvars_forCD_111325.rds"))
+```
+
+```{r}
+ema_data_release_timeproc %>%
+	dplyr::select(pid, ends_with("mincalc"), ends_with("correctionsmade"), ends_with("errors"), ends_with("_hhmm_ampm")) 
+```
+
+
+Save time processed files:
+
+```{r}
+save(ema_data_release_timeproc, file = paste0(dir_data, "/processed/time_processed_ema_data_release.RData"))
+
+load(file = paste0(dir_data, "/processed/time_processed_ema_data_release.RData"))
+```
+
+## Create calculated variables to compare with self-report time estimates:
+
+Relevant variables:
+	# time_bed_am_hhmm_ampm
+	# time_sleep_am_hhmm_ampm
+	# time_awake_am_hhmm_ampm
+	# time_getup_am_hhmm_ampm
+	# num_waso_estimate_am
+	# duration_totalmin_sol_estimate_am_mincalc
+	# duration_totalmin_waso_estimate_am_mincalc
+	# num_waso_estimate_am
+
+```{r}
+#check that we have the corrected variables
+
+ema_data_release_timeproc %>%
+	select(ends_with("hhmm_ampm"))
+
+ema_data_release_timeproc %>%
+	select(duration_totalmin_sol_estimate_am, duration_totalmin_waso_estimate_am, duration_totalmin_napstoday_PM)
+#conversion of duration in min is missing hours to min
+#timestamp correction hasn't happened all the way yet for the naps duration
+
+ema_data_release_timeproc %>%
+	select(ends_with("_mincalc"))
+
+ema_data_release_timeproc %>%
+	select(ends_with("_checkforerrors"))
+```
+
+Use the function `calculate_sleep_time_vars` (currently under construction).
+
+```{r}
+ema_data_release_timecalc <- calculate_sleep_time_vars(AM_rawdata = ema_data_release_timeproc)
+```
+
+```{r}
+#check that it ran
+ema_data_release_timecalc %>%
+	select(pid, StartDate, starts_with("time"), starts_with("self_diffcalc"))
+```
+
+
+```{r}
+save(ema_data_release_timecalc, file = paste0(dir_data, "/processed/time_processed_calculated_emadatarelease.RData"))
+```
+
+```{r}
+ema_data_release_timecalc <- load(paste0(dir_data, "/processed/time_processed_calculated_emadatarelease.RData"))
+```
+
+
+# Take a look at entry errors rows and make manual corrections:
+
+Calculate mean and SD of all vars:
+
+Timestamps:
+	# time_bed_am_hhmm_ampm
+	# time_sleep_am_hhmm_ampm
+	# time_awake_am_hhmm_ampm
+	# time_getup_am_hhmm_ampm
+
+Duration:
+	# duration_totalmin_sol_estimate_am_mincalc
+	# duration_totalmin_waso_estimate_am_mincalc
+
+Number:
+	# num_waso_estimate_am
+
+```{r}
+names(ema_data_release_timecalc)
+
+check_for_errors <- ema_data_release_timecalc %>% 
+	dplyr::select(pid, date_of_obs, survey_type, survey_comments, survey_concerns, contains("checkforerrors")) %>% 
+	filter(if_any(ends_with("checkforerrors"), ~ is.na(.) == FALSE)) %>% #will still come out a true
+	## alternative AI suggestions: filter(if_any(ends_with("checkforerrors"), ~ . == TRUE))
+	pivot_longer(cols = any(ends_with("checkforerrors")), names_to = "variable_check", values_to = "true_false") %>% #not working!
+	## alternative AI suggestions: pivot_longer(cols = ends_with("checkforerrors"), names_to = "variable_check", values_to = "true_false")
+	filter(true_false == TRUE)
+```
+
+!!!start here: this isn;t working
+```{r}
+summary_timestamps <- ema_data_release_timecalc %>%
+# 	mutate(across(c(time_bed_am_hhmm_ampm, time_sleep_am_hhmm_ampm, 
+#                   time_awake_am_hhmm_ampm, time_getup_am_hhmm_ampm), 
+#                 ~ hms::as_hms(strptime(.x, format = "%I:%M %p")))) %>% 
+	summarise(across(c(time_bed_am_hhmm_ampm, time_sleep_am_hhmm_ampm, 
+                  time_awake_am_hhmm_ampm, time_getup_am_hhmm_ampm), 
+                ~ mean(na.rm = T))) %>% 
+	summarise(across(c(time_bed_am_hhmm_ampm, time_sleep_am_hhmm_ampm, 
+                  time_awake_am_hhmm_ampm, time_getup_am_hhmm_ampm), 
+                ~ sd(na.rm = T)))	
+
+#summarise(across(.cols = -ID, ~ mean))
+
+ema_data_release_timecalc %>% select(pid, survey_type, time_bed_am_hhmm_ampm)
+```
+
+
+### Plot TIB, TST, SE
+
+
+
+
+!!! there are several errors with time in bed / time asleep 3AM switching to 15:00, or 1AM to 13:00!
+fix!!!
+
+```{r}
+data_recoded_AM_diaries %>%
+	select() %>%
+ggplot(., aes(x = diaryday, y = self_diffcalc_sol_minutes, color = id)) +
+	geom_line() +
+	theme_minimal() +
+	theme(legend.position = "none")
+
+
+```
+
+	#Suffixes
+	##Corrected timestamps
+	timestamp_suffix <- "_hhmm_ampm"
+	##Corrected interval durations in minutes
+	interval_suffix <- "_mincalc"
+	##Check for errors
+	errorcheck_suffix <- "_checkforerrors"
+
+```{r}
+
+```
+
+
+
+## Comments and corrections:
+
+```{r}
+unique(data_raw$comments_am)
+unique(data_raw$survey_comments)
+```
+
+Plan: Ashish and Maia split
+
+Go through comments, mark if
+sick
+traveling
+unusual circumstance sleep-related
+unusual circumstance other
+
+Corrections to survey responses:
+Mark that response has been manually corrected
+Make manual correction
+
+
+# Check situations
+
+Plan:
+Spot check % of situations early in EMA, 1x/day
