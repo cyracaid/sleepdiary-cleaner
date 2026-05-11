@@ -17,7 +17,6 @@ A comprehensive R pipeline for cleaning, normalizing, and validating Ecological 
 - [Error Classification System](#error-classification-system)
 - [Output](#output)
 - [Development History](#development-history)
-- [Methodology](#methodology)
 - [License](#license)
 
 ---
@@ -165,17 +164,6 @@ EMA-Sleep-Diary-Data-Cleaning-Pipeline/
 │   ├── sleep_visualization.R          #   22-figure visualization suite
 │   ├── validation_helpers.R           #   Validation utility functions
 │   └── test_df_entry.R                #   Unit test (4 cases)
-│
-├── docs/                              # 📝 Documentation & methodology
-│   ├── Methods english cyra.docx      #   English methodology write-up
-│   ├── Methodology Cyra #2 _MtB edits 031926.docx  # Methodology v2 with edits
-│   ├── methodology 草稿.docx          #   Chinese methodology draft
-│   ├── The dataset consisted of 13.docx  # Dataset description
-│   ├── Sleep Time Code Processing Logic Explanation.md  # Processing logic
-│   ├── Decision Tree for Manual Corrections Processing.md  # Correction decision tree
-│   ├── Calculate_sleep_time_simple Logic.md  # Simplified logic explanation
-│   ├── threshold_optimization_report.md  # Threshold optimization report
-│   └── R01_online_sleepdiary_manualcleaning_111325.Rmd  # R Markdown notebook
 │
 ├── output/                            # 📈 Output visualizations & reports
 │   ├── plots_png/                     #   PNG figures (22+7)
@@ -413,21 +401,6 @@ Flag exclusion filters:
 - 22-figure visualization suite
 
 ---
-
-## Methodology
-
-Methodology documents are available in `docs/`:
-
-- **Methods english cyra.docx** — English methodology write-up
-- **Methodology Cyra #2 _MtB edits 031926.docx** — Methodology version 2 with co-author edits
-- **methodology 草稿.docx** — Chinese methodology draft
-- **The dataset consisted of 13.docx** — Dataset description
-
-### Key Methodological References
-
-- **Sleep Time Code Processing Logic Explanation**: Detailed explanation of the normalization algorithm
-- **Decision Tree for Manual Corrections Processing**: Comprehensive decision tree for the manual correction pipeline
-- **Threshold Optimization Report**: Analysis of optimal thresholds for time swap and AM/PM detection
 
 ### Perception Bias Analysis
 
