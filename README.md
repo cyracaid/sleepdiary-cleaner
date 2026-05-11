@@ -412,6 +412,7 @@ The pipeline includes SOL and WASO perception bias analysis (Figures 20, 20B), c
 
 This project is developed for sleep research purposes at the **Stanford Psychophysiology Lab**. The raw EMA sleep diary data is **IRB-protected** and **not included in this repository**. Access to the original data requires IRB approval — please contact the Stanford Psychophysiology Lab for data access permissions.
 
-### Author
+### Authors
 
-- **cyracaid / sloblucyra** — Sole author and maintainer
+- **cyracaid / sloblucyra** — Primary author and maintainer
+- **Maia ten Brink** — Co-author and methodology contributor
