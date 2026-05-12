@@ -414,5 +414,5 @@ This project is developed for sleep research purposes at the **Stanford Psychoph
 
 ### Authors
 
-- **Cyra Cai Dong** — Primary author and maintainer
-- **Maia ten Brink** — Co-author and methodology contributor
+- Cyra Cai Dong
+- Maia ten Brink
