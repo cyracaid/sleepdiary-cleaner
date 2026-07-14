@@ -1,0 +1,31 @@
+{
+  "$schema": "https://opencode.ai/schema/opencode.json",
+  "skills": {
+    "splsleep-pipeline": {
+      "description": "Run and maintain the splsleep sleep EMA diary data cleaning pipeline. Install R package, run_pipeline(), interpret figures and correction reports.",
+      "location": "file:///Users/sloblucyra/.agents/skills/splsleep-pipeline/SKILL.md",
+      "triggers": [
+        "splsleep",
+        "sleep pipeline",
+        "sleep EMA",
+        "run_pipeline",
+        "clean sleep data",
+        "睡眠管线",
+        "sleep diary cleaning"
+      ]
+    }
+  },
+  "agents": {
+    "splsleep-pipeline": {
+      "description": "Maintain and run the splsleep sleep diary data cleaning pipeline.",
+      "skills": ["splsleep-pipeline"],
+      "triggers": [
+        "run pipeline",
+        "clean sleep data",
+        "splsleep",
+        "sleep EMA",
+        "睡眠数据"
+      ]
+    }
+  }
+}

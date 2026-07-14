@@ -1,0 +1,4 @@
+target_csv,pid,day_num,row_id,original_assessment,consensus_reached,final_action
+manual_error_corrections.csv,1001,5,1,"AM/PM error — bedtime recorded as PM",TRUE,apply_correction
+manual_unusual_corrections.csv,1003,7,5,"Unusually long sleep — plausible for delayed phase",TRUE,mark_as_accepted
+manual_metric_review_acceptances.csv,1001,3,10,"SOL > 120min but participant has chronic insomnia",TRUE,mark_as_accepted

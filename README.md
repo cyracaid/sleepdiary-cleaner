@@ -179,27 +179,109 @@ To use with opencode or compatible AI tools, the skill is registered in `opencod
 }
 ```
 
-## Output Structure
+## Data Format (Text Only — Templates Provided)
 
-| Path | Contents |
-|------|----------|
-| `latest_visualization/` | All PNGs from latest pipeline run |
-| `latest_visualization/pipeline_cleaning/` | QC and pipeline progress figures |
-| `latest_visualization/research_ready/` | Sleep metrics and analysis figures |
-| `output/correction_status.csv` | Per-checkpoint snapshots over all runs |
-| `output/correction_status_final.csv` | Cross-checkpoint comparisons per run |
-| `output/flagged_records_self_reported.csv` | Records flagged as SELF_REPORTED_FLAG |
+**This repository contains no raw participant data, no real identifiers, and no actual study responses.** All CSV files containing participant data are excluded from version control via `.gitignore` and have been purged from git history.
 
-## Manual Correction CSVs
+You can find template CSV files in [`templates/`](templates/) showing the expected column structure with synthetic (fake) data values. Copy these to create your own correction files.
 
-| File | Step | Purpose |
-|------|------|---------|
-| `manual_error_corrections.csv` | 6 | Timestamp corrections (AM/PM, order) |
-| `manual_unusual_corrections.csv` | 6 | Accepted unusual patterns |
-| `manual_nap_exercise_corrections.csv` | 6.5 | Nap/exercise duration corrections |
-| `manual_sleep_metric_duration_corrections.csv` | 6.5 | SOL/WASO metric corrections |
-| `manual_metric_review_acceptances.csv` | 6.5/8 | Human-accepted metric flags |
-| `second_review_checklist.csv` | 5.75 | Second-person verification decisions |
+### Input Data Structure (Text Description)
+
+#### Main Sleep Diary Data (RDS format)
+A pre-processed R data frame with one row per participant per study day. Each row contains:
+
+| Column group | Variables | Description |
+|---|---|---|
+| Identifiers | pid, day_num, row_id, participant | Participant and record IDs |
+| Date | StartDate | Calendar date of the EMA session |
+| Raw timestamps (HH:MM) | time_bed_am_hhmm, time_sleep_am_hhmm, time_awake_am_hhmm, time_getup_am_hhmm | Self-reported bed/sleep/awake/getup clock times |
+| Raw timestamps (AM/PM) | time_bed_am_ampm, time_sleep_am_ampm, time_awake_am_ampm, time_getup_am_ampm | AM/PM indicator for each timestamp |
+| Raw durations | duration_totalmin_sol_estimate_am, duration_totalmin_waso_estimate_am | Self-reported SOL and WASO in minutes |
+| Nap/Exercise | duration_totalmin_napstoday_PM, exercise_PM_totalmin_[Light\|Moderate\|Vigorous\|Strength] | Self-reported nap and exercise durations |
+| Substance use | caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1, alcoholtoday_PM_NumAlcoholicDrinks_1, nicotine_amount_pm_doses, cannabis_amount_pm_doses | Self-reported substance use |
+| WASO count | num_waso_estimate_am, num_waso_am | Number of wake bouts |
+
+#### Raw EMA CSV
+A CSV file with the same participant-day structure, containing additional raw response columns from the EMA survey platform. Key columns that supplement the RDS:
+
+| Column | Description |
+|---|---|
+| StartDate | EMA session start date |
+| num_waso, num_waso_estimate_am | WASO bout counts |
+| Various substance-use responses | Raw text/numeric inputs |
+
+### Manual Correction CSV Formats (Templates Available)
+
+All manual correction files follow a consistent structure of participant identifier + day number + correction instruction.
+**Template files with synthetic data are in [`templates/`](templates/)** — copy them to create your own:
+
+| Template File | Corresponding Live File | Purpose |
+|---|---|---|
+| `templates/template_manual_error_corrections.csv` | `manual_error_corrections.csv` | Timestamp corrections (AM/PM, order) |
+| `templates/template_manual_unusual_corrections.csv` | `manual_unusual_corrections.csv` | Accepted unusual patterns |
+| `templates/template_manual_nap_exercise_corrections.csv` | `manual_nap_exercise_corrections.csv` | Nap/exercise duration corrections |
+| `templates/template_manual_sleep_metric_duration_corrections.csv` | `manual_sleep_metric_duration_corrections.csv` | SOL/WASO metric corrections |
+| `templates/template_manual_metric_review_acceptances.csv` | `manual_metric_review_acceptances.csv` | Human-accepted metric flags |
+| `templates/template_second_review_checklist.csv` | `second_review_checklist.csv` | Second-person verification decisions |
+
+#### Column-by-Column Description
+
+##### `manual_error_corrections.csv`
+Contains timestamp corrections entered by human reviewers. Each row specifies:
+- **pid, day_num, row_id**: identifies the record
+- **variable**: the timestamp variable to correct (e.g., time_bed_am, time_sleep_am)
+- **old_value_hhmm, old_value_ampm**: the original value
+- **new_value_hhmm, new_value_ampm**: the corrected value
+- **correction_type**: type of fix applied (e.g., "order_error", "ampm_fix")
+- **confidence**: reviewer confidence level
+- **reviewer_notes**: free-text notes
+
+##### `manual_unusual_corrections.csv`
+Accepted unusual temporal patterns judged as physiologically plausible:
+- **pid, day_num, row_id**: identifies the record
+- **unusual_type**: category (e.g., "short_sleep", "delayed_phase")
+- **sleep_duration_h**: observed sleep duration
+- **notes**: reviewer rationale
+
+##### `manual_nap_exercise_corrections.csv`
+Fix duration parsing errors in nap/exercise entries:
+- **pid, day_num, row_id**: identifies the record
+- **variable**: which duration variable to correct
+- **old_value**: original parsed value (string)
+- **new_value**: corrected value (numeric minutes)
+- **correction_type**: "MMSS_recode" (e.g., "06:30" → 6.5 min) or "decimal_fix"
+
+##### `manual_sleep_metric_duration_corrections.csv`
+Fix SOL/WASO duration entries where HH:MM was misinterpreted as MM:SS:
+- **pid, day_num, row_id**: identifies the record
+- **variable**: "duration_totalmin_sol_estimate_am" or "duration_totalmin_waso_estimate_am"
+- **original_mincalc**: value before correction
+- **corrected_value**: value after correction
+- **mmss_threshold_applied**: whether MM:SS→min conversion was applied
+
+##### `manual_metric_review_acceptances.csv`
+Rows where a human reviewer judged the auto-detected flag as acceptable (not an error):
+- **pid, day_num, row_id**: identifies the record
+- **human_metric_review_status**: "confirmed_not_error_do_not_correct"
+- **auto_error_desc**: the original auto-detection description
+- **reviewer_id**: who approved it
+- **review_date**: when it was approved
+
+##### `second_review_checklist.csv`
+Second-person verification of single-annotator decisions:
+- **target_csv**: which correction CSV the decision applies to
+- **pid, day_num, row_id**: identifies the record
+- **original_assessment**: what the first reviewer decided
+- **consensus_reached**: TRUE/FALSE
+- **final_action**: e.g., "apply_correction", "mark_as_accepted"
+
+### Derived / Output CSV Formats
+
+| File | Contents |
+|---|---|
+| `output/correction_status.csv` | Run history of checkpoint snapshots (A-E per run). Tracks n_clean, n_error, n_unusual, n_equal_time, n_skipped, n_corrected at each pipeline step |
+| `output/correction_status_final.csv` | Per-run summary comparing first meaningful checkpoint (B) to last (E), with deltas |
+| `output/flagged_records_self_reported.csv` | Records flagged as SELF_REPORTED_FLAG, with SOL/SE/ratio categories and metric values |
 
 ## Renv Reproducibility
 
