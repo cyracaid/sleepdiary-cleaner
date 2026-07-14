@@ -1,5 +1,13 @@
 # SPL Sleep — EMA Sleep Diary Data Cleaning Pipeline
 
+> **[English](#english) · [中文](#中文)**
+
+---
+
+<a name="english"></a>
+
+# English Version
+
 Automated pipeline for cleaning sleep EMA diary data. Parses raw bedtime/sleep/awake/getup timestamps, detects and corrects temporal and duration errors, computes sleep metrics (TST, SOL, WASO, SE), validates self-reported durations, and generates 27 QC visualizations.
 
 ## Features
@@ -154,41 +162,15 @@ run_pipeline(config = "my_study_config.yaml")
 
 All pipeline scripts automatically read the config; no R code changes needed.
 
-## Agent Skill
-
-The project includes an AI agent skill for AI-assisted pipeline maintenance:
-
-**Location**: `.agents/skills/splsleep-pipeline/SKILL.md`
-
-The skill enables AI assistants to:
-- Understand the pipeline architecture, file structure, and data flow
-- Run the pipeline and interpret checkpoint reports
-- Add manual corrections and regenerate figures
-- Diagnose issues in the cleaning process
-
-To use with opencode or compatible AI tools, the skill is registered in `opencode.jsonc`:
-
-```json
-{
-  "skills": {
-    "splsleep-pipeline": {
-      "description": "Run and maintain the sleep EMA diary data cleaning pipeline",
-      "triggers": ["splsleep", "sleep pipeline", "sleep EMA", "run_pipeline"]
-    }
-  }
-}
-```
-
 ## Data Format (Text Only — Templates Provided)
 
-**This repository contains no raw participant data, no real identifiers, and no actual study responses.** All CSV files containing participant data are excluded from version control via `.gitignore` and have been purged from git history.
+**This repository contains no raw participant data, no real identifiers, and no actual study responses.** All CSV files containing participant data are excluded via `.gitignore` and purged from git history.
 
-You can find template CSV files in [`templates/`](templates/) showing the expected column structure with synthetic (fake) data values. Copy these to create your own correction files.
+Template CSV files with synthetic data are in [`templates/`](templates/). Copy these to create your own correction files.
 
 ### Input Data Structure (Text Description)
 
 #### Main Sleep Diary Data (RDS format)
-A pre-processed R data frame with one row per participant per study day. Each row contains:
 
 | Column group | Variables | Description |
 |---|---|---|
@@ -201,21 +183,9 @@ A pre-processed R data frame with one row per participant per study day. Each ro
 | Substance use | caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1, alcoholtoday_PM_NumAlcoholicDrinks_1, nicotine_amount_pm_doses, cannabis_amount_pm_doses | Self-reported substance use |
 | WASO count | num_waso_estimate_am, num_waso_am | Number of wake bouts |
 
-#### Raw EMA CSV
-A CSV file with the same participant-day structure, containing additional raw response columns from the EMA survey platform. Key columns that supplement the RDS:
+### Manual Correction CSV Templates
 
-| Column | Description |
-|---|---|
-| StartDate | EMA session start date |
-| num_waso, num_waso_estimate_am | WASO bout counts |
-| Various substance-use responses | Raw text/numeric inputs |
-
-### Manual Correction CSV Formats (Templates Available)
-
-All manual correction files follow a consistent structure of participant identifier + day number + correction instruction.
-**Template files with synthetic data are in [`templates/`](templates/)** — copy them to create your own:
-
-| Template File | Corresponding Live File | Purpose |
+| Template File | Live File | Purpose |
 |---|---|---|
 | `templates/template_manual_error_corrections.csv` | `manual_error_corrections.csv` | Timestamp corrections (AM/PM, order) |
 | `templates/template_manual_unusual_corrections.csv` | `manual_unusual_corrections.csv` | Accepted unusual patterns |
@@ -224,58 +194,9 @@ All manual correction files follow a consistent structure of participant identif
 | `templates/template_manual_metric_review_acceptances.csv` | `manual_metric_review_acceptances.csv` | Human-accepted metric flags |
 | `templates/template_second_review_checklist.csv` | `second_review_checklist.csv` | Second-person verification decisions |
 
-#### Column-by-Column Description
+Each template uses synthetic data. See the template files for column-level descriptions.
 
-##### `manual_error_corrections.csv`
-Contains timestamp corrections entered by human reviewers. Each row specifies:
-- **pid, day_num, row_id**: identifies the record
-- **variable**: the timestamp variable to correct (e.g., time_bed_am, time_sleep_am)
-- **old_value_hhmm, old_value_ampm**: the original value
-- **new_value_hhmm, new_value_ampm**: the corrected value
-- **correction_type**: type of fix applied (e.g., "order_error", "ampm_fix")
-- **confidence**: reviewer confidence level
-- **reviewer_notes**: free-text notes
-
-##### `manual_unusual_corrections.csv`
-Accepted unusual temporal patterns judged as physiologically plausible:
-- **pid, day_num, row_id**: identifies the record
-- **unusual_type**: category (e.g., "short_sleep", "delayed_phase")
-- **sleep_duration_h**: observed sleep duration
-- **notes**: reviewer rationale
-
-##### `manual_nap_exercise_corrections.csv`
-Fix duration parsing errors in nap/exercise entries:
-- **pid, day_num, row_id**: identifies the record
-- **variable**: which duration variable to correct
-- **old_value**: original parsed value (string)
-- **new_value**: corrected value (numeric minutes)
-- **correction_type**: "MMSS_recode" (e.g., "06:30" → 6.5 min) or "decimal_fix"
-
-##### `manual_sleep_metric_duration_corrections.csv`
-Fix SOL/WASO duration entries where HH:MM was misinterpreted as MM:SS:
-- **pid, day_num, row_id**: identifies the record
-- **variable**: "duration_totalmin_sol_estimate_am" or "duration_totalmin_waso_estimate_am"
-- **original_mincalc**: value before correction
-- **corrected_value**: value after correction
-- **mmss_threshold_applied**: whether MM:SS→min conversion was applied
-
-##### `manual_metric_review_acceptances.csv`
-Rows where a human reviewer judged the auto-detected flag as acceptable (not an error):
-- **pid, day_num, row_id**: identifies the record
-- **human_metric_review_status**: "confirmed_not_error_do_not_correct"
-- **auto_error_desc**: the original auto-detection description
-- **reviewer_id**: who approved it
-- **review_date**: when it was approved
-
-##### `second_review_checklist.csv`
-Second-person verification of single-annotator decisions:
-- **target_csv**: which correction CSV the decision applies to
-- **pid, day_num, row_id**: identifies the record
-- **original_assessment**: what the first reviewer decided
-- **consensus_reached**: TRUE/FALSE
-- **final_action**: e.g., "apply_correction", "mark_as_accepted"
-
-### Derived / Output CSV Formats
+### Output CSV Structure
 
 | File | Contents |
 |---|---|
@@ -283,16 +204,160 @@ Second-person verification of single-annotator decisions:
 | `output/correction_status_final.csv` | Per-run summary comparing first meaningful checkpoint (B) to last (E), with deltas |
 | `output/flagged_records_self_reported.csv` | Records flagged as SELF_REPORTED_FLAG, with SOL/SE/ratio categories and metric values |
 
-## Renv Reproducibility
+## Agent Skill
 
-The project includes a `renv.lock` file for exact R environment reproduction:
+**Location**: `.agents/skills/splsleep-pipeline/SKILL.md`
+
+The skill enables AI assistants to understand the pipeline architecture, run the pipeline, interpret checkpoint reports, add manual corrections, and diagnose issues.
+
+Registered in `opencode.jsonc`:
+
+```json
+{
+  "skills": {
+    "splsleep-pipeline": {
+      "description": "Run and maintain the sleep EMA diary data cleaning pipeline",
+      "triggers": ["splsleep", "sleep pipeline", "sleep EMA", "run_pipeline"]
+    }
+  }
+}
+```
+
+## Output Structure
+
+| Path | Contents |
+|------|----------|
+| `latest_visualization/` | All PNGs from latest pipeline run |
+| `latest_visualization/pipeline_cleaning/` | QC and pipeline progress figures |
+| `latest_visualization/research_ready/` | Sleep metrics and analysis figures |
+| `output/correction_status.csv` | Per-checkpoint snapshots over all runs |
+| `output/correction_status_final.csv` | Cross-checkpoint comparisons per run |
+| `output/flagged_records_self_reported.csv` | Records flagged as SELF_REPORTED_FLAG |
+
+## Renv Reproducibility
 
 ```r
 renv::restore()
 ```
 
-This ensures all package versions match the development environment.
-
 ## License
+
+MIT
+
+---
+
+<a name="中文"></a>
+
+# 中文版本
+
+自动化的睡眠 EMA 日记数据清洗管线：解析原始就寝/入睡/醒来/起床时间戳，检测并修正时序和时长错误，计算睡眠指标（TST、SOL、WASO、SE），验证自报时长，生成 27 张质控可视化图表。
+
+## 功能特性
+
+- **9 步管线**：原始数据 → 时间戳解析 → 区间处理 → 时序修正 → 时长修正 → 指标计算 → 自动检测 → 跨被试检查 → 可视化
+- **人工修正 CSV 工作流**：审阅决策存储在 CSV 中，每次运行自动读取
+- **可配置阈值**：SOL/SE/TST-TIB 标记阈值、时间戳格式、列名 — 全部通过 YAML 配置
+- **检查点报告器**：每步的 clean/error/unusual/corrected 计数自动打印并保存为 CSV
+- **27 张诊断图**：分为 `pipeline_cleaning/`（质控）和 `research_ready/`（睡眠分析）
+- **R 包**：`library(splsleep); run_pipeline()` — 可安装、版本化
+- **Agent 技能**：AI 助手可维护管线
+
+## 管线架构
+
+```
+原始数据 ──→ Step 1: 加载数据 ──→ Step 2: 解析时间戳 ──→ Step 3: 解析区间 ──→ Step 4: 序列标准化
+                                                                                    │
+                                                                                    ▼
+                                                                           Step 5: 分类记录（生成审阅 CSV）
+                                                                                    │
+                                                                           Step 5.75: Second Review
+                                                                                    │
+                                                                           Step 6: 应用人工修正（读取 manual_error_corrections.csv）
+                                                                                    │
+                                                                           Step 6.5: 应用时长修正
+                                                                                    │
+                                                                           Step 7: 计算睡眠指标（TST/SOL/WASO/SE）
+                                                                                    │
+                                                                           Step 8: 自动检测
+                                                                                    │
+                                                                           Step 8.5: 跨被试检查
+                                                                                    │
+                                                                           Step 9: 生成 27 张图
+```
+
+### 分类体系
+
+| 系统 | 来源 | 类别 |
+|------|------|------|
+| `data_category` | Step 5（时序） | clean, error, unusual, equal_time_ok, skipped_na |
+| `flag_severity` | Step 7（指标） | Clean, Minor（1 标记）, Major（2+ 标记） |
+| `checkforerrors_summary` | Step 8（自动） | TIMESTAMP_ISSUE, DURATION_ISSUE, AMOUNT_FLAG, SELF_REPORTED_FLAG, CLEAN |
+
+## 快速开始
+
+### 安装运行
+
+```r
+install.packages("splsleep_1.0.0.tar.gz", repos = NULL)
+library(splsleep)
+run_pipeline()
+```
+
+### 适配新数据集
+
+```r
+# 生成配置模板
+file.copy(system.file("config_default.yaml", package = "splsleep"), "my_study_config.yaml")
+
+# 编辑 my_study_config.yaml → 映射列名、调阈值、改时间格式
+
+# 运行
+run_pipeline(config = "my_study_config.yaml")
+```
+
+## 数据说明（纯文字，无真实数据）
+
+**本仓库不含任何原始参与者数据。** 所有真实数据 CSV 已从 git 历史彻底清除。
+
+模板文件（含假数据）在 [`templates/`](templates/)，展示列结构。
+
+### 主要输入数据
+
+| 列组 | 变量 | 说明 |
+|------|------|------|
+| 标识符 | pid, day_num, row_id | 参与者/记录 ID |
+| 日期 | StartDate | EMA 会话日期 |
+| 原始时间戳 | time_bed_am_hhmm (+ampm), time_sleep_am, time_awake_am, time_getup_am | 自报就寝/入睡/醒来/起床 |
+| 原始时长 | duration_totalmin_sol_estimate_am, waso_estimate_am | SOL/WASO（分钟） |
+| 小睡/运动 | duration_totalmin_napstoday_PM, exercise_PM_totalmin_* | 小睡和运动时长 |
+| 物质使用 | caffeinetoday_PM_*, alcoholtoday_PM_*, nicotine_*, cannabis_* | 自报物质使用 |
+| WASO 次数 | num_waso_estimate_am | 醒来次数 |
+
+### 人工修正 CSV 模板
+
+| 模板 | 对应文件 | 用途 |
+|------|---------|------|
+| `templates/template_manual_error_corrections.csv` | `manual_error_corrections.csv` | 时间戳修正 |
+| `templates/template_manual_unusual_corrections.csv` | `manual_unusual_corrections.csv` | 异常模式接受 |
+| `templates/template_manual_nap_exercise_corrections.csv` | `manual_nap_exercise_corrections.csv` | 小睡/运动时长修正 |
+| `templates/template_manual_sleep_metric_duration_corrections.csv` | `manual_sleep_metric_duration_corrections.csv` | SOL/WASO 修正 |
+| `templates/template_manual_metric_review_acceptances.csv` | `manual_metric_review_acceptances.csv` | 人工接受标记 |
+| `templates/template_second_review_checklist.csv` | `second_review_checklist.csv` | 二次验证 |
+
+### 输出 CSV
+
+| 文件 | 内容 |
+|------|------|
+| `output/correction_status.csv` | 每次运行的检查点快照 |
+| `output/correction_status_final.csv` | 检查点间对比汇总 |
+| `output/flagged_records_self_reported.csv` | SELF_REPORTED_FLAG 记录详情 |
+
+## Agent Skill
+
+**位置**：`.agents/skills/splsleep-pipeline/SKILL.md`
+
+AI 助手可通过此技能理解管线架构、运行管线、解读报告、添加修正。
+
+## 许可证
 
 MIT
