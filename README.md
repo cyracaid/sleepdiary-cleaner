@@ -8,7 +8,7 @@
 
 # English Version
 
-Automated pipeline for cleaning sleep EMA diary data. Parses raw bedtime/sleep/awake/getup timestamps, detects and corrects temporal and duration errors, computes sleep metrics (TST, SOL, WASO, SE), validates self-reported durations, and generates 27 QC visualizations.
+SPL Sleep is a reproducible, auditable R pipeline for cleaning sleep EMA (ecological momentary assessment) diary data. It parses raw bedtime/sleep/awake/get-up timestamps, detects and corrects temporal and duration errors through a transparent human-in-the-loop workflow (every correction stored in a re-readable CSV), computes standard sleep metrics (TST, SOL, WASO, SE), validates self-reported durations, and generates 27 QC and research-ready figures. A schema-validated YAML config maps the pipeline to your dataset without touching code; detection thresholds and their rationale are documented in THRESHOLDS.md, and the input contract in SCHEMA.md.
 
 ## Features
 
