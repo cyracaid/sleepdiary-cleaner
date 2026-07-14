@@ -1,29 +1,28 @@
-# R
-.Rproj.user/
-.Rhistory
+# R session files
 .RData
-.Renv
-renv/
-renv.lock
+.Rhistory
+.Rapp.history
+.Rproj.user/
+*.Rproj
 
-# Pipeline output
-sleep_visualization_*/
-latest_visualization/
-output/*.csv
-Rplots.pdf
+# Raw input data (not included — IRB protected)
+*.rds
+output/data/
 
-# Manual CSVs (user-specific corrections)
-manual_error_correction_updated.csv
-reasonable_unusual_records.csv
-cross_participant_*.csv
+# Work logs (internal only)
+logs/
 
-# Archive & old code
-archive/
-visualizations/
+# Working directories (intermediate files)
+working/
 
-# macOS
+# OS
 .DS_Store
 
-# Package build
-*.tar.gz
-src/
+# Sensitivity analysis (unused/experimental)
+sensitivity_analysis/
+
+# Documentation (methodology drafts not included in repo)
+docs/
+
+# Archives
+*.zip
