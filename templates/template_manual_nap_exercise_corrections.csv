@@ -1,0 +1,3 @@
+pid,day_num,row_id,variable,old_value,new_value,correction_type
+1001,4,6,duration_totalmin_napstoday_PM,"06:30",6.5,MMSS_recode
+1002,9,7,exercisetoday_PM_totalmin_Moderate,"00:12.5",12.5,MMSS_recode

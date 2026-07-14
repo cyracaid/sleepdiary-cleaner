@@ -1,0 +1,15 @@
+{
+  "name": "splsleep-pipeline",
+  "description": "睡眠 EMA 日记数据清洗管线。维护和运行 splsleep R package pipeline，处理 timestamp/duration cleaning、sleep metrics 计算、auto-detection 和 visualization。",
+  "triggers": [
+    "run pipeline",
+    "clean sleep data",
+    "splsleep",
+    "sleep EMA",
+    "sleep diary cleaning",
+    "修正睡眠数据",
+    "睡眠管线"
+  ],
+  "skills": ["splsleep-pipeline"],
+  "tools": ["bash", "read", "write", "edit", "grep", "glob", "todowrite"]
+}

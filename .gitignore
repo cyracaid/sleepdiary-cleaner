@@ -1,0 +1,49 @@
+# Raw data (never commit)
+*.rds
+sber_ema_anon_20260227.csv
+
+# Worklog (local only)
+worklog/
+
+# Manual correction CSVs (contain participant identifiers)
+manual_error_corrections.csv
+manual_unusual_corrections.csv
+manual_nap_exercise_corrections.csv
+manual_sleep_metric_duration_corrections.csv
+manual_metric_review_acceptances.csv
+second_review_checklist.csv
+metrics_ai_review.csv
+
+# Pipeline output
+sleep_visualization_*/
+latest_visualization/
+output/*.csv
+output/reports/
+Rplots.pdf
+
+# Archive & old code
+archive/
+visualizations/
+
+# R
+.Rproj.user/
+.Rhistory
+.RData
+.Renv
+renv/
+renv.lock
+
+# macOS
+.DS_Store
+
+# Package build
+*.tar.gz
+src/
+splsleep.Rcheck/
+
+# Build artifacts
+manual_error_correction_updated.csv
+reasonable_unusual_records.csv
+cross_participant_field_misentries.csv
+cross_participant_flagged_rows.csv
+cross_participant_suspicious_slices.csv

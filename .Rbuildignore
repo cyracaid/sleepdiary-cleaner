@@ -1,0 +1,16 @@
+^renv$
+^renv\.lock$
+^archive$
+^visualizations$
+^sleep_visualization_.*$
+^worklog$
+^\.opencode$
+^\.agents$
+^\.github$
+^data-raw$
+^templates$
+^opencode\.jsonc$
+^vignettes$
+^doc$
+^Meta$
+^pipeline$
