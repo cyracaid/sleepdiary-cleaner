@@ -1,0 +1,31 @@
+Package: splsleep
+Title: Sleep EMA Diary Data Cleaning Pipeline
+Version: 1.1.0
+Authors@R: c(
+    person("Cyra", "Sloblucyra", role = c("aut", "cre"),
+           email = "cyracaid@users.noreply.github.com")
+  )
+Description: Automated pipeline for cleaning sleep EMA diary data.
+  Parses raw timestamp and interval data, detects and corrects temporal
+  errors, computes sleep metrics (TST, SOL, WASO, SE), validates
+  self-reported durations, and generates QC visualizations.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Depends:
+    R (>= 4.2)
+Imports:
+    ggplot2,
+    dplyr,
+    tidyr,
+    lubridate,
+    patchwork,
+    scales,
+    RColorBrewer,
+    gridExtra,
+    reshape2,
+    corrplot,
+    yaml
+Suggests:
+    testthat (>= 3.0.0)
+Config/roxygen2/version: 8.0.0

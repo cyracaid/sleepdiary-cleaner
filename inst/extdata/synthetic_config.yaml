@@ -1,0 +1,75 @@
+# splsleep Pipeline Configuration -- Synthetic Demo Data
+# =============================================================================
+# This config uses the bundled synthetic dataset in inst/extdata/.
+# It demonstrates how to map column names for a new dataset.
+# =============================================================================
+
+pipeline:
+  name: "splsleep (Synthetic Demo)"
+  version: "1.0.0"
+
+data:
+  files:
+    main_rds: "inst/extdata/synthetic_sleep_data.rds"
+    main_csv: "inst/extdata/synthetic_ema_data.csv"
+    # manual stubs for demo -- no manual corrections
+    manual_error: "stub_error_corrections.csv"
+    manual_unusual: "stub_unusual_corrections.csv"
+    manual_nap_exercise: "stub_nap_exercise.csv"
+    manual_metric_duration: "stub_metric_duration.csv"
+    manual_metric_accept: "stub_metric_accept.csv"
+    second_review: "stub_second_review.csv"
+
+column_mapping:
+  identifiers:
+    pid: "pid"
+    day_num: "day_num"
+    row_id: "row_id"
+    date_bed: "StartDate"
+
+  timestamp:
+    time_bed_hhmm: "time_bed_am_hhmm"
+    time_bed_ampm: "time_bed_am_ampm"
+    time_sleep_hhmm: "time_sleep_am_hhmm"
+    time_sleep_ampm: "time_sleep_am_ampm"
+    time_awake_hhmm: "time_awake_am_hhmm"
+    time_awake_ampm: "time_awake_am_ampm"
+    time_getup_hhmm: "time_getup_am_hhmm"
+    time_getup_ampm: "time_getup_am_ampm"
+
+  duration:
+    sol: "duration_totalmin_sol_estimate_am"
+    waso: "duration_totalmin_waso_estimate_am"
+    nap: "duration_totalmin_napstoday_PM"
+    exercise_light: "exercisetoday_PM_totalmin_Light"
+    exercise_moderate: "exercisetoday_PM_totalmin_Moderate"
+    exercise_vigorous: "exercisetoday_PM_totalmin_Vigorous"
+    exercise_strength: "exercisetoday_PM_totalmin_Strength"
+
+  waso_count: "num_waso_estimate_am"
+
+  substance:
+    caffeine: "caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1"
+    alcohol: "alcoholtoday_PM_NumAlcoholicDrinks_1"
+    nicotine: "nicotine_amount_pm_doses"
+    cannabis: "cannabis_amount_pm_doses"
+
+classification:
+  metric_validation:
+    sol:
+      excessive_minutes: 120
+    se:
+      min_valid_percent: 0
+      max_valid_percent: 100
+    tst_tib_ratio:
+      min_ratio: 0.5
+      max_ratio: 1.0
+  flag_severity:
+    poor_efficiency_threshold_pct: 70
+    high_sol_threshold_hours: 1
+    high_waso_threshold_hours: 1.5
+
+timestamp:
+  input_format: "hh:mm AM/PM"
+  ampm:
+    enabled: true
