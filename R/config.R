@@ -172,10 +172,12 @@ validate_column_types <- function(data, type_spec, label = "data") {
     actual <- class(data[[col]])[1]
     ok <- switch(expected,
       numeric = actual %in% c("numeric", "integer"),
-      character = actual == "character",
+      integer = actual %in% c("integer", "numeric"),
+      character = actual %in% c("character", "hms"),
       POSIXct = actual == "POSIXct" || actual == "Date",
       Date = actual == "Date",
       logical = actual == "logical",
+      any = TRUE,  # accept any type
       actual == expected
     )
     if (!ok) {
