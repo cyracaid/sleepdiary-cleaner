@@ -11,22 +11,22 @@ validate_schema <- function(data, config, label = "raw EMA input (post-adaptatio
   SCHEMA <- list(
     list(field = "pid",            default = "pid",                                  type = "numeric",   required = TRUE),
     list(field = "day_num",        default = "day_num",                              type = "numeric",   required = TRUE),
-    list(field = "row_id",         default = "row_id",                               type = "numeric",   required = TRUE),
-    list(field = "time_bed_hhmm",  default = "time_bed_am_hhmm",                     type = "character", required = TRUE),
-    list(field = "time_sleep_hhmm",default = "time_sleep_am_hhmm",                   type = "character", required = TRUE),
-    list(field = "time_awake_hhmm",default = "time_awake_am_hhmm",                   type = "character", required = TRUE),
-    list(field = "time_getup_hhmm",default = "time_getup_am_hhmm",                   type = "character", required = TRUE),
-    list(field = "time_bed_ampm",  default = "time_bed_am_ampm",                     type = "character", required = "ampm"),
-    list(field = "time_sleep_ampm",default = "time_sleep_am_ampm",                   type = "character", required = "ampm"),
-    list(field = "time_awake_ampm",default = "time_awake_am_ampm",                   type = "character", required = "ampm"),
-    list(field = "time_getup_ampm",default = "time_getup_am_ampm",                   type = "character", required = "ampm"),
-    list(field = "sol",            default = "duration_totalmin_sol_estimate_am",    type = "numeric",   required = TRUE),
-    list(field = "waso",           default = "duration_totalmin_waso_estimate_am",   type = "numeric",   required = TRUE),
-    list(field = "date_bed",       default = "StartDate",                            type = "character", required = FALSE),
-    list(field = "waso_count",     default = "num_waso_estimate_am",                 type = "numeric",   required = FALSE),
-    list(field = "nap",            default = "duration_totalmin_napstoday_PM",       type = "numeric",   required = FALSE),
-    list(field = "caffeine",       default = "caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1", type = "numeric", required = FALSE),
-    list(field = "alcohol",        default = "alcoholtoday_PM_NumAlcoholicDrinks_1",  type = "numeric",   required = FALSE)
+    # row_id is created by the pipeline, not required as input
+    list(field = "time_bed_hhmm",  default = "time_bed_am_hhmm",                      type = "any", required = TRUE),
+    list(field = "time_sleep_hhmm", default = "time_sleep_am_hhmm",                    type = "any", required = TRUE),
+    list(field = "time_awake_hhmm",default = "time_awake_am_hhmm",                   type = "any", required = TRUE),
+    list(field = "time_getup_hhmm",default = "time_getup_am_hhmm",                   type = "any", required = TRUE),
+    list(field = "time_bed_ampm",  default = "time_bed_am_ampm",                     type = "any", required = "ampm"),
+    list(field = "time_sleep_ampm",default = "time_sleep_am_ampm",                   type = "any", required = "ampm"),
+    list(field = "time_awake_ampm",default = "time_awake_am_ampm",                   type = "any", required = "ampm"),
+    list(field = "time_getup_ampm",default = "time_getup_am_ampm",                   type = "any", required = "ampm"),
+    list(field = "sol",            default = "duration_totalmin_sol_estimate_am",    type = "any", required = TRUE),
+    list(field = "waso",           default = "duration_totalmin_waso_estimate_am",   type = "any", required = TRUE),
+    list(field = "date_bed",       default = "StartDate",                            type = "any", required = FALSE),
+    list(field = "waso_count",     default = "num_waso_estimate_am",                 type = "any",   required = FALSE),
+    list(field = "nap",            default = "duration_totalmin_napstoday_PM",       type = "any",   required = FALSE),
+    list(field = "caffeine",       default = "caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1", type = "any", required = FALSE),
+    list(field = "alcohol",        default = "alcoholtoday_PM_NumAlcoholicDrinks_1",  type = "any",   required = FALSE)
   )
 
   uses_ampm <- isTRUE(tryCatch(config_get(config, "timestamp")$ampm$enabled, error = function(e) TRUE))

@@ -9,7 +9,6 @@ Single source of truth for the raw input columns the pipeline consumes.
 |---|---|---|---|
 | `pid` | `pid` | numeric | Participant ID |
 | `day_num` | `day_num` | numeric | Study day |
-| `row_id` | `row_id` | numeric | Record ID |
 | `time_bed_hhmm` | `time_bed_am_hhmm` | character | Bedtime HH:MM |
 | `time_sleep_hhmm` | `time_sleep_am_hhmm` | character | Sleep-onset HH:MM |
 | `time_awake_hhmm` | `time_awake_am_hhmm` | character | Final awakening HH:MM |

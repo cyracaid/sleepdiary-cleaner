@@ -78,7 +78,7 @@ process_timestamp <- function(df, varname, format) {
     
     # Combine hour+minute with AM/PM, detect 24-hour format usage
     concat.tstamp.ampm.cstr = data.frame(tstamp.varname.cstr, stringsAsFactors = FALSE)
-    concat.tstamp.ampm.cstr[[ampm.varname]] <- df[, ampm.varname]
+    concat.tstamp.ampm.cstr[[ampm.varname]] <- df[[ampm.varname]]
     
     concat.tstamp.ampm.cstr = concat.tstamp.ampm.cstr %>%
       mutate(!!paste0(varname, "_hhmm_orig") := tstamp.varname.cstr) %>%
