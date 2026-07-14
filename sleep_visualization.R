@@ -1206,58 +1206,102 @@ if(length(flag_columns) >= 2) {
 }
 
 # ============================================================================
-# Figure 12: Pipeline Correction Progress
+# Figure 12: Pipeline Correction Progress (Three-Panel Table)
 # ============================================================================
-# WHAT IT SHOWS: Bar chart of record status (Clean/Error/Unusual/Equal Time/
-#   Corrected) at each pipeline checkpoint (A→E), illustrating how the
-#   cleaning pipeline transforms the data step by step.
+# WHAT IT SHOWS: Three-panel summary table of pipeline correction progress.
+#   Panel 1 — Core metrics per step (Total, Clean, Error, Unusual, etc.)
+#   Panel 2 — Step-to-step changes (Δ Clean, Δ Error, Δ Unusual, Δ Corrected)
+#   Panel 3 — Sleep metrics for steps where available (Valid N, TST, SOL)
 # DATA SOURCE: correction_status.csv from report_correction_status.R
 # ============================================================================
-cat("Generating FIGURE 12 (Pipeline Correction Progress)...\n")
+cat("Generating FIGURE 12 (Pipeline Correction Progress Table)...\n")
 
 cp_file <- "output/correction_status.csv"
 if (file.exists(cp_file)) {
   cp <- read.csv(cp_file, stringsAsFactors = FALSE)
   latest_run <- max(cp$run_id)
-  cp <- cp[cp$run_id == latest_run, ]
-  
-  cp_long <- cp %>%
+  cp <- cp[cp$run_id == latest_run, ] %>%
     filter(checkpoint %in% c("A", "B", "C", "D", "E")) %>%
-    select(checkpoint, n_clean, n_error, n_unusual, n_equal_time, n_corrected) %>%
-    reshape2::melt(id.vars = "checkpoint", variable.name = "status", value.name = "count") %>%
     mutate(
-      status = case_when(
-        grepl("n_clean", status) ~ "Clean",
-        grepl("n_error", status) ~ "Error",
-        grepl("n_unusual", status) ~ "Unusual",
-        grepl("n_equal_time", status) ~ "Equal Time",
-        grepl("n_corrected", status) ~ "Corrected (cumulative)"
+      step_label = case_when(
+        checkpoint == "A" ~ "Step 4",
+        checkpoint == "B" ~ "Step 6",
+        checkpoint == "C" ~ "Step 6.5",
+        checkpoint == "D" ~ "Step 7",
+        checkpoint == "E" ~ "Step 8"
       ),
-      status = factor(status, levels = c("Clean", "Error", "Unusual", "Equal Time", "Corrected (cumulative)")),
-      checkpoint = factor(checkpoint, levels = c("A", "B", "C", "D", "E"),
-                          labels = c("A: After\nNormalize", "B: After\nTimestamp Fix", "C: After\nDuration Fix", "D: After\nMetrics Calc", "E: After\nAuto-Detect"))
-    ) %>%
-    filter(!is.na(count))
-  
-  if (nrow(cp_long) > 0) {
-    cp_labels <- cp %>% filter(checkpoint %in% c("A", "B", "C", "D", "E"))
-    p12 <- ggplot(cp_long, aes(x = checkpoint, y = count, fill = status)) +
-      geom_col(alpha = 0.8, width = 0.7) +
-      scale_fill_manual(values = c("Clean" = "#2E7D32", "Error" = "#D32F2F",
-                                   "Unusual" = "#FF8C00", "Equal Time" = "#64B5F6",
-                                   "Corrected (cumulative)" = "#9C27B0")) +
-      labs(title = "Figure 12: Pipeline Correction Progress",
-           subtitle = sprintf("Record status at each pipeline checkpoint (run %s). Skipped NA (%.0f records) omitted — these are EMA responses without sleep data.",
-                              latest_run, cp$n_skipped[1]),
-           x = "", y = "Record Count", fill = "Status") +
-      theme_minimal(base_size = 11) +
-      theme(legend.position = "bottom")
-    print(p12)
-    save_png(p12, "12_Pipeline_Correction_Progress", subdir = "pipeline_cleaning")
-    cat("✓ Figure 12 (Pipeline Progress) completed\n\n")
+      step_desc = case_when(
+        checkpoint == "A" ~ "Auto-normalize",
+        checkpoint == "B" ~ "Timestamp corrections",
+        checkpoint == "C" ~ "Duration corrections",
+        checkpoint == "D" ~ "Metrics computed",
+        checkpoint == "E" ~ "Auto-detection"
+      )
+    )
+
+  # Panel 1 — Core metrics
+  tbl1 <- cp %>%
+    mutate(n_corrected = ifelse(is.na(n_corrected), 0, n_corrected)) %>%
+    select(Step = step_label, Description = step_desc,
+           Total = n_total, Clean = n_clean, Error = n_error,
+           Unusual = n_unusual, `Eq.Time` = n_equal_time,
+           Skipped = n_skipped, Corrected = n_corrected)
+
+  # Panel 2 — Step-to-step deltas
+  delta_df <- data.frame(
+    Step = cp$step_label,
+    `Δ Clean`    = c(NA, diff(cp$n_clean)),
+    `Δ Error`    = c(NA, diff(cp$n_error)),
+    `Δ Unusual`  = c(NA, diff(cp$n_unusual)),
+    `Δ Corrected` = c(NA, diff(ifelse(is.na(cp$n_corrected), 0, cp$n_corrected))),
+    check.names = FALSE
+  )
+
+  # Panel 3 — Sleep metrics (step D/E only)
+  metrics_data <- cp %>% filter(checkpoint %in% c("D", "E"))
+  if (nrow(metrics_data) > 0 && any(!is.na(metrics_data$n_valid) & metrics_data$n_valid > 0)) {
+    tbl3 <- metrics_data %>%
+      mutate(`TST (h)` = sprintf("%.2f", tst_mean_h),
+             `SOL (min)` = sprintf("%.1f", sol_mean_min)) %>%
+      select(Step = step_label, `N Valid` = n_valid, `TST (h)`, `SOL (min)`)
+  } else {
+    tbl3 <- data.frame(Step = "—", `N Valid` = "—", `TST (h)` = "—",
+                       `SOL (min)` = "—", check.names = FALSE)
   }
+
+  # Render helpers
+  make_tab <- function(df, fontsize = 9) {
+    tableGrob(df, rows = NULL,
+              theme = ttheme_minimal(
+                base_size = fontsize,
+                core = list(fg_params = list(hjust = 0, x = 0.03)),
+                colhead = list(fg_params = list(hjust = 0, x = 0.03, fontface = "bold"))
+              ))
+  }
+
+  t1 <- make_tab(tbl1)
+  t2 <- make_tab(delta_df)
+  t3 <- make_tab(tbl3)
+
+  # Layout
+  p12 <- grid.arrange(
+    textGrob("Figure 12: Pipeline Correction Progress",
+             gp = gpar(fontsize = 14, fontface = "bold"), just = "left", x = 0.03),
+    textGrob(sprintf("Run %s  |  Checkpoints A→E → Steps 4→8  |  Δ = change from previous step",
+                     latest_run),
+             gp = gpar(fontsize = 9, col = "gray40"), just = "left", x = 0.03),
+    t1, t2, t3, ncol = 1,
+    heights = c(unit(0.35, "in"), unit(0.2, "in"),
+                unit(nrow(tbl1) * 0.28 + 0.4, "in"),
+                unit(nrow(delta_df) * 0.28 + 0.4, "in"),
+                unit(nrow(tbl3) * 0.28 + 0.4, "in"))
+  )
+
+  save_png(p12, "12_Pipeline_Correction_Progress", subdir = "pipeline_cleaning")
+  print(p12)
+  cat("✓ Figure 12 (Three-Panel Progress Table) completed\n\n")
 } else {
-  cat("⚠ correction_status.csv not found — skipping Figure 12 (Pipeline Progress)\n\n")
+  cat("⚠ correction_status.csv not found — skipping Figure 12\n\n")
 }
 
 cat("\n")
@@ -2405,7 +2449,7 @@ cat("  Figure 8: Sleep Duration by Data Category\n")
 cat("  Figure 9: Bedtime vs Get-up Time Distribution\n")
 cat("  Figure 10: Extreme Durations with Efficiency (COLOR-CODED)\n")
 cat("  Figure 11: Flag Co-occurrence Heatmap\n")
-cat("  Figure 12: Pipeline Correction Progress\n\n")
+cat("  Figure 12: Pipeline Correction Progress (Three-Panel Table)\n\n")
 
 if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
   cat("FIGURES 13-18 (Based on AUTO-DETECTION - Pre-Correction):\n")
