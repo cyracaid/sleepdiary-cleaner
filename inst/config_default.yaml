@@ -1,0 +1,233 @@
+# splsleep Pipeline Configuration
+# =============================================================================
+# This file defines all variable mappings, thresholds, and settings for the
+# sleep EMA data cleaning pipeline. To adapt the pipeline to a new dataset:
+#   1. Copy this file as config_custom.yaml
+#   2. Update the column_mapping section with YOUR column names
+#   3. Adjust thresholds if needed
+#   4. Run: library(splsleep); run_pipeline(config = "config_custom.yaml")
+
+pipeline:
+  name: "Sleep EMA Data Cleaning Pipeline"
+  version: "1.0.0"
+
+# =============================================================================
+# DATA FILES
+# =============================================================================
+data:
+  files:
+    main_rds: "deidentified_intervalvars_forCD_111325.rds"
+    main_csv: "sber_ema_anon_20260227.csv"
+    manual_error: "manual_error_corrections.csv"
+    manual_unusual: "manual_unusual_corrections.csv"
+    manual_nap_exercise: "manual_nap_exercise_corrections.csv"
+    manual_metric_duration: "manual_sleep_metric_duration_corrections.csv"
+    manual_metric_accept: "manual_metric_review_acceptances.csv"
+    second_review: "second_review_checklist.csv"
+
+# =============================================================================
+# COLUMN MAPPING
+# =============================================================================
+# Maps pipeline-internal column names to your dataset's column names.
+# For each entry: "pipeline_name": "your_column_name"
+# 
+# If your dataset already uses the pipeline names, keep them as-is.
+# If a column doesn't exist in your data, set to null or omit.
+# =============================================================================
+column_mapping:
+  identifiers:
+    pid: "pid"
+    day_num: "day_num"
+    row_id: "row_id"
+    participant: "participant"
+    study_day: "study_day"
+    date_bed: "StartDate"
+
+  # Timestamp columns (raw, before parsing)
+  # These are the HH:MM and AM/PM pairs from the EMA diary.
+  timestamp:
+    time_bed_hhmm: "time_bed_am_hhmm"
+    time_bed_ampm: "time_bed_am_ampm"
+    time_sleep_hhmm: "time_sleep_am_hhmm"
+    time_sleep_ampm: "time_sleep_am_ampm"
+    time_awake_hhmm: "time_awake_am_hhmm"
+    time_awake_ampm: "time_awake_am_ampm"
+    time_getup_hhmm: "time_getup_am_hhmm"
+    time_getup_ampm: "time_getup_am_ampm"
+
+  # Duration columns (raw, as reported by participants)
+  duration:
+    sol: "duration_totalmin_sol_estimate_am"
+    waso: "duration_totalmin_waso_estimate_am"
+    nap: "duration_totalmin_napstoday_PM"
+    exercise_light: "exercisetoday_PM_totalmin_Light"
+    exercise_moderate: "exercisetoday_PM_totalmin_Moderate"
+    exercise_vigorous: "exercisetoday_PM_totalmin_Vigorous"
+    exercise_strength: "exercisetoday_PM_totalmin_Strength"
+
+  # WASO count (number of wake bouts)
+  waso_count: "num_waso_estimate_am"
+
+  # Substance use columns
+  substance:
+    caffeine: "caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1"
+    alcohol: "alcoholtoday_PM_NumAlcoholicDrinks_1"
+    nicotine: "nicotine_amount_pm_doses"
+    nicotine_pm: "nicotine_amount_pm"
+    cannabis: "cannabis_amount_pm_doses"
+
+  # Corrected timestamp columns (produced by pipeline Steps 2-4)
+  # These are created internally; map to null
+  corrected_timestamp:
+    time_bed: "time_bed_corrected"
+    time_sleep: "time_sleep_corrected"
+    time_awake: "time_awake_corrected"
+    time_getup: "time_getup_corrected"
+
+  # Computed metric columns (produced by pipeline Step 7)
+  metric:
+    tst: "self_diffcalc_totalsleeptime_minutes"
+    sol: "self_diffcalc_sol_minutes"
+    se: "self_diffcalc_sleepefficiency_percent"
+    tib: "self_diffcalc_timeinbed_minutes"
+    sleep_period: "self_diffcalc_sleepperiod_minutes"
+    total_try_sleep: "self_diffcalc_totaltrysleep_minutes"
+    waso_used: "duration_totalmin_waso_estimate_am_mincalc_used"
+    waso_checkforerrors: "duration_totalmin_waso_estimate_am_checkforerrors"
+
+  # Derived visualization columns (produced by apply_sleep_metrics)
+  derived:
+    sleep_duration_h: "sleep_duration_h"
+    sol_h: "sol_h"
+    waso_h: "waso_h"
+    sleep_efficiency_pct: "sleep_efficiency_pct"
+    time_in_bed_h: "time_in_bed_h"
+
+  # Classification columns
+  classification:
+    data_category: "data_category"
+    error_type: "error_type"
+    unusual_type: "unusual_type"
+    has_na: "has_na"
+    manually_corrected: "manually_corrected"
+    is_priority_adjusted: "is_priority_adjusted"
+    minor_order_error: "minor_order_error"
+    flag_severity: "flag_severity"
+    flag_poor_efficiency: "flag_poor_efficiency"
+    flag_high_sol: "flag_high_sol"
+    flag_high_waso: "flag_high_waso"
+    flag_duration_extreme: "flag_duration_extreme"
+    flag_issue_count: "flag_issue_count"
+
+  # Auto-detection columns
+  auto_detection:
+    checkforerrors_suffix: "_checkforerrors"
+    needs_review_flag: "needs_review_flag"
+    auto_error_desc: "auto_error_desc"
+    sol_category: "sol_category"
+    se_category: "se_category"
+    tst_tib_ratio_category: "tst_tib_ratio_category"
+    metric_duration_input_category: "metric_duration_input_category"
+
+# =============================================================================
+# TIMESTAMP SETTINGS
+# =============================================================================
+timestamp:
+  # Format of raw timestamp columns
+  # Supported: "hh:mm AM/PM", "HH:MM", "HH:MM:SS", "HH.MM"
+  input_format: "hh:mm AM/PM"
+
+  # AM/PM settings (only relevant for "hh:mm AM/PM" format)
+  ampm:
+    enabled: true
+    pm_keywords: ["PM", "pm", "P.M.", "p.m."]
+    am_keywords: ["AM", "am", "A.M.", "a.m."]
+
+  # Midnight handling
+  # "next_day": timestamps < 6:00 AM are considered next day
+  # "as_is": no adjustment
+  midnight_handling: "next_day"
+  midnight_threshold_hour: 6
+
+  # Sequence validation
+  # Expected order: bed → sleep → awake → getup
+  sequence:
+    expected_order: ["time_bed", "time_sleep", "time_awake", "time_getup"]
+    max_gap_hours: 12  # gaps >= 12h trigger AM/PM flip
+
+  # Interval format detection
+  interval:
+    mmss_threshold_minutes: 60  # values > this and with ":" → assume MM:SS not HH:MM
+    max_plausible_minutes: 10000
+    max_nap_minutes: 720       # 12 hours
+    max_exercise_minutes: 360  # 6 hours
+
+# =============================================================================
+# CLASSIFICATION THRESHOLDS
+# =============================================================================
+classification:
+  # Temporal order thresholds (for error/unusual detection)
+  temporal:
+    min_sleep_duration_minutes: 120        # 2h — below this is flagged
+    max_sleep_duration_minutes: 780        # 13h — above this is flagged
+    min_time_in_bed_minutes: 120
+    max_time_in_bed_minutes: 960
+    max_sol_minutes: 180                   # SOL above this is unusual
+    max_waso_minutes: 240
+
+  # Sleep metric validation (Part C auto-detection)
+  metric_validation:
+    sol:
+      excessive_minutes: 120               # SOL > 2h → flag
+      negative: true                       # SOL < 0 → flag
+    se:
+      min_valid_percent: 0                 # SE < 0 → flag
+      max_valid_percent: 100               # SE > 100 → flag
+      insane_negative_percent: -1000       # SE < -1000 → insane flag
+    tst_tib_ratio:
+      min_ratio: 0.5                       # TST/TIB < 0.5 → flag
+      max_ratio: 1.0                       # TST/TIB > 1.0 → flag
+    waso:
+      excessive_hours: 1.5                 # WASO > 1.5h
+
+  # Flag severity (for figures)
+  flag_severity:
+    poor_efficiency_threshold_pct: 70      # SE < 70% → flag
+    high_sol_threshold_hours: 1            # SOL > 1h → flag
+    high_waso_threshold_hours: 1.5         # WASO > 1.5h → flag
+
+  # Categories
+  categories:
+    clean: "clean"
+    error: "error"
+    unusual: "unusual"
+    equal_time_ok: "equal_time_ok"
+    skipped_na: "skipped_na"
+    reasonable_unusual: "reasonable_unusual"
+
+  # Auto-detection category labels
+  auto_detection_categories:
+    timestamp_issue: "TIMESTAMP_ISSUE"
+    duration_issue: "DURATION_ISSUE"
+    amount_flag: "AMOUNT_FLAG"
+    self_reported_flag: "SELF_REPORTED_FLAG"
+    clean: "CLEAN"
+    clean_manually_fixed: "CLEAN (Manually Fixed)"
+
+# =============================================================================
+# OUTPUT SETTINGS
+# =============================================================================
+output:
+  figure:
+    root_dir: "latest_visualization"
+    width_inches: 14
+    height_inches: 9
+    dpi: 150
+    subfolders:
+      pipeline_cleaning: "pipeline_cleaning"
+      research_ready: "research_ready"
+  report:
+    dir: "output"
+    correction_status: "correction_status.csv"
+    correction_status_final: "correction_status_final.csv"
+    flagged_self_reported: "flagged_records_self_reported.csv"

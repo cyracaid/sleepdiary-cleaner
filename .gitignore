@@ -1,0 +1,29 @@
+# R
+.Rproj.user/
+.Rhistory
+.RData
+.Renv
+renv/
+renv.lock
+
+# Pipeline output
+sleep_visualization_*/
+latest_visualization/
+output/*.csv
+Rplots.pdf
+
+# Manual CSVs (user-specific corrections)
+manual_error_correction_updated.csv
+reasonable_unusual_records.csv
+cross_participant_*.csv
+
+# Archive & old code
+archive/
+visualizations/
+
+# macOS
+.DS_Store
+
+# Package build
+*.tar.gz
+src/

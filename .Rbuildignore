@@ -1,0 +1,8 @@
+^renv$
+^renv\.lock$
+^archive$
+^visualizations$
+^sleep_visualization_.*$
+^worklog$
+^\.opencode$
+^\.agents$
