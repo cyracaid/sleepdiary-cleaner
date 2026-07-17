@@ -136,15 +136,17 @@ multi_process <- function(df, var_list, func, format = NULL) {
   cat("\n=== Step 5: Generating correction files ===\n")
   source(file.path(sdir, "generate_correction_files.R"), local = TRUE)
   suppressMessages(generated_files <- generate_correction_files(ema_data_release_timecalc))
-  manual_corrections <- if (file.exists("manual_error_corrections.csv")) {
-    suppressMessages(read_csv("manual_error_corrections.csv", show_col_types = FALSE))
+  manual_error_path <- cfg_get("data.files.manual_error", "manual_error_corrections.csv")
+  manual_unusual_path <- cfg_get("data.files.manual_unusual", "manual_unusual_corrections.csv")
+  manual_corrections <- if (file.exists(manual_error_path)) {
+    suppressMessages(read_csv(manual_error_path, show_col_types = FALSE))
   } else {
-    cat("  ⚠ manual_error_corrections.csv not found — using empty corrections\n"); tibble()
+    cat(sprintf("  ⚠ %s not found — using empty corrections\n", manual_error_path)); tibble()
   }
-  manual_unusual <- if (file.exists("manual_unusual_corrections.csv")) {
-    read.csv("manual_unusual_corrections.csv", fileEncoding = "UTF-8-BOM")
+  manual_unusual <- if (file.exists(manual_unusual_path)) {
+    read.csv(manual_unusual_path, fileEncoding = "UTF-8-BOM")
   } else {
-    cat("  ⚠ manual_unusual_corrections.csv not found — using empty unusual\n"); data.frame()
+    cat(sprintf("  ⚠ %s not found — using empty unusual\n", manual_unusual_path)); data.frame()
   }
   names(manual_unusual) <- gsub("^X\\.\\.\\.|^X\\.|^\\.", "", names(manual_unusual))
   rm(generated_files, generate_correction_files); gc()
