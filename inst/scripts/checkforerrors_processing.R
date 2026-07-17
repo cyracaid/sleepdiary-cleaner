@@ -656,8 +656,9 @@ if ("human_metric_review_status" %in% names(data)) {
 # Path 2: also read manual_metric_review_acceptances.csv to catch any rows
 # that haven't been matched by apply_metric_review_acceptances() yet
 # (runs regardless of Path 1, to cover all accepted rows)
-if (file.exists("manual_metric_review_acceptances.csv")) {
-  metric_acceptances <- read.csv("manual_metric_review_acceptances.csv", stringsAsFactors = FALSE)
+accept_path <- cfg_get("data.files.manual_metric_accept", "manual_metric_review_acceptances.csv")
+if (file.exists(accept_path)) {
+  metric_acceptances <- read.csv(accept_path, stringsAsFactors = FALSE)
   required_accept_cols <- c("pid", "day_num", "row_id")
   if (all(required_accept_cols %in% names(metric_acceptances))) {
     if (!"human_metric_review_status" %in% names(data)) {
