@@ -1,3 +1,9 @@
+scripts_dir <- function() {
+  pkg_dir <- system.file("scripts", package = "splsleep")
+  if (nchar(pkg_dir) > 0 && dir.exists(pkg_dir)) return(pkg_dir)
+  getwd()
+}
+
 #' Run the full SPL Sleep pipeline
 #'
 #' Executes the complete sleep EMA data cleaning pipeline:
@@ -8,7 +14,7 @@
 #' @param config Character or list. Path to a YAML config file, or a config
 #'   list (from \code{load_config()}). If NULL, uses the bundled default.
 #' @param project_dir Character. Path to the project root containing data
-#'   files and pipeline scripts. Default: current working directory.
+#'   files. Default: current working directory.
 #' @param skip_visualization Logical. If TRUE, skip visualization step.
 #' @param verbose Logical. Print progress messages. Default: TRUE.
 #'
@@ -24,6 +30,10 @@
 run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = FALSE, verbose = TRUE) {
   old_wd <- setwd(project_dir)
   on.exit(setwd(old_wd))
+
+  # Locate pipeline scripts (installed package or repo root)
+  sdir <- scripts_dir()
+  assign("splsleep_scripts_dir", sdir, envir = .GlobalEnv)
 
   # Load config
   if (is.character(config) || is.null(config)) {
@@ -42,7 +52,7 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
                            if (is.null(cfg$pipeline$name)) "splsleep" else cfg$pipeline$name))
 
   # Source setup (loads data into global env)
-  source("00a_setup.R", local = TRUE)
+  source(file.path(sdir, "00a_setup.R"), local = TRUE)
 
   # Adapt columns only when a custom config with non-default mapping is provided
   if (!is.null(cfg$column_mapping) && !is.null(config)) {
@@ -62,7 +72,7 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   }
 
   if (verbose) cat("Setup complete. Starting main pipeline...\n")
-  source("00_MAIN_entry.R", local = TRUE)
+  source(file.path(sdir, "00_MAIN_entry.R"), local = TRUE)
 
   # Call the internal pipeline function
   .run_pipeline_internal()
@@ -81,13 +91,15 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
 run_setup <- function(config = NULL, project_dir = ".") {
   old_wd <- setwd(project_dir)
   on.exit(setwd(old_wd))
+  sdir <- scripts_dir()
+  assign("splsleep_scripts_dir", sdir, envir = .GlobalEnv)
   if (is.character(config) || is.null(config)) {
     cfg <- load_config(config)
   } else {
     cfg <- config
   }
   assign("pipeline_config", cfg, envir = .GlobalEnv)
-  source("00a_setup.R", local = TRUE)
+  source(file.path(sdir, "00a_setup.R"), local = TRUE)
   cat("Setup complete. Data loaded successfully.\n")
   invisible(TRUE)
 }
@@ -103,13 +115,15 @@ run_setup <- function(config = NULL, project_dir = ".") {
 run_visualization <- function(config = NULL, project_dir = ".") {
   old_wd <- setwd(project_dir)
   on.exit(setwd(old_wd))
+  sdir <- scripts_dir()
+  assign("splsleep_scripts_dir", sdir, envir = .GlobalEnv)
   if (is.character(config) || is.null(config)) {
     cfg <- load_config(config)
   } else {
     cfg <- config
   }
   assign("pipeline_config", cfg, envir = .GlobalEnv)
-  source("sleep_visualization.R", local = TRUE)
+  source(file.path(sdir, "sleep_visualization.R"), local = TRUE)
   invisible(TRUE)
 }
 
@@ -121,6 +135,8 @@ run_visualization <- function(config = NULL, project_dir = ".") {
 run_report <- function(config = NULL, project_dir = ".") {
   old_wd <- setwd(project_dir)
   on.exit(setwd(old_wd))
-  source("report_correction_status.R", local = TRUE)
+  sdir <- scripts_dir()
+  assign("splsleep_scripts_dir", sdir, envir = .GlobalEnv)
+  source(file.path(sdir, "report_correction_status.R"), local = TRUE)
   invisible(TRUE)
 }
