@@ -38,6 +38,7 @@ library(lubridate)
 library(scales)
 library(RColorBrewer)
 library(gridExtra)
+library(grid)
 
 # Set global theme
 theme_set(theme_minimal(base_size = 14))
