@@ -1,6 +1,6 @@
 Package: splsleep
 Title: Sleep EMA Diary Data Cleaning Pipeline
-Version: 1.1.0
+Version: 1.1.1
 Authors@R: c(
     person("Cyra", "Sloblucyra", role = c("aut", "cre"),
            email = "cyracaid@users.noreply.github.com")
