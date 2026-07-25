@@ -38,6 +38,14 @@ library(lubridate)
 library(scales)
 library(RColorBrewer)
 library(gridExtra)
+library(grid)
+
+# Clean latest_visualization directory for fresh output
+if (dir.exists("latest_visualization")) {
+  unlink("latest_visualization", recursive = TRUE)
+}
+dir.create("latest_visualization/pipeline_cleaning", recursive = TRUE)
+dir.create("latest_visualization/research_ready", recursive = TRUE)
 
 # Set global theme
 theme_set(theme_minimal(base_size = 14))
@@ -160,28 +168,21 @@ add_quality_flags <- function(data) {
     return(data)
   }
   
+  # If flag_severity already computed (by Step 7), skip recomputation
+  if (!"flag_severity" %in% names(data)) {
+    .cfg <- get0("pipeline_config", envir = .GlobalEnv, ifnotfound = NULL)
+    data$flag_severity <- eval_flag_severity(data, .cfg)
+    data$flag_duration_extreme <- eval_duration_extreme(data, .cfg)
+  }
+  
   data <- data %>%
     mutate(
-      flag_duration_extreme = case_when(
-        sleep_duration_h < 3 ~ "Too short (<3h)",
-        sleep_duration_h > 12 ~ "Too long (>12h)",
-        TRUE ~ "Normal range"
-      ),
-      
       flag_poor_efficiency = ifelse(!is.na(sleep_efficiency_pct),
         sleep_efficiency_pct < cfg_get("classification.flag_severity.poor_efficiency_threshold_pct", 70), FALSE),
       flag_high_sol = ifelse(!is.na(sol_h),
         sol_h > cfg_get("classification.flag_severity.high_sol_threshold_hours", 1), FALSE),
       flag_high_waso = ifelse(!is.na(waso_h),
         waso_h > cfg_get("classification.flag_severity.high_waso_threshold_hours", 1.5), FALSE),
-      
-      flag_issue_count = (flag_poor_efficiency + flag_high_sol + flag_high_waso),
-      flag_severity = case_when(
-        flag_issue_count == 0 ~ "Clean",
-        flag_issue_count == 1 ~ "Minor issues (1 flag)",
-        flag_issue_count >= 2 ~ "Major issues (2+ flags)",
-        TRUE ~ "Unknown"
-      ),
       
       flag_sleep_calculation_issue = ifelse(
         !is.na(self_diffcalc_sol_minutes) & !is.na(duration_totalmin_sol_estimate_am_mincalc),
@@ -1140,21 +1141,15 @@ if(all(c("sleep_duration_h", "sleep_efficiency_pct", "flag_severity") %in% names
 # ============================================================================
 cat("Generating FIGURE 11 (Flag co-occurrence heatmap)...\n")
 
-if(!"flag_poor_efficiency" %in% names(clean_df)) {
-  clean_df <- clean_df %>%
-    mutate(
-      flag_poor_efficiency = ifelse(!is.na(sleep_efficiency_pct), sleep_efficiency_pct < 70, FALSE),
-      flag_high_sol = ifelse(!is.na(sol_h), sol_h > 1, FALSE),
-      flag_high_waso = ifelse(!is.na(waso_h), waso_h > 1.5, FALSE),
-      flag_duration_extreme_num = ifelse(!is.na(sleep_duration_h), sleep_duration_h < 3 | sleep_duration_h > 12, FALSE)
-    )
+if(!"flag_severity" %in% names(clean_df)) {
+  .cfg <- get0("pipeline_config", envir = .GlobalEnv, ifnotfound = NULL)
+  clean_df$flag_severity <- eval_flag_severity(clean_df, .cfg)
+  clean_df$flag_duration_extreme <- eval_duration_extreme(clean_df, .cfg)
 }
 
 flag_columns <- c()
-if("flag_poor_efficiency" %in% names(clean_df)) flag_columns <- c(flag_columns, "Poor Efficiency" = "flag_poor_efficiency")
-if("flag_high_sol" %in% names(clean_df)) flag_columns <- c(flag_columns, "High SOL" = "flag_high_sol")
-if("flag_high_waso" %in% names(clean_df)) flag_columns <- c(flag_columns, "High WASO" = "flag_high_waso")
-if("flag_duration_extreme_num" %in% names(clean_df)) flag_columns <- c(flag_columns, "Extreme Duration" = "flag_duration_extreme_num")
+if("flag_severity" %in% names(clean_df)) flag_columns <- c(flag_columns, "Severity" = "flag_severity")
+if("flag_duration_extreme" %in% names(clean_df)) flag_columns <- c(flag_columns, "Extreme Duration" = "flag_duration_extreme")
 
 if(length(flag_columns) >= 2) {
   
@@ -2564,3 +2559,36 @@ cat(paste(rep("=", 80), collapse = ""))
 cat("\n✅ ANALYSIS COMPLETE!\n")
 cat(paste(rep("=", 80), collapse = ""))
 cat("\n")
+
+# ============================================================================
+# APPENDIX: Step Flag Ledger table (complement to Figure 12)
+# ============================================================================
+generate_appendix_ledger <- function() {
+  long <- get_step_ledger_long()
+  if (nrow(long) == 0) {
+    cat("⚠ Appendix ledger empty — did run_pipeline call init_step_ledger()?\n")
+    return(invisible(FALSE))
+  }
+  # CSV output
+  csv_path <- "output/appendix_step_ledger.csv"
+  write_step_ledger(csv_path)
+  # PNG output (uses filename parameter added in R/figure12_step_flag_table.R)
+  figure12_step_flag_table(
+    cfg = get0("cfg"),
+    output_dir = "latest_visualization",
+    save_png = function(plot, ...) { save_png(plot, "A1_Step_Flag_Ledger", subdir = "pipeline_cleaning", ...) },
+    filename = "A1_Step_Flag_Ledger"
+  )
+  cat(sprintf("✓ Appendix Ledger: %s + latest_visualization/pipeline_cleaning/A1_Step_Flag_Ledger.png\n", csv_path))
+  invisible(TRUE)
+}
+
+# Run appendix and figure index
+generate_appendix_ledger()
+
+if (exists("generate_figure_index")) {
+  generate_figure_index("latest_visualization")
+} else if (file.exists("make_figure_index.R")) {
+  source("make_figure_index.R", local = TRUE)
+  generate_figure_index("latest_visualization")
+}
