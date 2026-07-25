@@ -24,6 +24,12 @@ multi_process <- function(df, var_list, func, format = NULL) {
 # ============================================================================
 .run_pipeline_internal <- function() {
   
+  # Suppress default PDF device (Rplots.pdf) in non-interactive mode
+  pdf(NULL)
+  
+  # Start step ledger (for Figure 12 / per-step flag tracking)
+  init_step_ledger()
+  
   # Load correction status reporter
   sdir <- get0("splsleep_scripts_dir", envir = .GlobalEnv, ifnotfound = getwd())
   source(file.path(sdir, "report_correction_status.R"), local = TRUE)
@@ -37,22 +43,31 @@ multi_process <- function(df, var_list, func, format = NULL) {
   #         The RDS holds the main body of processed EMA variables.
   cat("\n=== Step 1: Loading data ===\n")
   rds_file <- cfg_get("data.files.main_rds", "deidentified_intervalvars_forCD_111325.rds")
-  csv_file <- cfg_get("data.files.main_csv", "sber_ema_anon_20260227.csv")
+  csv_file <- cfg_get("data.files.main_csv", NULL)
   cat(sprintf("  Reading RDS: %s\n", basename(rds_file)))
   df <- readRDS(rds_file)
-  cat(sprintf("  Reading CSV: %s\n", basename(csv_file)))
-  full_df <- read.csv(csv_file)
-  df <- df %>%
-    mutate(
-      StartDate = full_df$StartDate,
-      num_waso_am = full_df$num_waso,
-      num_waso_estimate_am = full_df$num_waso_estimate_am,
-    )
-  rm(full_df); gc()
+  
+  # Optional CSV merge: if main_csv is set, different from RDS, and exists → merge 3 columns
+  if (!is.null(csv_file) && file.exists(csv_file) && csv_file != rds_file) {
+    cat(sprintf("  Reading CSV: %s\n", basename(csv_file)))
+    full_df <- read.csv(csv_file)
+    df <- df %>%
+      mutate(
+        StartDate = full_df$StartDate,
+        num_waso_am = full_df$num_waso,
+        num_waso_estimate_am = full_df$num_waso_estimate_am,
+      )
+    rm(full_df); gc()
+  } else if (!is.null(csv_file) && csv_file == rds_file) {
+    cat("  main_csv == main_rds — RDS assumed to contain all columns\n")
+  } else {
+    cat("  main_csv not configured — RDS expected to have all columns\n")
+  }
   
   # Validate schema right after data loading
   .cfg <- get0("pipeline_config", envir = .GlobalEnv, ifnotfound = NULL)
   if (!is.null(.cfg)) validate_schema(df, .cfg, label = "Step 1 output")
+  log_step(df, "1", "Load data", .cfg)
   
   # ── Step 1.5: Cross-participant field-misentry check ──
   # INPUT:  deidentified_intervalvars_forCD_111325.rds (raw data)
@@ -63,6 +78,7 @@ multi_process <- function(df, var_list, func, format = NULL) {
   #         MM:SS parser silently "fixes" (630→10.5) without addressing
   #         the underlying cross-field contamination.
   source(file.path(sdir, "cross_participant_field_misentry_check.R"), local = TRUE)
+  log_step(df, "1.5", "Field-misentry check", .cfg)
   
   # ── Step 2: Process timestamps ──
   # INPUT:  df (raw timestamp strings like "7:30 PM")
@@ -79,6 +95,7 @@ multi_process <- function(df, var_list, func, format = NULL) {
   ema_data_release_timeproc <- df
   ema_data_release_timeproc <- multi_process(ema_data_release_timeproc, tstamp.vars.to.proc, process_timestamp, "timestamp")
   rm(df, tstamp.vars.to.proc); gc()
+  log_step(ema_data_release_timeproc, "2", "Process timestamps", .cfg)
   
   # NOTE: pid=4024 hardcoded fix was migrated to manual_nap_exercise_corrections.csv
   #       (handled by apply_nap_exercise_corrections() in Step 6.5).
@@ -102,6 +119,7 @@ multi_process <- function(df, var_list, func, format = NULL) {
     ema_data_release_timeproc <- multi_process(ema_data_release_timeproc, interval.vars.to.proc, process_interval, "interval_hhmm")
   }
   rm(interval.vars.to.proc); gc()
+  log_step(ema_data_release_timeproc, "3", "Process intervals", .cfg)
   
   # ── Step 4: Normalize sleep time sequence ──
   # INPUT:  ema_data_release_timeproc (parsed timestamps, may have AM/PM order errors)
@@ -117,6 +135,7 @@ multi_process <- function(df, var_list, func, format = NULL) {
   flip_gap <- tryCatch(cfg_get("timestamp.sequence.max_gap_hours", 12), error = function(e) 12)
   ema_data_release_timecalc <- normalize_sleep_time_sequence(AM_rawdata = ema_data_release_timeproc, flip_gap_hours = flip_gap)
   rm(ema_data_release_timeproc); gc()
+  log_step(ema_data_release_timecalc, "4", "Normalize sequence", .cfg)
   
   # ── Checkpoint A: raw state before corrections ──
   checkpoint_A <- report_status(ema_data_release_timecalc, "After Step 4 (auto-normalize)", "A")
@@ -150,6 +169,7 @@ multi_process <- function(df, var_list, func, format = NULL) {
   }
   names(manual_unusual) <- gsub("^X\\.\\.\\.|^X\\.|^\\.", "", names(manual_unusual))
   rm(generated_files, generate_correction_files); gc()
+  log_step(ema_data_release_timecalc, "5", "Classify records", .cfg)
 
   # ── Step 5.75: Apply second-review consensus decisions ──
   # INPUT:  second_review_checklist.csv (13 rows, all consensus_reached)
@@ -166,6 +186,7 @@ multi_process <- function(df, var_list, func, format = NULL) {
   #         manual_error_corrections.csv take effect in the same pipeline run.
   cat("\n=== Step 5.75: Applying second-review consensus ===\n")
   source(file.path(sdir, "apply_second_review.R"), local = TRUE)
+  log_step(ema_data_release_timecalc, "5.75", "Second-review consensus", .cfg)
 
   # ── Step 6: Apply manual corrections & recalculate ──
   # INPUT:  corrected_ema_data (post-step-4) + manual_error_corrections.csv +
@@ -188,6 +209,7 @@ multi_process <- function(df, var_list, func, format = NULL) {
   )
   assign("corrected_ema_data", results$corrected_ema_data, envir = .GlobalEnv)
   rm(manual_corrections, manual_unusual, results); gc()
+  log_step(corrected_ema_data, "6", "Manual corrections", .cfg)
   
   # ── Checkpoint B: after timestamp corrections ──
   checkpoint_B <- report_status(corrected_ema_data, "After Step 6 (timestamp corrections)", "B", previous = checkpoint_A)
@@ -212,6 +234,7 @@ multi_process <- function(df, var_list, func, format = NULL) {
   source(file.path(sdir, "apply_metric_review_acceptances.R"), local = TRUE)
   corrected_ema_data <- apply_metric_review_acceptances(corrected_ema_data)
   assign("corrected_ema_data", corrected_ema_data, envir = .GlobalEnv)
+  log_step(corrected_ema_data, "6.5", "Duration corrections", .cfg)
   
   # ── Checkpoint C: after duration corrections ──
   checkpoint_C <- report_status(corrected_ema_data, "After Step 6.5 (duration corrections)", "C", previous = checkpoint_B)
@@ -234,6 +257,7 @@ multi_process <- function(df, var_list, func, format = NULL) {
   corrected_ema_data <- calculate_sleep_time_vars_end(corrected_ema_data)
   assign("corrected_ema_data", corrected_ema_data, envir = .GlobalEnv)
   rm(calculate_sleep_time_vars_end, verify_sleep_calculations); gc()
+  log_step(corrected_ema_data, "7", "Compute metrics", .cfg)
   
   # ── Checkpoint D: after metrics computed ──
   checkpoint_D <- report_status(corrected_ema_data, "After Step 7 (metrics computed)", "D", previous = checkpoint_C)
@@ -281,6 +305,7 @@ multi_process <- function(df, var_list, func, format = NULL) {
     cat(sprintf("  Exported %d SELF-REPORTED FLAG records → output/flagged_records_self_reported.csv\n", nrow(needs_csv)))
   }
   rm(rs, flag_extra, needs_idx, df, cols, needs_csv)
+  log_step(corrected_ema_data, "8", "Auto-detect", .cfg)
 
   # ── Step 8.5: Cross-participant global consistency check ──
   # INPUT:  review_output$data_with_flags (flagged data from Step 8)
@@ -296,6 +321,7 @@ multi_process <- function(df, var_list, func, format = NULL) {
   cat("\n=== Step 8.5: Cross-participant global consistency check ===\n")
   source(file.path(sdir, "cross_participant_global_check.R"), local = TRUE)
   assign("review_output", review_output, envir = .GlobalEnv)
+  log_step(corrected_ema_data, "8.5", "Cross-participant check", .cfg)
   
   # ── Step 9: Generate all figures ──
   # INPUT:  corrected_ema_data + checkforerrors_processed + checkforerrors_summary
@@ -307,6 +333,14 @@ multi_process <- function(df, var_list, func, format = NULL) {
   #         Figures 22-24: Substance use distributions
   cat("\n=== Step 9: Generating visualizations ===\n")
   source(file.path(sdir, "sleep_visualization.R"), local = TRUE)
+  
+  # ── Persist step ledger ──
+  write_step_ledger("output/step_flag_ledger.csv")
+  
+  # ── Data integrity audit ──
+  if (file.exists(file.path(sdir, "audit_data_integrity.R"))) {
+    source(file.path(sdir, "audit_data_integrity.R"), local = TRUE)
+  }
   
   # ── Final summary ──
   final_summary(list(A = checkpoint_A, B = checkpoint_B, C = checkpoint_C, D = checkpoint_D, E = checkpoint_E))

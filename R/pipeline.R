@@ -48,6 +48,10 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   assign("pipeline_config", cfg, envir = .GlobalEnv)
   assign("splsleep_loaded", TRUE, envir = .GlobalEnv)
 
+  # Propagate verbose flag for log_step()
+  options(splsleep.verbose = verbose)
+  on.exit(options(splsleep.verbose = NULL), add = TRUE)
+
   if (verbose) cat(sprintf("\n=== SPL Sleep Pipeline (%s) ===\n",
                            if (is.null(cfg$pipeline$name)) "splsleep" else cfg$pipeline$name))
 
@@ -138,5 +142,19 @@ run_report <- function(config = NULL, project_dir = ".") {
   sdir <- scripts_dir()
   assign("splsleep_scripts_dir", sdir, envir = .GlobalEnv)
   source(file.path(sdir, "report_correction_status.R"), local = TRUE)
+  invisible(TRUE)
+}
+
+#' Generate the figure index contact sheet
+#'
+#' Builds \code{figure_index.png} in the specified viz directory — a single
+#' contact-sheet image showing all pipeline figures in a 3-tier layout.
+#'
+#' @param viz_dir Character. Path to the directory containing figure PNGs.
+#'   Default: \code{"latest_visualization"}.
+#' @export
+run_figure_index <- function(viz_dir = "latest_visualization") {
+  source(file.path(scripts_dir(), "make_figure_index.R"), local = TRUE)
+  generate_figure_index(viz_dir)
   invisible(TRUE)
 }

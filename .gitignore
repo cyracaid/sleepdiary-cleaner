@@ -25,6 +25,14 @@ Rplots.pdf
 archive/
 visualizations/
 
+# Binary / data files (never commit)
+*.docx
+*.xlsx
+*.numbers
+*.pdf
+*.zip
+SPL/
+
 # R
 .Rproj.user/
 .Rhistory

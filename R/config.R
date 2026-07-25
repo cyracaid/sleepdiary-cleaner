@@ -186,3 +186,21 @@ validate_column_types <- function(data, type_spec, label = "data") {
   }
   invisible(TRUE)
 }
+
+#' Validate config file paths for R code expressions
+#'
+#' Checks that data file paths in the config are absolute paths, not
+#' R expressions like paste0(...) or file.path(...). Call during
+#' pipeline setup to catch config errors early.
+#' @param cfg Config list (from load_config)
+#' @export
+validate_no_r_code_in_paths <- function(cfg) {
+  rds <- config_get(cfg, "data.files.main_rds", "")
+  csv <- config_get(cfg, "data.files.main_csv", "")
+  for (path in c(rds, csv)) {
+    if (is.character(path) && grepl("paste0|file\\.path|~\\$|getwd", path)) {
+      stop("Config paths must be absolute paths, not R expressions. Found: ", path)
+    }
+  }
+  invisible(TRUE)
+}
