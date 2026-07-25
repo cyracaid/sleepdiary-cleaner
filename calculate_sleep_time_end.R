@@ -217,6 +217,23 @@ calculate_sleep_time_vars_end <- function(data) {
   attr(cleaned_data, "calculation_timestamp") <- Sys.time()
   attr(cleaned_data, "source_dataframe") <- data_name
   
+  # ---- Block 1: 4 standard contract columns (for eval_flag_severity / eval_duration_extreme) ----
+  cleaned_data$sleep_efficiency_pct <- cleaned_data$self_diffcalc_sleepefficiency_percent * 100
+  cleaned_data$sol_h  <- cleaned_data$self_diffcalc_sol_minutes / 60
+  cleaned_data$waso_h <- cleaned_data$duration_totalmin_waso_estimate_am_mincalc / 60
+  cleaned_data$sleep_duration_h <- cleaned_data$self_diffcalc_totalsleeptime_minutes / 60
+  
+  # ---- Block 2: Flag evaluators (single source of truth) ----
+  cfg <- get0("pipeline_config", envir = .GlobalEnv, ifnotfound = NULL)
+  if (!is.null(cfg)) {
+    cleaned_data$flag_severity   <- eval_flag_severity(cleaned_data, cfg)
+    cleaned_data$flag_duration_extreme <- eval_duration_extreme(cleaned_data, cfg)
+  }
+  
+  # ---- Block 3: Persist clean data ----
+  dir.create("output", showWarnings = FALSE)
+  saveRDS(cleaned_data, "output/corrected_ema_data.rds")
+  
   return(cleaned_data)
 }
 

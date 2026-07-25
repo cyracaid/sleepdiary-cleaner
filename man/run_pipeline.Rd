@@ -16,7 +16,7 @@ run_pipeline(
 list (from \code{load_config()}). If NULL, uses the bundled default.}
 
 \item{project_dir}{Character. Path to the project root containing data
-files and pipeline scripts. Default: current working directory.}
+files. Default: current working directory.}
 
 \item{skip_visualization}{Logical. If TRUE, skip visualization step.}
 
