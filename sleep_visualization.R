@@ -2576,7 +2576,7 @@ generate_appendix_ledger <- function() {
   figure12_step_flag_table(
     cfg = get0("cfg"),
     output_dir = "latest_visualization",
-    save_png = function(plot, ...) { save_png(plot, "A1_Step_Flag_Ledger", subdir = "pipeline_cleaning", ...) },
+    save_png = function(plot, filename, w, h, subdir, ...) { save_png(plot, "A1_Step_Flag_Ledger", w = w, h = h, subdir = subdir) },
     filename = "A1_Step_Flag_Ledger"
   )
   cat(sprintf("✓ Appendix Ledger: %s + latest_visualization/pipeline_cleaning/A1_Step_Flag_Ledger.png\n", csv_path))
