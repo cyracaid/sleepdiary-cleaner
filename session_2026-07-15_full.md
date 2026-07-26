@@ -2,9 +2,9 @@
 
 **Project:** splsleep (sleepdiary-cleaner)
 **Working directories:**
-- `/Users/sloblucyra/Documents/splsleep` (primary)
-- `/Users/sloblucyra/Desktop/splsleep_pipeline_full` (secondary, deleted after sync)
-- `/Users/sloblucyra/Documents/opencode/proj_splclean` (work log workspace)
+- `<project-root>` (primary)
+- `/splsleep_pipeline_full` (secondary, deleted after sync)
+- `<project-root>` (work log workspace)
 
 ---
 
