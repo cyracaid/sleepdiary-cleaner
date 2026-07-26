@@ -318,5 +318,5 @@ But 01:00-05:59 bed/sleep times ARE correctly AM, and 04:00-11:59 awake/getup ti
 ## References
 - Previous work log: `2026-05-18_work_log.md`
 - Pipeline architecture: `../ARCHITECTURE.md`
-- Data directory: `/Users/sloblucyra/Documents/splsleep/`
-- Round 2 screening CSV: `/Users/sloblucyra/Documents/splsleep/round2_checkforerrors_review.csv`
+- Data directory: `<project-root>/`
+- Round 2 screening CSV: `<project-root>/round2_checkforerrors_review.csv`
