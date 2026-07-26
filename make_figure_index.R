@@ -7,10 +7,15 @@
 # Usage (sourced):     generate_figure_index("latest_visualization")
 #
 # Requires: magick  (install.packages("magick"))
-
-suppressMessages(library(magick))
+# Gracefully skips if magick is not available.
 
 generate_figure_index <- function(viz_dir = "latest_visualization") {
+  if (!requireNamespace("magick", quietly = TRUE)) {
+    message("magick package not installed, skipping figure_index generation.")
+    message("To install: install.packages('magick')")
+    return(invisible(FALSE))
+  }
+  library(magick)
   out_path <- file.path(viz_dir, "figure_index.png")
 
   reg <- rbind(

@@ -1,18 +1,19 @@
 # audit_data_integrity.R
 # Run at pipeline end to verify data hasn't been accidentally modified.
 # Called from 00_MAIN_entry.R after all processing steps.
+# Accepts before_data, after_data (required) and timecalc_data (optional).
 
-run_data_integrity_audit <- function(input_data, output_data) {
+run_data_integrity_audit <- function(before_data, after_data, timecalc_data = NULL) {
   report <- list()
 
   # 1) Row count check
-  report$nrow_input  <- nrow(input_data)
-  report$nrow_output <- nrow(output_data)
+  report$nrow_input  <- nrow(before_data)
+  report$nrow_output <- nrow(after_data)
   report$row_count_ok <- report$nrow_input == report$nrow_output
 
   # 2) Column name check: all input columns should still exist in output
-  input_cols  <- sort(names(input_data))
-  output_cols <- sort(names(output_data))
+  input_cols  <- sort(names(before_data))
+  output_cols <- sort(names(after_data))
   report$ncol_input  <- length(input_cols)
   report$ncol_output <- length(output_cols)
   report$missing_cols <- setdiff(input_cols, output_cols)
@@ -29,14 +30,14 @@ run_data_integrity_audit <- function(input_data, output_data) {
       "exercisetoday_PM_totalmin_Vigorous",
       "exercisetoday_PM_totalmin_Strength",
       "duration_totalmin_napstoday_PM"),
-    names(input_data)
+    names(before_data)
   )
-  untouched_vars <- intersect(untouched_vars, names(output_data))
+  untouched_vars <- intersect(untouched_vars, names(after_data))
 
   mismatches <- list()
   for (v in untouched_vars) {
-    i <- input_data[[v]]
-    o <- output_data[[v]]
+    i <- before_data[[v]]
+    o <- after_data[[v]]
     if (is.numeric(i) && is.numeric(o)) {
       diff <- sum(abs(i - o) > 1e-6, na.rm = TRUE)
     } else {
@@ -49,14 +50,24 @@ run_data_integrity_audit <- function(input_data, output_data) {
   report$untouched_vars_ok <- length(mismatches) == 0
 
   # 4) Duplicate row check
-  report$n_duplicates <- sum(duplicated(output_data))
+  report$n_duplicates <- sum(duplicated(after_data))
   report$duplicates_ok <- report$n_duplicates == 0
+
+  # Extra: timecalc_data check (if provided)
+  if (!is.null(timecalc_data)) {
+    report$timecalc_rows <- nrow(timecalc_data)
+    report$timecalc_ok   <- nrow(timecalc_data) == nrow(after_data)
+  } else {
+    report$timecalc_rows <- NA_integer_
+    report$timecalc_ok   <- TRUE
+  }
 
   # Format report
   report_df <- data.frame(
-    check = c("row_count", "col_names", "untouched_vars", "duplicates"),
+    check = c("row_count", "col_names", "untouched_vars", "duplicates", "timecalc"),
     status = c(report$row_count_ok, report$col_names_ok,
-               report$untouched_vars_ok, report$duplicates_ok),
+               report$untouched_vars_ok, report$duplicates_ok,
+               report$timecalc_ok),
     detail = c(
       sprintf("input=%d output=%d", report$nrow_input, report$nrow_output),
       sprintf("missing=%s new=%s",
@@ -65,7 +76,8 @@ run_data_integrity_audit <- function(input_data, output_data) {
       sprintf("mismatches=%d in %s",
               length(report$untouched_var_mismatches),
               paste(names(report$untouched_var_mismatches), collapse = ",")),
-      sprintf("n=%d", report$n_duplicates)
+      sprintf("n=%d", report$n_duplicates),
+      sprintf("timecalc_rows=%d", report$timecalc_rows)
     ),
     stringsAsFactors = FALSE
   )
@@ -87,9 +99,13 @@ run_data_integrity_audit <- function(input_data, output_data) {
   invisible(report)
 }
 
-# Auto-run with corrected_ema_data if sourced in pipeline context
+# Auto-run with data from pipeline environment (sourced with local=TRUE)
 if (exists("corrected_ema_data") && exists("ema_data_release_timecalc")) {
-  run_data_integrity_audit(ema_data_release_timecalc, corrected_ema_data)
-} else if (exists("corrected_ema_data")) {
-  cat("  Audit: input reference not available (ema_data_release_timecalc missing), skipping.\n")
+  run_data_integrity_audit(
+    before_data = ema_data_release_timecalc,
+    after_data = corrected_ema_data,
+    timecalc_data = ema_data_release_timecalc
+  )
+} else {
+  cat("  Audit: required objects not in scope, skipping. (Run via source(..., local=TRUE) inside pipeline)\n")
 }
