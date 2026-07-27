@@ -6,6 +6,9 @@
 \usage{
 write_step_ledger(path = "output/step_flag_ledger.csv")
 }
+\arguments{
+\item{path}{Character. Output CSV file path.}
+}
 \description{
 Persist the ledger to CSV (long form)
 }

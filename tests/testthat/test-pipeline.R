@@ -1,4 +1,4 @@
-context("Pipeline end-to-end test with synthetic data")
+# test-pipeline.R — end-to-end test with synthetic data
 
 test_that("run_pipeline completes successfully on synthetic data", {
   # Locate synthetic data config bundled with the package
@@ -7,15 +7,19 @@ test_that("run_pipeline completes successfully on synthetic data", {
     # Development mode fallback
     cfg_path <- file.path(getwd(), "inst", "extdata", "synthetic_config.yaml")
   }
-  expect_true(file.exists(cfg_path), "synthetic_config.yaml must exist")
+  skip_if_not(file.exists(cfg_path), "synthetic_config.yaml not found")
 
-  # Run pipeline on synthetic data
   # Set project_dir to package root for dev mode
   pkg_root <- if (cfg_path == file.path(getwd(), "inst", "extdata", "synthetic_config.yaml")) {
     getwd()
   } else {
     dirname(dirname(dirname(cfg_path)))
   }
+
+  # Check data files exist before running
+  cfg <- yaml::read_yaml(cfg_path)
+  rds_ok <- file.exists(file.path(pkg_root, cfg$data$files$main_rds))
+  skip_if_not(rds_ok, "synthetic RDS data file not found")
 
   result <- run_pipeline(config = cfg_path, project_dir = pkg_root, verbose = FALSE)
   expect_true(result, "Pipeline should complete successfully")

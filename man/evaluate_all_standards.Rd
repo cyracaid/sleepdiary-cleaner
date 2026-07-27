@@ -6,6 +6,11 @@
 \usage{
 evaluate_all_standards(df, cfg = NULL)
 }
+\arguments{
+\item{df}{A data frame to evaluate all standards against.}
+
+\item{cfg}{Pipeline configuration list.}
+}
 \description{
 Evaluate ALL standards, returning per-record label data frame.
 }

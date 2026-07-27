@@ -6,6 +6,11 @@
 \usage{
 eval_data_category(df, cfg = NULL)
 }
+\arguments{
+\item{df}{A data frame with corrected timestamp columns.}
+
+\item{cfg}{Pipeline configuration list.}
+}
 \description{
 Authoritative from Step 5. Categories: clean | error | unusual | equal_time_ok |
 reasonable_unusual | skipped_na.
