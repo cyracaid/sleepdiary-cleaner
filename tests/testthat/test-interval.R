@@ -1,9 +1,10 @@
 # test-interval.R — process_interval colon edge cases
 # process_interval lives in inst/scripts/, sourced at runtime by pipeline
+# (its library() calls may fail on CI where Suggest packages aren't installed)
 sdir <- system.file("scripts", package = "splsleep")
 if (sdir == "") sdir <- file.path(getwd(), "inst", "scripts")
 src <- file.path(sdir, "process_interval.R")
-if (file.exists(src)) source(src, local = TRUE)
+if (file.exists(src)) tryCatch(source(src, local = TRUE), error = function(e) NULL)
 
 test_that("00:000 normalizes to 00:00 with mincalc=0", {
   skip_if_not(exists("process_interval"), "process_interval function not available")
