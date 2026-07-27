@@ -6,6 +6,11 @@
 \usage{
 eval_flag_severity(df, cfg = NULL)
 }
+\arguments{
+\item{df}{A data frame with sleep_efficiency_pct, sol_h, waso_h columns.}
+
+\item{cfg}{Pipeline configuration list.}
+}
 \description{
 Prereq: Step 7 metrics. Clean (0) | Minor issues (1 flag) | Major issues (2+ flags).
 }

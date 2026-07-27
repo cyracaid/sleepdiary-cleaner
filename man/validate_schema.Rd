@@ -6,6 +6,13 @@
 \usage{
 validate_schema(data, config, label = "raw EMA input (post-adaptation)")
 }
+\arguments{
+\item{data}{A data frame to validate.}
+
+\item{config}{Pipeline configuration list.}
+
+\item{label}{Character label for error messages.}
+}
 \description{
 Single source of truth for raw input columns. Call right after
 adapt_columns() so missing/misnamed columns fail loudly.

@@ -14,6 +14,8 @@ log_step(df, step_id, label, cfg = NULL, verbose = TRUE)
 \item{label}{Human-readable step name.}
 
 \item{cfg}{Config list (for thresholds).}
+
+\item{verbose}{Logical. Print progress messages. Default: TRUE.}
 }
 \value{
 invisibly the row that was appended.

@@ -2,7 +2,7 @@
 % Please edit documentation in R/figure12_step_flag_table.R
 \name{figure12_step_flag_table}
 \alias{figure12_step_flag_table}
-\title{Figure 12 (new) — Step x Flag ledger table}
+\title{Figure 12 (new) --- Step x Flag ledger table}
 \usage{
 figure12_step_flag_table(
   cfg = NULL,
@@ -11,10 +11,19 @@ figure12_step_flag_table(
   filename = "12_Pipeline_Correction_Progress"
 )
 }
+\arguments{
+\item{cfg}{Pipeline configuration list.}
+
+\item{output_dir}{Directory for saving output PNG.}
+
+\item{save_png}{Optional save function for PNG output.}
+
+\item{filename}{Output PNG filename without extension.}
+}
 \description{
 Replaces the coarse A-E bar chart. Renders one row per pipeline step and,
 against the shared final standards, shows how each flag family is generated
-and reduced across steps. "not computable at this step" shows as "—".
+and reduced across steps. "not computable at this step" shows as "---".
 }
 \details{
 Drop-in: replace the current Figure 12 block in sleep_visualization.R with a

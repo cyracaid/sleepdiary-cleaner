@@ -6,6 +6,11 @@
 \usage{
 eval_checkforerrors(df, cfg = NULL)
 }
+\arguments{
+\item{df}{A data frame with checkforerrors columns.}
+
+\item{cfg}{Pipeline configuration list.}
+}
 \description{
 Prereq: Step 8. TIMESTAMP_ISSUE | DURATION_ISSUE | AMOUNT_FLAG |
 SELF_REPORTED_FLAG | CLEAN | NEEDS_REVIEW.

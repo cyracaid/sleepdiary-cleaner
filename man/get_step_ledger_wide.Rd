@@ -6,6 +6,9 @@
 \usage{
 get_step_ledger_wide(standard = "data_category")
 }
+\arguments{
+\item{standard}{Character. The standard to pivot wide. Default: "data_category".}
+}
 \description{
 Wide ledger for one standard
 }

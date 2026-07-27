@@ -6,6 +6,9 @@
 #' Design: each schema entry is a LOGICAL field resolved through the config
 #' column_mapping. The validator accepts EITHER the mapped internal key OR the
 #' raw default name, tolerating the current config-key vs hardcoded-name mismatch.
+#' @param data A data frame to validate.
+#' @param config Pipeline configuration list.
+#' @param label Character label for error messages.
 #' @export
 validate_schema <- function(data, config, label = "raw EMA input (post-adaptation)") {
   SCHEMA <- list(

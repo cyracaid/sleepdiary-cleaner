@@ -6,6 +6,11 @@
 \usage{
 eval_duration_extreme(df, cfg = NULL)
 }
+\arguments{
+\item{df}{A data frame with sleep_duration_h column.}
+
+\item{cfg}{Pipeline configuration list.}
+}
 \description{
 Evaluate duration_extreme (separate from severity count)
 }

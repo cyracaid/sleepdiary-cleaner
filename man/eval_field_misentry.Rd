@@ -6,6 +6,11 @@
 \usage{
 eval_field_misentry(df, cfg = NULL)
 }
+\arguments{
+\item{df}{A data frame with SOL/WASO and timestamp columns.}
+
+\item{cfg}{Pipeline configuration list.}
+}
 \description{
 Evaluate field_misentry (cross-participant field misentry, Step 1.5)
 }
