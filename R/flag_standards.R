@@ -8,6 +8,9 @@
 #'   2. else if the prerequisite columns exist -> compute a provisional label;
 #'   3. else -> return NA ("not computable at this step").
 
+#' @param a,b Values to check. Returns \code{b} if \code{a} is NULL.
+#' @keywords internal
+#' @noRd
 `%||%` <- function(a, b) if (is.null(a)) b else a
 
 .cfg_num <- function(cfg, path, default) {
@@ -24,6 +27,8 @@
 #'
 #' Authoritative from Step 5. Categories: clean | error | unusual | equal_time_ok |
 #' reasonable_unusual | skipped_na.
+#' @param df A data frame with corrected timestamp columns.
+#' @param cfg Pipeline configuration list.
 #' @export
 eval_data_category <- function(df, cfg = NULL) {
   n <- nrow(df)
@@ -69,6 +74,8 @@ eval_data_category <- function(df, cfg = NULL) {
 #' Evaluate flag_severity (computed metric flags)
 #'
 #' Prereq: Step 7 metrics. Clean (0) | Minor issues (1 flag) | Major issues (2+ flags).
+#' @param df A data frame with sleep_efficiency_pct, sol_h, waso_h columns.
+#' @param cfg Pipeline configuration list.
 #' @export
 eval_flag_severity <- function(df, cfg = NULL) {
   n <- nrow(df)
@@ -89,6 +96,8 @@ eval_flag_severity <- function(df, cfg = NULL) {
 }
 
 #' Evaluate duration_extreme (separate from severity count)
+#' @param df A data frame with sleep_duration_h column.
+#' @param cfg Pipeline configuration list.
 #' @export
 eval_duration_extreme <- function(df, cfg = NULL) {
   n <- nrow(df)
@@ -102,6 +111,8 @@ eval_duration_extreme <- function(df, cfg = NULL) {
 #'
 #' Prereq: Step 8. TIMESTAMP_ISSUE | DURATION_ISSUE | AMOUNT_FLAG |
 #' SELF_REPORTED_FLAG | CLEAN | NEEDS_REVIEW.
+#' @param df A data frame with checkforerrors columns.
+#' @param cfg Pipeline configuration list.
 #' @export
 eval_checkforerrors <- function(df, cfg = NULL) {
   n <- nrow(df)
@@ -116,6 +127,8 @@ eval_checkforerrors <- function(df, cfg = NULL) {
 }
 
 #' Evaluate field_misentry (cross-participant field misentry, Step 1.5)
+#' @param df A data frame with SOL/WASO and timestamp columns.
+#' @param cfg Pipeline configuration list.
 #' @export
 eval_field_misentry <- function(df, cfg = NULL) {
   n <- nrow(df)
@@ -136,6 +149,8 @@ eval_field_misentry <- function(df, cfg = NULL) {
 }
 
 #' Evaluate ALL standards, returning per-record label data frame.
+#' @param df A data frame to evaluate all standards against.
+#' @param cfg Pipeline configuration list.
 #' @export
 evaluate_all_standards <- function(df, cfg = NULL) {
   data.frame(
@@ -162,8 +177,12 @@ STANDARD_LEVELS <- list(
 
 #' Tally one standard's labels into a fixed-level count vector.
 #' Returns all-NA (named by levels) if the label vector is entirely NA.
+#' @param labels Character vector of labels to tally.
+#' @param levels Character vector of all possible category levels.
+#' @return Named integer vector with counts per level.
+#' @importFrom stats setNames
 tally_standard <- function(labels, levels) {
-  if (all(is.na(labels))) return(setNames(rep(NA_integer_, length(levels)), levels))
+  if (all(is.na(labels))) return(stats::setNames(rep(NA_integer_, length(levels)), levels))
   tab <- table(factor(labels, levels = levels))
-  setNames(as.integer(tab), levels)
+  stats::setNames(as.integer(tab), levels)
 }

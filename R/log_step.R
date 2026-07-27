@@ -24,6 +24,7 @@ init_step_ledger <- function() {
 #' @param step_id  Short ordered id, e.g. "1", "1.5", "2", ... "8.5".
 #' @param label    Human-readable step name.
 #' @param cfg      Config list (for thresholds).
+#' @param verbose  Logical. Print progress messages. Default: TRUE.
 #' @return invisibly the row that was appended.
 #' @export
 log_step <- function(df, step_id, label, cfg = NULL, verbose = TRUE) {
@@ -80,6 +81,7 @@ get_step_ledger_long <- function() {
 }
 
 #' Wide ledger for one standard
+#' @param standard Character. The standard to pivot wide. Default: "data_category".
 #' @export
 get_step_ledger_wide <- function(standard = "data_category") {
   long <- get_step_ledger_long()
@@ -100,6 +102,7 @@ get_step_ledger_wide <- function(standard = "data_category") {
 }
 
 #' Persist the ledger to CSV (long form)
+#' @param path Character. Output CSV file path.
 #' @export
 write_step_ledger <- function(path = "output/step_flag_ledger.csv") {
   long <- get_step_ledger_long()

@@ -7,6 +7,14 @@ Returns all-NA (named by levels) if the label vector is entirely NA.}
 \usage{
 tally_standard(labels, levels)
 }
+\arguments{
+\item{labels}{Character vector of labels to tally.}
+
+\item{levels}{Character vector of all possible category levels.}
+}
+\value{
+Named integer vector with counts per level.
+}
 \description{
 Tally one standard's labels into a fixed-level count vector.
 Returns all-NA (named by levels) if the label vector is entirely NA.

@@ -1,17 +1,21 @@
-#' Figure 12 (new) — Step x Flag ledger table
+#' Figure 12 (new) --- Step x Flag ledger table
 #'
 #' Replaces the coarse A-E bar chart. Renders one row per pipeline step and,
 #' against the shared final standards, shows how each flag family is generated
-#' and reduced across steps. "not computable at this step" shows as "—".
+#' and reduced across steps. "not computable at this step" shows as "---".
 #'
 #' Drop-in: replace the current Figure 12 block in sleep_visualization.R with a
 #' call to `figure12_step_flag_table(cfg = cfg, output_dir = output_dir, save_png = save_png)`.
+#' @param cfg Pipeline configuration list.
+#' @param output_dir Directory for saving output PNG.
+#' @param save_png Optional save function for PNG output.
+#' @param filename Output PNG filename without extension.
 #' @export
 figure12_step_flag_table <- function(cfg = NULL, output_dir = ".", save_png = NULL,
                                       filename = "12_Pipeline_Correction_Progress") {
   long <- get_step_ledger_long()
   if (nrow(long) == 0) {
-    cat("⚠ Step ledger empty — did run_pipeline call init_step_ledger()/log_step()? Skipping Figure 12.\n")
+    cat("WARNING: Step ledger empty -- did run_pipeline call init_step_ledger()/log_step()? Skipping Figure 12.\n")
     return(invisible(FALSE))
   }
 
@@ -81,6 +85,6 @@ figure12_step_flag_table <- function(cfg = NULL, output_dir = ".", save_png = NU
     ggplot2::ggsave(file.path(output_dir, paste0(filename, ".png")),
                     plot_obj, width = 12, height = max(4, 0.42 * nrow(disp) + 3), dpi = 150)
   }
-  cat("✓ Figure 12 (Per-Step Flag Ledger table) completed\n")
+  cat("Figure 12 (Per-Step Flag Ledger table) completed\n")
   invisible(TRUE)
 }

@@ -1,4 +1,9 @@
-context("normalize_sleep_time_sequence -- edge cases")
+# test-normalize.R — normalize_sleep_time_sequence edge cases
+# normalize_sleep_time_sequence lives in inst/scripts/, sourced at pipeline runtime
+sdir <- system.file("scripts", package = "splsleep")
+if (sdir == "") sdir <- file.path(getwd(), "inst", "scripts")
+src <- file.path(sdir, "normalize_sleep_time_sequence.R")
+if (file.exists(src)) source(src, local = TRUE)
 
 make_row <- function(bed, sleep, awake, getup, pid = 1, day_num = 1, row_id = 1) {
   base_date <- as.POSIXct("2026-01-01", tz = "UTC")

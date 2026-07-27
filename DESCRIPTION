@@ -5,6 +5,8 @@ Authors@R: c(
     person("Cyra", "Sloblucyra", role = c("aut", "cre"),
            email = "cyracaid@users.noreply.github.com")
   )
+Author: Cyra Sloblucyra
+Maintainer: Cyra Sloblucyra <cyracaid@users.noreply.github.com>
 Description: A reproducible, auditable pipeline for cleaning sleep EMA diary data. Parses raw timestamps, detects and corrects temporal and duration errors through a human-in-the-loop CSV workflow, computes sleep metrics (TST, SOL, WASO, SE), validates self-reported durations against a schema-checked input contract, and generates QC visualizations.
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -13,16 +15,16 @@ Depends:
     R (>= 4.2)
 Imports:
     ggplot2,
+    gridExtra,
+    yaml
+Suggests:
+    testthat (>= 3.0.0),
     dplyr,
     tidyr,
     lubridate,
     patchwork,
     scales,
     RColorBrewer,
-    gridExtra,
     reshape2,
-    corrplot,
-    yaml
-Suggests:
-    testthat (>= 3.0.0)
+    corrplot
 Config/roxygen2/version: 8.0.0
