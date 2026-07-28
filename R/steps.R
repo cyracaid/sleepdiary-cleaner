@@ -154,7 +154,7 @@ step_process_intervals <- function(x,
 #' @export
 step_normalize_sequence <- function(x, flip_gap_hours = NULL) {
   if (is.null(flip_gap_hours)) {
-    flip_gap_hours <- tryCatch(cfg_get("timestamp.sequence.max_gap_hours", 12),
+    flip_gap_hours <- tryCatch(cfg_get("timestamp.sequence.max_gap_hours", 12, cfg = x$cfg),
                                error = function(e) 12)
   }
   env <- .load_script("normalize_sleep_time_sequence.R")

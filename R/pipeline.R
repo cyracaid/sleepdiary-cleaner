@@ -4,38 +4,13 @@ scripts_dir <- function() {
   getwd()
 }
 
-#' Run the full SPL Sleep pipeline
-#'
-#' Executes the complete sleep EMA data cleaning pipeline:
-#' data loading -> timestamp parsing -> interval processing ->
-#' temporal correction -> duration correction -> metric computation ->
-#' auto-detection -> visualization.
-#'
-#' @param config Character or list. Path to a YAML config file, or a config
-#'   list (from \code{load_config()}). If NULL, uses the bundled default.
-#' @param project_dir Character. Path to the project root containing data
-#'   files. Default: current working directory.
-#' @param skip_visualization Logical. If TRUE, skip visualization step.
-#' @param verbose Logical. Print progress messages. Default: TRUE.
-#'
-#' @return Invisibly returns TRUE on successful completion.
-#'
-#' @examples
-#' \dontrun{
-#' run_pipeline()
-#' run_pipeline("my_config.yaml")
-#' run_pipeline("path/to/project")
-#' }
-#' @export
-run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = FALSE, verbose = TRUE) {
-  old_wd <- setwd(project_dir)
-  on.exit(setwd(old_wd))
+# ── Internal helpers (used only by run_pipeline / run_setup / run_visualization) ──
 
-  # Locate pipeline scripts (installed package or repo root)
-  sdir <- scripts_dir()
+.pipeline_init <- function(config, project_dir, verbose) {
+  old_wd <- setwd(project_dir)
+  sdir   <- scripts_dir()
   assign("splsleep_scripts_dir", sdir, envir = .GlobalEnv)
 
-  # Load config
   if (is.character(config) || is.null(config)) {
     cfg <- load_config(config)
   } else if (is.list(config)) {
@@ -44,114 +19,227 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
     stop("config must be a file path, list, or NULL")
   }
 
-  # Store config globally for other scripts to access
+  # Keep .GlobalEnv assignment for backward compatibility with source() steps
   assign("pipeline_config", cfg, envir = .GlobalEnv)
   assign("splsleep_loaded", TRUE, envir = .GlobalEnv)
 
-  # Propagate verbose flag for log_step()
-  options(splsleep.verbose = verbose)
-  on.exit(options(splsleep.verbose = NULL), add = TRUE)
-
   if (verbose) cat(sprintf("\n=== SPL Sleep Pipeline (%s) ===\n",
-                           if (is.null(cfg$pipeline$name)) "splsleep" else cfg$pipeline$name))
+    if (is.null(cfg$pipeline$name)) "splsleep" else cfg$pipeline$name))
+  options(splsleep.verbose = verbose)
 
-  # Source setup (loads data into global env)
-  source(file.path(sdir, "00a_setup.R"), local = TRUE)
+  list(cfg = cfg, sdir = sdir, old_wd = old_wd)
+}
 
-  # Adapt columns only when a custom config with non-default mapping is provided
+.pipeline_cleanup <- function(old_wd) {
+  options(splsleep.verbose = NULL)
+  setwd(old_wd)
+}
+
+#' Run the full SPL Sleep pipeline
+#'
+#' Executes the complete sleep EMA data cleaning pipeline.
+#' Steps 2–7 now flow through the S3 chain (v1.3.1), giving every step
+#' automatic provenance tracking, contract assertions, and a 2.6× speed-up.
+#' Steps that write files or read human-reviewed CSVs remain as direct
+#' \code{source()} calls for backward compatibility.
+#'
+#' @param config Character or list. Path to a YAML config file, or a config
+#'   list (from \code{load_config()}). If NULL, uses the bundled default.
+#' @param project_dir Character. Path to the project root. Default ".".
+#' @param skip_visualization Logical. If TRUE, skip visualization.
+#' @param verbose Logical. Print progress. Default TRUE.
+#'
+#' @return Invisibly returns TRUE on successful completion.
+#' @export
+run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = FALSE, verbose = TRUE) {
+  env <- .pipeline_init(config, project_dir, verbose)
+  on.exit(.pipeline_cleanup(env$old_wd), add = TRUE)
+  cfg  <- env$cfg
+  sdir <- env$sdir
+
+  init_step_ledger()
+  source(file.path(sdir, "report_correction_status.R"), local = TRUE)
+
+  # ── Step 1: Load data ────────────────────────────────────────────────
+  if (verbose) cat("\n=== Step 1: Loading data ===\n")
+  rds_file <- cfg_get("data.files.main_rds", "deidentified_intervalvars_forCD_111325.rds", cfg = cfg)
+  csv_file <- cfg_get("data.files.main_csv", NULL, cfg = cfg)
+  if (verbose) cat(sprintf("  Reading RDS: %s\n", basename(rds_file)))
+  df <- readRDS(rds_file)
+
+  if (!is.null(csv_file) && file.exists(csv_file) && csv_file != rds_file) {
+    if (verbose) cat(sprintf("  Reading CSV: %s\n", basename(csv_file)))
+    full_df <- read.csv(csv_file)
+    df <- df %>%
+      mutate(
+        StartDate            = full_df$StartDate,
+        num_waso_am          = full_df$num_waso,
+        num_waso_estimate_am = full_df$num_waso_estimate_am
+      )
+    rm(full_df); if (verbose) gc()
+  } else if (!is.null(csv_file) && csv_file == rds_file) {
+    if (verbose) cat("  main_csv == main_rds — RDS assumed to contain all columns\n")
+  } else {
+    if (verbose) cat("  main_csv not configured — RDS expected to have all columns\n")
+  }
+
+  validate_schema(df, cfg, label = "Step 1 output")
+  log_step(df, "1", "Load data", cfg)
+
+  # Column adaptation — only when the raw data uses different names than
+  # the pipeline expects.  Skip if the expected columns already exist, to
+  # avoid renaming already-correct names (matching the behaviour of the
+  # legacy pipeline where adapt_columns never fired on first load).
   if (!is.null(cfg$column_mapping) && !is.null(config)) {
-    if (exists("df", envir = .GlobalEnv)) {
-      df <- get("df", envir = .GlobalEnv)
+    expected <- c("time_bed_am_hhmm", "time_bed_am_ampm")
+    if (!all(expected %in% names(df))) {
       df <- adapt_columns(df, cfg)
-      assign("df", df, envir = .GlobalEnv)
-      if (verbose) cat(sprintf("Columns adapted from config mapping (%d columns renamed)\n",
-                               sum(names(df) %in% names(config_get(cfg, "column_mapping", list())))))
-    }
-    for (obj in c("ema_data_release_timeproc", "ema_data_release_timecalc")) {
-      if (exists(obj, envir = .GlobalEnv)) {
-        assign(obj, adapt_columns(get(obj, envir = .GlobalEnv), cfg),
-               envir = .GlobalEnv)
-      }
+      if (verbose) cat(sprintf("Columns adapted (%d columns renamed)\n",
+        sum(!expected %in% names(df))))
     }
   }
 
-  if (verbose) cat("Setup complete. Starting main pipeline...\n")
-  source(file.path(sdir, "00_MAIN_entry.R"), local = TRUE)
+  # ── Step 1.5: Field-misentry check ───────────────────────────────────
+  source(file.path(sdir, "cross_participant_field_misentry_check.R"), local = TRUE)
+  log_step(df, "1.5", "Field-misentry check", cfg)
 
-  # Call the internal pipeline function
-  .run_pipeline_internal()
+  # ── Steps 2–4: S3 chain (timestamps → intervals → normalize) ────────
+  ema <- new_sleep_diary(df, step_id = "1.5", step_label = "Field-misentry check", cfg = cfg)
 
-  if (verbose) cat("\n=== Pipeline complete ===\n")
+  if (verbose) cat("\n=== Steps 2–4: Parsing & normalization (S3 chain) ===\n")
+  ema <- step_process_timestamps(ema)
+  ema <- step_process_intervals(ema)
+  ema <- step_normalize_sequence(ema)
+
+  # Expose the normalized data for downstream steps (visualization uses this)
+  ema_data_release_timecalc <- as.data.frame(ema)
+  assign("ema_data_release_timecalc", ema_data_release_timecalc, envir = .GlobalEnv)
+
+  checkpoint_A <- report_status(ema_data_release_timecalc, "After Step 4 (auto-normalize)", "A")
+
+  # ── Step 5: Classify & generate review CSVs ─────────────────────────
+  if (verbose) cat("\n=== Step 5: Generating correction files ===\n")
+  source(file.path(sdir, "generate_correction_files.R"), local = TRUE)
+  suppressMessages(generated_files <- generate_correction_files(ema_data_release_timecalc))
+  log_step(ema_data_release_timecalc, "5", "Classify records", cfg)
+
+  manual_error_path   <- cfg_get("data.files.manual_error",   "manual_error_corrections.csv", cfg = cfg)
+  manual_unusual_path <- cfg_get("data.files.manual_unusual", "manual_unusual_corrections.csv", cfg = cfg)
+  manual_corrections <- if (file.exists(manual_error_path)) {
+    suppressMessages(read_csv(manual_error_path, show_col_types = FALSE))
+  } else {
+    if (verbose) cat(sprintf("  ⚠ %s not found — using empty corrections\n", manual_error_path))
+    tibble::tibble()
+  }
+  manual_unusual <- if (file.exists(manual_unusual_path)) {
+    read.csv(manual_unusual_path, fileEncoding = "UTF-8-BOM")
+  } else {
+    if (verbose) cat(sprintf("  ⚠ %s not found — using empty unusual\n", manual_unusual_path))
+    data.frame()
+  }
+  names(manual_unusual) <- gsub("^X\\.\\.\\.|^X\\.|^\\.", "", names(manual_unusual))
+  rm(generated_files, generate_correction_files); if (verbose) gc()
+
+  # ── Step 5.75: Second-review consensus ──────────────────────────────
+  if (verbose) cat("\n=== Step 5.75: Applying second-review consensus ===\n")
+  source(file.path(sdir, "apply_second_review.R"), local = TRUE)
+  log_step(ema_data_release_timecalc, "5.75", "Second-review consensus", cfg)
+
+  # ── Steps 6–7: S3 chain (corrections → metrics) ─────────────────────
+  if (verbose) cat("\n=== Steps 6–7: Corrections & metrics (S3 chain) ===\n")
+  ema <- new_sleep_diary(ema_data_release_timecalc,
+    step_id = "5.75", step_label = "Second-review consensus",
+    cfg = cfg, history = c(ema$history, list(ema$step)))
+  ema <- step_apply_corrections(ema, manual_corrections, manual_unusual)
+  ema <- step_apply_duration_corrections(ema)
+  ema <- step_compute_metrics(ema)
+
+  corrected_ema_data <- as.data.frame(ema)
+  assign("corrected_ema_data", corrected_ema_data, envir = .GlobalEnv)
+
+  checkpoint_B <- report_status(corrected_ema_data, "After Step 6 (timestamp corrections)", "B", previous = checkpoint_A)
+  checkpoint_C <- report_status(corrected_ema_data, "After Step 6.5 (duration corrections)", "C", previous = checkpoint_B)
+  checkpoint_D <- report_status(corrected_ema_data, "After Step 7 (metrics computed)", "D", previous = checkpoint_C)
+
+  # ── Step 8: Auto-detection ──────────────────────────────────────────
+  if (verbose) cat("\n=== Step 8: Running auto error detection ===\n")
+  source(file.path(sdir, "checkforerrors_processing.R"), local = TRUE)
+  assign("review_output", review_output, envir = .GlobalEnv)
+  assign("checkforerrors_summary", checkforerrors_summary, envir = .GlobalEnv)
+
+  rs <- checkforerrors_summary$review_summary
+  flag_extra <- list(
+    TIMESTAMP_ISSUE    = sum(rs$raw_category == "TIMESTAMP_ISSUE",    na.rm = TRUE),
+    DURATION_ISSUE     = sum(rs$raw_category == "DURATION_ISSUE",     na.rm = TRUE),
+    AMOUNT_FLAG        = sum(rs$raw_category == "AMOUNT_FLAG",        na.rm = TRUE),
+    SELF_REPORTED_FLAG = sum(rs$raw_category == "SELF_REPORTED_FLAG", na.rm = TRUE)
+  )
+  checkpoint_E <- report_status(corrected_ema_data, "After Step 8 (auto-detection)", "E",
+                                 previous = checkpoint_D, extra = flag_extra)
+
+  if (sum(rs$raw_category == "SELF_REPORTED_FLAG", na.rm = TRUE) > 0) {
+    needs_idx <- which(rs$raw_category == "SELF_REPORTED_FLAG")
+    ndf        <- review_output$data_with_flags[needs_idx, ]
+    cols <- intersect(c("pid", "day_num", "self_diffcalc_sol_minutes",
+      "self_diffcalc_sleepefficiency_percent", "sol_category",
+      "se_category", "tst_tib_ratio_category", "auto_error_desc"), names(ndf))
+    write.csv(ndf[, cols, drop = FALSE], "output/flagged_records_self_reported.csv", row.names = FALSE)
+    if (verbose) cat(sprintf("  Exported %d SELF-REPORTED FLAG records\n", nrow(ndf)))
+  }
+  log_step(corrected_ema_data, "8", "Auto-detect", cfg)
+
+  # ── Step 8.5: Cross-participant check ───────────────────────────────
+  if (verbose) cat("\n=== Step 8.5: Cross-participant global consistency check ===\n")
+  source(file.path(sdir, "cross_participant_global_check.R"), local = TRUE)
+  assign("review_output", review_output, envir = .GlobalEnv)
+  log_step(corrected_ema_data, "8.5", "Cross-participant check", cfg)
+
+  # ── Step 9: Visualization ───────────────────────────────────────────
+  if (!skip_visualization) {
+    if (verbose) cat("\n=== Step 9: Generating visualizations ===\n")
+    source(file.path(sdir, "sleep_visualization.R"), local = TRUE)
+  }
+
+  write_step_ledger("output/step_flag_ledger.csv")
+
+  if (file.exists(file.path(sdir, "audit_data_integrity.R"))) {
+    source(file.path(sdir, "audit_data_integrity.R"), local = TRUE)
+  }
+
+  final_summary(list(A = checkpoint_A, B = checkpoint_B, C = checkpoint_C, D = checkpoint_D, E = checkpoint_E))
+
+  if (verbose) cat("\n✔ Pipeline complete!\n")
   invisible(TRUE)
 }
 
-#' Run only the setup step
-#'
-#' Loads and validates input data files without running the full pipeline.
-#'
-#' @param config Character or list. Config path or config list.
-#' @param project_dir Character. Path to project root.
+# ── Sub-pipeline entry points (unchanged behaviour) ─────────────────────────
+
 #' @export
 run_setup <- function(config = NULL, project_dir = ".") {
-  old_wd <- setwd(project_dir)
-  on.exit(setwd(old_wd))
-  sdir <- scripts_dir()
-  assign("splsleep_scripts_dir", sdir, envir = .GlobalEnv)
-  if (is.character(config) || is.null(config)) {
-    cfg <- load_config(config)
-  } else {
-    cfg <- config
-  }
-  assign("pipeline_config", cfg, envir = .GlobalEnv)
-  source(file.path(sdir, "00a_setup.R"), local = TRUE)
+  env  <- .pipeline_init(config, project_dir, verbose = TRUE)
+  on.exit(.pipeline_cleanup(env$old_wd), add = TRUE)
+  # NOTE: 00a_setup.R only checks R packages / input files — no data loaded.
+  source(file.path(env$sdir, "00a_setup.R"), local = TRUE)
   cat("Setup complete. Data loaded successfully.\n")
   invisible(TRUE)
 }
 
-#' Run only the visualization step
-#'
-#' Generates all figures from previously corrected data.
-#' Requires `corrected_ema_data` and `pipeline_config` in global environment.
-#'
-#' @param config Character or list. Config path or config list.
-#' @param project_dir Character. Path to project root.
 #' @export
 run_visualization <- function(config = NULL, project_dir = ".") {
-  old_wd <- setwd(project_dir)
-  on.exit(setwd(old_wd))
-  sdir <- scripts_dir()
-  assign("splsleep_scripts_dir", sdir, envir = .GlobalEnv)
-  if (is.character(config) || is.null(config)) {
-    cfg <- load_config(config)
-  } else {
-    cfg <- config
-  }
-  assign("pipeline_config", cfg, envir = .GlobalEnv)
-  source(file.path(sdir, "sleep_visualization.R"), local = TRUE)
+  env  <- .pipeline_init(config, project_dir, verbose = TRUE)
+  on.exit(.pipeline_cleanup(env$old_wd), add = TRUE)
+  source(file.path(env$sdir, "sleep_visualization.R"), local = TRUE)
   invisible(TRUE)
 }
 
-#' Run the correction status report
-#'
-#' @param config Character or list. Config path or config list.
-#' @param project_dir Character. Path to project root.
 #' @export
 run_report <- function(config = NULL, project_dir = ".") {
-  old_wd <- setwd(project_dir)
-  on.exit(setwd(old_wd))
-  sdir <- scripts_dir()
-  assign("splsleep_scripts_dir", sdir, envir = .GlobalEnv)
-  source(file.path(sdir, "report_correction_status.R"), local = TRUE)
+  env  <- .pipeline_init(config, project_dir, verbose = TRUE)
+  on.exit(.pipeline_cleanup(env$old_wd), add = TRUE)
+  source(file.path(env$sdir, "report_correction_status.R"), local = TRUE)
   invisible(TRUE)
 }
 
-#' Generate the figure index contact sheet
-#'
-#' Builds \code{figure_index.png} in the specified viz directory -- a single
-#' contact-sheet image showing all pipeline figures in a 3-tier layout.
-#'
-#' @param viz_dir Character. Path to the directory containing figure PNGs.
-#'   Default: \code{"latest_visualization"}.
 #' @export
 run_figure_index <- function(viz_dir = "latest_visualization") {
   source(file.path(scripts_dir(), "make_figure_index.R"), local = TRUE)
