@@ -10,6 +10,8 @@
 
 SPL Sleep is a reproducible, auditable R pipeline for cleaning sleep EMA (ecological momentary assessment) diary data. It parses raw bedtime/sleep/awake/get-up timestamps, detects and corrects temporal and duration errors through a transparent human-in-the-loop workflow (every correction stored in a re-readable CSV), computes standard sleep metrics (TST, SOL, WASO, SE), validates self-reported durations, and generates 27 QC and research-ready figures. A schema-validated YAML config maps the pipeline to your dataset without touching code; detection thresholds and their rationale are documented in THRESHOLDS.md, and the input contract in SCHEMA.md.
 
+**v1.3 (current)** adds a `sleep_diary` S3 class with provenance tracking (`print()` / `summary()` / `plot()`), Bland-Altman analysis with threshold validation, per-participant IQR outlier detection, and missing-data reason codes with single-day LOCF. The pipeline now runs on a unified entry point (`run_pipeline()` internally uses the S3 chain for steps 2--7 with 2.6x speed improvement). See [NEWS.md](NEWS.md) for full changelog.
+
 ## Features
 
 - **9-step pipeline**: raw data → timestamp parsing → interval processing → temporal correction → duration correction → metric computation → auto-detection → cross-participant consistency → visualization
@@ -18,7 +20,10 @@ SPL Sleep is a reproducible, auditable R pipeline for cleaning sleep EMA (ecolog
 - **Checkpoint reporter**: per-step clean/error/unusual/corrected counts printed and saved to CSV
 - **27 diagnostic figures**: organized into `pipeline_cleaning/` (QC) and `research_ready/` (sleep metrics, substance use)
 - **R package**: `library(splsleep); run_pipeline()` — installable, versioned, dependency-managed
-- **Agent skill**: AI assistants can understand and maintain the pipeline via `.agents/skills/splsleep-pipeline/SKILL.md`
+- **S3 provenance tracking** (v1.3): `summary()` and `plot()` on pipeline output, step-by-step history
+- **Statistical validation** (v1.3): `validate_thresholds()` checks cutoffs against Bland-Altman agreement limits
+- **Per-participant outlier detection** (v1.3): `flag_statistical_outliers()` via IQR
+- **Missing-data handling** (v1.3): `handle_missing()` with reason codes and optional single-day LOCF
 
 ## Pipeline Architecture
 
@@ -73,8 +78,8 @@ Raw Data ──→ Step 1: Load Data ──→ Step 2: Parse Timestamps ──�
 ### Install and Run
 
 ```r
-# Install the package
-install.packages("splsleep_1.0.0.tar.gz", repos = NULL)
+# Install the package (replace with current version)
+install.packages("splsleep_1.3.1.tar.gz", repos = NULL, type = "source")
 
 # Load and run (uses built-in default configuration)
 library(splsleep)
@@ -236,19 +241,19 @@ Registered in `opencode.jsonc`:
 
 ## Testing Coverage
 
-The pipeline includes unit tests for critical edge cases in timestamp normalization and interval parsing:
+The pipeline includes 76+ testthat tests across multiple areas:
 
-| Tested Scenario | What It Checks |
-|---|---|
-| Normal sequence | bed < sleep < awake < getup with plausible gaps → no correction |
-| AM/PM error on getup | getup recorded 12h late → auto-corrected by subtracting 12h |
-| AM/PM error on sleep | sleep recorded 12h ahead → auto-corrected to same day |
-| Minor order error | bed/sleep swapped with < 3h gap → auto-swapped |
-| All-NA row | all four timestamps NA → has_na flag set, no crash |
-| Bed = getup | all timestamps identical → no correction, no crash |
-| Interval colon edge case | "00:000" / "000:45" → normalized to "00:00" / "00:45" |
+| Test File | Coverage |
+|-----------|----------|
+| `test-normalize.R` | 15 tests: AM/PM correction, minor order errors, midnight crossing, edge cases |
+| `test-interval.R` | 2 tests: colon edge cases ("00:000", "000:45") |
+| `test-pipeline.R` | 3 tests: end-to-end on synthetic data, config loading, column adaptation |
+| `test-sleep-diary.R` | 11 tests: S3 construction, validation, coercion, generics, contract assertion, provenance |
+| `test-flag-standards.R` | 6 tests: flag evaluators for field misentry, data category, duration extreme, flag severity |
 
 Run tests with: `testthat::test_package("splsleep")`
+
+Snapshot verification (`inst/verification/`) confirms the S3 chain produces bit-identical output to the legacy pipeline on all 95 columns.
 
 ## Renv Reproducibility
 
@@ -276,7 +281,10 @@ MIT
 - **检查点报告器**：每步的 clean/error/unusual/corrected 计数自动打印并保存为 CSV
 - **27 张诊断图**：分为 `pipeline_cleaning/`（质控）和 `research_ready/`（睡眠分析）
 - **R 包**：`library(splsleep); run_pipeline()` — 可安装、版本化
-- **Agent 技能**：AI 助手可维护管线
+- **S3 provenance 追踪**（v1.3）：对管线输出调用 `summary()` / `plot()`，步骤历史记录
+- **统计验证**（v1.3）：`validate_thresholds()` 通过 Bland-Altman 一致性分析检验阈值合理性
+- **被试内异常检测**（v1.3）：`flag_statistical_outliers()` 基于 IQR
+- **缺失值处理**（v1.3）：`handle_missing()` 支持原因码标注和可选单天 LOCF
 
 ## 管线架构
 
@@ -314,7 +322,7 @@ MIT
 ### 安装运行
 
 ```r
-install.packages("splsleep_1.0.0.tar.gz", repos = NULL)
+install.packages("splsleep_1.3.1.tar.gz", repos = NULL, type = "source")
 library(splsleep)
 run_pipeline()
 ```
