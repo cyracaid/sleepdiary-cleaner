@@ -12,7 +12,7 @@ utils::globalVariables(c(
   "pipeline_config", "splsleep_scripts_dir"
 ))
 
-# ── Internal helpers (used only by run_pipeline / run_setup / run_visualization) ──
+# -- Internal helpers (used only by run_pipeline / run_setup / run_visualization) --
 
 .pipeline_init <- function(config, project_dir, verbose) {
   old_wd <- setwd(project_dir)
@@ -46,8 +46,8 @@ utils::globalVariables(c(
 #' Run the full SPL Sleep pipeline
 #'
 #' Executes the complete sleep EMA data cleaning pipeline.
-#' Steps 2–7 now flow through the S3 chain (v1.3.1), giving every step
-#' automatic provenance tracking, contract assertions, and a 2.6× speed-up.
+#' Steps 2--7 now flow through the S3 chain (v1.3.1), giving every step
+#' automatic provenance tracking, contract assertions, and a 2.6x speed-up.
 #' Steps that write files or read human-reviewed CSVs remain as direct
 #' \code{source()} calls for backward compatibility.
 #'
@@ -68,7 +68,7 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   init_step_ledger()
   source(file.path(sdir, "report_correction_status.R"), local = TRUE)
 
-  # ── Step 1: Load data ────────────────────────────────────────────────
+  # -- Step 1: Load data ------------------------------------------------
   if (verbose) cat("\n=== Step 1: Loading data ===\n")
   rds_file <- cfg_get("data.files.main_rds", "deidentified_intervalvars_forCD_111325.rds", cfg = cfg)
   csv_file <- cfg_get("data.files.main_csv", NULL, cfg = cfg)
@@ -86,15 +86,15 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
       )
     rm(full_df); if (verbose) gc()
   } else if (!is.null(csv_file) && csv_file == rds_file) {
-    if (verbose) cat("  main_csv == main_rds — RDS assumed to contain all columns\n")
+    if (verbose) cat("  main_csv == main_rds -- RDS assumed to contain all columns\n")
   } else {
-    if (verbose) cat("  main_csv not configured — RDS expected to have all columns\n")
+    if (verbose) cat("  main_csv not configured -- RDS expected to have all columns\n")
   }
 
   validate_schema(df, cfg, label = "Step 1 output")
   log_step(df, "1", "Load data", cfg)
 
-  # Column adaptation — only when the raw data uses different names than
+  # Column adaptation -- only when the raw data uses different names than
   # the pipeline expects.  Skip if the expected columns already exist, to
   # avoid renaming already-correct names (matching the behaviour of the
   # legacy pipeline where adapt_columns never fired on first load).
@@ -107,14 +107,14 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
     }
   }
 
-  # ── Step 1.5: Field-misentry check ───────────────────────────────────
+  # -- Step 1.5: Field-misentry check -----------------------------------
   source(file.path(sdir, "cross_participant_field_misentry_check.R"), local = TRUE)
   log_step(df, "1.5", "Field-misentry check", cfg)
 
-  # ── Steps 2–4: S3 chain (timestamps → intervals → normalize) ────────
+  # -- Steps 2--4: S3 chain (timestamps -> intervals -> normalize) --------
   ema <- new_sleep_diary(df, step_id = "1.5", step_label = "Field-misentry check", cfg = cfg)
 
-  if (verbose) cat("\n=== Steps 2–4: Parsing & normalization (S3 chain) ===\n")
+  if (verbose) cat("\n=== Steps 2--4: Parsing & normalization (S3 chain) ===\n")
   ema <- step_process_timestamps(ema)
   ema <- step_process_intervals(ema)
   ema <- step_normalize_sequence(ema)
@@ -125,7 +125,7 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
 
   checkpoint_A <- report_status(ema_data_release_timecalc, "After Step 4 (auto-normalize)", "A")
 
-  # ── Step 5: Classify & generate review CSVs ─────────────────────────
+  # -- Step 5: Classify & generate review CSVs -------------------------
   if (verbose) cat("\n=== Step 5: Generating correction files ===\n")
   source(file.path(sdir, "generate_correction_files.R"), local = TRUE)
   suppressMessages(generated_files <- generate_correction_files(ema_data_release_timecalc))
@@ -136,25 +136,25 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   manual_corrections <- if (file.exists(manual_error_path)) {
     suppressMessages(read_csv(manual_error_path, show_col_types = FALSE))
   } else {
-    if (verbose) cat(sprintf("  ⚠ %s not found — using empty corrections\n", manual_error_path))
+    if (verbose) cat(sprintf("  [WARN] %s not found -- using empty corrections\n", manual_error_path))
     data.frame()
   }
   manual_unusual <- if (file.exists(manual_unusual_path)) {
     read.csv(manual_unusual_path, fileEncoding = "UTF-8-BOM")
   } else {
-    if (verbose) cat(sprintf("  ⚠ %s not found — using empty unusual\n", manual_unusual_path))
+    if (verbose) cat(sprintf("  [WARN] %s not found -- using empty unusual\n", manual_unusual_path))
     data.frame()
   }
   names(manual_unusual) <- gsub("^X\\.\\.\\.|^X\\.|^\\.", "", names(manual_unusual))
   rm(generated_files, generate_correction_files); if (verbose) gc()
 
-  # ── Step 5.75: Second-review consensus ──────────────────────────────
+  # -- Step 5.75: Second-review consensus ------------------------------
   if (verbose) cat("\n=== Step 5.75: Applying second-review consensus ===\n")
   source(file.path(sdir, "apply_second_review.R"), local = TRUE)
   log_step(ema_data_release_timecalc, "5.75", "Second-review consensus", cfg)
 
-  # ── Steps 6–7: S3 chain (corrections → metrics) ─────────────────────
-  if (verbose) cat("\n=== Steps 6–7: Corrections & metrics (S3 chain) ===\n")
+  # -- Steps 6--7: S3 chain (corrections -> metrics) ---------------------
+  if (verbose) cat("\n=== Steps 6--7: Corrections & metrics (S3 chain) ===\n")
   ema <- new_sleep_diary(ema_data_release_timecalc,
     step_id = "5.75", step_label = "Second-review consensus",
     cfg = cfg, history = c(ema$history, list(ema$step)))
@@ -169,7 +169,7 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   checkpoint_C <- report_status(corrected_ema_data, "After Step 6.5 (duration corrections)", "C", previous = checkpoint_B)
   checkpoint_D <- report_status(corrected_ema_data, "After Step 7 (metrics computed)", "D", previous = checkpoint_C)
 
-  # ── Step 8: Auto-detection ──────────────────────────────────────────
+  # -- Step 8: Auto-detection ------------------------------------------
   if (verbose) cat("\n=== Step 8: Running auto error detection ===\n")
   source(file.path(sdir, "checkforerrors_processing.R"), local = TRUE)
   assign("review_output", review_output, envir = .GlobalEnv)
@@ -196,13 +196,13 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   }
   log_step(corrected_ema_data, "8", "Auto-detect", cfg)
 
-  # ── Step 8.5: Cross-participant check ───────────────────────────────
+  # -- Step 8.5: Cross-participant check -------------------------------
   if (verbose) cat("\n=== Step 8.5: Cross-participant global consistency check ===\n")
   source(file.path(sdir, "cross_participant_global_check.R"), local = TRUE)
   assign("review_output", review_output, envir = .GlobalEnv)
   log_step(corrected_ema_data, "8.5", "Cross-participant check", cfg)
 
-  # ── Step 9: Visualization ───────────────────────────────────────────
+  # -- Step 9: Visualization -------------------------------------------
   if (!skip_visualization) {
     if (verbose) cat("\n=== Step 9: Generating visualizations ===\n")
     source(file.path(sdir, "sleep_visualization.R"), local = TRUE)
@@ -216,17 +216,17 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
 
   final_summary(list(A = checkpoint_A, B = checkpoint_B, C = checkpoint_C, D = checkpoint_D, E = checkpoint_E))
 
-  if (verbose) cat("\n✔ Pipeline complete!\n")
+  if (verbose) cat("\n[OK] Pipeline complete!\n")
   invisible(TRUE)
 }
 
-# ── Sub-pipeline entry points (unchanged behaviour) ─────────────────────────
+# -- Sub-pipeline entry points (unchanged behaviour) -------------------------
 
 #' @export
 run_setup <- function(config = NULL, project_dir = ".") {
   env  <- .pipeline_init(config, project_dir, verbose = TRUE)
   on.exit(.pipeline_cleanup(env$old_wd), add = TRUE)
-  # NOTE: 00a_setup.R only checks R packages / input files — no data loaded.
+  # NOTE: 00a_setup.R only checks R packages / input files -- no data loaded.
   source(file.path(env$sdir, "00a_setup.R"), local = TRUE)
   cat("Setup complete. Data loaded successfully.\n")
   invisible(TRUE)
