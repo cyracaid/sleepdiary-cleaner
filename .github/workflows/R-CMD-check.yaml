@@ -2,7 +2,7 @@
 # Runs on every push and PR to ensure package integrity
 on:
   push:
-    branches: [main]
+    branches: [main, v1.3-s3]
   pull_request:
     branches: [main]
 
