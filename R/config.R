@@ -64,7 +64,7 @@ config_get <- function(config, key, default = NULL) {
   val
 }
 
-#' Safe config_get — fetches pipeline_config from global env automatically
+#' Safe config_get -- fetches pipeline_config from global env automatically
 #'
 #' Use this in standalone scripts (sleep_visualization.R, checkforerrors_processing.R)
 #' where pipeline_config may not exist in the calling scope.
