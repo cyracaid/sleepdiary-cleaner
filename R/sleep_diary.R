@@ -29,7 +29,7 @@ NULL
 
 # Columns referenced inside ggplot2::aes(); declared so R CMD check does not
 # report them as undefined global variables.
-utils::globalVariables(c("step_lab", "n_rows_out"))
+utils::globalVariables(c("step_lab", "n_rows_out", ".data"))
 
 #' Construct a sleep_diary object
 #'
