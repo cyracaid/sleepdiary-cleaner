@@ -105,7 +105,7 @@ fix_substance_text <- function(df, raw_csv_path, val_col, label) {
   df
 }
 
-raw_csv <- "sber_ema_anon_20260227.csv"
+raw_csv <- cfg_get("data.files.main_csv", "sber_ema_anon_20260227.csv")
 corrected_ema_data <- fix_substance_text(corrected_ema_data, raw_csv,
                                          "caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1", "caffeine")
 
@@ -303,9 +303,9 @@ detect_input_anomaly <- function(df, val_col, label, raw_vals_char = NULL) {
 }
 
 # Load raw CSV values for text-preserving detection
-raw_csv_fname <- "sber_ema_anon_20260227.csv"
+raw_csv_fname <- cfg_get("data.files.main_csv", "sber_ema_anon_20260227.csv")
 raw_csv_data <- NULL
-if (file.exists(raw_csv_fname)) {
+if (!is.null(raw_csv_fname) && file.exists(raw_csv_fname)) {
   raw_csv_data <- read.csv(raw_csv_fname, stringsAsFactors = FALSE)
 }
 
