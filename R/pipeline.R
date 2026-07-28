@@ -147,7 +147,7 @@ run_report <- function(config = NULL, project_dir = ".") {
 
 #' Generate the figure index contact sheet
 #'
-#' Builds \code{figure_index.png} in the specified viz directory — a single
+#' Builds \code{figure_index.png} in the specified viz directory -- a single
 #' contact-sheet image showing all pipeline figures in a 3-tier layout.
 #'
 #' @param viz_dir Character. Path to the directory containing figure PNGs.
