@@ -81,7 +81,7 @@ flag_statistical_outliers <- function(data,
 
       q <- stats::quantile(vals[valid], probs = c(0.25, 0.75), na.rm = TRUE)
       iqr <- q[2] - q[1]
-      if (iqr == 0) next  # all values identical — no outliers possible
+      if (iqr == 0) next  # all values identical -- no outliers possible
 
       lower <- q[1] - multiplier * iqr
       upper <- q[2] + multiplier * iqr
