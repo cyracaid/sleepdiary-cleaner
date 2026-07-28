@@ -4,6 +4,14 @@ scripts_dir <- function() {
   getwd()
 }
 
+# Declare variables placed in .GlobalEnv by run_pipeline() for backward
+# compatibility with the legacy source()-based steps 8 and 9.
+utils::globalVariables(c(
+  "corrected_ema_data", "ema_data_release_timecalc",
+  "review_output", "checkforerrors_summary",
+  "pipeline_config", "splsleep_scripts_dir"
+))
+
 # ── Internal helpers (used only by run_pipeline / run_setup / run_visualization) ──
 
 .pipeline_init <- function(config, project_dir, verbose) {
@@ -242,6 +250,8 @@ run_report <- function(config = NULL, project_dir = ".") {
 
 #' @export
 run_figure_index <- function(viz_dir = "latest_visualization") {
+  # generate_figure_index is defined in inst/scripts/make_figure_index.R
+  # which is sourced at call time
   source(file.path(scripts_dir(), "make_figure_index.R"), local = TRUE)
   generate_figure_index(viz_dir)
   invisible(TRUE)
