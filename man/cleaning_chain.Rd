@@ -25,8 +25,8 @@ run_cleaning_chain(data, corrections_df = data.frame(),
                    manual_unusual_df = data.frame(), cfg = NULL,
                    verbose = getOption("splsleep.verbose", TRUE))
 assert_contract_columns(x, error = TRUE)
-step_process_timestamps(x, vars = c(...))
-step_process_intervals(x, vars = c(...))
+step_process_timestamps(x, vars)
+step_process_intervals(x, vars)
 step_normalize_sequence(x, flip_gap_hours = NULL)
 step_apply_corrections(x, corrections_df, manual_unusual_df)
 step_apply_duration_corrections(x)
