@@ -71,10 +71,21 @@ config_get <- function(config, key, default = NULL) {
 #'
 #' @param key Character. Dot-separated key.
 #' @param default Default value if key not found.
+#' @param cfg Optional. A pipeline configuration list. When provided, this
+#'   is used directly instead of falling back to the global environment.
+#'   **From v1.3.1, passing \code{cfg} explicitly is the preferred path.**
+#'   The global-environment fallback is deprecated and will emit a warning.
 #' @return The config value, or \code{default}.
 #' @export
-cfg_get <- function(key, default = NULL) {
-  cfg <- get0("pipeline_config", envir = .GlobalEnv, ifnotfound = NULL)
+cfg_get <- function(key, default = NULL, cfg = NULL) {
+  if (is.null(cfg)) {
+    cfg <- get0("pipeline_config", envir = .GlobalEnv, ifnotfound = NULL)
+    if (!is.null(cfg)) {
+      warning("cfg_get(\"", key, "\") read from .GlobalEnv$pipeline_config. ",
+              "Pass cfg explicitly. Deprecated in v1.4.0.",
+              call. = FALSE)
+    }
+  }
   config_get(cfg, key, default)
 }
 
