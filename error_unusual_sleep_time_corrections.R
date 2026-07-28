@@ -1060,10 +1060,15 @@ check_swap_corrections <- function(data, corrections_df) {
   
   cat("  Checking swap operation handling...\n")
   
+  if (nrow(corrections_df) == 0 || !("correction_type" %in% names(corrections_df))) {
+    cat("    No swap correction records to process\n")
+    return(data)
+  }
+  
   swap_corrections <- corrections_df %>%
     filter(str_detect(tolower(correction_type), "swap"))
   
-  for (i in 1:nrow(swap_corrections)) {
+  for (i in seq_len(nrow(swap_corrections))) {
     corr <- swap_corrections[i, ]
     target_idx <- which(data$pid == corr$pid & data$day_num == corr$day_num)
     
@@ -1556,7 +1561,7 @@ create_classified_dataframes <- function(data,
         data$is_reasonable_unusual <- FALSE
       }
       
-      for (i in 1:nrow(reasonable_unusual_records)) {
+      for (i in seq_len(nrow(reasonable_unusual_records))) {
         rec <- reasonable_unusual_records[i, ]
         target_idx <- which(data$pid == rec$pid & data$row_id == rec$row_id)
         
@@ -1893,7 +1898,7 @@ apply_manual_corrections_and_recalculate <- function(ema_data, corrections_df, m
     if (nrow(manual_unusual_corrections) > 0) {
       cat(sprintf("  Found %d Manual unusual records\n", nrow(manual_unusual_corrections)))
       
-      for (i in 1:nrow(manual_unusual_corrections)) {
+      for (i in seq_len(nrow(manual_unusual_corrections))) {
         corr <- manual_unusual_corrections[i, ]
         cat(sprintf("\n  Processing Manual unusual: pid=%s, row_id=%s\n", corr$pid, corr$row_id))
         
@@ -1914,7 +1919,7 @@ apply_manual_corrections_and_recalculate <- function(ema_data, corrections_df, m
   case3_count <- 0
   case4_count <- 0
   
-  for (i in 1:nrow(corrections_df)) {
+  for (i in seq_len(nrow(corrections_df))) {
     corr <- corrections_df[i, ]
     
     solution_na <- is.na(corr$solution_humanidentified) || corr$solution_humanidentified == ""
