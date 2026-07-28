@@ -35,7 +35,7 @@
 #'
 #' * True Bland-Altman requires two independent measurement instruments.
 #'   In EMA data the "computed" SOL is derived from self-reported bed/sleep
-#'   timestamps — not from an objective device like actigraphy or PSG.
+#'   timestamps -- not from an objective device like actigraphy or PSG.
 #'   Interpret the bias as an *agreement between two processing methods for
 #'   the same source*, not as an accuracy assessment against a gold standard.
 #'
@@ -62,7 +62,7 @@ bland_altman <- function(data,
   n_pairs  <- sum(complete)
 
   if (n_pairs < 5) {
-    warning("Fewer than 5 complete pairs — Bland-Altman may be unreliable.")
+    warning("Fewer than 5 complete pairs -- Bland-Altman may be unreliable.")
   }
   if (n_pairs == 0) {
     stop("No complete pairs found in ", reported_col, " and ", computed_col, ".")
@@ -172,7 +172,7 @@ plot.bland_altman <- function(x, ...) {
 }
 
 # ---------------------------------------------------------------------------
-# Threshold validation — Bland-Altman vs configured cutoffs
+# Threshold validation -- Bland-Altman vs configured cutoffs
 # ---------------------------------------------------------------------------
 
 #' Validate cleaning thresholds against Bland-Altman agreement limits
@@ -365,7 +365,7 @@ plot.threshold_validation <- function(x, ...) {
   if (!is.null(p1) && !is.null(p2)) {
     combined <- p1 + p2 + patchwork::plot_annotation(
       title = "Threshold validation: Bland-Altman plots",
-      subtitle = paste0("Thresholds (not shown on plot — see print() for assessment) ",
+      subtitle = paste0("Thresholds (not shown on plot -- see print() for assessment) ",
                         "are validated against the LoA band width."),
       theme = ggplot2::theme_minimal(base_size = 11)
     )

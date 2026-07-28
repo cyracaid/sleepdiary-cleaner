@@ -7,7 +7,7 @@
 #'
 #' @section Design boundaries:
 #'
-#' * Timestamp columns are **never** imputed — filling a missing bedtime
+#' * Timestamp columns are **never** imputed -- filling a missing bedtime
 #'   would fabricate an event that did not happen.
 #' * Only metric columns (SOL, WASO, TST, SE) are eligible for LOCF.
 #' * LOCF is capped at \code{max_gap} consecutive days (default 1) to
@@ -41,7 +41,7 @@
 #' handled <- handle_missing(corrected_ema_data)
 #' table(handled$missing_reason)
 #'
-#' # LOCF disabled — only reason codes
+#' # LOCF disabled -- only reason codes
 #' handled <- handle_missing(corrected_ema_data, max_gap = 0)
 #' }
 #'
