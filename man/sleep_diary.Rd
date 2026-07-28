@@ -26,6 +26,7 @@ validate_sleep_diary(x)
   \item{history}{List of prior step records.}
   \item{extra}{Optional extra fields merged into the step record.}
   \item{x}{An object.}
+  \item{...}{Additional arguments passed through.}
 }
 \value{
   \code{new_sleep_diary()} and \code{as_sleep_diary()} return a
