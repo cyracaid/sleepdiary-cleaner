@@ -35,7 +35,7 @@
 ^splsleep_ci\.Rcheck$
 ^verify_v1_3_s3\.R$
 ^verify_v1_3_snapshot\.R$
-^inst/verification$
+^inst/verification
 ^session.*\.md$
 ^cross_participant.*\.csv$
 ^reasonable_unusual_records\.csv$
