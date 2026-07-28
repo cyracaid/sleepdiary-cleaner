@@ -137,7 +137,7 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
     suppressMessages(read_csv(manual_error_path, show_col_types = FALSE))
   } else {
     if (verbose) cat(sprintf("  ⚠ %s not found — using empty corrections\n", manual_error_path))
-    tibble::tibble()
+    data.frame()
   }
   manual_unusual <- if (file.exists(manual_unusual_path)) {
     read.csv(manual_unusual_path, fileEncoding = "UTF-8-BOM")
