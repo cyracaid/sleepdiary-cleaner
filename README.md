@@ -404,6 +404,72 @@ If they differ and the input data did not change, the pipeline output has change
 
 ---
 
+### 5. How to Read the Figures (viewing sequence)
+
+Figures are saved in `latest_visualization/`. Open them in this order:
+
+**Pass 1 — Pipeline Cleaning (3 figures, 60 seconds)**
+
+Start with `pipeline_cleaning/` to confirm the pipeline ran correctly:
+
+| Order | Figure | What to check |
+|:-----:|--------|---------------|
+| 1 | **01 Final Data Quality Dashboard** | This is your main dashboard. Look at the TST/SOL/WASO/SE distributions — are they bell-shaped? Any extreme spikes at 0 or max values? The "records per participant" bar chart should show roughly equal bar heights (similar data from each participant). |
+| 2 | **12 Pipeline Correction Progress** | Check that the bar for "Corrected" appears at Step 6 (manual corrections) and stays stable afterward. If "Corrected" appears earlier or changes later, something is wrong. |
+| 3 | **18 Auto-Detected Dashboard** | Shows the final flag distribution. TIMESTAMP_ISSUE should be 0 or very low. DURATION_ISSUE and SELF_REPORTED_FLAG should match what you saw in `correction_status_final.csv`. |
+
+**Pass 2 — Research Metrics (4 figures, 2 minutes)**
+
+These confirm the sleep metrics are physiologically plausible:
+
+| Order | Figure | What to check |
+|:-----:|--------|---------------|
+| 4 | **02 Distribution Sleep Variables** | TST histogram should peak around 6–8 h. SOL should be right-skewed (most values 10–45 min, a long tail). WASO should cluster at 0–60 min. SE should peak at 85–100%. |
+| 5 | **04B SOL vs Sleep Duration** | Scatter plot should show a weak negative correlation (higher SOL → slightly less sleep). If the correlation is positive or flat, check for AM/PM errors. |
+| 6 | **09 Bedtime vs Getup Distribution** | Clock-plot: bedtime should cluster around 22:00–01:00, getup around 06:00–09:00. Values outside this range may be AM/PM errors not caught by the pipeline. |
+| 7 | **19 Unified Quality Status** | The pie chart or bar chart shows the proportion of Clean / Minor / Major / Error / Unusual. Most records should be Clean or Minor. |
+
+**Pass 3 — Anomaly Patterns (3 figures, 2 minutes)**
+
+| Order | Figure | What to check |
+|:-----:|--------|---------------|
+| 8 | **13 Error Category Distribution** | Which error type is most common? If `order_error` (temporal sequence violation) dominates, review the EMA survey logic. If `bed_sleep_diff_error` dominates, participants may not understand the bedtime vs sleep question. |
+| 9 | **17 Top Participants Flags** | Bar chart showing which participants have the most flags. If one participant has far more flags than everyone else, check their raw data — they may have a systematic misunderstanding of the survey. |
+| 10 | **20 SOL Perception Bias** | Bland-Altman style plot: x-axis = mean of self-reported and computed SOL, y-axis = difference (computed − reported). Values should cluster around zero. If the mean line is far from zero, participants systematically over- or under-estimate their SOL. |
+
+**Pass 4 — Substance Use (optional, 1 minute)**
+
+| Order | Figure | What to check |
+|:-----:|--------|---------------|
+| 11 | **23 Caffeine Consumption** | Distribution of caffeine drinks per day. Most values should be 0–5. Any value > 20 may be a data-entry error. |
+| 12 | **24 Alcohol Consumption** | Distribution of alcoholic drinks per day. Most values should be 0–5. |
+
+**Pass 5 — Summary (optional, 1 minute)**
+
+| Order | Figure | What to check |
+|:-----:|--------|---------------|
+| 13 | **R25 Sleep Regularity** | Weekday vs weekend TST and bedtime. A small difference (30–60 min) is normal. A large difference (> 2 h) may indicate a shift-work or social-jetlag pattern worth noting in your analysis. |
+| 14 | **R26 Sleep Composition (TIB Breakdown)** | Stacked bar showing how TIB (time in bed) is composed of TST + SOL + WASO. TST should be the largest component for most participants. |
+| 15 | **R27 Sleep Metrics Correlation Matrix** | Correlation heatmap between all sleep metrics. Expected patterns: TST and SE should be positively correlated; SOL and SE should be negatively correlated. |
+
+**Summary checklist:**
+
+```
+Pass 1 (1 min): 01 → 12 → 18
+   ↓ Pass?
+Pass 2 (2 min): 02 → 04B → 09 → 19
+   ↓ Pass?
+Pass 3 (2 min): 13 → 17 → 20
+   ↓ Pass?
+Pass 4 (1 min): 23 → 24
+   ↓ Pass?
+Pass 5 (1 min): R25 → R26 → R27
+   ↓ All pass?
+Output is valid.
+```
+
+---
+
 ## Step Flag Ledger (detailed reference)
 
 After every pipeline run, `step_flag_ledger.csv` records which flags were set at each step. Each row answers: *"at this step, using this standard, how many records fell into this category?"*
