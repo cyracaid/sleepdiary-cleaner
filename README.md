@@ -397,9 +397,46 @@ If they differ and the input data did not change, the pipeline output has change
 
 ### 5. How to Read the Figures
 
-Figures are saved in `latest_visualization/`. This section has two parts:
+Figures are saved in `latest_visualization/`. This section has three parts:
+- **Part 0 — Publication Figures** (for a manuscript Methods section)
 - **Part A — The 5 Essential Figures** (3 minutes, quick validation every run)
 - **Part B — Complete Figure Reference** (all 28 figures, detailed)
+
+---
+
+#### Part 0: Publication Figures (for your Methods section)
+
+Two publication-ready figures are generated for a manuscript. They answer the reviewer questions: *"How did the cleaning pipeline work?"* and *"What effect did it have on the data?"* — without requiring the reader to inspect source code.
+
+| Figure | File | What it shows | Color coding |
+|--------|------|---------------|-------------|
+| **Figure 1 — Pipeline Workflow** | `figures/Figure_1_Pipeline_Workflow.png` | Flow of raw records through 4 stages: automatic validation → algorithmic correction → manual review → final classification. Each box shows the count and percentage of records at that stage. | **Red** = auto-detected errors removed; **Orange** = algorithmically corrected; **Blue** = manually corrected (human CSV review); **Purple** = reviewed but unchanged; **Green** = retained in final dataset |
+| **Figure 2 — Effect of Cleaning** | `figures/Figure_2_Cleaning_Effect.png` | Three panels: **A** = SOL before (self-reported) vs after (computed) with violin + boxplot; **B** = TST distribution after cleaning, stacked by flag severity (Clean/Minor/Major); **C** = individual record changes — scatter of self-reported vs computed SOL, coloured by correction type | **A**: red = before, blue = after; **B**: green = Clean, orange = Minor, red = Major; **C**: green = unchanged, orange = auto-corrected, blue = manually corrected |
+
+**How to generate them** (after `run_pipeline()`):
+
+```r
+figure_pipeline_workflow()   # -> figures/Figure_1_Pipeline_Workflow.png
+figure_cleaning_effect()     # -> figures/Figure_2_Cleaning_Effect.png
+```
+
+Both figures read all numbers directly from `corrected_ema_data` — no hardcoded values. Percentages use the raw record count as the denominator.
+
+**Publication-ready captions** are in `figures/Figure_Captions.md`. They include sample sizes, percentages, colour semantics, and interpretation for direct use in a manuscript.
+
+**What you can answer from these figures (Methods section checklist):**
+
+| Reviewer question | Where in the figures |
+|-------------------|---------------------|
+| How many raw records entered the pipeline? | Figure 1, first box |
+| How many were discarded as errors? | Figure 1, red box |
+| How many were algorithmically corrected? | Figure 1, orange box |
+| How many required manual correction? | Figure 1, blue box |
+| How many were reviewed but unchanged? | Figure 1, purple box |
+| How many entered the final dataset? | Figure 1, green box |
+| How much did SOL change? | Figure 2 Panel A + C |
+| What is the TST distribution and severity? | Figure 2 Panel B |
+| Is the effect visually obvious? | Figure 2 Panel C (identity line + coloured points) |
 
 ---
 
