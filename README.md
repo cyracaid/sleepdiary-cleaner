@@ -206,6 +206,9 @@ Each template uses synthetic data. See the template files for column-level descr
 | File | Contents |
 |---|---|
 | `output/correction_status_final.csv` | Per-run summary: n_total, tst, sol, error/corrected/flag counts |
+| `figures/Figure_1_Pipeline_Workflow.png` | Pipeline flow diagram — shows records through correction stages with counts and percentages |
+| `figures/Figure_2_Cleaning_Effect.png` | Before/after comparison — SOL distributions, TST severity breakdown, individual record changes |
+| `figures/Figure_Captions.md` | Publication-ready captions for both figures |
 | `output/flagged_records_self_reported.csv` | Records flagged as SELF_REPORTED_FLAG, with SOL/SE/ratio categories and metric values |
 
 ## Agent Skill
