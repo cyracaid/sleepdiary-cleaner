@@ -228,7 +228,129 @@ Registered in `opencode.jsonc`:
 }
 ```
 
-## Step Flag Ledger (`output/step_flag_ledger.csv`)
+## How to Check the Pipeline Output
+
+After `run_pipeline()` finishes, follow this checklist.
+
+### Step 0: Did the pipeline finish?
+
+```bash
+ls output/ | head -10
+ls latest_visualization/ | head -5
+```
+
+If `output/correction_status_final.csv` exists and has data: the pipeline completed.
+
+---
+
+### Step 1: Open `output/correction_status_final.csv`
+
+This is the **first place you look**. Each row = one pipeline run.
+
+```
+run_id, n_total, n_clean, n_error, n_corrected,
+timestamp_issue, duration_issue, amount_flag, self_reported_flag,
+tst_mean_h, sol_mean_min
+```
+
+| Check | What to look for | What's normal |
+|-------|-----------------|---------------|
+| `n_total` | Matches your input row count? | Should equal your RDS/CSV record count |
+| `tst_mean_h` | Mean total sleep time | 6.0-8.5 h for most adult populations |
+| `sol_mean_min` | Mean sleep onset latency | 10-45 min for most populations |
+| `n_clean` | Records passing all checks | Depends on data quality; stable across re-runs |
+| `n_error` | Records with impossible temporal order | Should be low (< 1% of total) |
+| `n_corrected` | Records manually corrected | Should equal your correction CSV row count |
+| `timestamp_issue` | Unparseable timestamps | 0 normally |
+| `duration_issue` | Metrics outside configured thresholds | Small relative to n_total |
+| `self_reported_flag` | Self-report vs computed value mismatch | Indicates perception bias |
+
+**Key rule: same data, same output.** If you run the pipeline twice on identical input, every number in this file must be identical. If any number changes, something is non-deterministic.
+
+---
+
+### Step 2: Open `output/step_flag_ledger.csv`
+
+Shows exactly which step produced which flag, and whether those flags persist or get resolved.
+
+**In R:**
+
+```r
+ledger <- read.csv("output/step_flag_ledger.csv")
+library(dplyr)
+ledger %>% filter(!is.na(count)) %>% arrange(step_id, standard)
+```
+
+#### 2a. `data_category` -- must be stable after Step 6
+
+Steps 6, 6.5, 7, 8, 8.5 must have **identical** clean / error / unusual / equal_time_ok / skipped_na counts.
+
+**Validation:** `equal_time_ok + skipped_na = n_total`
+
+#### 2b. `flag_severity` -- must be stable after Step 7
+
+Steps 7, 8, 8.5 must have **identical** Clean / Minor / Major counts.
+
+**Validation:** `Clean + Minor + Major = n_total - skipped_na`
+
+#### 2c. `field_misentry` -- check for cross-field contamination
+
+If any category other than `none` has count > 0, the participant may have typed into the wrong field.
+
+#### 2d. `duration_extreme` -- implausible TST
+
+`Too short (< 3 h)` + `Too long (> 12 h)` should be < 5% of total.
+
+#### 2e. `checkforerrors` -- auto-detection summary
+
+Populated at Step 8. TIMESTAMP_ISSUE / DURATION_ISSUE / AMOUNT_FLAG / SELF_REPORTED_FLAG.
+
+---
+
+### Step 3: Scan the Figures
+
+| Figure | What to look for |
+|--------|-----------------|
+| **01 Quality Dashboard** | Expected distributions? Spike anywhere? |
+| **12 Pipeline Correction Progress** | Flag composition change at Step 6? |
+| **13 Error Category Distribution** | Which error type dominates? |
+| **17 Top Participants Flags** | One participant dominating? |
+| **20 SOL/WASO Perception Bias** | Bias cluster around zero? |
+
+---
+
+### Step 4: Regression Check
+
+Compare against a previous run. In R:
+
+```r
+old <- read.csv("output/correction_status_old.csv")
+new <- read.csv("output/correction_status_final.csv")
+# n_total, tst_mean_h, sol_mean_min must match
+# n_clean, n_error, n_corrected must match
+```
+
+Or run snapshot verification:
+
+```bash
+Rscript inst/verification/verify_v1_3_snapshot.R
+```
+
+---
+
+### Summary: Three-Question Quickscan
+
+| # | Ask | Answer from |
+|---|-----|-------------|
+| 1 | Did the pipeline finish? | `correction_status_final.csv` exists |
+| 2 | Are final numbers reasonable? | `tst_mean_h` 6-8.5, `sol_mean_min` 10-45, `n_error` < 1% |
+| 3 | Are per-step flags stable? | `step_flag_ledger.csv`: data_category + flag_severity unchanged after Step 7 |
+
+If all three pass, the output is valid.
+
+---
+
+## Step Flag Ledger (detailed reference)
 
 After every pipeline run, `step_flag_ledger.csv` records which flags were set at each step. Each row answers: *"at this step, using this standard, how many records fell into this category?"*
 
