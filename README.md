@@ -360,19 +360,7 @@ The numbers do not change after they are first computed. That is the signature o
 
 ---
 
-### 3. Scan the Figures (visual confirmation)
-
-| Figure | What to look for |
-|--------|-----------------|
-| **01 Quality Dashboard** | Are the distributions bell-shaped? Any unexpected spikes? |
-| **12 Pipeline Correction Progress** | Does flag composition change at Step 6 (corrections applied) as expected? |
-| **13 Error Category Distribution** | Which error type is most common? `order_error` should be the rarest. |
-| **17 Top Participants Flags** | Is one participant responsible for most flags? If so, investigate that participant. |
-| **20 SOL/WASO Perception Bias** | Do the differences cluster around zero? If the bias is far from zero, there is a systematic perception issue. |
-
----
-
-### 4. Regression Check (compare against a previous run)
+### 3. Regression Check (compare against a previous run)
 
 ```r
 old <- read.csv("output/correction_status_old.csv")
@@ -389,7 +377,7 @@ If they differ and the input data did not change, the pipeline output has change
 
 ---
 
-### Quick Reference Card (print this)
+### 4. Quick Reference Card (print this)
 
 | Check | What to run | Pass if |
 |-------|-------------|---------|
