@@ -410,7 +410,7 @@ Two publication-ready figures are generated for a manuscript. They answer the re
 
 | Figure | File | What it shows | Color coding |
 |--------|------|---------------|-------------|
-| **Figure 1 — Pipeline Workflow** | `figures/Figure_1_Pipeline_Workflow.png` | Flow of raw records through 4 stages: automatic validation → algorithmic correction → manual review → final classification. Each box shows the count and percentage of records at that stage. | **Red** = auto-detected errors removed; **Orange** = algorithmically corrected; **Blue** = manually corrected (human CSV review); **Purple** = reviewed but unchanged; **Green** = retained in final dataset |
+| **Figure 1 — Pipeline Workflow** | `figures/Figure_1_Pipeline_Workflow.png` | Left-to-right flow: raw records → automatic correction (Step 4) → automatic validation (Step 5) → manual review (Step 6) → final clean dataset. Each box shows count and percentage. | **Gray** = processing stage; **Red** = errors flagged for review (NOT auto-fixed); **Orange** = algorithmically corrected (Step 4); **Blue** = manually corrected (human CSV review); **Purple** = unusual or reviewed-but-unchanged; **Green** = retained in final dataset |
 | **Figure 2 — Effect of Cleaning** | `figures/Figure_2_Cleaning_Effect.png` | Three panels: **A** = SOL before (self-reported) vs after (computed) with violin + boxplot; **B** = TST distribution after cleaning, stacked by flag severity (Clean/Minor/Major); **C** = individual record changes — scatter of self-reported vs computed SOL, coloured by correction type | **A**: red = before, blue = after; **B**: green = Clean, orange = Minor, red = Major; **C**: green = unchanged, orange = auto-corrected, blue = manually corrected |
 
 **How to generate them** (after `run_pipeline()`):
@@ -424,12 +424,29 @@ Both figures read all numbers directly from `corrected_ema_data` — no hardcode
 
 **Publication-ready captions** are in `figures/Figure_Captions.md`. They include sample sizes, percentages, colour semantics, and interpretation for direct use in a manuscript.
 
+##### Reading Figure 1 correctly
+
+**"Algorithmic Correction" (orange, Step 4) vs "Auto-Detected Errors Flagged" (red, Step 5) are different outcomes:**
+
+| | Algorithmic Correction | Auto-Detected Errors Flagged |
+|---|---|---|
+| What the algorithm does | **Actually fixes** the record | **Only flags** it — does not change it |
+| Example | AM/PM confusion (subtract 12 h), minor order swap (< 3 h) | Getup before bedtime, sleep latency > 7 h |
+| Record outcome | Becomes clean automatically | Stays in the data **with an error label**, waiting for human review |
+| Human involvement | None | Required (investigator decides correct / accept / exclude) |
+
+The key point: **Step 5-flagged errors are NOT removed from the data.** They remain in the dataset, marked as errors, until a human decides what to do with them. This is a deliberate design decision of the human-in-the-loop workflow.
+
+> ⚠ **Design note (may change):** the "flag but don't remove" behaviour is intentional today — flagged records are kept for audit and human decision. A future version may switch to automatically removing or excluding error records instead. If you see a red "Errors Flagged" box with N > 0, those records still exist in `corrected_ema_data` under `data_category == "error"`; they are not dropped.
+
+**What the green "Final Clean Dataset" means:** it is the subset of records that enter analysis — NOT all raw records. It equals *clean* + *equal_time_ok* records. It **excludes**: skipped records (missing timestamps), flagged errors, and unusual records. In Figure 1, the green box shows only the records that made it through all stages as usable data.
+
 **What you can answer from these figures (Methods section checklist):**
 
 | Reviewer question | Where in the figures |
 |-------------------|---------------------|
 | How many raw records entered the pipeline? | Figure 1, first box |
-| How many were discarded as errors? | Figure 1, red box |
+| How many were flagged as errors (not auto-fixed)? | Figure 1, red box |
 | How many were algorithmically corrected? | Figure 1, orange box |
 | How many required manual correction? | Figure 1, blue box |
 | How many were reviewed but unchanged? | Figure 1, purple box |
