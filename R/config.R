@@ -61,6 +61,7 @@ config_get <- function(config, key, default = NULL) {
       return(default)
     }
   }
+  if (is.null(val)) return(default)
   val
 }
 

@@ -58,7 +58,7 @@ if (!"manually_corrected" %in% names(corrected_ema_data)) {
 cat("\n--- 1a. Pre-processing raw substance values ---\n")
 
 fix_substance_text <- function(df, raw_csv_path, val_col, label) {
-  if (!file.exists(raw_csv_path)) {
+  if (is.null(raw_csv_path) || !nzchar(raw_csv_path) || !file.exists(raw_csv_path)) {
     cat(sprintf("  Warning: %s not found, skipping raw pre-processing\n", raw_csv_path))
     return(df)
   }
@@ -125,7 +125,7 @@ cat("\n--- 1b. Building substance input anomaly reference table ---\n")
 
 build_input_anomalies <- function(val_col, label, raw_csv_path) {
   out <- data.frame()
-  if (!file.exists(raw_csv_path)) return(out)
+  if (is.null(raw_csv_path) || !nzchar(raw_csv_path) || !file.exists(raw_csv_path)) return(out)
   raw_all <- read.csv(raw_csv_path, stringsAsFactors = FALSE)
   if (!(val_col %in% names(raw_all))) return(out)
   
