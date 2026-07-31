@@ -167,6 +167,35 @@ run_pipeline(config = "my_study_config.yaml")
 
 All pipeline scripts automatically read the config; no R code changes needed.
 
+## How the Pipeline Treats Your Data (Non-Destructive Model)
+
+**The pipeline never deletes a record.** Cleaning means *adding labels and corrected columns*, not removing rows. The number of records in `corrected_ema_data` always equals the number of records you put in.
+
+```
+Input:  280 raw records
+Output: 280 records, each with additional classification columns
+        (data_category, flag_severity) and corrected-value columns
+        (time_*_corrected). Raw columns are preserved untouched.
+```
+
+What this means for you:
+
+- **Nothing is lost.** Raw timestamps (`time_bed_am_hhmm_ampm`, etc.) stay in the data. Corrected versions are added as new columns (`time_bed_corrected`), so every correction is auditable against the original value.
+- **Every record is labelled, not removed.** Records that fail validation are tagged (`data_category = "error"` or `"unusual"`) but remain in the dataset. You decide later whether to include or exclude them in analysis.
+- **"Final Clean Dataset" is a recommended analysis subset, not a physically separate file.** It is the records where `data_category` is `clean` or `equal_time_ok`. You can filter to it anytime:
+
+```r
+clean_data <- corrected_ema_data[corrected_ema_data$data_category %in% c("clean", "equal_time_ok"), ]
+```
+
+**One exception:** records with all four sleep-event timestamps missing (`data_category = "skipped_na"`) remain in the file, but their TST/SOL/WASO metrics are `NA` — there is no way to compute sleep metrics from missing timestamps. They are usable for compliance/attrition analysis (e.g., "how many days did each participant complete?") but not for sleep-metric analysis.
+
+| Record type | Stays in data? | Has sleep metrics? | Suitable for sleep analysis? |
+|-------------|:--------------:|:------------------:|:----------------------------:|
+| clean / equal_time_ok | Yes | Yes | **Yes** (recommended) |
+| error / unusual (flagged) | Yes | Yes | With caution — researcher decides |
+| skipped_na (missing timestamps) | Yes | No (NA) | No — compliance analysis only |
+
 ## Data Format (Text Only — Templates Provided)
 
 **This repository contains no raw participant data, no real identifiers, and no actual study responses.** All CSV files containing participant data are excluded via `.gitignore` and purged from git history.
@@ -710,6 +739,32 @@ run_pipeline(config = "my_study_config.yaml")
 ```
 
 ## 数据说明（纯文字，无真实数据）
+
+### 管线如何处理你的数据（非破坏性模型）
+
+**管线从不删除任何记录。** 清洗的意思是*打标记 + 增加修正列*，不是删行。`corrected_ema_data` 的行数永远等于你输入的行数。
+
+```
+输入：280 条原始记录
+输出：280 条记录，每条多了分类列（data_category, flag_severity）
+     和修正列（time_*_corrected）。原始列原样保留。
+```
+
+- **什么都不丢。** 原始时间戳（`time_bed_am_hhmm_ampm` 等）留在数据里，修正版新增为 `time_bed_corrected` 列——每条修正都能和原值对照。
+- **每条记录被打标记，不是被删除。** 验证失败的记录标上 `data_category = "error"` 或 `"unusual"`，但仍然在数据集里。你之后自己决定分析时是否包含它们。
+- **"最终干净数据集"是推荐的分析子集，不是一个物理上独立的文件。** 它 = `data_category` 为 `clean` 或 `equal_time_ok` 的记录。随时可以这样筛选：
+
+```r
+clean_data <- corrected_ema_data[corrected_ema_data$data_category %in% c("clean", "equal_time_ok"), ]
+```
+
+**一个例外：** 四个睡眠时间戳全部缺失的记录（`data_category = "skipped_na"`）保留在文件里，但 TST/SOL/WASO 指标是 `NA`——时间戳缺失无法计算睡眠指标。它们可用于依从性/流失分析（如"每个被试完成了多少天"），但不能用于睡眠指标分析。
+
+| 记录类型 | 还在数据里？ | 有睡眠指标？ | 适合睡眠分析？ |
+|---------|:---:|:---:|:---:|
+| clean / equal_time_ok | 是 | 是 | **是**（推荐） |
+| error / unusual（被标记）| 是 | 是 | 谨慎——研究者决定 |
+| skipped_na（时间戳缺失）| 是 | 否（NA） | 否——仅依从性分析 |
 
 **本仓库不含任何原始参与者数据。** 所有真实数据 CSV 已从 git 历史彻底清除。
 
