@@ -7,7 +7,7 @@ Authors@R: c(
   )
 Author: Cyra Sloblucyra
 Maintainer: Cyra Sloblucyra <cyracaid@users.noreply.github.com>
-Description: A reproducible, auditable R pipeline for cleaning sleep EMA diary data. Parses raw timestamps, detects and corrects temporal and duration errors through a human-in-the-loop CSV workflow, computes sleep metrics (TST, SOL, WASO, SE), validates self-reported durations against a schema-checked input contract, and generates QC visualizations. v1.3 adds an S3 sleep_diary class with provenance tracking (print/summary/plot), Bland-Altman analysis with threshold validation, per-participant IQR outlier detection, and missing-data reason codes with single-day LOCF.
+Description: A reproducible, auditable R pipeline for cleaning sleep EMA diary data. Parses raw timestamps, detects and corrects temporal and duration errors through a human-in-the-loop CSV workflow, computes sleep metrics (TST, SOL, WASO, SE), validates self-reported durations against a schema-checked input contract, and generates QC visualizations. v1.3 adds an S3 sleep_diary class with provenance tracking (print/summary/plot), Bland-Altman analysis with threshold validation, per-participant IQR outlier detection, and missing-data reason codes with single-day LOCF. Includes publication-ready figures (pipeline workflow flow diagram and before/after cleaning effects) for a manuscript Methods section.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
