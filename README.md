@@ -392,68 +392,106 @@ If they differ and the input data did not change, the pipeline output has change
 
 ---
 
-### 5. How to Read the Figures (viewing sequence)
+### 5. How to Read the Figures
 
-Figures are saved in `latest_visualization/`. Open them in this order:
+Figures are saved in `latest_visualization/`. This section has two parts:
+- **Part A — The 5 Essential Figures** (3 minutes, quick validation every run)
+- **Part B — Complete Figure Reference** (all 28 figures, detailed)
 
-**Pass 1 — Pipeline Cleaning (3 figures, 60 seconds)**
+---
 
-Start with `pipeline_cleaning/` to confirm the pipeline ran correctly:
+#### Part A: The 5 Essential Figures for Output Checking
 
-| Order | Figure | What to check |
-|:-----:|--------|---------------|
-| 1 | **01 Final Data Quality Dashboard** | This is your main dashboard. Look at the TST/SOL/WASO/SE distributions — are they bell-shaped? Any extreme spikes at 0 or max values? The "records per participant" bar chart should show roughly equal bar heights (similar data from each participant). |
-| 2 | **12 Pipeline Correction Progress** | Check that the bar for "Corrected" appears at Step 6 (manual corrections) and stays stable afterward. If "Corrected" appears earlier or changes later, something is wrong. |
-| 3 | **18 Auto-Detected Dashboard** | Shows the final flag distribution. TIMESTAMP_ISSUE should be 0 or very low. DURATION_ISSUE and SELF_REPORTED_FLAG should match what you saw in `correction_status_final.csv`. |
+These are the only figures you need to check every time. Each answers one yes/no question.
 
-**Pass 2 — Research Metrics (4 figures, 2 minutes)**
+| Step | Figure | Look at this | It should look like this | If not? |
+|:----:|--------|-------------|--------------------------|---------|
+| 1 | **01 Final Data Quality Dashboard** `pipeline_cleaning/` | The TST / SOL / WASO / SE histograms (top row) | Bell-shaped curves. No spikes at 0 or extreme values. | Large spike at 0 = missing data or parsing failure. Spike at max = threshold too loose. |
+| 2 | **12 Pipeline Correction Progress** `pipeline_cleaning/` | The grouped bar chart showing Clean / Error / Corrected across the 5 checkpoints (A–E) | Corrected bar appears ONLY at C (Step 6.5) and stays flat after that. | Corrected bar before C = correction logic triggered too early. Corrected bar changes after C = instability. |
+| 3 | **18 Auto-Detected Dashboard** `pipeline_cleaning/` | The flag counts (TIMESTAMP_ISSUE, DURATION_ISSUE, etc.) | Numbers match what you saw in `correction_status_final.csv`. TIMESTAMP_ISSUE is 0 or very low. | Mismatch = the auto-detection output is not aligned with the run summary. Investigate. |
+| 4 | **02 Distribution Sleep Variables** `research_ready/` | The four histograms (TST, SOL, WASO, SE) | TST peaks 6–8 h. SOL is right-skewed (mostly 10–45). WASO < 60 min. SE peaks > 85%. | TST peak < 5 h = study population may have short sleep or timestamps are off. SOL flat or bimodal = possible AM/PM confusion not fully resolved. |
+| 5 | **19 Unified Quality Status** `research_ready/` | The pie or bar chart of Clean / Minor / Major / Error / Unusual | Most records are Clean or Minor. Error + Unusual < 5% of total. | High Error + Unusual = review the manual correction CSVs. Something systematic may have been missed. |
 
-These confirm the sleep metrics are physiologically plausible:
+**If all 5 pass, the pipeline output is valid.** If any fail, go to Part B to diagnose.
 
-| Order | Figure | What to check |
-|:-----:|--------|---------------|
-| 4 | **02 Distribution Sleep Variables** | TST histogram should peak around 6–8 h. SOL should be right-skewed (most values 10–45 min, a long tail). WASO should cluster at 0–60 min. SE should peak at 85–100%. |
-| 5 | **04B SOL vs Sleep Duration** | Scatter plot should show a weak negative correlation (higher SOL → slightly less sleep). If the correlation is positive or flat, check for AM/PM errors. |
-| 6 | **09 Bedtime vs Getup Distribution** | Clock-plot: bedtime should cluster around 22:00–01:00, getup around 06:00–09:00. Values outside this range may be AM/PM errors not caught by the pipeline. |
-| 7 | **19 Unified Quality Status** | The pie chart or bar chart shows the proportion of Clean / Minor / Major / Error / Unusual. Most records should be Clean or Minor. |
+---
 
-**Pass 3 — Anomaly Patterns (3 figures, 2 minutes)**
+#### Part B: Complete Figure Reference (all 28 figures)
 
-| Order | Figure | What to check |
-|:-----:|--------|---------------|
-| 8 | **13 Error Category Distribution** | Which error type is most common? If `order_error` (temporal sequence violation) dominates, review the EMA survey logic. If `bed_sleep_diff_error` dominates, participants may not understand the bedtime vs sleep question. |
-| 9 | **17 Top Participants Flags** | Bar chart showing which participants have the most flags. If one participant has far more flags than everyone else, check their raw data — they may have a systematic misunderstanding of the survey. |
-| 10 | **20 SOL Perception Bias** | Bland-Altman style plot: x-axis = mean of self-reported and computed SOL, y-axis = difference (computed − reported). Values should cluster around zero. If the mean line is far from zero, participants systematically over- or under-estimate their SOL. |
+##### Figures 01–06: Data Quality and Distributions
 
-**Pass 4 — Substance Use (optional, 1 minute)**
+| Figure | Section | What it shows | Detailed interpretation |
+|--------|---------|---------------|------------------------|
+| **01 Final Data Quality Dashboard** | `pipeline_cleaning/` | Multi-panel dashboard with TST, SOL, WASO, SE distributions + records per participant | **Distributions** (top row, 4 histograms): Each should be a plausible bell or right-skewed curve. TST centered ~6–8 h. SOL right-skewed (most < 45 min). WASO right-skewed (most < 60 min). SE left-skewed (most > 85%). **Records per participant** (bottom row): Bar heights should be roughly equal (similar data from each participant). A very tall bar means one participant has many more records than others — may indicate duplicate entries. |
+| **02 Distribution Sleep Variables** | `research_ready/` | Same 4 histograms as Figure 01 but in publication-ready layout | Same interpretation as Figure 01 upper row. This figure is for use in reports and presentations. |
+| **03 Sleep Duration Distribution** | `research_ready/` | Histogram of TST alone | Peak should be between 360 and 480 min (6–8 h). Values below 180 min (< 3 h) or above 720 min (> 12 h) should be rare or flagged by the pipeline. |
+| **04 Sleep Duration vs Time in Bed** | `research_ready/` | Scatter plot: TIB (x-axis) vs TST (y-axis) | Points should cluster along the diagonal (TST ≤ TIB). Points far below the diagonal = high WASO (lots of wake time). Points on the diagonal = WASO near zero. Outliers with TST > TIB are flagged as impossible (error). |
+| **04B SOL vs Sleep Duration** | `research_ready/` | Scatter plot: SOL (x-axis) vs TST (y-axis) | Weak negative correlation is expected: higher SOL → slightly less TST. A flat or positive slope suggests an AM/PM confusion pattern (SOL values are not real). |
+| **05 Variability Sleep Variables** | `research_ready/` | Boxplots of TST, SOL, WASO, SE per participant (or grouped) | Shows between-participant variability. Each box should have reasonable width. Very wide boxes = high day-to-day variability in that participant. Very narrow boxes = possible duplicate or non-varying data. |
 
-| Order | Figure | What to check |
-|:-----:|--------|---------------|
-| 11 | **23 Caffeine Consumption** | Distribution of caffeine drinks per day. Most values should be 0–5. Any value > 20 may be a data-entry error. |
-| 12 | **24 Alcohol Consumption** | Distribution of alcoholic drinks per day. Most values should be 0–5. |
+##### Figures 07–12: Pipeline Progress and Classification
 
-**Pass 5 — Summary (optional, 1 minute)**
+| Figure | Section | What it shows | Detailed interpretation |
+|--------|---------|---------------|------------------------|
+| **07 Flag Composition Stacked** | `pipeline_cleaning/` | Stacked bar chart of flag types at each pipeline step | The proportion of TIMESTAMP_ISSUE, DURATION_ISSUE, AMOUNT_FLAG, SELF_REPORTED_FLAG should decrease or stay flat as corrections are applied. If a flag type increases after Step 6 (Manual corrections), the correction logic may have introduced new errors. |
+| **08 Sleep Duration by Category** | `pipeline_cleaning/` | Boxplot of TST grouped by `data_category` (clean, error, unusual, equal_time_ok, skipped_na) | Clean and equal_time_ok records should show similar TST distributions. Error records should show extreme TST values (very short or very long). If clean and error distributions overlap completely, the error classification may be too strict. |
+| **09 Bedtime vs Getup Distribution** | `pipeline_cleaning/` | Clock-plot (circular) showing bed and getup times | Bedtime should cluster around 22:00–01:00 (10 PM–1 AM). Getup around 06:00–09:00 (6 AM–9 AM). Points outside these ranges may indicate AM/PM errors (e.g., bedtime recorded as 13:00 = 1 PM instead of 1 AM) or shift-work schedules. |
+| **10 Extreme Sleep Duration** | `pipeline_cleaning/` | Scatter or bar plot of records with extreme TST (< 3 h or > 12 h) | Each extreme record should have a clear explanation: missing data, AM/PM error, or genuine short/long sleep. If many records are extreme, review the threshold. |
+| **12 Pipeline Correction Progress** | `pipeline_cleaning/` | Grouped bar chart at Checkpoints A–E showing Clean, Error, Unusual, Equal Time, Corrected counts | **This is the most important figure for pipeline validation.** The Corrected bar should first appear at Checkpoint C (Step 6.5) and stay at the same height through E. If Corrected increases between C and E, the correction logic applied corrections after the "corrections" step — a bug. If Clean decreases after B, corrections removed the wrong flag from some records. |
+| **—** | | | *Figure 11 was removed (free-y axis comparison was misleading).* |
 
-| Order | Figure | What to check |
-|:-----:|--------|---------------|
-| 13 | **R25 Sleep Regularity** | Weekday vs weekend TST and bedtime. A small difference (30–60 min) is normal. A large difference (> 2 h) may indicate a shift-work or social-jetlag pattern worth noting in your analysis. |
-| 14 | **R26 Sleep Composition (TIB Breakdown)** | Stacked bar showing how TIB (time in bed) is composed of TST + SOL + WASO. TST should be the largest component for most participants. |
-| 15 | **R27 Sleep Metrics Correlation Matrix** | Correlation heatmap between all sleep metrics. Expected patterns: TST and SE should be positively correlated; SOL and SE should be negatively correlated. |
+##### Figures 13–18: Auto-Detection and Error Patterns
 
-**Summary checklist:**
+| Figure | Section | What it shows | Detailed interpretation |
+|--------|---------|---------------|------------------------|
+| **13 Error Category Distribution** | `pipeline_cleaning/` | Bar chart of error types (order_error, bed_sleep_diff_error, awake_getup_diff_error, sleep_awake_24h_error) | Shows which temporal errors are most common. `order_error` (bed > sleep > awake > getup violated) should be the rarest — it means a record's timestamps cannot be arranged in chronological order at all. `bed_sleep_diff_error` (difference > 7 h) may indicate the participant reports "time to bed" and "time to sleep" inconsistently. If any error type dominates (> 50% of errors), review that specific survey question. |
+| **14 Sleep Duration Pre-Correction** | `pipeline_cleaning/` | Distribution of TST BEFORE manual corrections are applied | Compare with Figure 03 (post-correction). If pre-correction has more extreme values, the corrections are working as expected. If pre- and post-correction look identical, the manual correction CSVs may not have been read correctly. |
+| **15 Error Timeline** | `pipeline_cleaning/` | Error records plotted over time (study day on x-axis) | Errors should be randomly distributed across study days. If errors cluster on specific days (e.g., Day 1 only), participants may have had trouble starting the survey. If errors cluster late in the study, participant fatigue may be affecting data quality. |
+| **16 Common Error Patterns** | `pipeline_cleaning/` | Most frequent combinations of error types per participant | Some participants may have multiple errors of different types. If a participant has both `order_error` and `bed_sleep_diff_error`, their data entry pattern is problematic — consider excluding them or reviewing their training. |
+| **17 Top Participants Flags** | `pipeline_cleaning/` | Bar chart: participants with the most total flags | One participant with many more flags than others = investigate their raw data. They may have not understood the survey, or their sleep pattern is genuinely unusual. Evenly distributed flags across participants = good. |
+| **18 Auto-Detected Dashboard** | `pipeline_cleaning/` | Dashboard of all flags from Step 8: TIMESTAMP_ISSUE, DURATION_ISSUE, AMOUNT_FLAG, SELF_REPORTED_FLAG | TIMESTAMP_ISSUE should be 0 or very low (unparseable timestamps). DURATION_ISSUE flags records outside configured metric thresholds — compare with `correction_status_final.csv` to verify the count matches. SELF_REPORTED_FLAG indicates a disconnect between what the participant estimated and what the timestamps compute. Cross-reference with Figure 20. |
+
+##### Figure 19: Unified Classification Summary
+
+| Figure | Section | What it shows | Detailed interpretation |
+|--------|---------|---------------|------------------------|
+| **19 Unified Quality Status** | `research_ready/` | Pie chart or bar of final classification: Clean, Minor, Major, Error, Unusual | This is your final quality summary. Most records should be Clean or Minor. Error + Unusual should be a small fraction (< 5%). If Error + Unusual is large, the data collection protocol or correction CSV workflow may need adjustment. |
+
+##### Figures 20–20B: Perception Bias
+
+| Figure | Section | What it shows | Detailed interpretation |
+|--------|---------|---------------|------------------------|
+| **20 SOL Perception Bias** | `research_ready/` | Bland-Altman plot: self-reported SOL vs computed SOL | **X-axis:** mean of self-reported and computed SOL. **Y-axis:** computed minus self-reported. **This plot answers:** "Do participants accurately estimate their sleep onset latency?" If the horizontal bias line is near 0 (y ≈ 0), self-report is accurate. If the bias line is above 0, participants overestimate their SOL (they think it took longer than it did). If below 0, they underestimate. The dotted lines are 95% limits of agreement — 95% of differences should fall between them. If many points fall outside, the disagreement is large. |
+| **20B WASO Perception Bias** | `research_ready/` | Bland-Altman plot: self-reported WASO vs computed WASO | Same interpretation as Figure 20 but for wake-after-sleep-onset. Note: WASO has no "computed" equivalent in EMA data (both values come from self-report). This figure compares two different processing paths for the same self-report, so it measures consistency, not accuracy. |
+
+##### Figures 21–24: Substance Use
+
+| Figure | Section | What it shows | Detailed interpretation |
+|--------|---------|---------------|------------------------|
+| **21 Substance Use Availability** | `research_ready/` | Bar chart or table showing how many records have non-NA values for each substance (caffeine, alcohol, nicotine, cannabis) | High availability (most records have a value) = good compliance. Low availability for a specific substance = participants may have skipped that question, or it was added late to the survey. |
+| **22 Substance Use Distribution** | `research_ready/` | Combined distribution plots for all four substances | Caffeine should show the widest range (0–5+ drinks). Alcohol typically 0–3. Nicotine and cannabis use depends on study population. Spikes at 888 or 999 = filler codes (handled by the pipeline). |
+| **23 Caffeine Consumption** | `research_ready/` | Histogram or bar chart of caffeine drinks per day | Most values should be 0–5. Values of 0 should be common (not everyone drinks caffeine every day). A value of exactly 1 or 2 is typical. Values > 10 may be energy drinks or data-entry errors. |
+| **24 Alcohol Consumption** | `research_ready/` | Histogram or bar chart of alcoholic drinks per day | Most values should be 0–3. Daily alcohol > 5 drinks may indicate heavy drinking (depends on study population) or data-entry errors. |
+
+##### Figures R25–R27: Research Summary
+
+| Figure | Section | What it shows | Detailed interpretation |
+|--------|---------|---------------|------------------------|
+| **R25 Sleep Regularity** | `research_ready/` | Side-by-side comparison of weekday vs weekend: TST, bedtime, getup | A small difference is normal (30–60 min later bedtime on weekends). A difference > 2 h suggests social jetlag or shift work. This figure is useful for characterizing the study population's sleep patterns. |
+| **R26 Sleep Composition (TIB Breakdown)** | `research_ready/` | Stacked bar: TIB = TST + SOL + WASO for each participant | TST should be the largest segment for most participants. If a participant has WASO > TST, their sleep is highly fragmented — worth noting as an exclusion criterion or covariate. |
+| **R27 Sleep Metrics Correlation Matrix** | `research_ready/` | Correlation heatmap of all sleep metrics | Expected: TST ↔ SE = positive (more sleep = higher efficiency). SOL ↔ SE = negative (longer latency = lower efficiency). WASO ↔ SE = negative (more wake = lower efficiency). If correlations are weak or in the wrong direction, the data may have measurement issues. |
+
+---
+
+#### Summary Checklist
 
 ```
-Pass 1 (1 min): 01 → 12 → 18
-   ↓ Pass?
-Pass 2 (2 min): 02 → 04B → 09 → 19
-   ↓ Pass?
-Pass 3 (2 min): 13 → 17 → 20
-   ↓ Pass?
-Pass 4 (1 min): 23 → 24
-   ↓ Pass?
-Pass 5 (1 min): R25 → R26 → R27
-   ↓ All pass?
-Output is valid.
+Part A (3 min): 01 → 12 → 18 → 02 → 19
+   All 5 pass? → Output is valid.
+   Any fail?   → Go to Part B for detailed diagnosis.
+
+Part B — Use the table above to find the specific figure that failed
+and read its detailed interpretation.
 ```
 
 ---
