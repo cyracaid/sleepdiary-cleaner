@@ -227,140 +227,180 @@ Registered in `opencode.jsonc`:
 }
 ```
 
-## How to Check the Pipeline Output
+## How to Read the Pipeline Output
 
-### Which Outputs Actually Matter
-
-Every `run_pipeline()` call produces this. Here's what you actually need:
-
-| Output | File | Priority | Why | Check every run? |
-|--------|------|:--------:|-----|:----------------:|
-| **Run summary** | `output/correction_status_final.csv` | ★★★★★ | One row per run: n_total, tst_mean, sol_mean, error/corrected/flag counts | **Yes** |
-| **Per-step flags** | `output/step_flag_ledger.csv` | ★★★★☆ | Which step produced which flag, and whether flags persist or get resolved | Yes (first run only, then spot-check) |
-| **QC figures** | `latest_visualization/pipeline_cleaning/` | ★★★☆☆ | Visual sanity check: distributions, flag composition, error patterns | Yes (first run, then glance) |
-| **Research figures** | `latest_visualization/research_ready/` | ★★☆☆☆ | Analysis-ready plots (distributions, correlations, substance use) | No — only when preparing figures for a report |
-| **Integrity report** | `output/audit_integrity_report.csv` | ★☆☆☆☆ | Data integrity checks (column counts, NA rates, etc.) | No — only needed after schema or data changes |
-| **Flagged records export** | `output/flagged_records_self_reported.csv` | ★☆☆☆☆ | Records flagged as self-report vs computed mismatch | No — only when reviewing specific participants |
-
-**In short: you only need `correction_status_final.csv` for routine checks. Grab `step_flag_ledger.csv` when you want to understand which step caused a change. The rest is for debugging or publications.**
+After `run_pipeline()` finishes, two CSV files tell you everything. Here is how to read them.
 
 ---
 
-### Step 0: Did the pipeline finish?
+### 1. `output/correction_status_final.csv` — The Run Summary (Open This First)
 
-```bash
-ls output/ | head -10
-ls latest_visualization/ | head -5
+One row per pipeline run. It answers: *"did the cleaning work as expected?"*
+
+**How to open it:**
+
+```r
+read.csv("output/correction_status_final.csv")
 ```
 
-If `output/correction_status_final.csv` exists and has data: the pipeline completed.
+**What each column means and what to check:**
+
+| Column | It tells you... | Check this |
+|--------|----------------|------------|
+| `n_total` | Total records in your data | Must equal your input row count. If smaller, records were dropped somewhere. |
+| `tst_mean_h` | Mean total sleep time in hours | 6.0–8.5 h is normal for most adult studies. If < 5 or > 10, something is off with the timestamp parsing or the study population is unusual. |
+| `sol_mean_min` | Mean sleep onset latency in minutes | 10–45 min is normal. If > 60, either the population has high insomnia or AM/PM confusion was not fully corrected. |
+| `n_clean` | Records that passed every check | Should be stable across runs (same data = same count). |
+| `n_error` | Records with impossible temporal order (e.g., getup before bedtime) | Should be < 1% of total. If > 5%, review the survey design or data collection. |
+| `n_corrected` | Records manually corrected via your CSV files | Should match the number of rows in your `manual_error_corrections.csv`. |
+| `n_corrected` jump from 0 to 71 to 81 across B→C→D checkpoints | 71 = timestamp corrections, +10 = duration corrections | The jump at the right step is expected. |
+| `timestamp_issue` | Timestamps that could not be parsed into a valid time | 0 is normal. > 0 means some participants entered non-standard time formats. |
+| `duration_issue` | Sleep metrics (SOL, SE, TST) outside configured thresholds | Small numbers are normal (e.g., 10 out of 280). If very large, your thresholds may be too strict or the data has quality problems. |
+| `amount_flag` | Substance-use entries with unusual values (e.g., text, 3-digit numbers) | Should be 0 or very low. Automatic text-to-number conversion handles "three" → 3. |
+| `self_reported_flag` | Records where self-reported SOL/WASO disagrees with the computed value | Indicates perception bias. Check Figure 20 (SOL Perception Bias) to see the pattern. |
+
+**Real example (synthetic data):**
+
+```
+  n_total tst_mean_h sol_mean_min n_clean n_error n_corrected duration_issue
+     280       6.94         31.4       0       0           0             10
+```
+
+Interpretation: 280 records, mean TST 6.94 h (normal), mean SOL 31.4 min (normal). 10 duration issues (plausible). No errors (synthetic data was well-formed).
+
+**Stability rule:** Run twice on the same data → every number must be identical. If not, something is non-deterministic.
 
 ---
 
-### Step 1: Open `output/correction_status_final.csv`
+### 2. `output/step_flag_ledger.csv` — The Per-Step Flag Tracker (Open Second)
 
-This is the **first place you look**. Each row = one pipeline run.
+One row per step × per standard × per category. It answers: *"at which step did which flag appear, and did it persist?"*
 
-```
-run_id, n_total, n_clean, n_error, n_corrected,
-timestamp_issue, duration_issue, amount_flag, self_reported_flag,
-tst_mean_h, sol_mean_min
-```
-
-| Check | What to look for | What's normal |
-|-------|-----------------|---------------|
-| `n_total` | Matches your input row count? | Should equal your RDS/CSV record count |
-| `tst_mean_h` | Mean total sleep time | 6.0-8.5 h for most adult populations |
-| `sol_mean_min` | Mean sleep onset latency | 10-45 min for most populations |
-| `n_clean` | Records passing all checks | Depends on data quality; stable across re-runs |
-| `n_error` | Records with impossible temporal order | Should be low (< 1% of total) |
-| `n_corrected` | Records manually corrected | Should equal your correction CSV row count |
-| `timestamp_issue` | Unparseable timestamps | 0 normally |
-| `duration_issue` | Metrics outside configured thresholds | Small relative to n_total |
-| `self_reported_flag` | Self-report vs computed value mismatch | Indicates perception bias |
-
-**Key rule: same data, same output.** If you run the pipeline twice on identical input, every number in this file must be identical. If any number changes, something is non-deterministic.
-
----
-
-### Step 2: Open `output/step_flag_ledger.csv`
-
-Shows exactly which step produced which flag, and whether those flags persist or get resolved.
-
-**In R:**
+**How to open it:**
 
 ```r
 ledger <- read.csv("output/step_flag_ledger.csv")
+
+# Only rows with actual numbers (skip NA = not yet computed)
 library(dplyr)
 ledger %>% filter(!is.na(count)) %>% arrange(step_id, standard)
 ```
 
-#### 2a. `data_category` -- must be stable after Step 6
+#### What each "standard" is
 
-Steps 6, 6.5, 7, 8, 8.5 must have **identical** clean / error / unusual / equal_time_ok / skipped_na counts.
+The ledger uses 5 independent evaluation systems. Each one becomes meaningful only after the step that computes it:
 
-**Validation:** `equal_time_ok + skipped_na = n_total`
+| Standard | First step with numbers | What it evaluates | Key categories |
+|----------|:----------------------:|-------------------|----------------|
+| `field_misentry` | 1.5 | Whether a duration estimate (SOL, WASO) exactly matches a timestamp — may indicate "typed in wrong box" | `none`, `SOL=time_sleep`, `SOL=time_bed`, `WASO=time_awake`, `WASO=time_getup` |
+| `data_category` | 4 | Temporal order and plausibility of the bed → sleep → awake → getup sequence | `clean`, `error`, `unusual`, `equal_time_ok`, `skipped_na` |
+| `flag_severity` | 7 | How many derived-metric flags (low SE, high SOL, high WASO) each record triggered | `Clean`, `Minor (1 flag)`, `Major (2+ flags)` |
+| `duration_extreme` | 7 | Total sleep time outside physiologically plausible bounds | `OK`, `Too short (< 3 h)`, `Too long (> 12 h)` |
+| `checkforerrors` | 8 | Summary of all auto-detection flags assembled in Step 8 | `TIMESTAMP_ISSUE`, `DURATION_ISSUE`, `AMOUNT_FLAG`, `SELF_REPORTED_FLAG` |
 
-#### 2b. `flag_severity` -- must be stable after Step 7
+**Conceptual rule:** Standards are computed once and never re-computed. If a standard's counts change after its first computation step, something is wrong.
 
-Steps 7, 8, 8.5 must have **identical** Clean / Minor / Major counts.
+#### How to validate each standard
 
-**Validation:** `Clean + Minor + Major = n_total - skipped_na`
+**a. `data_category` — must be frozen from Step 6 onward**
 
-#### 2c. `field_misentry` -- check for cross-field contamination
+Run this:
+```r
+ledger %>%
+  filter(standard == "data_category", !is.na(count)) %>%
+  select(step_id, label, category, count)
+```
 
-If any category other than `none` has count > 0, the participant may have typed into the wrong field.
+You should see: Steps 6, 6.5, 7, 8, 8.5 all have **identical** numbers for every category (`equal_time_ok`, `skipped_na`, `clean`, `error`, `unusual`). Step 8 (Auto-detect) does NOT reclassify records — it only summarizes.
 
-#### 2d. `duration_extreme` -- implausible TST
+**Arithmetic check:** `equal_time_ok + skipped_na = n_total`
 
-`Too short (< 3 h)` + `Too long (> 12 h)` should be < 5% of total.
+**b. `flag_severity` — must be frozen from Step 7 onward**
 
-#### 2e. `checkforerrors` -- auto-detection summary
+Run this:
+```r
+ledger %>%
+  filter(standard == "flag_severity", !is.na(count)) %>%
+  select(step_id, label, category, count)
+```
 
-Populated at Step 8. TIMESTAMP_ISSUE / DURATION_ISSUE / AMOUNT_FLAG / SELF_REPORTED_FLAG.
+Steps 7, 8, 8.5 must have **identical** Clean / Minor / Major counts. Severity is computed once in Step 7.
+
+**Arithmetic check:** `Clean + Minor + Major = n_total - skipped_na`
+
+**c. `field_misentry` — cross-field contamination check**
+
+If any category other than `none` has `count > 0`, the participant may have typed a duration into a time field or vice versa. This is flagged at Step 1.5 and recorded through every subsequent step.
+
+**d. `duration_extreme` — implausible sleep durations**
+
+From Step 7 onward: `Too short (< 3 h)` + `Too long (> 12 h)` should sum to < 5% of `n_total`. If higher, review whether participant instructions or data collection need adjustment.
+
+**e. `checkforerrors` — auto-detection flags (Step 8 only)**
+
+This standard is populated only at Step 8. It summarizes:
+- `TIMESTAMP_ISSUE`: timestamps that could not be parsed
+- `DURATION_ISSUE`: metrics outside configured thresholds
+- `AMOUNT_FLAG`: anomalous substance-use entries
+- `SELF_REPORTED_FLAG`: self-reported vs computed value mismatch
+
+#### Real example (synthetic data, 280 rows)
+
+```
+  Step 4 (Normalize sequence):       data_category: equal_time_ok=266, skipped_na=14
+  Step 6 (Manual corrections):       data_category: equal_time_ok=266, skipped_na=14  (unchanged ✓)
+  Step 7 (Compute metrics):          data_category: equal_time_ok=266, skipped_na=14  (unchanged ✓)
+                                     flag_severity: Clean=251, Minor=28, Major=1      251+28+1=266=280-14 ✓
+                                     duration_extreme: OK=262, Too short=1, Too long=0
+  Step 8 (Auto-detect):              data_category + flag_severity + duration_extreme = unchanged from Step 7 ✓
+  Step 8.5 (Cross-participant):      same as Step 8 ✓
+```
+
+The numbers do not change after they are first computed. That is the signature of a stable pipeline.
 
 ---
 
-### Step 3: Scan the Figures
+### 3. Scan the Figures (visual confirmation)
 
 | Figure | What to look for |
 |--------|-----------------|
-| **01 Quality Dashboard** | Expected distributions? Spike anywhere? |
-| **12 Pipeline Correction Progress** | Flag composition change at Step 6? |
-| **13 Error Category Distribution** | Which error type dominates? |
-| **17 Top Participants Flags** | One participant dominating? |
-| **20 SOL/WASO Perception Bias** | Bias cluster around zero? |
+| **01 Quality Dashboard** | Are the distributions bell-shaped? Any unexpected spikes? |
+| **12 Pipeline Correction Progress** | Does flag composition change at Step 6 (corrections applied) as expected? |
+| **13 Error Category Distribution** | Which error type is most common? `order_error` should be the rarest. |
+| **17 Top Participants Flags** | Is one participant responsible for most flags? If so, investigate that participant. |
+| **20 SOL/WASO Perception Bias** | Do the differences cluster around zero? If the bias is far from zero, there is a systematic perception issue. |
 
 ---
 
-### Step 4: Regression Check
-
-Compare against a previous run. In R:
+### 4. Regression Check (compare against a previous run)
 
 ```r
 old <- read.csv("output/correction_status_old.csv")
 new <- read.csv("output/correction_status_final.csv")
-# n_total, tst_mean_h, sol_mean_min must match
-# n_clean, n_error, n_corrected must match
+
+# These must be identical if the input data has not changed
+identical(old$tst_mean_h, new$tst_mean_h)
+identical(old$sol_mean_min, new$sol_mean_min)
+identical(old$n_clean, new$n_clean)
+identical(old$n_corrected, new$n_corrected)
 ```
 
-Or run snapshot verification:
-
-```bash
-Rscript inst/verification/verify_v1_3_snapshot.R
-```
+If they differ and the input data did not change, the pipeline output has changed. Investigate.
 
 ---
 
-### Summary: Three-Question Quickscan
+### Quick Reference Card (print this)
 
-| # | Ask | Answer from |
-|---|-----|-------------|
-| 1 | Did the pipeline finish? | `correction_status_final.csv` exists |
-| 2 | Are final numbers reasonable? | `tst_mean_h` 6-8.5, `sol_mean_min` 10-45, `n_error` < 1% |
-| 3 | Are per-step flags stable? | `step_flag_ledger.csv`: data_category + flag_severity unchanged after Step 7 |
-
-If all three pass, the output is valid.
+| Check | What to run | Pass if |
+|-------|-------------|---------|
+| Pipeline finished | `file.exists("output/correction_status_final.csv")` | `TRUE` |
+| Reasonable TST | `tst_mean_h` between 6–8.5 | Yes |
+| Reasonable SOL | `sol_mean_min` between 10–45 | Yes |
+| Few errors | `n_error < 0.01 * n_total` | Yes |
+| data_category stable | Counts identical across Steps 6–8.5 | Yes |
+| flag_severity stable | Counts identical across Steps 7–8.5 | Yes |
+| All records accounted | `equal_time_ok + skipped_na = n_total` | Yes |
+| Deterministic | Same input → same output every time | Yes |
 
 ---
 
