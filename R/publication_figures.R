@@ -51,89 +51,144 @@ figure_pipeline_workflow <- function() {
   cc <- .extract_counts(df)
 
   # Derived categories
-  n_removed <- cc$n_error
+  n_errors_flagged <- cc$n_error
+  n_unusual_flagged <- cc$n_unusual
   n_auto_corrected <- cc$n_auto
   n_manual_corrected <- cc$n_manual
-  n_reviewed_unchanged <- cc$n_flagged + cc$n_unusual
-  n_final <- cc$n_clean + cc$n_equal
+  n_reviewed_unchanged <- cc$n_flagged
+  n_clean <- cc$n_clean + cc$n_equal
+  n_skipped <- cc$n_skipped
   n_total <- cc$total
 
   pct <- function(x) round(x / n_total * 100, 1)
 
-  # Build nodes data frame
-  nodes <- data.frame(
-    id = c("raw", "errors", "algocorrect", "manualcorrect",
-           "reviewed", "final"),
+  # ---- Layout: left-to-right flow ----
+  # Column 0: Raw       (x=0)
+  # Column 1: Auto-correction  (x=3)
+  # Column 2: Validation       (x=6)
+  # Column 3: Manual review    (x=9)
+  # Column 4: Final            (x=12)
+
+  boxes <- data.frame(
+    id = c("raw", "autocorr", "valid", "manual", "final",
+           "auto_corr_out", "errors_out", "unusual_out",
+           "manual_corr_out", "reviewed_out"),
     label = c(
       sprintf("Raw Sleep Diary\nRecords\nN = %d", n_total),
-      sprintf("Auto-Detected\nErrors Removed\nN = %d (%.1f%%)", n_removed, pct(n_removed)),
-      sprintf("Algorithmic\nCorrection\nN = %d (%.1f%%)", n_auto_corrected, pct(n_auto_corrected)),
-      sprintf("Manual Review\n& Correction\nN = %d (%.1f%%)", n_manual_corrected, pct(n_manual_corrected)),
-      sprintf("Reviewed,\nUnchanged\nN = %d (%.1f%%)", n_reviewed_unchanged, pct(n_reviewed_unchanged)),
-      sprintf("Final Clean\nDataset\nN = %d (%.1f%%)", n_final, pct(n_final))
+      "Automatic\nCorrection\n(Step 4)",
+      "Automatic\nValidation\n(Step 5)",
+      "Manual Review\n(Step 6)",
+      sprintf("Final Clean\nDataset\nN = %d\n(%.1f%%)", n_clean, pct(n_clean)),
+      sprintf("Auto-Corrected\nN = %d (%.1f%%)", n_auto_corrected, pct(n_auto_corrected)),
+      sprintf("Errors Flagged\nN = %d (%.1f%%)", n_errors_flagged, pct(n_errors_flagged)),
+      sprintf("Unusual Flagged\nN = %d (%.1f%%)", n_unusual_flagged, pct(n_unusual_flagged)),
+      sprintf("Manually\nCorrected\nN = %d (%.1f%%)", n_manual_corrected, pct(n_manual_corrected)),
+      sprintf("Reviewed,\nUnchanged\nN = %d (%.1f%%)", n_reviewed_unchanged, pct(n_reviewed_unchanged))
     ),
-    x = c(0, -2.5, 2.5, 2.5, -2.5, 0),
-    y = c(5, 3.5, 3.5, 2, 2, 0),
-    fill = c("#2166AC", "#B2182B", "#F4A582", "#4393C3", "#D1C4E9", "#4DAF4A"),
-    width = c(2.8, 2.8, 2.8, 2.8, 2.8, 2.8),
-    height = c(0.8, 0.8, 0.8, 0.8, 0.8, 0.8),
+    x = c(0, 3, 6, 9, 12, 3, 6, 6, 9, 9),
+    y = c(0, 0, 0, 0, 0, -2.2, -2.2, -3.6, -2.2, -3.6),
+    fill = c("#2166AC", "#2166AC", "#2166AC", "#2166AC", "#4DAF4A",
+             "#F4A582", "#B2182B", "#D1C4E9", "#4393C3", "#D1C4E9"),
+    width = c(2.2, 2.2, 2.2, 2.2, 2.2, 2.2, 2.2, 2.2, 2.2, 2.2),
+    height = c(1.0, 1.0, 1.0, 1.0, 1.0, 0.9, 0.9, 0.9, 0.9, 0.9),
     stringsAsFactors = FALSE
   )
 
-  # Build edges data frame
-  edges <- data.frame(
-    x = c(0, 0, 2.5, 2.5, -1, -1),
-    y = c(4.6, 4.6, 3, 3, 2.6, 2.6),
-    xend = c(-1.2, 1.2, 0, 3.5, -2.5, 0.5),
-    yend = c(3.9, 3.9, 2.4, 2, 1.6, 0.4),
-    label = c("", "", "", "",
-              sprintf("%.0f (%.1f%%)", cc$n_equal + cc$n_clean, pct(cc$n_equal + cc$n_clean)), ""),
+  # Main flow arrows (left to right, along y=0)
+  flow_edges <- data.frame(
+    x = c(1.1, 4.1, 7.1, 10.1),
+    xend = c(1.9, 4.9, 7.9, 10.9),
+    y = c(0, 0, 0, 0),
+    yend = c(0, 0, 0, 0),
     stringsAsFactors = FALSE
   )
 
-  p <- ggplot(nodes) +
-    # Arrow segments
-    geom_segment(data = edges,
+  # Branch arrows (down from stage to outcome)
+  branch_edges <- data.frame(
+    x = c(3, 6, 6, 9, 9),
+    xend = c(3, 6, 6, 9, 9),
+    y = c(-0.5, -0.5, -0.5, -0.5, -0.5),
+    yend = c(-1.7, -1.7, -3.1, -1.7, -3.1),
+    stringsAsFactors = FALSE
+  )
+
+  # Diagonal arrows: flagged errors -> manual review, unusual -> manual review
+  diag_edges <- data.frame(
+    x = c(7.1, 7.1),
+    xend = c(8.9, 8.9),
+    y = c(-2.2, -3.6),
+    yend = c(-1.7, -3.1),
+    stringsAsFactors = FALSE
+  )
+
+  # "Passed validation" arrow from validation down to manual review route
+  # (validation passes through horizontally already, so branch notes suffice)
+
+  p <- ggplot(boxes) +
+    # Main flow arrows
+    geom_segment(data = flow_edges,
                  aes(x = x, y = y, xend = xend, yend = yend),
-                 arrow = arrow(length = unit(0.08, "inches"), type = "closed"),
-                 colour = "grey50", linewidth = 0.5) +
+                 arrow = arrow(length = unit(0.12, "inches"), type = "closed"),
+                 colour = "grey40", linewidth = 0.7) +
+    # Branch arrows (down)
+    geom_segment(data = branch_edges,
+                 aes(x = x, y = y, xend = xend, yend = yend),
+                 arrow = arrow(length = unit(0.10, "inches"), type = "closed"),
+                 colour = "grey60", linewidth = 0.5, linetype = "dashed") +
+    # Diagonal arrows (flagged -> manual review)
+    geom_segment(data = diag_edges,
+                 aes(x = x, y = y, xend = xend, yend = yend),
+                 arrow = arrow(length = unit(0.10, "inches"), type = "closed"),
+                 colour = "grey60", linewidth = 0.5, linetype = "dashed") +
 
-    # Boxes
-    geom_tile(aes(x = x, y = y, fill = I(fill)),
-              width = nodes$width, height = nodes$height,
-              colour = "grey30", linewidth = 0.7) +
+    # Stage boxes (main flow, y=0)
+    geom_tile(data = boxes[1:5, ],
+              aes(x = x, y = y, fill = I(fill)),
+              width = boxes$width[1:5], height = boxes$height[1:5],
+              colour = "grey30", linewidth = 0.8) +
 
-    # Labels
-    geom_text(aes(x = x, y = y - 0.05, label = label),
-              size = 3.8, lineheight = 0.9, colour = "white",
-              fontface = "bold") +
+    # Outcome boxes (branches)
+    geom_tile(data = boxes[6:10, ],
+              aes(x = x, y = y, fill = I(fill)),
+              width = boxes$width[6:10], height = boxes$height[6:10],
+              colour = "grey30", linewidth = 0.6) +
 
-    # Legend-like annotation
-    annotate("text", x = 0, y = -1.2, size = 3.2, colour = "grey40", lineheight = 0.85,
-             label = sprintf(
-"Correction summary:
-  %d auto-corrected (%.1f%%)
-  %d manually corrected (%.1f%%)
-  %d reviewed, unchanged (%.1f%%)
-  %d auto-detected errors removed (%.1f%%)
-  %d clean records (%.1f%%)",
-               n_auto_corrected, pct(n_auto_corrected),
-               n_manual_corrected, pct(n_manual_corrected),
-               n_reviewed_unchanged, pct(n_reviewed_unchanged),
-               n_removed, pct(n_removed),
-               n_final, pct(n_final))) +
+    # Labels — main stage boxes (white text)
+    geom_text(data = boxes[1:5, ],
+              aes(x = x, y = y, label = label),
+              size = 3.6, lineheight = 0.9, colour = "white", fontface = "bold") +
+    # Labels — outcome boxes
+    geom_text(data = boxes[6:10, ],
+              aes(x = x, y = y, label = label),
+              size = 3.2, lineheight = 0.9, colour = "white", fontface = "bold") +
 
-    xlim(-4, 4) + ylim(-1.5, 6) +
-    labs(title = "Figure 1. Sleep diary cleaning pipeline workflow",
-         subtitle = sprintf("Flow of %d raw records through automatic and manual correction stages", n_total)) +
+    # "passed" / "flagged" annotations on arrows
+    annotate("text", x = 3, y = -0.75, size = 2.8, colour = "grey30",
+             label = "corrected / unchanged") +
+    annotate("text", x = 6, y = -0.75, size = 2.8, colour = "grey30",
+             label = "flagged for review") +
+    annotate("text", x = 9, y = -0.75, size = 2.8, colour = "grey30",
+             label = "decisions applied") +
+
+    coord_cartesian(xlim = c(-1.5, 13.5), ylim = c(-5, 1.5), clip = "off") +
+    labs(
+      title = "Figure 1. Sleep diary cleaning pipeline workflow",
+      subtitle = sprintf(
+        "Flow of %d raw records through automatic correction, validation, and manual review. Percentages use the raw record count as denominator.",
+        n_total),
+      caption = "Red = errors flagged (not auto-fixed). Orange = algorithmically corrected (Step 4).\nBlue = manually corrected (Step 6). Purple = reviewed but unchanged. Green = retained in final dataset.\nGray boxes = processing stages."
+    ) +
     theme_void(base_size = 11) +
     theme(
       plot.title = element_text(face = "bold", size = 13, hjust = 0.5),
-      plot.subtitle = element_text(size = 9, colour = "grey40", hjust = 0.5, margin = margin(b = 10))
+      plot.subtitle = element_text(size = 9, colour = "grey40", hjust = 0.5,
+                                   margin = margin(b = 15)),
+      plot.caption = element_text(size = 8, colour = "grey50", hjust = 0.5,
+                                  margin = margin(t = 15))
     )
 
   dir.create("figures", showWarnings = FALSE)
-  ggsave("figures/Figure_1_Pipeline_Workflow.png", p, width = 8, height = 6, dpi = 300)
+  ggsave("figures/Figure_1_Pipeline_Workflow.png", p, width = 11, height = 6.5, dpi = 300)
   cat("  Saved: figures/Figure_1_Pipeline_Workflow.png\n")
   invisible(p)
 }
