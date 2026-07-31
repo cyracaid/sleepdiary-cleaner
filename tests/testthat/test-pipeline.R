@@ -25,8 +25,8 @@ test_that("run_pipeline completes successfully on synthetic data", {
   expect_true(result, "Pipeline should complete successfully")
 
   # Verify output files exist
-  expect_true(file.exists(file.path(pkg_root, "output", "correction_status.csv")),
-              "correction_status.csv should exist")
+  expect_true(file.exists(file.path(pkg_root, "output", "correction_status_final.csv")),
+              "correction_status_final.csv should exist")
   expect_true(file.exists(file.path(pkg_root, "latest_visualization")),
               "latest_visualization/ should exist")
   expect_true(file.exists(file.path(pkg_root, "latest_visualization", "pipeline_cleaning")),

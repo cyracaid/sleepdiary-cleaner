@@ -205,8 +205,7 @@ Each template uses synthetic data. See the template files for column-level descr
 
 | File | Contents |
 |---|---|
-| `output/correction_status.csv` | Run history of checkpoint snapshots (A-E per run). Tracks n_clean, n_error, n_unusual, n_equal_time, n_skipped, n_corrected at each pipeline step |
-| `output/correction_status_final.csv` | Per-run summary comparing first meaningful checkpoint (B) to last (E), with deltas |
+| `output/correction_status_final.csv` | Per-run summary: n_total, tst, sol, error/corrected/flag counts |
 | `output/flagged_records_self_reported.csv` | Records flagged as SELF_REPORTED_FLAG, with SOL/SE/ratio categories and metric values |
 
 ## Agent Skill
@@ -230,7 +229,22 @@ Registered in `opencode.jsonc`:
 
 ## How to Check the Pipeline Output
 
-After `run_pipeline()` finishes, follow this checklist.
+### Which Outputs Actually Matter
+
+Every `run_pipeline()` call produces this. Here's what you actually need:
+
+| Output | File | Priority | Why | Check every run? |
+|--------|------|:--------:|-----|:----------------:|
+| **Run summary** | `output/correction_status_final.csv` | ★★★★★ | One row per run: n_total, tst_mean, sol_mean, error/corrected/flag counts | **Yes** |
+| **Per-step flags** | `output/step_flag_ledger.csv` | ★★★★☆ | Which step produced which flag, and whether flags persist or get resolved | Yes (first run only, then spot-check) |
+| **QC figures** | `latest_visualization/pipeline_cleaning/` | ★★★☆☆ | Visual sanity check: distributions, flag composition, error patterns | Yes (first run, then glance) |
+| **Research figures** | `latest_visualization/research_ready/` | ★★☆☆☆ | Analysis-ready plots (distributions, correlations, substance use) | No — only when preparing figures for a report |
+| **Integrity report** | `output/audit_integrity_report.csv` | ★☆☆☆☆ | Data integrity checks (column counts, NA rates, etc.) | No — only needed after schema or data changes |
+| **Flagged records export** | `output/flagged_records_self_reported.csv` | ★☆☆☆☆ | Records flagged as self-report vs computed mismatch | No — only when reviewing specific participants |
+
+**In short: you only need `correction_status_final.csv` for routine checks. Grab `step_flag_ledger.csv` when you want to understand which step caused a change. The rest is for debugging or publications.**
+
+---
 
 ### Step 0: Did the pipeline finish?
 
@@ -539,8 +553,7 @@ run_pipeline(config = "my_study_config.yaml")
 
 | 文件 | 内容 |
 |------|------|
-| `output/correction_status.csv` | 每次运行的检查点快照 |
-| `output/correction_status_final.csv` | 检查点间对比汇总 |
+| `output/correction_status_final.csv` | Per-run summary: n_total, tst, sol, error/corrected/flag counts |
 | `output/flagged_records_self_reported.csv` | SELF_REPORTED_FLAG 记录详情 |
 
 ## Agent Skill
