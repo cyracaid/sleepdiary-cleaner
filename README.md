@@ -228,16 +228,61 @@ Registered in `opencode.jsonc`:
 }
 ```
 
-## Output Structure
+## Step Flag Ledger (`output/step_flag_ledger.csv`)
 
-| Path | Contents |
-|------|----------|
-| `latest_visualization/` | All PNGs from latest pipeline run |
-| `latest_visualization/pipeline_cleaning/` | QC and pipeline progress figures |
-| `latest_visualization/research_ready/` | Sleep metrics and analysis figures |
-| `output/correction_status.csv` | Per-checkpoint snapshots over all runs |
-| `output/correction_status_final.csv` | Cross-checkpoint comparisons per run |
-| `output/flagged_records_self_reported.csv` | Records flagged as SELF_REPORTED_FLAG |
+After every pipeline run, `step_flag_ledger.csv` records which flags were set at each step. Each row answers: *"at this step, using this standard, how many records fell into this category?"*
+
+### Column Layout
+
+| Column | What it is |
+|--------|-----------|
+| `step_id` | Pipeline step number |
+| `label` | Human-readable step name |
+| `n_total` | Total records in the pipeline at this point |
+| `standard` | The evaluation system being tracked (see below) |
+| `category` | The specific category within that standard |
+| `count` | Number of records in this category (NA = not yet computed at this step) |
+| `n_corrected` | Records manually corrected at this step |
+
+### The Five Standards
+
+The ledger tracks **five independent evaluation systems**, each applied across the pipeline. A standard only produces actual counts starting from the step where the pipeline first has enough information to compute it — before that step, its `count` is NA.
+
+| Standard | First step with counts | Categories | What it evaluates |
+|----------|:----------------------:|-----------|-------------------|
+| `field_misentry` | 1.5 | none, SOL=time\_sleep, SOL=time\_bed, WASO=time\_awake, WASO=time\_getup | Whether a self-reported SOL or WASO duration exactly matches a timestamp field, suggesting the participant typed in the wrong box |
+| `data_category` | 4 | clean, error, unusual, equal\_time\_ok, reasonable\_unusual, skipped\_na | Temporal order and reasonability of the bed → sleep → awake → getup sequence |
+| `flag_severity` | 7 | Clean, Minor (1 flag), Major (2+ flags) | Severity of derived metric flags: poor efficiency (SE < 70%), high SOL (> 1 h), high WASO (> 1.5 h) |
+| `duration_extreme` | 7 | OK, Too short (< 3 h), Too long (> 12 h) | Total sleep time outside physiologically plausible bounds |
+| `checkforerrors` | 8 | CLEAN, TIMESTAMP\_ISSUE, DURATION\_ISSUE, AMOUNT\_FLAG, SELF\_REPORTED\_FLAG | Summary of all auto-detection flags assembled in Step 8 |
+
+### How to Read It — Validation Rules
+
+1. **`field_misentry`** is recorded at every step but populated from Step 1.5 onward. If any `SOL=time_bed` or `WASO=time_getup` rows have `count > 0`, the field-misentry check identified potential cross-field contamination.
+
+2. **`data_category`** — from Step 6 onward, the numbers must be **stable** (Step 8 does not reclassify records):
+   ```
+   equal_time_ok + skipped_na = n_total
+   ```
+
+3. **`flag_severity`** — from Step 7 onward, the numbers must be **identical across Steps 7, 8, and 8.5** (severity is computed once in Step 7, never re-calculated):
+   ```
+   Clean + Minor + Major = n_total - skipped_na
+   ```
+
+4. **`duration_extreme`** — from Step 7 onward, stays constant. `Too short (< 3 h)` + `Too long (> 12 h)` should be a small fraction of total records (< 5%).
+
+5. **`checkforerrors`** — populated at Step 8. TIMESTAMP\_ISSUE counts timestamps that could not be parsed; DURATION\_ISSUE flags metrics outside configured thresholds; AMOUNT\_FLAG flags anomalous substance-use entries; SELF\_REPORTED\_FLAG flags records where the participant's self-reported duration disagrees with the computed value.
+
+### Example (synthetic data, 280 rows)
+
+```
+Step 7 (Compute metrics):
+  data_category:    equal_time_ok = 266, skipped_na = 14        266 + 14 = 280 ✓
+  flag_severity:    Clean = 251, Minor = 28, Major = 1         251 + 28 + 1 = 266 = 280 - 14 ✓
+  duration_extreme: OK = 262, Too short = 1, Too long = 0
+  field_misentry:   none = 266                                   (no misentries detected)
+```
 
 ## Testing Coverage
 
