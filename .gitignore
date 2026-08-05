@@ -17,8 +17,7 @@ metrics_ai_review.csv
 # Pipeline output
 sleep_visualization_*/
 latest_visualization/
-output/*.csv
-output/reports/
+output/
 Rplots.pdf
 
 # Archive & old code
