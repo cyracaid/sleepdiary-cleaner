@@ -56,16 +56,28 @@ if (!exists("pipeline_config")) { pipeline_config <- list() }
 # ============================================================================
 # AUTO-SAVE SETUP
 # ============================================================================
-output_dir <- paste0("sleep_visualization_", format(Sys.time(), "%Y%m%d_%H%M"))
+# The run directory carries the input row count, so a real-data run
+# (..._n13990) is distinguishable at a glance from a synthetic-data run
+# (..._n280). The count is a fact rather than a label: unlike a "_real" /
+# "_synthetic" tag it cannot be set wrong or go stale.
+.n_records <- if (exists("corrected_ema_data", envir = .GlobalEnv))
+  nrow(get("corrected_ema_data", envir = .GlobalEnv)) else NA_integer_
+output_dir <- paste0("sleep_visualization_", format(Sys.time(), "%Y%m%d_%H%M"),
+                     if (!is.na(.n_records)) paste0("_n", .n_records) else "")
 dir.create(output_dir, showWarnings = FALSE)
 cat(sprintf("\nFigures auto-saving to: %s/\n", output_dir))
+
+# Write each figure ONCE, into its classified subfolder.
+# Previously every figure was written twice (flat copy + subfolder copy) and the
+# whole run directory was then copied into latest_visualization/, so ~30 figures
+# became ~90 files. Nothing referenced the flat copy: make_figure_index.R
+# addresses every figure as "<subdir>/<name>.png", and the README links to the
+# folders rather than to individual files.
 save_png <- function(plot, name, w = 14, h = 9, subdir = NULL) {
-  ggsave(file.path(output_dir, paste0(name, ".png")), plot, width = w, height = h, dpi = 150, limitsize = FALSE)
-  if (!is.null(subdir)) {
-    sub_path <- file.path(output_dir, subdir, paste0(name, ".png"))
-    dir.create(dirname(sub_path), showWarnings = FALSE, recursive = TRUE)
-    ggsave(sub_path, plot, width = w, height = h, dpi = 150, limitsize = FALSE)
-  }
+  rel  <- if (is.null(subdir)) paste0(name, ".png") else file.path(subdir, paste0(name, ".png"))
+  path <- file.path(output_dir, rel)
+  dir.create(dirname(path), showWarnings = FALSE, recursive = TRUE)
+  ggsave(path, plot, width = w, height = h, dpi = 150, limitsize = FALSE)
 }
 
 # ============================================================================
@@ -2407,9 +2419,8 @@ if (requireNamespace("corrplot", quietly = TRUE) &&
     mtext(side = 3, line = 0.5, cex = 0.8,
           sprintf("Pairwise Pearson correlations (N=%d valid records after pipeline correction). Red = negative, Green = positive.", nrow(cor_data)))
     dev.off()
-    # Also save to master directory
-    file.copy(file.path(output_dir, "research_ready", "R27_Sleep_Metrics_Correlation_Matrix.png"),
-              file.path(output_dir, "R27_Sleep_Metrics_Correlation_Matrix.png"))
+    # No flat top-level copy: subfolders are the single location for figures
+    # (see save_png above).
     cat("✓ Figure R27 completed\n\n")
   } else {
     cat("⚠ Too few records for correlation matrix — skipping Figure R27\n\n")
@@ -2573,13 +2584,35 @@ generate_appendix_ledger <- function() {
   csv_path <- "output/appendix_step_ledger.csv"
   write_step_ledger(csv_path)
   # PNG output (uses filename parameter added in R/figure12_step_flag_table.R)
+  #
+  # NOTE on output_dir: figure12_step_flag_table() only consults output_dir when
+  # no save_png function is supplied. We do supply one, and that shim writes
+  # through the run-directory closure, so output_dir has no effect here. It
+  # previously read "latest_visualization", which was doubly misleading -- the
+  # argument was dead AND the figure did not land there. Pass the real run
+  # directory so the call no longer claims something untrue.
   figure12_step_flag_table(
     cfg = get0("cfg"),
-    output_dir = "latest_visualization",
+    output_dir = output_dir,
     save_png = function(plot, filename, w, h, subdir, ...) { save_png(plot, "A1_Step_Flag_Ledger", w = w, h = h, subdir = subdir) },
     filename = "A1_Step_Flag_Ledger"
   )
-  cat(sprintf("✓ Appendix Ledger: %s + latest_visualization/pipeline_cleaning/A1_Step_Flag_Ledger.png\n", csv_path))
+
+  # A1 is generated AFTER latest_visualization/ has already been mirrored from
+  # the run directory, so without this copy it never appears there -- the one
+  # figure missing from every "latest" folder to date. Copy it across rather
+  # than reordering the 2600-line script.
+  a1_rel <- file.path("pipeline_cleaning", "A1_Step_Flag_Ledger.png")
+  a1_src <- file.path(output_dir, a1_rel)
+  a1_dst <- file.path("latest_visualization", a1_rel)
+  a1_copied <- FALSE
+  if (file.exists(a1_src)) {
+    dir.create(dirname(a1_dst), showWarnings = FALSE, recursive = TRUE)
+    a1_copied <- file.copy(a1_src, a1_dst, overwrite = TRUE)
+  }
+  cat(sprintf("✓ Appendix Ledger: %s + %s%s\n", csv_path, a1_src,
+              if (a1_copied) paste0(" -> also ", a1_dst) else
+                "  (WARNING: not copied to latest_visualization/)"))
   invisible(TRUE)
 }
 
