@@ -49,6 +49,7 @@
 ^TEST_RESULTS\.md$
 ^NEWS\.md$
 ^ROADMAP\.md$
+^ARCHITECTURE\.md$
 ^00_MAIN_entry\.R$
 ^00a_setup\.R$
 ^splsleep_1\.0\.0\.tar\.gz$
