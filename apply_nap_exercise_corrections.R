@@ -19,7 +19,7 @@ apply_nap_exercise_corrections <- function(data) {
 
   cat("\n=== Applying nap/exercise manual corrections ===\n")
 
-  corr_file <- "manual_nap_exercise_corrections.csv"
+  corr_file <- cfg_get("data.files.manual_nap_exercise", "manual_nap_exercise_corrections.csv")
   if (!file.exists(corr_file)) {
     cat(sprintf("  No corrections file found (%s) — skipping\n", corr_file))
     return(data)

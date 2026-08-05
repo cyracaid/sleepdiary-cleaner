@@ -86,9 +86,13 @@ eval_flag_severity <- function(df, cfg = NULL) {
   sol_thr  <- .cfg_num(cfg, "classification.flag_severity.high_sol_threshold_hours", 1)
   waso_thr <- .cfg_num(cfg, "classification.flag_severity.high_waso_threshold_hours", 1.5)
 
-  poor <- ifelse(!is.na(df$sleep_efficiency_pct), df$sleep_efficiency_pct < se_thr, FALSE)
-  hsol <- ifelse(!is.na(df$sol_h),  df$sol_h  > sol_thr,  FALSE)
-  hwas <- ifelse(!is.na(df$waso_h), df$waso_h > waso_thr, FALSE)
+  # Use is.finite(), not !is.na(): is.na(Inf) is FALSE, so a non-finite metric
+  # would otherwise pass the guard and be compared against the threshold.
+  # Inf < 70 is FALSE, i.e. a record whose efficiency failed to compute would be
+  # silently scored as "not poor". A non-finite metric is unknown, not clean.
+  poor <- ifelse(is.finite(df$sleep_efficiency_pct), df$sleep_efficiency_pct < se_thr, FALSE)
+  hsol <- ifelse(is.finite(df$sol_h),  df$sol_h  > sol_thr,  FALSE)
+  hwas <- ifelse(is.finite(df$waso_h), df$waso_h > waso_thr, FALSE)
   cnt  <- poor + hsol + hwas
   out <- ifelse(cnt == 0, "Clean",
          ifelse(cnt == 1, "Minor issues (1 flag)", "Major issues (2+ flags)"))
@@ -102,7 +106,9 @@ eval_flag_severity <- function(df, cfg = NULL) {
 eval_duration_extreme <- function(df, cfg = NULL) {
   n <- nrow(df)
   if (!("sleep_duration_h" %in% names(df))) return(rep(NA_character_, n))
-  ifelse(is.na(df$sleep_duration_h), NA_character_,
+  # !is.finite() covers NA, NaN and Inf. An infinite duration is a failed
+  # computation, not a genuinely long sleep, so report it as unknown.
+  ifelse(!is.finite(df$sleep_duration_h), NA_character_,
     ifelse(df$sleep_duration_h < 3,  "Too short (<3h)",
     ifelse(df$sleep_duration_h > 12, "Too long (>12h)", "OK")))
 }

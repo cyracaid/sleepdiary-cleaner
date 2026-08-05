@@ -11,7 +11,7 @@ apply_metric_review_acceptances <- function(data) {
 
   cat("\n=== Applying human metric review acceptances ===\n")
 
-  accept_file <- "manual_metric_review_acceptances.csv"
+  accept_file <- cfg_get("data.files.manual_metric_accept", "manual_metric_review_acceptances.csv")
   if (!file.exists(accept_file)) {
     cat(sprintf("  No acceptances file found (%s) - skipping\n", accept_file))
     return(data)
