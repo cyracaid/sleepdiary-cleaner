@@ -196,7 +196,19 @@ calculate_sleep_time_vars_end <- function(data) {
     # Values range from 0 to 1 (typically 0.70-0.95 in healthy adults).
     # Higher values indicate that a greater proportion of the try-sleep
     # window was actually spent asleep.
-    mutate(self_diffcalc_sleepefficiency_percent = self_diffcalc_totalsleeptime_minutes / self_diffcalc_totaltrysleep_minutes) %>% 
+    #
+    # Denominator guard: a try-sleep duration of zero (or missing) means the
+    # try-sleep window could not be established, so efficiency is UNKNOWN, not
+    # infinite. Without this guard the bare division yields Inf, which then
+    # propagates into the contract column sleep_efficiency_pct (Inf * 100),
+    # breaks plot axes, and contaminates any un-guarded mean()/summary() of the
+    # column -- is.na(Inf) is FALSE, so na.rm = TRUE does not remove it.
+    # Leave it NA instead.
+    mutate(self_diffcalc_sleepefficiency_percent = if_else(
+      !is.na(self_diffcalc_totaltrysleep_minutes) & self_diffcalc_totaltrysleep_minutes > 0,
+      self_diffcalc_totalsleeptime_minutes / self_diffcalc_totaltrysleep_minutes,
+      NA_real_
+    )) %>%
    
     # 8. WASO average bout duration
     # Average length of each trusted WASO interruption. If the bout count is

@@ -1,3 +1,60 @@
+# splsleep 1.3.3
+
+Bug-fix release. No cleaning logic changed other than the guard described below.
+
+## Bug fixes
+
+* `calculate_sleep_time_end.R` -- **sleep efficiency had no denominator guard.**
+  `self_diffcalc_sleepefficiency_percent` was computed as a bare division of TST
+  by total-try-sleep. A try-sleep duration of zero produced `Inf`, which
+  propagated into the contract column `sleep_efficiency_pct` (`Inf * 100`), broke
+  plot axes, and contaminated any un-guarded `mean()`/`summary()` of the column.
+  A zero or missing denominator now yields `NA_real_`: the efficiency is unknown,
+  not infinite. Fixed in **both** the repository-root and `inst/scripts/` copies.
+
+  This fix had been reported as applied in an earlier session but was absent from
+  `main`, which is why the sync test below now exists.
+
+* `flag_standards.R` -- `eval_flag_severity()` and `eval_duration_extreme()` now
+  guard with `is.finite()` rather than `!is.na()`. `is.na(Inf)` is `FALSE`, so a
+  non-finite metric previously passed the guard and reached the threshold
+  comparison. `eval_flag_severity()` behaviour is unchanged for real data (both
+  paths already scored a non-finite metric as un-flagged); `eval_duration_extreme()`
+  now reports an infinite duration as `NA` instead of "Too long (>12h)", since an
+  infinite duration is a failed computation rather than a long sleep.
+
+## Tests
+
+* `test-nonfinite-guards.R` -- pins both bugs: missing and infinite durations
+  must be reported as unknown, non-finite metrics must not be scored, and finite
+  values must still classify correctly.
+* `test-script-copies-in-sync.R` -- several pipeline scripts exist in both the
+  repository root and `inst/scripts/`. This test fails on any **new** divergence
+  and asserts the Bug 2 guard is present in both copies of
+  `calculate_sleep_time_end.R`.
+
+## Script copies brought back into sync
+
+Five scripts had drifted between the repository root and `inst/scripts/`:
+`apply_metric_review_acceptances.R`, `apply_nap_exercise_corrections.R`,
+`apply_second_review.R`, `apply_sleep_metric_duration_corrections.R` and
+`checkforerrors_processing.R`. In every case the `inst/scripts/` copy resolved
+its file paths through `cfg_get()` while the root copy still hardcoded
+filenames -- a half-finished configuration migration.
+
+Which copy runs depends on how the pipeline is started: `run_pipeline()` sources
+from `system.file("scripts")`, whereas `source("00_MAIN_entry.R")` falls back to
+`getwd()`. Under the default config the two behaved identically, because each
+`cfg_get()` default was the same string as the hardcoded filename, so nothing was
+visibly broken. The latent trap was that any config overriding `data.files.*`
+would be honoured by one copy and silently ignored by the other -- the affected
+run would read the default filename without raising an error.
+
+Resolved by making the config-aware `inst/scripts/` copies canonical and copying
+them over the root copies. No behaviour change under `config_default.yaml`.
+All 20 shared scripts are now byte-identical and `KNOWN_DIVERGENT` in the sync
+test is empty.
+
 # splsleep 1.3.0 (in development)
 
 Phase 1 of the v2.0 roadmap: the trustworthy-cleaning foundation. This release
