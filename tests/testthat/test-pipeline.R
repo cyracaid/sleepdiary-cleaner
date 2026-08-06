@@ -27,12 +27,28 @@ test_that("run_pipeline completes successfully on synthetic data", {
   # Verify output files exist
   expect_true(file.exists(file.path(pkg_root, "output", "correction_status_final.csv")),
               "correction_status_final.csv should exist")
-  expect_true(file.exists(file.path(pkg_root, "latest_visualization")),
-              "latest_visualization/ should exist")
-  expect_true(file.exists(file.path(pkg_root, "latest_visualization", "pipeline_cleaning")),
+  # Figure output lives in latest_visualization_<tag>_n<rows>/. Locate it by
+  # pattern rather than by a literal name, so the synthetic row count can change
+  # without breaking the test.
+  viz_dirs <- list.files(pkg_root, pattern = "^latest_visualization_", full.names = TRUE)
+  viz_dirs <- viz_dirs[dir.exists(viz_dirs)]
+  expect_true(length(viz_dirs) >= 1, "a latest_visualization_* directory should exist")
+
+  # This is the load-bearing assertion: a test run reads synthetic_config.yaml,
+  # so it MUST tag its output "synth". If it ever produced a "real" folder the
+  # test suite would be overwriting real-data figures -- which is exactly what
+  # happened on 2026-08-06 back when every run shared one output directory.
+  synth_dirs <- grep("_synth", basename(viz_dirs), value = TRUE)
+  expect_true(length(synth_dirs) >= 1,
+              "test run must write a _synth-tagged directory, never _real")
+
+  viz <- file.path(pkg_root, synth_dirs[1])
+  expect_true(dir.exists(file.path(viz, "pipeline_cleaning")),
               "pipeline_cleaning/ subfolder should exist")
-  expect_true(file.exists(file.path(pkg_root, "latest_visualization", "research_ready")),
+  expect_true(dir.exists(file.path(viz, "research_ready")),
               "research_ready/ subfolder should exist")
+  expect_true(file.exists(file.path(viz, "RUN_INFO.txt")),
+              "RUN_INFO.txt provenance file should exist")
 
   # Verify metrics are in expected ranges
   status <- read.csv(file.path(pkg_root, "output", "correction_status_final.csv"),

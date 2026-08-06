@@ -15,8 +15,11 @@ second_review_checklist.csv
 metrics_ai_review.csv
 
 # Pipeline output
+# Figure output. NOTE the trailing * before the slash: run directories are named
+# latest_visualization_real_n13990/ etc., so a bare "latest_visualization/"
+# pattern would NOT match them and real-data figures would be committed.
 sleep_visualization_*/
-latest_visualization/
+latest_visualization*/
 output/
 output_*/
 Rplots.pdf
