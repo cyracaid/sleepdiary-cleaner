@@ -514,13 +514,16 @@ if (checkforerrors_exists) {
     checkforerrors_processed <- checkforerrors_processed %>%
       mutate(
         error_category = case_when(
-          grepl("Interval format error", auto_error_desc, ignore.case = TRUE) ~ "Interval Format Error",
-          grepl("order error", auto_error_desc, ignore.case = TRUE) ~ "Time Order Error",
-          grepl("sleep latency.*[0-9]+h", auto_error_desc, ignore.case = TRUE) ~ "Sleep Latency Issue",
-          grepl("WASO", auto_error_desc, ignore.case = TRUE) ~ "WASO Issue",
-          grepl("duration >24h", auto_error_desc, ignore.case = TRUE) ~ "Duration >24 Hours",
-          grepl("Unusual pattern", auto_error_desc, ignore.case = TRUE) ~ "Unusual Sleep Pattern",
-          grepl("Error detected", auto_error_desc, ignore.case = TRUE) ~ "General Error",
+          grepl("\\[Interval\\].*SOL", auto_error_desc, ignore.case = TRUE) ~ "SOL Interval Format",
+          grepl("\\[Interval\\].*WASO", auto_error_desc, ignore.case = TRUE) ~ "WASO Interval Format",
+          grepl("\\[Temporal\\] Error:.*order_error", auto_error_desc, ignore.case = TRUE) ~ "Temporal: Time Order",
+          grepl("\\[Temporal\\] Error:.*bed_sleep", auto_error_desc, ignore.case = TRUE) ~ "Temporal: Sleep Latency",
+          grepl("\\[Temporal\\] Error:.*awake_getup", auto_error_desc, ignore.case = TRUE) ~ "Temporal: Awake-Getup",
+          grepl("\\[Temporal\\] Error:.*24h", auto_error_desc, ignore.case = TRUE) ~ "Temporal: Duration >24h",
+          grepl("\\[Temporal\\] Unusual:", auto_error_desc, ignore.case = TRUE) ~ "Temporal: Unusual Pattern",
+          grepl("\\[Metrics\\]", auto_error_desc, ignore.case = TRUE) ~ "Metric Threshold",
+          grepl("\\[Timestamp\\]", auto_error_desc, ignore.case = TRUE) ~ "Timestamp Format",
+          grepl("\\[Amount\\]", auto_error_desc, ignore.case = TRUE) ~ "Substance Input",
           TRUE ~ "Other Issue"
         )
       )
@@ -1415,17 +1418,26 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
   
   # Severity reference table for error categories
   severity_df <- data.frame(
-    Category = c("Interval Format Error", "Time Order Error", 
-                 "Sleep Latency Issue", "WASO Issue",
-                 "Duration >24 Hours", "Unusual Sleep Pattern", "General Error"),
-    Severity = c("Low", "Medium", "High", "Medium", "High", "Low", "High"),
-    Description = c("Format issues, likely entry habit differences",
-                    "Chronological order reversed",
-                    "SOL reaches hour-level, possible entry error",
-                    "Abnormal wake-after-sleep-onset",
-                    "Calculation error or abnormal entry",
-                    "Unusual but possibly real pattern",
-                    "Uncategorized error")
+    Category = c("SOL Interval Format", "WASO Interval Format",
+                 "Temporal: Time Order", "Temporal: Sleep Latency",
+                 "Temporal: Awake-Getup", "Temporal: Duration >24h",
+                 "Temporal: Unusual Pattern", "Metric Threshold",
+                 "Timestamp Format", "Substance Input"),
+    Severity = c("Low", "Low",
+                 "Medium", "Medium", "Medium", "High",
+                 "Low", "High",
+                 "Medium", "Low"),
+    Description = c("SOL entry format issue (e.g. MM:SS vs HH:MM)",
+                    "WASO entry format issue",
+                    "Sleep times in wrong chronological order",
+                    "Bed-to-sleep latency exceeds threshold",
+                    "Awake-to-getup interval exceeds threshold",
+                    "Sleep period exceeds 24h boundary",
+                    "Unusual but possibly valid sleep pattern",
+                    "Sleep metric exceeds clinical threshold (SOL/SE/TST)",
+                    "Clock-time entry format error",
+                    "Substance count input anomaly"),
+    stringsAsFactors = FALSE
   )
   
   severity_tab <- tableGrob(severity_df, rows = NULL,
