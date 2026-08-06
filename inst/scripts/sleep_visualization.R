@@ -589,102 +589,84 @@ cat("\n\n")
 # Error records suggests systematic issues in data collection or entry. The
 # "Needs Review" count should decrease as corrections are applied over time.
 # ============================================================================
-cat("Generating Figure 1...\n")
+# WHAT THIS FIGURE SHOWS:
+# A vertical flow diagram tracing every record through the pipeline.
+# Each stage with counts and % of total raw input.
+# ============================================================================
+cat("Generating Figure 1 (Pipeline Flow Diagram)...\n")
 
-if(all(c("data_category", "manually_corrected") %in% names(corrected_ema_data))) {
-  
-  final_classification <- corrected_ema_data %>%
-    mutate(
-      final_category = case_when(
-        manually_corrected == TRUE ~ "Manually Corrected",
-        # Label must match the factor levels and scale_fill_manual palette
-        # below, both of which say "Clean". This branch previously produced
-        # "Cleaned by Algorithm", a string in neither list, so every record in
-        # data_category == "clean" was silently coerced to NA by factor() and
-        # vanished from the Figure 1 legend -- 1,878 records (13.4%) on the real
-        # dataset. Synthetic data never exposed it because it contains no
-        # "clean" records at all.
-        # "Clean" is also the accurate word: these records had no issues found,
-        # they were not corrected by anything.
-        data_category == "clean" ~ "Clean",
-        data_category == "unusual" ~ "Unusual (Acceptable)",
-        data_category == "error" ~ "Error (Needs Review)",
-        data_category == "equal_time_ok" ~ "Equal Time (Auto-accepted)",
-        data_category == "reasonable_unusual" ~ "Reasonable Unusual",
-        data_category == "skipped_na" ~ "Not Reported",
-        TRUE ~ "Other"
-      )
-    ) %>%
-    group_by(final_category) %>%
-    summarise(count = n(), .groups = "drop") %>%
-    mutate(
-      percentage = count / sum(count) * 100,
-      final_category = factor(final_category, 
-                              levels = c("Manually Corrected", "Error (Needs Review)", 
-                                         "Unusual (Acceptable)", "Clean", 
-                                         "Equal Time (Auto-accepted)", 
-                                         "Reasonable Unusual", "Not Reported", "Other"))
-    )
-  
-  total_records <- nrow(corrected_ema_data)
-  corrected_count <- sum(corrected_ema_data$manually_corrected, na.rm = TRUE)
-  needs_review_count <- sum(corrected_ema_data$data_category == "error" & 
-                              !corrected_ema_data$manually_corrected, na.rm = TRUE)
-  
-  summary_stats <- data.frame(
-    metric = c("Total Records", "Manually Corrected", "Needs Review (Error)"),
-    value = c(format(total_records, big.mark=","),
-              sprintf("%d (%.1f%%)", corrected_count, corrected_count/total_records*100),
-              sprintf("%d (%.1f%%)", needs_review_count, needs_review_count/total_records*100))
+if(all(c("data_category", "manually_corrected", "corrected") %in% names(corrected_ema_data))) {
+
+  .na_cat <- is.na(corrected_ema_data$data_category)
+  .has_time <- !is.na(corrected_ema_data$time_bed_corrected)
+  if (any(.na_cat & .has_time)) {
+    warning(sum(.na_cat & .has_time), " record(s) have NA data_category despite ",
+            "valid corrected timestamps. Step 6 may have been skipped.")
+  }
+
+  n_total     <- nrow(corrected_ema_data)
+  n_not_rpt   <- sum(corrected_ema_data$data_category == "skipped_na", na.rm = TRUE)
+  n_parsed    <- n_total - n_not_rpt
+  n_algo      <- sum(corrected_ema_data$corrected == TRUE, na.rm = TRUE)
+  n_manual    <- sum(corrected_ema_data$manually_corrected == TRUE, na.rm = TRUE)
+  n_error     <- sum(corrected_ema_data$data_category == "error", na.rm = TRUE)
+  n_clean     <- sum(corrected_ema_data$data_category == "clean", na.rm = TRUE)
+  n_unusual   <- sum(corrected_ema_data$data_category == "unusual", na.rm = TRUE)
+  n_equal     <- sum(corrected_ema_data$data_category == "equal_time_ok", na.rm = TRUE)
+  n_valid     <- sum(!is.na(corrected_ema_data$self_diffcalc_totalsleeptime_minutes))
+
+  flow <- data.frame(
+    stage  = c("Raw Load", "Parsed (non-NA)", "Algo-Corrected", "Manual-Corrected",
+               "Final Valid"),
+    count  = c(n_total, n_parsed, n_algo, n_manual, n_valid),
+    color  = c("#2E7D32", "#4CAF50", "#FF8C00", "#2196F3", "#2E7D32"),
+    stringsAsFactors = FALSE
   )
-  
-  p1_left <- ggplot(summary_stats, aes(x = metric, y = 1, label = value)) +
-    geom_text(size = 6, fontface = "bold") +
-    labs(title = "Key Metrics") +
-    theme_void() +
-    theme(plot.title = element_text(hjust = 0.5, size = 11, face = "bold"))
-  
-  p1_right <- ggplot(final_classification, aes(x = "", y = percentage, fill = final_category)) +
-    geom_bar(stat = "identity", width = 1, alpha = 0.85) +
-    coord_polar("y", start = 0) +
-    geom_text(aes(label = sprintf("%s\n%.1f%%", count, percentage)), 
-              position = position_stack(vjust = 0.5), size = 3) +
-    scale_fill_manual(
-      values = c("Manually Corrected" = "#4CAF50",
-                 "Error (Needs Review)" = "#D32F2F",
-                 "Unusual (Acceptable)" = "#FF8C00", 
-                 "Clean" = "#2E7D32",
-                 "Equal Time (Auto-accepted)" = "#64B5F6",
-                 "Reasonable Unusual" = "#AB47BC",
-                  "Not Reported" = "#9E9E9E",
-                 "Other" = "#757575"),
-      name = "Category"
+  flow$pct  <- round(flow$count / n_total * 100, 1)
+  flow$label <- sprintf("%s\nn = %s (%s%%)", flow$stage,
+                        format(flow$count, big.mark = ","), flow$pct)
+  flow$y <- seq(length(flow$stage), 1, by = -1)
+
+  p1 <- ggplot(flow, aes(x = 0.5, y = y)) +
+    geom_rect(aes(xmin = 0.05, xmax = 0.95,
+                  ymin = y - 0.38, ymax = y + 0.38),
+              fill = flow$color, alpha = 0.12, color = flow$color, linewidth = 0.6) +
+    geom_text(aes(label = label), size = 3.2, fontface = "bold", color = "#212121") +
+    geom_segment(data = flow[flow$y > min(flow$y), ],
+                 aes(x = 0.5, xend = 0.5,
+                     y = y - 0.38, yend = y - 0.62),
+                 arrow = arrow(length = unit(0.10, "inches"), type = "closed"),
+                 color = "#616161", linewidth = 0.6) +
+    annotate("text", x = 1.6, y = max(flow$y) - 1, hjust = 0, size = 3.2,
+             label = sprintf(
+               "Not Reported: %s (%s%%)\nClean: %s (%s%%)\nUnusual (Accepted): %s\nError (Reviewed): %s\nEqual Time: %s",
+               format(n_not_rpt, big.mark = ","), round(n_not_rpt / n_total * 100, 1),
+               format(n_clean, big.mark = ","), round(n_clean / n_total * 100, 1),
+               n_unusual, n_error, n_equal)) +
+    annotate("text", x = 1.6, y = min(flow$y), hjust = 0, size = 3,
+             color = "#757575",
+             label = sprintf("%s%% of raw records enter analysis",
+                             round(n_valid / n_total * 100, 1))) +
+    xlim(0, 2.5) + ylim(0.5, length(flow$stage) + 0.5) +
+    labs(
+      title = "Figure 1: Pipeline Record Flow Diagram",
+      subtitle = sprintf("N = %s raw diary entries | %s records with computed sleep metrics",
+                         format(n_total, big.mark = ","),
+                         format(n_valid, big.mark = ","))
     ) +
-    labs(title = "Final Data Classification") +
     theme_void() +
-    theme(plot.title = element_text(hjust = 0.5, size = 11, face = "bold"),
-          legend.position = "right",
-          legend.text = element_text(size = 8))
-  
-  p1 <- (p1_left | p1_right) + 
-    plot_layout(widths = c(0.4, 0.6)) +
-    plot_annotation(
-      title = "Figure 1: Final Data Quality Dashboard (Post-Correction)",
-      subtitle = sprintf("Pipeline Step 9 output: records classified by data_category after timestamp/duration corrections | Flagged for review: %d (%.1f%%)", 
-                         needs_review_count, needs_review_count/total_records*100),
-      theme = theme(plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
-                    plot.subtitle = element_text(hjust = 0.5, size = 10))
+    theme(
+      plot.title    = element_text(hjust = 0.5, size = 14, face = "bold"),
+      plot.subtitle = element_text(hjust = 0.5, size = 10, color = "#616161")
     )
-  
+
   print(p1)
-  save_png(p1, "01_Final_Data_Quality_Dashboard", subdir = "pipeline_cleaning")
-  cat("✓ Figure 1 completed (using corrected_ema_data$data_category and manually_corrected)\n\n")
-  
-  cat("\n--- Final Classification Details (Figure 1) ---\n")
-  print(final_classification)
-  
+  save_png(p1, "01_Pipeline_Flow_Diagram", subdir = "pipeline_cleaning")
+  cat("✓ Figure 1 completed (pipeline flow diagram)\n\n")
+
 } else {
-  cat("⚠ Missing required columns: data_category or manually_corrected\n")
+  cat("⚠ Missing required columns for Figure 1 flow diagram\n")
+}
 }
 
 # ----------------------------------------------------------------------------
@@ -1090,8 +1072,8 @@ cat("Generating Figure 8...\n")
 
 combined_all <- bind_rows(
   clean_df %>% mutate(category = "clean"),
-  if(exists("unusual_df") && nrow(unusual_df) > 0) unusual_df %>% mutate(category = "unusual") else NULL,
-  if(exists("error_df") && nrow(error_df) > 0) error_df %>% mutate(category = "error") else NULL
+  if(exists("unusual_df") && is.data.frame(unusual_df) && nrow(unusual_df) > 0) unusual_df %>% mutate(category = "unusual") else NULL,
+  if(exists("error_df") && is.data.frame(error_df) && nrow(error_df) > 0) error_df %>% mutate(category = "error") else NULL
 ) %>% filter(!is.na(sleep_duration_h))
 
 if(nrow(combined_all) > 0) {
