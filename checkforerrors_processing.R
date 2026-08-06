@@ -638,6 +638,12 @@ if (all(required_metrics %in% names(data))) {
 # have already been checked by a human and judged reasonable. This suppresses
 # repeated metric warnings without changing the raw or corrected sleep data.
 # ==========================================================================
+# Snapshot the flag count BEFORE suppression. Without it, a downstream reader
+# sees only "checkforerrors_df has 0 rows" and cannot tell whether the detector
+# found nothing or found plenty that a human had already cleared. Those two
+# situations mean opposite things and must not look alike.
+n_flagged_before_acceptance <- sum(data$needs_review_flag %in% TRUE)
+
 accepted_count <- 0
 
 # Path 1: suppress flagged rows that already have human_metric_review_status set
@@ -780,8 +786,16 @@ keep_cols <- intersect(keep_cols, names(checkforerrors_df))
 checkforerrors_df <- checkforerrors_df[, unique(c(keep_cols, extra_cols))]
 
 review_output <- list(
-  data_with_flags = data,
-  checkforerrors_df = checkforerrors_df
+  data_with_flags   = data,
+  checkforerrors_df = checkforerrors_df,
+  # Audit trail explaining how many candidates the detector raised and how many
+  # a human had already cleared. Figures 13-18 are built from checkforerrors_df,
+  # so when it is empty this is the only thing that can say WHY.
+  review_audit = list(
+    n_flagged   = n_flagged_before_acceptance,  # raised by Parts A/B/C
+    n_accepted  = accepted_count,               # withdrawn: human said "not an error"
+    n_pending   = nrow(checkforerrors_df)       # still awaiting human review
+  )
 )
 
 cat(sprintf("  Part D: checkforerrors_df created with %d rows\n", nrow(checkforerrors_df)))
