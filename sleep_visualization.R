@@ -670,7 +670,6 @@ if(all(c("data_category", "manually_corrected", "corrected") %in% names(correcte
 } else {
   cat("⚠ Missing required columns for Figure 1 flow diagram\n")
 }
-}
 
 # ----------------------------------------------------------------------------
 # Figure 2: Distribution of Sleep Variables
