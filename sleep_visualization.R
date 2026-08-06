@@ -1406,6 +1406,7 @@ if(length(flag_columns) >= 2) {
   save_png(p11_heatmap, "11_Flag_Cooccurrence_Heatmap", subdir = "pipeline_cleaning")
       cat("✓ FIGURE 11 (Heatmap) completed\n\n")
 }
+}
 
 
 # ============================================================================
@@ -1505,6 +1506,7 @@ if (file.exists(cp_file)) {
   cat("✓ Figure 12 (Three-Panel Progress Table) completed\n\n")
 } else {
   cat("⚠ correction_status.csv not found — skipping Figure 12\n\n")
+}
 }
 
 cat("\n")
