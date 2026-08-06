@@ -105,9 +105,16 @@ fix_substance_text <- function(df, raw_csv_path, val_col, label) {
   df
 }
 
+# Resolve substance column names from config (supports column_mapping)
+.s_col <- function(key, fallback) cfg_get(paste0("column_mapping.substance.", key), fallback)
+caf_col <- .s_col("caffeine", "caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1")
+alc_col <- .s_col("alcohol",  "alcoholtoday_PM_NumAlcoholicDrinks_1")
+nic_col <- .s_col("nicotine", "nicotine_amount_pm_doses")
+can_col <- .s_col("cannabis", "cannabis_amount_pm_doses")
+
   raw_csv <- cfg_get("data.files.extra", "sber_ema_anon_20260227.csv")
 corrected_ema_data <- fix_substance_text(corrected_ema_data, raw_csv,
-                                         "caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1", "caffeine")
+                                         caf_col, "caffeine")
 
 # ----------------------------------------------------------------------------
 # 1b. Build substance input anomaly reference table
@@ -177,10 +184,11 @@ build_input_anomalies <- function(val_col, label, raw_csv_path) {
 }
 
 assign("substance_decimal_anomalies", rbind(
-  build_input_anomalies("caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1", "caffeine", raw_csv),
-  build_input_anomalies("alcoholtoday_PM_NumAlcoholicDrinks_1", "alcohol", raw_csv),
-  build_input_anomalies("nicotine_amount_pm_doses", "nicotine", raw_csv),
-  build_input_anomalies("cannabis_amount_pm_doses", "cannabis", raw_csv)
+  build_input_anomalies(caf_col, "caffeine", raw_csv),
+  build_input_anomalies(alc_col, "alcohol", raw_csv),
+  build_input_anomalies(nic_col, "nicotine", raw_csv),
+  build_input_anomalies(can_col, "cannabis", raw_csv)
+), envir = .GlobalEnv)
 ), envir = .GlobalEnv)
 
 if (nrow(substance_decimal_anomalies) > 0) {
@@ -310,17 +318,17 @@ if (!is.null(raw_csv_fname) && file.exists(raw_csv_fname)) {
 }
 
 corrected_ema_data <- detect_input_anomaly(corrected_ema_data,
-                                           "caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1", "caffeine",
-                                           raw_csv_data[["caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1"]])
+                                           caf_col, "caffeine",
+                                           raw_csv_data[[caf_col]])
 corrected_ema_data <- detect_input_anomaly(corrected_ema_data,
-                                           "alcoholtoday_PM_NumAlcoholicDrinks_1", "alcohol",
-                                           raw_csv_data[["alcoholtoday_PM_NumAlcoholicDrinks_1"]])
+                                           alc_col, "alcohol",
+                                           raw_csv_data[[alc_col]])
 corrected_ema_data <- detect_input_anomaly(corrected_ema_data,
-                                           "nicotine_amount_pm_doses", "nicotine",
-                                           raw_csv_data[["nicotine_amount_pm_doses"]])
+                                           nic_col, "nicotine",
+                                           raw_csv_data[[nic_col]])
 corrected_ema_data <- detect_input_anomaly(corrected_ema_data,
-                                           "cannabis_amount_pm_doses", "cannabis",
-                                           raw_csv_data[["cannabis_amount_pm_doses"]])
+                                           can_col, "cannabis",
+                                           raw_csv_data[[can_col]])
 
 # ----------------------------------------------------------------------------
 # 2. generate_review_flags logic (fully embedded)
