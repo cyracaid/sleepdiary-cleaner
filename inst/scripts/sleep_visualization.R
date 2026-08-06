@@ -674,11 +674,148 @@ if(all(c("data_category", "manually_corrected", "corrected") %in% names(correcte
 
 # ----------------------------------------------------------------------------
 # Figure 2: Distribution of Sleep Variables
-# ----------------------------------------------------------------------------
-# DATA SOURCE: clean_df (subset of corrected_ema_data without NAs)
-# WHAT IT SHOWS: Histograms and density curves for key sleep metrics
-#                - Sleep Duration (hours)
-#                - Time in Bed (hours)
+# ============================================================================
+# Figure 2: Impact of Corrections on Sleep Metrics
+# ============================================================================
+# WHAT THIS FIGURE SHOWS:
+# The magnitude of changes introduced by algorithmic and manual corrections.
+# Only 81 / 13,990 records (0.58%) were modified, so this figure leads with
+# a delta-focused view of those 81 records rather than showing all 13,990.
+#
+# Panel A: TST delta lollipop, one row per modified record
+# Panel B: SOL delta lollipop, same structure
+# Panel C: Identity scatter with unchanged mass as faint backdrop
+# Summary table: Mean/SD before and after
+# ============================================================================
+cat("Generating Figure 2 (Before/After Cleaning Impact)...\n")
+
+has_raw_times <- all(c("time_bed_am_hhmm_ampm", "time_sleep_am_hhmm_ampm",
+                        "time_awake_am_hhmm_ampm") %in% names(corrected_ema_data))
+has_metrics  <- all(c("self_diffcalc_sol_minutes",
+                       "self_diffcalc_totalsleeptime_minutes") %in% names(corrected_ema_data))
+has_n_waso   <- "duration_totalmin_waso_estimate_am_mincalc" %in% names(corrected_ema_data)
+
+if (has_raw_times && has_metrics) {
+
+  waso_col <- if (has_n_waso) corrected_ema_data$duration_totalmin_waso_estimate_am_mincalc else 0
+
+  pre_post <- corrected_ema_data %>%
+    filter(
+      !is.na(time_bed_am_hhmm_ampm),
+      !is.na(time_sleep_am_hhmm_ampm),
+      !is.na(time_awake_am_hhmm_ampm)
+    ) %>%
+    mutate(
+      tst_before = as.numeric(difftime(time_awake_am_hhmm_ampm,
+                                       time_sleep_am_hhmm_ampm, units = "mins")) - waso_col,
+      sol_before = as.numeric(difftime(time_sleep_am_hhmm_ampm,
+                                       time_bed_am_hhmm_ampm, units = "mins")),
+      tst_after  = self_diffcalc_totalsleeptime_minutes,
+      sol_after  = self_diffcalc_sol_minutes,
+      delta_tst  = tst_after - tst_before,
+      delta_sol  = sol_after - sol_before,
+      status = if (exists("has_correction", where = corrected_ema_data)) {
+        corrected_ema_data$has_correction
+      } else if (exists("manually_corrected", where = corrected_ema_data) &&
+                 exists("corrected", where = corrected_ema_data)) {
+        dplyr::case_when(
+          corrected_ema_data$manually_corrected ~ "manual",
+          corrected_ema_data$corrected ~ "algorithmic",
+          TRUE ~ "none"
+        )
+      } else {
+        "unknown"
+      }
+    ) %>%
+    filter(!is.na(tst_after), !is.na(sol_after),
+           !is.na(tst_before), !is.na(sol_before))
+
+  n_mod <- sum(pre_post$status != "none")
+  n_total <- nrow(pre_post)
+
+  # --- Annotation bar (one line that tells the story) ---
+  .anno <- sprintf(
+    "%s of %s records with valid timestamps modified (%s algorithmic / %s manual)",
+    n_mod, format(n_total, big.mark = ","),
+    sum(pre_post$status == "algorithmic"),
+    sum(pre_post$status == "manual")
+  )
+
+  # --- Panels A/B: Delta lollipops (modified records only) ---
+  mod <- pre_post %>% filter(status != "none")
+
+  if (nrow(mod) > 0) {
+    p2a <- mod %>%
+      arrange(desc(abs(delta_tst))) %>%
+      mutate(id = row_number()) %>%
+      ggplot(aes(x = delta_tst, y = id, color = status)) +
+      geom_vline(xintercept = 0, linetype = "dashed", linewidth = 0.3, color = "#757575") +
+      geom_segment(aes(xend = 0), linewidth = 0.5) +
+      geom_point(size = 1.8) +
+      scale_color_manual(values = c(algorithmic = "#FF8C00", manual = "#2196F3")) +
+      labs(x = expression(Delta ~ "TST (min)"), y = "Record",
+           subtitle = sprintf("TST corrections (n = %d)", nrow(mod))) +
+      theme(legend.position = "none")
+
+    p2b <- mod %>%
+      arrange(desc(abs(delta_sol))) %>%
+      mutate(id = row_number()) %>%
+      ggplot(aes(x = delta_sol, y = id, color = status)) +
+      geom_vline(xintercept = 0, linetype = "dashed", linewidth = 0.3, color = "#757575") +
+      geom_segment(aes(xend = 0), linewidth = 0.5) +
+      geom_point(size = 1.8) +
+      scale_color_manual(values = c(algorithmic = "#FF8C00", manual = "#2196F3")) +
+      labs(x = expression(Delta ~ "SOL (min)"), y = "",
+           subtitle = sprintf("SOL corrections (n = %d)", nrow(mod))) +
+      theme(legend.position = "none")
+  } else {
+    p2a <- ggplot() + annotate("text", x = 0, y = 0, label = "No records modified") + theme_void()
+    p2b <- ggplot() + annotate("text", x = 0, y = 0, label = "No records modified") + theme_void()
+  }
+
+  # --- Panel C: Identity scatter (unchanged as faint backdrop) ---
+  p2c <- ggplot(pre_post, aes(x = tst_before, y = tst_after, color = status)) +
+    geom_abline(slope = 1, linetype = "dotted", linewidth = 0.3, color = "#BDBDBD") +
+    geom_point(data = pre_post %>% filter(status == "none"),
+               alpha = 0.03, size = 0.5, color = "gray60") +
+    geom_point(data = pre_post %>% filter(status != "none"),
+               alpha = 0.85, size = 1.5) +
+    scale_color_manual(
+      values = c(algorithmic = "#FF8C00", manual = "#2196F3", none = "gray60"),
+      name = "Correction"
+    ) +
+    labs(x = "TST before (min)", y = "TST after (min)",
+         subtitle = "Each dot = one record. Unchanged records shown at 3% opacity.") +
+    coord_fixed()
+
+  # --- Summary table ---
+  sum_tbl <- data.frame(
+    Metric = c("TST (min)", "TST (min)", "SOL (min)", "SOL (min)"),
+    Stage  = c("Before", "After", "Before", "After"),
+    Mean   = c(round(mean(pre_post$tst_before), 1), round(mean(pre_post$tst_after), 1),
+               round(mean(pre_post$sol_before), 1), round(mean(pre_post$sol_after), 1)),
+    SD     = c(round(sd(pre_post$tst_before), 1), round(sd(pre_post$tst_after), 1),
+               round(sd(pre_post$sol_before), 1), round(sd(pre_post$sol_after), 1)),
+    stringsAsFactors = FALSE
+  )
+  tbl_grob <- tableGrob(sum_tbl, rows = NULL, theme = ttheme_minimal(base_size = 9))
+
+  p2 <- (p2a | p2b) / p2c / tbl_grob +
+    plot_layout(heights = c(2, 2, 0.5)) +
+    plot_annotation(
+      title   = "Figure 2: Impact of Corrections on Sleep Metrics",
+      caption = .anno,
+      theme   = theme(plot.title    = element_text(hjust = 0.5, size = 14, face = "bold"),
+                      plot.caption  = element_text(hjust = 0.5, size = 9, color = "#616161"))
+    )
+
+  print(p2)
+  save_png(p2, "02_Correction_Impact", subdir = "research_ready")
+  cat("✓ Figure 2 completed (before/after delta)\n\n")
+
+} else {
+  cat("⚠ Missing raw timestamp or metric columns for Figure 2\n\n")
+}
 #                - WASO (hours)
 #                - SOL (hours)
 #                - Sleep Efficiency (%)
