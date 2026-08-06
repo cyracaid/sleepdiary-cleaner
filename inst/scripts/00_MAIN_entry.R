@@ -35,35 +35,63 @@ multi_process <- function(df, var_list, func, format = NULL) {
   source(file.path(sdir, "report_correction_status.R"), local = TRUE)
   
   # ── Step 1: Load data ──
-  # INPUT:  deidentified_intervalvars_forCD_111325.rds (processed R data)
-  #         sber_ema_anon_20260227.csv (raw survey responses)
-  # OUTPUT: df (merged with start dates, WASO columns from CSV)
-  # WHAT:   Loads the two data sources and merges the few columns
-  #         that live only in the CSV (start date, WASO counts).
-  #         The RDS holds the main body of processed EMA variables.
   cat("\n=== Step 1: Loading data ===\n")
-  rds_file <- cfg_get("data.files.main_rds", "deidentified_intervalvars_forCD_111325.rds")
-  csv_file <- cfg_get("data.files.main_csv", NULL)
-  cat(sprintf("  Reading RDS: %s\n", basename(rds_file)))
-  df <- readRDS(rds_file)
-  
-  # Optional CSV merge: if main_csv is set, different from RDS, and exists → merge 3 columns
-  if (!is.null(csv_file) && file.exists(csv_file) && csv_file != rds_file) {
-    cat(sprintf("  Reading CSV: %s\n", basename(csv_file)))
-    full_df <- read.csv(csv_file)
-    df <- df %>%
-      mutate(
-        StartDate = full_df$StartDate,
-        num_waso_am = full_df$num_waso,
-        num_waso_estimate_am = full_df$num_waso_estimate_am,
-      )
-    rm(full_df); gc()
-  } else if (!is.null(csv_file) && csv_file == rds_file) {
-    cat("  main_csv == main_rds — RDS assumed to contain all columns\n")
-  } else {
-    cat("  main_csv not configured — RDS expected to have all columns\n")
+
+  .resolve_data_key <- function(cfg, key) {
+    val <- cfg_get(key, NULL, cfg = cfg)
+    if (!is.null(val) && nchar(val) > 0) return(val)
+    legacy <- switch(key,
+      "data.files.main"  = cfg_get("data.files.main_rds",  NULL, cfg = cfg),
+      "data.files.extra" = cfg_get("data.files.main_csv", NULL, cfg = cfg)
+    )
+    if (!is.null(legacy) && nchar(legacy) > 0) return(legacy)
+    NULL
   }
-  
+
+  main_file <- .resolve_data_key(.cfg, "data.files.main")
+  extra_file <- .resolve_data_key(.cfg, "data.files.extra")
+
+  if (is.null(main_file) || nchar(main_file) == 0) {
+    stop("No data file configured. Set 'data.files.main' in your config YAML.")
+  }
+  if (!file.exists(main_file)) {
+    stop(sprintf(
+      "\n  Cannot find your data file:\n    %s\n\n  Options:\n    1. Place your file at the path above, or\n    2. Edit your config YAML and change 'data.files.main' to point to your file\n\n  Accepted formats: .rds (R data) or .csv (plain text)\n  Required columns: see SCHEMA.md\n",
+      main_file
+    ))
+  }
+
+  is_csv <- grepl("\\.csv$", main_file, ignore.case = TRUE)
+  cat(sprintf("  Reading %s: %s\n", if (is_csv) "CSV" else "RDS", basename(main_file)))
+  if (is_csv) {
+    df <- read.csv(main_file, stringsAsFactors = FALSE)
+  } else {
+    df <- readRDS(main_file)
+  }
+
+  if (!is.null(extra_file) && nchar(extra_file) > 0 && file.exists(extra_file)) {
+    cat(sprintf("  Reading extra: %s\n", basename(extra_file)))
+    extra_df <- read.csv(extra_file, stringsAsFactors = FALSE)
+    if (nrow(extra_df) != nrow(df)) {
+      stop(sprintf(
+        "Row mismatch: extra file %s has %d rows, main data has %d. They must match 1:1 by row position.",
+        basename(extra_file), nrow(extra_df), nrow(df)
+      ))
+    }
+    if ("StartDate" %in% names(extra_df)) df$StartDate <- extra_df$StartDate
+    if ("num_waso" %in% names(extra_df)) df$num_waso_am <- extra_df$num_waso
+    if ("num_waso_estimate_am" %in% names(extra_df)) df$num_waso_estimate_am <- extra_df$num_waso_estimate_am
+    rm(extra_df); gc()
+  } else {
+    cat("  No extra file — assuming main data contains all columns\n")
+  }
+
+  if (!"StartDate" %in% names(df)) {
+    message("Note: No StartDate column. Figures relying on dates will be limited.")
+  }
+  if (!"num_waso_estimate_am" %in% names(df)) {
+    message("Note: No num_waso_estimate_am column. Average WASO bout metrics will be skipped.")
+  }
   # Validate schema right after data loading
   .cfg <- get0("pipeline_config", envir = .GlobalEnv, ifnotfound = NULL)
   if (!is.null(.cfg)) validate_schema(df, .cfg, label = "Step 1 output")
