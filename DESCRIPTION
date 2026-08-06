@@ -26,6 +26,7 @@ Imports:
     readr,
     reshape2,
     scales,
+    stringi,
     stringr,
     tibble,
     tidyr,
