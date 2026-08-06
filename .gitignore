@@ -18,6 +18,7 @@ metrics_ai_review.csv
 sleep_visualization_*/
 latest_visualization/
 output/
+output_*/
 Rplots.pdf
 
 # Archive & old code
