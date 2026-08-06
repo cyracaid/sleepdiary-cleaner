@@ -1406,9 +1406,8 @@ if(length(flag_columns) >= 2) {
       print(p11_heatmap)
   save_png(p11_heatmap, "11_Flag_Cooccurrence_Heatmap", subdir = "pipeline_cleaning")
       cat("✓ FIGURE 11 (Heatmap) completed\n\n")
-    }
-  }
 }
+
 
 # ============================================================================
 # Figure 12: Pipeline Correction Progress (Three-Panel Table)
