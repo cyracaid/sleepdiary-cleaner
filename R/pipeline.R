@@ -120,7 +120,7 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
     if ("num_waso_estimate_am" %in% names(extra_df)) df$num_waso_estimate_am <- extra_df$num_waso_estimate_am
     rm(extra_df); if (verbose) gc()
   } else {
-    if (verbose) cat("  No extra file — assuming main data contains all columns\n")
+    if (verbose) cat("  No extra file -- assuming main data contains all columns\n")
   }
 
   if (!"StartDate" %in% names(df) && verbose) {
