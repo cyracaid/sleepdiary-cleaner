@@ -40,13 +40,6 @@ library(RColorBrewer)
 library(gridExtra)
 library(grid)
 
-# Clean latest_visualization directory for fresh output
-if (dir.exists("latest_visualization")) {
-  unlink("latest_visualization", recursive = TRUE)
-}
-dir.create("latest_visualization/pipeline_cleaning", recursive = TRUE)
-dir.create("latest_visualization/research_ready", recursive = TRUE)
-
 # Set global theme
 theme_set(theme_minimal(base_size = 14))
 
@@ -56,15 +49,41 @@ if (!exists("pipeline_config")) { pipeline_config <- list() }
 # ============================================================================
 # AUTO-SAVE SETUP
 # ============================================================================
-# The run directory carries the input row count, so a real-data run
-# (..._n13990) is distinguishable at a glance from a synthetic-data run
-# (..._n280). The count is a fact rather than a label: unlike a "_real" /
-# "_synthetic" tag it cannot be set wrong or go stale.
+# One directory per dataset, overwritten on every run -- no timestamped folders
+# piling up. The name carries BOTH a human-readable tag and the row count:
+#
+#   latest_visualization_real_n13990/
+#   latest_visualization_synth_n280/
+#
+# The tag says which dataset this is (a colleague can read it without being
+# told); the row count is the fact that backs the tag up, and keeps a synthetic
+# test run from overwriting real-data figures. On 2026-08-06 a devtools::test()
+# run did exactly that, and only a distinct directory name saved the output.
+#
+# IMPORTANT: .gitignore must match "latest_visualization*/" (with the star), or
+# these directories are committed. Real data must never reach GitHub.
 .n_records <- if (exists("corrected_ema_data", envir = .GlobalEnv))
   nrow(get("corrected_ema_data", envir = .GlobalEnv)) else NA_integer_
-output_dir <- paste0("sleep_visualization_", format(Sys.time(), "%Y%m%d_%H%M"),
+
+# Derive the tag from the configured input file. "unknown" when it cannot be
+# determined -- an honest label beats a confidently wrong one.
+.rds_name <- tryCatch(
+  basename(cfg_get("data.files.main_rds", "", cfg = pipeline_config)),
+  error = function(e) ""
+)
+.data_tag <- if (!nzchar(.rds_name)) {
+  "unknown"
+} else if (grepl("synthetic|synth|stub|demo|example", .rds_name, ignore.case = TRUE)) {
+  "synth"
+} else {
+  "real"
+}
+
+output_dir <- paste0("latest_visualization_", .data_tag,
                      if (!is.na(.n_records)) paste0("_n", .n_records) else "")
-dir.create(output_dir, showWarnings = FALSE)
+if (dir.exists(output_dir)) unlink(output_dir, recursive = TRUE)
+dir.create(file.path(output_dir, "pipeline_cleaning"), recursive = TRUE, showWarnings = FALSE)
+dir.create(file.path(output_dir, "research_ready"),    recursive = TRUE, showWarnings = FALSE)
 cat(sprintf("\nFigures auto-saving to: %s/\n", output_dir))
 
 # Write each figure ONCE, into its classified subfolder.
@@ -2498,8 +2517,8 @@ cat("  Figure R26: Sleep Composition — TIB = TST + SOL + WASO\n")
 cat("  Figure R27: Sleep Metrics Correlation Matrix\n\n")
 
 cat("FOLDER STRUCTURE:\n")
-cat("  latest_visualization/pipeline_cleaning/  — Data cleaning pipeline progress & quality control\n")
-cat("  latest_visualization/research_ready/     — Sleep metrics, substance use & perception for analysis\n\n")
+cat(sprintf("  %s/pipeline_cleaning/  — Data cleaning pipeline progress & quality control\n", output_dir))
+cat(sprintf("  %s/research_ready/     — Sleep metrics, substance use & perception for analysis\n\n", output_dir))
 
 cat("NOTE: Figures 1-12 show the FINAL corrected data (after manual fixes)\n")
 cat("      Figures 13-18 show AUTO-DETECTED issues (before manual review)\n")
@@ -2553,26 +2572,44 @@ if ("flag_severity" %in% names(clean_df)) {
   write.csv(sev_summary, file.path(output_dir, "flag_severity_summary.csv"), row.names = FALSE)
 }
 
-# ── Update latest_visualization (replace old with current run) ──
-latest_dir <- "latest_visualization"
-if (dir.exists(latest_dir)) unlink(latest_dir, recursive = TRUE)
-dir.create(latest_dir, showWarnings = FALSE)
-viz_files <- list.files(output_dir, full.names = TRUE)
-file.copy(viz_files, latest_dir, recursive = TRUE)
-# Also re-create subfolder structure under latest_visualization
-for (sub in c("pipeline_cleaning", "research_ready")) {
-  src_sub <- file.path(output_dir, sub)
-  if (dir.exists(src_sub)) {
-    dst_sub <- file.path(latest_dir, sub)
-    dir.create(dst_sub, showWarnings = FALSE, recursive = TRUE)
-    file.copy(list.files(src_sub, full.names = TRUE), dst_sub)
-  }
-}
-cat(sprintf("\n✓ latest_visualization/ updated → %s/\n", output_dir))
-cat(sprintf("  ├── latest_visualization/pipeline_cleaning/  (%d cleaning figures)\n",
+# ── Provenance record ──
+# Figures were written straight into output_dir, so there is no mirror step any
+# more. What replaces it is this file: the directory name says WHICH dataset,
+# RUN_INFO.txt says exactly WHICH FILES, so anyone opening the folder can tell
+# what they are looking at without asking. It also gives the manuscript Methods
+# section something citable.
+.run_info <- c(
+  "splsleep figure output",
+  "========================================",
+  sprintf("Run time    : %s", format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z")),
+  sprintf("Dataset tag : %s", .data_tag),
+  sprintf("Records in  : %s", if (is.na(.n_records)) "unknown" else format(.n_records, big.mark = ",")),
+  sprintf("Input RDS   : %s", if (nzchar(.rds_name)) .rds_name else "unknown"),
+  sprintf("Input CSV   : %s",
+          tryCatch(basename(cfg_get("data.files.main_csv", "", cfg = pipeline_config)),
+                   error = function(e) "unknown")),
+  sprintf("Package     : splsleep %s",
+          tryCatch(as.character(utils::packageVersion("splsleep")),
+                   error = function(e) "unknown")),
+  sprintf("Git commit  : %s",
+          tryCatch(substr(system("git rev-parse HEAD", intern = TRUE, ignore.stderr = TRUE), 1, 7),
+                   error = function(e) "unknown")),
+  "",
+  "pipeline_cleaning/  cleaning progress and quality control",
+  "research_ready/     sleep metrics, substance use, perception",
+  "",
+  "NOTE: if the tag reads 'real', this folder contains figures derived from",
+  "participant data. It is gitignored and must not be committed or shared",
+  "outside the study team."
+)
+writeLines(.run_info, file.path(output_dir, "RUN_INFO.txt"))
+
+cat(sprintf("\n✓ %s/ written\n", output_dir))
+cat(sprintf("  ├── pipeline_cleaning/  (%d cleaning figures)\n",
             length(list.files(file.path(output_dir, "pipeline_cleaning")))))
-cat(sprintf("  └── latest_visualization/research_ready/    (%d research figures)\n",
+cat(sprintf("  ├── research_ready/     (%d research figures)\n",
             length(list.files(file.path(output_dir, "research_ready")))))
+cat("  └── RUN_INFO.txt        (data source + version provenance)\n")
 
 cat("\n")
 cat(paste(rep("=", 80), collapse = ""))
@@ -2596,10 +2633,8 @@ generate_appendix_ledger <- function() {
   #
   # NOTE on output_dir: figure12_step_flag_table() only consults output_dir when
   # no save_png function is supplied. We do supply one, and that shim writes
-  # through the run-directory closure, so output_dir has no effect here. It
-  # previously read "latest_visualization", which was doubly misleading -- the
-  # argument was dead AND the figure did not land there. Pass the real run
-  # directory so the call no longer claims something untrue.
+  # through the run-directory closure, so output_dir has no effect here. It is
+  # passed anyway so the call does not claim something untrue.
   figure12_step_flag_table(
     cfg = get0("cfg"),
     output_dir = output_dir,
@@ -2607,21 +2642,13 @@ generate_appendix_ledger <- function() {
     filename = "A1_Step_Flag_Ledger"
   )
 
-  # A1 is generated AFTER latest_visualization/ has already been mirrored from
-  # the run directory, so without this copy it never appears there -- the one
-  # figure missing from every "latest" folder to date. Copy it across rather
-  # than reordering the 2600-line script.
-  a1_rel <- file.path("pipeline_cleaning", "A1_Step_Flag_Ledger.png")
-  a1_src <- file.path(output_dir, a1_rel)
-  a1_dst <- file.path("latest_visualization", a1_rel)
-  a1_copied <- FALSE
-  if (file.exists(a1_src)) {
-    dir.create(dirname(a1_dst), showWarnings = FALSE, recursive = TRUE)
-    a1_copied <- file.copy(a1_src, a1_dst, overwrite = TRUE)
-  }
-  cat(sprintf("✓ Appendix Ledger: %s + %s%s\n", csv_path, a1_src,
-              if (a1_copied) paste0(" -> also ", a1_dst) else
-                "  (WARNING: not copied to latest_visualization/)"))
+  # A1 previously needed copying into latest_visualization/ because it was
+  # generated after the mirror step. There is no mirror step now -- figures are
+  # written straight into output_dir -- so it lands in the right place by
+  # construction. Verify rather than copy.
+  a1_path <- file.path(output_dir, "pipeline_cleaning", "A1_Step_Flag_Ledger.png")
+  cat(sprintf("✓ Appendix Ledger: %s + %s%s\n", csv_path, a1_path,
+              if (file.exists(a1_path)) "" else "  (WARNING: PNG not found)"))
   invisible(TRUE)
 }
 
@@ -2629,8 +2656,8 @@ generate_appendix_ledger <- function() {
 generate_appendix_ledger()
 
 if (exists("generate_figure_index")) {
-  generate_figure_index("latest_visualization")
+  generate_figure_index(output_dir)
 } else if (file.exists("make_figure_index.R")) {
   source("make_figure_index.R", local = TRUE)
-  generate_figure_index("latest_visualization")
+  generate_figure_index(output_dir)
 }
