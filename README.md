@@ -763,11 +763,131 @@ clean_data <- corrected_ema_data[corrected_ema_data$data_category %in% c("clean"
 | `latest_visualization_*/figure_index.png` | 全部生成图表的缩略图索引 |
 | `latest_visualization_*/RUN_INFO.txt` | 运行溯源：数据集标签、版本、git commit、文件来源 |
 
-## Agent Skill
+## 如何读懂管线输出
 
-**位置**：`.opencode/skills/splsleep-pipeline/SKILL.md`
+`run_pipeline()` 跑完后，CSV 文件和图表目录会告诉你一切。
 
-AI 助手可通过此技能理解管线架构、运行管线、解读报告、添加修正、诊断问题。
+---
+
+### 1. `output/correction_status_final.csv` — 运行摘要（先看这个）
+
+每行一次运行。回答"清洗是否按预期工作？"
+
+```r
+read.csv("output/correction_status_final.csv")
+```
+
+| 列 | 含义 | 检查标准 |
+|----|------|---------|
+| `n_total` | 总记录数 | 必须等于输入行数 |
+| `tst_mean_h` | 平均 TST（小时） | 成人研究 6.0–8.5 h 正常。若 < 5 或 > 10，时间戳解析或研究人群异常 |
+| `sol_mean_min` | 平均 SOL（分钟） | 10–45 min 正常。若 > 60，AM/PM 混淆未完全修正或失眠率高 |
+| `n_clean` | 通过所有检查的记录 | 同数据多次运行应完全相同 |
+| `n_error` | 时序不可能的记录 | 应 < 总记录 1%。若 > 5%，审查调查设计 |
+| `n_corrected` | 通过人工 CSV 修正的记录 | 应与 `manual_error_corrections.csv` 行数匹配 |
+| `timestamp_issue` | 无法解析的时间戳 | 应为 0 |
+| `duration_issue` | 超出阈值的指标 | 少量正常 |
+| `amount_flag` | 物质使用异常值 | 应为 0 或极低 |
+| `self_reported_flag` | 自报 vs 计算 SOL/WASO 不一致 | 表示知觉偏差，见图 20 |
+
+**稳定性规则：** 同一数据跑两次，所有数字必须完全相同。
+
+---
+
+### 2. `output/appendix_step_ledger.csv` — 每步标记追踪
+
+每行 = 一步 × 一个标准 × 一个类别。回答"哪个标记在哪一步出现、是否保持稳定？"
+
+```r
+ledger <- read.csv("output/appendix_step_ledger.csv")
+library(dplyr)
+ledger %>% filter(!is.na(count)) %>% arrange(step_id, standard)
+```
+
+#### 5 个评估标准
+
+| 标准 | 首次有数字的步骤 | 评估什么 | 关键类别 |
+|------|:--:|------|------|
+| `field_misentry` | 1.5 | 时长是否误填为时间戳 | none, SOL=time_sleep, SOL=time_bed |
+| `data_category` | 4 | bed→sleep→awake→getup 时序是否合理 | clean, error, unusual, equal_time_ok, skipped_na |
+| `flag_severity` | 7 | 指标超阈值数量 | Clean, Minor, Major |
+| `duration_extreme` | 7 | 睡眠时长是否超出合理范围 | OK, Too short (<3h), Too long (>12h) |
+| `checkforerrors` | 8 | 自动检测摘要 | TIMESTAMP_ISSUE, DURATION_ISSUE, AMOUNT_FLAG, SELF_REPORTED_FLAG |
+
+**核心规则：** 每个标准只计算一次，后续步骤不重新分类。如果某个标准的计数在其首次计算步骤之后发生变化 → 有 bug。
+
+#### 验证方法
+
+- **`data_category`** — Step 6 起冻结。Steps 6/6.5/7/8/8.5 各类别计数必须完全相同。`equal_time_ok + skipped_na = n_total`
+- **`flag_severity`** — Step 7 起冻结。`Clean + Minor + Major = n_total - skipped_na`
+- **`duration_extreme`** — Too short + Too long 应 < n_total 的 5%
+- **`checkforerrors`** — 仅在 Step 8 有数据
+
+#### 示例
+
+```
+  Step 4: data_category: equal_time_ok=266, skipped_na=14
+  Step 6: data_category: equal_time_ok=266, skipped_na=14  (不变)
+  Step 7: flag_severity: Clean=251, Minor=28, Major=1
+          duration_extreme: OK=262, Too short=1, Too long=0
+  Step 8: 同上 (不变)
+```
+
+数字在首次计算后不再变化——这是管线稳定的标志。
+
+---
+
+### 3. 回归检查（对比上次运行）
+
+```r
+old <- read.csv("output/correction_status_old.csv")
+new <- read.csv("output/correction_status_final.csv")
+identical(old$tst_mean_h, new$tst_mean_h)
+identical(old$sol_mean_min, new$sol_mean_min)
+identical(old$n_clean, new$n_clean)
+```
+
+输入数据没变但结果不同 → 管线输出改变了，需调查。
+
+---
+
+### 4. 快速检查卡
+
+| 检查项 | 如何验证 | 通过条件 |
+|--------|---------|---------|
+| 管线完成 | `file.exists("output/correction_status_final.csv")` | TRUE |
+| TST 合理 | `tst_mean_h` 6–8.5 | 是 |
+| SOL 合理 | `sol_mean_min` 10–45 | 是 |
+| 错误少 | `n_error < 0.01 × n_total` | 是 |
+| data_category 稳定 | Steps 6–8.5 计数相同 | 是 |
+| flag_severity 稳定 | Steps 7–8.5 计数相同 | 是 |
+| 记录数一致 | `equal_time_ok + skipped_na = n_total` | 是 |
+| 确定性 | 相同输入 → 相同输出 | 是 |
+
+---
+
+### 5. 如何看图
+
+图保存在带时间标记的目录中（如 `latest_visualization_*/`）。`figure_index.png` 是一张所有图的缩略索引。
+
+#### 论文用图
+
+| 图 | 文件 | 展示内容 |
+|----|------|---------|
+| **Figure 1 — 管线流程** | `pipeline_cleaning/01_Pipeline_Flow_Diagram.png` | 垂直流程图：原始 → 解析 → 算法修正 → 人工修正 → 最终有效。每步含计数和百分比 |
+| **Figure 2 — 修正影响** | `research_ready/02_Correction_Impact.png` | 三面板：TST/SOL 变化棒棒糖图 + 身份散点图 + Before/After 汇总表 |
+
+#### 5 张必看检查图
+
+| 步骤 | 图 | 看什么 | 正常外观 | 如果不正常？ |
+|:--:|----|--------|---------|---------|
+| 1 | **01 Pipeline Flow** `pipeline_cleaning/` | 各类别计数和百分比 | 大部分 Clean / Not Reported，Error < 1% | Error 过多 = 修正 CSV 未正确应用 |
+| 2 | **12 Pipeline Correction Progress** `pipeline_cleaning/` | 5 个检查点的 Clean/Error/Corrected 柱状图 | Corrected 柱仅在 C 首次出现后保持平直 | Corrected 在 C 之后变化 = 不稳定 |
+| 3 | **02 Distribution Sleep Variables** `research_ready/` | TST/SOL/WASO/SE 四个直方图 | TST 峰值 6–8h，SOL 右偏，WASO < 60min，SE 峰值 > 85% | TST 峰值 < 5h = 解析可能有问题 |
+| 4 | **02 Correction Impact** `research_ready/` | 棒棒糖图 + 散点图 | 绝大多数点在 identity line 上，只有几条被修正的记录偏离 | 如果大量记录偏离 = 算法修正范围过大 |
+| 5 | **19 Unified Quality Status** `pipeline_cleaning/` | Clean/Minor/Major 分类 | 大部分 Clean 或 Minor，Error + Unusual < 5% | 高 Error/Unusual = 审查人工修正 CSV |
+
+**5 张全过 → 管线输出有效。** 任何一张不过 → 看详细图诊断。
 
 ## 许可证
 
