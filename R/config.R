@@ -207,8 +207,8 @@ validate_column_types <- function(data, type_spec, label = "data") {
 #' @param cfg Config list (from load_config)
 #' @export
 validate_no_r_code_in_paths <- function(cfg) {
-  rds <- config_get(cfg, "data.files.main_rds", "")
-  csv <- config_get(cfg, "data.files.main_csv", "")
+  rds <- config_get(cfg, "data.files.main", "")
+  csv <- config_get(cfg, "data.files.extra", "")
   for (path in c(rds, csv)) {
     if (is.character(path) && grepl("paste0|file\\.path|~\\$|getwd", path)) {
       stop("Config paths must be absolute paths, not R expressions. Found: ", path)

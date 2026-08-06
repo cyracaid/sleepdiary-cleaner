@@ -68,7 +68,7 @@ if (!exists("pipeline_config")) { pipeline_config <- list() }
 # Derive the tag from the configured input file. "unknown" when it cannot be
 # determined -- an honest label beats a confidently wrong one.
 .rds_name <- tryCatch(
-  basename(cfg_get("data.files.main_rds", "", cfg = pipeline_config)),
+  basename(cfg_get("data.files.main", "", cfg = pipeline_config)),
   error = function(e) ""
 )
 .data_tag <- if (!nzchar(.rds_name)) {
@@ -2636,7 +2636,7 @@ if ("flag_severity" %in% names(clean_df)) {
   sprintf("Records in  : %s", if (is.na(.n_records)) "unknown" else format(.n_records, big.mark = ",")),
   sprintf("Input RDS   : %s", if (nzchar(.rds_name)) .rds_name else "unknown"),
   sprintf("Input CSV   : %s",
-          tryCatch(basename(cfg_get("data.files.main_csv", "", cfg = pipeline_config)),
+          tryCatch(basename(cfg_get("data.files.extra", "", cfg = pipeline_config)),
                    error = function(e) "unknown")),
   sprintf("Package     : splsleep %s",
           tryCatch(as.character(utils::packageVersion("splsleep")),

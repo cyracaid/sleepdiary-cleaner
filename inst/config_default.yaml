@@ -1,11 +1,10 @@
 # splsleep Pipeline Configuration
 # =============================================================================
-# This file defines all variable mappings, thresholds, and settings for the
-# sleep EMA data cleaning pipeline. To adapt the pipeline to a new dataset:
-#   1. Copy this file as config_custom.yaml
-#   2. Update the column_mapping section with YOUR column names
-#   3. Adjust thresholds if needed
-#   4. Run: library(splsleep); run_pipeline(config = "config_custom.yaml")
+# This config drives the study dataset. For your OWN data, copy
+# inst/config_template.yaml -> my_study.yaml and edit the "data" section.
+#
+# Quick start: library(splsleep); run_pipeline(config = "my_study.yaml")
+# =============================================================================
 
 pipeline:
   name: "Sleep EMA Data Cleaning Pipeline"
@@ -16,8 +15,21 @@ pipeline:
 # =============================================================================
 data:
   files:
-    main_rds: "deidentified_intervalvars_forCD_111325.rds"
-    main_csv: "sber_ema_anon_20260227.csv"
+    main: "deidentified_intervalvars_forCD_111325.rds"
+    # -- Your main sleep diary file. Accepts .rds (R data) or .csv (plain text).
+    #   Required columns: pid, day_num, sleep time columns, SOL, WASO.
+    #   Full contract: see SCHEMA.md
+
+    extra: "sber_ema_anon_20260227.csv"
+    # -- Optional supplementary file. Leave "" if your main file already
+    #   contains StartDate and num_waso_estimate_am.
+    #   When provided: StartDate, num_waso (-> num_waso_am), num_waso_estimate_am
+    #   are copied from this file into the main data.
+    #   Row count must match the main file exactly.
+
+    # Compatibility: the legacy keys main_rds / main_csv are still recognised
+    # when no "main" or "extra" key is present. They will be removed in v2.0.
+
     manual_error: "manual_error_corrections.csv"
     manual_unusual: "manual_unusual_corrections.csv"
     manual_nap_exercise: "manual_nap_exercise_corrections.csv"
@@ -150,14 +162,14 @@ timestamp:
   midnight_threshold_hour: 6
 
   # Sequence validation
-  # Expected order: bed → sleep → awake → getup
+  # Expected order: bed -> sleep -> awake -> getup
   sequence:
     expected_order: ["time_bed", "time_sleep", "time_awake", "time_getup"]
     max_gap_hours: 12  # gaps >= 12h trigger AM/PM flip
 
   # Interval format detection
   interval:
-    mmss_threshold_minutes: 60  # values > this and with ":" → assume MM:SS not HH:MM
+    mmss_threshold_minutes: 60  # values > this and with ":" -> assume MM:SS not HH:MM
     max_plausible_minutes: 10000
     max_nap_minutes: 720       # 12 hours
     max_exercise_minutes: 360  # 6 hours
@@ -178,23 +190,23 @@ classification:
   # Sleep metric validation (Part C auto-detection)
   metric_validation:
     sol:
-      excessive_minutes: 120               # SOL > 2h → flag (lenient; clinical cutoff ~30min. rationale: see THRESHOLDS.md)
-      negative: true                       # SOL < 0 → flag
+      excessive_minutes: 120               # SOL > 2h -> flag (lenient; clinical cutoff ~30min. rationale: see THRESHOLDS.md)
+      negative: true                       # SOL < 0 -> flag
     se:
-      min_valid_percent: 0                 # SE < 0 → flag
-      max_valid_percent: 100               # SE > 100 → flag
-      insane_negative_percent: -1000       # SE < -1000 → insane flag
+      min_valid_percent: 0                 # SE < 0 -> flag
+      max_valid_percent: 100               # SE > 100 -> flag
+      insane_negative_percent: -1000       # SE < -1000 -> insane flag
     tst_tib_ratio:
-      min_ratio: 0.5                       # TST/TIB < 0.5 → flag
-      max_ratio: 1.0                       # TST/TIB > 1.0 → flag
+      min_ratio: 0.5                       # TST/TIB < 0.5 -> flag
+      max_ratio: 1.0                       # TST/TIB > 1.0 -> flag
     waso:
       excessive_hours: 1.5                 # WASO > 1.5h
 
   # Flag severity (for figures)
   flag_severity:
-    poor_efficiency_threshold_pct: 70      # SE < 70% → flag (lenient; clinical insomnia cutoff ~85%. rationale: see THRESHOLDS.md)
-    high_sol_threshold_hours: 1            # SOL > 1h → flag (lenient; clinical marker ~30min. rationale: see THRESHOLDS.md)
-    high_waso_threshold_hours: 1.5         # WASO > 1.5h → flag (lenient; clinical marker ~30min. rationale: see THRESHOLDS.md)
+    poor_efficiency_threshold_pct: 70      # SE < 70% -> flag (lenient; clinical insomnia cutoff ~85%. rationale: see THRESHOLDS.md)
+    high_sol_threshold_hours: 1            # SOL > 1h -> flag (lenient; clinical marker ~30min. rationale: see THRESHOLDS.md)
+    high_waso_threshold_hours: 1.5         # WASO > 1.5h -> flag (lenient; clinical marker ~30min. rationale: see THRESHOLDS.md)
 
   # Categories
   categories:

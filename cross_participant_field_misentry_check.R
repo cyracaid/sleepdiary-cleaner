@@ -13,7 +13,7 @@
 
 cat("=== Field-Misentry Check: SOL/WASO vs time columns ===\n")
 
-rds_path <- cfg_get("data.files.main_rds", "deidentified_intervalvars_forCD_111325.rds")
+rds_path <- cfg_get("data.files.main", "deidentified_intervalvars_forCD_111325.rds")
 if (!file.exists(rds_path)) {
   stop(sprintf("Raw data not found: %s. Run from splsleep/ directory.", rds_path))
 }

@@ -1,0 +1,82 @@
+# splsleep -- Configuration Template
+# =============================================================================
+# 1. Copy this file -> e.g. "my_study.yaml"
+# 2. Fill in the 2 settings below
+# 3. Run: library(splsleep); run_pipeline(config = "my_study.yaml")
+# =============================================================================
+
+pipeline:
+  name: "My Sleep Study"
+
+# =============================================================================
+# YOUR DATA
+# =============================================================================
+data:
+  files:
+    # -- Your main data file --
+    main: "your_data.rds"
+    # -- This is your sleep diary data. It can be .rds (R data) or .csv (plain text).
+    #   We detect the format from the file extension automatically.
+    #
+    #   Required columns (see SCHEMA.md for full details):
+    #     pid              -- participant ID (number)
+    #     day_num          -- study day (number)
+    #     time_bed_am_hhmm -- bedtime hour:minute string, e.g. "10:30"
+    #     time_bed_am_ampm -- AM/PM indicator, e.g. "PM"
+    #     time_sleep_am_hhmm / time_sleep_am_ampm -- same for sleep onset
+    #     time_awake_am_hhmm / time_awake_am_ampm -- same for final awakening
+    #     time_getup_am_hhmm / time_getup_am_ampm -- same for get-up time
+    #     duration_totalmin_sol_estimate_am  -- self-reported SOL in minutes
+    #     duration_totalmin_waso_estimate_am -- self-reported WASO in minutes
+
+    # -- Your supplementary file (optional -- leave "" 99% of the time) --
+    extra: ""
+    # -- Leave EMPTY unless StartDate and/or num_waso_estimate_am are in a
+    #   SEPARATE file from your main data above.
+    #
+    #   Three common scenarios:
+    #
+    #   A. Everything in one file (most datasets)
+    #      -> main: "my_data.rds"   extra: ""
+    #      Just make sure your file has a StartDate column.
+    #
+    #   B. Data in two files (like our study)
+    #      -> main: "ema_vars.rds"   extra: "survey_dates.csv"
+    #      The extra file provides StartDate and WASO bout counts.
+    #
+    #   C. Data is a CSV (not RDS)
+    #      -> main: "my_data.csv"    extra: ""
+    #      We detect .csv extension and use read.csv() automatically.
+
+    # -- Human review files (leave empty -- the pipeline generates them) --
+    manual_error: ""
+    manual_unusual: ""
+    manual_nap_exercise: ""
+    manual_metric_duration: ""
+    manual_metric_accept: ""
+    second_review: ""
+
+# =============================================================================
+# COLUMN MAPPING (only needed if your column names differ from ours)
+# =============================================================================
+# If your columns are named differently, uncomment this section and map them.
+# For example, if your bedtime column is called "bed_time" instead of
+# "time_bed_am_hhmm":
+#
+# column_mapping:
+#   timestamp:
+#     time_bed_hhmm: "bed_time"
+#
+# See inst/config_default.yaml for the full list of mappable columns.
+
+# =============================================================================
+# THRESHOLDS (optional -- defaults are sensible for most sleep studies)
+# =============================================================================
+# See THRESHOLDS.md for the rationale behind each default.
+# Uncomment and adjust only if your study population needs different cutoffs.
+#
+# classification:
+#   flag_severity:
+#     poor_efficiency_threshold_pct: 70
+#     high_sol_threshold_hours: 1
+#     high_waso_threshold_hours: 1.5

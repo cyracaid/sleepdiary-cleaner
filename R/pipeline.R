@@ -14,6 +14,20 @@ utils::globalVariables(c(
 
 # -- Internal helpers (used only by run_pipeline / run_setup / run_visualization) --
 
+# Resolve data.files.main / data.files.extra, falling back to legacy
+# main_rds / main_csv keys for backward compatibility.
+.resolve_data_key <- function(cfg, key) {
+  val <- cfg_get(key, NULL, cfg = cfg)
+  if (!is.null(val) && nchar(val) > 0) return(val)
+
+  legacy <- switch(key,
+    "data.files.main"  = cfg_get("data.files.main_rds",  NULL, cfg = cfg),
+    "data.files.extra" = cfg_get("data.files.main_csv", NULL, cfg = cfg)
+  )
+  if (!is.null(legacy) && nchar(legacy) > 0) return(legacy)
+  NULL
+}
+
 .pipeline_init <- function(config, project_dir, verbose) {
   old_wd <- setwd(project_dir)
   sdir   <- scripts_dir()
@@ -70,34 +84,50 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
 
   # -- Step 1: Load data ------------------------------------------------
   if (verbose) cat("\n=== Step 1: Loading data ===\n")
-  rds_file <- cfg_get("data.files.main_rds", "deidentified_intervalvars_forCD_111325.rds", cfg = cfg)
-  csv_file <- cfg_get("data.files.main_csv", NULL, cfg = cfg)
-  if (verbose) cat(sprintf("  Reading RDS: %s\n", basename(rds_file)))
-  df <- readRDS(rds_file)
+  main_file <- .resolve_data_key(cfg, "data.files.main")
+  extra_file <- .resolve_data_key(cfg, "data.files.extra")
 
-  if (!is.null(csv_file) && file.exists(csv_file) && csv_file != rds_file) {
-    if (verbose) cat(sprintf("  Reading CSV: %s\n", basename(csv_file)))
-    full_df <- utils::read.csv(csv_file)
-    # Base-R column copy rather than dplyr::mutate() through a magrittr pipe.
-    # run_pipeline() previously called %>% and mutate() without importing them,
-    # so a clean `library(splsleep); run_pipeline()` session failed here with
-    # "could not find function %>%" -- it only ever worked when the caller had
-    # already attached tidyverse. Assigning columns directly removes the
-    # undeclared dependency entirely and is exactly what mutate() did here.
-    if (nrow(full_df) != nrow(df)) {
+  if (is.null(main_file) || nchar(main_file) == 0) {
+    stop("No data file configured. Set 'data.files.main' in your config YAML.")
+  }
+  if (!file.exists(main_file)) {
+    stop(sprintf(
+      "\n  Cannot find your data file:\n    %s\n\n  Options:\n    1. Place your file at the path above, or\n    2. Edit your config YAML and change 'data.files.main' to point to your file\n\n  Accepted formats: .rds (R data) or .csv (plain text)\n  Required columns: see SCHEMA.md\n",
+      main_file
+    ))
+  }
+
+  is_csv <- grepl("\\.csv$", main_file, ignore.case = TRUE)
+  if (verbose) cat(sprintf("  Reading %s: %s\n", if (is_csv) "CSV" else "RDS", basename(main_file)))
+  if (is_csv) {
+    df <- utils::read.csv(main_file, stringsAsFactors = FALSE)
+  } else {
+    df <- readRDS(main_file)
+  }
+
+  # Optional supplementary file (extra columns: StartDate, WASO counts)
+  if (!is.null(extra_file) && nchar(extra_file) > 0 && file.exists(extra_file)) {
+    if (verbose) cat(sprintf("  Reading extra: %s\n", basename(extra_file)))
+    extra_df <- utils::read.csv(extra_file, stringsAsFactors = FALSE)
+    if (nrow(extra_df) != nrow(df)) {
       stop(sprintf(
-        "CSV/RDS row mismatch: %s has %d rows, %s has %d. Refusing to align columns by position.",
-        basename(csv_file), nrow(full_df), basename(rds_file), nrow(df)
+        "Row mismatch: extra file %s has %d rows, main data has %d. They must match 1:1 by row position.",
+        basename(extra_file), nrow(extra_df), nrow(df)
       ))
     }
-    df$StartDate            <- full_df$StartDate
-    df$num_waso_am          <- full_df$num_waso
-    df$num_waso_estimate_am <- full_df$num_waso_estimate_am
-    rm(full_df); if (verbose) gc()
-  } else if (!is.null(csv_file) && csv_file == rds_file) {
-    if (verbose) cat("  main_csv == main_rds -- RDS assumed to contain all columns\n")
+    if ("StartDate" %in% names(extra_df)) df$StartDate <- extra_df$StartDate
+    if ("num_waso" %in% names(extra_df)) df$num_waso_am <- extra_df$num_waso
+    if ("num_waso_estimate_am" %in% names(extra_df)) df$num_waso_estimate_am <- extra_df$num_waso_estimate_am
+    rm(extra_df); if (verbose) gc()
   } else {
-    if (verbose) cat("  main_csv not configured -- RDS expected to have all columns\n")
+    if (verbose) cat("  No extra file — assuming main data contains all columns\n")
+  }
+
+  if (!"StartDate" %in% names(df) && verbose) {
+    message("Note: No StartDate column. Figures relying on dates will be limited.")
+  }
+  if (!"num_waso_estimate_am" %in% names(df) && verbose) {
+    message("Note: No num_waso_estimate_am column. Average WASO bout metrics will be skipped.")
   }
 
   validate_schema(df, cfg, label = "Step 1 output")
