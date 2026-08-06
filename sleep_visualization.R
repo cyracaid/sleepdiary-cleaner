@@ -2742,10 +2742,6 @@ if (exists("final_classification")) {
 if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) && "review_summary" %in% names(checkforerrors_summary)) {
   write.csv(checkforerrors_summary$review_summary, file.path(output_dir, "flag_distribution.csv"), row.names = FALSE)
 }
-if ("flag_severity" %in% names(clean_df)) {
-  sev_summary <- clean_df %>% count(flag_severity) %>% mutate(pct = n / sum(n) * 100)
-  write.csv(sev_summary, file.path(output_dir, "flag_severity_summary.csv"), row.names = FALSE)
-}
 
 # ── Provenance record ──
 # Figures were written straight into output_dir, so there is no mirror step any
