@@ -77,13 +77,22 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
 
   if (!is.null(csv_file) && file.exists(csv_file) && csv_file != rds_file) {
     if (verbose) cat(sprintf("  Reading CSV: %s\n", basename(csv_file)))
-    full_df <- read.csv(csv_file)
-    df <- df %>%
-      mutate(
-        StartDate            = full_df$StartDate,
-        num_waso_am          = full_df$num_waso,
-        num_waso_estimate_am = full_df$num_waso_estimate_am
-      )
+    full_df <- utils::read.csv(csv_file)
+    # Base-R column copy rather than dplyr::mutate() through a magrittr pipe.
+    # run_pipeline() previously called %>% and mutate() without importing them,
+    # so a clean `library(splsleep); run_pipeline()` session failed here with
+    # "could not find function %>%" -- it only ever worked when the caller had
+    # already attached tidyverse. Assigning columns directly removes the
+    # undeclared dependency entirely and is exactly what mutate() did here.
+    if (nrow(full_df) != nrow(df)) {
+      stop(sprintf(
+        "CSV/RDS row mismatch: %s has %d rows, %s has %d. Refusing to align columns by position.",
+        basename(csv_file), nrow(full_df), basename(rds_file), nrow(df)
+      ))
+    }
+    df$StartDate            <- full_df$StartDate
+    df$num_waso_am          <- full_df$num_waso
+    df$num_waso_estimate_am <- full_df$num_waso_estimate_am
     rm(full_df); if (verbose) gc()
   } else if (!is.null(csv_file) && csv_file == rds_file) {
     if (verbose) cat("  main_csv == main_rds -- RDS assumed to contain all columns\n")
@@ -134,13 +143,16 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   manual_error_path   <- cfg_get("data.files.manual_error",   "manual_error_corrections.csv", cfg = cfg)
   manual_unusual_path <- cfg_get("data.files.manual_unusual", "manual_unusual_corrections.csv", cfg = cfg)
   manual_corrections <- if (file.exists(manual_error_path)) {
-    suppressMessages(read_csv(manual_error_path, show_col_types = FALSE))
+    # Kept as readr::read_csv rather than utils::read.csv: this file feeds the
+    # Step 6 manual corrections, and readr's column-type inference differs from
+    # read.csv's. Changing the parser here would change cleaning results.
+    suppressMessages(readr::read_csv(manual_error_path, show_col_types = FALSE))
   } else {
     if (verbose) cat(sprintf("  [WARN] %s not found -- using empty corrections\n", manual_error_path))
     data.frame()
   }
   manual_unusual <- if (file.exists(manual_unusual_path)) {
-    read.csv(manual_unusual_path, fileEncoding = "UTF-8-BOM")
+    utils::read.csv(manual_unusual_path, fileEncoding = "UTF-8-BOM")
   } else {
     if (verbose) cat(sprintf("  [WARN] %s not found -- using empty unusual\n", manual_unusual_path))
     data.frame()
@@ -191,7 +203,7 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
     cols <- intersect(c("pid", "day_num", "self_diffcalc_sol_minutes",
       "self_diffcalc_sleepefficiency_percent", "sol_category",
       "se_category", "tst_tib_ratio_category", "auto_error_desc"), names(ndf))
-    write.csv(ndf[, cols, drop = FALSE], "output/flagged_records_self_reported.csv", row.names = FALSE)
+    utils::write.csv(ndf[, cols, drop = FALSE], "output/flagged_records_self_reported.csv", row.names = FALSE)
     if (verbose) cat(sprintf("  Exported %d SELF-REPORTED FLAG records\n", nrow(ndf)))
   }
   log_step(corrected_ema_data, "8", "Auto-detect", cfg)

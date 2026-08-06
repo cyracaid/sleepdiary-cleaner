@@ -530,7 +530,16 @@ if(all(c("data_category", "manually_corrected") %in% names(corrected_ema_data)))
     mutate(
       final_category = case_when(
         manually_corrected == TRUE ~ "Manually Corrected",
-        data_category == "clean" ~ "Cleaned by Algorithm",
+        # Label must match the factor levels and scale_fill_manual palette
+        # below, both of which say "Clean". This branch previously produced
+        # "Cleaned by Algorithm", a string in neither list, so every record in
+        # data_category == "clean" was silently coerced to NA by factor() and
+        # vanished from the Figure 1 legend -- 1,878 records (13.4%) on the real
+        # dataset. Synthetic data never exposed it because it contains no
+        # "clean" records at all.
+        # "Clean" is also the accurate word: these records had no issues found,
+        # they were not corrected by anything.
+        data_category == "clean" ~ "Clean",
         data_category == "unusual" ~ "Unusual (Acceptable)",
         data_category == "error" ~ "Error (Needs Review)",
         data_category == "equal_time_ok" ~ "Equal Time (Auto-accepted)",

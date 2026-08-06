@@ -18,6 +18,8 @@ Depends:
 Imports:
     ggplot2,
     gridExtra,
+    readr,
+    utils,
     yaml
 Suggests:
     testthat (>= 3.0.0),
