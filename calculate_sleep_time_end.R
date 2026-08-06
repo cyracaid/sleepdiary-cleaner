@@ -229,11 +229,20 @@ calculate_sleep_time_vars_end <- function(data) {
   attr(cleaned_data, "calculation_timestamp") <- Sys.time()
   attr(cleaned_data, "source_dataframe") <- data_name
   
-  # ---- Block 1: 4 standard contract columns (for eval_flag_severity / eval_duration_extreme) ----
+  # ---- Block 1: 5 standard contract columns ----
   cleaned_data$sleep_efficiency_pct <- cleaned_data$self_diffcalc_sleepefficiency_percent * 100
   cleaned_data$sol_h  <- cleaned_data$self_diffcalc_sol_minutes / 60
   cleaned_data$waso_h <- cleaned_data$duration_totalmin_waso_estimate_am_mincalc / 60
   cleaned_data$sleep_duration_h <- cleaned_data$self_diffcalc_totalsleeptime_minutes / 60
+  cleaned_data$time_in_bed_h <- cleaned_data$self_diffcalc_timeinbed_minutes / 60
+
+  # ---- Block 1b: Correction traceability ----
+  cleaned_data$has_correction <- dplyr::case_when(
+    cleaned_data$corrected & cleaned_data$manually_corrected ~ "both",
+    cleaned_data$corrected                                 ~ "algorithmic",
+    cleaned_data$manually_corrected                        ~ "manual",
+    TRUE                                                   ~ "none"
+  )
   
   # ---- Block 2: Flag evaluators (single source of truth) ----
   cfg <- get0("pipeline_config", envir = .GlobalEnv, ifnotfound = NULL)
