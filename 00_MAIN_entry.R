@@ -83,7 +83,7 @@ multi_process <- function(df, var_list, func, format = NULL) {
     if ("num_waso_estimate_am" %in% names(extra_df)) df$num_waso_estimate_am <- extra_df$num_waso_estimate_am
     rm(extra_df); gc()
   } else {
-    cat("  No extra file — assuming main data contains all columns\n")
+    cat("  No extra file -- assuming main data contains all columns\n")
   }
 
   if (!"StartDate" %in% names(df)) {
