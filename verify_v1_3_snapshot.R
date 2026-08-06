@@ -71,8 +71,8 @@ multi_process <- function(df, var_list, func, format = NULL) {
 
 # ── Load data (replicating old pipeline Step 1) ──────────────────────────
 cat("\nLoading synthetic data...\n")
-rds_file <- cfg_get("data.files.main_rds")
-csv_file <- cfg_get("data.files.main_csv")
+rds_file <- cfg_get("data.files.main")
+csv_file <- cfg_get("data.files.extra")
 
 df_old <- readRDS(rds_file)
 cat(sprintf("  RDS: %d rows x %d columns\n", nrow(df_old), ncol(df_old)))

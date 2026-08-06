@@ -18,7 +18,7 @@ test_that("run_pipeline completes successfully on synthetic data", {
 
   # Check data files exist before running
   cfg <- yaml::read_yaml(cfg_path)
-  rds_ok <- file.exists(file.path(pkg_root, cfg$data$files$main_rds))
+  rds_ok <- file.exists(file.path(pkg_root, cfg$data$files$main))
   skip_if_not(rds_ok, "synthetic RDS data file not found")
 
   result <- run_pipeline(config = cfg_path, project_dir = pkg_root, verbose = FALSE)

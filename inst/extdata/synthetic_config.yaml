@@ -10,9 +10,9 @@ pipeline:
 
 data:
   files:
-    main_rds: "inst/extdata/synthetic_sleep_data.rds"
-    main_csv: "inst/extdata/synthetic_ema_data.csv"
-    # manual stubs for demo -- no manual corrections
+    main: "inst/extdata/synthetic_sleep_data.rds"
+    extra: "inst/extdata/synthetic_ema_data.csv"
+    # Leave manual stubs for demo
     manual_error: "stub_error_corrections.csv"
     manual_unusual: "stub_unusual_corrections.csv"
     manual_nap_exercise: "stub_nap_exercise.csv"
