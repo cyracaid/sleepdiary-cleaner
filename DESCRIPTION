@@ -28,6 +28,7 @@ Imports:
     stringr,
     tibble,
     tidyr,
+    tidyverse,
     utils,
     yaml
 Suggests:
