@@ -16,6 +16,7 @@ BugReports: https://github.com/cyracaid/sleepdiary-cleaner/issues
 Depends:
     R (>= 4.2)
 Imports:
+    corrplot,
     dplyr,
     ggplot2,
     gridExtra,
@@ -35,6 +36,5 @@ Imports:
     utils,
     yaml
 Suggests:
-    testthat (>= 3.0.0),
-    corrplot
+    testthat (>= 3.0.0)
 Config/roxygen2/version: 8.0.0
