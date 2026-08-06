@@ -696,9 +696,10 @@ has_n_waso   <- "duration_totalmin_waso_estimate_am_mincalc" %in% names(correcte
 
 if (has_raw_times && has_metrics) {
 
-  waso_col <- if (has_n_waso) corrected_ema_data$duration_totalmin_waso_estimate_am_mincalc else 0
-
   pre_post <- corrected_ema_data %>%
+    mutate(
+      .waso = if (has_n_waso) duration_totalmin_waso_estimate_am_mincalc else 0
+    ) %>%
     filter(
       !is.na(time_bed_am_hhmm_ampm),
       !is.na(time_sleep_am_hhmm_ampm),
@@ -706,7 +707,7 @@ if (has_raw_times && has_metrics) {
     ) %>%
     mutate(
       tst_before = as.numeric(difftime(time_awake_am_hhmm_ampm,
-                                       time_sleep_am_hhmm_ampm, units = "mins")) - waso_col,
+                                       time_sleep_am_hhmm_ampm, units = "mins")) - .waso,
       sol_before = as.numeric(difftime(time_sleep_am_hhmm_ampm,
                                        time_bed_am_hhmm_ampm, units = "mins")),
       tst_after  = self_diffcalc_totalsleeptime_minutes,
