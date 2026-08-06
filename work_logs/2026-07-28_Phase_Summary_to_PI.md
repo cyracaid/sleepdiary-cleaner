@@ -8,7 +8,7 @@
 
 Subject: splsleep v1.3.1 Phase Summary (trustworthy cleaning + statistical validation)
 
-Hi,,
+Hi,
 
 Here's a summary of what happened with the sleep diary pipeline over the past two weeks (July 15–28). The short version: the pipeline went from "works reliably" to "provably correct and statistically validated." No cleaning logic changed — every correction decision is identical to before. What's new is the evidence that those decisions are correct, and the infrastructure that proves it.
 
