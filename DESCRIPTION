@@ -7,7 +7,7 @@ Authors@R: c(
   )
 Author: Cyra Sloblucyra
 Maintainer: Cyra Sloblucyra <cyracaid@users.noreply.github.com>
-Description: A reproducible, auditable R pipeline for cleaning sleep EMA diary data. Parses raw timestamps, detects and corrects temporal and duration errors through a human-in-the-loop CSV workflow, computes sleep metrics (TST, SOL, WASO, SE), validates self-reported durations against a schema-checked input contract, and generates QC visualizations. v1.3 adds an S3 sleep_diary class with provenance tracking (print/summary/plot), Bland-Altman analysis with threshold validation, per-participant IQR outlier detection, and missing-data reason codes with single-day LOCF. Includes publication-ready figures (pipeline workflow flow diagram and before/after cleaning effects) for a manuscript Methods section.
+Description: Reproducible R pipeline for cleaning sleep EMA diary data. Parses raw timestamps, detects and corrects temporal and duration errors through a human-in-the-loop CSV workflow, computes sleep metrics (TST, SOL, WASO, SE), and generates diagnostic and research-ready figures. Configurable via YAML — maps your dataset columns without code changes. v1.3.8 adds correction traceability (has_correction enum), a pipeline flow diagram, before/after delta impact visualization, and 68 tests.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -16,19 +16,22 @@ BugReports: https://github.com/cyracaid/sleepdiary-cleaner/issues
 Depends:
     R (>= 4.2)
 Imports:
+    dplyr,
     ggplot2,
     gridExtra,
+    lubridate,
+    patchwork,
+    purrr,
+    RColorBrewer,
     readr,
+    scales,
+    stringr,
+    tibble,
+    tidyr,
     utils,
     yaml
 Suggests:
     testthat (>= 3.0.0),
-    dplyr,
-    tidyr,
-    lubridate,
-    patchwork,
-    scales,
-    RColorBrewer,
-    reshape2,
+    magick,
     corrplot
 Config/roxygen2/version: 8.0.0
