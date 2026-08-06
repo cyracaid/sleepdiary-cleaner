@@ -1093,7 +1093,7 @@ ensure_marking_columns <- function(data) {
   
   for (col in required_mark_cols) {
     if (!col %in% names(data)) {
-      data[[col]] <- NA
+      data[[col]] <- if (col == "data_category") NA_character_ else NA
     }
   }
   
