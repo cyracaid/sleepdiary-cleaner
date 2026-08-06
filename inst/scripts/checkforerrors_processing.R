@@ -189,7 +189,6 @@ assign("substance_decimal_anomalies", rbind(
   build_input_anomalies(nic_col, "nicotine", raw_csv),
   build_input_anomalies(can_col, "cannabis", raw_csv)
 ), envir = .GlobalEnv)
-), envir = .GlobalEnv)
 
 if (nrow(substance_decimal_anomalies) > 0) {
   cat(sprintf("  Found %d input anomalies:\n", nrow(substance_decimal_anomalies)))
