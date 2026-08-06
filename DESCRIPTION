@@ -26,6 +26,7 @@ Imports:
     readr,
     reshape2,
     scales,
+    magick,
     stringi,
     stringr,
     tibble,
@@ -35,6 +36,5 @@ Imports:
     yaml
 Suggests:
     testthat (>= 3.0.0),
-    magick,
     corrplot
 Config/roxygen2/version: 8.0.0
