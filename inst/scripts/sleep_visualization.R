@@ -391,13 +391,57 @@ if (exists("review_output") && is.list(review_output) &&
   checkforerrors_df <- data.frame()
 }
 
+# Explains, in one place, WHY Figures 13-18 are absent. Two situations produce
+# an identical-looking output directory but mean opposite things:
+#
+#   (a) the detector raised candidates and a human cleared every one -> finished
+#   (b) the detector could not run, or produced nothing usable       -> broken
+#
+# Printing a bare "skipping" for both is how a COMPLETED human review ends up
+# looking like a failure. On the real dataset (2026-08-06) auto-detection raised
+# 103 candidates and all 103 had already been accepted by a reviewer, leaving an
+# empty queue -- a good result that read like missing figures.
+.explain_no_review_figures <- function() {
+  ro  <- get0("review_output", ifnotfound = NULL)
+  aud <- if (is.list(ro)) ro$review_audit else NULL
+
+  if (is.null(aud) || is.null(aud$n_flagged)) {
+    cat("  Why: no review audit was returned by checkforerrors_processing.R,\n")
+    cat("       so the reason cannot be determined. Treat this as a problem.\n")
+    return(invisible(FALSE))
+  }
+
+  if (aud$n_flagged == 0) {
+    cat("  Why: auto-detection raised no candidate records on this dataset.\n")
+    cat("  Meaning: nothing was suspicious enough to queue for human review.\n")
+    cat("  Figures 13-18 plot that queue, so there is nothing to draw.\n")
+  } else if (aud$n_pending == 0) {
+    cat(sprintf("  Why: auto-detection raised %d candidate record(s), and a human has\n",
+                aud$n_flagged))
+    cat(sprintf("       already reviewed and accepted %d of them as 'not an error'\n",
+                aud$n_accepted))
+    cat("       (recorded in manual_metric_review_acceptances.csv).\n")
+    cat("  Records still awaiting human review: 0\n")
+    cat("  Meaning: THE REVIEW IS COMPLETE. Figures 13-18 plot the outstanding\n")
+    cat("  review queue; an empty queue is the finished state, not a missing figure.\n")
+    cat("  What to report: 'auto-detection proposed N candidates, all human-reviewed,\n")
+    cat("  zero outstanding' -- a stronger statement than any of these figures.\n")
+  } else {
+    cat(sprintf("  Why: %d record(s) are still pending review, but checkforerrors_df\n",
+                aud$n_pending))
+    cat("       could not be used. This is UNEXPECTED -- the figures should exist.\n")
+  }
+  invisible(TRUE)
+}
+
 # Now check if checkforerrors_df is valid
 checkforerrors_exists <- FALSE
 if (is.data.frame(checkforerrors_df) && nrow(checkforerrors_df) > 0) {
   checkforerrors_exists <- TRUE
   cat(sprintf("\n✓ checkforerrors_df has %d rows\n", nrow(checkforerrors_df)))
 } else {
-  cat("\n⚠ checkforerrors_df is empty or not available.\n")
+  cat("\nℹ checkforerrors_df is empty -- Figures 13-18 will not be generated.\n")
+  .explain_no_review_figures()
 }
 
 # ============================================================================
@@ -419,7 +463,7 @@ if (exists("checkforerrors_df")) {
       checkforerrors_exists <- TRUE
       cat(sprintf("\n✓ checkforerrors_df found with %d rows\n", nrow(checkforerrors_df)))
     } else {
-      cat("\n⚠ checkforerrors_df exists but has 0 rows\n")
+      cat("\nℹ checkforerrors_df has 0 rows (empty review queue)\n")
     }
   } else {
     cat("\n⚠ checkforerrors_df exists but is not a data frame\n")
@@ -500,7 +544,11 @@ if (checkforerrors_exists) {
   }
   
 } else {
-  cat("\n⚠ No checkforerrors data available - skipping checkforerrors visualizations\n")
+  cat("\n────────────────────────────────────────────────────────────\n")
+  cat("  FIGURES 13-18 NOT GENERATED\n")
+  cat("────────────────────────────────────────────────────────────\n")
+  .explain_no_review_figures()
+  cat("────────────────────────────────────────────────────────────\n")
 }
 
 # ============================================================================
@@ -563,7 +611,7 @@ if(all(c("data_category", "manually_corrected") %in% names(corrected_ema_data)))
         data_category == "error" ~ "Error (Needs Review)",
         data_category == "equal_time_ok" ~ "Equal Time (Auto-accepted)",
         data_category == "reasonable_unusual" ~ "Reasonable Unusual",
-        data_category == "skipped_na" ~ "Missing Data",
+        data_category == "skipped_na" ~ "Not Reported",
         TRUE ~ "Other"
       )
     ) %>%
@@ -575,7 +623,7 @@ if(all(c("data_category", "manually_corrected") %in% names(corrected_ema_data)))
                               levels = c("Manually Corrected", "Error (Needs Review)", 
                                          "Unusual (Acceptable)", "Clean", 
                                          "Equal Time (Auto-accepted)", 
-                                         "Reasonable Unusual", "Missing Data", "Other"))
+                                         "Reasonable Unusual", "Not Reported", "Other"))
     )
   
   total_records <- nrow(corrected_ema_data)
@@ -608,7 +656,7 @@ if(all(c("data_category", "manually_corrected") %in% names(corrected_ema_data)))
                  "Clean" = "#2E7D32",
                  "Equal Time (Auto-accepted)" = "#64B5F6",
                  "Reasonable Unusual" = "#AB47BC",
-                 "Missing Data" = "#9E9E9E",
+                  "Not Reported" = "#9E9E9E",
                  "Other" = "#757575"),
       name = "Category"
     ) +
@@ -916,7 +964,7 @@ if (exists("clean_df") && exists("corrected_ema_data") &&
         data_category == "unusual" ~ "Unusual",
         data_category == "error" ~ "Error",
         data_category == "equal_time_ok" ~ "Equal Time",
-        data_category == "skipped_na" ~ "Missing Data",
+        data_category == "skipped_na" ~ "Not Reported",
         TRUE ~ "Other"
       )
     ) %>%
@@ -2496,7 +2544,9 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
   cat("  Figure 17: Top 15 Participants with Most Review Flags (Auto-Detection)\n")
   cat("  Figure 18: Auto-Detected Review Flags Dashboard\n\n")
 } else {
-  cat("FIGURES 13-18: SKIPPED (no checkforerrors data available)\n\n")
+  cat("FIGURES 13-18: NOT GENERATED (the human-review queue is empty)\n")
+  .explain_no_review_figures()
+  cat("\n")
 }
 
 cat("ADDITIONAL PIPELINE CLEANING FIGURES:\n")
@@ -2602,6 +2652,43 @@ if ("flag_severity" %in% names(clean_df)) {
   "participant data. It is gitignored and must not be committed or shared",
   "outside the study team."
 )
+
+# ── Figures 13-18 audit (explain WHY the auto-detection queue may be empty) ──
+# When checkforerrors_df is 0-row, Figures 13-18 are absent. That is the
+# COMPLETED state (everything reviewed), not a bug. Write the audit trail
+# into RUN_INFO.txt so the folder answers the question itself.
+.ro <- get0("review_output", ifnotfound = NULL)
+if (is.list(.ro) && is.list(.ro$review_audit)) {
+  .aud <- .ro$review_audit
+  .fig13 <- NULL
+  if (.aud$n_flagged == 0) {
+    .fig13 <- c(
+      "",
+      "Figures 13-18: NOT GENERATED",
+      "  Auto-detection raised no candidate records on this dataset.",
+      "  The pipeline found nothing suspicious enough to queue for human review."
+    )
+  } else if (.aud$n_pending == 0) {
+    .fig13 <- c(
+      "",
+      "Figures 13-18: NOT GENERATED — Auto-Detection Review Queue Empty",
+      sprintf("  The auto-detection system (Parts A/B/C) raised %d candidate record(s).",
+              .aud$n_flagged),
+      sprintf("  All %d were reviewed by a human and marked as 'not an error'", .aud$n_accepted),
+      "  (decisions archived in manual_metric_review_acceptances.csv).",
+      "  Current pending review queue: 0 records.",
+      "",
+      "  Figures 13-18 plot the outstanding review queue. An empty queue is the",
+      "  COMPLETED state — the human review is finished, not missing.",
+      "",
+      "  What to report in Methods:",
+      sprintf("  'Automated detection proposed %d candidates; all were manually", .aud$n_flagged),
+      "   reviewed and confirmed acceptable. Zero outstanding.'"
+    )
+  }
+  if (!is.null(.fig13)) .run_info <- c(.run_info, .fig13)
+}
+
 writeLines(.run_info, file.path(output_dir, "RUN_INFO.txt"))
 
 cat(sprintf("\n✓ %s/ written\n", output_dir))
