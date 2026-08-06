@@ -704,24 +704,24 @@ if (has_raw_times && has_metrics) {
       !is.na(time_bed_am_hhmm_ampm),
       !is.na(time_sleep_am_hhmm_ampm),
       !is.na(time_awake_am_hhmm_ampm)
-    ) %>%
-    mutate(
-      tst_before = as.numeric(difftime(time_awake_am_hhmm_ampm,
-                                       time_sleep_am_hhmm_ampm, units = "mins")) - .waso,
-      sol_before = as.numeric(difftime(time_sleep_am_hhmm_ampm,
-                                       time_bed_am_hhmm_ampm, units = "mins")),
-      tst_after  = self_diffcalc_totalsleeptime_minutes,
-      sol_after  = self_diffcalc_sol_minutes,
-      delta_tst  = tst_after - tst_before,
-      delta_sol  = sol_after - sol_before,
-      status = dplyr::case_when(
-        manually_corrected ~ "manual",
-        corrected ~ "algorithmic",
-        TRUE ~ "none"
-      )
-    ) %>%
-    filter(!is.na(tst_after), !is.na(sol_after),
-           !is.na(tst_before), !is.na(sol_before))
+    )
+  # Use base R assignment for the difftime operations to avoid dplyr scoping issues
+  pre_post$tst_before <- as.numeric(pre_post$time_awake_am_hhmm_ampm -
+                                    pre_post$time_sleep_am_hhmm_ampm, units = "mins") -
+                         pre_post$.waso
+  pre_post$sol_before <- as.numeric(pre_post$time_sleep_am_hhmm_ampm -
+                                    pre_post$time_bed_am_hhmm_ampm, units = "mins")
+  pre_post$tst_after  <- pre_post$self_diffcalc_totalsleeptime_minutes
+  pre_post$sol_after  <- pre_post$self_diffcalc_sol_minutes
+  pre_post$delta_tst  <- pre_post$tst_after - pre_post$tst_before
+  pre_post$delta_sol  <- pre_post$sol_after - pre_post$sol_before
+  pre_post$status <- dplyr::case_when(
+    pre_post$manually_corrected ~ "manual",
+    pre_post$corrected ~ "algorithmic",
+    TRUE ~ "none"
+  )
+  pre_post <- pre_post[!is.na(pre_post$tst_after) & !is.na(pre_post$sol_after) &
+                       !is.na(pre_post$tst_before) & !is.na(pre_post$sol_before), ]
 
   n_mod <- sum(pre_post$status != "none")
   n_total <- nrow(pre_post)
