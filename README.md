@@ -705,8 +705,8 @@ run_pipeline(config = "my_study.yaml")
 **管线从不删除任何记录。** 清洗的意思是*打标记 + 增加修正列*，不是删行。`corrected_ema_data` 的行数永远等于你输入的行数。
 
 ```
-输入：280 条原始记录
-输出：280 条记录，每条多了分类列（data_category, flag_severity）
+输入：N 条原始记录
+输出：N 条记录，每条多了分类列（data_category, flag_severity）
      和修正列（time_*_corrected）。原始列原样保留。
 ```
 
@@ -753,18 +753,21 @@ clean_data <- corrected_ema_data[corrected_ema_data$data_category %in% c("clean"
 | `templates/template_manual_metric_review_acceptances.csv` | `manual_metric_review_acceptances.csv` | 人工接受标记 |
 | `templates/template_second_review_checklist.csv` | `second_review_checklist.csv` | 二次验证 |
 
-### 输出 CSV
+### 输出
 
 | 文件 | 内容 |
 |------|------|
-| `output/correction_status_final.csv` | Per-run summary: n_total, tst, sol, error/corrected/flag counts |
-| `output/flagged_records_self_reported.csv` | SELF_REPORTED_FLAG 记录详情 |
+| `output/correction_status_final.csv` | 单次运行摘要：总行数、TST、SOL、各类别计数 |
+| `output/appendix_step_ledger.csv` | 每步标记追踪账本 |
+| `output/flagged_records_self_reported.csv` | SELF_REPORTED_FLAG 记录 |
+| `latest_visualization_*/figure_index.png` | 全部生成图表的缩略图索引 |
+| `latest_visualization_*/RUN_INFO.txt` | 运行溯源：数据集标签、版本、git commit、文件来源 |
 
 ## Agent Skill
 
-**位置**：`.agents/skills/splsleep-pipeline/SKILL.md`
+**位置**：`.opencode/skills/splsleep-pipeline/SKILL.md`
 
-AI 助手可通过此技能理解管线架构、运行管线、解读报告、添加修正。
+AI 助手可通过此技能理解管线架构、运行管线、解读报告、添加修正、诊断问题。
 
 ## 许可证
 
