@@ -54,3 +54,5 @@
 ^00a_setup\.R$
 ^splsleep_1\.0\.0\.tar\.gz$
 ^splsleep_1\.1\.0\.tar\.gz$
+^.*\.Rproj$
+^\.Rproj\.user$
