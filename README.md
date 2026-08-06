@@ -8,9 +8,9 @@
 
 # English Version
 
-SPL Sleep is a reproducible, auditable R pipeline for cleaning sleep EMA (ecological momentary assessment) diary data. It parses raw bedtime/sleep/awake/get-up timestamps, detects and corrects temporal and duration errors through a transparent human-in-the-loop workflow (every correction stored in a re-readable CSV), computes standard sleep metrics (TST, SOL, WASO, SE), validates self-reported durations, and generates 27 QC and research-ready figures. A schema-validated YAML config maps the pipeline to your dataset without touching code; detection thresholds and their rationale are documented in THRESHOLDS.md, and the input contract in SCHEMA.md.
+SPL Sleep is a reproducible, auditable R pipeline for cleaning sleep EMA (ecological momentary assessment) diary data. It parses raw bedtime/sleep/awake/get-up timestamps, detects and corrects temporal and duration errors through a transparent human-in-the-loop workflow (every correction stored in a re-readable CSV), computes standard sleep metrics (TST, SOL, WASO, SE), validates self-reported durations, and generates diagnostic and research-ready figures. A schema-validated YAML config maps the pipeline to your dataset without touching code; detection thresholds and their rationale are documented in THRESHOLDS.md, and the input contract in SCHEMA.md.
 
-**v1.3 (current)** adds a `sleep_diary` S3 class with provenance tracking (`print()` / `summary()` / `plot()`), Bland-Altman analysis with threshold validation, per-participant IQR outlier detection, and missing-data reason codes with single-day LOCF. The pipeline now runs on a unified entry point (`run_pipeline()` internally uses the S3 chain for steps 2--7 with 2.6x speed improvement). See [NEWS.md](NEWS.md) for full changelog.
+**v1.3.7 (current)** — 68 tests, R CMD CHECK 0 ERROR / 0 WARNING. Installable via `renv::install("cyracaid/sleepdiary-cleaner")`. See [releases](https://github.com/cyracaid/sleepdiary-cleaner/releases) for full changelog.
 
 ## Features
 
@@ -18,12 +18,11 @@ SPL Sleep is a reproducible, auditable R pipeline for cleaning sleep EMA (ecolog
 - **Manual correction CSV workflow**: human review decisions stored in CSVs, re-read on each pipeline run
 - **Configurable thresholds**: SOL/SE/TST-TIB flag thresholds, timestamp format, column names — all set in a YAML config file
 - **Checkpoint reporter**: per-step clean/error/unusual/corrected counts printed and saved to CSV
-- **27 diagnostic figures**: organized into `pipeline_cleaning/` (QC) and `research_ready/` (sleep metrics, substance use)
+- **Diagnostic figures**: organized into `pipeline_cleaning/` (QC, pipeline flow, correction impact) and `research_ready/` (sleep metrics, substance use, perception)
 - **R package**: `library(splsleep); run_pipeline()` — installable, versioned, dependency-managed
-- **S3 provenance tracking** (v1.3): `summary()` and `plot()` on pipeline output, step-by-step history
-- **Statistical validation** (v1.3): `validate_thresholds()` checks cutoffs against Bland-Altman agreement limits
-- **Per-participant outlier detection** (v1.3): `flag_statistical_outliers()` via IQR
-- **Missing-data handling** (v1.3): `handle_missing()` with reason codes and optional single-day LOCF
+- **Correction traceability**: `has_correction` enum column (none / algorithmic / manual / both) plus per-step audit ledger
+- **Column mapping**: `adapt_columns()` maps your dataset's column names to pipeline internals via YAML config — no code changes
+- **68 tests**: covering correction engine, classification thresholds, auto-detection logic, and config validation
 
 ## Pipeline Architecture
 
@@ -50,23 +49,24 @@ Raw Data ──→ Step 1: Load Data ──→ Step 2: Parse Timestamps ──�
                                                                                                       │
                                                                                              Step 8.5: Cross-Participant Check
                                                                                                       │
-                                                                                             Step 9: Generate 27 Figures
+                                                                                              Step 9: Generate Figures
 ```
 
 ### Classification Systems
 
 | System | Source | Categories |
 |--------|--------|------------|
-| `data_category` | Step 5 (temporal) | clean, error, unusual, equal_time_ok, skipped_na |
+| `data_category` | Step 6 (temporal) | clean, error, unusual, equal_time_ok, skipped_na |
+| `has_correction` | Step 7 (traceability) | none, algorithmic, manual, both |
 | `flag_severity` | Step 7 (metrics) | Clean, Minor (1 flag), Major (2+ flags) |
 | `checkforerrors_summary` | Step 8 (auto-detect) | TIMESTAMP_ISSUE, DURATION_ISSUE, AMOUNT_FLAG, SELF_REPORTED_FLAG, CLEAN |
 
 ### Figures
 
-| Folder | Count | Content |
-|--------|-------|---------|
-| `pipeline_cleaning/` | 9 | Pipeline progress, data quality dashboard, flag composition, per-participant flag rate |
-| `research_ready/` | 15 | Sleep variable distributions, perception bias, substance use, sleep regularity, correlation matrix |
+| Folder | Content |
+|--------|---------|
+| `pipeline_cleaning/` | Pipeline flow diagram, correction impact (before/after), data quality dashboard, flag composition, per-participant flag rate, auto-detected issues |
+| `research_ready/` | Sleep variable distributions, perception bias, substance use, sleep regularity, correlation matrix |
 
 ## Quick Start
 
@@ -78,18 +78,12 @@ Raw Data ──→ Step 1: Load Data ──→ Step 2: Parse Timestamps ──�
 ### Install and Run
 
 ```r
-# Install the package (replace with current version)
-install.packages("splsleep_1.3.1.tar.gz", repos = NULL, type = "source")
+# Install from GitHub
+renv::install("cyracaid/sleepdiary-cleaner")
 
-# Load and run (uses built-in default configuration)
+# Load and run
 library(splsleep)
 run_pipeline()
-```
-
-Or from the command line:
-
-```bash
-bash run.sh
 ```
 
 ### Using with Your Own Dataset
@@ -97,15 +91,29 @@ bash run.sh
 The pipeline is fully configurable via a YAML configuration file. This lets you map your dataset's column names to pipeline variables and adjust thresholds without modifying any R code.
 
 ```r
-# Step 1: Generate a configuration template
+# Step 1: Copy the configuration template
 library(splsleep)
-file.copy(system.file("config_default.yaml", package = "splsleep"),
-          "my_study_config.yaml")
+file.copy(system.file("config_template.yaml", package = "splsleep"),
+          "my_study.yaml")
 ```
 
-**Step 2: Edit `my_study_config.yaml`**
+**Step 2: Edit `my_study.yaml`**
 
-The config file has three key sections:
+The file starts with the only two things you must change:
+
+```yaml
+data:
+  files:
+    main: "your_data.rds"        # Your sleep diary file (.rds or .csv)
+    extra: ""                    # Leave empty unless StartDate lives in a separate file
+```
+
+Three common scenarios:
+- **Everything in one file** (most datasets): `main: "my_data.rds"`, `extra: ""`
+- **Data split across two files**: `main: "ema_vars.rds"`, `extra: "dates.csv"`
+- **Your data is a CSV**: `main: "my_data.csv"`, `extra: ""` — the `.csv` extension is auto-detected
+
+The config file has additional optional sections for column mapping and thresholds:
 
 #### Column Mapping
 Map your dataset's column names to the pipeline's internal variables:
@@ -172,8 +180,8 @@ All pipeline scripts automatically read the config; no R code changes needed.
 **The pipeline never deletes a record.** Cleaning means *adding labels and corrected columns*, not removing rows. The number of records in `corrected_ema_data` always equals the number of records you put in.
 
 ```
-Input:  280 raw records
-Output: 280 records, each with additional classification columns
+Input:  N raw records
+Output: N records, each with additional classification columns
         (data_category, flag_severity) and corrected-value columns
         (time_*_corrected). Raw columns are preserved untouched.
 ```
@@ -230,15 +238,15 @@ Template CSV files with synthetic data are in [`templates/`](templates/). Copy t
 
 Each template uses synthetic data. See the template files for column-level descriptions.
 
-### Output CSV Structure
+### Output
 
 | File | Contents |
-|---|---|
+|------|----------|
 | `output/correction_status_final.csv` | Per-run summary: n_total, tst, sol, error/corrected/flag counts |
-| `figures/Figure_1_Pipeline_Workflow.png` | Pipeline flow diagram — shows records through correction stages with counts and percentages |
-| `figures/Figure_2_Cleaning_Effect.png` | Before/after comparison — SOL distributions, TST severity breakdown, individual record changes |
-| `figures/Figure_Captions.md` | Publication-ready captions for both figures |
-| `output/flagged_records_self_reported.csv` | Records flagged as SELF_REPORTED_FLAG, with SOL/SE/ratio categories and metric values |
+| `output/appendix_step_ledger.csv` | Per-step flag tracking ledger |
+| `output/flagged_records_self_reported.csv` | Records flagged as SELF_REPORTED_FLAG |
+| `latest_visualization_*/figure_index.png` | Contact-sheet index of all generated figures |
+| `latest_visualization_*/RUN_INFO.txt` | Run provenance: dataset tag, version, git commit, file sources |
 
 ## Agent Skill
 
@@ -295,7 +303,7 @@ read.csv("output/correction_status_final.csv")
 
 ```
   n_total tst_mean_h sol_mean_min n_clean n_error n_corrected duration_issue
-     280       6.94         31.4       0       0           0             10
+    N      ~7.5       ~30          ...     0       ...          0-10
 ```
 
 Interpretation: 280 records, mean TST 6.94 h (normal), mean SOL 31.4 min (normal). 10 duration issues (plausible). No errors (synthetic data was well-formed).
@@ -376,19 +384,19 @@ This standard is populated only at Step 8. It summarizes:
 - `AMOUNT_FLAG`: anomalous substance-use entries
 - `SELF_REPORTED_FLAG`: self-reported vs computed value mismatch
 
-#### Real example (synthetic data, 280 rows)
+#### Example (synthetic demo data)
 
 ```
   Step 4 (Normalize sequence):       data_category: equal_time_ok=266, skipped_na=14
-  Step 6 (Manual corrections):       data_category: equal_time_ok=266, skipped_na=14  (unchanged ✓)
-  Step 7 (Compute metrics):          data_category: equal_time_ok=266, skipped_na=14  (unchanged ✓)
-                                     flag_severity: Clean=251, Minor=28, Major=1      251+28+1=266=280-14 ✓
+  Step 6 (Manual corrections):       data_category: equal_time_ok=266, skipped_na=14  (unchanged)
+  Step 7 (Compute metrics):          data_category: equal_time_ok=266, skipped_na=14  (unchanged)
+                                     flag_severity: Clean=251, Minor=28, Major=1
                                      duration_extreme: OK=262, Too short=1, Too long=0
-  Step 8 (Auto-detect):              data_category + flag_severity + duration_extreme = unchanged from Step 7 ✓
-  Step 8.5 (Cross-participant):      same as Step 8 ✓
+  Step 8 (Auto-detect):              data_category + flag_severity + duration_extreme = unchanged from Step 7
+  Step 8.5 (Cross-participant):      same as Step 8
 ```
 
-The numbers do not change after they are first computed. That is the signature of a stable pipeline.
+The numbers do not change after they are first computed. This is the signature of a stable pipeline.
 
 ---
 
@@ -426,69 +434,18 @@ If they differ and the input data did not change, the pipeline output has change
 
 ### 5. How to Read the Figures
 
-Figures are saved in `latest_visualization/`. This section has three parts:
-- **Part 0 — Publication Figures** (for a manuscript Methods section)
-- **Part A — The 5 Essential Figures** (3 minutes, quick validation every run)
-- **Part B — Complete Figure Reference** (all 28 figures, detailed)
+Figures are saved in a timestamped directory (e.g. `latest_visualization_*/`). A `figure_index.png` contact sheet shows all figures at a glance.
 
----
+#### Publication Figures (for your Methods section)
 
-#### Part 0: Publication Figures (for your Methods section)
+Two publication-ready figures answer the reviewer questions: *"How did the cleaning pipeline work?"* and *"What effect did it have on the data?"* — without requiring the reader to inspect source code.
 
-Two publication-ready figures are generated for a manuscript. They answer the reviewer questions: *"How did the cleaning pipeline work?"* and *"What effect did it have on the data?"* — without requiring the reader to inspect source code.
+| Figure | File | What it shows |
+|--------|------|---------------|
+| **Figure 1 — Pipeline Flow** | `pipeline_cleaning/01_Pipeline_Flow_Diagram.png` | Vertical flow diagram: raw records → parsed → algo-corrected → manual-corrected → final valid. Each stage with count and % of total. Right panel: breakdown by classification (clean, error, unusual, not reported, equal time). |
+| **Figure 2 — Correction Impact** | `research_ready/02_Correction_Impact.png` | Three panels: **A/B** = delta lollipops showing only modified records for TST and SOL (sorted by magnitude). **C** = identity scatter plot with unchanged records as faint gray backdrop, modified records in orange/blue. Below: Before/After summary table (mean, SD). |
 
-| Figure | File | What it shows | Color coding |
-|--------|------|---------------|-------------|
-| **Figure 1 — Pipeline Workflow** | `figures/Figure_1_Pipeline_Workflow.png` | Left-to-right flow: raw records → automatic correction (Step 4) → automatic validation (Step 5) → manual review (Step 6) → final clean dataset. Each box shows count and percentage. | **Gray** = processing stage; **Red** = errors flagged for review (NOT auto-fixed); **Orange** = algorithmically corrected (Step 4); **Blue** = manually corrected (human CSV review); **Purple** = unusual or reviewed-but-unchanged; **Green** = retained in final dataset |
-| **Figure 2 — Effect of Cleaning** | `figures/Figure_2_Cleaning_Effect.png` | Three panels: **A** = SOL before (self-reported) vs after (computed) with violin + boxplot; **B** = TST distribution after cleaning, stacked by flag severity (Clean/Minor/Major); **C** = individual record changes — scatter of self-reported vs computed SOL, coloured by correction type | **A**: red = before, blue = after; **B**: green = Clean, orange = Minor, red = Major; **C**: green = unchanged, orange = auto-corrected, blue = manually corrected |
-
-**How to generate them** (after `run_pipeline()`):
-
-```r
-figure_pipeline_workflow()   # -> figures/Figure_1_Pipeline_Workflow.png
-figure_cleaning_effect()     # -> figures/Figure_2_Cleaning_Effect.png
-```
-
-Both figures read all numbers directly from `corrected_ema_data` — no hardcoded values. Percentages use the raw record count as the denominator.
-
-**Publication-ready captions** are in `figures/Figure_Captions.md`. They include sample sizes, percentages, colour semantics, and interpretation for direct use in a manuscript.
-
-##### Reading Figure 1 correctly
-
-**"Algorithmic Correction" (orange, Step 4) vs "Auto-Detected Errors Flagged" (red, Step 5) are different outcomes:**
-
-| | Algorithmic Correction | Auto-Detected Errors Flagged |
-|---|---|---|
-| What the algorithm does | **Actually fixes** the record | **Only flags** it — does not change it |
-| Example | AM/PM confusion (subtract 12 h), minor order swap (< 3 h) | Getup before bedtime, sleep latency > 7 h |
-| Record outcome | Becomes clean automatically | Stays in the data **with an error label**, waiting for human review |
-| Human involvement | None | Required (investigator decides correct / accept / exclude) |
-
-The key point: **Step 5-flagged errors are NOT removed from the data.** They remain in the dataset, marked as errors, until a human decides what to do with them. This is a deliberate design decision of the human-in-the-loop workflow.
-
-> ⚠ **Design note (may change):** the "flag but don't remove" behaviour is intentional today — flagged records are kept for audit and human decision. A future version may switch to automatically removing or excluding error records instead. If you see a red "Errors Flagged" box with N > 0, those records still exist in `corrected_ema_data` under `data_category == "error"`; they are not dropped.
-
-**What the green "Final Clean Dataset" means:** it is the subset of records that enter analysis — NOT all raw records. It equals *clean* + *equal_time_ok* records. It **excludes**: skipped records (missing timestamps), flagged errors, and unusual records. In Figure 1, the green box shows only the records that made it through all stages as usable data.
-
-**What you can answer from these figures (Methods section checklist):**
-
-| Reviewer question | Where in the figures |
-|-------------------|---------------------|
-| How many raw records entered the pipeline? | Figure 1, first box |
-| How many were flagged as errors (not auto-fixed)? | Figure 1, red box |
-| How many were algorithmically corrected? | Figure 1, orange box |
-| How many required manual correction? | Figure 1, blue box |
-| How many were reviewed but unchanged? | Figure 1, purple box |
-| How many entered the final dataset? | Figure 1, green box |
-| How much did SOL change? | Figure 2 Panel A + C |
-| What is the TST distribution and severity? | Figure 2 Panel B |
-| Is the effect visually obvious? | Figure 2 Panel C (identity line + coloured points) |
-
----
-
-#### Part A: The 5 Essential Figures for Output Checking
-
-These are the only figures you need to check every time. Each answers one yes/no question.
+Both figures read all numbers directly from `corrected_ema_data` — no hardcoded values. Percentages use the raw record count as the denominator. Generated automatically by `run_pipeline()`.
 
 | Step | Figure | Look at this | It should look like this | If not? |
 |:----:|--------|-------------|--------------------------|---------|
@@ -502,7 +459,7 @@ These are the only figures you need to check every time. Each answers one yes/no
 
 ---
 
-#### Part B: Complete Figure Reference (all 28 figures)
+#### Part B: Complete Figure Reference
 
 ##### Figures 01–06: Data Quality and Distributions
 
@@ -670,7 +627,9 @@ MIT
 
 # 中文版本
 
-自动化的睡眠 EMA 日记数据清洗管线：解析原始就寝/入睡/醒来/起床时间戳，检测并修正时序和时长错误，计算睡眠指标（TST、SOL、WASO、SE），验证自报时长，生成 27 张质控可视化图表。
+自动化的睡眠 EMA 日记数据清洗管线：解析原始就寝/入睡/醒来/起床时间戳，检测并修正时序和时长错误，计算睡眠指标（TST、SOL、WASO、SE），验证自报时长，生成诊断与科研图表。
+
+**v1.3.7（当前版本）** — 68 个测试，R CMD CHECK 0 ERROR / 0 WARNING。通过 `renv::install("cyracaid/sleepdiary-cleaner")` 安装。
 
 ## 功能特性
 
@@ -678,12 +637,11 @@ MIT
 - **人工修正 CSV 工作流**：审阅决策存储在 CSV 中，每次运行自动读取
 - **可配置阈值**：SOL/SE/TST-TIB 标记阈值、时间戳格式、列名 — 全部通过 YAML 配置
 - **检查点报告器**：每步的 clean/error/unusual/corrected 计数自动打印并保存为 CSV
-- **27 张诊断图**：分为 `pipeline_cleaning/`（质控）和 `research_ready/`（睡眠分析）
+- **诊断图表**：分为 `pipeline_cleaning/`（质控、管线流程、修正影响）和 `research_ready/`（睡眠指标、物质使用、知觉偏差）
 - **R 包**：`library(splsleep); run_pipeline()` — 可安装、版本化
-- **S3 provenance 追踪**（v1.3）：对管线输出调用 `summary()` / `plot()`，步骤历史记录
-- **统计验证**（v1.3）：`validate_thresholds()` 通过 Bland-Altman 一致性分析检验阈值合理性
-- **被试内异常检测**（v1.3）：`flag_statistical_outliers()` 基于 IQR
-- **缺失值处理**（v1.3）：`handle_missing()` 支持原因码标注和可选单天 LOCF
+- **修正追溯**：`has_correction` enum 列（none / algorithmic / manual / both）+ 每步审计账本
+- **列映射**：`adapt_columns()` 通过 YAML 配置映射数据集列名 — 无需修改代码
+- **68 个测试**：覆盖修正引擎、分类阈值、自动检测逻辑、配置验证
 
 ## 管线架构
 
@@ -705,14 +663,15 @@ MIT
                                                                                     │
                                                                            Step 8.5: 跨被试检查
                                                                                     │
-                                                                           Step 9: 生成 27 张图
+                                                                            Step 9: 生成图表
 ```
 
 ### 分类体系
 
 | 系统 | 来源 | 类别 |
 |------|------|------|
-| `data_category` | Step 5（时序） | clean, error, unusual, equal_time_ok, skipped_na |
+| `data_category` | Step 6（时序） | clean, error, unusual, equal_time_ok, skipped_na |
+| `has_correction` | Step 7（追溯） | none, algorithmic, manual, both |
 | `flag_severity` | Step 7（指标） | Clean, Minor（1 标记）, Major（2+ 标记） |
 | `checkforerrors_summary` | Step 8（自动） | TIMESTAMP_ISSUE, DURATION_ISSUE, AMOUNT_FLAG, SELF_REPORTED_FLAG, CLEAN |
 
@@ -721,7 +680,8 @@ MIT
 ### 安装运行
 
 ```r
-install.packages("splsleep_1.3.1.tar.gz", repos = NULL, type = "source")
+# 从 GitHub 安装
+renv::install("cyracaid/sleepdiary-cleaner")
 library(splsleep)
 run_pipeline()
 ```
@@ -729,13 +689,13 @@ run_pipeline()
 ### 适配新数据集
 
 ```r
-# 生成配置模板
-file.copy(system.file("config_default.yaml", package = "splsleep"), "my_study_config.yaml")
+# 复制配置模板
+file.copy(system.file("config_template.yaml", package = "splsleep"), "my_study.yaml")
 
-# 编辑 my_study_config.yaml → 映射列名、调阈值、改时间格式
+# 编辑 my_study.yaml → 设置数据文件路径，可选映射列名、调阈值
 
 # 运行
-run_pipeline(config = "my_study_config.yaml")
+run_pipeline(config = "my_study.yaml")
 ```
 
 ## 数据说明（纯文字，无真实数据）
