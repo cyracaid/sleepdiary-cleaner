@@ -714,18 +714,11 @@ if (has_raw_times && has_metrics) {
       sol_after  = self_diffcalc_sol_minutes,
       delta_tst  = tst_after - tst_before,
       delta_sol  = sol_after - sol_before,
-      status = if (exists("has_correction", where = corrected_ema_data)) {
-        corrected_ema_data$has_correction
-      } else if (exists("manually_corrected", where = corrected_ema_data) &&
-                 exists("corrected", where = corrected_ema_data)) {
-        dplyr::case_when(
-          corrected_ema_data$manually_corrected ~ "manual",
-          corrected_ema_data$corrected ~ "algorithmic",
-          TRUE ~ "none"
-        )
-      } else {
-        "unknown"
-      }
+      status = dplyr::case_when(
+        manually_corrected ~ "manual",
+        corrected ~ "algorithmic",
+        TRUE ~ "none"
+      )
     ) %>%
     filter(!is.na(tst_after), !is.na(sol_after),
            !is.na(tst_before), !is.na(sol_before))
