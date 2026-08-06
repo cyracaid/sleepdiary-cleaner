@@ -24,6 +24,7 @@ Imports:
     purrr,
     RColorBrewer,
     readr,
+    reshape2,
     scales,
     stringr,
     tibble,
