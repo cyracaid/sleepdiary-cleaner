@@ -2200,9 +2200,10 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
           geom_vline(xintercept = c(15, 60), linetype = "dashed", color = c("orange", "red"), linewidth = 1) +
           annotate("text", x = 15, y = Inf, label = "Minor (15min)", vjust = 2, color = "orange") +
           annotate("text", x = 60, y = Inf, label = "Red Line (60min)", vjust = 2, color = "red") +
-          labs(title = "Figure 20B: WASO Perception Bias (Subjective vs Objective)",
-           subtitle = paste0("Absolute difference: subjective WASO (self-reported duration_totalmin_waso_estimate_am) vs objective WASO (time_getup - time_awake). ",
-                             "N=", length(valid_waso_rows), " | Clinical: <15min typical, >60min significant discrepancy."),
+           labs(title = "Figure 20B: Self-Reported Nighttime Wakefulness vs Post-Awakening Time in Bed",
+            subtitle = paste0("Note: self-reported WASO (within sleep period) and post-awakening interval (getup − awake) are different time windows. ",
+                              "The latter captures time spent in bed after final awakening, not wakefulness during sleep. ",
+                              "N=", length(valid_waso_rows), " | Clinical: <15min typical, >60min significant discrepancy."),
                x = "Absolute difference (minutes)", y = "Count") +
           scale_x_continuous(limits = c(0, 200)) +
           theme_minimal(base_size = 12)
