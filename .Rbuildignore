@@ -34,6 +34,7 @@
 ^..Rcheck$
 ^splsleep_ci\.Rcheck$
 ^verify_v1_3_s3\.R$
+^verify_finalize_columns\.R$
 ^verify_v1_3_snapshot\.R$
 ^inst/verification
 ^session.*\.md$
