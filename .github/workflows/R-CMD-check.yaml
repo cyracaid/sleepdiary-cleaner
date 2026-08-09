@@ -2,7 +2,7 @@
 # Runs on every push and PR to ensure package integrity
 on:
   push:
-    branches: [main, v1.3-s3]
+    branches: [main]
   pull_request:
     branches: [main]
 
@@ -33,3 +33,21 @@ jobs:
         with:
           upload-snapshots: true
           build_args: 'c("--no-build-vignettes", "--no-manual")'
+
+      # R CMD check runs tests/testthat/ only -- it never touches the
+      # standalone verify_*.R scripts. Until 2026-08-09 those four scripts had
+      # to be remembered and run by hand, so nothing enforced them on push.
+      #
+      # verify_reference_fidelity.R runs in --strict mode: a metric with no
+      # recorded comparison against the 2026-05-19 baseline fails the build.
+      # That is the gate B1 lacked; it went unnoticed for three months and
+      # shifted mean TST by about 29 minutes.
+      #
+      # verify_v1_3_snapshot.R is not listed: it needs the configured input
+      # data, which is real participant data and is never committed.
+      - name: Structural verification (standalone scripts)
+        run: |
+          Rscript verify_finalize_columns.R
+          Rscript verify_reference_fidelity.R --strict
+          Rscript verify_delivery_wiring.R --dir output
+        shell: bash

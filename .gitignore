@@ -6,6 +6,15 @@ sber_ema_anon_20260227.csv
 worklog/
 
 # Manual correction CSVs (contain participant identifiers)
+# NOTE the *.bak* / *.csv.* patterns below: on 2026-08-09 a backup created as
+# manual_error_corrections.csv.bak_20260808 showed up as untracked, because the
+# exact-filename patterns here do not match a suffixed copy. Any hand-made
+# backup of a real-data CSV must stay out of git.
+*.bak
+*.bak_*
+manual_*.csv.*
+second_review_checklist.csv.*
+metrics_ai_review.csv.*
 manual_error_corrections.csv
 manual_unusual_corrections.csv
 manual_nap_exercise_corrections.csv

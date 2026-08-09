@@ -13,7 +13,7 @@
 | 级别 | 数量 | 说明 |
 |---|---|---|
 | 🔴 阻断 | 0（B1、B2 均已结案） | 影响主要结局指标数值，必须先定 |
-| 🟠 严重 | 5 | 影响数据交付可用性 |
+| 🟠 严重 | **3 未结**（S3、S6、S8）<br>已结案：S1、S2、S4、S5<br>已评估决定不做：S7 | 影响数据交付可用性 |
 | 🟡 中等 | 8 | 影响可理解性 / 可维护性 |
 | ⚪ 已知债 | 6 | 记录在案，可延后 |
 
@@ -126,7 +126,12 @@ table(d$waso_duration_for_metrics_status, useNA = "always")
 
 ## 🟠 严重
 
-### S1. Dataset A 缺「计算侧 WASO」，但该列已存在于 Full
+### ~~S1~~ 已结案（2026-08-09）：Dataset A 缺「计算侧 WASO」，但该列已存在于 Full
+
+> **已实施。** 字典新增 `awake_getup_diff_h → waso_computed_minutes`（`transform=x60`），
+> 由 `verify_finalize_columns.R` 两条断言守住（存在 + 单位换算）。
+> 真实数据实测见 `2026-08-09_work_log.md` §六。
+
 
 研究目标之一是 WASO 的自报 vs 计算 discrepancy。**两侧的值都已存在**，只是计算侧没接进 A：
 
@@ -163,7 +168,8 @@ awake_getup_diff_h = ifelse(!has_na,
 
 ---
 
-### S2. 两个不同的量共用 "WASO" 之名 —— Figure 20B 会误导
+### ~~S2~~ 已结案（2026-08-09，commit `239e858`）：两个不同的量共用 "WASO" 之名
+
 
 本管线里有**两个不同的时间段**都被叫作 WASO：
 
@@ -207,7 +213,11 @@ awake_getup_diff_h = ifelse(!has_na,
 
 ---
 
-### S4. Dataset B 缺 `row_id`，与 A 的连接可能不唯一
+### ~~S4~~ 已结案（2026-08-09）：Dataset B 缺 `row_id`，与 A 的连接可能不唯一
+
+> **已实施。** B 加 `row_id`（15 列）。`verify_finalize_columns.R` 断言
+> 「A ⋈ B on (pid, day_num, row_id) 行数不变」，testthat 同步一条。
+
 
 - Dataset A 有 `row_id`（#3，注为 "Traceability key"）
 - Dataset B 只有 `pid` + `day_num`
@@ -224,7 +234,7 @@ data$pid == rec$pid & data$day_num == rec$day_num & data$row_id == rec$row_id
 
 ---
 
-### S5. snapshot 测试挡不住算法偏离
+### ~~S5~~ 已结案（2026-08-09）：snapshot 测试挡不住算法偏离
 
 `verify_v1_3_snapshot.R` 比对的是 **splsleep 旧路径 vs splsleep 的 S3 链**
 （脚本自述："The S3 chain is bit-identical to the old pipeline"）。
@@ -234,6 +244,120 @@ B1 的 sleeponset 偏离在 snapshot 建立之前就存在，两边都带着它�
 
 **建议：** 增加一个**对参照实现**的算式快照——把八个指标的算式（而非结果）
 钉成测试。B1/B2 定案后加，否则会把当前的偏离一起钉死。
+
+### ✅ 已结案（2026-08-09）：`verify_reference_fidelity.R`
+
+详见 `2026-08-09_work_log.md` §九。**纯新增文件，管线零改动。**
+
+```
+默认模式    15 passed, 0 failed   4 identical, 4 deviating, 0 unreviewed
+--strict    15 passed, 0 failed
+```
+
+- **Part 1 算式契约** —— 8 条算式 + 3 条守卫 + 3 条单位换算。
+  改动 `calculate_sleep_time_end.R` 而不同步更新此脚本，构建即红
+- **Part 2 保真登记** —— 对基线逐条比对完成：
+  4 条相同；4 条偏离全部刻意且有文档（B1、B2 信任门、SE 除零守卫、bout 守卫）
+
+**基线位置**（一度被我误判为「不在仓库」，实为按文件名检索失败）：
+
+```
+archive/2026-07-25/spl_pipeline_package_2026-05-19/splsleep/calculate_sleep_time_end.R
+```
+
+**保留：** 该文件是 splsleep 自己的 2026-05-19 祖先版本，不是上游
+`R01_online_sleepdiary_manualclean`（截图第 49 行为 `+ time_sleep_am_hhmm_ampm`，
+archive 为 `+ time_sleep_corrected`，同血统非同文件）。
+**故本验证证明的是「算式未从起点漂移」，不是「忠实于上游」。**
+
+`--strict` 现可进 CI。日后若取得上游文件，
+用 `SPLSLEEP_REFERENCE_IMPL=` 换基线重跑并重新裁定登记表。
+
+---
+
+### S6. `correction_type` 在被人工覆盖后不失效 —— Dataset B 的溯源字段会说谎
+
+**新增 2026-08-09。** 详细复盘见 `2026-08-09_work_log.md` §七。
+
+`row_id 12078`：算法把 `sleep` 减了 12h（`sleep_reduce_12h_loop`），
+人工把 sleep 改了回去、转而给 `bed` 加 12h。
+**那次算法修正已被完全撤销，数据里没有它的痕迹，
+`correction_type` 却至今写着 `sleep_reduce_12h_loop`。**
+
+影响面：16 条 `has_correction = "both"` 的记录。
+
+**这条直接打在 M6 上。** M6 把 `correction_type` 放进 Dataset B 是为了让 B 自足回答
+"用什么规则改的"——对这 16 条，它给的答案是错的。
+
+**建议：** 人工覆盖的行给 `correction_type` 加后缀（如 `+ manual_override`），
+或在字典 description 中明写该字段仅记录算法动作、可能已被人工撤销。
+**后者零代码改动，应先做。**
+
+### S7. AM/PM 归一化规则会猜错「哪个时间戳错了」
+
+**新增 2026-08-09。** 详细复盘见 `2026-08-09_work_log.md` §七。
+
+`normalize_sleep_time_sequence.R:134`（4.1）与 `:158`（4.2）各自写死了假设：
+
+> *"the user likely recorded **getup** with the wrong AM/PM"*（4.1）
+> *"the user likely recorded **sleep** with the wrong AM/PM"*（4.2）
+
+**规则只看一对时间戳，不拿另外两个当锚点交叉验证。**
+
+全量筛查（`manually_corrected & corrected & correction_type 含 12h_loop`）共 3 条：
+
+| row_id | 算法怪谁 | 实际错谁 | 人工是否改全 | 最终 |
+|---|---|---|---|---|
+| 8502 | getup | **awake** | ❌ 只改了 awake | `error` |
+| 8827 | sleep | 原始值即垃圾（`awake = "0"`） | — | `error` |
+| 12078 | sleep | **bed** | ✅ | `clean` |
+
+**3 条里人工推翻算法 2 条，两次人都对。** 4.1 若看一眼 `bed = 04:27`，
+就能排除「awake = 00:13」这个读法（人不可能在上床前 4 小时醒）。
+
+**2026-08-09 决定：不实施。** 见 `2026-08-09_work_log.md` §八。
+
+管线目前能跑、数字正常、即将交付，**不为「未来可能少一点人工审核」换掉核心算法。**
+影响面 3 条记录：2 条已被正确标记为 `error`，1 条（12078）人工已改对，
+另 1 条（8502）已由 ② 修复。**真实风险为零，只有理论风险。**
+
+本条降级为「已知设计局限」，不再是待办。
+
+**另：`row_id 8502` 是唯一真正没修好的记录**（人工改了 awake，
+保留了算法基于旧 awake 减过 12h 的 getup）。正确值可推：`getup = 12:17`。
+它带 `error_type = order_error`，不会静默进入分析。
+
+### S8. `calculate_sleep_time_vars_end()` 有隐藏的写副作用
+
+**新增 2026-08-09。** 写 S5 验证脚本时踩到。
+
+函数名与文档都说它是「计算睡眠指标」，但 `return()` 之前是：
+
+```r
+dir.create("output", showWarnings = FALSE)
+saveRDS(cleaned_data, "output/corrected_ema_data.rds")
+```
+
+**在仓库根目录调用它，就会用传入的数据覆盖 `output/corrected_ema_data.rds`。**
+
+S5 脚本传的是 3 行 fixture。若当时跑通，刚跑完的 13,990 行真实输出就没了。
+`dplyr::case_when()` 因 fixture 缺 `corrected` 列先报错才挡住 ——
+**这是运气，不是设计。**
+
+影响面不止验证脚本。任何人想：
+
+- 对该函数写单元测试
+- 拿子集重算指标
+- 并行跑两份数据（synth / real）
+
+都会静默互相覆盖，且没有任何提示。
+
+**当前缓解：** `verify_reference_fidelity.R` 用 `run_sandboxed()`
+把每次调用 `setwd()` 到临时目录，并加了一条断言 —— 沙箱漏了就红。
+**这只保护了这一个调用点。**
+
+**正式修法（需动管线，按研究者原则暂不实施）：** 把写盘移出计算函数，
+交给调用方；或加 `output_path = NULL` 参数，默认不写。
 
 ---
 
@@ -292,6 +416,8 @@ B 给出位移量（pre → post），但**用什么规则改的**
 
 **建议：** `correction_type` 加进 Dataset B。它是修正溯源数据集，
 "改了多少"和"用什么规则改的"应在同一张表。
+
+**已实施（2026-08-09），但随后发现该字段本身不可靠 —— 见 S6。**
 
 ### M7. `self_diffcalc_sleepefficiency_percent` 名为 percent 实为 0–1 分数
 

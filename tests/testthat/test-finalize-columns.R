@@ -55,7 +55,7 @@ test_that("dictionary is internally consistent", {
   expect_false(any(duplicated(a)), info = "Dataset A has duplicate column names")
   expect_false(any(duplicated(b)), info = "Dataset B has duplicate column names")
 
-  expect_true(all(dict$status %in% c("implemented", "pending")))
+  expect_true(all(dict$status %in% c("implemented", "pending", "reserved")))
   expect_true(all(dict$transform == "none" | grepl("^x[0-9.]+$", dict$transform)))
 })
 
@@ -105,6 +105,51 @@ test_that("unit transforms are applied", {
   }
 })
 
+test_that("reserved affect columns pass through untouched and are never fabricated", {
+  skip_if_not(file.exists(.dict_path()), "column_dictionary.csv not found")
+  dict <- utils::read.csv(.dict_path(), stringsAsFactors = FALSE,
+                  colClasses = "character", na.strings = NULL)
+  resv <- dict$source_column[dict$status == "reserved"]
+  if (!length(resv)) skip("no reserved columns declared")
+
+  # Absent from the pipeline output -> nothing added, no fabricated blanks.
+  d    <- .fake_data()
+  res  <- finalize_columns(d, review_data = .fake_review(), dict_path = .dict_path(),
+                           write = FALSE, verbose = FALSE)
+  expect_false(any(resv %in% names(res$final)))
+
+  # Present -> passed through byte-for-byte, unchanged (cleaner did not touch).
+  d2 <- .fake_data()
+  for (cn in resv) d2[[cn]] <- seq_len(nrow(d2))
+  res2 <- finalize_columns(d2, review_data = .fake_review(), dict_path = .dict_path(),
+                           write = FALSE, verbose = FALSE)
+  for (cn in resv) expect_identical(res2$final[[cn]], d2[[cn]])
+})
+
+test_that("export guard stops on negative minutes in analyzable rows", {
+  skip_if_not(file.exists(.dict_path()), "column_dictionary.csv not found")
+  d <- .fake_data(n = 3)
+  # Give the fake frame a real record_status so the guard's exclusion works.
+  # waso_computed_minutes is derived from awake_getup_diff_h (hours, x60).
+  d$record_status <- c("clean", "error", "clean")
+  d$awake_getup_diff_h <- c(-5/60, 0.5, 0.75)  # -5 min in an analyzable row
+
+  expect_error(
+    finalize_columns(d, review_data = .fake_review(), dict_path = .dict_path(),
+                     write = FALSE, verbose = FALSE),
+    "Export guard"
+  )
+
+  # Negative inside error or not_reported (skipped_na) rows is fine: those
+  # rows are excluded from analysis. The guard protects what analysts see.
+  d$awake_getup_diff_h <- c(0.5, -716/60, 0.75)
+  d$record_status <- c("clean", "error", "not_reported")
+  expect_silent(
+    finalize_columns(d, review_data = .fake_review(), dict_path = .dict_path(),
+                     write = FALSE, verbose = FALSE)
+  )
+})
+
 test_that("a missing promised column stops the build", {
   skip_if_not(file.exists(.dict_path()), "column_dictionary.csv not found")
   d <- .fake_data()
@@ -133,8 +178,13 @@ test_that("declared defaults fill legitimately-optional columns", {
   res <- finalize_columns(d, review_data = .fake_review(), dict_path = .dict_path(),
                           write = FALSE, verbose = FALSE)
   for (i in seq_len(nrow(opt))) {
-    expect_true(opt$name_a[i] %in% names(res$final))
-    expect_equal(unique(res$final[[opt$name_a[i]]]),
-                 as.logical(opt$default_if_absent[i]))
+    want <- opt$default_if_absent[i]
+    got  <- res$final[[opt$name_a[i]]]
+    if (want == "NA") {
+      expect_true(all(is.na(got)), info = paste("NA default not applied for", opt$name_a[i]))
+    } else {
+      expect_equal(unique(got), as.logical(want),
+                   info = paste("default not applied for", opt$name_a[i]))
+    }
   }
 })

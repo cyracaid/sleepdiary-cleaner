@@ -416,16 +416,23 @@ if (exists("review_output") && is.list(review_output) &&
     cat("  Meaning: nothing was suspicious enough to queue for human review.\n")
     cat("  Figures 13-18 plot that queue, so there is nothing to draw.\n")
   } else if (aud$n_pending == 0) {
-    cat(sprintf("  Why: auto-detection raised %d candidate record(s), and a human has\n",
+    # n_flagged and n_accepted are NOT nested: n_flagged counts distinct rows
+    # raised by THIS run, n_accepted counts rows cleared by the standing
+    # acceptance file, which also covers rows this run never raised. Printing
+    # "accepted X of them" made n_accepted > n_flagged read as nonsense.
+    cat(sprintf("  Why: auto-detection raised %d candidate record(s) in this run.\n",
                 aud$n_flagged))
-    cat(sprintf("       already reviewed and accepted %d of them as 'not an error'\n",
+    cat(sprintf("       The standing acceptance list cleared %d record(s) as\n",
                 aud$n_accepted))
-    cat("       (recorded in manual_metric_review_acceptances.csv).\n")
+    cat("       'reviewed, not an error' (manual_metric_review_acceptances.csv).\n")
+    cat("       That list is broader than this run's candidates, so the two\n")
+    cat("       counts are not nested -- every candidate was covered by it.\n")
     cat("  Records still awaiting human review: 0\n")
     cat("  Meaning: THE REVIEW IS COMPLETE. Figures 13-18 plot the outstanding\n")
     cat("  review queue; an empty queue is the finished state, not a missing figure.\n")
-    cat("  What to report: 'auto-detection proposed N candidates, all human-reviewed,\n")
-    cat("  zero outstanding' -- a stronger statement than any of these figures.\n")
+    cat(sprintf("  What to report: 'auto-detection proposed %d candidates, all\n",
+                aud$n_flagged))
+    cat("  human-reviewed, zero outstanding' -- a stronger statement than the figures.\n")
   } else {
     cat(sprintf("  Why: %d record(s) are still pending review, but checkforerrors_df\n",
                 aud$n_pending))

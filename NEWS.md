@@ -1,3 +1,102 @@
+# splsleep 1.4.0
+
+Delivery release. **No cleaning logic changed.** Run-to-run figures are
+identical to 1.3.9: Clean 1,908 / Unusual 31 / Equal 903 / Corrected 81 /
+mean TST 7.71 h / mean SOL 28.8 min.
+
+## New
+
+* **`finalize_columns()` now runs as Step 10 of `run_pipeline()`.** Previously
+  it had to be called by hand, so a plain `run_pipeline()` produced no Dataset A
+  or B at all. Pass `finalize = FALSE` for the old behaviour. It runs after
+  `final_summary()` on purpose: it only selects and renames columns, so a
+  failure there leaves the cleaning run and every reported number intact.
+
+* **`inst/extdata/column_dictionary.csv`** is the single source of truth for the
+  delivered columns -- whitelist, rename mapping and data dictionary in one
+  table. Adding a column means editing one CSV row.
+
+* **Dataset A (36 columns)** and **Dataset B (15 columns)**. B carries `row_id`
+  so `A ⋈ B` on `(pid, day_num, row_id)` cannot multiply rows; `pid + day_num`
+  alone is not unique.
+
+* **`record_status`** replaces `data_category` in Dataset A. Six levels, not the
+  five originally planned: `reasonable_unusual` records were reviewed and
+  accepted by a human, and that is not the same claim as `unusual`. An unmapped
+  level stops the build rather than shipping a blank.
+
+* **`waso_computed_minutes`** (`getup - final awakening`, converted from hours to
+  minutes). Not a substitute for `waso_selfreport_minutes`: on real data
+  (n = 1,723 paired) the marginal distributions nearly coincide -- both median
+  10 min, both Q3 20 min -- but night-level correlation is r = 0.013. They are
+  two variables, not two measurements of one quantity.
+
+* **`verify_reference_fidelity.R`** -- the fidelity check deferred in 1.3. It
+  pins each of the 8 metric formulas to its stated definition and records, per
+  metric, whether it has been compared against the 2026-05-19 baseline. Four are
+  identical; four deviate, all deliberately and all documented. Previously
+  "has anyone actually checked this formula?" had no answer anywhere in the
+  repo, which is how the sleep-onset deviation survived three months.
+
+* **CI now runs the standalone verification scripts.** `R CMD check` executes
+  `tests/testthat/` only and never touched `verify_*.R`, so nothing enforced
+  them on push. `verify_reference_fidelity.R` runs with `--strict`: a metric
+  with no recorded comparison fails the build.
+
+## Fixes
+
+* **Affect-layer columns are now reserved, not dropped.** `pos_affect`,
+  `neg_affect`, `stress_today_pm` and `copestress_today_pm` are declared as
+  `status = reserved` in the dictionary. When a corrected dataset carries them,
+  `finalize_columns()` passes them through untouched; when it does not (the
+  current real data), no placeholder is fabricated. They exist so a future
+  dataset with the EMA affect items can be finalised without a breaking change.
+
+* **Export guard.** `finalize_columns()` stops the run if any of the 14 signed
+  minute metrics (`tst_minutes`, `sol_computed_minutes`, `sleepperiod_minutes`,
+  `waso_*`, exercise minutes, ...) is negative in an analysable row
+  (`record_status` neither `error` nor `not_reported`). `not_reported`
+  (`skipped_na`) rows are whole missing nights; their negative fragments are
+  arithmetic noise and are excluded, mirroring analyst filters.
+
+* **Delivery is CI-verified.** `verify_delivery_wiring.R` checks the delivered
+  files against the dictionary (exact column contract, finalize wiring,
+  live guard) and joins `.github/workflows/R-CMD-check.yaml`; it defers
+  gracefully when no `output/` exists in a checkout. `verify_reference_fidelity.R`
+  runs in `--strict` mode (currently 16/16) and `verify_finalize_columns.R`
+  (41/41). Full testthat suite 190 passing.
+
+* **Development branch `v1.3-s3` deleted** (local and remote) and its trigger
+  removed from the CI workflow. Phase 2 (analytics) and Phase 3 (methods
+  paper) are paused; this release is the Phase 1 delivery gate.
+
+* `row_id 8502` -- a manual correction fixed the awakening timestamp but left
+  the get-up timestamp that the AM/PM normaliser had already shifted by 12 h,
+  producing a WASO of -716 minutes. Corrected via the existing
+  `column_to_correct_2` mechanism; no code changed.
+
+* `.gitignore` -- backups such as `manual_error_corrections.csv.bak_20260808`
+  were untracked rather than ignored, because the existing rules matched exact
+  filenames and no suffixed copy. Those files hold participant identifiers.
+  Now covered by `*.bak*` and `manual_*.csv.*`.
+
+## Known limitations
+
+* `correction_type` records only the algorithmic action and is not rewritten
+  when a later manual correction overrides it. On the 16 rows with
+  `has_correction == "both"` it may name a rule whose effect is no longer
+  present. Noted in the dictionary; see open issues S6.
+
+* `calculate_sleep_time_vars_end()` writes `output/corrected_ema_data.rds` as a
+  side effect, so calling it from a working directory that holds real output
+  overwrites that output. See open issues S8.
+
+* The AM/PM normaliser decides *which* timestamp carries the error by looking at
+  one pair only, without cross-checking the other two. On the three affected
+  records a human overruled it twice, correctly both times. Assessed and
+  deliberately not changed: three records, all either flagged or already
+  corrected. See open issues S7.
+
 # splsleep 1.3.3
 
 Bug-fix release. No cleaning logic changed other than the guard described below.

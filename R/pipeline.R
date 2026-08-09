@@ -69,11 +69,17 @@ utils::globalVariables(c(
 #'   list (from \code{load_config()}). If NULL, uses the bundled default.
 #' @param project_dir Character. Path to the project root. Default ".".
 #' @param skip_visualization Logical. If TRUE, skip visualization.
+#' @param finalize Logical. If TRUE (default) run \code{finalize_columns()} as
+#'   Step 10 and write the delivered datasets. Set FALSE to stop after the
+#'   cleaning run and inspect \code{corrected_ema_data} yourself. Before v1.4
+#'   this step had to be invoked by hand, which meant a plain
+#'   \code{run_pipeline()} produced no Dataset A or B at all.
 #' @param verbose Logical. Print progress. Default TRUE.
 #'
 #' @return Invisibly returns TRUE on successful completion.
 #' @export
-run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = FALSE, verbose = TRUE) {
+run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = FALSE,
+                         finalize = TRUE, verbose = TRUE) {
   env <- .pipeline_init(config, project_dir, verbose)
   on.exit(.pipeline_cleanup(env$old_wd), add = TRUE)
   cfg  <- env$cfg
@@ -257,6 +263,26 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   }
 
   final_summary(list(A = checkpoint_A, B = checkpoint_B, C = checkpoint_C, D = checkpoint_D, E = checkpoint_E))
+
+  # -- Step 10: Build the delivered datasets ----------------------------
+  # Deliberately last, and deliberately after final_summary(): this step only
+  # selects and renames columns, so if it fails the cleaning run and all its
+  # reported numbers are still intact on disk and in corrected_ema_data.
+  if (finalize) {
+    if (verbose) cat("\n=== Step 10: Building delivered datasets ===\n")
+    rv <- if (exists("review_output", inherits = TRUE) &&
+              is.list(review_output) &&
+              !is.null(review_output$data_with_flags)) {
+      review_output$data_with_flags
+    } else NULL
+
+    # Hard fail, not a warning. The delivered datasets are the point of the
+    # run: the cleaning output is preserved in corrected_ema_data.rds, so if
+    # the dictionary drifts out of sync the correct fix is to stop the run
+    # so CI and anyone else notices, then repair the dictionary -- not to walk
+    # away with a green exit code and no delivered files.
+    finalize_columns(corrected_ema_data, review_data = rv, verbose = verbose)
+  }
 
   if (verbose) cat("\n[OK] Pipeline complete!\n")
   invisible(TRUE)

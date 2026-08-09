@@ -126,14 +126,31 @@ config_col <- function(config, internal_name) {
 #' @return Data frame with columns renamed to pipeline-internal names.
 #' @export
 adapt_columns <- function(data, config) {
+  # Config keys are LOGICAL column names (e.g. time_bed_hhmm); the pipeline's
+  # canonical data columns carry the AM/PM suffix (e.g. time_bed_am_hhmm).
+  # consumer code (flag_standards.R etc.) hardcodes the long form, so a mapped
+  # user column must land on the canonical name, not on the logical key.
+  .CANONICAL_NAMES <- c(
+    time_bed_hhmm    = "time_bed_am_hhmm",
+    time_bed_ampm    = "time_bed_am_ampm",
+    time_sleep_hhmm  = "time_sleep_am_hhmm",
+    time_sleep_ampm  = "time_sleep_am_ampm",
+    time_awake_hhmm  = "time_awake_am_hhmm",
+    time_awake_ampm  = "time_awake_am_ampm",
+    time_getup_hhmm  = "time_getup_am_hhmm",
+    time_getup_ampm  = "time_getup_am_ampm"
+  )
+
   mapping <- config_get(config, "column_mapping", list())
   reverse_map <- list()
 
-  # Build reverse map: user_col_name -> internal_name
+  # Build reverse map: user_col_name -> internal (canonical) name
   for (section in names(mapping)) {
     for (internal_name in names(mapping[[section]])) {
       user_name <- mapping[[section]][[internal_name]]
       if (!is.null(user_name) && !is.na(user_name) && user_name != "") {
+        canonical <- unname(.CANONICAL_NAMES[internal_name])
+        if (!is.na(canonical)) internal_name <- canonical
         reverse_map[[user_name]] <- internal_name
       }
     }
