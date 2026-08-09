@@ -67,3 +67,6 @@ reasonable_unusual_records.csv
 cross_participant_field_misentries.csv
 cross_participant_flagged_rows.csv
 cross_participant_suspicious_slices.csv
+
+# Local-only verification reports (real-data aggregates). Never pushed.
+verify_reports/
