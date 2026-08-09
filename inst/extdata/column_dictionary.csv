@@ -2,33 +2,34 @@ source_column,source_object,default_if_absent,name_a,name_b,transform,unit,statu
 pid,corrected_ema_data,,pid,pid,none,id,implemented,Participant ID
 day_num,corrected_ema_data,,day_num,day_num,none,count,implemented,Study day number
 row_id,corrected_ema_data,,row_id,row_id,none,id,implemented,Row traceability key. Required in BOTH A and B: pid+day_num alone is not unique (the pipeline itself matches on the pid+day_num+row_id triple).
-time_bed_corrected,corrected_ema_data,,bedtime_selfreport_ts,bedtime_postcorrection,none,timestamp,implemented,"Bedtime after algorithmic and manual correction. 'selfreport' denotes the data source modality (sleep diary), not 'unmodified'."
+time_bed_corrected,corrected_ema_data,,bedtime_selfreport_ts,bedtime_postcorrection,none,timestamp,implemented,Bedtime after algorithmic and manual correction. 'selfreport' denotes the data source modality (sleep diary)  not 'unmodified'.
 self_diffcalc_sleeponset,corrected_ema_data,,sleeponset_selfreport_ts,sleeponset_postcorrection,none,timestamp,implemented,Sleep onset. Currently an alias of time_sleep_corrected (calculate_sleep_time_end.R:131) -- self-reported SOL is deliberately NOT added; see 2026-08-09 work log section 1.
 time_awake_corrected,corrected_ema_data,,awakening_selfreport_ts,awakening_postcorrection,none,timestamp,implemented,Final morning awakening after correction
 time_getup_corrected,corrected_ema_data,,getup_selfreport_ts,getup_postcorrection,none,timestamp,implemented,Get out of bed time after correction
 self_diffcalc_totalsleeptime_minutes,corrected_ema_data,,tst_minutes,tst_minutes,none,minutes,implemented,Total Sleep Time = sleepperiod - self-reported WASO. Primary outcome. NA when self-reported WASO is missing or untrusted; use sleepperiod_minutes as an upper bound in that case.
 self_diffcalc_sol_minutes,corrected_ema_data,,sol_computed_minutes,,none,minutes,implemented,Sleep Onset Latency computed from timestamps (time_sleep - time_bed). Pairs with sol_selfreport_minutes.
 sleep_efficiency_pct,corrected_ema_data,,se_percent,,none,percent,implemented,Sleep efficiency on a 0-100 scale = TST / trysleep * 100
-self_diffcalc_timeinbed_minutes,corrected_ema_data,,tib_minutes,,none,minutes,implemented,"Time in Bed = getup - bedtime. Contains SOL, sleep, WASO and post-awakening time."
+self_diffcalc_timeinbed_minutes,corrected_ema_data,,tib_minutes,,none,minutes,implemented,Time in Bed = getup - bedtime. Contains SOL  sleep  WASO and post-awakening time.
 self_diffcalc_sleepperiod_minutes,corrected_ema_data,,sleepperiod_minutes,,none,minutes,implemented,Sleep period = awakening - sleep onset. Identical BY CONSTRUCTION to the former trysleep_minutes because this diary records no mid-sleep awakening timestamps. Also serves as the upper bound of TST when WASO is unavailable.
-awake_getup_diff_h,corrected_ema_data,,waso_computed_minutes,,x60,minutes,implemented,WASO under this study's operational definition = getup - final awakening. Source column is in HOURS; multiplied by 60 here so it is directly comparable with waso_selfreport_minutes.
+awake_getup_diff_h,corrected_ema_data,,waso_computed_minutes,,x60,minutes,implemented,WASO under this study's operational definition = getup - final awakening. Source column is in HOURS; multiplied by 60 here so it is directly comparable with waso_selfreport_minutes. NOT a substitute for waso_selfreport_minutes: on real data (n=1723 paired) the two have near-identical marginal distributions (both median 10 min; both Q3 20 min) but night-level correlation is r=0.013. Use them as two variables not as two measurements of one quantity.
 avg_waso_estimate_am_minutes,corrected_ema_data,,waso_avg_bout_selfreport_minutes,,none,minutes,implemented,Mean duration per awakening bout = self-reported WASO / self-reported bout count. BOTH numerator and denominator are self-reported.
 duration_totalmin_sol_estimate_am_mincalc,corrected_ema_data,,sol_selfreport_minutes,sol_selfreport_minutes,none,minutes,implemented,Participant's own SOL estimate. Pairs with sol_computed_minutes for discrepancy analysis.
-duration_totalmin_waso_estimate_am_mincalc,corrected_ema_data,,waso_selfreport_minutes,,none,minutes,implemented,Participant's own total WASO estimate. Pairs with waso_computed_minutes.
+duration_totalmin_waso_estimate_am_mincalc,corrected_ema_data,,waso_selfreport_minutes,,none,minutes,implemented,Participant's own total WASO estimate. Pairs with waso_computed_minutes but does not track it night to night (r=0.013). Values are heavily rounded to multiples of 5 which attenuates any correlation.
 num_waso_estimate_am,corrected_ema_data,,num_waso_bouts_selfreport,,none,count,implemented,Self-reported number of awakenings
-duration_totalmin_napstoday_PM_mincalc,corrected_ema_data,,nap_selfreport_totalminutes,,none,minutes,implemented,"Self-reported total nap duration. No nap timestamps exist, so nap timing discrepancy cannot be computed."
-exercisetoday_PM_totalmin_Light_mincalc,corrected_ema_data,,exercise_light_minutes,,none,minutes,implemented,Light exercise duration
-exercisetoday_PM_totalmin_Moderate_mincalc,corrected_ema_data,,exercise_moderate_minutes,,none,minutes,implemented,Moderate exercise duration
-exercisetoday_PM_totalmin_Vigorous_mincalc,corrected_ema_data,,exercise_vigorous_minutes,,none,minutes,implemented,Vigorous exercise duration
-exercisetoday_PM_totalmin_Strength_mincalc,corrected_ema_data,,exercise_strength_minutes,,none,minutes,implemented,Strength training duration
-has_correction,corrected_ema_data,,has_correction,has_correction,none,category,implemented,"none / algorithmic / manual / both. Distinct from correction_type, which names the specific fix applied."
-correction_type,corrected_ema_data,,,correction_type,none,category,implemented,Which algorithmic rule was applied (e.g. sleep_reduce_12h_loop). Belongs in B so that 'how much it moved' and 'which rule moved it' live in one table.
+duration_totalmin_napstoday_PM_mincalc,corrected_ema_data,,nap_selfreport_totalminutes,,none,minutes,implemented,Self-reported total nap duration. No nap timestamps exist  so nap timing discrepancy cannot be computed.
+exercisetoday_PM_totalmin_Light_mincalc,corrected_ema_data,NA,exercise_light_minutes,,none,minutes,implemented,Light exercise duration
+exercisetoday_PM_totalmin_Moderate_mincalc,corrected_ema_data,NA,exercise_moderate_minutes,,none,minutes,implemented,Moderate exercise duration
+exercisetoday_PM_totalmin_Vigorous_mincalc,corrected_ema_data,NA,exercise_vigorous_minutes,,none,minutes,implemented,Vigorous exercise duration
+exercisetoday_PM_totalmin_Strength_mincalc,corrected_ema_data,NA,exercise_strength_minutes,,none,minutes,implemented,Strength training duration
+has_correction,corrected_ema_data,,has_correction,has_correction,none,category,implemented,none / algorithmic / manual / both. Distinct from correction_type  which names the specific fix applied.
+correction_type,corrected_ema_data,,,correction_type,none,category,implemented,Which algorithmic rule was applied (e.g. sleep_reduce_12h_loop). Belongs in B so that 'how much it moved' and 'which rule moved it' live in one table. CAVEAT: records only the ALGORITHMIC action and is never rewritten when a later manual correction overrides it. On rows with has_correction='both' (n=16 in the 2026-08 real data) this field may name a rule whose effect is no longer present. See open_issues S6.
 is_error,corrected_ema_data,,is_error,,none,flag,implemented,Error flag from Step 6 classification
 error_type,corrected_ema_data,,error_type,,none,category,implemented,Error category text
 is_unusual,corrected_ema_data,,is_unusual,,none,flag,implemented,Unusual pattern flag
 unusual_type,corrected_ema_data,,unusual_type,,none,category,implemented,Unusual pattern text
 is_reasonable_unusual,corrected_ema_data,FALSE,is_reasonable_unusual,,none,flag,implemented,Human reviewer judged the unusual pattern acceptable
-record_status,corrected_ema_data,,record_status,,none,category,pending,NOT YET IMPLEMENTED. Planned: clean / error / unusual / equal_time / not_reported. Intended to replace data_category in the analysis-facing dataset.
+data_category,corrected_ema_data,,,,none,category,implemented,Step 5 temporal-check outcome and the SOURCE record_status is derived from (see .RECORD_STATUS_MAP in finalize_columns.R). Deliberately NOT in Dataset A: shipping two status columns invites analysts to filter on the wrong one. Kept in the dictionary so the reverse gap check does not flag it. Use record_status.
+record_status,corrected_ema_data,,record_status,,none,category,implemented,Analysis-facing status: clean / error / unusual / reasonable_unusual / equal_time / not_reported. DERIVED from data_category in finalize_columns() -- see .RECORD_STATUS_MAP. Six levels not five: reasonable_unusual records were reviewed and accepted by a human and that judgement is not the same claim as 'unusual'. EXCLUDE record_status=='error' before computing any summary statistic.
 flag_severity,corrected_ema_data,,flag_severity,,none,category,implemented,Clean / Minor issues (1 flag) / Major issues (2+ flags)
 needs_review_flag,review_output,,needs_review,,none,flag,implemented,Still awaiting human review after acceptances are applied
 caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1,corrected_ema_data,,caffeine_num,,none,count,implemented,Caffeinated drinks or snacks
@@ -40,3 +41,7 @@ time_bed_am_hhmm_ampm,corrected_ema_data,,,bedtime_precorrection,none,timestamp,
 time_sleep_am_hhmm_ampm,corrected_ema_data,,,sleeponset_precorrection,none,timestamp,implemented,Parsed sleep onset before any correction (Step 2)
 time_awake_am_hhmm_ampm,corrected_ema_data,,,awakening_precorrection,none,timestamp,implemented,Parsed awakening before any correction (Step 2)
 time_getup_am_hhmm_ampm,corrected_ema_data,,,getup_precorrection,none,timestamp,implemented,Parsed get-up before any correction (Step 2)
+pos_affect,,,pos_affect,,none,affect_score,reserved,Affect layer (positive affect EMA score). NOT cleaned by this pipeline: reserved as a declaration that the sleep cleaner must never drop/alter this column if present. Passed through untouched when present; column absent when survey data unavailable.
+neg_affect,,,neg_affect,,none,affect_score,reserved,Affect layer (negative affect EMA score). NOT cleaned by this pipeline: pass-through only  never flagged/imputed/corrected. Reserved declaration.
+stress_today_pm,,,stress_today_pm,,none,affect_score,reserved,Affect layer (evening stress rating per EMA protocol). NOT cleaned by this pipeline: pass-through only. Reserved declaration.
+copestress_today_pm,,,copestress_today_pm,,none,affect_score,reserved,Affect layer (evening coping stress rating). NOT cleaned by this pipeline: pass-through only. Reserved declaration.

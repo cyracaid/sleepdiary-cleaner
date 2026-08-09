@@ -10,7 +10,14 @@
 
 SPL Sleep is a reproducible, auditable R pipeline for cleaning sleep EMA (ecological momentary assessment) diary data. It parses raw bedtime/sleep/awake/get-up timestamps, detects and corrects temporal and duration errors through a transparent human-in-the-loop workflow (every correction stored in a re-readable CSV), computes standard sleep metrics (TST, SOL, WASO, SE), validates self-reported durations, and generates diagnostic and research-ready figures. A schema-validated YAML config maps the pipeline to your dataset without touching code; detection thresholds and their rationale are documented in THRESHOLDS.md, and the input contract in SCHEMA.md.
 
-**v1.3.9 (current)** — 68 tests, R CMD CHECK 0 ERROR / 0 WARNING. Installable via `renv::install("cyracaid/sleepdiary-cleaner")`. See [releases](https://github.com/cyracaid/sleepdiary-cleaner/releases) for full changelog.
+**v1.4.0 (current)** — delivery release, 190+ tests, R CMD CHECK 0 ERROR / 0 WARNING. Adds `finalize_columns()` as Step 10, the column dictionary as single source of truth, reserved affect-layer columns, an export guard against negative signed minutes, and CI-verified delivery wiring. Installable via `renv::install("cyracaid/sleepdiary-cleaner")`. See [releases](https://github.com/cyracaid/sleepdiary-cleaner/releases) for full changelog.
+
+## Phase status
+
+* **Phase 1 — delivery pipeline (v1.4.0): complete.** Cleaning logic is frozen;
+  this is the CLI release of the reproducible cleaning pipeline.
+* **Phase 2 — analytics** and **Phase 3 — methods paper: paused.** Deliberately
+  deferred while Phase 1 is reviewed by the study team.
 
 ## Features
 
@@ -22,7 +29,7 @@ SPL Sleep is a reproducible, auditable R pipeline for cleaning sleep EMA (ecolog
 - **R package**: `library(splsleep); run_pipeline()` — installable, versioned, dependency-managed
 - **Correction traceability**: `has_correction` enum column (none / algorithmic / manual / both) plus per-step audit ledger
 - **Column mapping**: `adapt_columns()` maps your dataset's column names to pipeline internals via YAML config — no code changes
-- **68 tests**: covering correction engine, classification thresholds, auto-detection logic, and config validation
+- **190+ tests**: covering correction engine, classification thresholds, auto-detection logic, config validation, and the finalize/guard delivery contract
 
 ## Pipeline Architecture
 
@@ -629,7 +636,7 @@ MIT
 
 自动化的睡眠 EMA 日记数据清洗管线：解析原始就寝/入睡/醒来/起床时间戳，检测并修正时序和时长错误，计算睡眠指标（TST、SOL、WASO、SE），验证自报时长，生成诊断与科研图表。
 
-**v1.3.9（当前版本）** — 68 个测试，R CMD CHECK 0 ERROR / 0 WARNING。通过 `renv::install("cyracaid/sleepdiary-cleaner")` 安装。
+**v1.4.0（当前版本）** — 交付版本，190+ 个测试，R CMD CHECK 0 ERROR / 0 WARNING。通过 `renv::install("cyracaid/sleepdiary-cleaner")` 安装。
 
 ## 功能特性
 

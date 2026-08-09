@@ -59,10 +59,10 @@ a_names <- dict$name_a[nzchar(dict$name_a)]
 b_names <- dict$name_b[nzchar(dict$name_b)]
 check("Dataset A has no duplicate names", !any(duplicated(a_names)))
 check("Dataset B has no duplicate names", !any(duplicated(b_names)))
-check("status is implemented|pending",
-      all(dict$status %in% c("implemented", "pending")))
-check("source_object is a known object",
-      all(dict$source_object %in% c("corrected_ema_data", "review_output")))
+check("status is implemented|pending|reserved",
+      all(dict$status %in% c("implemented", "pending", "reserved")))
+check("source_object is a known object (reserved may be empty)",
+      all(dict$source_object %in% c("corrected_ema_data", "review_output", "")))
 check("transform is 'none' or x<number>",
       all(dict$transform == "none" | grepl("^x[0-9.]+$", dict$transform)))
 
@@ -88,6 +88,20 @@ check("needs_review_flag sourced from review_output",
                 "review_output"))
 check("is_reasonable_unusual has a declared default",
       nzchar(dict$default_if_absent[dict$source_column == "is_reasonable_unusual"]))
+
+# Dataset A shipped 7 error rows with no status column until 2026-08-09 -- one of
+# them carried a physically impossible waso_computed_minutes of -716. Without a
+# filter column an analyst has no direct way to exclude them.
+check("Dataset A carries a record-status column (data_category or record_status)",
+      any(c("data_category", "record_status") %in%
+            dict$name_a[dict$status == "implemented"]))
+
+# S3 shipped on 2026-08-09. record_status supersedes data_category; carrying
+# both would let an analyst filter on the wrong one.
+check("record_status is implemented, not pending (S3)",
+      identical(dict$status[dict$source_column == "record_status"], "implemented"))
+check("data_category is NOT also in Dataset A (one status column only)",
+      !("data_category" %in% dict$name_a))
 
 # ---- Build with synthetic input --------------------------------------------
 cat("\n-- build --\n")
@@ -167,6 +181,48 @@ check("omitting review_data stops the build with a pointer to the fix", {
   inherits(e, "error") && grepl("review_output", conditionMessage(e))
 })
 
+# ---- record_status derivation (S3) -----------------------------------------
+# These need the fixture, so they live here rather than with the dictionary
+# checks above.
+cat("\n-- record_status derivation (S3) --\n")
+
+# The derivation must be total. An unmapped data_category level has to stop the
+# build -- mapping it to NA would ship a blank in the column analysts filter on.
+check("unmapped data_category level stops the build", {
+  d4 <- d
+  d4$data_category <- rep("a_level_that_does_not_exist", nrow(d4))
+  d4$record_status <- NULL
+  e <- tryCatch(finalize_columns(d4, review_data = rev, dict_path = dict_path,
+                                 write = FALSE, verbose = FALSE),
+                error = function(e) e)
+  inherits(e, "error") && grepl("record_status mapping", conditionMessage(e))
+})
+
+# reasonable_unusual keeps its own level: it records that a human looked at an
+# unusual record and accepted it, which is a different claim from "unusual".
+check("reasonable_unusual is not folded into unusual", {
+  d5 <- d
+  d5$data_category <- c("clean", "error", "unusual", "reasonable_unusual",
+                        "equal_time_ok")[seq_len(nrow(d5))]
+  d5$record_status <- NULL
+  r5 <- finalize_columns(d5, review_data = rev, dict_path = dict_path,
+                         write = FALSE, verbose = FALSE)
+  identical(r5$final$record_status,
+            c("clean", "error", "unusual", "reasonable_unusual",
+              "equal_time")[seq_len(nrow(d5))])
+})
+
+# skipped_na is the only level whose delivered name differs in wording rather
+# than punctuation, and it is the largest group in the real data (11,142 rows).
+check("skipped_na becomes not_reported", {
+  d6 <- d
+  d6$data_category <- rep("skipped_na", nrow(d6))
+  d6$record_status <- NULL
+  r6 <- finalize_columns(d6, review_data = rev, dict_path = dict_path,
+                         write = FALSE, verbose = FALSE)
+  all(r6$final$record_status == "not_reported")
+})
+
 opt <- dict[nzchar(dict$default_if_absent) & nzchar(dict$name_a) &
               dict$status == "implemented", ]
 if (nrow(opt)) {
@@ -175,11 +231,61 @@ if (nrow(opt)) {
   r3 <- tryCatch(finalize_columns(d3, review_data = rev, dict_path = dict_path,
                                   write = FALSE, verbose = FALSE),
                  error = function(e) NULL)
-  check("optional columns fall back to their declared default",
-        !is.null(r3) && all(vapply(seq_len(nrow(opt)), function(i)
-          isTRUE(all(r3$final[[opt$name_a[i]]] ==
-                       as.logical(opt$default_if_absent[i]))), logical(1))))
+  opt_ok <- !is.null(r3) && all(vapply(seq_len(nrow(opt)), function(i) {
+    want <- opt$default_if_absent[i]
+    got  <- r3$final[[opt$name_a[i]]]
+    if (want == "NA") all(is.na(got))
+    else isTRUE(all(got == as.logical(want)))
+  }, logical(1)))
+  check("optional columns fall back to their declared default", opt_ok)
 }
+
+# ---- Affect layer (reserved) and export guard -------------------------------
+# The study's emotion/affect EMA layer is NOT cleaned here. Reserved rows in the
+# dictionary declare it so the cleaner can never silently destroy those columns:
+# present -> passed through untouched, absent -> no fabricated blanks.
+cat("\n-- affect layer + export guard --\n")
+
+resv <- dict$source_column[dict$status == "reserved"]
+if (length(resv)) {
+  check(sprintf("%d reserved affect columns declared", length(resv)),
+        length(resv) >= 0)
+  r_absent <- finalize_columns(d, review_data = rev, dict_path = dict_path,
+                               write = FALSE, verbose = FALSE)
+  check("pass-through when absent adds nothing",
+        !any(resv %in% names(r_absent$final)))
+
+  d9 <- d
+  for (cn in resv) d9[[cn]] <- seq_len(nrow(d9))
+  r9 <- finalize_columns(d9, review_data = rev, dict_path = dict_path,
+                         write = FALSE, verbose = FALSE)
+  check("affect columns pass through untouched when present",
+        all(resv %in% names(r9$final)) &&
+          all(vapply(resv, function(cn) identical(r9$final[[cn]], d9[[cn]]),
+                     logical(1))))
+}
+
+# Export guard: a negative duration in any ANALYSABLE row (record_status
+# neither error nor not_reported) is impossible. This is the guard that would
+# have caught row 8502's -716-minute WASO had it targeted post-error-filter
+# rather than the whole column.
+d11 <- d
+d11$record_status <- c("clean", "error", "clean", "clean", "clean")[seq_len(nrow(d11))]
+d11$awake_getup_diff_h <- c(-5/60, 0.5, 0.75, 0.5, 0.5)  # hours; -5 min
+e11 <- tryCatch(finalize_columns(d11, review_data = rev, dict_path = dict_path,
+                                 write = FALSE, verbose = FALSE),
+                error = function(e) e)
+check("export guard stops on negative minutes in analyzable rows",
+      inherits(e11, "error") && grepl("Export guard", conditionMessage(e11)))
+
+d12 <- d
+d12$record_status <- c("clean", "error", "not_reported", "error", "clean")
+d12$awake_getup_diff_h <- c(0.5, -716/60, -10/60, 0.75, 0.5)
+r12 <- tryCatch(finalize_columns(d12, review_data = rev, dict_path = dict_path,
+                                 write = FALSE, verbose = FALSE),
+                error = function(e) e)
+check("negative inside error or not_reported rows is allowed (guard protects analyzable rows only)",
+      !inherits(r12, "error"))
 
 # ---- Summary ----------------------------------------------------------------
 cat(sprintf("\n%d passed, %d failed\n", .pass, .fail))

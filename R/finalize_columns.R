@@ -55,6 +55,7 @@ finalize_columns <- function(data,
   promised    <- dict[nzchar(dict$name_a) | nzchar(dict$name_b), ]
   implemented <- promised[promised$status == "implemented", ]
   pending     <- promised[promised$status == "pending", ]
+  reserved    <- promised[promised$status == "reserved", ]
 
   if (nrow(pending) && verbose) {
     message("  [finalize_columns] ", nrow(pending),
@@ -71,6 +72,41 @@ finalize_columns <- function(data,
            "copy of corrected_ema_data, so any mismatch means something ",
            "reordered or filtered the rows.")
     }
+  }
+
+  # ---- 2b. Derive record_status (S3) -----------------------------------------
+  # record_status is the analysis-facing name for data_category. It is derived
+  # here, in the delivery layer, rather than in the pipeline: the pipeline
+  # currently runs and its numbers are signed off, so a purely presentational
+  # rename has no business touching it.
+  #
+  # Six levels, not the five originally sketched. reasonable_unusual is a real
+  # data_category level (error_unusual_sleep_time_corrections.R:1570 assigns it)
+  # and means "a human looked at this unusual record and accepted it" -- which
+  # is not the same claim as "unusual". Folding the two together would discard
+  # a human judgement, so it keeps its own level.
+  #
+  # An unknown level stops the build. Mapping it to NA instead would let a new
+  # pipeline category leak into the delivered data as a silent blank.
+  .RECORD_STATUS_MAP <- c(
+    clean              = "clean",
+    error              = "error",
+    unusual            = "unusual",
+    reasonable_unusual = "reasonable_unusual",
+    equal_time_ok      = "equal_time",
+    skipped_na         = "not_reported"
+  )
+
+  if (!"record_status" %in% names(data) && "data_category" %in% names(data)) {
+    dc      <- as.character(data$data_category)
+    unknown <- setdiff(unique(dc[!is.na(dc)]), names(.RECORD_STATUS_MAP))
+    if (length(unknown)) {
+      stop("data_category has level(s) with no record_status mapping: ",
+           paste(unknown, collapse = ", "),
+           "\nAdd them to .RECORD_STATUS_MAP in R/finalize_columns.R. ",
+           "Leaving them unmapped would ship blanks in a status column.")
+    }
+    data$record_status <- unname(.RECORD_STATUS_MAP[dc])
   }
 
   .resolve <- function(i) {
@@ -166,6 +202,81 @@ finalize_columns <- function(data,
 
   final   <- .build("name_a")
   prepost <- .build("name_b")
+
+  # ---- 4a. Affect-layer passthrough -----------------------------------------
+  # The study has an emotion/affect EMA layer (pos_affect, neg_affect,
+  # stress_today_pm, copestress_today_pm, ...) that is NOT part of the sleep
+  # cleaning pipeline: it is not parsed, flagged, imputed or corrected here,
+  # and its columns are not in the whitelist. The cleaner must nevertheless
+  # never drop them silently.
+  #
+  # Rows in the dictionary marked status == 'reserved' declare affect columns
+  # by their real survey name. If such a column is present in the pipeline
+  # output, it is passed through to Dataset A untouched. If it is absent
+  # there is nothing to pass -- no empty column is fabricated. Column names
+  # matching the affect family that are not yet listed are also passed through
+  # so a renamed survey item cannot be silently destroyed.
+  .AFFECT_PATTERN <-
+    "^(pos_affect|neg_affect|stress_today_pm|copestress_today_pm)$|_affect_|_affect$|_mood_|_mood$|_stress_|_stress$"
+  affect_in <- intersect(names(data), c(reserved$source_column,
+                                        grep(.AFFECT_PATTERN, names(data),
+                                             value = TRUE)))
+  affect_cols <- setdiff(affect_in, names(final))
+  if (length(affect_cols)) {
+    if (write) {
+      dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
+    }
+    final <- cbind(final,
+                   data[, affect_cols, drop = FALSE])
+    if (verbose) {
+      cat("  [finalize_columns] affect-layer passthrough (cleaner does not touch): ",
+          paste(affect_cols, collapse = ", "), "\n", sep = "")
+    }
+  }
+
+  # ---- 4b. Export guard: nothing impossible in the delivered files --------
+  # A human analyst filtering on record_status != 'error' should never see a
+  # negative duration or an absurd sleep metric. The pipeline classifies
+  # negatives as errors, but that classification is being relied on, not
+  # enforced -- a negative value that leaked into a non-error row would ship
+  # silently. That is exactly how row 8502's -716-minute WASO once escaped.
+  #
+  # Which rows are guarded: the ANALYSABLE rows, i.e. everything except
+  # 'error' and 'not_reported'. not_reported (skipped_na) rows are, by
+  # definition, missing a whole night -- on real data some of them still carry
+  # a derived sleepperiod from the fragments that were filled, and that value
+  # is arithmetic noise, not a signal. Guarding those rows would fail the
+  # build on data the study will not analyse. error rows are the pipeline's
+  # job to carry; the guard exists for what leaks PAST the filter, so if
+  # record_status is missing entirely, every non-NA value is still checked.
+  # Guard only the numeric 'minutes' columns; category/status columns are left
+  # alone.
+  .METRIC_MINUTES_COLS <- c("tst_minutes", "sol_computed_minutes",
+      "se_percent", "tib_minutes", "sleepperiod_minutes",
+      "waso_computed_minutes", "waso_selfreport_minutes",
+      "waso_avg_bout_selfreport_minutes", "sol_selfreport_minutes",
+      "nap_selfreport_total_minutes", "exercise_light_minutes",
+      "exercise_moderate_minutes", "exercise_vigorous_minutes",
+      "exercise_strength_minutes")
+  .metric_cols <- intersect(.METRIC_MINUTES_COLS, names(final))
+  if (length(.metric_cols) > 0) {
+    status_col <- if ("record_status" %in% names(final)) "record_status"
+                  else if ("data_category" %in% names(final)) "data_category"
+                  else NULL
+    for (nm in .metric_cols) {
+      if (!is.numeric(final[[nm]])) next
+      val <- if (!is.null(status_col) && status_col %in% names(final)) {
+        final[[nm]][!final[[status_col]] %in% c("error", "not_reported")]
+      } else final[[nm]]
+      if (any(!is.na(val) & val < 0)) {
+        stop("Export guard (finalize_columns): '", nm, "' contains negative ",
+             "value(s) in analyzable rows (record_status neither error nor ",
+             "not_reported). A negative duration is impossible; investigate ",
+             "before shipping. (This is the guard that would catch the row ",
+             "8502 type of bug.)")
+      }
+    }
+  }
 
   # ---- 5. Write ---------------------------------------------------------------
   if (write) {
