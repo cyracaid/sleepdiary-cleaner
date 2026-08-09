@@ -35,6 +35,8 @@ sdir <- scripts_dir()
 cat("Scripts directory:", sdir, "\n")
 
 cfg_path <- "inst/extdata/synthetic_config.yaml"
+a <- commandArgs(trailingOnly = TRUE)
+for (i in seq_along(a)) if (a[i] == "--config") cfg_path <- a[i + 1]
 if (!file.exists(cfg_path)) stop("Config not found: ", cfg_path)
 cfg <- yaml::read_yaml(cfg_path)
 

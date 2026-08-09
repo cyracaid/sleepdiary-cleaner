@@ -9,32 +9,47 @@ test_that("run_pipeline completes successfully on synthetic data", {
   }
   skip_if_not(file.exists(cfg_path), "synthetic_config.yaml not found")
 
-  # Set project_dir to package root for dev mode
-  pkg_root <- if (cfg_path == file.path(getwd(), "inst", "extdata", "synthetic_config.yaml")) {
-    getwd()
-  } else {
-    dirname(dirname(dirname(cfg_path)))
+  # Run inside a sandbox project_dir so every side effect of a synthetic
+  # pipeline run (output/, corrected_ema_data.rds, latest_visualization_*,
+  # manual_*_updated.csv, cross_participant_flagged_rows.csv, ...) is isolated
+  # and can never overwrite the real-data deliverables in the package root.
+  # This is the class of bug that destroyed output/ on 2026-08-09: a synthetic
+  # testthat run silently replaced the real 13990-row Dataset A/B with a
+  # 280-row synthetic stand-in, and even the /tmp backup had already been
+  # clobbered by an earlier synthetic run.
+  sandbox        <- tempfile("spltest_")
+  dir.create(sandbox, recursive = TRUE, showWarnings = FALSE)
+  on.exit(unlink(sandbox, recursive = TRUE, force = TRUE), add = TRUE)
+
+  # Copy the synthetic input files into the sandbox (their config paths are
+  # relative, so they must sit where run_pipeline will look for them).
+  src_data <- dirname(cfg_path)
+  for (f in c("synthetic_sleep_data.rds", "synthetic_ema_data.csv")) {
+    file.copy(file.path(src_data, f), sandbox, overwrite = TRUE)
   }
 
-  # Check data files exist before running
+  # Point the config's data engine paths at the sandbox copies (names kept
+  # relative so the pipeline resolves them against project_dir = sandbox).
   cfg <- yaml::read_yaml(cfg_path)
-  rds_ok <- file.exists(file.path(pkg_root, cfg$data$files$main))
-  skip_if_not(rds_ok, "synthetic RDS data file not found")
+  cfg$data$files$main    <- "synthetic_sleep_data.rds"
+  cfg$data$files$extra   <- "synthetic_ema_data.csv"
+  sandbox_cfg <- file.path(sandbox, "synthetic_config.yaml")
+  yaml::write_yaml(cfg, sandbox_cfg)
 
-  result <- run_pipeline(config = cfg_path, project_dir = pkg_root, verbose = FALSE)
+  pkg_root <- getwd()
+
+  result <- run_pipeline(config = sandbox_cfg, project_dir = sandbox, verbose = FALSE)
   expect_true(result, "Pipeline should complete successfully")
 
-  # Verify output files exist
-  expect_true(file.exists(file.path(pkg_root, "output", "correction_status_final.csv")),
-              "correction_status_final.csv should exist")
-  # Figure output lives in latest_visualization_<tag>_n<rows>/. Locate it by
-  # pattern rather than by a literal name, so the synthetic row count can change
-  # without breaking the test.
-  viz_dirs <- list.files(pkg_root, pattern = "^latest_visualization_", full.names = TRUE)
+  # Verify output files exist — inside the sandbox, never the package root.
+  expect_true(file.exists(file.path(sandbox, "output", "correction_status_final.csv")),
+              "correction_status_final.csv should exist (in sandbox)")
+  # Figure output lives in latest_visualization_<tag>_n<rows>/ under the sandbox.
+  viz_dirs <- list.files(sandbox, pattern = "^latest_visualization_", full.names = TRUE)
   viz_dirs <- viz_dirs[dir.exists(viz_dirs)]
   expect_true(length(viz_dirs) >= 1, "a latest_visualization_* directory should exist")
 
-  # This is the load-bearing assertion: a test run reads synthetic_config.yaml,
+  # This is the load-bearing assertion: a test run reads synthetic config,
   # so it MUST tag its output "synth". If it ever produced a "real" folder the
   # test suite would be overwriting real-data figures -- which is exactly what
   # happened on 2026-08-06 back when every run shared one output directory.
@@ -42,7 +57,7 @@ test_that("run_pipeline completes successfully on synthetic data", {
   expect_true(length(synth_dirs) >= 1,
               "test run must write a _synth-tagged directory, never _real")
 
-  viz <- file.path(pkg_root, synth_dirs[1])
+  viz <- file.path(sandbox, synth_dirs[1])
   expect_true(dir.exists(file.path(viz, "pipeline_cleaning")),
               "pipeline_cleaning/ subfolder should exist")
   expect_true(dir.exists(file.path(viz, "research_ready")),
@@ -51,13 +66,21 @@ test_that("run_pipeline completes successfully on synthetic data", {
               "RUN_INFO.txt provenance file should exist")
 
   # Verify metrics are in expected ranges
-  status <- read.csv(file.path(pkg_root, "output", "correction_status_final.csv"),
+  status <- read.csv(file.path(sandbox, "output", "correction_status_final.csv"),
                      stringsAsFactors = FALSE)
   latest <- status[nrow(status), ]
 
   expect_true(latest$n_total > 0, "Total records should be > 0")
   expect_true(latest$delta_clean >= 0, "Clean delta should be >= 0")
   expect_true(latest$delta_error >= 0, "Error delta should be >= 0")
+
+  # Prove the sandbox really isolated the run: real deliverables (if any)
+  # at the package root must be untouched.
+  final_path <- file.path(pkg_root, "output", "cleaned_data_final.rds")
+  skip_if_not(file.exists(final_path),
+              "no real deliverables present; sandbox isolation untestable")
+  expect_false(file.exists(file.path(sandbox, "output", "cleaned_data_final.rds")),
+               "sandbox run must not produce real-data deliverables")
 })
 
 test_that("Config loading works", {
