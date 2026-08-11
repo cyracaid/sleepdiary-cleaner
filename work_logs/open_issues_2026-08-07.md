@@ -13,7 +13,7 @@
 | 级别 | 数量 | 说明 |
 |---|---|---|
 | 🔴 阻断 | 0（B1、B2 均已结案） | 影响主要结局指标数值，必须先定 |
-| 🟠 严重 | **3 未结**（S3、S6、S8）<br>已结案：S1、S2、S4、S5<br>已评估决定不做：S7 | 影响数据交付可用性 |
+| 🟠 严重 | **1 未结**（S8 仅缓解，正式修法延后）<br>已结案：S1–S6<br>已评估决定不做：S7 | 影响数据交付可用性 |
 | 🟡 中等 | 8 | 影响可理解性 / 可维护性 |
 | ⚪ 已知债 | 6 | 记录在案，可延后 |
 
@@ -199,12 +199,17 @@ awake_getup_diff_h = ifelse(!has_na,
 
 ### S3. `record_status` 尚未实现，但已列入 Dataset A
 
+> **已结案（2026-08-09）**：`finalize_columns.R:77-109` 实现 `.RECORD_STATUS_MAP`
+> （data_category → record_status 六档映射，未知档 `stop()`），Dataset A 交付
+> `record_status` 列并写字典说明（EXCLUDE 'error'）。`verify_finalize_columns.R`
+> 有断言守住状态列必须存在。CSV status 全列 implemented，无 pending。
+
 - 字典第 140 行标 `**new**`
 - Dataset A 第 29 行列为交付列，取值 `clean / error / unusual / equal_time / not_reported`
-- 实测：`grep -r record_status *.R R/*.R` → **0 处命中**
+- 实测：`grep -r record_status *.R R/*.R` → **0 处命中**（当时）
 
-**建议：** Dataset A 表格加「状态」列，区分 `已实现` / `待实现`。
-读者现在会以为 36 列都已就绪。
+**当时建议：** Dataset A 表格加「状态」列，区分 `已实现` / `待实现`。
+读者现在会以为 36 列都已就绪。（随 `finalize_columns()` 落地而完成）
 
 **已验证确实存在的：** `has_correction`（`calculate_sleep_time_end.R:240`，
 取值 `none/algorithmic/manual/both`，与字典一致 ✅）、
@@ -276,6 +281,11 @@ archive 为 `+ time_sleep_corrected`，同血统非同文件）。
 ---
 
 ### S6. `correction_type` 在被人工覆盖后不失效 —— Dataset B 的溯源字段会说谎
+
+> **已结案（2026-08-09）**：字典 `correction_type` description 已加
+> "CAVEAT: records only the ALGORITHMIC action and is never rewritten when a
+> later manual correction overrides it"。字段行为未变；
+> 16 条 `has_correction = "both"` 的溯源歧义已在字典中显式声明。
 
 **新增 2026-08-09。** 详细复盘见 `2026-08-09_work_log.md` §七。
 
