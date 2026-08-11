@@ -253,7 +253,59 @@ Each template uses synthetic data. See the template files for column-level descr
 | `output/appendix_step_ledger.csv` | Per-step flag tracking ledger |
 | `output/flagged_records_self_reported.csv` | Records flagged as SELF_REPORTED_FLAG |
 | `latest_visualization_*/figure_index.png` | Contact-sheet index of all generated figures |
-| `latest_visualization_*/RUN_INFO.txt` | Run provenance: dataset tag, version, git commit, file sources |
+| `latest_visualization_*/RUN_INFO.txt` | Run provenance: dataset tag, version, git commit, file sources. **Overwritten every run.** |
+| `output/verification/real_n13990/`, `verification/synth_n280/` | Stable, never-overwritten verification artifacts (S3-vs-legacy snapshots, Bland-Altman plots, threshold validation, audit reports) — see `verification_run_dir()` in `R/config.R` |
+
+#### Full Output Directory Structure
+
+```
+output/                                        <- REAL data (gitignored, never committed)
+├── cleaned_data_final.{csv,rds}                <- Delivered dataset A
+├── cleaned_data_prepostcorrection.{csv,rds}    <- Delivered dataset B
+├── cleaned_data_full.rds                       <- Full-column archive (not delivered)
+├── corrected_ema_data.rds                      <- Cleaning intermediate (feeds visualization)
+├── correction_status.csv                       <- Draft/intermediate run report
+├── correction_status_final.csv                 <- Final run summary (read this one)
+├── appendix_step_ledger.csv
+├── audit_integrity_report.csv
+├── flagged_records_self_reported.csv
+├── column_dictionary_gaps.csv
+├── step_flag_ledger.csv
+│
+├── latest_visualization_real_n<rows>/          <- Most recent REAL-data figure run.
+│   │                                              Overwritten every run -- no history.
+│   ├── RUN_INFO.txt                            <- Provenance for THIS run only
+│   ├── figure_index.png
+│   ├── flag_distribution.csv
+│   ├── pipeline_cleaning/                      <- Cleaning diagnostics
+│   └── research_ready/                         <- Publication-ready figures
+│
+└── verification/real_n<rows>/                  <- STABLE, never overwritten or wiped.
+    ├── VERIFICATION_<date>.md                  <- S3-vs-legacy snapshot report
+    ├── snapshot_old.rds / snapshot_s3.rds       <- Comparison snapshots
+    ├── bland_altman_sol.png / _waso.png        <- Regenerated every real-data run
+    └── threshold_validation.csv                <- Regenerated every real-data run
+
+                                                <- Below: project root, NOT inside output/
+latest_visualization_synth_n<rows>/             <- Most recent SYNTHETIC test figure run.
+├── RUN_INFO.txt                                   Tag reads 'synth' -- not real data.
+├── figure_index.png
+├── flag_distribution.csv
+├── pipeline_cleaning/
+└── research_ready/
+
+verification/synth_n<rows>/                     <- STABLE synth verification artifacts,
+├── snapshot_old.rds / snapshot_s3.rds             same structure as verification/real_n<rows>/
+├── bland_altman_sol.png / _waso.png
+└── threshold_validation.csv
+```
+
+Key rules this structure encodes:
+
+- **`latest_visualization_<tag>_n<rows>/` is "latest", not "history".** It is deleted and rebuilt from scratch on every `run_visualization()` call. Nothing inside it survives a rerun except by accident.
+- **`verification/<tag>_n<rows>/` is a sibling, not a child, of the figure directory above** (`verification_run_dir()` in `R/config.R`). It is never touched by the wipe, so no special preserve logic is needed anywhere.
+- **Location, not just the name, signals real vs. synthetic.** Real-tagged output only ever lands under `output/` (gitignored). Synthetic and `unknown`-tagged output are routed outside `output/` by default — see `figure_run_dir()` in `R/config.R`. A run tagged `unknown` (its data source could not be identified from config) is treated the same as `synth`, never as `real`.
+- **Being outside `output/` does not mean git-tracked.** `.gitignore`'s `latest_visualization*/` and the anchored `/verification/` rule both catch these directories regardless of location.
 
 ## Agent Skill
 
@@ -409,7 +461,17 @@ The numbers do not change after they are first computed. This is the signature o
 
 ### 3. Regression Check (compare against a previous run)
 
+`output/correction_status_old.csv` is not written by any pipeline script — you create it yourself, as a saved baseline, before rerunning:
+
 ```r
+# BEFORE rerunning the pipeline (e.g. after a code change you want to check
+# for regressions): save the current output as your baseline.
+file.copy("output/correction_status_final.csv", "output/correction_status_old.csv",
+          overwrite = TRUE)
+
+# ... rerun the pipeline here ...
+
+# AFTER rerunning: compare against the baseline you just saved.
 old <- read.csv("output/correction_status_old.csv")
 new <- read.csv("output/correction_status_final.csv")
 
@@ -441,7 +503,7 @@ If they differ and the input data did not change, the pipeline output has change
 
 ### 5. How to Read the Figures
 
-Figures are saved in a timestamped directory (e.g. `latest_visualization_*/`). A `figure_index.png` contact sheet shows all figures at a glance.
+Figures are saved in a directory named `latest_visualization_<tag>_n<rows>/` (e.g. `output/latest_visualization_real_n13990/`) that is **overwritten on each run — no history kept**; `RUN_INFO.txt` inside it records only the most recent run's provenance (data source, package version, git commit). A `figure_index.png` contact sheet shows all figures at a glance. Snapshot comparisons, Bland-Altman plots, and other verification artifacts that DO need to survive across runs live separately, in `verification_run_dir()`'s stable location (e.g. `output/verification/real_n13990/`), never inside the overwritten figure directory.
 
 #### Publication Figures (for your Methods section)
 
@@ -768,7 +830,59 @@ clean_data <- corrected_ema_data[corrected_ema_data$data_category %in% c("clean"
 | `output/appendix_step_ledger.csv` | 每步标记追踪账本 |
 | `output/flagged_records_self_reported.csv` | SELF_REPORTED_FLAG 记录 |
 | `latest_visualization_*/figure_index.png` | 全部生成图表的缩略图索引 |
-| `latest_visualization_*/RUN_INFO.txt` | 运行溯源：数据集标签、版本、git commit、文件来源 |
+| `latest_visualization_*/RUN_INFO.txt` | 运行溯源：数据集标签、版本、git commit、文件来源。**每次运行都会被覆盖。** |
+| `output/verification/real_n13990/`、`verification/synth_n280/` | 稳定、不会被覆盖的校验产物（S3 与旧管线快照对比、Bland-Altman 图、阈值校验、审计报告）——见 `R/config.R` 中的 `verification_run_dir()` |
+
+#### 完整 output 目录结构
+
+```
+output/                                        ← 真实数据（gitignored，从不提交）
+├── cleaned_data_final.{csv,rds}                ← 交付数据集 A
+├── cleaned_data_prepostcorrection.{csv,rds}    ← 交付数据集 B
+├── cleaned_data_full.rds                       ← 全字段存档（非交付物）
+├── corrected_ema_data.rds                      ← 清洗中间产物（图的输入）
+├── correction_status.csv                       ← 中间态运行报告
+├── correction_status_final.csv                 ← 最终运行摘要（看这个）
+├── appendix_step_ledger.csv
+├── audit_integrity_report.csv
+├── flagged_records_self_reported.csv
+├── column_dictionary_gaps.csv
+├── step_flag_ledger.csv
+│
+├── latest_visualization_real_n<行数>/          ← 最近一次真实数据可视化。
+│   │                                              每次运行都会被整个覆盖——不保留历史。
+│   ├── RUN_INFO.txt                            ← 仅记录这一次运行的溯源信息
+│   ├── figure_index.png
+│   ├── flag_distribution.csv
+│   ├── pipeline_cleaning/                      ← 清洗诊断图
+│   └── research_ready/                         ← 可发表图
+│
+└── verification/real_n<行数>/                  ← 稳定，不会被覆盖或清空。
+    ├── VERIFICATION_<日期>.md                  ← S3 与旧管线快照对比报告
+    ├── snapshot_old.rds / snapshot_s3.rds       ← 对比快照
+    ├── bland_altman_sol.png / _waso.png        ← 每次真实数据运行都会重新生成
+    └── threshold_validation.csv                ← 每次真实数据运行都会重新生成
+
+                                                ← 以下：项目根目录，不在 output/ 内
+latest_visualization_synth_n<行数>/             ← 最近一次合成测试数据可视化。
+├── RUN_INFO.txt                                   tag 显示 'synth'——不是真实数据
+├── figure_index.png
+├── flag_distribution.csv
+├── pipeline_cleaning/
+└── research_ready/
+
+verification/synth_n<行数>/                     ← 稳定的合成数据校验产物，
+├── snapshot_old.rds / snapshot_s3.rds             结构与 verification/real_n<行数>/ 一致
+├── bland_altman_sol.png / _waso.png
+└── threshold_validation.csv
+```
+
+这套结构背后的规则：
+
+- **`latest_visualization_<tag>_n<行数>/` 是"最新"语义，不是"历史"语义。** 每次调用 `run_visualization()` 都会被整个删除重建，里面的东西除非意外，否则不会跨次运行留存。
+- **`verification/<tag>_n<行数>/` 是图目录的兄弟目录，不是子目录**（`R/config.R` 中的 `verification_run_dir()`）。它从不被 wipe 逻辑碰到，因此不需要任何特殊的保留逻辑。
+- **区分真实/合成数据靠的不只是命名，还有位置。** 打上 real 标签的输出只会落在 `output/` 下（gitignored）。synth 和 `unknown`（配置里读不到数据来源，无法判断）标签的输出默认都路由到 `output/` 之外——见 `R/config.R` 中的 `figure_run_dir()`。`unknown` 会被当作 `synth` 处理，绝不会被当作 `real`。
+- **不在 `output/` 里不等于会被 git 追踪。** `.gitignore` 里的 `latest_visualization*/` 和带锚点的 `/verification/` 规则，不管目录在哪个位置都会命中。
 
 ## 如何读懂管线输出
 
@@ -846,7 +960,16 @@ ledger %>% filter(!is.na(count)) %>% arrange(step_id, standard)
 
 ### 3. 回归检查（对比上次运行）
 
+`output/correction_status_old.csv` 不是任何管线脚本自动生成的——需要你在重跑前自己另存一份作为基线：
+
 ```r
+# 重跑管线之前（比如改了代码想检查有没有回归）：把当前结果存成基线
+file.copy("output/correction_status_final.csv", "output/correction_status_old.csv",
+          overwrite = TRUE)
+
+# ……在此重跑管线……
+
+# 重跑之后：和刚才存的基线对比
 old <- read.csv("output/correction_status_old.csv")
 new <- read.csv("output/correction_status_final.csv")
 identical(old$tst_mean_h, new$tst_mean_h)
@@ -875,7 +998,7 @@ identical(old$n_clean, new$n_clean)
 
 ### 5. 如何看图
 
-图保存在带时间标记的目录中（如 `latest_visualization_*/`）。`figure_index.png` 是一张所有图的缩略索引。
+图保存在名为 `latest_visualization_<tag>_n<行数>/` 的目录中（如 `output/latest_visualization_real_n13990/`），**每次运行都会被覆盖——不保留历史版本**；目录内的 `RUN_INFO.txt` 只记录最近一次运行的溯源信息（数据来源、包版本、git commit）。`figure_index.png` 是一张所有图的缩略索引。需要跨次运行留存的校验产物（快照对比、Bland-Altman 图等）单独存放，位置由 `verification_run_dir()` 决定（如 `output/verification/real_n13990/`），从不放在会被覆盖的图目录内部。
 
 #### 论文用图
 
