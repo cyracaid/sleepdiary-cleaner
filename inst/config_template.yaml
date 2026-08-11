@@ -57,6 +57,24 @@ data:
     second_review: ""
 
 # =============================================================================
+# OUTPUT SETTINGS (optional -- defaults are correct for most studies)
+# =============================================================================
+# Only a run whose data_tag resolves to "real" is written to
+# output/latest_visualization_real_n<rows>/. Synthetic/test runs AND runs
+# whose data_tag could not be determined ("unknown") both go to
+# latest_visualization_<tag>_n<rows>/ in the project root (never inside
+# output/) -- fail-closed, so anything not positively confirmed as real never
+# lands in the gitignored real-data zone. Change only if you need figures
+# elsewhere. Note this only controls overwrite risk, not git tracking: the
+# project root location is still excluded by .gitignore's
+# `latest_visualization*/` pattern.
+#
+# output:
+#   figure:
+#     root_dir: "output"
+#     synth_root_dir: ""
+
+# =============================================================================
 # COLUMN MAPPING (only needed if your column names differ from ours)
 # =============================================================================
 # If your columns are named differently, uncomment this section and map them.

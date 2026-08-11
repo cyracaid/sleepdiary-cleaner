@@ -21,8 +21,9 @@
 ^\.DS_Store$
 ^work_logs$
 ^SPL$
-^output$
-^latest_visualization$
+^output
+^latest_visualization
+^verification$
 ^manual_error_correction.*\.csv$
 ^manual_unusual_corrections\.csv$
 ^manual_nap_exercise_corrections\.csv$

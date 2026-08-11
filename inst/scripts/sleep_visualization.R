@@ -52,7 +52,7 @@ if (!exists("pipeline_config")) { pipeline_config <- list() }
 # One directory per dataset, overwritten on every run -- no timestamped folders
 # piling up. The name carries BOTH a human-readable tag and the row count:
 #
-#   latest_visualization_real_n13990/
+#   output/latest_visualization_real_n13990/
 #   latest_visualization_synth_n280/
 #
 # The tag says which dataset this is (a colleague can read it without being
@@ -60,8 +60,36 @@ if (!exists("pipeline_config")) { pipeline_config <- list() }
 # test run from overwriting real-data figures. On 2026-08-06 a devtools::test()
 # run did exactly that, and only a distinct directory name saved the output.
 #
+# The base directory is configurable: only a run whose data_tag resolves to
+# "real" defaults to output/ (kept with the delivered datasets). "synth" AND
+# "unknown" (tag could not be determined) both default to the project root,
+# outside output/ -- fail-closed, so nothing lands in the real-data zone
+# unless it was positively confirmed as real. See output.figure.root_dir /
+# output.figure.synth_root_dir in the config. figure_run_dir() (R/config.R)
+# resolves the final path.
+#
 # IMPORTANT: .gitignore must match "latest_visualization*/" (with the star), or
-# these directories are committed. Real data must never reach GitHub.
+# these directories are committed. Real data must never reach GitHub. Moving
+# synth/unknown runs out of output/ is ONLY about preventing overwrite -- it
+# does not make them git-tracked; that same gitignore pattern has no path
+# anchor and still catches them at the project root.
+#
+# verification/ is a SEPARATE, stable directory tree (see verification_dir
+# below and verification_run_dir() in R/config.R) -- it is not nested inside
+# this wiped-every-run directory, so it survives reruns with no special
+# rescue logic.
+#
+# Data guard: this script can only visualize data that a prior pipeline run
+# left in memory. If nothing was loaded (e.g. run_visualization() called before
+# run_pipeline()), fail fast BEFORE creating the output directory -- otherwise a
+# stranded empty output/latest_visualization_real/ shell is left behind.
+# NOTE: plain exists() (no envir=) checks the source() environment, which is
+# run_pipeline's frame during a real run and .GlobalEnv for a standalone call.
+if (!exists("ema_data_release_timecalc")) {
+  stop("No pipeline data in memory. Run run_pipeline() (or 00_MAIN_entry.R) ",
+       "first so it loads the data, then re-run the visualization.")
+}
+
 .n_records <- if (exists("corrected_ema_data", envir = .GlobalEnv))
   nrow(get("corrected_ema_data", envir = .GlobalEnv)) else NA_integer_
 
@@ -79,11 +107,59 @@ if (!exists("pipeline_config")) { pipeline_config <- list() }
   "real"
 }
 
-output_dir <- paste0("latest_visualization_", .data_tag,
-                     if (!is.na(.n_records)) paste0("_n", .n_records) else "")
+output_dir <- figure_run_dir(cfg = pipeline_config, data_tag = .data_tag,
+                             n_records = .n_records)
+
+# verification_dir is a SIBLING of output_dir, not a child of it (see
+# verification_run_dir() in R/config.R). Root-cause fix, 2026-08-11: this
+# directory used to be nested inside output_dir and had to be rescued around
+# the wipe below with a rename-out/rename-back dance. That dance was the only
+# thing protecting it, and on 2026-08-11 a wipe ran before the dance existed
+# and permanently, unrecoverably deleted that day's verification report (see
+# the "History note" in verification_dir/VERIFICATION_*.md). Putting
+# verification_dir outside the wiped path removes the failure mode instead of
+# guarding it -- nothing below can reach it, so nothing needs to preserve it.
+verification_dir <- verification_run_dir(cfg = pipeline_config, data_tag = .data_tag,
+                                         n_records = .n_records)
+dir.create(verification_dir, recursive = TRUE, showWarnings = FALSE)
+
 if (dir.exists(output_dir)) unlink(output_dir, recursive = TRUE)
 dir.create(file.path(output_dir, "pipeline_cleaning"), recursive = TRUE, showWarnings = FALSE)
 dir.create(file.path(output_dir, "research_ready"),    recursive = TRUE, showWarnings = FALSE)
+
+# ── Bland-Altman advisory plots (self-reported vs pipeline-computed SOL/WASO) ──
+# Regenerated on every run from THIS run's corrected_ema_data, via
+# validate_thresholds() (R/bland_altman.R), which already knows the correct
+# reported/computed column pairs. Previously these two PNGs were one-off
+# artifacts from a 2026-08-06 manual analysis that nothing ever refreshed --
+# they sat in verification/ looking like current output while actually being
+# almost a week stale relative to the run they appeared to belong to, with no
+# record anywhere of when or how they were made. Generating them here fixes
+# that at the root: whatever is in verification_dir now really did come from
+# this run. Wrapped in tryCatch so a plotting failure here degrades gracefully
+# (skips the plots, logs why) instead of aborting the whole visualization run.
+if (exists("corrected_ema_data", envir = .GlobalEnv)) {
+  .ba_result <- tryCatch(
+    validate_thresholds(get("corrected_ema_data", envir = .GlobalEnv), cfg = pipeline_config),
+    error = function(e) {
+      cat(sprintf("⚠ Bland-Altman validation skipped: %s\n", conditionMessage(e)))
+      NULL
+    }
+  )
+  if (!is.null(.ba_result)) {
+    .ba <- attr(.ba_result, "bland_altman")
+    if (!is.null(.ba$sol$plot)) {
+      ggsave(file.path(verification_dir, "bland_altman_sol.png"), .ba$sol$plot,
+             width = 8, height = 6, dpi = 150)
+    }
+    if (!is.null(.ba$waso$plot)) {
+      ggsave(file.path(verification_dir, "bland_altman_waso.png"), .ba$waso$plot,
+             width = 8, height = 6, dpi = 150)
+    }
+    write.csv(.ba_result, file.path(verification_dir, "threshold_validation.csv"), row.names = FALSE)
+    cat(sprintf("✓ Bland-Altman plots + threshold_validation.csv written to %s/\n", verification_dir))
+  }
+}
 cat(sprintf("\nFigures auto-saving to: %s/\n", output_dir))
 
 # Write each figure ONCE, into its classified subfolder.
@@ -92,11 +168,14 @@ cat(sprintf("\nFigures auto-saving to: %s/\n", output_dir))
 # became ~90 files. Nothing referenced the flat copy: make_figure_index.R
 # addresses every figure as "<subdir>/<name>.png", and the README links to the
 # folders rather than to individual files.
-save_png <- function(plot, name, w = 14, h = 9, subdir = NULL) {
+save_png <- function(plot, name, w = NULL, h = NULL, subdir = NULL) {
+  w  <- if (is.null(w)) cfg_get("output.figure.width_inches", 14, cfg = pipeline_config) else w
+  h  <- if (is.null(h)) cfg_get("output.figure.height_inches", 9, cfg = pipeline_config) else h
+  dpi <- cfg_get("output.figure.dpi", 150, cfg = pipeline_config)
   rel  <- if (is.null(subdir)) paste0(name, ".png") else file.path(subdir, paste0(name, ".png"))
   path <- file.path(output_dir, rel)
   dir.create(dirname(path), showWarnings = FALSE, recursive = TRUE)
-  ggsave(path, plot, width = w, height = h, dpi = 150, limitsize = FALSE)
+  ggsave(path, plot, width = w, height = h, dpi = dpi, limitsize = FALSE)
 }
 
 # ============================================================================
@@ -2777,10 +2856,30 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) && "revi
   "pipeline_cleaning/  cleaning progress and quality control",
   "research_ready/     sleep metrics, substance use, perception",
   "",
+  "Verification artifacts (snapshots, Bland-Altman, audit reports) for",
+  "this run live in a SEPARATE, stable directory, not inside this one:",
+  sprintf("  %s/", verification_dir),
+  "It is not wiped when this directory is rebuilt on the next run.",
+  "",
   "NOTE: if the tag reads 'real', this folder contains figures derived from",
   "participant data. It is gitignored and must not be committed or shared",
   "outside the study team."
 )
+
+if (identical(.data_tag, "unknown")) {
+  .run_info <- c(
+    .run_info,
+    "",
+    "*** WARNING: dataset tag could not be determined ('unknown'). ***",
+    "  data.files.main was empty or unreadable in the config used for this",
+    "  run, so this could be real participant data, synthetic/test data, or",
+    "  something else entirely -- the pipeline genuinely does not know.",
+    "  Fail-closed handling: this run was routed like 'synth' (outside",
+    "  output/), NOT treated as real. Verify the data source before using",
+    "  anything in this folder for analysis, and fix data.files.main in the",
+    "  config so future runs resolve to a real tag."
+  )
+}
 
 # ── Figures 13-18 audit (explain WHY the auto-detection queue may be empty) ──
 # When checkforerrors_df is 0-row, Figures 13-18 are absent. That is the
@@ -2826,6 +2925,7 @@ cat(sprintf("  ├── pipeline_cleaning/  (%d cleaning figures)\n",
 cat(sprintf("  ├── research_ready/     (%d research figures)\n",
             length(list.files(file.path(output_dir, "research_ready")))))
 cat("  └── RUN_INFO.txt        (data source + version provenance)\n")
+cat(sprintf("\n✓ %s/ written (verification artifacts; survives future reruns)\n", verification_dir))
 
 cat("\n")
 cat(paste(rep("=", 80), collapse = ""))
