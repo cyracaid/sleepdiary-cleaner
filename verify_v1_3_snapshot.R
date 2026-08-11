@@ -63,6 +63,38 @@ cfg_get <- function(key, default = NULL) {
   if (is.null(val)) default else val
 }
 
+# ── Helper: figure_run_dir / verification_run_dir ─────────────────────────
+# Single source of truth: sourced from R/config.R rather than duplicated
+# here. Before 2026-08-11 this script carried its own inline copy of
+# figure_run_dir(), which had already drifted from R/config.R once (the
+# routing for an "unknown" data_tag differed between the two). Loaded into a
+# private environment so R/config.R's own cfg_get()/config_get() (3-arg
+# signature, cfg-object based) do not shadow this script's simpler local
+# cfg_get() (2-arg, closes over `cfg` directly) used everywhere else below --
+# only figure_run_dir/verification_run_dir are pulled out, as thin wrappers
+# matching this script's existing calling convention.
+.cfg_helpers <- new.env()
+if (!file.exists("R/config.R")) {
+  stop("R/config.R not found. This script must be run from the splsleep ",
+       "source checkout root (cd /path/to/splsleep; Rscript ",
+       "verify_v1_3_snapshot.R), same as the rest of this script assumes.")
+}
+source("R/config.R", local = .cfg_helpers)
+figure_run_dir <- function(data_tag, n_records = NULL)
+  .cfg_helpers$figure_run_dir(cfg = cfg, data_tag = data_tag, n_records = n_records)
+verification_run_dir <- function(data_tag, n_records = NULL)
+  .cfg_helpers$verification_run_dir(cfg = cfg, data_tag = data_tag, n_records = n_records)
+
+# Derive the run tag from the configured input file (same rule as the pipeline).
+.snap_rds_name <- basename(cfg_get("data.files.main", ""))
+.snap_tag <- if (!nzchar(.snap_rds_name)) {
+  "unknown"
+} else if (grepl("synthetic|synth|stub|demo|example", .snap_rds_name, ignore.case = TRUE)) {
+  "synth"
+} else {
+  "real"
+}
+
 # ── Helper: multi_process (same as pipeline) ──────────────────────────────
 multi_process <- function(df, var_list, func, format = NULL) {
   for (varname in var_list) {
@@ -397,10 +429,21 @@ cat(strrep("=", 60), "\n\n")
 # =========================================================================
 # Save comparison artifacts for inspection
 # =========================================================================
-dir.create("output", showWarnings = FALSE)
-saveRDS(corrected_old, "output/snapshot_old.rds")
-saveRDS(corrected_s3, "output/snapshot_s3.rds")
-cat("Artifacts saved: output/snapshot_old.rds, output/snapshot_s3.rds\n")
+# Artifacts land in verification_run_dir(), a STABLE sibling of the figure
+# run directory (see R/config.R) rather than nested inside it. Before
+# 2026-08-11 this was <viz_dir>/verification/ -- convenient to browse next to
+# the figures, but only surviving a rerun of sleep_visualization.R because
+# that one script implemented a rename-out/rename-back dance around its own
+# wipe. That dance failed once already (2026-08-11: that day's
+# VERIFICATION_2026-08-10.md was deleted and had to be reconstructed from a
+# work log, because it was gitignored and unrecoverable from git). Nothing
+# below can be wiped by any figure-generation run, current or future, so no
+# such dance is needed here either.
+.ver_dir <- verification_run_dir(.snap_tag, nrow(corrected_old))
+dir.create(.ver_dir, showWarnings = FALSE, recursive = TRUE)
+saveRDS(corrected_old, file.path(.ver_dir, "snapshot_old.rds"))
+saveRDS(corrected_s3, file.path(.ver_dir, "snapshot_s3.rds"))
+cat(sprintf("Artifacts saved: %s/snapshot_{old,s3}.rds\n", .ver_dir))
 
 # Return exit code
 if (.fail > 0) quit(status = 1) else quit(status = 0)

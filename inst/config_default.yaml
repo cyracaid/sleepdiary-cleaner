@@ -231,7 +231,24 @@ classification:
 # =============================================================================
 output:
   figure:
-    root_dir: "latest_visualization"
+    # Base directory for CONFIRMED-real-data figure runs only (data_tag == "real").
+    # "output" keeps real-data figures with the delivered datasets; set to
+    # anything (e.g. ".") to place them elsewhere.
+    root_dir: "output"
+    # Base directory for synthetic/test runs AND for runs whose data_tag could
+    # not be determined ("unknown"). Empty string = project root. This is a
+    # fail-closed default: only a run positively tagged "real" is trusted with
+    # output/ (gitignored, treated as containing participant data). "unknown"
+    # is routed here on purpose, not into output/ -- see figure_run_dir() in
+    # R/config.R for why.
+    #
+    # NOTE: moving synth/unknown runs out of output/ only prevents them from
+    # overwriting real-data figures. It does NOT make them git-tracked --
+    # .gitignore's `latest_visualization*/` pattern has no path anchor, so it
+    # matches this directory wherever it lands, output/ or not. If you need a
+    # synth run committed for CI/reviewer reference, give it its own path that
+    # isn't caught by that pattern.
+    synth_root_dir: ""
     width_inches: 14
     height_inches: 9
     dpi: 150

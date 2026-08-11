@@ -33,6 +33,14 @@ output/
 output_*/
 Rplots.pdf
 
+# Verification artifacts (snapshot .rds pairs, Bland-Altman plots, audit
+# reports) written by verification_run_dir() (R/config.R). Real-data ones
+# land under output/ and are already covered by the "output/" rule above;
+# this anchored rule (leading slash) additionally catches the project-root
+# copy used for synth/unknown runs. Anchored so it does NOT match
+# inst/verification/ (the tracked verification *scripts*, not their output).
+/verification/
+
 # Archive & old code
 archive/
 visualizations/

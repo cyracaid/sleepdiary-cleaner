@@ -90,6 +90,75 @@ cfg_get <- function(key, default = NULL, cfg = NULL) {
   config_get(cfg, key, default)
 }
 
+#' Resolve the figure output directory for a run
+#'
+#' Builds the run-specific visualization directory name:
+#' \code{<root>/latest_visualization_<tag>_n<records>}. The base root comes from
+#' config (\code{output.figure.root_dir} for real data, \code{output.figure.synth_root_dir}
+#' for synthetic/test AND unresolved data). Only a data_tag that has been
+#' positively confirmed as \code{"real"} is trusted with the \code{output/}
+#' root -- \code{"synth"} and \code{"unknown"} both stay outside \code{output/}
+#' by default. This is a fail-closed choice: \code{"unknown"} means the tag
+#' detector could not read \code{data.files.main} from the config (see
+#' \code{sleep_visualization.R}), i.e. we genuinely do not know what was
+#' loaded. Routing it next to confirmed real-data figures would silently
+#' extend real-data trust (gitignored, "never leaves the study team" handling)
+#' to data whose identity is unverified. Before 2026-08-11, "unknown" fell
+#' into the \code{else} branch and was treated exactly like "real"; that has
+#' been fixed so only "real" gets the privileged path.
+#'
+#' @param cfg Optional. Pipeline configuration list (preferred; falls back to
+#'   the global environment when omitted).
+#' @param data_tag Character. "real", "synth", or "unknown".
+#' @param n_records Numeric or NULL. Row count appended to the directory name.
+#' @return Character. Relative path to the figure output directory.
+#' @keywords internal
+figure_run_dir <- function(cfg = NULL, data_tag, n_records = NULL) {
+  base <- if (identical(data_tag, "real")) {
+    cfg_get("output.figure.root_dir", "output", cfg = cfg)
+  } else {
+    # "synth" and "unknown" both land here -- see the fail-closed rationale above.
+    cfg_get("output.figure.synth_root_dir", "", cfg = cfg)
+  }
+  nm <- paste0("latest_visualization_", data_tag,
+               if (!is.null(n_records) && !is.na(n_records)) paste0("_n", n_records) else "")
+  if (nzchar(base)) file.path(base, nm) else nm
+}
+
+#' Resolve the stable, never-wiped verification directory for a run
+#'
+#' Verification artifacts (S3-vs-legacy snapshot \code{.rds} pairs, the
+#' Markdown verification report, advisory analyses such as Bland-Altman
+#' plots) must survive the *next* pipeline run. The figure run directory
+#' returned by \code{\link{figure_run_dir}} does not survive it -- every run
+#' of \code{sleep_visualization.R} deletes and rebuilds that directory from
+#' scratch.
+#'
+#' Earlier, \code{verification/} was nested *inside* the wiped run directory
+#' and rescued around each wipe with a rename-out/rename-back dance
+#' implemented once, in \code{sleep_visualization.R}. That single
+#' implementation was the only thing standing between the wipe and data loss;
+#' on 2026-08-11 a wipe ran before the dance existed and permanently deleted
+#' that day's verification report (it was gitignored, so it could not be
+#' recovered from git either -- see the "History note" in
+#' \code{output/verification/real_n13990/VERIFICATION_2026-08-10.md}). This
+#' function fixes the root cause instead of guarding the symptom: it returns
+#' a path that is a *sibling* of the run directory, not a child of it, so no
+#' wipe -- current or future, in this script or any other -- can reach it.
+#' No preserve logic is required anywhere, and none can be forgotten.
+#'
+#' @inheritParams figure_run_dir
+#' @return Character. Relative path to the stable verification directory,
+#'   e.g. \code{"output/verification/real_n13990"} or
+#'   \code{"verification/synth_n280"}.
+#' @keywords internal
+verification_run_dir <- function(cfg = NULL, data_tag, n_records = NULL) {
+  run_dir <- figure_run_dir(cfg = cfg, data_tag = data_tag, n_records = n_records)
+  suffix  <- paste0(data_tag,
+                     if (!is.null(n_records) && !is.na(n_records)) paste0("_n", n_records) else "")
+  file.path(dirname(run_dir), "verification", suffix)
+}
+
 #' Get column mapping from config
 #'
 #' Returns the user's column name for a given pipeline-internal column.
