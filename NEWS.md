@@ -1,3 +1,34 @@
+# splsleep 1.4.1
+
+Bug-fix release. No cleaning logic changed outside the two items below.
+
+## Bug fixes
+
+* **SOL/WASO high-risk duration-reinterpretation flag (`checkforerrors_processing.R`,
+  Part A4).** Synthetic benchmark testing (n=400/class) found `field_misentry_sol` /
+  `field_misentry_waso` (clock-time text typed into a duration field) were silently
+  misrepaired 95.8% / 96.0% of the time: `process_interval.R`'s `MM:SS` / `dd:00`
+  reinterpretation heuristic turns the misentry into a small, plausible-looking number,
+  and the downstream `sol_duration_for_review_status` / `waso_duration_for_metrics_status`
+  checks (`calculate_sleep_time_end.R`) only ever flag values that are too *large*, never
+  too *small* -- so nothing catches it. New Part A4 block flags any row whose
+  `_correctionsmade` note matches the `MM:SS`/`dd:00` reinterpretation pattern and routes
+  it to human review. Reduces SOL silent misrepair to 3.5% (14/400 -- a disclosed residual
+  blind spot for "01:XX"-shaped values that leave no reinterpretation trace) and WASO to
+  0% (0/400). Verified 0/10,000 new false positives on clean synthetic data and 0/10,000
+  unrelated-field false alterations, both unchanged from pre-patch.
+
+* **`generate_correction_files.R` now actually writes the human-review CSVs (Section 13).**
+  The `write.csv()` calls for `[NEW]manual_error_correction_review.csv` and
+  `[NEW]manual_unusual_review.csv` were commented out, and `run_pipeline()` immediately
+  `rm()`'d the in-memory result afterward -- so neither file was ever produced, even
+  though the pipeline's own log unconditionally printed "Files saved: ...". Human
+  reviewers had nothing to review. Fixed; verified non-empty/expected output on a full
+  real n=280 pipeline run and confirmed no collision with the Step 6 input filenames
+  (`manual_error_corrections.csv` / `manual_unusual_corrections.csv`).
+
+---
+
 # splsleep 1.4.0
 
 Delivery release. **No cleaning logic changed.** Run-to-run figures are
