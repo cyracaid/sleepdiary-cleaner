@@ -1,3 +1,35 @@
+# splsleep 1.4.2
+
+Adds the calibrated synthetic-error-injection benchmark harness to the
+tracked repo (`validation/synthetic/`). No cleaning logic changed.
+
+## New
+
+* **Benchmark harness**: `generate_clean_data.R` (structurally-pure and
+  population-realistic synthetic data), `error_catalog.yaml` (12-category
+  error taxonomy with provenance tags), `inject_errors.R`
+  (participant-clustered injector with ground-truth logging),
+  `evaluate_fcr.R` / `evaluate_detection.R` (false-alteration and
+  per-category detection/recall evaluators).
+* **First-pass results** (`validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md`):
+  0/10,000 false alterations on structurally-clean synthetic input;
+  population-stratified flag-rate gradient (0.0% healthy_adult to 7.7%
+  insomnia_like); per-category detection results across 12 injected-error
+  types. This harness is what found and verified the two bugs fixed in
+  v1.4.1 (field-misentry silent misrepair, missing human-review CSVs).
+* **README**: Validation section's benchmark row corrected from "planned"
+  to "first pass done", linking to the results doc.
+
+## Not yet done
+
+Full recall/specificity/PPV-curve treatment with cluster-bootstrap CIs,
+multiverse analysis (needs a prerequisite refactor: the 3-hour
+adjacent-swap threshold and cross-participant MAD constants are currently
+hardcoded, not configurable), leave-one-out ablation, and downstream
+sleep-metric sensitivity analysis. See `benchmark-design.md`.
+
+---
+
 # splsleep 1.4.1
 
 Bug-fix release. No cleaning logic changed outside the two items below.
