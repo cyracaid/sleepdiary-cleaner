@@ -456,6 +456,80 @@ for (label in names(nap_exercise_vars)) {
 }
 
 # ==========================================================================
+# PART A4: SOL/WASO high-risk reinterpretation flag
+# ==========================================================================
+# WHAT:  process_interval.R logs a text note in {varname}_correctionsmade for
+#        every raw-string reformat it performs. Most of these notes describe
+#        routine, low-risk format normalization (padding, digit-count
+#        reformatting) that the format_no_colon/format_malformed_colon
+#        synthetic-benchmark categories confirmed the parser handles
+#        correctly (100% correct on 400/400 injected cases each).
+#
+#        Two specific notes are different: "sleep metric duration MM:SS
+#        threshold conversion" and "dd:00 -> 00:dd" both fire when a
+#        multi-digit, colon-containing raw string gets REINTERPRETED under
+#        an ambiguous heuristic (is "12:02" a duration already in MM:SS, or
+#        a clock time that leaked into this field?) rather than just
+#        reformatted. Neither of these two notes previously fed into
+#        needs_review_flag anywhere in the pipeline -- confirmed by grep,
+#        _correctionsmade is written here and in process_interval.R but read
+#        nowhere else in this file (or elsewhere in inst/scripts/) before
+#        this block. sol_duration_for_review_status /
+#        waso_duration_for_metrics_status (Step 7, calculate_sleep_time_end.R)
+#        don't catch it either -- those only fire when the parsed value
+#        EXCEEDS the sleep-to-awake window, and this reinterpretation
+#        specifically produces small, plausible-looking numbers, not large
+#        ones.
+#
+#        Real-world motivation: pid 1036 in the actual study data (see
+#        work_logs/2026-06-18_cross_participant_global_check.md) had clock
+#        times leaking into the SOL field on 3/9 non-NA days, silently
+#        "normalized" into small plausible-looking minute counts by exactly
+#        this MM:SS heuristic. A synthetic benchmark built to test for this
+#        class of error (validation/synthetic/error_catalog.yaml's
+#        field_misentry_sol/waso categories, n=400 each) measured a 95.8%/
+#        96.0% silent-misrepair rate before this patch -- i.e. the wrong
+#        value was written with NO flag and NO way for a human reviewer to
+#        find it short of reading the archived _correctionsmade text by
+#        hand.
+#
+# KNOWN GAP: this only catches the two most common reinterpretation
+#        branches. On the same 400-row benchmark, ~3.5% of field_misentry_sol
+#        cases (clock times shaped like "01:07"-"01:59") parse as an
+#        ordinary, unremarkable HH:MM value with NO note logged at all --
+#        there is no text signal a downstream check can key off for those;
+#        catching them would need a different (semantic, not textual)
+#        approach. This block narrows the blind spot, it does not close it.
+#
+# SAFETY: verified against 12,264 real/synthetic clean records (10,000
+#        structurally-pure + 2,264 physiologically-realistic control rows)
+#        -- 0 false-positive flags from this rule on any of them, and
+#        FAR_alter (any field silently altered) stayed at 0/10,000 before
+#        and after this patch.
+risky_reinterpretation_pattern <- "MM:SS|dd:00"
+sol_waso_note_cols <- c(
+  sol  = "duration_totalmin_sol_estimate_am_correctionsmade",
+  waso = "duration_totalmin_waso_estimate_am_correctionsmade"
+)
+for (label in names(sol_waso_note_cols)) {
+  col_name <- sol_waso_note_cols[[label]]
+  if (col_name %in% names(data)) {
+    risky <- !is.na(data[[col_name]]) & grepl(risky_reinterpretation_pattern, data[[col_name]])
+    flag_idx <- which(risky & !data$manually_corrected)
+    for (i in flag_idx) {
+      data$needs_review_flag[i] <- TRUE
+      desc <- paste0("[DurationReinterp] ", label, ": ", data[[col_name]][i])
+      if (is.na(data$auto_error_desc[i])) {
+        data$auto_error_desc[i] <- desc
+      } else {
+        data$auto_error_desc[i] <- paste(data$auto_error_desc[i], desc, sep = "; ")
+      }
+    }
+    if (length(flag_idx) > 0) cat(sprintf("  Part A4: %s flagged %d high-risk duration reinterpretations\n", label, length(flag_idx)))
+  }
+}
+
+# ==========================================================================
 # PART B: Import temporal error/unusual flags from existing columns
 # ==========================================================================
 # WHAT:  Reads the error_type and unusual_type columns that were already
