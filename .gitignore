@@ -78,3 +78,8 @@ cross_participant_suspicious_slices.csv
 
 # Local-only verification reports (real-data aggregates). Never pushed.
 verify_reports/
+
+# Manuscript notes for direct email attachment to coauthors -- contain real
+# participant identifiers (pid 6490, pid 1036 etc.) in prose/tables, unlike
+# the git-tracked validation/ docs which are kept scrubbed. Never commit.
+manuscript_notes/
