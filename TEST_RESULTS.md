@@ -1,63 +1,40 @@
 # splsleep Package Test Results
 
-**Date:** 2026-07-15
+**Date:** 2026-08-12
 **R version:** 4.6.0
-**Platform:** aarch64-apple-darwin23 (macOS Sequoia 15.4.1)
+**Platform:** aarch64-apple-darwin23 (macOS Sequoia)
 
-## R CMD CHECK Summary
+## Test Summary (testthat, 12 test files)
 
 ```
-Status: 5 WARNINGs, 3 NOTEs
+total: 90 tests
+passed: 190
+failed: 0
+errors: 0
+warnings: 39 (non-fatal: cfg_get() .GlobalEnv fallback deprecation notices, dplyr coercion)
+skip: 1
 ```
 
-- **0 ERRORs**
-- **checking tests ... OK** (all 17 testthat tests pass)
-- 5 WARNINGs are typical: missing documentation entries, unstated dependencies in examples
-- 3 NOTEs are informational (non-ASCII code, subdirectory structure)
+## Coverage
 
-## Test Coverage (testthat)
-
-### normalize_sleep_time_sequence — 15 tests
-
-| # | Scenario | Status |
-|---|----------|--------|
-| 1 | Normal midnight crossing (bed 22:00 → getup 06:30+1) | ✅ |
-| 2 | AM/PM error (bed 10:00 should be 22:00) → sleep_reduce_12h | ✅ |
-| 3 | Short cross-midnight (23:30→02:00) | ✅ |
-| 4 | All four timestamps equal (bed==sleep==awake==getup) | ✅ |
-| 5 | All-NA row → skipped_na | ✅ |
-| 6 | Partial NA (getup missing) → has_na=TRUE | ✅ |
-| 7 | >3h temporal disorder → NOT auto-corrected | ✅ |
-| 8 | <3h bed-sleep swap → bed_sleep_swap_3h | ✅ |
-| 9 | <3h sleep-awake swap → sleep_awake_swap_3h | ✅ |
-| 10 | <3h awake-getup swap → awake_getup_swap_3h | ✅ |
-| 11 | Gap near 12h (11.5h) → no AM/PM flip | ✅ |
-| 12 | Gap of exactly 12h → triggers correction | ✅ |
-| 13 | checkforerrors cleared after valid correction | ✅ |
-| 14 | Row count preserved (3 in = 3 out) | ✅ |
-| 15 | Combined AM/PM + swap correction | ✅ |
-
-### process_interval — 2 tests
-
-| # | Scenario | Status |
-|---|----------|--------|
-| 1 | "00:000" normalizes to 00:00, mincalc=0 | ✅ |
-| 2 | "000:45" normalizes to 00:45, mincalc=45 | ✅ |
+| Test file | Focus |
+|---|---|
+| `test-normalize.R` | Sequence normalization: AM/PM errors, <3h swaps, all-NA, bed=getup, 12h gaps |
+| `test-interval.R` | Malformed colon formats ("00:000" → "00:00") |
+| `test-pipeline.R` | End-to-end smoke on synthetic data, config loading, column adaptation |
+| `test-script-copies-in-sync.R` | Root vs `inst/scripts/` copies byte-identical (no new divergence) |
+| others | Per-module unit tests (config, flags, figure steps, S3 chain) |
 
 ## Running Tests
 
 ```r
-# From R console (package root):
-library(testthat)
-test_dir("tests/testthat")
-
-# Or via R CMD CHECK:
-R CMD CHECK . --no-manual
-
-# Or directly with testthat:
-test_file("tests/testthat/test-normalize_sleep_time_sequence.R")
+# From package root:
+Rscript -e 'pkgload::load_all(quiet=TRUE); library(testthat); test_dir("tests/testthat", reporter="summary")'
 ```
 
-## Full Log
+Or via R CMD CHECK: `R CMD CHECK . --no-manual`
 
-See `R_CMD_CHECK.log` in the `tests/` directory for the complete R CMD CHECK output.
+## Notes
+
+- 39 warnings are non-fatal deprecation notices: `cfg_get()` read from `.GlobalEnv$pipeline_config` without explicit `cfg` (tracked in `TECH_DEBT.md` item 3) plus dplyr coercion notices.
+- 1 skipped test is expected.

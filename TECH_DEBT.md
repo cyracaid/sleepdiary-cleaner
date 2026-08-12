@@ -1,39 +1,37 @@
-# Technical Debt — splsleep v1.3.1
+# Technical Debt — splsleep v1.4.0
 
 Tracked code-quality items that are intentionally deferred to a future release.
 Each entry states what the debt is, why it exists, and when it should be resolved.
 
 ---
 
-## 1. Duplicate scripts in root and inst/scripts/
+## 1. Root and inst/scripts/ script duplication — RESOLVED as design (2026-08-12)
 
-**What:** The following files exist in TWO locations with identical content:
+**Status: NOT debt.** The dual copies exist by design, not accident:
 
-| File | Root copy | inst/scripts/ copy | Why duplicated |
-|------|-----------|-------------------|----------------|
-| `error_unusual_sleep_time_corrections.R` | 2,082 lines | 2,082 lines | Root copy used by legacy run_pipeline(); inst/scripts/ used by S3 chain |
-| `checkforerrors_processing.R` | 987 lines | 987 lines | Same reason |
-| `sleep_visualization.R` | 2,594 lines | 2,594 lines | Same reason |
-| `generate_correction_files.R` | 807 lines | 807 lines | Same reason |
-| `cross_participant_field_misentry_check.R` | — | — | Same reason |
-| `cross_participant_global_check.R` | 429 lines | 429 lines | Same reason |
-| `apply_second_review.R` | — | 98 lines | Same reason |
-| `apply_nap_exercise_corrections.R` | — | — | Same reason |
-| `apply_sleep_metric_duration_corrections.R` | — | — | Same reason |
-| `apply_metric_review_acceptances.R` | — | — | Same reason |
-| `report_correction_status.R` | — | — | Same reason |
-| `audit_data_integrity.R` | — | — | Same reason |
-| `audit_review_propagation.R` | — | — | Same reason |
-| `generate_ai_review_csvs.R` | — | — | Same reason |
+- `run_pipeline()` → `system.file("scripts")` → `inst/scripts/` copy
+- `source("00_MAIN_entry.R")` → `getwd()` → repo-root copy
 
-**Why this debt exists:** The legacy pipeline (`run_pipeline()`) sourced scripts from the project root. When the package was restructured for `R CMD build`, these scripts were copied into `inst/scripts/` while the roots were kept for backward compatibility. The S3 chain reads from `inst/scripts/` via `scripts_dir()`.
+`test-script-copies-in-sync.R` enforces byte-identical copies and fails on any new divergence (`KNOWN_DIVERGENT` deliberately empty). Historical note: on 2026-08-05 five scripts (apply_metric_review_acceptances, apply_nap_exercise_corrections, apply_second_review, apply_sleep_metric_duration_corrections, calculate_sleep_time_end) diverged — inst/scripts read paths via cfg_get() while root hardcoded filenames; default config hid the difference until `data.files.*` was overridden. Commit 80c7e657. When refactoring, edit both copies and re-run the sync test.
 
-**Resolution plan (v1.4.0):**
-1. Internalise `process_timestamp()` and `process_interval()` into `R/steps.R` (see item 2).
-2. For the remaining scripts, make `inst/scripts/` the single source of truth. The root copies can become thin wrappers that call `source(system.file("scripts/...", package="splsleep"))`.
-3. Or: delete all root copies after all callers are migrated to use `scripts_dir()`.
+**File index (both locations):**
 
-**Last updated:** 2026-07-28 (v1.3.1)
+| File | Root copy | inst/scripts/ copy |
+|------|-----------|-------------------|
+| `error_unusual_sleep_time_corrections.R` | ✓ | ✓ |
+| `checkforerrors_processing.R` | ✓ | ✓ |
+| `sleep_visualization.R` | ✓ | ✓ |
+| `generate_correction_files.R` | ✓ | ✓ |
+| `cross_participant_field_misentry_check.R` | ✓ | ✓ |
+| `cross_participant_global_check.R` | ✓ | ✓ |
+| `apply_second_review.R` | ✓ | ✓ |
+| `apply_nap_exercise_corrections.R` | ✓ | ✓ |
+| `apply_sleep_metric_duration_corrections.R` | ✓ | ✓ |
+| `apply_metric_review_acceptances.R` | ✓ | ✓ |
+| `report_correction_status.R` | ✓ | ✓ |
+| `audit_data_integrity.R` | ✓ | ✓ |
+| `audit_review_propagation.R` | ✓ | ✓ |
+| `generate_ai_review_csvs.R` | ✓ | ✓ |
 
 ---
 

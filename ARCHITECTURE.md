@@ -2,7 +2,7 @@
 
 ## Overview
 
-An R pipeline that cleans EMA sleep diary data and produces 24 diagnostic figures. The pipeline has 9 sequential steps, from raw CSV/RDS loading through automatic error detection. Human correction feedback is applied at step 6 via CSV files. The entry point is `00_MAIN_entry.R`; run `run_pipeline()`.
+An R pipeline that cleans EMA sleep diary data and produces 24 diagnostic figures. The pipeline has 9 main sequential steps (with sub-steps 1.5/5.5/5.75/6.5/8.5/8.75), from raw CSV/RDS loading through automatic error detection. Human correction feedback is applied via CSV files at steps 5.5-6.5. The entry point is `00_MAIN_entry.R`; run `run_pipeline()` (installed package) or `source("00_MAIN_entry.R")` (development).
 
 Classification categories (TIMESTAMP_ISSUE / DURATION_ISSUE / AMOUNT_FLAG / NEEDS_REVIEW) are **data-type labels, not exclusion criteria** — no data is removed based on category membership.
 
@@ -19,6 +19,11 @@ raw data (RDS + CSV)
     │  Uses row-order alignment (not keyed join — ensure CSV row order matches RDS).
     │  Columns added: StartDate, num_waso (→ num_waso_am), num_waso_estimate_am
     │  Output: df (intermediate, rows = 13,990)
+    │
+    ▼
+[1.5] CROSS-PARTICIPANT FIELD-MISENTRY ─ cross_participant_field_misentry_check.R
+    │  Detects SOL/WASO values that exactly match timestamps from other fields.
+    │  Output: cross_participant_field_misentries.csv
     │
     ▼
 [2] TIMESTAMP PARSE ────────────────── process_timestamp_emadatarelease_cyra.R
@@ -54,6 +59,17 @@ raw data (RDS + CSV)
     │  as input for step 6: manual_error_corrections.csv / manual_unusual_corrections.csv
     │
     ▼
+[5.5] HUMAN REVIEW ────────────────── manual
+    │  Review [NEW] CSVs from step 5; populate and rename to strip [NEW] prefix.
+    │
+    ▼
+[5.75] SECOND-REVIEW CONSENSUS ─────── apply_second_review.R
+    │  Reads second_review_checklist.csv (13 rows, all consensus_reached).
+    │  Write-only: dispatches each row to target CSV (anti-join idempotent),
+    │  verifies manual_error_corrections.csv / manual_nap_exercise_corrections.csv
+    │  entries exist. Placed between 5 and 6 so corrections land in same run.
+    │
+    ▼
 [6] APPLY CORRECTIONS ──────────────── error_unusual_sleep_time_corrections.R
     │  Reads reviewed CSVs and applies fixes (see Human Review Guide below).
     │  Correction cases (check order):
@@ -64,6 +80,17 @@ raw data (RDS + CSV)
     │  Recalculates time differences, re-classifies.
     │  Flags "reasonable unusual" records (human-approved unusual patterns).
     │  Output: corrected_ema_data (the canonical analysis-ready dataframe)
+    │
+    ▼
+[6.5] APPLY DURATION CORRECTIONS ───── apply_nap_exercise_corrections.R
+    │                                    apply_sleep_metric_duration_corrections.R
+    │                                    apply_metric_review_acceptances.R
+    │  Nap/exercise numeric duration fixes; SOL/WASO MM:SS vs HH:MM fixes;
+    │  marks rows human-accepted to suppress future flags.
+    │  Inputs: manual_nap_exercise_corrections.csv,
+    │          manual_sleep_metric_duration_corrections.csv,
+    │          manual_metric_review_acceptances.csv
+    │  Output: corrected_ema_data (+ human_metric_review_status)
     │
     ▼
 [7] COMPUTE METRICS ────────────────── calculate_sleep_time_end.R
@@ -82,12 +109,26 @@ raw data (RDS + CSV)
     │    PART A — parse-time *_checkforerrors flags (excludes exercise/nap/substance-timestamp)
     │    PART B — temporal error/unusual from step 6 (imports existing error_type/unusual_type)
     │    PART C — sleep metric extremes (SOL<0, SE<0, SE>100%, TST/TIB=0, TST/TIB>1)
+    │    PART C2 — suppresses ALL flag types for human-accepted rows
+    │              (reads human_metric_review_status + manual_metric_review_acceptances.csv)
+    │    PART D — creates checkforerrors_df (remaining flagged records for review)
     │  Also detects substance input anomalies from raw CSV (6 types —
     │    see Key Design Decisions).
     │  Outputs:
     │    checkforerrors_processed    — main data with needs_review_flag + auto_error_desc
     │    checkforerrors_summary      — one-row-per-participant flag counts and category assignment
     │    substance_decimal_anomalies — reference table of input oddities (global env)
+    │
+    ▼
+[8.5] CROSS-PARTICIPANT GLOBAL ─────── cross_participant_global_check.R
+    │  Per-participant baselines (median + MAD); flags days where
+    │  SOL/WASO/exercise deviates ≥5 MAD from own norm.
+    │  Outputs: cross_participant_flagged_rows.csv, cross_participant_suspicious_slices.csv
+    │
+    ▼
+[8.75] HUMAN REVIEW ────────────────── manual
+    │  Review checkforerrors_df + cross_participant CSVs; re-run steps 5-8
+    │  (skipping manual review) to fold decisions into final check.
     │
     ▼
 [9] VISUALIZE ──────────────────────── sleep_visualization.R
@@ -134,9 +175,11 @@ equal_time_type:
 | `TIMESTAMP_ISSUE` | Clock-time format errors | Step 2 parse flags (bed/sleep/awake/getup) |
 | `DURATION_ISSUE` | Interval/duration format errors | Step 3 parse flags (SOL, WASO) |
 | `AMOUNT_FLAG` | Substance input structural anomaly | Step 8 sections 1a-1c |
-| `NEEDS_REVIEW` | Metric anomaly (manual inspection) | Step 8 Part C (SOL, SE, TST/TIB) |
+| `SELF_REPORTED_FLAG` | Diary-based metric anomaly (manual inspection) | Step 8 Part C (SOL, SE, TST/TIB) |
 | `CLEAN` | No issues | — |
 | `CLEAN (Manually Fixed)` | Corrected in step 6 | — |
+
+Note: `SELF_REPORTED_FLAG` was previously named `NEEDS_REVIEW`; relabeled 2026-07-14 to clarify these are diary-based metric anomalies, not data errors.
 
 ---
 
@@ -205,6 +248,13 @@ install.packages(c("lubridate", "tidyverse", "stringi", "stringr", "readr",
 ```
 Note: `checkforerrors_processing.R` has no `library()` calls — it relies on packages loaded by earlier steps. Always run via `00_MAIN_entry.R`, never standalone.
 
+### Dual Script Copies (Root vs inst/scripts/)
+Pipeline scripts exist in two physical locations — this is by design, not debt:
+- `run_pipeline()` → `system.file("scripts")` → the `inst/scripts/` copy
+- `source("00_MAIN_entry.R")` → `getwd()` → the repo-root copy
+
+Both copies must be kept byte-identical by hand; `test-script-copies-in-sync.R` fails if they drift. On 2026-08-05 five scripts (apply_metric_review_acceptances, apply_nap_exercise_corrections, apply_second_review, apply_sleep_metric_duration_corrections, calculate_sleep_time_end) diverged — inst/scripts read paths via cfg_get() while root hardcoded filenames; default config hid the divergence until `data.files.*` was overridden. Commit 80c7e657. When refactoring, edit both copies and re-run the sync test.
+
 ### Data Sources
 - `deidentified_intervalvars_forCD_111325.rds` — pre-processed EMA variables from the survey platform
 - `sber_ema_anon_20260227.csv` — raw survey responses (provides StartDate, num_waso, num_waso_estimate_am)
@@ -272,6 +322,40 @@ NEEDS_REVIEW=731    CLEAN=13,204       CLEAN(Manually Fixed)=53  (= 94.4%)
 | `object 'checkforerrors_processed' not found` | Running `sleep_visualization.R` standalone | Always run via `00_MAIN_entry.R`; the viz file is not self-contained |
 | All records classified CLEAN when errors expected | Manual correction CSVs out of date | Check that `manual_error_corrections.csv` exists and has been populated for known problem records |
 | CASE4 warnings in console | A correction instruction doesn't match any known case | Review the record manually; the record will remain uncorrected |
+
+---
+
+## Checkpoint System & Figure 12 (Pipeline Progress)
+
+`report_correction_status.R` captures data state at five pipeline milestones:
+
+| Checkpoint | Location | Description |
+|---|---|---|
+| **A** | After Step 4 | Post-normalization, pre-classification (no data_category yet) |
+| **B** | After Step 6 | After timestamp corrections applied |
+| **C** | After Step 6.5 | After nap/exercise duration corrections |
+| **D** | After Step 7 | After sleep metrics computed (TST, SOL, WASO, SE) |
+| **E** | After Step 8 | After auto-detection (final classification state) |
+
+Each checkpoint logs `n_total, n_clean, n_error, n_unusual, n_equal_time, n_skipped, n_corrected, n_valid, tst_mean_h, sol_mean_min` to `output/correction_status.csv`. After all checkpoints, `final_summary()` compares B→E (skips A — no data_category yet), prints a delta table, saves to `output/correction_status_final.csv`.
+
+**Figure 12** reads `output/correction_status.csv` and visualizes Clean/Error/Unusual/Equal Time/Corrected counts per checkpoint as a grouped bar chart (replaces the former flag_severity pie chart).
+
+---
+
+## Testing Coverage
+
+Unit tests for critical data-transformation logic in `tests/testthat/` (12 files):
+
+| Test file | Scenarios covered |
+|---|---|
+| `test-normalize.R` | Normal sequence, AM/PM getup/sleep error, minor order swap (< 3h), all-NA row, bed = getup, large-gap out-of-order |
+| `test-interval.R` | Malformed colon formats ("00:000" → "00:00", "000:45" → "00:45") |
+| `test-pipeline.R` | End-to-end smoke test on synthetic data, config loading, column adaptation |
+| `test-script-copies-in-sync.R` | Root vs `inst/scripts/` copies byte-identical (KNOWN_DIVERGENT deliberately empty; guards against silent divergence — see 2026-08-05 incident) |
+| others | One per R module (config, flags, figure steps, etc.) |
+
+Run: `Rscript -e 'pkgload::load_all(quiet=TRUE); library(testthat); test_dir("tests/testthat", reporter="summary")'`
 
 ---
 
