@@ -212,6 +212,26 @@ atypical 这条精确对上，说明手稿数字本身是真实、当初准确�
 
 ---
 
+## 08-12（三）：benchmark 真正进仓库、一次匿名化事故与修复、v1.4.2 发布、会议邮件改写
+
+### benchmark 一直没进仓库——用户追问才发现
+
+用户看到 README 里 benchmark 那一行还写着"🔲 计划中"，追问"不是做了吗"。核查后确认：合成 benchmark（`generate_clean_data.R`、`error_catalog.yaml`、`inject_errors.R`、`evaluate_fcr.R`、`evaluate_detection.R`，以及完整的 FCR/detection 结果）确实做了，而且正是这套 harness 揪出了 v1.4.1 那两个 bug——但这套代码和结果**只存在于沙盒里，从未进本地仓库、没进 GitHub，README 状态也写错了**。补齐：六个脚本 + 三份结果 CSV + 新写的 `SYNTHETIC_BENCHMARK_RESULTS.md`（完整方法、数字、诚实列出"还没做完的部分"）落到 `validation/synthetic/`；README 这一行状态改成 🟡"第一轮已完成"。
+
+### 例行核对时顺带发现的匿名化事故
+
+核对本地文件时发现：当天早些时候提交（`bd35065`、`e7f004b`）并推送到 GitHub 的两份 worklog 文件里混进了 7 个真实 pid（含通道B验证逐行数据表格），违反 08-10 建立的匿名化规则。用 `git rebase -i` 重写这两个 commit，把真实 pid 换成延续 90100+ 假区间的占位 ID（90121–90127），`--force-with-lease` 覆盖远程历史；`v1.4.1` tag 恰好打在被重写的那个 commit 上，一并重新打标签、force-push。**披露**：真实 pid 曾在 GitHub 上短暂公开过（当天几个小时的窗口期），这次重写只保证之后的访问者看不到，不能追溯清除这期间可能已产生的任何副本。
+
+### v1.4.2 发布
+
+把 benchmark 收仓库这件事本身作为一次版本发布：`DESCRIPTION`/`NEWS.md` 从 1.4.1 → 1.4.2（无清洗逻辑改动，只是补上 benchmark harness 的版本记录），打 tag、推送、建 GitHub release，`main`/tag/release 三处确认与本地同步。
+
+### 给 Maia 的会议邮件改写
+
+原邮件是"进度汇报"格式，改成"会议议程"格式，主体换成 benchmark 设计和结果需要一起决定的四件事：①预注册映射（confirmatory / exploratory / addendum，需要 Maia 带来预注册原文）②这次 benchmark 做到什么程度算够——完整版（recall/specificity/PPV 曲线、cluster bootstrap、multiverse；multiverse 还需要先把 3 小时交换阈值和 cross-participant MAD 常数从硬编码提到 config）还要再 2-3 周，第一轮是否已经够用于这篇论文 ③下游敏感性分析要不要现在做 ④失眠样人群误报率是健康人群 26 倍这个测出来的数字要不要写进 Limitations。手稿 κ/n=47 的修正提示保留在邮件下方。
+
+---
+
 ## 遗留 / 下一步
 
 | 项 | 状态 |
@@ -223,7 +243,11 @@ atypical 这条精确对上，说明手稿数字本身是真实、当初准确�
 | 两处 08-12 补丁的 commit/push | ✅ 已完成，`v1.4.1` 已上线 GitHub |
 | 通道B冗余验证 / B1 描述性分析 | ✅ 已完成（第一梯队验证清单 5 项中的 2 项） |
 | κ 独立标注 / n=47/37/84 数字差异 | ✅ 已查清（第一梯队验证清单剩余项目） |
-| 预注册协议（OSF） | 未开始——第一梯队验证清单最后一项，需在第二梯队（蒙特卡洛 benchmark、消融实验）开始前完成 |
+| benchmark harness 补齐进仓库 + README 状态修正 | ✅ 已完成，`validation/synthetic/` 已上线 GitHub |
+| GitHub 匿名化事故（7 个真实 pid）修复 | ✅ 已完成，历史重写并 force-push |
+| v1.4.2 发布 | ✅ 已完成，`main`/tag/release 三处同步 |
+| 给 Maia 的会议邮件（benchmark 设计+结果讨论） | ✅ 已改写，未提交进 git（个人草稿，按需可补提交） |
+| 预注册协议（OSF） | 未开始——第一梯队验证清单最后一项，需先跟 Maia 开会决定后续 benchmark 范围 |
 
 ---
 

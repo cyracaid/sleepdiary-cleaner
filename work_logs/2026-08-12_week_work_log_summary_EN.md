@@ -255,6 +255,26 @@ point for "review difficulty varies by task type."
 
 ---
 
+## 08-12 (round three): getting the benchmark into the repo, an anonymization incident and fix, v1.4.2, and rewriting the meeting email
+
+### The benchmark had never actually made it into the repo — caught by a direct question
+
+The user noticed the README's benchmark row still said "🔲 Planned" and asked directly whether this work had actually been done. Checking confirmed it had: the synthetic benchmark (`generate_clean_data.R`, `error_catalog.yaml`, `inject_errors.R`, `evaluate_fcr.R`, `evaluate_detection.R`, plus full FCR/detection results) was real, substantial work, and it's exactly what found the two bugs fixed in v1.4.1 — but the code and results **only ever existed in a scratch environment, never committed to the local repo, never pushed to GitHub, and the README status was wrong as a result**. Fixed: the six scripts plus three result CSVs plus a newly-written `SYNTHETIC_BENCHMARK_RESULTS.md` (full method, numbers, and an honest "not yet done" list) landed under `validation/synthetic/`; the README row now correctly reads 🟡 "first pass done."
+
+### A real anonymization incident, caught during a routine check and fixed
+
+While verifying local state, found that the two work-log files committed (`bd35065`, `e7f004b`) and pushed earlier that day contained seven real participant IDs (including a row-by-row Channel B table) — a violation of the anonymization rule established on 08-10. Fixed via `git rebase -i`, rewriting both commits to replace the real pids with anonymized placeholders continuing the existing 90100+ fake range (90121–90127), then `--force-with-lease` to overwrite the remote history. The `v1.4.1` tag happened to point at the rewritten commit, so it was deleted and recreated on the new hash and force-pushed. **Disclosure**: the real pids were briefly public on GitHub for a few hours that day — this rewrite only guarantees nobody sees them going forward, it can't retroactively scrub any copy someone may have already made during that window.
+
+### v1.4.2 released
+
+Treated getting the benchmark into the repo as its own release: `DESCRIPTION`/`NEWS.md` bumped 1.4.1 → 1.4.2 (no cleaning-logic change, just versioning the benchmark harness), tagged, pushed, and a GitHub release created — confirmed `main`, the tag, and the release all match locally.
+
+### Rewrote the meeting email to Maia
+
+The original email was a status-report format; rewrote it as a meeting-agenda format centered on four decisions needed about the benchmark: (1) pre-registration mapping (confirmatory/exploratory/addendum — needs Maia to bring the actual pre-reg text), (2) how much more of the full design (recall/specificity/PPV curves, cluster bootstrap, multiverse — which itself needs a small refactor first, pulling the 3-hour swap threshold and cross-participant MAD constants out of hardcoded values into config) to do before submission versus flagging as future work, (3) whether the downstream sensitivity analysis is in scope now, (4) whether the measured 26x flag-rate gap between the insomnia-like and healthy-adult populations is worth a Limitations line. The κ / n=47 methods-text fix is still noted further down.
+
+---
+
 ## What's left
 
 | Item | Status |
@@ -266,7 +286,11 @@ point for "review difficulty varies by task type."
 | Committing/pushing the two 08-12 fixes | ✅ Done — v1.4.1 is live on GitHub |
 | Channel B validation / B1 descriptive analysis | ✅ Done (2 of the 5 first-tier validation items) |
 | κ question / n=47/37/84 discrepancy | ✅ Resolved (the remaining first-tier items) |
-| OSF pre-registration protocol | Not started — last first-tier item, needed before starting tier-2 work (Monte Carlo benchmark, ablations) |
+| Benchmark harness into the repo + README status fix | ✅ Done — `validation/synthetic/` is live on GitHub |
+| GitHub anonymization incident (7 real pids) fix | ✅ Done — history rewritten and force-pushed |
+| v1.4.2 release | ✅ Done — `main`/tag/release all in sync |
+| Meeting email to Maia (benchmark design + results) | ✅ Rewritten, not yet committed to git (personal draft — can commit on request) |
+| OSF pre-registration protocol | Not started — last first-tier item, needs the benchmark-scope decision from the Maia meeting first |
 
 ---
 
@@ -275,6 +299,7 @@ point for "review difficulty varies by task type."
 - `2026-08-12_week_work_log_summary.md` — Chinese version of this same summary
 - `channel-b-redundancy-validation.md` — full Channel B + B1 methods, results, caveats (project doc)
 - `development-evidence-audit.md` — full write-up of the κ and n=47/37/84 investigations (project doc)
+- `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md` — the synthetic-benchmark numbers, now in-repo
 
 Best,
 Cyra
