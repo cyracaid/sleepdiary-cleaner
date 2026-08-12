@@ -1,0 +1,14 @@
+"category","n","CORRECT","FLAGGED_UNRESOLVED","MISREPAIRED","MISSED","NO_MATCH","correct_pct"
+"adjacent_swap_time_awake_am_time_getup_am",400,0,0,0,400,0,0
+"adjacent_swap_time_bed_am_time_sleep_am",400,0,0,0,400,0,0
+"adjacent_swap_time_sleep_am_time_awake_am",400,0,400,0,0,0,0
+"ampm_swap",400,203,197,0,0,0,50.8
+"compound_ampm_and_swap",400,0,268,0,132,0,0
+"cross_participant_spike",336,0,298,38,0,0,0
+"field_misentry_sol",400,17,0,383,0,0,4.2
+"field_misentry_waso",400,12,4,384,0,0,3
+"format_malformed_colon",400,400,0,0,0,0,100
+"format_no_colon",400,400,0,0,0,0,100
+"implausible_duration",400,0,400,0,0,0,0
+"mmss_confusion",400,379,11,10,0,0,94.8
+"no_error_control",2264,0,0,0,2264,0,0

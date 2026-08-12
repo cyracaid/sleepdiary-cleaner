@@ -1,0 +1,198 @@
+# error_catalog.yaml
+#
+# Error taxonomy for the splsleep synthetic benchmark.
+# See validation/benchmark_design.md §7 for the design rationale --
+# in particular §7④: this catalog is deliberately built as a UNION of three
+# sources, not just "errors splsleep has historically caught", to avoid
+# calibrating the benchmark against its own blind spots.
+#
+#   [observed]   -- seen in this project's real data / work_logs
+#   [literature] -- reported in SHUTi (2023 SLEEP) or RESTING (2024)
+#   [blind_spot] -- theoretically possible, historically UNDETECTED until a
+#                   dedicated check was added (field_misentry is the
+#                   canonical example: invisible to the pipeline until
+#                   Step 1.5 was written specifically to catch it -- see
+#                   work_logs/2026-06-18_cross_participant_global_check.md)
+#
+# rate_anchor_pct is NOT the injection rate used per-category (categories are
+# enriched independently per validation/benchmark_design.md §2-3). It is the
+# empirical prevalence anchor used to build the calibrated-mode PPV curve.
+
+meta:
+  anchors:
+    shuti_2023_pct: 1.07        # 487/45598 needed date or AM/PM correction
+    resting_2024_pct: 5.7       # diaries needing post-hoc correction
+    splsleep_real_pct: 0.60     # 84/13990 entered human review queue
+                                 # (47 flagged errors + 37 atypical cases;
+                                 #  NOTE: manual_error_corrections.csv has
+                                 #  n=75 rows -- the 84 vs 75 discrepancy is
+                                 #  unresolved, see development-evidence-audit.md §6.3;
+                                 #  do not treat either number as exact)
+  enrichment_target_per_category: 400   # see benchmark_design.md §3
+  clean_pool_target: 10000              # see benchmark_design.md §3 (FCR)
+
+categories:
+
+  ampm_swap:
+    provenance: [observed, literature]
+    description: >
+      An evening timestamp (bed or sleep) is recorded with the wrong AM/PM
+      designation, producing an apparent >=12h gap between adjacent
+      timestamps. This is normalize_sleep_time_sequence.R's primary target
+      (the 12h iterative-subtraction correction).
+    real_examples:
+      - "row_id 8827: sleep AM/PM wrong, awake='0' (garbage) -- correctly
+         classified as error, not auto-corrected"
+      - "row_id 12078: sleep reduced 12h by algorithm, later human override
+         added 12h to bed instead -- algorithm right variable, human found
+         the better fix (see open_issues S7)"
+    fields_affected: [time_bed, time_sleep]  # awake/getup analog also modeled
+    rate_anchor_pct: 1.07   # from SHUTi (AM/PM is their dominant date/AM-PM category)
+    direction_bias: "PM_entered_as_AM"   # far more common than the reverse
+                                          # empirically (evening confusion)
+
+  adjacent_swap_bed_sleep:
+    provenance: [observed, literature]
+    description: >
+      bed and sleep timestamps entered in reversed order due to a data-entry
+      slip, with a small (<3h) gap -- normalize_sleep_time_sequence.R's
+      stage-2 swap logic target.
+    fields_affected: [time_bed, time_sleep]
+    max_gap_hours: 3
+    rate_anchor_pct: 0.15   # sub-component of RESTING's broader "sequence error" bucket
+
+  adjacent_swap_sleep_awake:
+    provenance: [observed, literature]
+    description: Sleep and final-awakening timestamps reversed, gap <3h.
+    fields_affected: [time_sleep, time_awake]
+    max_gap_hours: 3
+    rate_anchor_pct: 0.15
+
+  adjacent_swap_awake_getup:
+    provenance: [observed, literature]
+    description: >
+      Final-awakening and get-up timestamps reversed, gap <3h. Real
+      counterpart: row_id 8502 (see open_issues S7) -- algorithm blamed
+      getup's AM/PM, the actual error was in awake; human only partially
+      fixed it (this remains the one genuinely-unrepaired real record).
+    fields_affected: [time_awake, time_getup]
+    max_gap_hours: 3
+    rate_anchor_pct: 0.15
+
+  field_misentry_sol:
+    provenance: [observed, blind_spot]
+    description: >
+      A clock time (e.g. sleep time "10:30 PM") is entered into the SOL
+      duration field instead of a duration. The MM:SS parser then silently
+      "normalizes" the resulting large number (630 min) down to a
+      plausible-looking small one (10.5 min) -- masking the error rather
+      than fixing it. UNDETECTED by the pipeline until Step 1.5
+      (cross_participant_field_misentry_check.R) was added specifically for
+      this. This category exists in the catalog precisely so the benchmark
+      does not just re-test what Step 1.5 already knows how to find --
+      injected instances should include variants Step 1.5's exact-string-
+      match logic would plausibly miss (e.g. off-by-format near-matches).
+    real_examples:
+      - "pid 1036: 3/9 non-NA SOL days (33%) were sleep-time entries misread
+         as SOL duration (630-660 'minutes')"
+      - "pid 2835, 4481, 6805: single-day instances, 615/765/725 'minutes'"
+    fields_affected: [duration_totalmin_sol_estimate_am]
+    source_field: time_sleep_am_hhmm    # the value that leaks into the target field
+    rate_anchor_pct: 0.10   # 6/13990 in the one real audit that looked for it --
+                             # almost certainly an undercount, since nothing
+                             # else in the pipeline can see this class
+
+  field_misentry_waso:
+    provenance: [blind_spot]
+    description: >
+      Same mechanism as field_misentry_sol, applied to the WASO field
+      (time_awake or time_getup leaking into duration_totalmin_waso_estimate_am).
+      Zero real instances were found in the one audit that looked
+      (2026-06-18), but the audit only checked exact HH:MM string matches --
+      this category is included because absence of detected instances is not
+      evidence of absence of the error mode (see benchmark_design.md §7④).
+    fields_affected: [duration_totalmin_waso_estimate_am]
+    source_field: time_awake_am_hhmm
+    rate_anchor_pct: 0.05   # conservative; deliberately not zero
+
+  format_no_colon:
+    provenance: [observed]
+    description: >
+      Duration entered without a colon delimiter (e.g. "130" instead of
+      "1:30" or "00:15"), routed through process_interval.R's digit-count
+      branch logic.
+    fields_affected: [duration_totalmin_sol_estimate_am, duration_totalmin_waso_estimate_am]
+    rate_anchor_pct: 0.30
+
+  format_malformed_colon:
+    provenance: [observed]
+    description: >
+      Duration entered with colon(s) in a non-standard position
+      (e.g. "1:2:34", ":1234", "123:4") -- process_interval.R's
+      pattern-matched regrouping branches.
+    fields_affected: [duration_totalmin_sol_estimate_am, duration_totalmin_waso_estimate_am]
+    rate_anchor_pct: 0.20
+
+  mmss_confusion:
+    provenance: [observed]
+    description: >
+      A genuinely short duration ("15 min") entered with an extra leading
+      zero pair or otherwise ambiguous with MM:SS notation, triggering
+      process_interval.R's >=60-with-colon MM:SS reinterpretation heuristic
+      in a case where that heuristic is WRONG (the true value was already
+      in minutes, not MM:SS).
+    fields_affected: [duration_totalmin_sol_estimate_am, duration_totalmin_waso_estimate_am]
+    rate_anchor_pct: 0.10
+
+  cross_participant_spike:
+    provenance: [observed]
+    description: >
+      A single day's SOL or WASO is set far outside that specific
+      participant's own multi-day baseline, while remaining internally
+      well-formed and within row-local plausibility bounds -- Step 8.5's
+      target. Requires participant-clustered injection (see
+      benchmark_design.md §7①): the same magnitude of value is a spike for
+      a low-baseline participant and unremarkable for a high-baseline one,
+      so this category cannot be injected IID.
+    fields_affected: [duration_totalmin_sol_estimate_am, duration_totalmin_waso_estimate_am]
+    injection_requires: participant_baseline_context
+    rate_anchor_pct: 0.35   # ~52/13990 in the one real Step 8.5 run (2026-06-18)
+
+  implausible_duration:
+    provenance: [literature]
+    description: >
+      SOL or WASO set to a structurally valid but physiologically extreme
+      value (e.g. SOL=200min) NOT tied to that participant's baseline --
+      i.e. an implausible value that would look extreme even in isolation,
+      as opposed to cross_participant_spike which is only extreme relative
+      to personal baseline. Targets checkforerrors_processing.R Part C
+      row-local thresholds.
+    fields_affected: [duration_totalmin_sol_estimate_am, duration_totalmin_waso_estimate_am]
+    rate_anchor_pct: 0.20
+
+  compound_ampm_and_swap:
+    provenance: [observed, blind_spot]
+    description: >
+      Two errors on the same record: an AM/PM swap AND an adjacent-timestamp
+      swap, interacting. This is exactly the failure mode documented in
+      open_issues S7 -- normalize_sleep_time_sequence.R's stage-1/stage-2
+      rules each look at only ONE timestamp pair and do not cross-check the
+      other two, so compound errors can cause the algorithm to misattribute
+      which timestamp is actually wrong. All 3 known real instances (row_id
+      8502, 8827, 12078) are this category. Team decision (2026-08-09) was
+      NOT to fix the underlying rule (real-world risk assessed as zero,
+      theoretical risk nonzero) -- this benchmark category is what turns
+      that theoretical risk into a measured one.
+    fields_affected: [time_bed, time_sleep, time_awake, time_getup]
+    rate_anchor_pct: 0.02   # 3/13990, all 3 known real instances
+
+  no_error_control:
+    provenance: [observed]
+    description: >
+      Explicit negative control -- records left untouched. Required at
+      roughly parity volume with the largest single injected category so
+      that specificity/FCR estimation (which needs a large pure-negative
+      pool; see benchmark_design.md §3) isn't starved by however many rows
+      happen to be left over after enrichment sampling.
+    fields_affected: []
+    rate_anchor_pct: null   # not a real-world rate; this is the complement pool
