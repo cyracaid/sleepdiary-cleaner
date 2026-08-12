@@ -10,7 +10,7 @@
 
 SPL Sleep is a reproducible, auditable R pipeline for cleaning sleep EMA (ecological momentary assessment) diary data. It parses raw bedtime/sleep/awake/get-up timestamps, detects and corrects temporal and duration errors through a transparent human-in-the-loop workflow (every correction stored in a re-readable CSV), computes standard sleep metrics (TST, SOL, WASO, SE), validates self-reported durations, and generates diagnostic and research-ready figures. A schema-validated YAML config maps the pipeline to your dataset without touching code; detection thresholds and their rationale are documented in THRESHOLDS.md, and the input contract in SCHEMA.md.
 
-**v1.4.0 (current)** — delivery release, 190+ tests, R CMD CHECK 0 ERROR / 0 WARNING. Adds `finalize_columns()` as Step 10, the column dictionary as single source of truth, reserved affect-layer columns, an export guard against negative signed minutes, and CI-verified delivery wiring. Installable via `renv::install("cyracaid/sleepdiary-cleaner")`. See [releases](https://github.com/cyracaid/sleepdiary-cleaner/releases) for full changelog.
+**v1.4.1 (current)** — bug-fix release on top of the v1.4.0 delivery gate, 190+ tests, R CMD CHECK 0 ERROR / 0 WARNING. v1.4.0 added `finalize_columns()` as Step 10, the column dictionary as single source of truth, reserved affect-layer columns, an export guard against negative signed minutes, and CI-verified delivery wiring. v1.4.1 fixes two review-pipeline bugs found during validation: a silent-misrepair blind spot where a clock time typed into a duration field could be "corrected" into a small, plausible-looking number without ever being flagged for human review, and a defect where the two human-review CSVs were never actually being written to disk despite the pipeline log reporting success. See [releases](https://github.com/cyracaid/sleepdiary-cleaner/releases) for full changelog. Installable via `renv::install("cyracaid/sleepdiary-cleaner")`.
 
 ## Phase status
 
@@ -666,19 +666,41 @@ Step 7 (Compute metrics):
 
 ## Testing Coverage
 
-The pipeline includes 76+ testthat tests across multiple areas:
+The pipeline includes 190+ testthat expectations across 12 test files, all exercising software correctness — does the code do what it was designed to do — as distinct from methodological validity, which is covered in [Validation](#validation) below.
 
 | Test File | Coverage |
 |-----------|----------|
-| `test-normalize.R` | 15 tests: AM/PM correction, minor order errors, midnight crossing, edge cases |
-| `test-interval.R` | 2 tests: colon edge cases ("00:000", "000:45") |
-| `test-pipeline.R` | 3 tests: end-to-end on synthetic data, config loading, column adaptation |
-| `test-sleep-diary.R` | 11 tests: S3 construction, validation, coercion, generics, contract assertion, provenance |
-| `test-flag-standards.R` | 6 tests: flag evaluators for field misentry, data category, duration extreme, flag severity |
+| `test-normalize.R` | AM/PM correction, minor order errors, midnight crossing, edge cases |
+| `test-interval.R` | Colon-format edge cases in duration parsing |
+| `test-pipeline.R` | End-to-end run on synthetic data, config loading, column adaptation |
+| `test-sleep-diary.R` | S3 construction, validation, coercion, generics, step-contract assertion, provenance |
+| `test-flag-standards.R` | Flag evaluators for field misentry, data category, duration extreme, flag severity, checkforerrors; step-ledger logging |
+| `test-correction-engine.R` | Every classification outcome (order/bed-sleep/awake-getup/24h errors, equal-time, unusual, skipped-NA, multiple errors, suspicious-latency flags) |
+| `test-classification-thresholds.R` | Boundary behavior at every classification threshold (7h error, 3h/15h unusual, suspicious-latency) |
+| `test-auto-detection-thresholds.R` | SOL/SE/TST-TIB boundary behavior for the Step 8 auto-detection flags |
+| `test-finalize-columns.R` | Dictionary ↔ delivered-column consistency, A/B join key uniqueness, unit transforms, reserved-column pass-through, export guard, missing/optional-column handling |
+| `test-nonfinite-guards.R` | NA/Inf handling in duration and flag-severity evaluators (regression tests for two real bugs) |
+| `test-config-data.R` | Config file loading (RDS/CSV, legacy keys, column mapping, friendly error messages) |
+| `test-script-copies-in-sync.R` | Root and `inst/scripts/` copies of every dual-maintained script stay byte-identical |
 
-Run tests with: `testthat::test_package("splsleep")`
+Run tests with: `testthat::test_package("splsleep")` (or `library(splsleep); testthat::test_dir("tests/testthat")` — note that `test_dir()` alone does **not** load the package, so run it after `library(splsleep)` or every exported function will fail to resolve).
 
-Snapshot verification (`inst/verification/`) confirms the S3 chain produces bit-identical output to the legacy pipeline on all 95 columns.
+Snapshot verification (`inst/verification/`, `verify_v1_3_snapshot.R`) confirms the current S3 pipeline chain produces byte-identical output to the legacy pipeline path on real data. `verify_reference_fidelity.R` separately pins each of the 8 core metric formulas against a documented baseline (`--strict` mode is CI-wired).
+
+<a name="validation"></a>
+
+## Validation
+
+Testing coverage (above) proves the code does what it was designed to do. It does not prove the design itself is methodologically valid — sleep-diary cleaning has no ground truth, since nobody can know for certain what a participant meant when they typed "10:30" into a duration field. This pipeline's validation strategy runs four independent lines of evidence, deliberately chosen so each one fails in a different way: a cleaning decision that survives all four is far more defensible than one that only survives a single check.
+
+| Evidence | What it tests | Status |
+|---|---|---|
+| **Clean-input specificity** | Run 100% error-free synthetic data through the pipeline; a correctly-behaving pipeline should make zero corrections. Any correction on clean input is pure iatrogenic damage. | ✅ 0 corrections on 10,000 clean synthetic records |
+| **Redundant-channel validation** | Real diaries record sleep-onset latency two independent ways — self-reported duration, and derived from timestamps. Step 4's timestamp-correction logic never reads the duration columns (verified by source inspection), so comparing the two after correction is a non-circular check, run directly on real data with no synthetic injection needed. | ✅ On real production data (n=13,990): the two largest correction rules (`bed_sleep_swap_3h`, `sleep_reduce_12h_loop`) move corrected records measurably closer to self-report (Wilcoxon p < 1e-7 both); one smaller rule (`sleep_awake_swap_3h`, n=10) shows a real, disclosed negative effect, most of which is independently caught by a downstream temporal-order check |
+| **Human co-review agreement** | Two researchers jointly reviewed every record the pipeline flagged for manual attention. | ✅ 64.0% immediate agreement on flagged temporal errors (n=75), 89.2% on statistically atypical records (n=37). Reported as raw agreement rather than inter-rater reliability / Cohen's κ, since review was collaborative (one shared worksheet) rather than independently double-coded — κ requires each rater's pre-discussion label, which this workflow never produced |
+| **Calibrated injected-error benchmark + downstream sensitivity** | Synthetic error injection with known ground truth, calibrated to empirically observed error rates; sensitivity of downstream sleep metrics (TST/SOL/WASO/SE) to cleaning-pipeline choices. | 🔲 Planned — the next phase of work |
+
+Full methodology, numeric results, and disclosed caveats for each completed item are written up in the dated logs under `work_logs/`; start from `work_logs/2026-08-12_week_work_log_summary_EN.md` (or the Chinese-language `2026-08-12_week_work_log_summary.md`) for the most recent consolidated summary, which also indexes back to earlier entries.
 
 ## Renv Reproducibility
 
@@ -698,7 +720,7 @@ MIT
 
 自动化的睡眠 EMA 日记数据清洗管线：解析原始就寝/入睡/醒来/起床时间戳，检测并修正时序和时长错误，计算睡眠指标（TST、SOL、WASO、SE），验证自报时长，生成诊断与科研图表。
 
-**v1.4.0（当前版本）** — 交付版本，190+ 个测试，R CMD CHECK 0 ERROR / 0 WARNING。通过 `renv::install("cyracaid/sleepdiary-cleaner")` 安装。
+**v1.4.1（当前版本）** — 在 v1.4.0 交付门基础上的 bug 修复版本，190+ 个测试，R CMD CHECK 0 ERROR / 0 WARNING。v1.4.0 新增了 `finalize_columns()`（Step 10）、作为唯一事实来源的列字典、保留的 affect 层列、负数导出门、以及 CI 校验的交付接线。v1.4.1 修复了验证过程中发现的两处人工复核环节 bug：一处是时钟时间误填进时长字段后会被"修正"成看似合理的小数字、却从未被标记转人工审核的静默误改盲区；另一处是两份人工复核 CSV 实际上从未被写盘，尽管管线日志一直报告"已保存"。完整变更见 [releases](https://github.com/cyracaid/sleepdiary-cleaner/releases)。通过 `renv::install("cyracaid/sleepdiary-cleaner")` 安装。
 
 ## 功能特性
 
@@ -710,7 +732,7 @@ MIT
 - **R 包**：`library(splsleep); run_pipeline()` — 可安装、版本化
 - **修正追溯**：`has_correction` enum 列（none / algorithmic / manual / both）+ 每步审计账本
 - **列映射**：`adapt_columns()` 通过 YAML 配置映射数据集列名 — 无需修改代码
-- **68 个测试**：覆盖修正引擎、分类阈值、自动检测逻辑、配置验证
+- **190+ 个测试**（12 个测试文件）：覆盖修正引擎、分类阈值、自动检测逻辑、配置验证、`finalize_columns()` 交付契约——测的是"代码有没有按设计跑"，跟"设计本身站不站得住"是两回事，后者见下方[验证](#验证)一节
 
 ## 管线架构
 
@@ -1018,6 +1040,21 @@ identical(old$n_clean, new$n_clean)
 | 5 | **19 Unified Quality Status** `pipeline_cleaning/` | Clean/Minor/Major 分类 | 大部分 Clean 或 Minor，Error + Unusual < 5% | 高 Error/Unusual = 审查人工修正 CSV |
 
 **5 张全过 → 管线输出有效。** 任何一张不过 → 看详细图诊断。
+
+<a name="验证"></a>
+
+## 验证
+
+上面的测试覆盖率证明代码按设计跑对了，不证明设计本身在方法学上站得住——睡眠日记清洗没有 ground truth，没有人能确定参与者在时长字段里填「10:30」时到底想说什么。这条管线的验证策略用四条相互独立的证据链，刻意选择让每一条的失效方式都不一样：一个能同时经受住全部四条检验的清洗决策，比只经受住其中一条的可信得多。
+
+| 证据 | 测的是什么 | 状态 |
+|---|---|---|
+| **干净输入特异度** | 把 100% 无错误的合成数据喂进管线，行为正确的管线应该零纠正。干净输入上出现的任何纠正都是纯粹的医源性损害。 | ✅ 10,000 条干净合成记录，零纠正 |
+| **冗余通道验证** | 真实日记里睡眠潜伏期存在两条独立测量——自报时长、时间戳推算。Step 4 的时间戳纠正逻辑从不读取自报时长列（源码检查确认），所以纠正后比较两者是非循环论证的检验，直接在真实数据上做，不需要合成注入。 | ✅ 真实生产数据（n=13,990）：两条最大的纠正规则（`bed_sleep_swap_3h`、`sleep_reduce_12h_loop`）让纠正后的记录明显更接近自报值（Wilcoxon p < 1e-7，两条都是）；一条较小的规则（`sleep_awake_swap_3h`，n=10）测出真实的、已披露的负面效应，其中大部分被下游的时序检查独立拦截 |
+| **人工共同审阅一致性** | 两位研究者共同审阅了管线标记出需要人工处理的每一条记录。 | ✅ 被标记的时序错误当场一致率 64.0%（n=75），统计学异常记录当场一致率 89.2%（n=37）。报告为 raw agreement，不是 inter-rater reliability / Cohen's κ，因为审阅方式是协作式共同审阅（共用一张表），不是各自独立编码——算 κ 需要每位评分者在讨论前各自的原始标签，这个协作流程本来就没有产生这种输入 |
+| **校准过的注入错误 benchmark + 下游敏感性** | 已知 ground truth 的合成错误注入，按经验观察到的错误率校准；下游睡眠指标（TST/SOL/WASO/SE）对清洗管线选择的敏感性。 | 🔲 计划中——下一阶段的工作 |
+
+已完成项目的完整方法、具体数字结果与已披露的局限性，写在 `work_logs/` 下按日期归档的日志里；从 `work_logs/2026-08-12_week_work_log_summary.md`（或英文版 `2026-08-12_week_work_log_summary_EN.md`）这份最新的汇总看起，里面也有指回更早条目的索引。
 
 ## 许可证
 
