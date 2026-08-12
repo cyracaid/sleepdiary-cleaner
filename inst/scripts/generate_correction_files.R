@@ -595,9 +595,9 @@ generate_correction_files <- function(ema_data_release_timecalc) {
   #   classification, then blank annotation columns at the end (where reviewers
   #   type their decisions). The original (pre-correction) timestamps appear
   #   alongside the algorithm-corrected timestamps so reviewers can compare.
-  # WHAT HAPPENS NEXT: This dataframe is currently NOT written to CSV (the
-  #   write.csv calls in Section 13 are commented out). It is returned in the
-  #   result list.
+  # WHAT HAPPENS NEXT: This dataframe is written to [NEW]manual_error_correction_review.csv
+  #   or [NEW]manual_unusual_review.csv in Section 13, and is also returned in
+  #   the result list.
   
   cat("\n12. Creating manual_corrections_pre...\n")
   
@@ -652,9 +652,9 @@ generate_correction_files <- function(ema_data_release_timecalc) {
   #   sleep_awake_suspicious) so they can focus their attention on the
   #   specific unusual value. The blank annotation columns let them record
   #   whether the value is accurate or needs adjustment.
-  # WHAT HAPPENS NEXT: This dataframe is currently NOT written to CSV (the
-  #   write.csv calls in Section 13 are commented out). It is returned in the
-  #   result list.
+  # WHAT HAPPENS NEXT: This dataframe is written to [NEW]manual_error_correction_review.csv
+  #   or [NEW]manual_unusual_review.csv in Section 13, and is also returned in
+  #   the result list.
   
   cat("\n13. Creating manual_unusual_pre...\n")
   
@@ -700,23 +700,37 @@ generate_correction_files <- function(ema_data_release_timecalc) {
   # ============================================
   # 13. Save only the two review files with [NEW] prefix (no timestamp files)
   # ============================================
-  # WHAT: Writes the human-review CSV files to disk. Currently the write.csv
-  #   calls are commented out — the dataframes are created but not saved.
-  #   Only a console note reports what would be saved.
-  # WHY: The write.csv calls are disabled, likely because the caller manages
-  #   file saving externally or because the user prefers manual control over
-  #   when / where files are written. The dataframes are returned via the
-  #   function return value for programmatic use.
-  
-  #cat("\n14. Saving review CSV files with [NEW] prefix...\n")
-  
+  # WHAT: Writes the human-review CSV files to disk.
+  # WHY: These are the files a human reviewer is meant to open, annotate
+  #   (problem_humanidentified / solution_humanidentified / column_to_adjust /
+  #   correction_value / manually_corrected), and save under the plain
+  #   manual_error_corrections.csv / manual_unusual_corrections.csv names that
+  #   Step 6 (apply_second_review / R/pipeline.R) reads back in. Filenames
+  #   differ ([NEW]...review.csv vs manual_..._corrections.csv) so writing
+  #   these does not collide with or get auto-consumed by Step 6.
+  # FIX (2026-08-12): these write.csv() calls were previously commented out,
+  #   so the review dataframes were built in memory, discarded (rm()'d by
+  #   R/pipeline.R right after this step), and NEVER reached disk -- while
+  #   the summary block below unconditionally printed "Files saved: ...".
+  #   That meant a human reviewer had nothing to open, and the console log
+  #   was actively misleading about it. Restoring the writes here also makes
+  #   the existing "Files saved" summary block below true again, with no
+  #   further changes needed there. Written as bare relative filenames into
+  #   the current working directory, consistent with every other Step-5/6
+  #   script in this codebase (e.g. cross_participant_field_misentry_check.R,
+  #   cross_participant_global_check.R) -- run_pipeline() has already
+  #   setwd()'d into project_dir by the time this runs, so these land at
+  #   project_dir root alongside cross_participant_*.csv, not under output/.
+
+  cat("\n14. Saving review CSV files with [NEW] prefix...\n")
+
   # Save manual error correction review file with [NEW] prefix
-  #write.csv(manual_corrections_pre, "[NEW]manual_error_correction_review.csv", row.names = FALSE)
-  #cat(sprintf("  ✓ [NEW]manual_error_correction_review.csv (%d rows)\n", nrow(manual_corrections_pre)))
-  
+  write.csv(manual_corrections_pre, "[NEW]manual_error_correction_review.csv", row.names = FALSE)
+  cat(sprintf("  ✓ [NEW]manual_error_correction_review.csv (%d rows)\n", nrow(manual_corrections_pre)))
+
   # Save manual unusual review file with [NEW] prefix
-  #write.csv(manual_unusual_pre, "[NEW]manual_unusual_review.csv", row.names = FALSE)
-  #cat(sprintf("  ✓ [NEW]manual_unusual_review.csv (%d rows)\n", nrow(manual_unusual_pre)))
+  write.csv(manual_unusual_pre, "[NEW]manual_unusual_review.csv", row.names = FALSE)
+  cat(sprintf("  ✓ [NEW]manual_unusual_review.csv (%d rows)\n", nrow(manual_unusual_pre)))
   
   # Note about other dataframes (not saved)
   cat("\n  Note: The following dataframes are available in environment but NOT saved to CSV:\n")
