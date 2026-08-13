@@ -15,26 +15,6 @@
 #' @name pipeline_steps
 NULL
 
-#' Locate and source a pipeline script into a private environment
-#'
-#' @param script Character. File name inside the scripts directory.
-#' @return An environment containing whatever the script defined.
-#' @keywords internal
-#' @noRd
-.load_script <- function(script) {
-  sdir <- get0("splsleep_scripts_dir", envir = .GlobalEnv,
-               ifnotfound = scripts_dir())
-  path <- file.path(sdir, script)
-  if (!file.exists(path)) {
-    stop("Pipeline script not found: ", path,
-         "\nSet options(splsleep.scripts_dir=) or run from the project root.",
-         call. = FALSE)
-  }
-  env <- new.env(parent = globalenv())
-  sys.source(path, envir = env, keep.source = FALSE)
-  env
-}
-
 #' Run one step and record its provenance
 #'
 #' The single choke point every adapter goes through, so timing, column diffing,

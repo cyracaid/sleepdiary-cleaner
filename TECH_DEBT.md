@@ -76,34 +76,32 @@ Deprecation warnings from the cfg fallback are gone; remaining 24 warnings in
 
 ## 4. R/steps.R still `.load_script()`s six adapters at runtime
 
-**Status: OPEN (2026-08-13).** Item 2 internalised the two timestamp/interval
-adapters, but six remain loaded from disk on every run:
+**Status: RESOLVED (2026-08-13, commits 8e70f10/f3a4eb7/4c983a4/c5ae1c3).**
+All six adapters internalised into `R/` with verbatim bodies:
+`R/normalize_sequence.R`, `R/sleep_time_metrics.R`,
+`R/correction_appliers.R`, `R/manual_corrections.R`. `.load_script()` deleted;
+the S3 chain has zero filesystem dependency. `test-internalised-in-sync.R`
+locks each R/ body to its inst/scripts counterpart (parse+deparse identical);
+the snapshot verifier was refactored to `pkgload::load_all` + `rm()` so it
+actually exercises the internalised code (13/13 bit-identical).
 
-| Line | Script |
-|------|--------|
-| 158 | `normalize_sleep_time_sequence.R` |
-| 177 | `error_unusual_sleep_time_corrections.R` |
-| 201 | `apply_nap_exercise_corrections.R` |
-| 202 | `apply_sleep_metric_duration_corrections.R` |
-| 203 | `apply_metric_review_acceptances.R` |
-| 226 | `calculate_sleep_time_end.R` |
+The `inst/scripts/` copies are **retained by design**: `00_MAIN_entry.R` and
+the legacy pipeline still `source()` them. Edit both copies together; the
+pre-commit hook + `test-script-copies-in-sync.R` cover the script pair and
+`test-internalised-in-sync.R` covers the R/↔script pair.
 
-**Why:** Same historical reason as item 2 — the S3 chain originally sourced
-step scripts. The adapters are large (error_unusual is ~2000 lines) so they
-were left in place when timestamps/intervals were internalised.
+**Why it existed:** Same historical reason as item 2 — the S3 chain
+originally sourced step scripts.
 
-**Cost:** Runtime filesystem dependency (installed-package vs source-tree
-resolution); adapter bodies can't be unit-tested or type-checked from the
-package; `test-script-copies-in-sync.R` + the pre-commit hook must keep
-catching drift instead of the package owning the code.
+**Cost (paid):** Runtime filesystem dependency; adapter bodies couldn't be
+unit-tested from the package; drift between copies was only half-gated.
 
-**Resolution:** Same pattern as item 2 — copy bodies verbatim into `R/*.R`,
-call directly from `step_*()` functions. Do the small ones first
-(normalize, calculate_sleep_time_end), error_unusual last. Verify with
-snapshot (13/13 bit-identical) after each.
+**Resolution (done):** Verbatim bodies into `R/*.R`, direct calls from
+`step_*()`, snapshot-verified bit-identical at each step.
 
 ---
 
+## 5. Two parallel pipeline implementations
 ## 5. Two parallel pipeline implementations
 
 **Status: OPEN (2026-08-13).** `run_pipeline()` (R/pipeline.R, 8 `source()`
@@ -190,5 +188,28 @@ dependent so it can't be asserted on.
 known-benign mutate in the relevant step, with a comment), or fix the
 name-repair root cause (explicit `.name_repair`). Cosmetic; do not block
 release work.
+
+**Last updated:** 2026-08-13
+
+---
+
+## 9. calculate_sleep_time_vars_end reads .GlobalEnv$pipeline_config
+
+**Status: OPEN (2026-08-13).** The internalised
+`calculate_sleep_time_vars_end()` (R/sleep_time_metrics.R, verbatim from the
+script) reads `cfg <- get0("pipeline_config", envir = .GlobalEnv,
+ifnotfound = NULL)` and only then computes the `flag_severity` /
+`flag_duration_extreme` columns. Called outside a run that assigned
+pipeline_config to .GlobalEnv (e.g. run_cleaning_chain standalone), the
+two flag columns are silently missing.
+
+**Why kept:** D7 decision during internalisation — changing the signature to
+`cfg = NULL` would break the verbatim parity gate across three copies
+(R/, inst/scripts, and the legacy entry). It was deliberately deferred.
+
+**Resolution:** Add `cfg = NULL` parameter, resolve via the explicit arg
+(apply_* pattern), update all three copies in one commit, extend
+test-internalised-in-sync.R if the signature change requires it, and add a
+unit test asserting flag_severity appears when cfg is passed.
 
 **Last updated:** 2026-08-13
