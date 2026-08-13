@@ -65,6 +65,7 @@ importFrom(dplyr,
   n,
   one_of,
   rename,
+  row_number,
   sym,
   vars
 )
@@ -73,6 +74,7 @@ importFrom(lubridate,
   days,
   duration,
   hour,
+  hours,
   interval,
   minutes,
   parse_date_time,
@@ -84,4 +86,7 @@ importFrom(rlang,
 )
 importFrom(stats,setNames)
 importFrom(stringr,str_replace)
-importFrom(tidyr,separate)
+importFrom(tidyr,
+  complete,
+  separate
+)

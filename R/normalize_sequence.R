@@ -5,11 +5,11 @@
 # it); R/ and inst/scripts bodies are locked identical by
 # tests/testthat/test-internalised-in-sync.R.
 #
-# @keywords internal
-# @noRd
-# @importFrom dplyr mutate row_number between
-# @importFrom tidyr complete
-# @importFrom lubridate hours duration
+#' @keywords internal
+#' @noRd
+#' @importFrom dplyr mutate row_number between
+#' @importFrom tidyr complete
+#' @importFrom lubridate hours duration
 
 ################################################################################
 # normalize_sleep_time_sequence: Decision-Tree Sleep Log Cleaner
