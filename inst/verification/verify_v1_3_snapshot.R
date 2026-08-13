@@ -45,12 +45,14 @@ assign("pipeline_config", cfg, envir = .GlobalEnv)
 assign("splsleep_scripts_dir", sdir, envir = .GlobalEnv)
 options(splsleep.verbose = FALSE)
 
-# Source the S3 layer
-source("R/flag_standards.R", local = TRUE)
-source("R/log_step.R", local = TRUE)
-source("R/sleep_diary.R", local = TRUE)
-source("R/steps.R", local = TRUE)
-source("R/pipeline_chain.R", local = TRUE)
+# Load the development package: internalised step functions live in its
+# namespace. The legacy (script-copy) pipeline below still sources
+# inst/scripts/ files into the global env; before the S3 chain runs we
+# rm() the internalised names from the global env so naked-name lookup in
+# step_* resolves to the namespace versions -- otherwise the S3 chain would
+# silently keep executing the OLD script copies and this verifier would not
+# validate the internalised code at all.
+suppressMessages(pkgload::load_all(".", quiet = TRUE))
 init_step_ledger()
 
 # ── Helper: cfg_get ──────────────────────────────────────────────────────
