@@ -1,3 +1,18 @@
+# splsleep 1.4.3
+
+Fixes a correction rule flagged by the redundant-channel validation on real
+data (Channel B, 2026-08-12/13).
+
+## Fixed
+
+* **`sleep_awake_swap_3h` guard**: the swap now only fires when `bed <= awake`.
+  Previously, swapping when the old awake time preceded bed put the new sleep
+  time before bed, worsening the (bed→sleep) SOL gap; validation measured this
+  as a real negative effect (7/10 corrected rows moved farther from
+  self-reported SOL). Real-data rerun after the guard: 10 → 4 swap rows, all
+  order-valid, 3/4 closer to self-report. Guarded rows are left uncorrected
+  and picked up by the downstream temporal-order check for human review.
+
 # splsleep 1.4.2
 
 Adds the calibrated synthetic-error-injection benchmark harness to the
