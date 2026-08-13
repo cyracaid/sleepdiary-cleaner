@@ -1,0 +1,40 @@
+# steps.yaml — single source of truth for pipeline steps.
+#
+# Mirrors the step markers in R/pipeline.R (run_pipeline). When a step is
+# added/removed/renamed there, update this file; test-generated-docs-in-sync.R
+# fails if the step id set drifts from what the code emits via log_step().
+#
+# Source of truth chain: R/pipeline.R comments → this file → render_docs.R →
+# SKILL.md facts + README architecture table → CI sync test.
+
+steps:
+  - id: "1"
+    label: "Load data"
+    description: ".rds/.csv auto-detected; schema validated; optional supplementary file merged"
+  - id: "1.5"
+    label: "Field-misentry check"
+    description: "SOL/WASO clock-time vs duration-field misentry detection on raw data"
+  - id: "2-4"
+    label: "Parse & normalize (S3 chain)"
+    description: "Parse timestamps → parse intervals → normalize sequence"
+  - id: "5"
+    label: "Classify records"
+    description: "Generate manual review CSVs for human approval"
+  - id: "5.75"
+    label: "Second-review consensus"
+    description: "Apply second-review checklist consensus"
+  - id: "6-7"
+    label: "Correct & compute metrics (S3 chain)"
+    description: "Manual + duration corrections; TST/SOL/WASO/SE metrics; has_correction enum"
+  - id: "8"
+    label: "Auto-detect remaining issues"
+    description: "TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED flag classification"
+  - id: "8.5"
+    label: "Cross-participant consistency check"
+    description: "Global consistency audit across participants"
+  - id: "9"
+    label: "Generate diagnostic figures"
+    description: "24 figures + figure_index.png contact sheet + RUN_INFO.txt"
+  - id: "10"
+    label: "Build delivered datasets"
+    description: "finalize_columns() selects/renames to Dataset A/B per column dictionary"
