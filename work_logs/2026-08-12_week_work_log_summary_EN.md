@@ -289,7 +289,7 @@ The original email was a status-report format; rewrote it as a meeting-agenda fo
 | Benchmark harness into the repo + README status fix | ✅ Done — `validation/synthetic/` is live on GitHub |
 | GitHub anonymization incident (7 real pids) fix | ✅ Done — history rewritten and force-pushed |
 | v1.4.2 release | ✅ Done — `main`/tag/release all in sync |
-| Meeting email to Maia (benchmark design + results) | ✅ Rewritten, not yet committed to git (personal draft — can commit on request) |
+| Meeting email to Maia (benchmark design + results) | ✅ Rewritten and committed (`c181948`), pushed; `[NEW]` review CSVs now gitignored as per-run real-pid artifacts |
 | OSF pre-registration protocol | Not started — last first-tier item, needs the benchmark-scope decision from the Maia meeting first |
 
 ---

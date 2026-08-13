@@ -246,7 +246,7 @@ atypical 这条精确对上，说明手稿数字本身是真实、当初准确�
 | benchmark harness 补齐进仓库 + README 状态修正 | ✅ 已完成，`validation/synthetic/` 已上线 GitHub |
 | GitHub 匿名化事故（7 个真实 pid）修复 | ✅ 已完成，历史重写并 force-push |
 | v1.4.2 发布 | ✅ 已完成，`main`/tag/release 三处同步 |
-| 给 Maia 的会议邮件（benchmark 设计+结果讨论） | ✅ 已改写，未提交进 git（个人草稿，按需可补提交） |
+| 给 Maia 的会议邮件（benchmark 设计+结果讨论） | ✅ 已改写并提交（`c181948`）且已 push；`[NEW]` 复核 CSV 作为每次运行的含真实 pid 产物已加入 gitignore |
 | 预注册协议（OSF） | 未开始——第一梯队验证清单最后一项，需先跟 Maia 开会决定后续 benchmark 范围 |
 
 ---
