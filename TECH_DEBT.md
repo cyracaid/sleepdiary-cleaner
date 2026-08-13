@@ -14,6 +14,8 @@ Each entry states what the debt is, why it exists, and when it should be resolve
 
 `test-script-copies-in-sync.R` enforces byte-identical copies and fails on any new divergence (`KNOWN_DIVERGENT` deliberately empty). Historical note: on 2026-08-05 five scripts (apply_metric_review_acceptances, apply_nap_exercise_corrections, apply_second_review, apply_sleep_metric_duration_corrections, calculate_sleep_time_end) diverged — inst/scripts read paths via cfg_get() while root hardcoded filenames; default config hid the difference until `data.files.*` was overridden. Commit 80c7e657. When refactoring, edit both copies and re-run the sync test.
 
+**Local gate (2026-08-13):** `inst/hooks/pre-commit` aborts any commit whose staged files touch a dual-maintained script with only one copy updated — installed via `bash inst/hooks/install-hooks.sh`. CI's sync test still runs on push; the hook just catches the drift before the commit exists.
+
 **File index (both locations):**
 
 | File | Root copy | inst/scripts/ copy |
