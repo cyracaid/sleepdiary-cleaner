@@ -10,7 +10,7 @@
 
 SPL Sleep is a reproducible, auditable R pipeline for cleaning sleep EMA (ecological momentary assessment) diary data. It parses raw bedtime/sleep/awake/get-up timestamps, detects and corrects temporal and duration errors through a transparent human-in-the-loop workflow (every correction stored in a re-readable CSV), computes standard sleep metrics (TST, SOL, WASO, SE), validates self-reported durations, and generates diagnostic and research-ready figures. A schema-validated YAML config maps the pipeline to your dataset without touching code; detection thresholds and their rationale are documented in THRESHOLDS.md, and the input contract in SCHEMA.md.
 
-**v1.4.1 (current)** — bug-fix release on top of the v1.4.0 delivery gate, 190+ tests, R CMD CHECK 0 ERROR / 0 WARNING. v1.4.0 added `finalize_columns()` as Step 10, the column dictionary as single source of truth, reserved affect-layer columns, an export guard against negative signed minutes, and CI-verified delivery wiring. v1.4.1 fixes two review-pipeline bugs found during validation: a silent-misrepair blind spot where a clock time typed into a duration field could be "corrected" into a small, plausible-looking number without ever being flagged for human review, and a defect where the two human-review CSVs were never actually being written to disk despite the pipeline log reporting success. See [releases](https://github.com/cyracaid/sleepdiary-cleaner/releases) for full changelog. Installable via `renv::install("cyracaid/sleepdiary-cleaner")`.
+**v1.4.2 (current)** — tracks the synthetic-error-injection benchmark harness under `validation/synthetic/` (no cleaning-logic change over v1.4.1; the harness itself is what found the two v1.4.1 bugs, and it now lives in the repo with its first-pass results). v1.4.1 was the bug-fix release on top of the v1.4.0 delivery gate: 190+ tests, R CMD CHECK 0 ERROR / 0 WARNING. v1.4.0 added `finalize_columns()` as Step 10, the column dictionary as single source of truth, reserved affect-layer columns, an export guard against negative signed minutes, and CI-verified delivery wiring. v1.4.1 fixed two review-pipeline bugs found during validation: a silent-misrepair blind spot where a clock time typed into a duration field could be "corrected" into a small, plausible-looking number without ever being flagged for human review, and a defect where the two human-review CSVs were never actually being written to disk despite the pipeline log reporting success. See [releases](https://github.com/cyracaid/sleepdiary-cleaner/releases) for full changelog. Installable via `renv::install("cyracaid/sleepdiary-cleaner")`.
 
 ## Phase status
 
@@ -702,6 +702,26 @@ Testing coverage (above) proves the code does what it was designed to do. It doe
 
 Full methodology, numeric results, and disclosed caveats for each completed item are written up in the dated logs under `work_logs/` (start from `work_logs/2026-08-12_week_work_log_summary_EN.md` / Chinese `2026-08-12_week_work_log_summary.md`) and, for the synthetic benchmark specifically, in `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md`.
 
+### Synthetic benchmark — glossary, how to run, where the numbers live
+
+**Glossary (what the headline numbers actually mean).**
+
+- **FCR / FAR_alter** — false-alteration rate: the share of records the pipeline *changes* on clean input. "0/10,000" means zero records were altered on structurally-clean synthetic data (rule-of-three 95% upper bound ≈ 0.03%). Any correction on clean input would be pure iatrogenic damage.
+- **Misrepaired vs. flagged vs. missed** — the three-way split of a false correction: *silently altered to a wrong value* (worst — no human ever sees it) vs. *flagged for review but not auto-fixed* (catchable by a human) vs. *missed entirely* (no signal at all). These have very different severities and get conflated if reported as one number.
+- **Enriched sampling** — each of the 12 error categories is injected to a fixed target count (e.g. 400), not at the empirically observed real-world rate. Rare error types would otherwise get too few samples to measure; the per-category table therefore reports detection rates, not prevalence.
+- **L1/L2/L3** — verification depth tiers: L1 = any flag raised, L3 = value corrected correctly, L2 = *type* also correct. The first-pass benchmark covers L1 and L3; L2 is still future work.
+
+**How to run it.**
+
+```r
+# from the repo root, after renv::restore() and installing splsleep
+Rscript validation/synthetic/run_one.R <input.rds> <project_dir> <label>
+```
+
+The four scripts, in dependency order: `generate_clean_data.R` (builds parameterized clean data, `mode=pure` vs `mode=plausible` populations), `inject_errors.R` (participant-clustered injection, one ground-truth row per injected error), `evaluate_fcr.R` (false-alteration rate), `evaluate_detection.R` (per-category detection/recall). Do **not** pre-create empty manual-correction CSVs — the pipeline treats a *missing* manual-correction file as "no human review layer" (`file.exists()`-guarded fallback), whereas an empty file triggers a `readr` column-type error (see the header comment in `run_one.R`). Each dataset gets its own `project_dir` so `output/` is never overwritten.
+
+**Where the numbers live** — in `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md`: Test A (FCR on 10,000 structurally-pure records), Test B (flag-rate gradient across 4 populations, including the 26× gap on the insomnia-like population), the 12-category detection table, and the pre/post-patch comparison table for the two v1.4.1 fixes.
+
 ## Renv Reproducibility
 
 ```r
@@ -720,7 +740,7 @@ MIT
 
 自动化的睡眠 EMA 日记数据清洗管线：解析原始就寝/入睡/醒来/起床时间戳，检测并修正时序和时长错误，计算睡眠指标（TST、SOL、WASO、SE），验证自报时长，生成诊断与科研图表。
 
-**v1.4.1（当前版本）** — 在 v1.4.0 交付门基础上的 bug 修复版本，190+ 个测试，R CMD CHECK 0 ERROR / 0 WARNING。v1.4.0 新增了 `finalize_columns()`（Step 10）、作为唯一事实来源的列字典、保留的 affect 层列、负数导出门、以及 CI 校验的交付接线。v1.4.1 修复了验证过程中发现的两处人工复核环节 bug：一处是时钟时间误填进时长字段后会被"修正"成看似合理的小数字、却从未被标记转人工审核的静默误改盲区；另一处是两份人工复核 CSV 实际上从未被写盘，尽管管线日志一直报告"已保存"。完整变更见 [releases](https://github.com/cyracaid/sleepdiary-cleaner/releases)。通过 `renv::install("cyracaid/sleepdiary-cleaner")` 安装。
+**v1.4.2（当前版本）** — 将合成错误注入 benchmark harness 纳入仓库（`validation/synthetic/`，相对 v1.4.1 无清洗逻辑改动；这套 harness 正是揪出 v1.4.1 两个 bug 的工具，现已连同一轮结果入库）。v1.4.1 是在 v1.4.0 交付门基础上的 bug 修复版本，190+ 个测试，R CMD CHECK 0 ERROR / 0 WARNING。v1.4.0 新增了 `finalize_columns()`（Step 10）、作为唯一事实来源的列字典、保留的 affect 层列、负数导出门、以及 CI 校验的交付接线。v1.4.1 修复了验证过程中发现的两处人工复核环节 bug：一处是时钟时间误填进时长字段后会被"修正"成看似合理的小数字、却从未被标记转人工审核的静默误改盲区；另一处是两份人工复核 CSV 实际上从未被写盘，尽管管线日志一直报告"已保存"。完整变更见 [releases](https://github.com/cyracaid/sleepdiary-cleaner/releases)。通过 `renv::install("cyracaid/sleepdiary-cleaner")` 安装。
 
 ## 功能特性
 
@@ -1055,6 +1075,26 @@ identical(old$n_clean, new$n_clean)
 | **校准过的注入错误 benchmark + 下游敏感性** | 已知 ground truth 的合成错误注入，按经验观察到的错误率校准；下游睡眠指标（TST/SOL/WASO/SE）对清洗管线选择的敏感性。 | 🟡 第一轮已完成：结构纯净合成数据 10,000 条，零误改；12 类注入错误的逐类检测结果；靠这套 harness 真的揪出并修好了 2 个 bug（field-misentry 静默误修率修补前 95.8%/96.0%，修补后 3.5%/0%——已随 v1.4.1 发布）。完整的 recall/specificity/PPV 曲线、cluster bootstrap、multiverse、下游敏感性分析还没开始。Harness 和结果见 `validation/synthetic/` |
 
 已完成项目的完整方法、具体数字结果与已披露的局限性，写在 `work_logs/` 下按日期归档的日志里（从 `work_logs/2026-08-12_week_work_log_summary.md` / 英文版 `2026-08-12_week_work_log_summary_EN.md` 看起）；合成 benchmark 部分单独写在 `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md`。
+
+### 合成 benchmark —— 术语、如何运行、数字在哪
+
+**术语（头版数字到底在说什么）。**
+
+- **FCR / FAR_alter** —— 误改率：干净输入上被管线*改动*的记录占比。"0/10,000" 指结构纯净合成数据上零条被改动（rule-of-three 95% 上限 ≈ 0.03%）。干净输入上的任何改动都是纯医源性损伤。
+- **Misrepaired vs. flagged vs. missed** —— 误修的三种形态：*被静默改成错值*（最严重——人工永远看不到）vs. *被标记转人工但未自动修直*（人工可拦截）vs. *完全漏检*（毫无信号）。三者严重度差异极大，合成一个数字会掩盖信号。
+- **Enriched sampling** —— 12 类错误各注入到固定目标数（如每类 400），而非按真实世界观察到的错误率。否则罕见错误类型样本太少测不准；因此逐类表报告的是检出率，不是发生率。
+- **L1/L2/L3** —— 验证深度层级：L1 = 有任意 flag，L3 = 值被正确修正，L2 = *类型*也正确。第一轮 benchmark 覆盖 L1 和 L3；L2 仍属 future work。
+
+**如何运行。**
+
+```r
+# 在仓库根目录，renv::restore() 并安装 splsleep 之后
+Rscript validation/synthetic/run_one.R <input.rds> <project_dir> <label>
+```
+
+四个脚本按依赖顺序：`generate_clean_data.R`（生成参数化干净数据，`mode=pure` vs `mode=plausible` 人群）、`inject_errors.R`（按被试聚类注入，每个注入错误一行 ground truth）、`evaluate_fcr.R`（误改率）、`evaluate_detection.R`（逐类检出/召回）。**不要**预创建空的 manual-correction CSV——管线把*缺失*的 manual-correction 文件当作"无人工复核层"（`file.exists()` 守卫回退），而空文件反而触发 `readr` 列类型报错（详见 `run_one.R` 头部注释）。每个数据集用独立的 `project_dir`，避免 `output/` 被覆盖。
+
+**数字在哪** —— `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md`：Test A（10,000 条结构纯净记录的 FCR）、Test B（4 个人群的 flag rate 梯度，含失眠样人群 26 倍差距）、12 类检出表、以及 v1.4.1 两个修复的前后对照表。
 
 ## 许可证
 
