@@ -57,7 +57,8 @@ test_that("00_MAIN_entry auto-runs the full legacy chain on synthetic data", {
 
   runner <- tempfile("splsmoke_run_", fileext = ".R")
   writeLines(c(
-    "suppressMessages(pkgload::load_all(getwd(), quiet = TRUE))",
+    "root_pkg <- if (basename(getwd()) == 'testthat') dirname(dirname(getwd())) else getwd()",
+    "suppressMessages(pkgload::load_all(root_pkg, quiet = TRUE))",
     "library(splsleep)",
     sprintf("setwd(%s)", shQuote(sandbox)),
     sprintf("assign('splsleep_scripts_dir', %s, envir = .GlobalEnv)",

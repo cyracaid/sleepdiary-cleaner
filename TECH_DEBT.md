@@ -102,6 +102,17 @@ unit-tested from the package; drift between copies was only half-gated.
 ---
 
 ## 5. Two parallel pipeline implementations
+
+**Status: RESOLVED (2026-08-13).** `.run_pipeline_internal()` in
+00_MAIN_entry.R (a ~20KB self-contained re-implementation of the ten
+steps, 16 `source()` calls) is now a thin shim over `run_pipeline()`:
+config comes from `.GlobalEnv$pipeline_config` when the legacy workflow
+assigned it, else the package default. The legacy-entry smoke test
+(2911d06) stays green through the packaged path; the two
+subprocess-based tests also gained an explicit package-root resolution
+(test_dir chdirs, so `load_all(getwd())` inside the subprocess loaded
+the wrong directory and hung).
+
 ## 5. Two parallel pipeline implementations
 
 **Status: OPEN (2026-08-13).** `run_pipeline()` (R/pipeline.R, 8 `source()`

@@ -45,7 +45,8 @@ test_that("legacy chain writes only protocol globals", {
 
   runner <- tempfile("splleak_run_", fileext = ".R")
   writeLines(c(
-    "suppressMessages(pkgload::load_all(getwd(), quiet = TRUE))",
+    "root_pkg <- if (basename(getwd()) == 'testthat') dirname(dirname(getwd())) else getwd()",
+    "suppressMessages(pkgload::load_all(root_pkg, quiet = TRUE))",
     sprintf("setwd(%s)", shQuote(sandbox)),
     sprintf("assign('splsleep_scripts_dir', %s, envir = .GlobalEnv)", shQuote(scripts_dir)),
     "assign('pipeline_config', yaml::read_yaml('pipeline_config.yaml'), envir = .GlobalEnv)",
