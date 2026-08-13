@@ -71,3 +71,124 @@ Deprecation warnings from the cfg fallback are gone; remaining 24 warnings in
 `test-pipeline.R` are pre-existing `mutate()` warnings, unrelated to cfg.
 
 **Last updated:** 2026-08-13
+
+---
+
+## 4. R/steps.R still `.load_script()`s six adapters at runtime
+
+**Status: OPEN (2026-08-13).** Item 2 internalised the two timestamp/interval
+adapters, but six remain loaded from disk on every run:
+
+| Line | Script |
+|------|--------|
+| 158 | `normalize_sleep_time_sequence.R` |
+| 177 | `error_unusual_sleep_time_corrections.R` |
+| 201 | `apply_nap_exercise_corrections.R` |
+| 202 | `apply_sleep_metric_duration_corrections.R` |
+| 203 | `apply_metric_review_acceptances.R` |
+| 226 | `calculate_sleep_time_end.R` |
+
+**Why:** Same historical reason as item 2 — the S3 chain originally sourced
+step scripts. The adapters are large (error_unusual is ~2000 lines) so they
+were left in place when timestamps/intervals were internalised.
+
+**Cost:** Runtime filesystem dependency (installed-package vs source-tree
+resolution); adapter bodies can't be unit-tested or type-checked from the
+package; `test-script-copies-in-sync.R` + the pre-commit hook must keep
+catching drift instead of the package owning the code.
+
+**Resolution:** Same pattern as item 2 — copy bodies verbatim into `R/*.R`,
+call directly from `step_*()` functions. Do the small ones first
+(normalize, calculate_sleep_time_end), error_unusual last. Verify with
+snapshot (13/13 bit-identical) after each.
+
+---
+
+## 5. Two parallel pipeline implementations
+
+**Status: OPEN (2026-08-13).** `run_pipeline()` (R/pipeline.R, 8 `source()`
+calls) and `.run_pipeline_internal()` (00_MAIN_entry.R, 16 `source()` calls)
+are separate implementations of the same 10 steps. The packaged entry wraps
+the S3 chain; the legacy entry re-sources every step itself.
+
+**Why:** 00_MAIN_entry.R predates the package wrapper and was kept for
+back-compat (users `source()` it directly).
+
+**Cost:** Proven by P2: the smoke test caught `.cfg` being used before
+assignment in 00_MAIN_entry's Step 1 — a bug that existed since 2cbe1be8
+(2026-08-06) because the two paths can drift independently. Every fix must
+land in both copies plus the sync gate.
+
+**Resolution options:** (a) make `.run_pipeline_internal()` delegate to the
+packaged `run_pipeline()`, keeping 00_MAIN_entry as a thin shim; (b) deprecate
+00_MAIN_entry entirely once smoke coverage is strong. Option (a) is lower
+risk; the legacy-entry smoke test (2911d06) must stay green either way.
+
+---
+
+## 6. verify_v1_3_snapshot.R carries a local cfg_get() duplicate
+
+**Status: OPEN (2026-08-13).** The snapshot verifier defines its own 3-arg
+`cfg_get(key, default, cfg_arg)` (verify_v1_3_snapshot.R:57 + inst/
+verification copy) that shadows the package version. `cfg_arg` avoids the
+parameter-vs-closure name clash; body logic duplicates R/config.R.
+
+**Why:** The verifier runs standalone (`Rscript verify_v1_3_snapshot.R`)
+without the package attached in the same way as the pipeline, and its closure
+needs the local `cfg` binding.
+
+**Cost:** Package `cfg_get()` semantics change → verifier version drifts
+silently; the sync test only checks the two verifier copies against each
+other, not against R/config.R.
+
+**Resolution:** Export `cfg_get` (already exported) and make the verifier
+call the package version with explicit `cfg`; delete the local definition.
+Requires the verifier to `library(splsleep)` (or `pkgload::load_all`) first —
+it already does for other package functions.
+
+---
+
+## 7. error_unusual publishes results via list2env() to .GlobalEnv
+
+**Status: OPEN (2026-08-13).** `error_unusual_sleep_time_corrections.R:2046`
+does `list2env(results, envir = .GlobalEnv)`, dumping equal_time_df, error_df,
+unusual_df, clean_df, correction_summary (+ reasonable_unusual_df via
+assign) into the global environment. The leakage test (2911d06) whitelists
+these 5 names as the accepted protocol.
+
+**Why:** Legacy data-passing style: downstream steps (checkforerrors,
+visualization) read the dataframes from the global env after the source()
+call, mirroring how the whole legacy chain passes data.
+
+**Cost:** Pollutes the global env; any refactor that adds a new result key
+silently leaks it unless the whitelist is updated; conflicts with package
+namespace hygiene (functions like eval_checkforerrors take the data as
+arguments instead).
+
+**Resolution:** Return the list from a function and pass it into downstream
+steps explicitly (same direction as items 3/4), or at minimum scope the
+names into the source() environment rather than .GlobalEnv. Low priority —
+contained and gated by the leakage test.
+
+---
+
+## 8. 35 pre-existing mutate() warnings in test-pipeline.R
+
+**Status: OPEN (2026-08-13).** `run_pipeline` on synthetic data emits dplyr
+`mutate()` warnings (name-repair / unknown-column style). Count changed
+24 → 35 when the test process locale moved from C to UTF-8
+(helper-locale.R), confirming they are encoding-sensitive noise, not
+cfg-related.
+
+**Why:** Legacy step scripts use `mutate()` with `:=`/`!!` patterns that
+trigger dplyr's name-repair warnings on the synthetic column set.
+
+**Cost:** Hides real warnings in CI output; the warning count is locale-
+dependent so it can't be asserted on.
+
+**Resolution:** Either silence deliberately (`suppressWarnings` around the
+known-benign mutate in the relevant step, with a comment), or fix the
+name-repair root cause (explicit `.name_repair`). Cosmetic; do not block
+release work.
+
+**Last updated:** 2026-08-13
