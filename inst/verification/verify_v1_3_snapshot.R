@@ -226,6 +226,8 @@ cat(sprintf("  Old pipeline elapsed: %.1f s\n", elapsed_old))
 # the legacy pass sourced into the global env).
 rm("normalize_sleep_time_sequence", envir = globalenv())
 rm("calculate_sleep_time_vars_end", envir = globalenv())
+rm(list = c("apply_nap_exercise_corrections", "apply_sleep_metric_duration_corrections",
+            "apply_metric_review_acceptances"), envir = globalenv())
 
 # =========================================================================
 # S3 CHAIN: run_cleaning_chain on same input

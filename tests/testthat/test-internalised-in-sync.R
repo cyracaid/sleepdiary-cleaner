@@ -11,6 +11,9 @@
 pairs <- list(
   list("normalize_sequence.R", "normalize_sleep_time_sequence.R")
   , list("sleep_time_metrics.R", "calculate_sleep_time_end.R")
+  , list("correction_appliers.R", "apply_nap_exercise_corrections.R")
+  , list("correction_appliers.R", "apply_sleep_metric_duration_corrections.R")
+  , list("correction_appliers.R", "apply_metric_review_acceptances.R")
 )
 
 extract_funs <- function(path) {
