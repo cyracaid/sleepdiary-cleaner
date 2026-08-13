@@ -39,20 +39,15 @@ Each entry states what the debt is, why it exists, and when it should be resolve
 
 ## 2. process_timestamp() and process_interval() exist in both R/steps.R and inst/scripts/
 
-**What:** The step adapters `step_process_timestamps()` and `step_process_intervals()` call the original scripts via `.load_script()` → `sys.source()`. The wrapper-first strategy (v1.3.0) intended that after snapshot verification, these bodies would be internalised into `R/steps.R`, eliminating the filesystem `source()` hit.
+**Status: RESOLVED (2026-08-13, commit 5d0e481).** The two adapter bodies are
+internalised: `R/timestamp_parse.R` and `R/interval_parse.R` carry verbatim
+copies, and `step_process_timestamps()` / `step_process_intervals()` call them
+directly — no `.load_script()` filesystem hit remains for these two adapters.
+Snapshot verification (13/13) confirmed bit-identical `corrected_ema_data`.
 
-**Current state:** The adapters still call the original scripts. The snapshot test (v1.3.0) proved bit-identical output, so internalisation is safe.
-
-**Why this debt exists:** The snapshot verification was completed in the same session as the S3 class implementation. Internalising the script bodies was deferred to a follow-up to avoid mixing structural changes with logic migration.
-
-**Resolution plan (v1.4.0):**
-1. Copy the body of `process_timestamp()` into `step_process_timestamps()` in `R/steps.R`.
-2. Copy the body of `process_interval()` into `step_process_intervals()` in `R/steps.R`.
-3. Remove `.load_script()` calls for these two adapters.
-4. Re-run `verify_v1_3_snapshot.R` to confirm output unchanged.
-5. The `inst/scripts/` copies are retained for steps 5/8/9 which still `source()` them.
-
-**Last updated:** 2026-07-28 (v1.3.1)
+The `inst/scripts/` copies are **retained by design**: `00_MAIN_entry.R`, the
+snapshot verifier and `test-interval.R` still `source()` them. Edit both copies
+together; `test-script-copies-in-sync.R` + the pre-commit hook enforce it.
 
 ---
 
