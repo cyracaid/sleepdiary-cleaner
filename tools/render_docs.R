@@ -89,6 +89,18 @@ render_skill_facts <- function(steps, columns, version, n_imports) {
   ))
 }
 
+render_readme_steps_zh <- function(steps) {
+  enc2utf8(unname(c(
+    sprintf("**%d 个步骤**（来源：`inst/steps.yaml`）：", length(steps)),
+    "",
+    "| 步骤 | 名称 | 说明 |",
+    "|------|------|------|",
+    vapply(steps, function(s) {
+      sprintf("| %s | %s | %s |", s$id, s$label, s$description)
+    }, character(1))
+  )))
+}
+
 render_readme_steps <- function(steps) {
   unname(c(
     sprintf("**%d steps** (source: `inst/steps.yaml`):", length(steps)),
@@ -136,6 +148,10 @@ main <- function() {
                     "<!-- AUTO:ARCH_START -->",
                     "<!-- AUTO:ARCH_END -->",
                     render_readme_steps(steps))
+  regenerate_region(readme_path,
+                    "<!-- AUTO:ARCH_ZH_START -->",
+                    "<!-- AUTO:ARCH_ZH_END -->",
+                    render_readme_steps_zh(steps))
 
   cat("Rendered docs from", ver, "-", length(steps), "steps,", length(cols), "columns.\n")
 }

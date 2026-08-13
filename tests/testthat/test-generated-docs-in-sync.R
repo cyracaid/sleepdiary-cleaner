@@ -68,6 +68,22 @@ test_that("README architecture region matches render_docs.R output", {
   expect_identical(committed[i_start:i_end], rendered,
                    info = paste("README architecture drifted. Run: Rscript tools/render_docs.R",
                                 "(also check inst/steps.yaml)"))
+
+  # Chinese architecture region (same single source, localized headers).
+  rendered_zh <- c(
+    "<!-- AUTO:ARCH_ZH_START -->",
+    "",
+    render_readme_steps_zh(steps),
+    "",
+    "<!-- AUTO:ARCH_ZH_END -->"
+  )
+  i_zs <- which(trimws(committed) == "<!-- AUTO:ARCH_ZH_START -->")
+  i_ze <- which(trimws(committed) == "<!-- AUTO:ARCH_ZH_END -->")
+  expect_identical(length(i_zs), 1L, info = "README.md must have one ARCH_ZH_START marker")
+  expect_identical(length(i_ze), 1L, info = "README.md must have one ARCH_ZH_END marker")
+  expect_identical(committed[i_zs:i_ze], rendered_zh,
+                   info = paste("README Chinese architecture drifted. Run: Rscript tools/render_docs.R",
+                                "(also check inst/steps.yaml)"))
 })
 
 test_that("steps.yaml step ids match run_pipeline step markers", {

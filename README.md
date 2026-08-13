@@ -784,7 +784,7 @@ MIT
 
 ## 功能特性
 
-- **9 步管线**：原始数据 → 时间戳解析 → 区间处理 → 时序修正 → 时长修正 → 指标计算 → 自动检测 → 跨被试检查 → 可视化
+- **10 步管线**：原始数据 → 时间戳解析 → 区间处理 → 时序修正 → 时长修正 → 指标计算 → 自动检测 → 跨被试检查 → 可视化
 - **人工修正 CSV 工作流**：审阅决策存储在 CSV 中，每次运行自动读取
 - **可配置阈值**：SOL/SE/TST-TIB 标记阈值、时间戳格式、列名 — 全部通过 YAML 配置
 - **检查点报告器**：每步的 clean/error/unusual/corrected 计数自动打印并保存为 CSV
@@ -816,6 +816,25 @@ MIT
                                                                                     │
                                                                             Step 9: 生成图表
 ```
+
+<!-- AUTO:ARCH_ZH_START -->
+
+**10 个步骤**（来源：`inst/steps.yaml`）：
+
+| 步骤 | 名称 | 说明 |
+|------|------|------|
+| 1 | Load data | .rds/.csv auto-detected; schema validated; optional supplementary file merged |
+| 1.5 | Field-misentry check | SOL/WASO clock-time vs duration-field misentry detection on raw data |
+| 2-4 | Parse & normalize (S3 chain) | Parse timestamps → parse intervals → normalize sequence |
+| 5 | Classify records | Generate manual review CSVs for human approval |
+| 5.75 | Second-review consensus | Apply second-review checklist consensus |
+| 6-7 | Correct & compute metrics (S3 chain) | Manual + duration corrections; TST/SOL/WASO/SE metrics; has_correction enum |
+| 8 | Auto-detect remaining issues | TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED flag classification |
+| 8.5 | Cross-participant consistency check | Global consistency audit across participants |
+| 9 | Generate diagnostic figures | 24 figures + figure_index.png contact sheet + RUN_INFO.txt |
+| 10 | Build delivered datasets | finalize_columns() selects/renames to Dataset A/B per column dictionary |
+
+<!-- AUTO:ARCH_ZH_END -->
 
 ### 分类体系
 
