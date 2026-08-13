@@ -683,7 +683,29 @@ The pipeline includes 190+ testthat expectations across 12 test files, all exerc
 | `test-config-data.R` | Config file loading (RDS/CSV, legacy keys, column mapping, friendly error messages) |
 | `test-script-copies-in-sync.R` | Root and `inst/scripts/` copies of every dual-maintained script stay byte-identical |
 
-Run tests with: `testthat::test_package("splsleep")` (or `library(splsleep); testthat::test_dir("tests/testthat")` — note that `test_dir()` alone does **not** load the package, so run it after `library(splsleep)` or every exported function will fail to resolve).
+Run tests with:
+
+```r
+# Installed-package mode (fast, tests the built package):
+testthat::test_package("splsleep")
+
+# Source-development mode (tests the working tree; use this when editing
+# code — test_dir() alone does NOT load the package, so load it first):
+pkgload::load_all(".")
+testthat::test_dir("tests/testthat")
+
+# Preferred dev workflow (loads source + runs tests in one call, needs
+# devtools installed):
+devtools::test()
+```
+
+Full package check (documentation, examples, tests, and the `verify_reference_fidelity` / dual-copy checks):
+
+```r
+devtools::check()   # needs devtools; equivalently: R CMD check splsleep_*.tar.gz
+```
+
+`devtools` is a development-only tool — it is intentionally **not** a dependency of the package (not in `DESCRIPTION`), so it is never required to install or run splsleep itself.
 
 Snapshot verification (`inst/verification/`, `verify_v1_3_snapshot.R`) confirms the current S3 pipeline chain produces byte-identical output to the legacy pipeline path on real data. `verify_reference_fidelity.R` separately pins each of the 8 core metric formulas against a documented baseline (`--strict` mode is CI-wired).
 
@@ -808,6 +830,29 @@ file.copy(system.file("config_template.yaml", package = "splsleep"), "my_study.y
 # 运行
 run_pipeline(config = "my_study.yaml")
 ```
+
+### 开发者：跑测试
+
+```r
+# 已安装包模式（快，测的是构建好的包）：
+testthat::test_package("splsleep")
+
+# 源码开发模式（测工作区的当前代码；改代码时用这个——
+# test_dir() 单独跑不会自动加载被测包，必须先加载）：
+pkgload::load_all(".")
+testthat::test_dir("tests/testthat")
+
+# 推荐的开发工作流（一次调用完成加载源码 + 跑测试，需要装 devtools）：
+devtools::test()
+```
+
+完整包检查（文档、示例、测试、`verify_reference_fidelity` 与双份脚本一致性校验）：
+
+```r
+devtools::check()   # 需要 devtools；等价于 R CMD check splsleep_*.tar.gz
+```
+
+`devtools` 只是开发期工具——**刻意不**列为包的依赖（不在 `DESCRIPTION` 里），安装或运行 splsleep 本身永远不需要它。
 
 ## 数据说明（纯文字，无真实数据）
 
