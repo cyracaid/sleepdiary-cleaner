@@ -1,71 +1,39 @@
 context("Correction engine — recalculate_and_mark_errors thresholds")
 
-# Inline the core classification logic from recalculate_and_mark_errors().
-# This avoids source()-ing the 2077-line file and its dplyr dependencies.
-# The thresholds being tested are the same ones used in production.
-
+# Thin wrapper over the PRODUCTION classifier (R/manual_corrections.R, formerly
+# inst/scripts/error_unusual_sleep_time_corrections.R). Previously this file
+# hand-transcribed the classification logic, which tested a copy, not the
+# shipped code. Now every scenario runs the real internalised function via
+# splsleep:::, so threshold drift in production fails these tests.
 .classify <- function(bed, sleep, awake, getup) {
-  t <- list(bed = as.POSIXct(bed, tz = "UTC"),
-            sleep = as.POSIXct(sleep, tz = "UTC"),
-            awake = as.POSIXct(awake, tz = "UTC"),
-            getup = as.POSIXct(getup, tz = "UTC"))
+  df <- data.frame(
+    time_bed_corrected   = as.POSIXct(bed,   tz = "UTC"),
+    time_sleep_corrected = as.POSIXct(sleep, tz = "UTC"),
+    time_awake_corrected = as.POSIXct(awake, tz = "UTC"),
+    time_getup_corrected = as.POSIXct(getup, tz = "UTC")
+  )
+  res <- suppressOutput(
+    splsleep:::recalculate_and_mark_errors(
+      df,
+      bed_corr_col   = "time_bed_corrected",
+      sleep_corr_col = "time_sleep_corrected",
+      awake_corr_col = "time_awake_corrected",
+      getup_corr_col = "time_getup_corrected"
+    )
+  )
+  list(
+    is_error     = res$is_error[1],
+    error_type   = res$error_type[1],
+    is_unusual   = res$is_unusual[1],
+    unusual_type = res$unusual_type[1],
+    data_category = res$data_category[1],
+    has_na       = res$has_na[1]
+  )
+}
 
-  has_na <- any(is.na(unlist(t)))
-  if (has_na) return(list(is_error = FALSE, error_type = NA_character_,
-                          is_unusual = FALSE, unusual_type = NA_character_,
-                          data_category = "skipped_na", has_na = TRUE))
-
-  diff_bed_sleep   <- as.numeric(difftime(t$sleep, t$bed, units = "hours"))
-  diff_sleep_awake <- as.numeric(difftime(t$awake, t$sleep, units = "hours"))
-  diff_awake_getup <- as.numeric(difftime(t$getup, t$awake, units = "hours"))
-  order_ok         <- t$bed <= t$sleep && t$sleep <= t$awake && t$awake <= t$getup
-
-  bed_sleep_equal   <- abs(diff_bed_sleep) < 0.01
-  awake_getup_equal <- abs(diff_awake_getup) < 0.01
-  is_equal_time     <- bed_sleep_equal || awake_getup_equal
-
-  order_err     <- !order_ok
-  bed_sleep_err <- abs(diff_bed_sleep) > 7
-  awake_getup_err <- abs(diff_awake_getup) > 7
-  duration_24h  <- abs(diff_sleep_awake) > 24
-
-  n_errors <- sum(order_err, bed_sleep_err, awake_getup_err, duration_24h)
-
-  if (n_errors > 0 && !is_equal_time) {
-    error_type <- if (n_errors > 1) "multiple_errors"
-    else if (order_err) "order_error"
-    else if (bed_sleep_err) "bed_sleep_diff_error"
-    else if (awake_getup_err) "awake_getup_diff_error"
-    else "sleep_awake_24h_error"
-    return(list(is_error = TRUE, error_type = error_type,
-                is_unusual = FALSE, unusual_type = NA_character_,
-                data_category = "error", has_na = FALSE))
-  }
-
-  awake_suspicious <- abs(diff_sleep_awake) < 3 || abs(diff_sleep_awake) > 15
-  bed_suspicious   <- abs(diff_bed_sleep) > 3
-  getup_suspicious <- abs(diff_awake_getup) > 3
-  n_suspicious <- sum(awake_suspicious, bed_suspicious, getup_suspicious)
-
-  if (n_suspicious > 0 && !is_equal_time && n_errors == 0) {
-    unusual_type <- if (n_suspicious > 1) "multiple_suspicious"
-    else if (awake_suspicious) "sleep_awake_suspicious"
-    else if (bed_suspicious) "bed_sleep_suspicious"
-    else "awake_getup_suspicious"
-    return(list(is_error = FALSE, error_type = NA_character_,
-                is_unusual = TRUE, unusual_type = unusual_type,
-                data_category = "unusual", has_na = FALSE))
-  }
-
-  if (is_equal_time) {
-    return(list(is_error = FALSE, error_type = NA_character_,
-                is_unusual = FALSE, unusual_type = NA_character_,
-                data_category = "equal_time_ok", has_na = FALSE))
-  }
-
-  list(is_error = FALSE, error_type = NA_character_,
-       is_unusual = FALSE, unusual_type = NA_character_,
-       data_category = "clean", has_na = FALSE)
+suppressOutput <- function(expr) {
+  capture.output(res <- expr, type = "output")
+  res
 }
 
 test_that("clean record: normal sleep, no flags", {
@@ -125,12 +93,14 @@ test_that("skipped_na: NA timestamp skips all classification", {
   expect_equal(r$data_category, "skipped_na")
 })
 
-test_that("multiple_errors: both order and bed_sleep violated", {
-  # Sleep (14:00) is before bed (22:00) by 8 hours → order_error + bed_sleep_diff_error
+test_that("order_error wins over bed_sleep_diff when both violated", {
+  # Sleep (14:00) is before bed (22:00) by 8 hours -> order AND latency
+  # violated. Production error_type is first-match-wins (case_when), so the
+  # temporal-order branch reports "order_error", not "multiple_errors".
   r <- .classify("2026-01-01 22:00", "2026-01-01 14:00",
                  "2026-01-02 06:00", "2026-01-02 07:00")
   expect_true(r$is_error)
-  expect_equal(r$error_type, "multiple_errors")
+  expect_equal(r$error_type, "order_error")
 })
 
 test_that("bed_sleep_suspicious: latency > 3 hours", {
@@ -145,4 +115,72 @@ test_that("awake_getup_suspicious: > 3h gap after waking", {
                  "2026-01-02 06:00", "2026-01-02 10:00")
   expect_true(r$is_unusual)
   expect_match(r$unusual_type, "awake_getup_suspicious")
+})
+
+test_that("internalised vs script-copy: non-empty corrections bit-identical", {
+  root <- if (basename(getwd()) == "testthat") dirname(dirname(getwd())) else getwd()
+
+  # 20-row synthetic diary. apply_manual_corrections_and_recalculate matches
+  # corrections by pid + day_num (not row_id) and expects the fixed legacy
+  # column names: *_am_hhmm_ampm (raw, only selected) and *_corrected (POSIXct,
+  # actually recalculated). A numeric duration column is required: its absence
+  # makes find_duration_columns() fall back to grepl and pick up the recalc
+  # output column reasonable_sleep_duration (logical), which breaks the
+  # duration-join mutate.
+  bed <- as.POSIXct("2026-01-01 22:00", tz = "UTC") + 0:19 * 3600
+  df <- data.frame(
+    pid = rep(1:5, each = 4),
+    day_num = rep(1:4, times = 5),
+    row_id = 1:20,
+    duration = rep(480, 20),
+    time_bed_am_hhmm_ampm   = bed,
+    time_sleep_am_hhmm_ampm = bed + 3600,
+    time_awake_am_hhmm_ampm = bed + 9 * 3600,
+    time_getup_am_hhmm_ampm = bed + 9.5 * 3600,
+    time_bed_corrected   = bed,
+    time_sleep_corrected = bed + 3600,
+    time_awake_corrected = bed + 9 * 3600,
+    time_getup_corrected = bed + 9.5 * 3600,
+    stringsAsFactors = FALSE
+  )
+  # Row 1 (pid=1, day_num=1): sleep BEFORE bed -> genuine order error that the
+  # case3 swap must fix. correct_value equals the current value, so the swap
+  # alone changes the data (bed <-> sleep exchange).
+  df$time_sleep_corrected[1] <- as.POSIXct("2026-01-01 21:00", tz = "UTC")
+
+  corrections_df <- data.frame(
+    pid = 1, day_num = 1, row_id = 1,
+    correction_type = "case3",
+    solution_humanidentified = "bed/sleep switch",
+    column_to_correct = "time_sleep_corrected",
+    correct_value = "21:00",
+    column_to_correct_2 = NA_character_,
+    correct_value_2 = NA_character_,
+    stringsAsFactors = FALSE
+  )
+
+  script_env <- new.env(parent = globalenv())
+  sys.source(file.path(root, "inst/scripts", "error_unusual_sleep_time_corrections.R"),
+             envir = script_env)
+
+  # write_csv side effect goes to cwd; run in a throwaway dir so the test
+  # tree stays clean.
+  withr::local_dir(tempdir())
+  capture.output(
+    out_script <- script_env$apply_manual_corrections_and_recalculate(df, corrections_df, NULL),
+    type = "output"
+  )
+  capture.output(
+    out_pkg <- splsleep:::apply_manual_corrections_and_recalculate(df, corrections_df, NULL),
+    type = "output"
+  )
+
+  expect_identical(out_pkg, out_script)
+
+  # Prove the branch actually fired: row 1 corrected, order fixed post-swap.
+  expect_true(out_pkg$updated_corrections$manually_corrected[1])
+  corr_row <- out_pkg$corrected_ema_data[1, ]
+  expect_false(corr_row$is_error)
+  expect_equal(corr_row$time_bed_corrected,   as.POSIXct("2026-01-01 21:00", tz = "UTC"))
+  expect_equal(corr_row$time_sleep_corrected, as.POSIXct("2026-01-01 22:00", tz = "UTC"))
 })
