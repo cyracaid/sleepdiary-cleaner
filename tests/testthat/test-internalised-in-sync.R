@@ -10,6 +10,7 @@
 # (file, script) pairs that have been internalised. Extended per task.
 pairs <- list(
   list("normalize_sequence.R", "normalize_sleep_time_sequence.R")
+  , list("sleep_time_metrics.R", "calculate_sleep_time_end.R")
 )
 
 extract_funs <- function(path) {

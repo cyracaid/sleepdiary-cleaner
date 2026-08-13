@@ -222,9 +222,8 @@ step_apply_duration_corrections <- function(x) {
 #' @return A \code{sleep_diary} object.
 #' @export
 step_compute_metrics <- function(x) {
-  env <- .load_script("calculate_sleep_time_end.R")
   .run_step(x, "7", "Compute metrics", function(df) {
-    env$calculate_sleep_time_vars_end(df)
+    calculate_sleep_time_vars_end(df)
   })
 }
 

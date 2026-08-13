@@ -57,9 +57,12 @@ export(validate_thresholds)
 export(write_step_ledger)
 importFrom(dplyr,
   "%>%",
+  between,
   case_when,
+  if_else,
   mutate,
   mutate_at,
+  n,
   one_of,
   rename,
   sym,
@@ -68,8 +71,12 @@ importFrom(dplyr,
 importFrom(lubridate,
   as_datetime,
   days,
+  duration,
   hour,
-  parse_date_time
+  interval,
+  minutes,
+  parse_date_time,
+  period
 )
 importFrom(rlang,
   ":=",
