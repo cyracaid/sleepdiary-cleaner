@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+#
+# pre-commit — root vs inst/scripts copy-consistency gate.
+#
+# The repo root and inst/scripts/ each carry a copy of the same pipeline
+# scripts (00_MAIN_entry.R sources the root copy in dev mode;
+# run_pipeline() ships and sources the inst/scripts copy). A silent
+# divergence means tests and production can execute different cleaning code
+# (see tests/testthat/test-script-copies-in-sync.R for the 2026-08-05
+# incident that motivated this).
+#
+# tests/testthat/test-script-copies-in-sync.R already gates divergence in CI
+# -- but only after a commit is pushed. CI has no chance to stop a commit
+# whose root copy was edited and whose inst/scripts copy was forgotten.
+# This hook fills that local gap: it aborts the commit before it exists.
+#
+# This hook is only ever a failsafe. It shares the exact comparison logic
+# with the CI test, so a hook miss (e.g. hook not installed) is still caught
+# on the next push.
+#
+# Install:  bash inst/hooks/install-hooks.sh
+# Verify:   ls -la .git/hooks/pre-commit
+
+set -euo pipefail
+
+# Resolve the repo root from the hook's own location.
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_ROOT="$(cd "$HOOK_DIR/../.." && pwd)"
+
+cd "$REPO_ROOT"
+
+# Only run when a staged change could have touched either copy. Any script
+# registered in inst/scripts/ counts as a canary: editing one copy and not
+# the other is exactly the failure mode we guard against.
+# Compare basenames so paths like staging/inst/scripts/x.R or root/x.R both
+# match the inst/scripts/ file list.
+staged=$(git diff --cached --name-only | sed 's#.*/##' | sort -u)
+touchable=$(for f in inst/scripts/*.R; do basename "$f"; done | sort -u)
+if [ -z "$(comm -12 <(printf '%s\n' "$staged") <(printf '%s\n' "$touchable"))" ]; then
+  exit 0
+fi
+
+Rscript -e '
+root <- getwd()
+inst_dir <- file.path(root, "inst", "scripts")
+files <- list.files(inst_dir)
+scripts <- files[tools::file_ext(files) == "R"]
+if (length(scripts) == 0) quit(status = 0)
+
+divergent <- character(0)
+for (s in scripts) {
+  root_copy <- file.path(root, s)
+  if (!file.exists(root_copy)) next
+  a <- readLines(root_copy, warn = FALSE)
+  b <- readLines(file.path(inst_dir, s), warn = FALSE)
+  if (!identical(a, b)) divergent <- c(divergent, s)
+}
+
+if (length(divergent) > 0) {
+  cat("pre-commit: root and inst/scripts copies diverged for:\n")
+  cat(paste0("  ", divergent, collapse = "\n"), "\n")
+  cat("The inst/scripts copies are what run_pipeline() ships and runs.\n")
+  cat("Sync the copies (decide which is canonical) before committing.\n")
+  quit(status = 1)
+}
+cat("pre-commit: root and inst/scripts copies are identical.\n")
+'
