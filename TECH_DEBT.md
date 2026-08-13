@@ -53,12 +53,21 @@ together; `test-script-copies-in-sync.R` + the pre-commit hook enforce it.
 
 ## 3. cfg_get() global-environment fallback
 
-**What:** Several `inst/scripts/` files call `cfg_get()` without passing the `cfg` parameter. They rely on the `.GlobalEnv$pipeline_config` fallback, which now emits a deprecation warning in v1.3.1.
+**Status: RESOLVED (2026-08-13, commit 53e6fda).** All `cfg_get()` calls now
+receive `cfg` explicitly — no `.GlobalEnv$pipeline_config` fallback remains in
+pipeline scripts:
 
-**Files affected:** `sleep_visualization.R`, `checkforerrors_processing.R`, `cross_participant_field_misentry_check.R`, `apply_sleep_metric_duration_corrections.R`, `apply_nap_exercise_corrections.R`, `apply_metric_review_acceptances.R`, `apply_second_review.R`, `00_MAIN_entry.R`
+- Function scripts (`apply_metric_review_acceptances`, `apply_nap_exercise`,
+  `apply_sleep_metric_duration_corrections`) take a `cfg = NULL` parameter.
+- Top-level scripts (`cross_participant_field_misentry_check`,
+  `checkforerrors_processing`, `sleep_visualization`) read `.pipeline_cfg`
+  from the source environment; callers inject it before `source()`.
+- `apply_second_review` default `checklist_path` moved out of the signature
+  arg (lazy evaluation couldn't see caller cfg) → `NULL` + resolve inside.
+- `run_visualization()` in `R/pipeline.R` injects `.pipeline_cfg <- env$cfg`
+  before sourcing.
 
-**Why this debt exists:** These scripts are `source()`-d into `run_pipeline()` with `local = TRUE`, so they execute in the calling environment where `pipeline_config` is available. Passing `cfg` explicitly would require changing every script's function signatures.
+Deprecation warnings from the cfg fallback are gone; remaining 24 warnings in
+`test-pipeline.R` are pre-existing `mutate()` warnings, unrelated to cfg.
 
-**Resolution plan (v1.4.0):** When these scripts are migrated away from `source()` (see item 1), their functions will accept `cfg` as an explicit parameter.
-
-**Last updated:** 2026-07-28 (v1.3.1)
+**Last updated:** 2026-08-13
