@@ -59,33 +59,58 @@ importFrom(dplyr,
   "%>%",
   between,
   case_when,
+  distinct,
+  filter,
   if_else,
+  left_join,
   mutate,
   mutate_at,
   n,
   one_of,
+  pull,
   rename,
   row_number,
+  select,
+  summarise,
   sym,
   vars
 )
 importFrom(lubridate,
   as_datetime,
+  date,
   days,
   duration,
   hour,
   hours,
   interval,
+  minute,
   minutes,
   parse_date_time,
-  period
+  period,
+  second,
+  ymd_hms
+)
+importFrom(readr,
+  cols,
+  write_csv
 )
 importFrom(rlang,
   ":=",
   sym
 )
-importFrom(stats,setNames)
-importFrom(stringr,str_replace)
+importFrom(stats,
+  setNames,
+  update
+)
+importFrom(stringr,
+  str_detect,
+  str_extract_all,
+  str_match,
+  str_replace,
+  str_replace_all,
+  str_split,
+  str_trim
+)
 importFrom(tidyr,
   complete,
   separate

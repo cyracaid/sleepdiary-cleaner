@@ -173,9 +173,8 @@ step_normalize_sequence <- function(x, flip_gap_hours = NULL) {
 #' @return A \code{sleep_diary} object.
 #' @export
 step_apply_corrections <- function(x, corrections_df, manual_unusual_df) {
-  env <- .load_script("error_unusual_sleep_time_corrections.R")
   .run_step(x, "6", "Manual corrections", function(df) {
-    res <- env$apply_manual_corrections_and_recalculate(
+    res <- apply_manual_corrections_and_recalculate(
       ema_data          = df,
       corrections_df    = corrections_df,
       manual_unusual_df = manual_unusual_df

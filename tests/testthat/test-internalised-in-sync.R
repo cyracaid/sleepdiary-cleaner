@@ -14,6 +14,7 @@ pairs <- list(
   , list("correction_appliers.R", "apply_nap_exercise_corrections.R")
   , list("correction_appliers.R", "apply_sleep_metric_duration_corrections.R")
   , list("correction_appliers.R", "apply_metric_review_acceptances.R")
+  , list("manual_corrections.R", "error_unusual_sleep_time_corrections.R")
 )
 
 extract_funs <- function(path) {
