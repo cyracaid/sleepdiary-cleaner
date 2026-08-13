@@ -15,11 +15,11 @@
 # OUTPUT: corrected_ema_data with nap/exercise values corrected
 # ============================================================================
 
-apply_nap_exercise_corrections <- function(data) {
+apply_nap_exercise_corrections <- function(data, cfg = NULL) {
 
   cat("\n=== Applying nap/exercise manual corrections ===\n")
 
-  corr_file <- cfg_get("data.files.manual_nap_exercise", "manual_nap_exercise_corrections.csv")
+  corr_file <- cfg_get("data.files.manual_nap_exercise", "manual_nap_exercise_corrections.csv", cfg = cfg)
   if (!file.exists(corr_file)) {
     cat(sprintf("  No corrections file found (%s) — skipping\n", corr_file))
     return(data)

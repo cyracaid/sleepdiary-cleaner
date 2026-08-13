@@ -202,9 +202,9 @@ step_apply_duration_corrections <- function(x) {
   dur  <- .load_script("apply_sleep_metric_duration_corrections.R")
   acc  <- .load_script("apply_metric_review_acceptances.R")
   .run_step(x, "6.5", "Duration corrections", function(df) {
-    df <- nap$apply_nap_exercise_corrections(df)
-    df <- dur$apply_sleep_metric_duration_corrections(df)
-    df <- acc$apply_metric_review_acceptances(df)
+    df <- nap$apply_nap_exercise_corrections(df, cfg = x$cfg)
+    df <- dur$apply_sleep_metric_duration_corrections(df, cfg = x$cfg)
+    df <- acc$apply_metric_review_acceptances(df, cfg = x$cfg)
     df
   })
 }

@@ -153,6 +153,7 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   }
 
   # -- Step 1.5: Field-misentry check -----------------------------------
+  .pipeline_cfg <- cfg
   source(file.path(sdir, "cross_participant_field_misentry_check.R"), local = TRUE)
   log_step(df, "1.5", "Field-misentry check", cfg)
 
@@ -304,6 +305,7 @@ run_setup <- function(config = NULL, project_dir = ".") {
 run_visualization <- function(config = NULL, project_dir = ".") {
   env  <- .pipeline_init(config, project_dir, verbose = TRUE)
   on.exit(.pipeline_cleanup(env$old_wd), add = TRUE)
+  .pipeline_cfg <- env$cfg
   source(file.path(env$sdir, "sleep_visualization.R"), local = TRUE)
   invisible(TRUE)
 }

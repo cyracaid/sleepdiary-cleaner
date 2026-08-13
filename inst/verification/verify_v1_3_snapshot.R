@@ -54,9 +54,9 @@ source("R/pipeline_chain.R", local = TRUE)
 init_step_ledger()
 
 # ── Helper: cfg_get ──────────────────────────────────────────────────────
-cfg_get <- function(key, default = NULL) {
+cfg_get <- function(key, default = NULL, cfg_arg = NULL) {
   keys <- strsplit(key, "\\.")[[1]]
-  val <- cfg
+  val <- if (!is.null(cfg_arg)) cfg_arg else cfg
   for (k in keys) {
     if (is.list(val) && k %in% names(val)) val <- val[[k]] else return(default)
   }
@@ -204,11 +204,11 @@ cat(sprintf("  → %d rows x %d columns\n", nrow(corrected_old), ncol(corrected_
 # Step 6.5: Duration corrections
 cat("  Step 6.5: Duration corrections...\n")
 source(file.path(sdir, "apply_nap_exercise_corrections.R"), local = TRUE)
-corrected_old <- apply_nap_exercise_corrections(corrected_old)
+corrected_old <- apply_nap_exercise_corrections(corrected_old, cfg = cfg)
 source(file.path(sdir, "apply_sleep_metric_duration_corrections.R"), local = TRUE)
-corrected_old <- apply_sleep_metric_duration_corrections(corrected_old)
+corrected_old <- apply_sleep_metric_duration_corrections(corrected_old, cfg = cfg)
 source(file.path(sdir, "apply_metric_review_acceptances.R"), local = TRUE)
-corrected_old <- apply_metric_review_acceptances(corrected_old)
+corrected_old <- apply_metric_review_acceptances(corrected_old, cfg = cfg)
 cat(sprintf("  → %d rows x %d columns\n", nrow(corrected_old), ncol(corrected_old)))
 
 # Step 7: Compute metrics

@@ -44,7 +44,7 @@ library(grid)
 theme_set(theme_minimal(base_size = 14))
 
 # Config: use defaults if not running inside run_pipeline()
-if (!exists("pipeline_config")) { pipeline_config <- list() }
+if (!exists(".pipeline_cfg")) { .pipeline_cfg <- list() }
 
 # ============================================================================
 # AUTO-SAVE SETUP
@@ -96,7 +96,7 @@ if (!exists("ema_data_release_timecalc")) {
 # Derive the tag from the configured input file. "unknown" when it cannot be
 # determined -- an honest label beats a confidently wrong one.
 .rds_name <- tryCatch(
-  basename(cfg_get("data.files.main", "", cfg = pipeline_config)),
+  basename(cfg_get("data.files.main", "", cfg = .pipeline_cfg)),
   error = function(e) ""
 )
 .data_tag <- if (!nzchar(.rds_name)) {
@@ -107,7 +107,7 @@ if (!exists("ema_data_release_timecalc")) {
   "real"
 }
 
-output_dir <- figure_run_dir(cfg = pipeline_config, data_tag = .data_tag,
+output_dir <- figure_run_dir(cfg = .pipeline_cfg, data_tag = .data_tag,
                              n_records = .n_records)
 
 # verification_dir is a SIBLING of output_dir, not a child of it (see
@@ -119,7 +119,7 @@ output_dir <- figure_run_dir(cfg = pipeline_config, data_tag = .data_tag,
 # the "History note" in verification_dir/VERIFICATION_*.md). Putting
 # verification_dir outside the wiped path removes the failure mode instead of
 # guarding it -- nothing below can reach it, so nothing needs to preserve it.
-verification_dir <- verification_run_dir(cfg = pipeline_config, data_tag = .data_tag,
+verification_dir <- verification_run_dir(cfg = .pipeline_cfg, data_tag = .data_tag,
                                          n_records = .n_records)
 dir.create(verification_dir, recursive = TRUE, showWarnings = FALSE)
 
@@ -140,7 +140,7 @@ dir.create(file.path(output_dir, "research_ready"),    recursive = TRUE, showWar
 # (skips the plots, logs why) instead of aborting the whole visualization run.
 if (exists("corrected_ema_data", envir = .GlobalEnv)) {
   .ba_result <- tryCatch(
-    validate_thresholds(get("corrected_ema_data", envir = .GlobalEnv), cfg = pipeline_config),
+    validate_thresholds(get("corrected_ema_data", envir = .GlobalEnv), cfg = .pipeline_cfg),
     error = function(e) {
       cat(sprintf("⚠ Bland-Altman validation skipped: %s\n", conditionMessage(e)))
       NULL
@@ -169,9 +169,9 @@ cat(sprintf("\nFigures auto-saving to: %s/\n", output_dir))
 # addresses every figure as "<subdir>/<name>.png", and the README links to the
 # folders rather than to individual files.
 save_png <- function(plot, name, w = NULL, h = NULL, subdir = NULL) {
-  w  <- if (is.null(w)) cfg_get("output.figure.width_inches", 14, cfg = pipeline_config) else w
-  h  <- if (is.null(h)) cfg_get("output.figure.height_inches", 9, cfg = pipeline_config) else h
-  dpi <- cfg_get("output.figure.dpi", 150, cfg = pipeline_config)
+  w  <- if (is.null(w)) cfg_get("output.figure.width_inches", 14, cfg = .pipeline_cfg) else w
+  h  <- if (is.null(h)) cfg_get("output.figure.height_inches", 9, cfg = .pipeline_cfg) else h
+  dpi <- cfg_get("output.figure.dpi", 150, cfg = .pipeline_cfg)
   rel  <- if (is.null(subdir)) paste0(name, ".png") else file.path(subdir, paste0(name, ".png"))
   path <- file.path(output_dir, rel)
   dir.create(dirname(path), showWarnings = FALSE, recursive = TRUE)
@@ -280,7 +280,7 @@ add_quality_flags <- function(data) {
   
   # If flag_severity already computed (by Step 7), skip recomputation
   if (!"flag_severity" %in% names(data)) {
-    .cfg <- get0("pipeline_config", envir = .GlobalEnv, ifnotfound = NULL)
+    .cfg <- .pipeline_cfg
     data$flag_severity <- eval_flag_severity(data, .cfg)
     data$flag_duration_extreme <- eval_duration_extreme(data, .cfg)
   }
@@ -1431,7 +1431,7 @@ if(all(c("sleep_duration_h", "sleep_efficiency_pct", "flag_severity") %in% names
 cat("Generating FIGURE 11 (Flag co-occurrence heatmap)...\n")
 
 if(!"flag_severity" %in% names(clean_df)) {
-  .cfg <- get0("pipeline_config", envir = .GlobalEnv, ifnotfound = NULL)
+  .cfg <- .pipeline_cfg
   clean_df$flag_severity <- eval_flag_severity(clean_df, .cfg)
   clean_df$flag_duration_extreme <- eval_duration_extreme(clean_df, .cfg)
 }
@@ -2844,7 +2844,7 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) && "revi
   sprintf("Records in  : %s", if (is.na(.n_records)) "unknown" else format(.n_records, big.mark = ",")),
   sprintf("Input RDS   : %s", if (nzchar(.rds_name)) .rds_name else "unknown"),
   sprintf("Input CSV   : %s",
-          tryCatch(basename(cfg_get("data.files.extra", "", cfg = pipeline_config)),
+          tryCatch(basename(cfg_get("data.files.extra", "", cfg = .pipeline_cfg)),
                    error = function(e) "unknown")),
   sprintf("Package     : splsleep %s",
           tryCatch(as.character(utils::packageVersion("splsleep")),

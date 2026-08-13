@@ -10,11 +10,11 @@
 # implausible number of minutes and then made TST/SE impossible.
 # ============================================================================
 
-apply_sleep_metric_duration_corrections <- function(data) {
+apply_sleep_metric_duration_corrections <- function(data, cfg = NULL) {
 
   cat("\n=== Applying sleep metric duration corrections ===\n")
 
-  corr_file <- cfg_get("data.files.manual_metric_duration", "manual_sleep_metric_duration_corrections.csv")
+  corr_file <- cfg_get("data.files.manual_metric_duration", "manual_sleep_metric_duration_corrections.csv", cfg = cfg)
   if (!file.exists(corr_file)) {
     cat(sprintf("  No corrections file found (%s) - skipping\n", corr_file))
     return(data)

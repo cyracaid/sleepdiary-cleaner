@@ -105,6 +105,7 @@ multi_process <- function(df, var_list, func, format = NULL) {
   #         This catches "filling in the wrong field" errors that the
   #         MM:SS parser silently "fixes" (630→10.5) without addressing
   #         the underlying cross-field contamination.
+  .pipeline_cfg <- .cfg
   source(file.path(sdir, "cross_participant_field_misentry_check.R"), local = TRUE)
   log_step(df, "1.5", "Field-misentry check", .cfg)
   
@@ -256,11 +257,11 @@ multi_process <- function(df, var_list, func, format = NULL) {
   #         forward so Step 8 does not repeatedly flag rows already judged OK.
   cat("\n=== Step 6.5: Applying manual duration corrections ===\n")
   source(file.path(sdir, "apply_nap_exercise_corrections.R"), local = TRUE)
-  corrected_ema_data <- apply_nap_exercise_corrections(corrected_ema_data)
+  corrected_ema_data <- apply_nap_exercise_corrections(corrected_ema_data, cfg = .cfg)
   source(file.path(sdir, "apply_sleep_metric_duration_corrections.R"), local = TRUE)
-  corrected_ema_data <- apply_sleep_metric_duration_corrections(corrected_ema_data)
+  corrected_ema_data <- apply_sleep_metric_duration_corrections(corrected_ema_data, cfg = .cfg)
   source(file.path(sdir, "apply_metric_review_acceptances.R"), local = TRUE)
-  corrected_ema_data <- apply_metric_review_acceptances(corrected_ema_data)
+  corrected_ema_data <- apply_metric_review_acceptances(corrected_ema_data, cfg = .cfg)
   assign("corrected_ema_data", corrected_ema_data, envir = .GlobalEnv)
   log_step(corrected_ema_data, "6.5", "Duration corrections", .cfg)
   

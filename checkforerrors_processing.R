@@ -106,13 +106,13 @@ fix_substance_text <- function(df, raw_csv_path, val_col, label) {
 }
 
 # Resolve substance column names from config (supports column_mapping)
-.s_col <- function(key, fallback) cfg_get(paste0("column_mapping.substance.", key), fallback)
+.s_col <- function(key, fallback) cfg_get(paste0("column_mapping.substance.", key, cfg = .pipeline_cfg), fallback)
 caf_col <- .s_col("caffeine", "caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1")
 alc_col <- .s_col("alcohol",  "alcoholtoday_PM_NumAlcoholicDrinks_1")
 nic_col <- .s_col("nicotine", "nicotine_amount_pm_doses")
 can_col <- .s_col("cannabis", "cannabis_amount_pm_doses")
 
-  raw_csv <- cfg_get("data.files.extra", "sber_ema_anon_20260227.csv")
+  raw_csv <- cfg_get("data.files.extra", "sber_ema_anon_20260227.csv", cfg = .pipeline_cfg)
 corrected_ema_data <- fix_substance_text(corrected_ema_data, raw_csv,
                                          caf_col, "caffeine")
 
@@ -310,7 +310,7 @@ detect_input_anomaly <- function(df, val_col, label, raw_vals_char = NULL) {
 }
 
 # Load raw CSV values for text-preserving detection
-  raw_csv_fname <- cfg_get("data.files.extra", "sber_ema_anon_20260227.csv")
+  raw_csv_fname <- cfg_get("data.files.extra", "sber_ema_anon_20260227.csv", cfg = .pipeline_cfg)
 raw_csv_data <- NULL
 if (!is.null(raw_csv_fname) && file.exists(raw_csv_fname)) {
   raw_csv_data <- read.csv(raw_csv_fname, stringsAsFactors = FALSE)
@@ -593,7 +593,7 @@ if (all(required_metrics %in% names(data))) {
 
   # C1: SOL
   sol_min <- data$self_diffcalc_sol_minutes
-  sol_excessive <- cfg_get("classification.metric_validation.sol.excessive_minutes", 120)
+  sol_excessive <- cfg_get("classification.metric_validation.sol.excessive_minutes", 120, cfg = .pipeline_cfg)
   sol_cat <- ifelse(is.na(sol_min), "missing",
                     ifelse(sol_min < 0, "negative",
                            ifelse(sol_min == 0, "zero",
@@ -605,9 +605,9 @@ if (all(required_metrics %in% names(data))) {
 
   # C2: Sleep Efficiency
   se_pct <- data$self_diffcalc_sleepefficiency_percent
-  se_insane <- cfg_get("classification.metric_validation.se.insane_negative_percent", -1000)
-  se_min <- cfg_get("classification.metric_validation.se.min_valid_percent", 0)
-  se_max <- cfg_get("classification.metric_validation.se.max_valid_percent", 100)
+  se_insane <- cfg_get("classification.metric_validation.se.insane_negative_percent", -1000, cfg = .pipeline_cfg)
+  se_min <- cfg_get("classification.metric_validation.se.min_valid_percent", 0, cfg = .pipeline_cfg)
+  se_max <- cfg_get("classification.metric_validation.se.max_valid_percent", 100, cfg = .pipeline_cfg)
   se_cat <- ifelse(is.na(se_pct), "missing",
                    ifelse(se_pct < se_insane, "insane_negative",
                           ifelse(se_pct < se_min, "negative",
@@ -620,8 +620,8 @@ if (all(required_metrics %in% names(data))) {
   tst <- data$self_diffcalc_totalsleeptime_minutes
   tib <- data$self_diffcalc_timeinbed_minutes
   ratio <- ifelse(!is.na(tib) & tib > 0, tst / tib, NA_real_)
-  ratio_min <- cfg_get("classification.metric_validation.tst_tib_ratio.min_ratio", 0.5)
-  ratio_max <- cfg_get("classification.metric_validation.tst_tib_ratio.max_ratio", 1.0)
+  ratio_min <- cfg_get("classification.metric_validation.tst_tib_ratio.min_ratio", 0.5, cfg = .pipeline_cfg)
+  ratio_max <- cfg_get("classification.metric_validation.tst_tib_ratio.max_ratio", 1.0, cfg = .pipeline_cfg)
   ratio_cat <- ifelse(is.na(ratio), "missing",
                       ifelse(ratio <= 0, "zero",
                              ifelse(ratio > 0 & ratio < ratio_min, "very_low",
@@ -743,7 +743,7 @@ if ("human_metric_review_status" %in% names(data)) {
 # Path 2: also read manual_metric_review_acceptances.csv to catch any rows
 # that haven't been matched by apply_metric_review_acceptances() yet
 # (runs regardless of Path 1, to cover all accepted rows)
-accept_path <- cfg_get("data.files.manual_metric_accept", "manual_metric_review_acceptances.csv")
+accept_path <- cfg_get("data.files.manual_metric_accept", "manual_metric_review_acceptances.csv", cfg = .pipeline_cfg)
 if (file.exists(accept_path)) {
   metric_acceptances <- read.csv(accept_path, stringsAsFactors = FALSE)
   required_accept_cols <- c("pid", "day_num", "row_id")
@@ -1064,7 +1064,7 @@ if (review_count > 0) {
   sr_ratio_low <- sum(d_flags$tst_tib_ratio_category == "very_low", na.rm = TRUE)
   sr_both <- sum(d_flags$sol_category == "excessive" & d_flags$tst_tib_ratio_category == "very_low", na.rm = TRUE)
   cat(sprintf("    SOL excessive (>&nbsp;%dmin):         %d\n", 
-              cfg_get("classification.metric_validation.sol.excessive_minutes", 120), sr_sol_excessive))
+              cfg_get("classification.metric_validation.sol.excessive_minutes", 120, cfg = .pipeline_cfg), sr_sol_excessive))
   if (sr_both > 0) cat(sprintf("      └─ also with TST/TIB < 0.5:       %d\n", sr_both))
   cat(sprintf("    TST/TIB very_low (<0.5):         %d\n", sr_ratio_low - sr_both))
   cat(sprintf("    ────────────────────────────────\n"))
