@@ -222,6 +222,10 @@ cat(sprintf("  → %d rows x %d columns\n", nrow(corrected_old), ncol(corrected_
 elapsed_old <- as.numeric(difftime(Sys.time(), timer_old, units = "secs"))
 cat(sprintf("  Old pipeline elapsed: %.1f s\n", elapsed_old))
 
+# Force the S3 chain to use the internalised normalize (not the script copy
+# the legacy pass sourced into the global env).
+rm("normalize_sleep_time_sequence", envir = globalenv())
+
 # =========================================================================
 # S3 CHAIN: run_cleaning_chain on same input
 # =========================================================================

@@ -8,6 +8,7 @@ run_pipeline(
   config = NULL,
   project_dir = ".",
   skip_visualization = FALSE,
+  finalize = TRUE,
   verbose = TRUE
 )
 }
@@ -15,26 +16,25 @@ run_pipeline(
 \item{config}{Character or list. Path to a YAML config file, or a config
 list (from \code{load_config()}). If NULL, uses the bundled default.}
 
-\item{project_dir}{Character. Path to the project root containing data
-files. Default: current working directory.}
+\item{project_dir}{Character. Path to the project root. Default ".".}
 
-\item{skip_visualization}{Logical. If TRUE, skip visualization step.}
+\item{skip_visualization}{Logical. If TRUE, skip visualization.}
 
-\item{verbose}{Logical. Print progress messages. Default: TRUE.}
+\item{finalize}{Logical. If TRUE (default) run \code{finalize_columns()} as
+Step 10 and write the delivered datasets. Set FALSE to stop after the
+cleaning run and inspect \code{corrected_ema_data} yourself. Before v1.4
+this step had to be invoked by hand, which meant a plain
+\code{run_pipeline()} produced no Dataset A or B at all.}
+
+\item{verbose}{Logical. Print progress. Default TRUE.}
 }
 \value{
 Invisibly returns TRUE on successful completion.
 }
 \description{
-Executes the complete sleep EMA data cleaning pipeline:
-data loading -> timestamp parsing -> interval processing ->
-temporal correction -> duration correction -> metric computation ->
-auto-detection -> visualization.
-}
-\examples{
-\dontrun{
-run_pipeline()
-run_pipeline("my_config.yaml")
-run_pipeline("path/to/project")
-}
+Executes the complete sleep EMA data cleaning pipeline.
+Steps 2--7 now flow through the S3 chain (v1.3.1), giving every step
+automatic provenance tracking, contract assertions, and a 2.6x speed-up.
+Steps that write files or read human-reviewed CSVs remain as direct
+\code{source()} calls for backward compatibility.
 }

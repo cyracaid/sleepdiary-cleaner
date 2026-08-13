@@ -9,7 +9,7 @@
 
 # (file, script) pairs that have been internalised. Extended per task.
 pairs <- list(
-  # normalized entries added by Tasks 1-4
+  list("normalize_sequence.R", "normalize_sleep_time_sequence.R")
 )
 
 extract_funs <- function(path) {
@@ -20,7 +20,13 @@ extract_funs <- function(path) {
       nm <- as.character(e[[2L]])
       rhs <- e[[3L]]
       if (is.call(rhs) && identical(rhs[[1L]], as.name("function"))) {
-        out[[nm]] <- paste(deparse(e), collapse = "\n")
+        body_txt <- paste(deparse(e), collapse = "\n")
+        # R/ copies drop require()/library() scaffolding (resolved via
+        # @importFrom in the namespace) while legacy scripts keep it; strip
+        # from both sides so the body comparison stays meaningful.
+        lines <- strsplit(body_txt, "\n", fixed = TRUE)[[1]]
+        lines <- lines[!grepl("^\\s*(require|library)\\(", lines)]
+        out[[nm]] <- paste(lines, collapse = "\n")
       }
     }
   }

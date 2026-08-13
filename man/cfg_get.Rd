@@ -2,17 +2,19 @@
 % Please edit documentation in R/config.R
 \name{cfg_get}
 \alias{cfg_get}
-\title{Safe config_get — fetches pipeline_config from global env automatically}
+\title{Safe config_get -- fetches pipeline_config from global env automatically}
 \usage{
 cfg_get(key, default = NULL, cfg = NULL)
 }
 \arguments{
-  \item{key}{Character. Dot-separated key.}
-  \item{default}{Default value if key not found.}
-  \item{cfg}{Optional. A pipeline configuration list. When provided, this
-    is used directly instead of falling back to the global environment.
-    From v1.3.1, passing \code{cfg} explicitly is the preferred path.
-    The global-environment fallback is deprecated and will emit a warning.}
+\item{key}{Character. Dot-separated key.}
+
+\item{default}{Default value if key not found.}
+
+\item{cfg}{Optional. A pipeline configuration list. When provided, this
+is used directly instead of falling back to the global environment.
+**From v1.3.1, passing \code{cfg} explicitly is the preferred path.**
+The global-environment fallback is deprecated and will emit a warning.}
 }
 \value{
 The config value, or \code{default}.

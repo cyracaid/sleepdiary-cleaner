@@ -2,15 +2,19 @@
 % Please edit documentation in R/pipeline.R
 \name{run_report}
 \alias{run_report}
-\title{Run the correction status report}
+\title{Run the reporting stage}
 \usage{
 run_report(config = NULL, project_dir = ".")
 }
 \arguments{
-\item{config}{Character or list. Config path or config list.}
+\item{config}{Character or list. Path to a config YAML, a configuration
+list (from \code{load_config()}), or NULL for the bundled default.}
 
-\item{project_dir}{Character. Path to project root.}
+\item{project_dir}{Character. Path to the project root. Default ".".}
+}
+\value{
+Invisibly TRUE.
 }
 \description{
-Run the correction status report
+Run the reporting stage
 }

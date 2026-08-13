@@ -21,11 +21,11 @@ export(eval_duration_extreme)
 export(eval_field_misentry)
 export(eval_flag_severity)
 export(evaluate_all_standards)
+export(figure12_step_flag_table)
 export(figure_cleaning_effect)
-export(finalize_columns)
 export(figure_pipeline_workflow)
 export(figure_run_dir)
-export(figure12_step_flag_table)
+export(finalize_columns)
 export(flag_statistical_outliers)
 export(get_step_ledger_long)
 export(get_step_ledger_wide)
@@ -55,4 +55,26 @@ export(validate_schema)
 export(validate_sleep_diary)
 export(validate_thresholds)
 export(write_step_ledger)
+importFrom(dplyr,
+  "%>%",
+  case_when,
+  mutate,
+  mutate_at,
+  one_of,
+  rename,
+  sym,
+  vars
+)
+importFrom(lubridate,
+  as_datetime,
+  days,
+  hour,
+  parse_date_time
+)
+importFrom(rlang,
+  ":=",
+  sym
+)
 importFrom(stats,setNames)
+importFrom(stringr,str_replace)
+importFrom(tidyr,separate)

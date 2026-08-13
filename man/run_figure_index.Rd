@@ -2,15 +2,17 @@
 % Please edit documentation in R/pipeline.R
 \name{run_figure_index}
 \alias{run_figure_index}
-\title{Generate the figure index contact sheet}
+\title{Regenerate the figure_index.png contact sheet}
 \usage{
 run_figure_index(viz_dir = "latest_visualization")
 }
 \arguments{
-\item{viz_dir}{Character. Path to the directory containing figure PNGs.
-Default: \code{"latest_visualization"}.}
+\item{viz_dir}{Character. Path to the figure run directory. Default
+\code{"latest_visualization"}.}
+}
+\value{
+Invisibly TRUE.
 }
 \description{
-Builds \code{figure_index.png} in the specified viz directory — a single
-contact-sheet image showing all pipeline figures in a 3-tier layout.
+Regenerate the figure_index.png contact sheet
 }

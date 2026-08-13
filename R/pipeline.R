@@ -291,6 +291,14 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
 
 # -- Sub-pipeline entry points (unchanged behaviour) -------------------------
 
+#' Run the setup-only stage (package / input-file checks)
+#'
+#' Checks R packages and input files without loading or cleaning data.
+#'
+#' @param config Character or list. Path to a config YAML, a configuration
+#'   list (from \code{load_config()}), or NULL for the bundled default.
+#' @param project_dir Character. Path to the project root. Default ".".
+#' @return Invisibly TRUE.
 #' @export
 run_setup <- function(config = NULL, project_dir = ".") {
   env  <- .pipeline_init(config, project_dir, verbose = TRUE)
@@ -301,6 +309,14 @@ run_setup <- function(config = NULL, project_dir = ".") {
   invisible(TRUE)
 }
 
+#' Run only the visualization stage on already-cleaned data
+#'
+#' Loads config + inputs and regenerates the diagnostic figures.
+#'
+#' @param config Character or list. Path to a config YAML, a configuration
+#'   list (from \code{load_config()}), or NULL for the bundled default.
+#' @param project_dir Character. Path to the project root. Default ".".
+#' @return Invisibly TRUE.
 #' @export
 run_visualization <- function(config = NULL, project_dir = ".") {
   env  <- .pipeline_init(config, project_dir, verbose = TRUE)
@@ -310,6 +326,12 @@ run_visualization <- function(config = NULL, project_dir = ".") {
   invisible(TRUE)
 }
 
+#' Run the reporting stage
+#'
+#' @param config Character or list. Path to a config YAML, a configuration
+#'   list (from \code{load_config()}), or NULL for the bundled default.
+#' @param project_dir Character. Path to the project root. Default ".".
+#' @return Invisibly TRUE.
 #' @export
 run_report <- function(config = NULL, project_dir = ".") {
   env  <- .pipeline_init(config, project_dir, verbose = TRUE)
@@ -318,6 +340,11 @@ run_report <- function(config = NULL, project_dir = ".") {
   invisible(TRUE)
 }
 
+#' Regenerate the figure_index.png contact sheet
+#'
+#' @param viz_dir Character. Path to the figure run directory. Default
+#'   \code{"latest_visualization"}.
+#' @return Invisibly TRUE.
 #' @export
 run_figure_index <- function(viz_dir = "latest_visualization") {
   # generate_figure_index is defined in inst/scripts/make_figure_index.R

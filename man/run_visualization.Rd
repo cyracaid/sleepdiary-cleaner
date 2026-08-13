@@ -2,16 +2,19 @@
 % Please edit documentation in R/pipeline.R
 \name{run_visualization}
 \alias{run_visualization}
-\title{Run only the visualization step}
+\title{Run only the visualization stage on already-cleaned data}
 \usage{
 run_visualization(config = NULL, project_dir = ".")
 }
 \arguments{
-\item{config}{Character or list. Config path or config list.}
+\item{config}{Character or list. Path to a config YAML, a configuration
+list (from \code{load_config()}), or NULL for the bundled default.}
 
-\item{project_dir}{Character. Path to project root.}
+\item{project_dir}{Character. Path to the project root. Default ".".}
+}
+\value{
+Invisibly TRUE.
 }
 \description{
-Generates all figures from previously corrected data.
-Requires `corrected_ema_data` and `pipeline_config` in global environment.
+Loads config + inputs and regenerates the diagnostic figures.
 }

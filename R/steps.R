@@ -155,10 +155,9 @@ step_normalize_sequence <- function(x, flip_gap_hours = NULL) {
     flip_gap_hours <- tryCatch(cfg_get("timestamp.sequence.max_gap_hours", 12, cfg = x$cfg),
                                error = function(e) 12)
   }
-  env <- .load_script("normalize_sleep_time_sequence.R")
   .run_step(x, "4", "Normalize sequence", function(df) {
-    env$normalize_sleep_time_sequence(AM_rawdata = df,
-                                      flip_gap_hours = flip_gap_hours)
+    normalize_sleep_time_sequence(AM_rawdata = df,
+                                  flip_gap_hours = flip_gap_hours)
   })
 }
 
