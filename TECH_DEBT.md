@@ -183,11 +183,21 @@ contained and gated by the leakage test.
 
 ## 8. 35 pre-existing mutate() warnings in test-pipeline.R
 
-**Status: OPEN (2026-08-13).** `run_pipeline` on synthetic data emits dplyr
-`mutate()` warnings (name-repair / unknown-column style). Count changed
-24 → 35 when the test process locale moved from C to UTF-8
-(helper-locale.R), confirming they are encoding-sensitive noise, not
-cfg-related.
+**Status: PARTIALLY RESOLVED (2026-08-13).** Two real defects surfaced and
+were fixed while chasing the noise:
+- tidyr `separate()` in `process_interval` warned "Expected 2 pieces" on
+  rows missing the `:` separator; the calculation chain is now wrapped in
+  `suppressWarnings` (three copies: R/interval_parse.R, inst/scripts/,
+  root).
+- P1-B's bulk cfg-threading bug in `checkforerrors_processing.R:109`:
+  `cfg = .pipeline_cfg` was inserted inside `paste0(...)` instead of the
+  `cfg_get()` call, so `.s_col()` kept hitting the deprecated
+  .GlobalEnv fallback; fixed in both copies.
+
+Remaining 29 warnings are framework-level deprecation noise: dplyr
+name-repair inside `mutate()`, ggplot2 `size` aesthetic deprecation and a
+manual-scale "no shared levels" hint in figure code. Cosmetic; not worth
+chasing further.
 
 **Why:** Legacy step scripts use `mutate()` with `:=`/`!!` patterns that
 trigger dplyr's name-repair warnings on the synthetic column set.

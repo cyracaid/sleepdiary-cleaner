@@ -106,7 +106,7 @@ fix_substance_text <- function(df, raw_csv_path, val_col, label) {
 }
 
 # Resolve substance column names from config (supports column_mapping)
-.s_col <- function(key, fallback) cfg_get(paste0("column_mapping.substance.", key, cfg = .pipeline_cfg), fallback)
+.s_col <- function(key, fallback) cfg_get(paste0("column_mapping.substance.", key), fallback, cfg = .pipeline_cfg)
 caf_col <- .s_col("caffeine", "caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1")
 alc_col <- .s_col("alcohol",  "alcoholtoday_PM_NumAlcoholicDrinks_1")
 nic_col <- .s_col("nicotine", "nicotine_amount_pm_doses")

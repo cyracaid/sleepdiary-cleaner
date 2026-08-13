@@ -461,7 +461,7 @@ process_interval<- function(df, varname, format) {
                !!as.symbol(paste0(varname, "_m_num")) := NA_real_,
                !!as.symbol(paste0(varname, "_mincalc")) := NA_real_)
     } else {
-      duration_calculations = data.frame(
+      duration_calculations = suppressWarnings(data.frame(
         temp_col = interval_working_df[, varname],
         corrections = interval_working_df[, "corrections"], 
         needs_manual_check = interval_working_df[, "needs_manual_check"],
@@ -473,6 +473,7 @@ process_interval<- function(df, varname, format) {
         mutate(!!as.symbol(paste0(varname, "_h_num")) := as.numeric(!!as.symbol((paste0(varname, "_h"))))) %>%
         mutate(!!as.symbol(paste0(varname, "_m_num")) := as.numeric(!!as.symbol((paste0(varname, "_m"))))) %>%
         mutate(!!as.symbol(paste0(varname, "_mincalc")) := (!!as.symbol((paste0(varname, "_h_num")))*60) + !!as.symbol((paste0(varname, "_m_num"))))
+      )
     }
     
     # Sleep metric duration fields have one recurring edge case: participants
