@@ -55,26 +55,16 @@ options(splsleep.verbose = FALSE)
 suppressMessages(pkgload::load_all(".", quiet = TRUE))
 init_step_ledger()
 
-# ── Helper: cfg_get ──────────────────────────────────────────────────────
-cfg_get <- function(key, default = NULL, cfg_arg = NULL) {
-  keys <- strsplit(key, "\\.")[[1]]
-  val <- if (!is.null(cfg_arg)) cfg_arg else cfg
-  for (k in keys) {
-    if (is.list(val) && k %in% names(val)) val <- val[[k]] else return(default)
-  }
-  if (is.null(val)) default else val
-}
-
 # ── Helper: figure_run_dir / verification_run_dir ─────────────────────────
 # Single source of truth: sourced from R/config.R rather than duplicated
 # here. Before 2026-08-11 this script carried its own inline copy of
 # figure_run_dir(), which had already drifted from R/config.R once (the
 # routing for an "unknown" data_tag differed between the two). Loaded into a
-# private environment so R/config.R's own cfg_get()/config_get() (3-arg
-# signature, cfg-object based) do not shadow this script's simpler local
-# cfg_get() (2-arg, closes over `cfg` directly) used everywhere else below --
-# only figure_run_dir/verification_run_dir are pulled out, as thin wrappers
-# matching this script's existing calling convention.
+# private environment so their internal cfg_get() calls resolve against the
+# sourced copy, not the package namespace; only figure_run_dir/
+# verification_run_dir are pulled out, as thin wrappers passing `cfg`
+# explicitly. cfg_get() below is the PACKAGE version called with cfg = cfg
+# (local duplicate removed, TECH_DEBT 6).
 .cfg_helpers <- new.env()
 if (!file.exists("R/config.R")) {
   stop("R/config.R not found. This script must be run from the splsleep ",
@@ -88,7 +78,7 @@ verification_run_dir <- function(data_tag, n_records = NULL)
   .cfg_helpers$verification_run_dir(cfg = cfg, data_tag = data_tag, n_records = n_records)
 
 # Derive the run tag from the configured input file (same rule as the pipeline).
-.snap_rds_name <- basename(cfg_get("data.files.main", ""))
+.snap_rds_name <- basename(cfg_get("data.files.main", "", cfg = cfg))
 .snap_tag <- if (!nzchar(.snap_rds_name)) {
   "unknown"
 } else if (grepl("synthetic|synth|stub|demo|example", .snap_rds_name, ignore.case = TRUE)) {
@@ -107,8 +97,8 @@ multi_process <- function(df, var_list, func, format = NULL) {
 
 # ── Load data (replicating old pipeline Step 1) ──────────────────────────
 cat("\nLoading synthetic data...\n")
-rds_file <- cfg_get("data.files.main")
-csv_file <- cfg_get("data.files.extra")
+rds_file <- cfg_get("data.files.main", cfg = cfg)
+csv_file <- cfg_get("data.files.extra", cfg = cfg)
 
 df_old <- readRDS(rds_file)
 cat(sprintf("  RDS: %d rows x %d columns\n", nrow(df_old), ncol(df_old)))
@@ -136,8 +126,8 @@ cat(sprintf("  Input data: %d rows x %d columns\n", nrow(df_s3), ncol(df_s3)))
 #
 # Old pipeline fallback: `cat(...); tibble()` which creates TRUE 0×0 tibble.
 # We replicate that exactly.
-manual_error_path <- cfg_get("data.files.manual_error", "manual_error_corrections.csv")
-manual_unusual_path <- cfg_get("data.files.manual_unusual", "manual_unusual_corrections.csv")
+manual_error_path <- cfg_get("data.files.manual_error", "manual_error_corrections.csv", cfg = cfg)
+manual_unusual_path <- cfg_get("data.files.manual_unusual", "manual_unusual_corrections.csv", cfg = cfg)
 
 cat("\nCorrection files:\n")
 cat(sprintf("  Error:  %s (%s)\n", manual_error_path,
@@ -188,7 +178,7 @@ cat(sprintf("  → %d rows x %d columns\n", nrow(ema_timeproc), ncol(ema_timepro
 # Step 4: Normalize sequence
 cat("  Step 4: Normalize sequence...\n")
 source(file.path(sdir, "normalize_sleep_time_sequence.R"), local = TRUE)
-flip_gap <- tryCatch(cfg_get("timestamp.sequence.max_gap_hours", 12), error = function(e) 12)
+flip_gap <- tryCatch(cfg_get("timestamp.sequence.max_gap_hours", 12, cfg = cfg), error = function(e) 12)
 ema_timecalc <- normalize_sleep_time_sequence(AM_rawdata = ema_timeproc, flip_gap_hours = flip_gap)
 cat(sprintf("  → %d rows x %d columns\n", nrow(ema_timecalc), ncol(ema_timecalc)))
 
