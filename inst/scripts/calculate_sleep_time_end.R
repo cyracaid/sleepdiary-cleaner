@@ -68,7 +68,7 @@
 #                                        many brief awakenings.
 # ============================================================================
 
-calculate_sleep_time_vars_end <- function(data) {
+calculate_sleep_time_vars_end <- function(data, cfg = NULL) {
   
   # Load required libraries
   library(dplyr)
@@ -245,7 +245,9 @@ calculate_sleep_time_vars_end <- function(data) {
   )
   
   # ---- Block 2: Flag evaluators (single source of truth) ----
-  cfg <- get0("pipeline_config", envir = .GlobalEnv, ifnotfound = NULL)
+  if (is.null(cfg)) {
+    cfg <- get0("pipeline_config", envir = .GlobalEnv, ifnotfound = NULL)
+  }
   if (!is.null(cfg)) {
     cleaned_data$flag_severity   <- eval_flag_severity(cleaned_data, cfg)
     cleaned_data$flag_duration_extreme <- eval_duration_extreme(cleaned_data, cfg)

@@ -17,6 +17,21 @@ pairs <- list(
   , list("manual_corrections.R", "error_unusual_sleep_time_corrections.R")
 )
 
+# deparse can render the same UTF-8 source as either raw bytes or <U+XXXX>
+# escapes depending on how parse() tagged the string's encoding. Normalise
+# both representations to the same form before comparing, so the gate is
+# immune to encoding-tag flapping (a real source of false results).
+normalize_deparse <- function(d) {
+  repeat {
+    m <- regexpr("<U\\+[0-9A-Fa-f]{4}>", d)
+    if (m == -1) break
+    hit <- regmatches(d, m)
+    code <- strtoi(sub("^<U\\+", "", sub(">$", "", hit)), 16)
+    d <- gsub(hit, intToUtf8(code), d, fixed = TRUE)
+  }
+  enc2utf8(d)
+}
+
 extract_funs <- function(path) {
   exprs <- parse(path)
   out <- list()
@@ -25,13 +40,7 @@ extract_funs <- function(path) {
       nm <- as.character(e[[2L]])
       rhs <- e[[3L]]
       if (is.call(rhs) && identical(rhs[[1L]], as.name("function"))) {
-        body_txt <- paste(deparse(e), collapse = "\n")
-        # R/ copies drop require()/library() scaffolding (resolved via
-        # @importFrom in the namespace) while legacy scripts keep it; strip
-        # from both sides so the body comparison stays meaningful.
-        lines <- strsplit(body_txt, "\n", fixed = TRUE)[[1]]
-        lines <- lines[!grepl("^\\s*(require|library)\\(", lines)]
-        out[[nm]] <- paste(lines, collapse = "\n")
+        out[[nm]] <- normalize_deparse(paste(deparse(e), collapse = "\n"))
       }
     }
   }

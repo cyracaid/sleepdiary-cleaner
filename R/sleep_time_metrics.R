@@ -5,9 +5,8 @@
 # it); R/ and inst/scripts bodies are locked identical by
 # tests/testthat/test-internalised-in-sync.R.
 #
-# NOTE: get0("pipeline_config", envir=.GlobalEnv) inside
-# calculate_sleep_time_vars_end is preserved verbatim (D7) -- it is a known
-# debt tracked separately in TECH_DEBT.md.
+# cfg param (TECH_DEBT #9): explicit cfg wins, .GlobalEnv fallback kept
+# for callers that do not pass one.
 #
 #' @keywords internal
 #' @noRd
@@ -99,7 +98,9 @@ utils::globalVariables(c(
 #                                        many brief awakenings.
 # ============================================================================
 
-calculate_sleep_time_vars_end <- function(data) {
+calculate_sleep_time_vars_end <- function(data, cfg = NULL) {
+  library(dplyr)
+  library(lubridate)
   
   # Load required libraries
 
@@ -275,7 +276,9 @@ calculate_sleep_time_vars_end <- function(data) {
   )
   
   # ---- Block 2: Flag evaluators (single source of truth) ----
-  cfg <- get0("pipeline_config", envir = .GlobalEnv, ifnotfound = NULL)
+  if (is.null(cfg)) {
+    cfg <- get0("pipeline_config", envir = .GlobalEnv, ifnotfound = NULL)
+  }
   if (!is.null(cfg)) {
     cleaned_data$flag_severity   <- eval_flag_severity(cleaned_data, cfg)
     cleaned_data$flag_duration_extreme <- eval_duration_extreme(cleaned_data, cfg)

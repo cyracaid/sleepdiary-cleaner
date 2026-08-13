@@ -46,6 +46,8 @@
 ################################################################################
 
 normalize_sleep_time_sequence <- function(AM_rawdata, flip_gap_hours = 12) {
+  require(dplyr)
+  require(lubridate)
   # Load required libraries
 
 

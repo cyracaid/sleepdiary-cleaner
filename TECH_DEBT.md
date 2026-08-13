@@ -195,7 +195,12 @@ release work.
 
 ## 9. calculate_sleep_time_vars_end reads .GlobalEnv$pipeline_config
 
-**Status: OPEN (2026-08-13).** The internalised
+**Status: RESOLVED (2026-08-13).** Now `function(data, cfg = NULL)` —
+explicit cfg wins, .GlobalEnv fallback kept for callers that do not pass
+one (verified: pipeline corrected_ema_data carries flag_severity +
+flag_duration_extreme via `step_compute_metrics` passing `cfg = x$cfg`).
+
+**Debt (was):** The internalised
 `calculate_sleep_time_vars_end()` (R/sleep_time_metrics.R, verbatim from the
 script) reads `cfg <- get0("pipeline_config", envir = .GlobalEnv,
 ifnotfound = NULL)` and only then computes the `flag_severity` /

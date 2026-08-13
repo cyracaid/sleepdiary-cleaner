@@ -199,7 +199,7 @@ step_apply_duration_corrections <- function(x) {
 #' @export
 step_compute_metrics <- function(x) {
   .run_step(x, "7", "Compute metrics", function(df) {
-    calculate_sleep_time_vars_end(df)
+    calculate_sleep_time_vars_end(df, cfg = x$cfg)
   })
 }
 
