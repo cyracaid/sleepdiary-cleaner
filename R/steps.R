@@ -104,10 +104,9 @@ step_process_timestamps <- function(x,
                                              "time_awake_am", "time_getup_am",
                                              "caffeinetoday_PM", "alcoholtoday_PM",
                                              "nicotine_amount_pm", "cannabis_amount_pm")) {
-  env <- .load_script("process_timestamp_emadatarelease_cyra.R")
   .run_step(x, "2", "Process timestamps", function(df) {
     for (varname in vars) {
-      df <- env$process_timestamp(df, varname = varname, format = "timestamp")
+      df <- process_timestamp(df, varname = varname, format = "timestamp")
     }
     df
   })
@@ -131,11 +130,10 @@ step_process_intervals <- function(x,
                                             "exercisetoday_PM_totalmin_Moderate",
                                             "exercisetoday_PM_totalmin_Vigorous",
                                             "exercisetoday_PM_totalmin_Strength")) {
-  env <- .load_script("process_interval.R")
   .run_step(x, "3", "Process intervals", function(df) {
-    if (!is.function(env$process_interval)) return(df)
+    if (!is.function(process_interval)) return(df)
     for (varname in vars) {
-      df <- env$process_interval(df, varname = varname, format = "interval_hhmm")
+      df <- process_interval(df, varname = varname, format = "interval_hhmm")
     }
     df
   })
