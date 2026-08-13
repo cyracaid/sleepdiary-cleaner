@@ -119,6 +119,10 @@ test_that("awake_getup_suspicious: > 3h gap after waking", {
 
 test_that("internalised vs script-copy: non-empty corrections bit-identical", {
   root <- if (basename(getwd()) == "testthat") dirname(dirname(getwd())) else getwd()
+  # R CMD check runs tests against the built package: the script copies live
+  # in the installed inst/scripts/, not the source tree.
+  scripts_dir_path <- system.file("scripts", package = "splsleep")
+  if (!nzchar(scripts_dir_path)) scripts_dir_path <- file.path(root, "inst", "scripts")
 
   # 20-row synthetic diary. apply_manual_corrections_and_recalculate matches
   # corrections by pid + day_num (not row_id) and expects the fixed legacy
@@ -160,7 +164,7 @@ test_that("internalised vs script-copy: non-empty corrections bit-identical", {
   )
 
   script_env <- new.env(parent = globalenv())
-  sys.source(file.path(root, "inst/scripts", "error_unusual_sleep_time_corrections.R"),
+  sys.source(file.path(scripts_dir_path, "error_unusual_sleep_time_corrections.R"),
              envir = script_env)
 
   # write_csv side effect goes to cwd; run in a throwaway dir so the test
