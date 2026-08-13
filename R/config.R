@@ -112,7 +112,7 @@ cfg_get <- function(key, default = NULL, cfg = NULL) {
 #' @param data_tag Character. "real", "synth", or "unknown".
 #' @param n_records Numeric or NULL. Row count appended to the directory name.
 #' @return Character. Relative path to the figure output directory.
-#' @keywords internal
+#' @export
 figure_run_dir <- function(cfg = NULL, data_tag, n_records = NULL) {
   base <- if (identical(data_tag, "real")) {
     cfg_get("output.figure.root_dir", "output", cfg = cfg)

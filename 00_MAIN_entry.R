@@ -27,6 +27,10 @@ multi_process <- function(df, var_list, func, format = NULL) {
   # Suppress default PDF device (Rplots.pdf) in non-interactive mode
   pdf(NULL)
   
+  # Resolve config early: .resolve_data_key() (Step 1) needs it before the
+  # schema-validation block that re-reads .GlobalEnv$pipeline_config.
+  .cfg <- get0("pipeline_config", envir = .GlobalEnv, ifnotfound = NULL)
+  
   # Start step ledger (for Figure 12 / per-step flag tracking)
   init_step_ledger()
   
@@ -93,7 +97,6 @@ multi_process <- function(df, var_list, func, format = NULL) {
     message("Note: No num_waso_estimate_am column. Average WASO bout metrics will be skipped.")
   }
   # Validate schema right after data loading
-  .cfg <- get0("pipeline_config", envir = .GlobalEnv, ifnotfound = NULL)
   if (!is.null(.cfg)) validate_schema(df, .cfg, label = "Step 1 output")
   log_step(df, "1", "Load data", .cfg)
   
