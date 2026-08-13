@@ -74,6 +74,29 @@ test_that("minor order error -- bed and sleep swapped (< 3h)", {
   expect_true(result$time_bed_corrected[1] < result$time_sleep_corrected[1])
 })
 
+test_that("sleep/awake swap guard -- old awake BEFORE bed: no swap, not corrected", {
+  # Channel B finding: swapping sleep/awake when old awake < bed puts the new
+  # sleep before bed, worsening the SOL gap. Guard must refuse the swap.
+  df <- make_row("05:45", "06:00", "05:30", "06:30")
+  result <- normalize_sleep_time_sequence(df)
+  expect_false(result$corrected[1])
+  expect_true(is.na(result$correction_type[1]))
+  expect_equal(result$time_sleep_corrected[1], result$time_sleep_am_hhmm_ampm[1])
+})
+
+test_that("sleep/awake swap allowed -- old awake AFTER bed: normal swap", {
+  df <- make_row("05:00", "06:00", "05:30", "06:30")
+  result <- normalize_sleep_time_sequence(df)
+  expect_true(result$corrected[1])
+  expect_true(grepl("sleep_awake_swap_3h", result$correction_type[1]))
+  # After swap: sleep = old awake (05:30), awake = old sleep (06:00)
+  expect_equal(result$time_sleep_corrected[1], as.POSIXct("2026-01-01 05:30:00", tz = "UTC"))
+  expect_equal(result$time_awake_corrected[1], as.POSIXct("2026-01-01 06:00:00", tz = "UTC"))
+  # Order restored: bed <= sleep <= awake
+  expect_true(result$time_bed_corrected[1] <= result$time_sleep_corrected[1])
+  expect_true(result$time_sleep_corrected[1] <= result$time_awake_corrected[1])
+})
+
 test_that("bed equals getup -- equal_time edge case, no crash", {
   df <- make_row("22:00", "22:00", "22:00", "22:00")
   result <- normalize_sleep_time_sequence(df)

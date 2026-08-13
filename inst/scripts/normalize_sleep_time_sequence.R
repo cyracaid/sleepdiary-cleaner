@@ -221,7 +221,14 @@ normalize_sleep_time_sequence <- function(AM_rawdata, flip_gap_hours = 12) {
 
       # 5.2 Check sleep-awake order error (difference less than 3 hours)
       sleep_awake_diff <- as.numeric(difftime(awake, sleep, units = "hours"))
-      if (sleep > awake && abs(sleep_awake_diff) < 3) {
+      # Guard (2026-08-13, Channel B redundant-channel validation): swapping
+      # sleep/awake when the old awake value is EARLIER than bed would put the
+      # new sleep time before bed time, making the bed->sleep (SOL) gap worse
+      # than the raw ordering slip. Leave such rows uncorrected; the
+      # downstream temporal-order check flags them for human review instead.
+      # Before this guard, sleep_awake_swap_3h worsened 7/10 real cases
+      # (work_logs/2026-08-12_week_work_log_summary_EN.md).
+      if (sleep > awake && abs(sleep_awake_diff) < 3 && bed <= awake) {
         # Swap sleep and awake
         temp <- sleep
         cleaned_data$time_sleep_corrected[i] <- awake
