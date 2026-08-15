@@ -187,7 +187,20 @@ b4_lines <- c(b4_lines, "",
   "Note: adjacent_swap_sleep_awake guard = 2026-08-13 `bed <= awake` (commit 606a0e0).",
   "field_misentry guard = 2026-06-18 Step 1.5 (A4), residual 3.5% '01:XX' known.",
   "Categories are ENRICHED in the benchmark (400/category) — detection coverage",
-  "is measured in validation/synthetic/results/, not re-derived here.")
+  "is measured in validation/synthetic/results/, not re-derived here.",
+  "",
+  "## Cross-reference: M1–M7 audit findings (2026-08-17)",
+  "",
+  "| catalog category | guarded? | audit finding |",
+  "|---|---|---|",
+  "| adjacent_swap_bed_sleep / sleep_awake / awake_getup | ✅ | **49 real rows** have RAW order violations the pipeline left uncorrected AND unflagged (25 `clean` + 23 `equal_time_ok` + 1 `error`). The guards exist but the >3h-violation rows fall through to \"clean\" — candidate for closed-loop re-injection. |",
+  "| mmss_confusion | ✅ | 35 rows flagged reinterpreted-shaped (M2), all FLAG not AUTO_FIX. |",
+  "| field_misentry_sol | ✅ | 922 rows (M4) have mincalc SOL > bed→sleep window (max 225 min) — SOL value contradicts timestamp window; FLAG-only. |",
+  "| (all) | — | AUTO_FIX = 0 under golden combo M1∧M4∧M5 on real data. M5 (direction validator) blocks every swap candidate. |",
+  "",
+  "**Closed-loop candidate:** add \"adjacent swap with >3h gap, left clean\" as a new",
+  "injector category (observed provenance) and re-run the synthetic benchmark to",
+  "measure whether the pipeline flags or silently passes it.")
 writeLines(b4_lines, "part_b_b4_no_guard_categories.md")
 
 # ── Summary ─────────────────────────────────────────────────────────────────
