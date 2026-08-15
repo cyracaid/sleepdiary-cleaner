@@ -1,11 +1,11 @@
 "metric","est","lo","hi"
-"recall_pooled",0.913382507903056,0.907239971930694,0.919918644092509
+"recall_pooled",0.987144362486828,0.984748912845351,0.989610459383024
 "specificity_control",1,1,1
 "adjacent_swap_time_awake_am_time_getup_am",1,1,1
 "adjacent_swap_time_bed_am_time_sleep_am",1,1,1
 "adjacent_swap_time_sleep_am_time_awake_am",1,1,1
-"ampm_swap",0.435,0.396945079751686,0.4760140625
-"compound_ampm_and_swap",0.69,0.657139905548996,0.723883582089552
+"ampm_swap",1,1,1
+"compound_ampm_and_swap",1,1,1
 "cross_participant_spike",0.878260869565217,0.853982300884956,0.902657940019666
 "field_misentry_sol",0.975,0.963855421686747,0.9877575807651
 "field_misentry_waso",1,1,1

@@ -70,6 +70,7 @@ if (!file.exists(corrected_rds)) {
 }
 corrected <- readRDS(corrected_rds)
 review    <- readRDS(review_rds)
+raw       <- readRDS(corr_rds)   # corrupted input fed to the pipeline
 cat("pipeline output rows:", nrow(corrected), "\n")
 
 # ── Step 3: per-row outcome classification (value-correct + flagged) ────────
@@ -120,11 +121,17 @@ value_correct <- function(gt_row) {
   # multi-field timestamp case: every touched prefix must match its true hhmm+ampm
   ts_fields <- fields[fields %in% names(TS_MAP)]
   prefixes <- unique(sub("_(hhmm|ampm)$", "", ts_fields))
+  rraw <- raw[raw$row_id == rid, , drop = FALSE]
+  if (nrow(rraw) != 1) return(FALSE)
   for (p in prefixes) {
     hf <- paste0(p, "_hhmm"); af <- paste0(p, "_ampm")
     hi <- match(hf, fields); ai <- match(af, fields)
-    want_hhmm <- if (!is.na(hi)) trues[hi] else NA_character_
-    want_ampm <- if (!is.na(ai)) trues[ai] else NA_character_
+    # Fallback to the raw (corrupted-input) value for a component this
+    # injection did NOT touch -- same semantics as evaluate_detection.R
+    # (true_hhmm/true_ampm). ampm_swap only touches the ampm field, so the
+    # hhmm component is absent from the pipe list and must come from raw.
+    want_hhmm <- if (!is.na(hi)) trues[hi] else rraw[[hf]]
+    want_ampm <- if (!is.na(ai)) trues[ai] else rraw[[af]]
     if (is.na(want_hhmm)) return(FALSE)
     cor_col <- TS_MAP[[hf]]
     got <- format(as.POSIXct(rcor[[cor_col]]), "%H:%M")
