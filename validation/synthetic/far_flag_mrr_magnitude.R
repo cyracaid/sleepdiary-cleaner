@@ -171,10 +171,10 @@ mrr_df <- cls %>%
     correct = sum(kind == "CORRECT"),
     missed = sum(kind == "MISSED"),
     mrr = mean(kind == "MISREPAIRED"),
-    mag_median = median(mag[kind == "MISREPAIRED"], na.rm = TRUE),
-    mag_iqr = IQR(mag[kind == "MISREPAIRED"], na.rm = TRUE),
-    mag_max = max(mag[kind == "MISREPAIRED"], na.rm = TRUE),
-    mag_gt_loa = mean(mag[kind == "MISREPAIRED"] > 6.5, na.rm = TRUE),  # LoA half-width ~13min/2
+    mag_median = suppressWarnings(median(mag[kind == "MISREPAIRED"], na.rm = TRUE)),
+    mag_iqr = suppressWarnings(IQR(mag[kind == "MISREPAIRED"], na.rm = TRUE)),
+    mag_max = suppressWarnings(max(mag[kind == "MISREPAIRED"], na.rm = TRUE)),
+    mag_gt_loa = suppressWarnings(mean(mag[kind == "MISREPAIRED"] > 6.5, na.rm = TRUE)),  # LoA half-width ~13min/2
     .groups = "drop"
   ) %>% as.data.frame()
 
