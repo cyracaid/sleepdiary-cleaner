@@ -32,7 +32,8 @@
 #   row_id               – Unique row number.
 ################################################################################
 
-normalize_sleep_time_sequence <- function(AM_rawdata, flip_gap_hours = 12) {
+normalize_sleep_time_sequence <- function(AM_rawdata, flip_gap_hours = 12,
+                                          swap_threshold_hours = 3) {
   # Load required libraries
   require(dplyr)
   require(lubridate)
@@ -206,7 +207,7 @@ normalize_sleep_time_sequence <- function(AM_rawdata, flip_gap_hours = 12) {
       bed_sleep_diff <- as.numeric(difftime(sleep, bed, units = "hours"))
       # bed > sleep: bed time later than sleep time (logical error, should sleep after bed)
       # abs(bed_sleep_diff) < 3: time difference less than 3 hours (small error range)
-      if (bed > sleep && abs(bed_sleep_diff) < 3) { 
+      if (bed > sleep && abs(bed_sleep_diff) < swap_threshold_hours) { 
         # Swap bed and sleep
         temp <- bed
         cleaned_data$time_bed_corrected[i] <- sleep
@@ -228,7 +229,7 @@ normalize_sleep_time_sequence <- function(AM_rawdata, flip_gap_hours = 12) {
       # downstream temporal-order check flags them for human review instead.
       # Before this guard, sleep_awake_swap_3h worsened 7/10 real cases
       # (work_logs/2026-08-12_week_work_log_summary_EN.md).
-      if (sleep > awake && abs(sleep_awake_diff) < 3 && bed <= awake) {
+      if (sleep > awake && abs(sleep_awake_diff) < swap_threshold_hours && bed <= awake) {
         # Swap sleep and awake
         temp <- sleep
         cleaned_data$time_sleep_corrected[i] <- awake
@@ -245,7 +246,7 @@ normalize_sleep_time_sequence <- function(AM_rawdata, flip_gap_hours = 12) {
       awake_getup_diff <- as.numeric(difftime(getup, awake, units = "hours"))
       # awake > getup: awake time later than getup time (logical error, should get up after awake)
       # abs(awake_getup_diff) < 3: time difference less than 3 hours (small error range)
-      if (awake > getup && abs(awake_getup_diff) < 3) {
+      if (awake > getup && abs(awake_getup_diff) < swap_threshold_hours) {
         # Swap awake and getup
         temp <- awake
         cleaned_data$time_awake_corrected[i] <- getup

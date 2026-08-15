@@ -175,6 +175,60 @@ timestamp:
     max_exercise_minutes: 360  # 6 hours
 
 # =============================================================================
+# NORMALIZE SETTINGS
+# =============================================================================
+# Minor order-error correction (Step 4, Section 5 of normalize_sleep_time_sequence)
+normalize:
+  # Absolute gap (hours) below which an out-of-order pair (bed/sleep,
+  # sleep/awake, awake/getup) is corrected by swapping the pair.
+  # Larger violations are left untouched (genuinely unusual sleep patterns).
+  swap_threshold_hours: 3
+
+# =============================================================================
+# CROSS-PARTICIPANT SETTINGS (Step 8.5)
+# =============================================================================
+# Per-metric spike detection against each participant's own baseline.
+# Defaults reproduce the pre-config literals exactly (do not change them
+# unless your study population needs different cutoffs).
+cross_participant:
+  min_days: 3
+  default:
+    min_baseline_for_spike: 5
+    spike_multiplier: 4
+    low_baseline_median_lt: 15
+    low_baseline_value_gt: 180
+  metrics:
+    subjective_sol:
+      spike_abs_threshold: 120
+      low_baseline_median_lt: 30
+      low_baseline_value_gt: 240
+    waso:
+      min_baseline_for_spike: 3
+      spike_abs_threshold: 60
+      low_baseline_median_lt: 15
+      low_baseline_value_gt: 120
+    nap:
+      spike_abs_threshold: 360
+      low_baseline_median_lt: 10
+      low_baseline_value_gt: 360
+    exercise_light:
+      spike_abs_threshold: 240
+      low_baseline_median_lt: 15
+      low_baseline_value_gt: 270
+    exercise_moderate:
+      spike_abs_threshold: 180
+      low_baseline_median_lt: 10
+      low_baseline_value_gt: 210
+    exercise_vigorous:
+      spike_abs_threshold: 120
+      low_baseline_median_lt: 5
+      low_baseline_value_gt: 180
+    exercise_strength:
+      spike_abs_threshold: 120
+      low_baseline_median_lt: 5
+      low_baseline_value_gt: 150
+
+# =============================================================================
 # CLASSIFICATION THRESHOLDS
 # =============================================================================
 classification:

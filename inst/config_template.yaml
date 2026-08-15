@@ -98,3 +98,18 @@ data:
 #     poor_efficiency_threshold_pct: 70
 #     high_sol_threshold_hours: 1
 #     high_waso_threshold_hours: 1.5
+#
+# # Minor order-error swap threshold (Step 4). Gap in hours below which an
+# # out-of-order timestamp pair is corrected by swapping. Default 3.
+# normalize:
+#   swap_threshold_hours: 3
+#
+# # Cross-participant spike detection (Step 8.5). Omit to use the literals
+# # that reproduce pre-config behaviour. Only set values you need to change.
+# cross_participant:
+#   min_days: 3
+#   default:
+#     spike_multiplier: 4
+#   metrics:
+#     subjective_sol:
+#       spike_abs_threshold: 120

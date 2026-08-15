@@ -63,6 +63,15 @@ if ("human_metric_review_status" %in% names(data)) {
 
 # ── Metrics to check ────────────────────────────────────────────────────────
 # Using trust-gated values where available
+# Thresholds now come from config (cross_participant: section). Defaults
+# reproduce the pre-config literals exactly -- only set a value in the config
+# to change behaviour. cfg_get falls back to the literals below when the
+# config lacks the key or is absent (e.g. standalone script runs).
+.cp_cfg <- function(key, default) {
+  tryCatch(cfg_get(paste0("cross_participant.", key), default, cfg = cfg),
+           error = function(e) default)
+}
+
 metrics_to_check <- list(
   # Subjective_SOL is the primary SOL metric.
   # Objective SOL (self_diffcalc_sol_minutes) is included in output columns
@@ -70,91 +79,112 @@ metrics_to_check <- list(
   subjective_sol = list(
     col = "duration_totalmin_sol_estimate_am_mincalc_for_review",
     label = "Subjective_SOL",
-    min_days = 3,
-    min_baseline_for_spike = 5,
-    spike_multiplier = 4,
-    spike_abs_threshold = 120,
+    min_days = .cp_cfg("min_days", 3),
+    min_baseline_for_spike = .cp_cfg("metrics.subjective_sol.min_baseline_for_spike",
+                                     .cp_cfg("default.min_baseline_for_spike", 5)),
+    spike_multiplier = .cp_cfg("default.spike_multiplier", 4),
+    spike_abs_threshold = .cp_cfg("metrics.subjective_sol.spike_abs_threshold", 120),
     low_baseline_override = list(
-      median_lt = 30,
-      value_gt = 240,
+      median_lt = .cp_cfg("metrics.subjective_sol.low_baseline_median_lt",
+                          .cp_cfg("default.low_baseline_median_lt", 15)),
+      value_gt = .cp_cfg("metrics.subjective_sol.low_baseline_value_gt",
+                         .cp_cfg("default.low_baseline_value_gt", 180)),
       label_extra = "low_baseline_extreme"
     )
   ),
   waso = list(
     col = "duration_totalmin_waso_estimate_am_mincalc_used",
     label = "WASO",
-    min_days = 3,
-    min_baseline_for_spike = 3,
-    spike_multiplier = 4,
-    spike_abs_threshold = 60,
+    min_days = .cp_cfg("min_days", 3),
+    min_baseline_for_spike = .cp_cfg("metrics.waso.min_baseline_for_spike",
+                                     .cp_cfg("default.min_baseline_for_spike", 5)),
+    spike_multiplier = .cp_cfg("default.spike_multiplier", 4),
+    spike_abs_threshold = .cp_cfg("metrics.waso.spike_abs_threshold", 60),
     low_baseline_override = list(
-      median_lt = 15,
-      value_gt = 120,
+      median_lt = .cp_cfg("metrics.waso.low_baseline_median_lt",
+                          .cp_cfg("default.low_baseline_median_lt", 15)),
+      value_gt = .cp_cfg("metrics.waso.low_baseline_value_gt",
+                         .cp_cfg("default.low_baseline_value_gt", 180)),
       label_extra = "low_baseline_extreme"
     )
   ),
   nap = list(
     col = "duration_totalmin_napstoday_PM_mincalc",
     label = "Nap",
-    min_days = 3,
-    min_baseline_for_spike = 5,
-    spike_multiplier = 4,
-    spike_abs_threshold = 360,           # 6h+ "nap" is definitely an error
+    min_days = .cp_cfg("min_days", 3),
+    min_baseline_for_spike = .cp_cfg("metrics.nap.min_baseline_for_spike",
+                                     .cp_cfg("default.min_baseline_for_spike", 5)),
+    spike_multiplier = .cp_cfg("default.spike_multiplier", 4),
+    spike_abs_threshold = .cp_cfg("metrics.nap.spike_abs_threshold", 360),
     low_baseline_override = list(
-      median_lt = 10,
-      value_gt = 360,
+      median_lt = .cp_cfg("metrics.nap.low_baseline_median_lt",
+                          .cp_cfg("default.low_baseline_median_lt", 15)),
+      value_gt = .cp_cfg("metrics.nap.low_baseline_value_gt",
+                         .cp_cfg("default.low_baseline_value_gt", 180)),
       label_extra = "low_baseline_extreme"
     )
   ),
   exercise_light = list(
     col = "exercisetoday_PM_totalmin_Light_mincalc",
     label = "Exercise_Light",
-    min_days = 3,
-    min_baseline_for_spike = 5,
-    spike_multiplier = 4,
-    spike_abs_threshold = 240,           # 4h+ light exercise is extreme
+    min_days = .cp_cfg("min_days", 3),
+    min_baseline_for_spike = .cp_cfg("metrics.exercise_light.min_baseline_for_spike",
+                                     .cp_cfg("default.min_baseline_for_spike", 5)),
+    spike_multiplier = .cp_cfg("default.spike_multiplier", 4),
+    spike_abs_threshold = .cp_cfg("metrics.exercise_light.spike_abs_threshold", 240),
     low_baseline_override = list(
-      median_lt = 15,
-      value_gt = 270,
+      median_lt = .cp_cfg("metrics.exercise_light.low_baseline_median_lt",
+                          .cp_cfg("default.low_baseline_median_lt", 15)),
+      value_gt = .cp_cfg("metrics.exercise_light.low_baseline_value_gt",
+                         .cp_cfg("default.low_baseline_value_gt", 180)),
       label_extra = "low_baseline_extreme"
     )
   ),
   exercise_moderate = list(
     col = "exercisetoday_PM_totalmin_Moderate_mincalc",
     label = "Exercise_Moderate",
-    min_days = 3,
-    min_baseline_for_spike = 5,
-    spike_multiplier = 4,
-    spike_abs_threshold = 180,           # 3h+ moderate exercise is extreme
+    min_days = .cp_cfg("min_days", 3),
+    min_baseline_for_spike = .cp_cfg("metrics.exercise_moderate.min_baseline_for_spike",
+                                     .cp_cfg("default.min_baseline_for_spike", 5)),
+    spike_multiplier = .cp_cfg("default.spike_multiplier", 4),
+    spike_abs_threshold = .cp_cfg("metrics.exercise_moderate.spike_abs_threshold", 180),
     low_baseline_override = list(
-      median_lt = 10,
-      value_gt = 210,
+      median_lt = .cp_cfg("metrics.exercise_moderate.low_baseline_median_lt",
+                          .cp_cfg("default.low_baseline_median_lt", 15)),
+      value_gt = .cp_cfg("metrics.exercise_moderate.low_baseline_value_gt",
+                         .cp_cfg("default.low_baseline_value_gt", 180)),
       label_extra = "low_baseline_extreme"
     )
   ),
   exercise_vigorous = list(
     col = "exercisetoday_PM_totalmin_Vigorous_mincalc",
     label = "Exercise_Vigorous",
-    min_days = 3,
-    min_baseline_for_spike = 5,
-    spike_multiplier = 4,
-    spike_abs_threshold = 120,           # 2h+ vigorous is very unusual
+    min_days = .cp_cfg("min_days", 3),
+    min_baseline_for_spike = .cp_cfg("metrics.exercise_vigorous.min_baseline_for_spike",
+                                     .cp_cfg("default.min_baseline_for_spike", 5)),
+    spike_multiplier = .cp_cfg("default.spike_multiplier", 4),
+    spike_abs_threshold = .cp_cfg("metrics.exercise_vigorous.spike_abs_threshold", 120),
     low_baseline_override = list(
-      median_lt = 5,
-      value_gt = 180,
+      median_lt = .cp_cfg("metrics.exercise_vigorous.low_baseline_median_lt",
+                          .cp_cfg("default.low_baseline_median_lt", 15)),
+      value_gt = .cp_cfg("metrics.exercise_vigorous.low_baseline_value_gt",
+                         .cp_cfg("default.low_baseline_value_gt", 180)),
       label_extra = "low_baseline_extreme"
     )
   ),
   exercise_strength = list(
     col = "exercisetoday_PM_totalmin_Strength_mincalc",
     label = "Exercise_Strength",
-    min_days = 3,
-    min_baseline_for_spike = 5,
-    spike_multiplier = 4,
-    spike_abs_threshold = 120,           # 2h+ strength training is extreme
+    min_days = .cp_cfg("min_days", 3),
+    min_baseline_for_spike = .cp_cfg("metrics.exercise_strength.min_baseline_for_spike",
+                                     .cp_cfg("default.min_baseline_for_spike", 5)),
+    spike_multiplier = .cp_cfg("default.spike_multiplier", 4),
+    spike_abs_threshold = .cp_cfg("metrics.exercise_strength.spike_abs_threshold", 120),
     low_baseline_override = list(
-      median_lt = 5,
-      value_gt = 150,
+      median_lt = .cp_cfg("metrics.exercise_strength.low_baseline_median_lt",
+                          .cp_cfg("default.low_baseline_median_lt", 15)),
+      value_gt = .cp_cfg("metrics.exercise_strength.low_baseline_value_gt",
+                         .cp_cfg("default.low_baseline_value_gt", 180)),
       label_extra = "low_baseline_extreme"
     )
   )

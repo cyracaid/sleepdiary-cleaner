@@ -128,16 +128,24 @@ step_process_intervals <- function(x,
 #' @param x A \code{sleep_diary} object.
 #' @param flip_gap_hours Numeric. Gap above which an AM/PM flip is applied.
 #'   Defaults to the configured \code{timestamp.sequence.max_gap_hours}, or 12.
+#' @param swap_threshold_hours Numeric. Absolute gap below which a minor
+#'   order error is corrected by swapping the pair. Defaults to the
+#'   configured \code{normalize.swap_threshold_hours}, or 3.
 #' @return A \code{sleep_diary} object.
 #' @export
-step_normalize_sequence <- function(x, flip_gap_hours = NULL) {
+step_normalize_sequence <- function(x, flip_gap_hours = NULL, swap_threshold_hours = NULL) {
   if (is.null(flip_gap_hours)) {
     flip_gap_hours <- tryCatch(cfg_get("timestamp.sequence.max_gap_hours", 12, cfg = x$cfg),
                                error = function(e) 12)
   }
+  if (is.null(swap_threshold_hours)) {
+    swap_threshold_hours <- tryCatch(cfg_get("normalize.swap_threshold_hours", 3, cfg = x$cfg),
+                                     error = function(e) 3)
+  }
   .run_step(x, "4", "Normalize sequence", function(df) {
     normalize_sleep_time_sequence(AM_rawdata = df,
-                                  flip_gap_hours = flip_gap_hours)
+                                  flip_gap_hours = flip_gap_hours,
+                                  swap_threshold_hours = swap_threshold_hours)
   })
 }
 
