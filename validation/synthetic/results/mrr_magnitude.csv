@@ -1,0 +1,13 @@
+"error_type","n","misrepaired","flagged","correct","missed","mrr","mag_median","mag_iqr","mag_max","mag_gt_loa"
+"adjacent_swap_time_awake_am_time_getup_am",400,0,0,400,0,0,NA,NA,-Inf,NA
+"adjacent_swap_time_bed_am_time_sleep_am",400,0,0,400,0,0,NA,NA,-Inf,NA
+"adjacent_swap_time_sleep_am_time_awake_am",400,0,400,0,0,0,NA,NA,-Inf,NA
+"ampm_swap",400,0,174,226,0,0,NA,NA,-Inf,NA
+"compound_ampm_and_swap",400,0,248,152,0,0,NA,NA,-Inf,NA
+"cross_participant_spike",345,42,303,0,0,0.121739130434783,69.5,15.75,88,1
+"field_misentry_sol",400,10,383,7,0,0.025,43,9.75,64,1
+"field_misentry_waso",400,0,387,13,0,0,NA,NA,-Inf,NA
+"format_malformed_colon",400,0,0,400,0,0,NA,NA,-Inf,NA
+"format_no_colon",400,0,0,400,0,0,NA,NA,-Inf,NA
+"implausible_duration",400,0,400,0,0,0,NA,NA,-Inf,NA
+"mmss_confusion",400,9,13,378,0,0.0225,59,0,59,1
