@@ -159,6 +159,15 @@ inject_ampm_swap <- function(i) {
   TRUE
 }
 
+# clock hh:mm + AM/PM -> minutes since midnight
+to_minutes <- function(hhmm, ampm) {
+  if (is.na(hhmm) || is.na(ampm) || !grepl("^[0-9]{1,2}:[0-9]{2}$", hhmm)) return(NA_real_)
+  h <- as.integer(sub(":.*$", "", hhmm)); m <- as.integer(sub("^.*:", "", hhmm))
+  if (ampm == "PM" && h != 12) h <- h + 12
+  if (ampm == "AM" && h == 12) h <- 0
+  h * 60 + m
+}
+
 inject_adjacent_swap <- function(i, pair) {
   # pair: c("time_bed_am", "time_sleep_am") etc.
   hhmm_a <- paste0(pair[1], "_hhmm"); ampm_a <- paste0(pair[1], "_ampm")
@@ -295,6 +304,57 @@ inject_compound <- function(i) {
 }
 
 # ---------------------------------------------------------------------------
+# adjacent_swap_large_gap -- swap a pair whose gap EXCEEDS the minor-order
+# swap threshold (>3h). The swap rule deliberately leaves >3h violations
+# untouched, so the downstream temporal-order check is the only thing that
+# can catch it. The 2026-08-17 M1-M7 audit found 49 real rows like this that
+# the pipeline left uncorrected AND unflagged (25 clean + 23 equal_time_ok).
+inject_adjacent_swap_large_gap <- function(i) {
+  pair <- sample(list(c("time_bed_am", "time_sleep_am"),
+                       c("time_sleep_am", "time_awake_am"),
+                       c("time_awake_am", "time_getup_am")), 1)[[1]]
+  hhmm_a <- paste0(pair[1], "_hhmm"); ampm_a <- paste0(pair[1], "_ampm")
+  hhmm_b <- paste0(pair[2], "_hhmm"); ampm_b <- paste0(pair[2], "_ampm")
+  orig_a_hhmm <- corrupted[[hhmm_a]][i]; orig_a_ampm <- corrupted[[ampm_a]][i]
+  orig_b_hhmm <- corrupted[[hhmm_b]][i]; orig_b_ampm <- corrupted[[ampm_b]][i]
+  corrupted[[hhmm_a]][i] <<- orig_b_hhmm; corrupted[[ampm_a]][i] <<- orig_b_ampm
+  corrupted[[hhmm_b]][i] <<- orig_a_hhmm; corrupted[[ampm_b]][i] <<- orig_a_ampm
+  gt_add(i, "adjacent_swap_large_gap_left_clean",
+         paste(hhmm_a, ampm_a, hhmm_b, ampm_b, sep = "|"),
+         paste(orig_a_hhmm, orig_a_ampm, orig_b_hhmm, orig_b_ampm, sep = "|"),
+         paste(orig_b_hhmm, orig_b_ampm, orig_a_hhmm, orig_a_ampm, sep = "|"),
+         paste(orig_a_hhmm, orig_a_ampm, orig_b_hhmm, orig_b_ampm, sep = "|"),
+         "observed+blind_spot")
+  TRUE
+}
+
+# ---------------------------------------------------------------------------
+# sol_window_contradiction -- set the SOL duration to a value LARGER than
+# the bed->sleep timestamp window, so the computed SOL cannot fit between
+# bedtime and sleep onset. The 2026-08-17 M1-M7 audit flagged 922 real rows
+# where mincalc SOL (up to 225 min) exceeded the sleep window, most with no
+# pipeline flag. Tests whether that contradiction is surfaced.
+inject_sol_window_contradiction <- function(i) {
+  bed_hhmm <- corrupted$time_bed_am_hhmm[i]; bed_ampm <- corrupted$time_bed_am_ampm[i]
+  slp_hhmm <- corrupted$time_sleep_am_hhmm[i]; slp_ampm <- corrupted$time_sleep_am_ampm[i]
+  if (is.na(bed_hhmm) || is.na(slp_hhmm)) return(FALSE)
+  bed_m <- to_minutes(bed_hhmm, bed_ampm)
+  slp_m <- to_minutes(slp_hhmm, slp_ampm)
+  if (is.na(bed_m) || is.na(slp_m)) return(FALSE)
+  window <- (slp_m - bed_m + 1440) %% 1440
+  if (window <= 5 || window > 300) return(FALSE)   # need a small but valid window
+  # SOL larger than the window, well-formed numeric minutes
+  new_sol <- window + sample(30:120, 1)
+  true_val <- corrupted$duration_totalmin_sol_estimate_am[i]
+  raw_clean <- render_plain(true_val)
+  corrupted$duration_totalmin_sol_estimate_am[i] <<- render_plain(new_sol)
+  gt_add(i, "sol_window_contradiction", "duration_totalmin_sol_estimate_am",
+         raw_clean, render_plain(new_sol), true_val, "observed+blind_spot")
+  TRUE
+}
+
+
+# ---------------------------------------------------------------------------
 # cross_participant_spike -- needs multi-day baseline per participant,
 # computed on the CLEAN pool (pre-corruption), so injection targets are
 # picked using the exact same MAD/median-baseline logic Step 8.5 uses to
@@ -376,7 +436,11 @@ simple_categories <- list(
   list(name = "implausible_duration",
        fn = function(i) inject_implausible_duration(i)),
   list(name = "compound_ampm_and_swap",
-       fn = function(i) inject_compound(i))
+       fn = function(i) inject_compound(i)),
+  list(name = "adjacent_swap_large_gap_left_clean",
+       fn = function(i) inject_adjacent_swap_large_gap(i)),
+  list(name = "sol_window_contradiction",
+       fn = function(i) inject_sol_window_contradiction(i))
 )
 
 log_lines <- character(0)

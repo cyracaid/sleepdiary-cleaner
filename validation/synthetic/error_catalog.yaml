@@ -196,3 +196,31 @@ categories:
       happen to be left over after enrichment sampling.
     fields_affected: []
     rate_anchor_pct: null   # not a real-world rate; this is the complement pool
+
+  adjacent_swap_large_gap_left_clean:
+    provenance: [observed, blind_spot]
+    description: >
+      An adjacent-timestamp pair (bed/sleep, sleep/awake, or awake/getup) is
+      swapped with a gap ABOVE the swap threshold (>3h). The minor-order
+      swap rule deliberately leaves >3h violations untouched, and the
+      downstream temporal-order check is supposed to flag them -- but the
+      2026-08-17 M1-M7 audit found 49 REAL rows with raw order violations
+      that the pipeline left uncorrected AND unflagged, landing in
+      `clean`/`equal_time_ok` with no review marker. This category makes the
+      theoretical gap measurable: does the pipeline flag a >3h adjacent
+      swap, or silently classify it clean?
+    fields_affected: [time_bed, time_sleep, time_awake, time_getup]
+    rate_anchor_pct: 0.35   # 49/13990 in the one real audit run (2026-08-17)
+
+  sol_window_contradiction:
+    provenance: [observed, blind_spot]
+    description: >
+      The computed (mincalc) SOL value exceeds the bed→sleep timestamp
+      window -- i.e. the reported SOL cannot fit between bedtime and sleep
+      onset. The 2026-08-17 M1-M7 audit flagged 922 REAL rows where
+      mincalc SOL (up to 225 min) exceeded the sleep window, none of which
+      were auto-fixed (AUTO_FIX=0 under the golden combo) and most of which
+      carried no flag. Tests whether the pipeline surfaces a
+      SOL-vs-window contradiction or passes it silently.
+    fields_affected: [duration_totalmin_sol_estimate_am, time_bed, time_sleep]
+    rate_anchor_pct: 6.6    # 922/13990 in the one real audit run (2026-08-17)
