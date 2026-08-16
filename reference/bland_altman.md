@@ -45,6 +45,6 @@ bland_altman(data, reported_col, computed_col,
 
 ## References
 
-Bland, J. M., \\ Altman, D. G. (1986). Statistical methods for assessing
+Bland, J. M. and Altman, D. G. (1986). Statistical methods for assessing
 agreement between two methods of clinical measurement. *The Lancet*,
 327(8476), 307-310.
