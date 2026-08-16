@@ -1,0 +1,82 @@
+# Testing Coverage
+
+The pipeline includes 190+ testthat expectations across 12 test files,
+all exercising software correctness — does the code do what it was
+designed to do — as distinct from methodological validity, which is
+covered in the validation-methodology vignette.
+
+``` r
+library(splsleep)
+```
+
+## Test files and coverage
+
+| Test File                          | Coverage                                                                                                                                                          |
+|------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `test-normalize.R`                 | AM/PM correction, minor order errors, midnight crossing, edge cases                                                                                               |
+| `test-interval.R`                  | Colon-format edge cases in duration parsing                                                                                                                       |
+| `test-pipeline.R`                  | End-to-end run on synthetic data, config loading, column adaptation                                                                                               |
+| `test-sleep-diary.R`               | S3 construction, validation, coercion, generics, step-contract assertion, provenance                                                                              |
+| `test-flag-standards.R`            | Flag evaluators for field misentry, data category, duration extreme, flag severity, checkforerrors; step-ledger logging                                           |
+| `test-correction-engine.R`         | Every classification outcome (order/bed-sleep/awake-getup/24h errors, equal-time, unusual, skipped-NA, multiple errors, suspicious-latency flags)                 |
+| `test-classification-thresholds.R` | Boundary behavior at every classification threshold (7h error, 3h/15h unusual, suspicious-latency)                                                                |
+| `test-auto-detection-thresholds.R` | SOL/SE/TST-TIB boundary behavior for the Step 8 auto-detection flags                                                                                              |
+| `test-finalize-columns.R`          | Dictionary ↔︎ delivered-column consistency, A/B join key uniqueness, unit transforms, reserved-column pass-through, export guard, missing/optional-column handling |
+| `test-nonfinite-guards.R`          | NA/Inf handling in duration and flag-severity evaluators (regression tests for two real bugs)                                                                     |
+| `test-config-data.R`               | Config file loading (RDS/CSV, legacy keys, column mapping, friendly error messages)                                                                               |
+| `test-script-copies-in-sync.R`     | Root and `inst/scripts/` copies of every dual-maintained script stay byte-identical                                                                               |
+
+## How to run the tests
+
+``` r
+# Installed-package mode (fast, tests the built package):
+testthat::test_package("splsleep")
+
+# Source-development mode (tests the working tree; use this when editing
+# code — test_dir() alone does NOT load the package, so load it first):
+pkgload::load_all(".")
+testthat::test_dir("tests/testthat")
+
+# Preferred dev workflow (loads source + runs tests in one call, needs
+# devtools installed):
+devtools::test()
+```
+
+Full package check (documentation, examples, tests, and the
+`verify_reference_fidelity` / dual-copy checks):
+
+``` r
+devtools::check()   # needs devtools; equivalently: R CMD check splsleep_*.tar.gz
+```
+
+`devtools` is a development-only tool — it is intentionally **not** a
+dependency of the package (not in `DESCRIPTION`), so it is never
+required to install or run splsleep itself.
+
+## Snapshot verification
+
+Snapshot verification (`inst/verification/`, `verify_v1_3_snapshot.R`)
+confirms the current S3 pipeline chain produces byte-identical output to
+the legacy pipeline path on real data. `verify_reference_fidelity.R`
+separately pins each of the 8 core metric formulas against a documented
+baseline (`--strict` mode is CI-wired).
+
+## 中文 — 测试覆盖率
+
+管线包含 12 个测试文件、190+ 条 testthat
+断言，全部检验软件正确性——代码是否
+按设计跑——区别于方法学效度（后者见验证方法学 vignette）。测试覆盖：AM/PM
+校正 与边界、冒号格式、端到端运行、S3 构造与步骤契约、5 个 flag
+评估器、全部分类 结果、阈值边界、自动检测边界、finalize 交付契约、NA/Inf
+守卫（两个真实 bug 的 回归）、配置加载、双维护脚本字节一致性。
+
+**运行方式**：`testthat::test_package("splsleep")`（已装包，快）/
+`pkgload::load_all(".")` +
+`testthat::test_dir("tests/testthat")`（源码开发）/
+`devtools::test()`（推荐）。完整包检查：`devtools::check()`。`devtools`
+是纯 开发工具，刻意不是包依赖。
+
+**Snapshot 验证**（`verify_v1_3_snapshot.R`）：当前 S3
+管线链与旧管线路径在
+真实数据上输出字节一致（13/13）。`verify_reference_fidelity.R` 单独把 8
+个核心 指标公式钉在文档化基线上（`--strict` 模式已接入 CI）。

@@ -1,0 +1,201 @@
+# Column Mapping, Config & Data Format
+
+splsleep is fully configurable via a YAML configuration file: map your
+dataset’s column names to pipeline internals and adjust thresholds
+without modifying any R code.
+
+``` r
+library(splsleep)
+```
+
+## Install and run
+
+``` r
+# Install from GitHub
+renv::install("cyracaid/sleepdiary-cleaner")
+
+# Load and run
+library(splsleep)
+run_pipeline()
+```
+
+## Using with your own dataset
+
+The pipeline is fully configurable via a YAML configuration file. This
+lets you map your dataset’s column names to pipeline variables and
+adjust thresholds without modifying any R code.
+
+``` r
+# Step 1: Copy the configuration template
+library(splsleep)
+file.copy(system.file("config_template.yaml", package = "splsleep"),
+          "my_study.yaml")
+```
+
+**Step 2: Edit `my_study.yaml`**
+
+The file starts with the only two things you must change:
+
+``` yaml
+data:
+  files:
+    main: "your_data.rds"        # Your sleep diary file (.rds or .csv)
+    extra: ""                    # Leave empty unless StartDate lives in a separate file
+```
+
+Three common scenarios: - **Everything in one file** (most datasets):
+`main: "my_data.rds"`, `extra: ""` - **Data split across two files**:
+`main: "ema_vars.rds"`, `extra: "dates.csv"` - **Your data is a CSV**:
+`main: "my_data.csv"`, `extra: ""` — the `.csv` extension is
+auto-detected
+
+### Column Mapping
+
+Map your dataset’s column names to the pipeline’s internal variables:
+
+``` yaml
+column_mapping:
+  identifiers:
+    pid: "subject_id"          # your participant ID column
+    day_num: "study_day"       # your day number column
+  timestamp:
+    time_bed_hhmm: "bedtime"   # your bedtime HH:MM column
+    time_bed_ampm: "bed_ampm"  # your bedtime AM/PM column
+    time_sleep_hhmm: "sleeptime"
+    time_sleep_ampm: "sleep_ampm"
+  duration:
+    sol: "sleep_onset_latency" # your SOL column (minutes)
+    waso: "wake_after_onset"   # your WASO column (minutes)
+  substance:
+    caffeine: "caffeine_cups"
+    alcohol: "alcohol_drinks"
+```
+
+### Thresholds
+
+Adjust detection sensitivity for your study population:
+
+``` yaml
+classification:
+  metric_validation:
+    sol:
+      excessive_minutes: 120   # SOL > 2h → flagged
+    se:
+      min_valid_percent: 0
+      max_valid_percent: 100
+    tst_tib_ratio:
+      min_ratio: 0.5
+      max_ratio: 1.0
+  flag_severity:
+    poor_efficiency_threshold_pct: 70   # SE < 70% → flag
+    high_sol_threshold_hours: 1         # SOL > 1h → flag
+    high_waso_threshold_hours: 1.5      # WASO > 1.5h → flag
+```
+
+Threshold rationale lives in `THRESHOLDS.md` — defaults are deliberately
+lenient for healthy-adult samples; revisit for clinical populations.
+
+### Timestamp Format
+
+``` yaml
+timestamp:
+  input_format: "hh:mm AM/PM"   # or "HH:MM", "HH:MM:SS"
+  ampm:
+    enabled: true
+    pm_keywords: ["PM", "pm"]
+```
+
+**Step 3: Run with your configuration**
+
+``` r
+run_pipeline(config = "my_study_config.yaml")
+```
+
+All pipeline scripts automatically read the config; no R code changes
+needed.
+
+## Input data structure
+
+**This repository contains no raw participant data.** All CSV files with
+participant data are gitignored. Templates with synthetic data live in
+`templates/`.
+
+| Column group           | Variables                                                                                                                               | Description                                     |
+|------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|
+| Identifiers            | pid, day_num, row_id, participant                                                                                                       | Participant and record IDs                      |
+| Date                   | StartDate                                                                                                                               | Calendar date of the EMA session                |
+| Raw timestamps (HH:MM) | time_bed_am_hhmm, time_sleep_am_hhmm, time_awake_am_hhmm, time_getup_am_hhmm                                                            | Self-reported bed/sleep/awake/getup clock times |
+| Raw timestamps (AM/PM) | time_bed_am_ampm, time_sleep_am_ampm, time_awake_am_ampm, time_getup_am_ampm                                                            | AM/PM indicator for each timestamp              |
+| Raw durations          | duration_totalmin_sol_estimate_am, duration_totalmin_waso_estimate_am                                                                   | Self-reported SOL and WASO in minutes           |
+| Nap/Exercise           | duration_totalmin_napstoday_PM, exercise_PM_totalmin\_\[Light\|Moderate\|Vigorous\|Strength\]                                           | Self-reported nap and exercise durations        |
+| Substance use          | caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1, alcoholtoday_PM_NumAlcoholicDrinks_1, nicotine_amount_pm_doses, cannabis_amount_pm_doses | Self-reported substance use                     |
+| WASO count             | num_waso_estimate_am, num_waso_am                                                                                                       | Number of wake bouts                            |
+
+## Manual correction CSV templates
+
+| Template File                                                     | Live File                                      | Purpose                              |
+|-------------------------------------------------------------------|------------------------------------------------|--------------------------------------|
+| `templates/template_manual_error_corrections.csv`                 | `manual_error_corrections.csv`                 | Timestamp corrections (AM/PM, order) |
+| `templates/template_manual_unusual_corrections.csv`               | `manual_unusual_corrections.csv`               | Accepted unusual patterns            |
+| `templates/template_manual_nap_exercise_corrections.csv`          | `manual_nap_exercise_corrections.csv`          | Nap/exercise duration corrections    |
+| `templates/template_manual_sleep_metric_duration_corrections.csv` | `manual_sleep_metric_duration_corrections.csv` | SOL/WASO metric corrections          |
+| `templates/template_manual_metric_review_acceptances.csv`         | `manual_metric_review_acceptances.csv`         | Human-accepted metric flags          |
+| `templates/template_second_review_checklist.csv`                  | `second_review_checklist.csv`                  | Second-person verification decisions |
+
+## Output
+
+| File                                                           | Contents                                                        |
+|----------------------------------------------------------------|-----------------------------------------------------------------|
+| `output/correction_status_final.csv`                           | Per-run summary: n_total, tst, sol, error/corrected/flag counts |
+| `output/appendix_step_ledger.csv`                              | Per-step flag tracking ledger                                   |
+| `output/flagged_records_self_reported.csv`                     | Records flagged as SELF_REPORTED_FLAG                           |
+| `latest_visualization_*/figure_index.png`                      | Contact-sheet index of all generated figures                    |
+| `output/verification/real_n13990/`, `verification/synth_n280/` | Stable, never-overwritten verification artifacts                |
+
+Key rules the output structure encodes: -
+`latest_visualization_<tag>_n<rows>/` is “latest”, not “history” — wiped
+on every visualization run. - `verification/<tag>_n<rows>/` is a sibling
+that is never touched by the wipe. - Real-tagged output only ever lands
+under `output/` (gitignored); synthetic output routes outside `output/`.
+
+## 中文 — 列映射、配置与数据格式
+
+splsleep 通过 YAML
+配置完全可配置：把数据集的列名映射到管线内部变量、调整 阈值，无需改 R
+代码。
+
+``` r
+# 复制配置模板
+file.copy(system.file("config_template.yaml", package = "splsleep"), "my_study.yaml")
+```
+
+必须改的两项：`data.files.main`（你的数据文件 .rds/.csv）和
+`data.files.extra` （StartDate
+单独文件时填，否则留空）。三种常见场景：单文件、双文件、CSV
+（自动检测扩展名）。
+
+**列映射**：`column_mapping`
+段把标识符（pid/day_num）、时间戳（bed/sleep 的 HH:MM + AM/PM
+列）、时长（SOL/WASO 分钟列）、物质使用列映射到管线内部名。
+
+**阈值**：`classification`
+段调整检测灵敏度。默认值故意宽松（健康成人样本）；
+临床人群需重审（依据见 THRESHOLDS.md）。
+
+**时间戳格式**：`timestamp.input_format` 支持 “hh:mm AM/PM” / “HH:MM” /
+“HH:MM:SS”。
+
+**运行**：`run_pipeline(config = "my_study.yaml")` —
+所有脚本自动读配置。
+
+**输入数据结构**：标识符、日期、原始时间戳（HH:MM + AM/PM
+双列）、原始时长 （SOL/WASO 分钟）、小睡/运动、物质使用、WASO
+次数。仓库不含真实数据，模板 用合成数据（`templates/`）。
+
+**人工修正 CSV**：6 种模板（时间戳修正、异常接受、小睡/运动、SOL/WASO
+指标 修正、指标接受、二次验证清单），模板用合成数据。
+
+**输出**：`correction_status_final.csv`（运行摘要）、`appendix_step_ledger.csv`
+（逐步标记账本）、`flagged_records_self_reported.csv`、图表索引、稳定验证产物
+（snapshot/Bland-Altman/阈值验证，永不被覆盖）。`latest_visualization_*`
+每次 覆盖；`verification_*` 永不触碰。

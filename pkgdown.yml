@@ -2,9 +2,13 @@ pandoc: 3.1.3
 pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
+  column-mapping: column-mapping.html
+  interpreting-output: interpreting-output.html
+  pipeline-architecture: pipeline-architecture.html
+  testing-coverage: testing-coverage.html
   validation-methodology-zh: validation-methodology-zh.html
   validation-methodology: validation-methodology.html
-last_built: 2026-08-16T19:19Z
+last_built: 2026-08-16T19:58Z
 urls:
   reference: https://cyracaid.github.io/sleepdiary-cleaner/reference
   article: https://cyracaid.github.io/sleepdiary-cleaner/articles
