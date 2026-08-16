@@ -118,12 +118,56 @@ for (nm in names(dims)) {
 cat("Surviving dimensions:", paste(keep, collapse = ", "), "\n")
 if (length(keep) == 0) keep <- "D2"  # never collapse to nothing
 
-# ── Phase 2: full factorial on survivors ────────────────────────────────────
-cat("\n=== Multiverse Phase 2: full factorial ===\n")
+# ── Robust survivors (seed-sensitive selection, robustness #2) ───────────────
+# seed_sensitivity.csv shows the OAT survival decision is SEED-SENSITIVE:
+# seed 20260817 -> D1+D2; seed 20260915 -> D1 only. D2 (swap threshold) sits
+# at the 5min/1% edge and flips with the seed. For the MAIN spec curve we
+# only trust dimensions that survive across seeds; the full factorial (incl.
+# the marginal D2) is kept as spec_curve_full.csv appendix.
+robust_keep <- keep
+ss_path <- file.path(SYN, "results", "seed_sensitivity.csv")
+if (file.exists(ss_path)) {
+  ss <- read.csv(ss_path)
+  oat_seeds <- ss$oat_survivors[!is.na(ss$oat_survivors)]
+  seed_sets <- lapply(strsplit(oat_seeds, ","), trimws)
+  across_seeds <- Reduce(intersect, seed_sets)
+  robust_keep <- intersect(keep, across_seeds)
+  cat(sprintf("Seed-sensitive survival: observed sets = %s\n",
+              paste(sprintf("{%s}", oat_seeds), collapse = " ")))
+  if (length(robust_keep) == 0) robust_keep <- "D1"
+  cat("Robust survivors (across seeds):", paste(robust_keep, collapse = ", "), "\n")
+} else {
+  cat("seed_sensitivity.csv not found — using single-seed survivors only\n")
+}
+
+# ── Phase 2a: MAIN spec curve on robust survivors (seed-stable dims) ────────
+cat("\n=== Multiverse Phase 2a: spec curve on ROBUST survivors ===\n")
+levs_main <- lapply(robust_keep, function(nm) dims[[nm]]$levels)
+names(levs_main) <- robust_keep
+grid_main <- expand.grid(levs_main, stringsAsFactors = FALSE)
+cat("Main specs:", nrow(grid_main), "\n")
+
+res_main <- list()
+for (i in seq_len(nrow(grid_main))) {
+  ov <- base_overrides
+  for (nm in robust_keep) ov[[nm]] <- grid_main[i, nm]
+  lab <- paste(paste0(robust_keep, "=", unlist(grid_main[i, robust_keep])), collapse = "_")
+  r <- run_spec(ov, lab)
+  if (!is.null(r)) res_main[[lab]] <- r
+}
+spec_curve <- do.call(rbind, res_main)
+write.csv(spec_curve, file.path(RES, "spec_curve.csv"), row.names = FALSE)
+
+cat("\n=== Specification curve (mean TST h) — robust dims ===\n")
+print(summary(spec_curve$mean_tst_h))
+cat("Analyzable n range:", range(spec_curve$analyzable_n, na.rm = TRUE), "\n")
+
+# ── Phase 2b: FULL factorial (incl. marginal D2) → appendix ─────────────────
+cat("\n=== Multiverse Phase 2b: full factorial (appendix) ===\n")
 levs <- lapply(keep, function(nm) dims[[nm]]$levels)
 names(levs) <- keep
 grid <- expand.grid(levs, stringsAsFactors = FALSE)
-cat("Factorial specs:", nrow(grid), "\n")
+cat("Full factorial specs:", nrow(grid), "\n")
 
 results <- list()
 for (i in seq_len(nrow(grid))) {
@@ -134,12 +178,8 @@ for (i in seq_len(nrow(grid))) {
   if (!is.null(r)) results[[lab]] <- r
   if (i %% 25 == 0) cat("  ", i, "/", nrow(grid), "\n")
 }
-spec_curve <- do.call(rbind, results)
-write.csv(spec_curve, file.path(RES, "spec_curve.csv"), row.names = FALSE)
-
-cat("\n=== Specification curve (mean TST h) ===\n")
-print(summary(spec_curve$mean_tst_h))
-cat("Analyzable n range:", range(spec_curve$analyzable_n, na.rm = TRUE), "\n")
+spec_curve_full <- do.call(rbind, results)
+write.csv(spec_curve_full, file.path(RES, "spec_curve_full.csv"), row.names = FALSE)
 
 # ── Record-level classification instability ─────────────────────────────────
 # Rerun BASE + extremes on the full set, compare data_category per record.
@@ -165,7 +205,10 @@ if (nrow(inst) > 0) {
 }
 
 # ── Variance decomposition (ANOVA-like on mean TST) ─────────────────────────
-vd <- spec_curve %>%
+# Uses the FULL factorial (incl. marginal D2) so the D1/D2 split is visible;
+# the main spec_curve.csv is D1-only and would hide D2's (small, seed-marginal)
+# contribution.
+vd <- spec_curve_full %>%
   tidyr::separate(spec, into = paste0("D", seq_along(keep)), sep = "_", remove = FALSE) %>%
   mutate(across(starts_with("D"), ~ suppressWarnings(as.numeric(sub(".*=", "", .)))))
 if (length(keep) >= 1 && nrow(vd) > 1) {

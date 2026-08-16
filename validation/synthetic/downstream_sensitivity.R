@@ -25,7 +25,10 @@ RES <- file.path(SYN, "results")
 
 # ── A. Multiverse layer ─────────────────────────────────────────────────────
 spec <- read.csv(file.path(RES, "multiverse", "spec_curve.csv"))
-base <- spec[spec$spec == "D1=12_D2=3", ]   # default levels (flip 12, swap 3)
+# main curve is now the ROBUST (seed-stable) dims only — D1-only after the
+# seed-sensitivity finding. Base = the default level of the robust dim(s).
+base <- spec[spec$spec == "D1=12", ]
+if (nrow(base) == 0) base <- spec[spec$spec == "D1=12_D2=3", ]
 if (nrow(base) == 0) base <- spec[1, ]
 
 cat("\n=== A. Downstream quantities across multiverse specs (n=9) ===\n")

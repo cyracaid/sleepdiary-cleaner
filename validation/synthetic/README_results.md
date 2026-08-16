@@ -47,7 +47,8 @@ mechanism-level behavior, the audit layer catches real-data blind spots.
 | `mrr_per_row.csv` | far_flag_mrr_magnitude.R | 20260817 | 4,745 | per-row kind + magnitude | — |
 | `control_baselines.csv` | control_baselines.R | 20260817 | 4,745 | no-cleaning / naive-rule / pipeline recall + FAR | point estimate |
 | `multiverse/oat_screening.csv` | multiverse.R | — | 13 specs | downstream qty per OAT level | none (screening) |
-| `multiverse/spec_curve.csv` | multiverse.R | — | **9 specs (3^2)** | mean TST/SOL/SE, analyzable n | none (deterministic runs) |
+| `multiverse/spec_curve.csv` | multiverse.R | — | **3 specs (D1-only)** | mean TST/SOL/SE, analyzable n | none (deterministic, robust survivors) |
+| `multiverse/spec_curve_full.csv` | multiverse.R | — | **9 specs (3^2)** | mean TST/SOL/SE, analyzable n | none (deterministic, appendix incl. marginal D2) |
 | `multiverse/instability.csv` | multiverse.R | — | 5 specs | record classification by spec | none |
 | `multiverse/variance_decomposition.csv` | multiverse.R | — | 9 specs | sum_sq + proportion per dim | ANOVA (descriptive) |
 | `downstream_sensitivity.csv` | downstream_sensitivity.R | — | — | multiverse ranges + B1/B2 | none |
@@ -57,21 +58,29 @@ mechanism-level behavior, the audit layer catches real-data blind spots.
 | `real_data_oat_screening.csv` | real_data_spec_curve.R | — | 13,990 | downstream qty per OAT level (real data) | none (screening) |
 | `real_data_spec_curve.csv` | real_data_spec_curve.R | — | 13,990 | mean TST/SOL/SE, analyzable n per spec | none (deterministic, D2 fallback) |
 
-## Multiverse — why 9 specs, not 243
+## Multiverse — spec curve on robust survivors + full factorial appendix
 
 The plan (08-14 meeting notes) expected "OAT → full factorial on surviving
-4–6 dimensions (3^5 = 243)". After OAT screening (multiverse.R), only 2 of 6
-candidate dimensions moved downstream quantities or classification on this
-benchmark set:
+4–6 dimensions (3^5 = 243)". OAT screening (multiverse.R) on the benchmark
+seed keeps 2 of 6 dimensions:
 
 - D1 flip_gap_hours (12h AM/PM flip threshold) — moves mean SOL strongly
-- D2 swap_threshold_hours (minor-order swap) — moves mean TST/n
+- D2 swap_threshold_hours (minor-order swap) — moves mean TST/n (marginally)
 
 D3–D6 (flag thresholds: SOL excessive, SE poor, WASO excessive, TST/TIB ratio)
-changed **no** downstream quantity or flag count on the healthy-adult
-enrichment set → dropped by the ≥1% / ≥5-min survival rule. Full factorial on
-the survivors = 3^2 = **9 specs**. Interaction found: D1=11 suppresses the D2
-effect (12h-flip path dominates at that level).
+change **no** downstream quantity or flag count on the healthy-adult
+enrichment set → dropped by the ≥1% / ≥5-min survival rule.
+
+**MAIN spec curve = robust survivors only (spec_curve.csv, 3 specs).**
+The OAT survival decision is seed-sensitive (seed_sensitivity.csv): seed
+20260817 → D1+D2; seed 20260915 → D1 only. D2 sits at the 5min/1% edge and
+flips with the seed. The main curve therefore uses the across-seed
+intersection — D1 alone → **3 specs** (D1=11/12/13). This is the
+manuscript-facing specification curve.
+
+**Appendix = full factorial on single-seed survivors (spec_curve_full.csv,
+9 specs).** Includes the marginal D2 (D1×D2, 3^2). Kept for transparency;
+the D1×D2 interaction is seed-marginal and should not be quoted as robust.
 
 243 is not claimed as a result; it was the pre-OAT worst-case budget.
 
