@@ -89,3 +89,17 @@ tests/testthat/_problems/
 /pkgdown/
 # pipeline run cache key (regenerated per input sha)
 validation/synthetic/run_ppv/input_key.txt
+# 🔴 REAL PARTICIPANT DATA — audit outputs with real pids (1027-5310).
+# Kept local only; purged from history 2026-08-17. Never commit.
+/audit_m1_m7_decision.csv
+/audit_m1_m7_notes_inventory.csv
+/part_b_b1_silent_alteration.csv
+/part_b_b2_redundant_worsening.csv
+/part_b_b3_note_inventory.csv
+# Private correspondence (local only).
+/manual_inputs_docs/
+# Personal work logs (local only).
+/work_logs/
+# Unpublished manuscript + figures (local only; JOSS submission separate).
+/paper/
+/figures/
