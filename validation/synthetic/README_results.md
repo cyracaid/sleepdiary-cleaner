@@ -42,7 +42,7 @@ mechanism-level behavior, the audit layer catches real-data blind spots.
 | `cluster_bootstrap_per_row.csv` | ppv_cluster_ci.R | 20260817 | 7,000 (4,745 inj + 1,609 ctrl) | per-row detected/flag/value_correct | — |
 | `recall_specificity_ci.csv` | ppv_cluster_ci.R | 20260817 | 4,745 inj / 1,609 ctrl | pooled + per-category recall, control specificity | participant-level cluster bootstrap, 2,000 resamples |
 | `ppv_curve.csv` | ppv_cluster_ci.R | 20260817 | — | PPV over pi=0.5–10% | Bayes from recall/spec + 500 bootstrap draws |
-| `far_flag_alter.csv` | far_flag_mrr_magnitude.R | 20260817 | 1,609 ctrl | FAR_flag, FAR_alter | point estimate |
+| `far_flag_alter.csv` | far_flag_mrr_magnitude.R | 20260817 | 1,609 ctrl | FAR_flag, FAR_alter + rule-of-three 95% upper bound (0.186% @ 0 hits) | point estimate + upper bound |
 | `mrr_magnitude.csv` | far_flag_mrr_magnitude.R | 20260817 | 4,745 inj | per-category MRR + magnitude | point estimate |
 | `mrr_per_row.csv` | far_flag_mrr_magnitude.R | 20260817 | 4,745 | per-row kind + magnitude | — |
 | `control_baselines.csv` | control_baselines.R | 20260817 | 4,745 | no-cleaning / naive-rule / pipeline recall + FAR | point estimate |
@@ -71,6 +71,32 @@ the survivors = 3^2 = **9 specs**. Interaction found: D1=11 suppresses the D2
 effect (12h-flip path dominates at that level).
 
 243 is not claimed as a result; it was the pre-OAT worst-case budget.
+
+## L3 value-correct rate — read it right (do not misquote 0.486)
+
+Pooled L3 (value_correct) is 0.486, which LOOKS like "the pipeline only fixes
+half of what it detects". That is a misreading. The per-row outcome split
+(mrr_per_row.csv) is:
+
+- **CORRECT** 2,619 (auto-fixed to ground truth)
+- **FLAGGED** 2,746 (surfaced for human review, NOT auto-changed)
+- **MISREPAIRED** 26 (auto-changed to the WRONG value — the true error rate)
+- MISSED: the remainder (recall gap, see recall_specificity_ci.csv)
+
+The design is conservative: when the pipeline cannot confirm a value it flags
+and stops (needs_review_flag), it does not guess. So L3 is the "confident
+auto-fix" rate, NOT the "correctness of cleaning" rate. The manuscript-facing
+numbers are:
+
+- Pooled detection (L1): 0.9952 — everything surfaced
+- Corrected-or-flagged (safe outcome): (2619+2746)/5391 = 0.9952 — nothing
+  silently lost except the recall gap
+- Misrepair (MISREPAIRED): pooled MRR 0.0048 (26/5391) — the only harmful
+  outcome
+- Misrepair magnitude: median ~0 min (see mrr_magnitude.csv)
+
+Quoting "L3 = 0.486" without this context misleads. Report L1 + MRR + the
+corrected-or-flagged safe outcome.
 
 ## FAR=0 wording (scope limitation)
 

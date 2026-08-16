@@ -76,12 +76,18 @@ far_alter <- sum(altered[d$row_id %in% ctrl_ids])
 cat(sprintf("\nFAR_flag = %d/%d = %.4f\n", far_flag, n_ctrl, far_flag / n_ctrl))
 cat(sprintf("FAR_alter = %d/%d = %.4f\n", far_alter, n_ctrl, far_alter / n_ctrl))
 
+# rule-of-three 95% upper bound when zero hits: 3/n. Gives the false-positive
+# ceiling so FAR=0 is not read as "proven zero".
+far_upper <- function(k, n) if (k == 0) 3 / n else NA_real_
+
 far_df <- data.frame(
   metric = c("FAR_flag", "FAR_alter"),
   n_control = n_ctrl, n_hit = c(far_flag, far_alter),
-  rate = c(far_flag / n_ctrl, far_alter / n_ctrl)
+  rate = c(far_flag / n_ctrl, far_alter / n_ctrl),
+  rate_upper95 = c(far_upper(far_flag, n_ctrl), far_upper(far_alter, n_ctrl))
 )
 write.csv(far_df, file.path(RES, "far_flag_alter.csv"), row.names = FALSE)
+cat(sprintf("FAR=0 rule-of-three 95%% upper bound: %.3f%%\n", 100 * 3 / n_ctrl))
 
 # ── MRR + magnitude on injected rows ────────────────────────────────────────
 # reuse the 5.1 value_correct classification for "changed to truth" and add

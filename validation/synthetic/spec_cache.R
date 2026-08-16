@@ -37,6 +37,23 @@ sha256_file <- function(path) {
   digest::digest(file = path, algo = "sha256")
 }
 
+# Pipeline code fingerprint: hashes every R/ source file + every installed
+# inst/scripts file. Guards against the #6/#7 "code drift" variant: a change
+# to checkforerrors_processing.R (new guard) with unchanged input/config must
+# invalidate cached summaries. Without this, the cache would serve stale
+# results computed by the pre-change pipeline.
+code_fingerprint <- function() {
+  repo_r <- list.files("R", pattern = "\\.R$", full.names = TRUE)
+  inst_s <- list.files("inst/scripts", pattern = "\\.R$", full.names = TRUE)
+  sdir <- system.file("scripts", package = "splsleep")
+  pkg_s <- if (nzchar(sdir)) list.files(sdir, pattern = "\\.R$", full.names = TRUE) else character()
+  all_files <- unique(c(repo_r, inst_s, pkg_s))
+  digest::digest(list(
+    pkg_version = tryCatch(as.character(utils::packageVersion("splsleep")), error = function(e) "unknown"),
+    files = lapply(all_files, sha256_file)
+  ), algo = "sha256")
+}
+
 # Only overrides that differ from the bundled default count in the key, so
 # multiverse "BASE" (all defaults) shares a cache slot with ablation
 # "baseline" (empty overrides) -- one pipeline run, two clients.
@@ -61,27 +78,28 @@ norm_overrides <- function(overrides) {
   keep[nm_sorted]
 }
 
-spec_cache_key <- function(overrides) {
+spec_cache_key <- function(overrides, input_rds = INPUT_RD) {
   digest::digest(list(
-    input = sha256_file(INPUT_RD),
+    input = sha256_file(input_rds),
     cfg   = sha256_file(CONFIG_RD),
+    code  = code_fingerprint(),
     ov    = norm_overrides(overrides)
   ), algo = "sha256")
 }
 
-cache_path <- function(label, overrides) {
+cache_path <- function(label, overrides, input_rds = INPUT_RD) {
   safe <- gsub("[^A-Za-z0-9_.-]", "_", label)
-  file.path(CACHE_DIR, sprintf("%s_%s.rds", safe, spec_cache_key(overrides)))
+  file.path(CACHE_DIR, sprintf("%s_%s.rds", safe, spec_cache_key(overrides, input_rds)))
 }
 
-save_spec_summary <- function(label, overrides, summary) {
+save_spec_summary <- function(label, overrides, summary, input_rds = INPUT_RD) {
   dir.create(CACHE_DIR, showWarnings = FALSE, recursive = TRUE)
-  saveRDS(summary, cache_path(label, overrides))
+  saveRDS(summary, cache_path(label, overrides, input_rds))
   summary
 }
 
-load_spec_summary <- function(label, overrides) {
-  p <- cache_path(label, overrides)
+load_spec_summary <- function(label, overrides, input_rds = INPUT_RD) {
+  p <- cache_path(label, overrides, input_rds)
   if (file.exists(p)) {
     cat(sprintf("  [cache] %s (input+config unchanged)\n", label))
     readRDS(p)
@@ -90,8 +108,10 @@ load_spec_summary <- function(label, overrides) {
 
 # Run the pipeline once for a set of overrides and collapse to the summary.
 # Returns the cached summary if present. Never re-executes on cache hit.
-run_spec_once <- function(label, overrides, verbose = TRUE) {
-  hit <- load_spec_summary(label, overrides)
+# input_rds: benchmark input to run the pipeline on (defaults to the
+# enrichment set; pass the real data rds for real-data spec curves).
+run_spec_once <- function(label, overrides, input_rds = INPUT_RD, verbose = TRUE) {
+  hit <- load_spec_summary(label, overrides, input_rds)
   if (!is.null(hit)) return(hit)
 
   cfg <- yaml::read_yaml(CONFIG_RD)
@@ -104,9 +124,9 @@ run_spec_once <- function(label, overrides, verbose = TRUE) {
   }
 
   # isolated run dir per spec to avoid cross-run state bleed
-  run_dir <- file.path(tempdir(), paste0("spec_", substr(spec_cache_key(overrides), 1, 12)))
+  run_dir <- file.path(tempdir(), paste0("spec_", substr(spec_cache_key(overrides, input_rds), 1, 12)))
   dir.create(run_dir, showWarnings = FALSE, recursive = TRUE)
-  file.copy(INPUT_RD, file.path(run_dir, "main.rds"), overwrite = TRUE)
+  file.copy(input_rds, file.path(run_dir, "main.rds"), overwrite = TRUE)
   cfg$data$files$main <- "main.rds"
   cfg$data$files$extra <- NULL
   yaml::write_yaml(cfg, file.path(run_dir, "config.yaml"))
@@ -153,6 +173,6 @@ run_spec_once <- function(label, overrides, verbose = TRUE) {
     flagged_injected = sum(flagged[d$row_id %in% inj_ids]),
     flagged_control  = sum(flagged[d$row_id %in% ctrl_ids])
   )
-  save_spec_summary(label, overrides, summary)
+  save_spec_summary(label, overrides, summary, input_rds)
   summary
 }
