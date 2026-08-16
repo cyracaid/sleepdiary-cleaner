@@ -29,9 +29,9 @@ the two measurement methods).
 }
 \details{
 A threshold is considered \strong{safe} (\eqn{\checkmark}) when it sits
-at least \strong{3\u00d7} the typical disagreement away from zero bias.
-Below 2\u00d7 the threshold is inside the normal measurement-noise range
-and will produce many false positives. Between 2\u00d7 and 3\u00d7 is
+at least \strong{3\eqn{\times}} the typical disagreement away from zero bias.
+Below 2\eqn{\times} the threshold is inside the normal measurement-noise range
+and will produce many false positives. Between 2\eqn{\times} and 3\eqn{\times} is
 borderline and warrants a close look at the per-participant data.
 
 This function is \strong{advisory only}. It does not change any threshold
