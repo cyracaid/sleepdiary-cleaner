@@ -7,8 +7,7 @@
 # WHY THIS EXISTS
 # ---------------
 # verify_v1_3_snapshot.R compares "splsleep old path" against "splsleep S3
-# chain". It proves the refactor did not change results. It CANNOT prove that
-# splsleep is faithful to the reference implementation
+# chain". It proves the refactor did not change results. It CANNOT prove that# splsleep is faithful to the reference implementation
 # (R01_online_sleepdiary_manualclean / calculate_sleep_time_vars.R), because a
 # deviation that predates the snapshot is carried by both sides and compares
 # equal. B1 (sleeponset) sat undetected for exactly that reason.
@@ -39,7 +38,14 @@
 # NOTE ON DEPENDENCIES: unlike verify_finalize_columns.R this is not
 # zero-dependency -- calculate_sleep_time_vars_end() calls library(dplyr) and
 # library(lubridate) itself. Those are pipeline dependencies anyway.
+# From 2026-08-17 the function no longer attaches them (R CMD check flags
+# library() in package code), so this script loads them explicitly.
 # ---------------------------------------------------------------------------
+
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(lubridate)
+})
 
 strict <- "--strict" %in% commandArgs(trailingOnly = TRUE)
 
