@@ -37,5 +37,6 @@ Imports:
     utils,
     yaml
 Suggests:
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    withr
 Config/roxygen2/version: 8.1.0
