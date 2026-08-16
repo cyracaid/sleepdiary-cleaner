@@ -2,3 +2,6 @@ url: https://cyracaid.github.io/sleepdiary-cleaner/
 destination: docs/
 template:
   bootstrap: 5
+authors:
+  "Maia ten Brink":
+    html: "Maia ten Brink — Author, Mentor"

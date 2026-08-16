@@ -128,7 +128,13 @@ if (opt$mode == "pure") {
 n_participants <- as.integer(opt$n_participants)
 n_days         <- as.integer(opt$n_days)
 
-pid_list <- 1001:(1001 + n_participants - 1)
+# Synthetic pid namespace: 50001+ (PID_BASE) — deliberately OUTSIDE the real
+# participant range (1027-11863, n=237) so synthetic rows can never be
+# conflated with real subject IDs in per-row benchmark outputs. Originally
+# 1001+, which collided with real pids (8+ overlapping values) -> indirect
+# re-identification risk in public results (purge 2026-08-17, external audit).
+PID_BASE <- 50001
+pid_list <- PID_BASE:(PID_BASE + n_participants - 1)
 rows <- expand.grid(pid = pid_list, day_num = 1:n_days, stringsAsFactors = FALSE) |>
   arrange(pid, day_num)
 rows$row_id <- seq_len(nrow(rows))

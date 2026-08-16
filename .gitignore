@@ -105,3 +105,8 @@ validation/synthetic/run_ppv/input_key.txt
 /figures/
 # internal agent plans (local only)
 /docs-dev/superpowers/
+# Per-row synthetic benchmark outputs — contain synthetic pids, regenerated
+# by ppv_cluster_ci.R. Never commit (purge 2026-08-17 #2).
+/validation/synthetic/ground_truth_enrichment.csv
+/validation/synthetic/results/cluster_bootstrap_per_row.csv
+/validation/synthetic/results/mrr_per_row.csv
