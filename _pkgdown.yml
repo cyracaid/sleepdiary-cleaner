@@ -1,0 +1,4 @@
+url: https://cyracaid.github.io/sleepdiary-cleaner/
+destination: pkgdown/
+template:
+  bootstrap: 5
