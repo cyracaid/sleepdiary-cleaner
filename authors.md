@@ -2,9 +2,9 @@
 
 ## Authors
 
-- **Cyra Cai Dong**. Author, maintainer.
+- **Cyra Cai Dong — Author, maintainer**. Author, maintainer.
 
-- **Maia ten Brink — Author, Mentor**. Author.
+- **Maia ten Brink — Author, mentor**. Author.
 
 ## Citation
 
