@@ -53,6 +53,9 @@ mechanism-level behavior, the audit layer catches real-data blind spots.
 | `downstream_sensitivity.csv` | downstream_sensitivity.R | — | — | multiverse ranges + B1/B2 | none |
 | `l2_tier.csv` | l2_tier_leave_one_out.R | 20260817 | 4,745 | per-category L1/L2/L3 | point estimate |
 | `leave_one_out.csv` | l2_tier_leave_one_out.R | 20260817 | 4,745 | recall/workload per ablation | deterministic via spec_cache (issue #6 closed) |
+| `seed_sensitivity.csv` | seed_sensitivity.R | 20260812/17, 20260901/15 | 4×~5,400 | pooled recall, FAR, weak-cat recall, OAT survivors | point estimates, 4 seeds |
+| `real_data_oat_screening.csv` | real_data_spec_curve.R | — | 13,990 | downstream qty per OAT level (real data) | none (screening) |
+| `real_data_spec_curve.csv` | real_data_spec_curve.R | — | 13,990 | mean TST/SOL/SE, analyzable n per spec | none (deterministic, D2 fallback) |
 
 ## Multiverse — why 9 specs, not 243
 
@@ -71,6 +74,33 @@ the survivors = 3^2 = **9 specs**. Interaction found: D1=11 suppresses the D2
 effect (12h-flip path dominates at that level).
 
 243 is not claimed as a result; it was the pre-OAT worst-case budget.
+
+**Seed sensitivity of the survival decision (seed_sensitivity.csv):** the
+D1+D2 → 9-spec selection is a property of the benchmark seed, not universal.
+Across 4 seeds (20260812/17, 20260901/15):
+
+- pooled recall stable 0.9935–0.9952, FAR_flag 0 across all seeds → the 5.1
+  headline is robust.
+- weak categories stable: cross_participant_spike 0.886–0.907 (always
+  lowest); adjacent_swap_awake_getup + ampm_swap = 1.0 everywhere.
+- OAT survival is seed-sensitive: seed 20260817 → D1+D2; seed 20260915 →
+  D1 only (D2's swap effect sits at the 5min/1% edge). Report the full
+  factorial as benchmark-seed-specific; D1 is the robust survivor, D2 is
+  marginal. D3–D6 never survive on any seed.
+
+## Real-data spec curve (real_data_spec_curve.csv) — thresholds insensitive
+
+Multiverse on real n=13,990 (input + sber extra csv for StartDate):
+
+- **No dimension passes the survival rule**: max |ΔTST| 0.93 min, max |Δn|
+  0.70% across D1–D6. Downstream quantities are insensitive to cleaning
+  thresholds on real data. (spec_curve is the D2 fallback, not a selection.)
+- Only 1,719/13,990 rows (12.3%) have analyzable TST — the real-data
+  cleaning surface is small, which is why thresholds barely matter there.
+- D3–D6 move NOTHING on real data either → flag thresholds don't affect
+  downstream values (synthetic and real agree).
+- n_flagged = 0 on real data under every spec → the human-review workload
+  on real data comes from checkforerrors flags only, never needs_review_flag.
 
 ## L3 value-correct rate — read it right (do not misquote 0.486)
 
