@@ -893,7 +893,12 @@ to wrong but plausible values; now 0% are — they go to human review.
 ### Step 4 — Is the pipeline better than doing nothing? (controls)
 
 **What we do.** Compare three conditions on the same corrupted data: no
-cleaning at all, a naive regex-only rule, and the full pipeline.
+cleaning at all, a naive regex-only rule, and the full pipeline. The no-cleaning
+condition is the floor (what the study team gets if they skip cleaning
+entirely); the naive rule is the "someone wrote a quick script" baseline; the
+pipeline is the full design. The gap between naive and pipeline is the
+*incremental* value of the rule families — the number that justifies the
+design's complexity.
 
 **Result.** no_cleaning **0** / naive_rule **0.623** / pipeline **0.995**.
 **Meaning.** Raw strings give zero detection; a naive rule catches 62%; the
@@ -996,21 +1001,90 @@ a record is unusual is easier than deciding exactly how to fix it.
 
 ### Step 8 — Do our choices matter? (multiverse, downstream sensitivity, seeds)
 
-**What we do.** Vary the cleaning thresholds and rule choices across a
-specification grid; measure how much the results and downstream metrics move.
+**Why we ask this.** Every threshold and rule choice in the pipeline is a
+judgment call: the 12-hour AM/PM flip trigger, the 3-hour adjacent-swap
+window, the 4× MAD spike cutoff, the SOL/SE/WASO flag thresholds, the 6-minute
+verification tolerance. A cleaning pipeline whose *answers* depend heavily on
+which of these reasonable values we picked is not trustworthy — the cleaning
+would be manufacturing its own conclusions. This step measures how much the
+results and the downstream metrics move when we vary those choices across a
+specification grid.
+
+**What we do.** Three analyses, in increasing order of scope:
+
+1. **Multiverse analysis (specification curve).** Define the cleaning choices
+   that are genuinely open (continuous thresholds — 12 h, 3 h, midnight 6,
+   mmss 60, SOL 120/180, SE 70, WASO 1.5, TST/TIB 0.5, CP 4× — plus discrete
+   branches: which rows to trust, cross-participant layer on/off, manual-review
+   layer on/off). Hard constraints are excluded (those are logic, not choice).
+   Screen with one-at-a-time (OAT) runs, then a full factorial grid; each spec
+   runs the real pipeline and records the same outputs. Two output contracts:
+   a **specification curve** (Simonsohn-style plot of the metric across all
+   specs) and a **variance decomposition** (how much of the variation each
+   dimension explains). Script: `validation/synthetic/multiverse.R`; results
+   in `results/multiverse/` (`spec_curve.csv`, `variance_decomposition.csv`,
+   `instability.csv`, `oat_screening.csv`).
+2. **Downstream sensitivity.** The same grid, but measuring the *deliverable*
+   quantities the study team actually uses: mean TST, mean SOL, and analyzable
+   n (records that survive the cleaning decisions). Script:
+   `validation/synthetic/downstream_sensitivity.R`.
+3. **Seed sensitivity.** Regenerate the whole benchmark under different random
+   seeds and confirm the headline numbers do not move. Script:
+   `validation/synthetic/seed_sensitivity.R`.
 
 **Result.**
-- Variance decomposition: the swap-threshold choice (D2) explains **44%** of
-  variation — the dominant design decision.
-- Downstream across specs: TST 7.89 h [7.76, 7.92] — robust. SOL
-  20.7 min [12.1, 48.4] — sensitive (consistent with the perception-bias
-  finding in the caveats below).
-- Decision-relevant deltas: B1 (which rows to trust) moves TST by 29.6 min;
-  B2 moves analyzable n by 1,131 records.
-- Seeds: pooled recall 0.993–0.995 across 4 seeds, FAR 0 in all.
 
-**Meaning.** TST conclusions are stable across reasonable choices; SOL
-conclusions are not, and we know which decision (swap threshold) matters most.
+*Multiverse — which choice dominates?*
+
+| Dimension | Share of variation |
+|---|---|
+| D2 (adjacent-swap threshold) | **44%** |
+| D1 (AM/PM flip trigger) | 10% |
+| others | remainder |
+
+The swap-threshold choice is the dominant design decision: 44% of the
+variation in outcomes across specs comes from that one parameter. This is why
+the multiverse exists — it tells us *where* the pipeline's behavior is most
+sensitive, so a user knows which default to scrutinize first.
+
+*Downstream — do the delivered metrics move?*
+
+| Quantity | Base spec | Across specs |
+|---|---|---|
+| mean TST (h) | 7.89 | [7.76, 7.92] — robust (±0.08 h) |
+| mean SOL (min) | 20.7 | [12.1, 48.4] — **sensitive** |
+| analyzable n | 6,611 | [6,333, 6,692] |
+
+TST conclusions are stable across reasonable cleaning choices; SOL conclusions
+are not. The SOL sensitivity is consistent with what Step 5.5 found: SOL
+self-report sits inside a ±75-min noise band, so SOL is the metric where
+cleaning choices and perception bias interact most.
+
+*Decision-relevant deltas (B1/B2) — how much does a defensible alternative
+choice move things?*
+
+| Choice | Effect |
+|---|---|
+| B1 — which rows to trust in the redundant-channel analysis | mean TST shifts **29.6 min** |
+| B2 — WASO trust gate variant | analyzable n shifts by **1,131 records** |
+
+These are not errors — they are the honest range of what a *different
+reasonable* decision produces. The study team needs to know this range before
+interpreting any single number.
+
+*Seed — 换随机种子数字动吗？* pooled recall stable at 0.993–0.995 across
+4 seeds, control FAR 0 in all; the one family that wobbles
+(0.886–0.907) is the known-weak `cross_participant_spike` — already
+disclosed as audit-only in the caveats below. Full per-seed table in
+`seed_sensitivity.csv`.
+
+**Meaning.** Three separate questions, three clear answers: (1) *which decision
+matters most?* — the swap threshold, at 44% of variation, so that default is
+the one to document and defend; (2) *which conclusions are robust?* — TST
+yes (±0.08 h), SOL no (12–48 min), and we now know why (perception bias,
+Step 5.5); (3) *are the numbers reproducible?* — yes across seeds (recall
+0.993–0.995, FAR 0), with the single known-weak family disclosed rather than
+hidden.
 
 ### Honest caveats (read before using any number)
 
@@ -1593,7 +1667,7 @@ CI 为参与者级 cluster bootstrap（1,000 次），因为同一参与者的�
 
 ### 第 4 步 — 管线比什么都不做强吗？（对照）
 
-**做什么。** 在同样的损坏数据上比较三种条件：完全不清洗、朴素正则规则、完整管线。
+**做什么。** 在同样的损坏数据上比较三种条件：完全不清洗、朴素正则规则、完整管线。不清洗条件是地板（研究团队完全跳过清洗会得到什么）；朴素规则是"有人随手写了个脚本"的基线；管线是完整设计。朴素与管线之差是规则族的*增量*价值——为设计复杂度正名的那个数字。
 
 **结果。** 不清洗 **0** / 朴素规则 **0.623** / 管线 **0.995**。
 **意味着。** 原始字符串检测率 0；朴素规则抓 62%；完整管线 99.5%。比朴素高 37 个百分点就是规则族的价值。
@@ -1652,15 +1726,73 @@ CI 为参与者级 cluster bootstrap（1,000 次），因为同一参与者的�
 
 ### 第 8 步 — 我们的选择要紧吗？（multiverse、下游敏感性、seed）
 
-**做什么。** 在规格网格上变化清洗阈值与规则选择；测量结果与下游指标移动多少。
+**为什么问这个。** 管线里的每个阈值和规则选择都是一次判断：12 小时 AM/PM 翻转触发、
+3 小时相邻交换窗口、4× MAD 尖峰切点、SOL/SE/WASO flag 阈值、6 分钟验证容差。
+如果清洗管线的*答案*高度依赖我们选哪个合理值，那它就不值得信赖——清洗会变成
+自产结论。这一步测量当我们把这些选择铺满规格网格时，结果与下游指标移动多少。
+
+**做什么。** 三个分析，范围递增：
+
+1. **Multiverse 分析（规格曲线）。** 定义真正开放的清洗选择（连续阈值——12h、
+   3h、midnight 6、mmss 60、SOL 120/180、SE 70、WASO 1.5、TST/TIB 0.5、CP 4×——
+   加上离散分支：信任哪些行、跨参与者层开关、人工审查层开关）。硬约束排除
+   （那是逻辑，不是选择）。先用 one-at-a-time（OAT）筛选，再跑全因子网格；每个
+   规格跑真实管线并记录相同输出。两个输出契约：**规格曲线**（Simonsohn 风格，
+   全部规格上的指标图）与**方差分解**（每个维度解释多少变异）。脚本：
+   `validation/synthetic/multiverse.R`；结果在 `results/multiverse/`
+   （`spec_curve.csv`、`variance_decomposition.csv`、`instability.csv`、
+   `oat_screening.csv`）。
+2. **下游敏感性。** 同一网格，但测量研究团队实际使用的*交付量*：平均 TST、
+   平均 SOL、可分析 n（经受住清洗决策的记录数）。脚本：
+   `validation/synthetic/downstream_sensitivity.R`。
+3. **Seed 敏感性。** 在不同随机种子下重新生成整个基准，确认头版数字不动。脚本：
+   `validation/synthetic/seed_sensitivity.R`。
 
 **结果。**
-- 方差分解：交换阈值选择（D2）解释 **44%** 的变异——主导性设计决策。
-- 跨规格下游：TST 7.89 小时 [7.76, 7.92]——稳健。SOL 20.7 分钟 [12.1, 48.4]——敏感（与下方注意事项的感知偏差发现一致）。
-- 决策相关偏移：B1（信任哪些行）移动 TST 29.6 分钟；B2 移动可分析 n 1,131 条。
-- Seed：合并 recall 跨 4 个 seed 0.993–0.995，FAR 全 0。
 
-**意味着。** TST 结论跨合理选择稳定；SOL 结论不稳定，且我们知道哪个决策（交换阈值）影响最大。
+*Multiverse — 哪个选择主导？*
+
+| 维度 | 变异占比 |
+|---|---|
+| D2（相邻交换阈值） | **44%** |
+| D1（AM/PM 翻转触发） | 10% |
+| 其余 | 剩余 |
+
+交换阈值选择是主导性设计决策：跨规格结果变异的 44% 来自这一个参数。这正是
+multiverse 存在的意义——它告诉我们管线行为*哪里*最敏感，让用户知道先审查
+哪个默认值。
+
+*下游 — 交付指标动吗？*
+
+| 量 | 基线规格 | 跨规格 |
+|---|---|---|
+| 平均 TST（小时） | 7.89 | [7.76, 7.92] — 稳健（±0.08 小时） |
+| 平均 SOL（分钟） | 20.7 | [12.1, 48.4] — **敏感** |
+| 可分析 n | 6,611 | [6,333, 6,692] |
+
+TST 结论跨合理清洗选择稳定；SOL 结论不稳定。SOL 的敏感性呼应第 5.5 步的发现：
+SOL 自报落在 ±75 分钟噪声带内，所以 SOL 是清洗选择与感知偏差交互最强的指标。
+
+*决策相关偏移（B1/B2）— 一个站得住的替代选择会移动多少？*
+
+| 选择 | 效果 |
+|---|---|
+| B1 — 冗余通道分析中信任哪些行 | 平均 TST 偏移 **29.6 分钟** |
+| B2 — WASO 信任门变体 | 可分析 n 偏移 **1,131 条** |
+
+这些不是错误——它们是*不同但合理*的决策会产生的诚实区间。研究团队在解读任何
+单个数字前需要知道这个区间。
+
+*Seed — 换随机种子数字动吗？* 合并 recall 跨 4 个 seed 稳定在 0.993–0.995，
+对照 FAR 全为 0；唯一摆动（0.886–0.907）的族是已知最弱族
+`cross_participant_spike`——已在下方注意事项中披露为 audit-only。完整逐 seed
+表见 `seed_sensitivity.csv`。
+
+**意味着。** 三个独立问题、三个清晰答案：(1) *哪个决策最重要？* — 交换阈值，
+占变异 44%，所以那个默认值是需要文档化并捍卫的。(2) *哪些结论稳健？* —
+TST 是（±0.08 小时），SOL 否（12–48 分钟），而且我们现在知道原因（感知偏差，
+第 5.5 步）。(3) *数字可复现吗？* — 跨 seed 是（recall 0.993–0.995，FAR 0），
+唯一已知弱族被披露而非隐藏。
 
 ### 诚实注意事项（用任何数字前先读）
 
