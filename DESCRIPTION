@@ -4,8 +4,7 @@ Version: 1.4.3
 Authors@R: c(
     person("Cyra", "Cai Dong", role = c("aut", "cre"),
            email = "cyracaid@users.noreply.github.com"),
-    person("Maia", "ten Brink", role = c("aut"),
-           comment = "Mentor")
+    person("Maia", "ten Brink", role = c("aut"))
   )
 Author: Cyra Cai Dong [aut, cre], Maia ten Brink [aut]
 Maintainer: Cyra Cai Dong <cyracaid@users.noreply.github.com>
