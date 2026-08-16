@@ -52,8 +52,14 @@ SPL/
 .Rhistory
 .RData
 .Renv
-renv/
-renv.lock
+# renv: activate.R + settings.json + renv.lock are COMMITTED (standard renv
+# workflow: the autoloader must exist on CI checkout or .Rprofile's
+# source("renv/activate.R") crashes every R step). Only the local library
+# cache and staging dir are ignored.
+renv/library/
+renv/staging/
+renv/python/
+renv/sandbox/
 # macOS
 .DS_Store
 # Package build
