@@ -1,6 +1,6 @@
 "layer","base_value","min_value","max_value"
-"multiverse_mean_tst_h",7.89394767138944,7.75619140756444,7.92178083934242
-"multiverse_mean_sol_min",20.6631428571428,12.0697142857146,48.3541428571428
-"multiverse_analyzable_n",6611,6333,6692
+"multiverse_mean_tst_h",8.0586518850563,8.0586518850563,8.07184100767434
+"multiverse_mean_sol_min",31.1649999999998,22.6634285714286,58.0918571428572
+"multiverse_analyzable_n",6581,6327,6660
 "B1_tst_shift_min",29.6207897793263,NA,NA
 "B2_n_shift_records",1131,NA,NA
