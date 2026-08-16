@@ -1,5 +1,6 @@
 # Raw data (never commit)
 *.rds
+!inst/extdata/*.rds
 sber_ema_anon_20260227.csv
 
 # Worklog (local only)
