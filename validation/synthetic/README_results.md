@@ -153,8 +153,8 @@ Rscript validation/synthetic/control_baselines.R         # 5.7 table
 Rscript validation/synthetic/multiverse.R                # 5.4 tables (cached via spec_cache)
 Rscript validation/synthetic/downstream_sensitivity.R    # 5.5 table
 Rscript validation/synthetic/l2_tier_leave_one_out.R     # 5.2 + 5.6 (cached via spec_cache)
-Rscript audit_review_queue_m1_m7.R                       # M1–M7 audit (real data)
-Rscript part_b_global_sweep.R                            # Part B sweep (real data)
+Rscript validation/audit_review_queue_m1_m7.R         # M1–M7 audit (real data)
+Rscript validation/part_b_global_sweep.R              # Part B sweep (real data)
 ```
 
 Spec-cache determinism (issues #6/#7, fixed 4e94ef1):
