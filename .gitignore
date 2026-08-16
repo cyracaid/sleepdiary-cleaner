@@ -103,3 +103,5 @@ validation/synthetic/run_ppv/input_key.txt
 # Unpublished manuscript + figures (local only; JOSS submission separate).
 /paper/
 /figures/
+# internal agent plans (local only)
+/docs-dev/superpowers/
