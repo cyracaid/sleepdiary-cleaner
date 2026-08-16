@@ -67,11 +67,11 @@ EOF
   done
 done < <(git diff --cached --name-only)
 
-# Only run when a staged change could have touched either copy. Any script
-# registered in inst/scripts/ counts as a canary: editing one copy and not
-# the other is exactly the failure mode we guard against.
-# Compare basenames so paths like staging/inst/scripts/x.R or root/x.R both
-# match the inst/scripts/ file list.
+# Dedup gate: inst/scripts/ is the ONLY home for pipeline scripts.
+# Root-level duplicates were removed 2026-08-17 (Phase 1 dedup). The only
+# allowed root .R files are the legacy dev entry points (00_MAIN_entry.R,
+# 00a_setup.R) and verify_* dev tools. A root duplicate reappearing is a
+# dedup regression -- block it.
 staged=$(git diff --cached --name-only | sed 's#.*/##' | sort -u)
 touchable=$(for f in inst/scripts/*.R; do basename "$f"; done | sort -u)
 if [ -z "$(comm -12 <(printf '%s\n' "$staged") <(printf '%s\n' "$touchable"))" ]; then
@@ -85,21 +85,16 @@ files <- list.files(inst_dir)
 scripts <- files[tools::file_ext(files) == "R"]
 if (length(scripts) == 0) quit(status = 0)
 
-divergent <- character(0)
-for (s in scripts) {
-  root_copy <- file.path(root, s)
-  if (!file.exists(root_copy)) next
-  a <- readLines(root_copy, warn = FALSE)
-  b <- readLines(file.path(inst_dir, s), warn = FALSE)
-  if (!identical(a, b)) divergent <- c(divergent, s)
-}
+allowed_root <- c("00_MAIN_entry.R", "00a_setup.R")
+unexpected <- scripts[file.exists(file.path(root, scripts)) &
+                        !(scripts %in% allowed_root)]
 
-if (length(divergent) > 0) {
-  cat("pre-commit: root and inst/scripts copies diverged for:\n")
-  cat(paste0("  ", divergent, collapse = "\n"), "\n")
-  cat("The inst/scripts copies are what run_pipeline() ships and runs.\n")
-  cat("Sync the copies (decide which is canonical) before committing.\n")
+if (length(unexpected) > 0) {
+  cat("pre-commit: root-level duplicate of inst/scripts file(s):\n")
+  cat(paste0("  ", unexpected, collapse = "\n"), "\n")
+  cat("Pipeline scripts live ONLY in inst/scripts/ (dedup 2026-08-17).\n")
+  cat("Remove the root duplicate before committing.\n")
   quit(status = 1)
 }
-cat("pre-commit: root and inst/scripts copies are identical.\n")
+cat("pre-commit: no root-level inst/scripts duplicates.\n")
 '

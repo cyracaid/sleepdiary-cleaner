@@ -1,31 +1,23 @@
 # test-script-copies-in-sync.R
 #
-# Several pipeline scripts exist in TWO places: the repository root (what
-# 00_MAIN_entry.R sources in dev mode) and inst/scripts/ (what ships with the
-# installed package and what the S3 step adapters call).
+# The pipeline scripts live in inst/scripts/ (what ships with the installed
+# package and what the S3 step adapters call via scripts_dir() in
+# R/pipeline.R). 00_MAIN_entry.R sources scripts through run_pipeline(),
+# which resolves scripts_dir() -> inst/scripts.
 #
-# This is not hypothetical bookkeeping. The Bug 2 denominator guard in
-# calculate_sleep_time_end.R was reported as fixed but was absent from main on
-# 2026-08-05 -- the likeliest cause being a fix applied to one copy while the
-# other won a later merge. A silent divergence means the tests and the
-# production run can execute different cleaning code.
+# Historical note: the repo root once carried duplicate copies of every
+# inst/scripts file (source("00_MAIN_entry.R") in dev mode used the root
+# copy). Those root copies were removed on 2026-08-17 (Phase 1 dedup) --
+# 00_MAIN_entry.R is now a thin shim over run_pipeline() and never sources
+# root scripts. The only root-level .R files that remain are the legacy dev
+# entry points (00_MAIN_entry.R, 00a_setup.R) and the verify_* dev tools.
 #
-# Which copy actually runs depends on how the pipeline is started:
-#   run_pipeline()                -> system.file("scripts")  -> inst/scripts copy
-#   source("00_MAIN_entry.R")     -> getwd()                 -> root copy
-# (see sdir in 00_MAIN_entry.R and scripts_dir() in R/pipeline.R)
-#
-# On 2026-08-05 five scripts had drifted apart: the inst/scripts copies resolved
-# their file paths through cfg_get() while the root copies still hardcoded
-# filenames. Under the default config the two behaved identically, because the
-# cfg_get() defaults were the same strings -- so nothing was visibly broken. The
-# trap was that any config which overrode data.files.* would be honoured by one
-# copy and silently ignored by the other. Those five were resolved by making the
-# config-aware inst/scripts copies canonical and copying them over the root.
-#
-# KNOWN_DIVERGENT is deliberately empty. If a divergence is ever legitimate,
-# add it here with a comment explaining why; otherwise this test should stay at
-# zero and catch the next drift on the commit that introduces it.
+# What this test now guards:
+#   1. inst/scripts exists and is non-empty (the shipped cleaning code).
+#   2. No unexpected root-level duplicate of an inst/scripts file reappears
+#      (dedup regression guard).
+#   3. The Bug 2 denominator guard is present in the canonical inst/scripts
+#      copy (the only copy that ships).
 
 KNOWN_DIVERGENT <- character(0)
 
@@ -44,7 +36,7 @@ KNOWN_DIVERGENT <- character(0)
   NA_character_
 }
 
-test_that("no NEW divergence between root and inst/scripts copies", {
+test_that("no unexpected root-level duplicate of an inst/scripts file", {
   root <- .find_pkg_root()
   skip_if(is.na(root), "package source root not found (installed-package run)")
 
@@ -52,64 +44,65 @@ test_that("no NEW divergence between root and inst/scripts copies", {
   scripts  <- list.files(inst_dir, pattern = "\\.R$")
   skip_if(length(scripts) == 0, "no scripts in inst/scripts")
 
-  divergent <- character(0)
-  for (s in scripts) {
-    root_copy <- file.path(root, s)
-    if (!file.exists(root_copy)) next
-    a <- readLines(root_copy, warn = FALSE)
-    b <- readLines(file.path(inst_dir, s), warn = FALSE)
-    if (!identical(a, b)) divergent <- c(divergent, s)
-  }
+  # Legacy entry points are expected at root; everything else in inst/scripts
+  # must NOT have a root duplicate (dedup contract).
+  allowed_root <- c("00_MAIN_entry.R", "00a_setup.R")
 
-  unexpected <- setdiff(divergent, KNOWN_DIVERGENT)
+  unexpected <- scripts[file.exists(file.path(root, scripts)) &
+                          !(scripts %in% allowed_root)]
   expect_identical(
     unexpected, character(0),
     info = paste0(
-      "New divergence between the repo root and inst/scripts/: ",
-      paste(unexpected, collapse = ", "),
-      ". Work out which copy is correct before syncing them."
-    )
-  )
-
-  # If a known divergence has been repaired, the allowlist is stale.
-  repaired <- setdiff(KNOWN_DIVERGENT, divergent)
-  expect_identical(
-    repaired, character(0),
-    info = paste0(
-      "These files are listed in KNOWN_DIVERGENT but now match: ",
-      paste(repaired, collapse = ", "),
-      ". Remove them from the allowlist."
+      "Root-level duplicate of inst/scripts file(s) reappeared (dedup ",
+      "regression): ", paste(unexpected, collapse = ", "),
+      ". These live only in inst/scripts/. See the file header comment."
     )
   )
 })
 
-test_that("the sleep-efficiency denominator guard is present in both copies (Bug 2)", {
+test_that("inst/scripts ships the canonical cleaning scripts", {
   root <- .find_pkg_root()
   skip_if(is.na(root), "package source root not found (installed-package run)")
 
-  targets <- c(
-    file.path(root, "calculate_sleep_time_end.R"),
-    file.path(root, "inst", "scripts", "calculate_sleep_time_end.R")
+  inst_dir <- file.path(root, "inst", "scripts")
+  required <- c(
+    "process_timestamp_emadatarelease_cyra.R",
+    "process_interval.R",
+    "normalize_sleep_time_sequence.R",
+    "calculate_sleep_time_end.R",
+    "sleep_visualization.R",
+    "checkforerrors_processing.R",
+    "cross_participant_global_check.R"
   )
-
-  for (f in targets) {
-    skip_if_not(file.exists(f), paste("missing:", f))
-    src <- paste(readLines(f, warn = FALSE), collapse = "\n")
-
-    # The efficiency assignment must not be a bare division.
-    expect_false(
-      grepl(
-        "self_diffcalc_sleepefficiency_percent\\s*=\\s*self_diffcalc_totalsleeptime_minutes\\s*/",
-        src
-      ),
-      info = paste0("Bare, unguarded division restored in ", basename(f),
-                    " -- Bug 2 has regressed.")
-    )
-
-    # ...and the guard on the denominator must be present.
+  for (s in required) {
     expect_true(
-      grepl("self_diffcalc_totaltrysleep_minutes\\s*>\\s*0", src),
-      info = paste0("Denominator guard missing in ", basename(f), ".")
+      file.exists(file.path(inst_dir, s)),
+      info = paste0("Missing canonical script in inst/scripts/: ", s)
     )
   }
+})
+
+test_that("the sleep-efficiency denominator guard is present (Bug 2)", {
+  root <- .find_pkg_root()
+  skip_if(is.na(root), "package source root not found (installed-package run)")
+
+  f <- file.path(root, "inst", "scripts", "calculate_sleep_time_end.R")
+  skip_if_not(file.exists(f), paste("missing:", f))
+  src <- paste(readLines(f, warn = FALSE), collapse = "\n")
+
+  # The efficiency assignment must not be a bare division.
+  expect_false(
+    grepl(
+      "self_diffcalc_sleepefficiency_percent\\s*=\\s*self_diffcalc_totalsleeptime_minutes\\s*/",
+      src
+    ),
+    info = paste0("Bare, unguarded division restored in ", basename(f),
+                  " -- Bug 2 has regressed.")
+  )
+
+  # ...and the guard on the denominator must be present.
+  expect_true(
+    grepl("self_diffcalc_totaltrysleep_minutes\\s*>\\s*0", src),
+    info = paste0("Denominator guard missing in ", basename(f), ".")
+  )
 })
