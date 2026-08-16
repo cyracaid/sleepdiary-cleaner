@@ -4,13 +4,17 @@
 \alias{step_normalize_sequence}
 \title{Step 4 -- normalise sleep time sequence}
 \usage{
-step_normalize_sequence(x, flip_gap_hours = NULL)
+step_normalize_sequence(x, flip_gap_hours = NULL, swap_threshold_hours = NULL)
 }
 \arguments{
 \item{x}{A \code{sleep_diary} object.}
 
 \item{flip_gap_hours}{Numeric. Gap above which an AM/PM flip is applied.
 Defaults to the configured \code{timestamp.sequence.max_gap_hours}, or 12.}
+
+\item{swap_threshold_hours}{Numeric. Absolute gap below which a minor
+order error is corrected by swapping the pair. Defaults to the
+configured \code{normalize.swap_threshold_hours}, or 3.}
 }
 \value{
 A \code{sleep_diary} object.

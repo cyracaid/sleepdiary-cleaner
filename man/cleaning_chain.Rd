@@ -27,7 +27,7 @@ run_cleaning_chain(data, corrections_df = data.frame(),
 assert_contract_columns(x, error = TRUE)
 step_process_timestamps(x, vars)
 step_process_intervals(x, vars)
-step_normalize_sequence(x, flip_gap_hours = NULL)
+step_normalize_sequence(x, flip_gap_hours = NULL, swap_threshold_hours = NULL)
 step_apply_corrections(x, corrections_df, manual_unusual_df)
 step_apply_duration_corrections(x)
 step_compute_metrics(x)
@@ -40,6 +40,8 @@ step_compute_metrics(x)
   \item{verbose}{Logical. Print per-step progress.}
   \item{vars}{Character vector of variable names to process.}
   \item{flip_gap_hours}{Numeric. AM/PM flip threshold in hours.}
+  \item{swap_threshold_hours}{Numeric. Gap below which a minor order error
+    is corrected by swapping the pair.}
   \item{error}{Logical. Raise on missing columns if TRUE.}
 }
 \value{
