@@ -123,13 +123,13 @@ calculate_sleep_time_vars_end <- function(data, cfg = NULL) {
   
   if (length(missing_cols) > 0) {
     stop(sprintf(
-      "\n❌ Missing required columns in %s: %s\nPlease ensure these columns exist in the data.",
+      "\n[MISSING] Missing required columns in %s: %s\nPlease ensure these columns exist in the data.",
       data_name,
       paste(missing_cols, collapse = ", ")
     ))
   }
   
-  cat(sprintf("\n✓ All required columns found in %s\n", data_name))
+  cat(sprintf("\n[OK] All required columns found in %s\n", data_name))
   cat("  Starting calculation of sleep variables...\n")
 
   if (!"duration_totalmin_waso_estimate_am_checkforerrors" %in% names(data)) {
@@ -325,24 +325,24 @@ verify_sleep_calculations <- function(data) {
   cat(sprintf("\nFound %d of %d expected variables:\n", length(found_vars), length(expected_vars)))
   if (length(found_vars) > 0) {
     for (var in found_vars) {
-      cat(sprintf("  ✓ %s\n", var))
+      cat(sprintf("  [OK] %s\n", var))
     }
   }
   
   if (length(missing_vars) > 0) {
-    cat("\n❌ Missing variables:\n")
+    cat("\n[MISSING] Missing variables:\n")
     for (var in missing_vars) {
-      cat(sprintf("  ✗ %s\n", var))
+      cat(sprintf("  [X] %s\n", var))
     }
   }
   
-  # Check attributes — confirms the calculation pipeline ran end-to-end
+  # Check attributes -- confirms the calculation pipeline ran end-to-end
   if (!is.null(attr(data, "sleep_vars_calculated"))) {
-    cat(sprintf("\n✓ Sleep variables calculated: %s\n", attr(data, "sleep_vars_calculated")))
-    cat(sprintf("✓ Calculation timestamp: %s\n", attr(data, "calculation_timestamp")))
-    cat(sprintf("✓ Source dataframe: %s\n", attr(data, "source_dataframe")))
+    cat(sprintf("\n[OK] Sleep variables calculated: %s\n", attr(data, "sleep_vars_calculated")))
+    cat(sprintf("[OK] Calculation timestamp: %s\n", attr(data, "calculation_timestamp")))
+    cat(sprintf("[OK] Source dataframe: %s\n", attr(data, "source_dataframe")))
   } else {
-    cat("\n⚠ No calculation metadata found\n")
+    cat("\n[WARN] No calculation metadata found\n")
   }
   
   return(length(missing_vars) == 0)

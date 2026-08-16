@@ -1,0 +1,208 @@
+pipeline:
+  name: Sleep EMA Data Cleaning Pipeline
+  version: 1.0.0
+data:
+  files:
+    main: main.rds
+    manual_error: manual_error_corrections.csv
+    manual_unusual: manual_unusual_corrections.csv
+    manual_nap_exercise: manual_nap_exercise_corrections.csv
+    manual_metric_duration: manual_sleep_metric_duration_corrections.csv
+    manual_metric_accept: manual_metric_review_acceptances.csv
+    second_review: second_review_checklist.csv
+column_mapping:
+  identifiers:
+    pid: pid
+    day_num: day_num
+    row_id: row_id
+    participant: participant
+    study_day: study_day
+    date_bed: StartDate
+  timestamp:
+    time_bed_hhmm: time_bed_am_hhmm
+    time_bed_ampm: time_bed_am_ampm
+    time_sleep_hhmm: time_sleep_am_hhmm
+    time_sleep_ampm: time_sleep_am_ampm
+    time_awake_hhmm: time_awake_am_hhmm
+    time_awake_ampm: time_awake_am_ampm
+    time_getup_hhmm: time_getup_am_hhmm
+    time_getup_ampm: time_getup_am_ampm
+  duration:
+    sol: duration_totalmin_sol_estimate_am
+    waso: duration_totalmin_waso_estimate_am
+    nap: duration_totalmin_napstoday_PM
+    exercise_light: exercisetoday_PM_totalmin_Light
+    exercise_moderate: exercisetoday_PM_totalmin_Moderate
+    exercise_vigorous: exercisetoday_PM_totalmin_Vigorous
+    exercise_strength: exercisetoday_PM_totalmin_Strength
+  waso_count: num_waso_estimate_am
+  substance:
+    caffeine: caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1
+    alcohol: alcoholtoday_PM_NumAlcoholicDrinks_1
+    nicotine: nicotine_amount_pm_doses
+    nicotine_pm: nicotine_amount_pm
+    cannabis: cannabis_amount_pm_doses
+  corrected_timestamp:
+    time_bed: time_bed_corrected
+    time_sleep: time_sleep_corrected
+    time_awake: time_awake_corrected
+    time_getup: time_getup_corrected
+  metric:
+    tst: self_diffcalc_totalsleeptime_minutes
+    sol: self_diffcalc_sol_minutes
+    se: self_diffcalc_sleepefficiency_percent
+    tib: self_diffcalc_timeinbed_minutes
+    sleep_period: self_diffcalc_sleepperiod_minutes
+    total_try_sleep: self_diffcalc_totaltrysleep_minutes
+    waso_used: duration_totalmin_waso_estimate_am_mincalc_used
+    waso_checkforerrors: duration_totalmin_waso_estimate_am_checkforerrors
+  derived:
+    sleep_duration_h: sleep_duration_h
+    sol_h: sol_h
+    waso_h: waso_h
+    sleep_efficiency_pct: sleep_efficiency_pct
+    time_in_bed_h: time_in_bed_h
+  classification:
+    data_category: data_category
+    error_type: error_type
+    unusual_type: unusual_type
+    has_na: has_na
+    manually_corrected: manually_corrected
+    is_priority_adjusted: is_priority_adjusted
+    minor_order_error: minor_order_error
+    flag_severity: flag_severity
+    flag_poor_efficiency: flag_poor_efficiency
+    flag_high_sol: flag_high_sol
+    flag_high_waso: flag_high_waso
+    flag_duration_extreme: flag_duration_extreme
+    flag_issue_count: flag_issue_count
+  auto_detection:
+    checkforerrors_suffix: _checkforerrors
+    needs_review_flag: needs_review_flag
+    auto_error_desc: auto_error_desc
+    sol_category: sol_category
+    se_category: se_category
+    tst_tib_ratio_category: tst_tib_ratio_category
+    metric_duration_input_category: metric_duration_input_category
+timestamp:
+  input_format: hh:mm AM/PM
+  ampm:
+    enabled: yes
+    pm_keywords:
+    - PM
+    - pm
+    - P.M.
+    - p.m.
+    am_keywords:
+    - AM
+    - am
+    - A.M.
+    - a.m.
+  midnight_handling: next_day
+  midnight_threshold_hour: 6
+  sequence:
+    expected_order:
+    - time_bed
+    - time_sleep
+    - time_awake
+    - time_getup
+    max_gap_hours: 12
+  interval:
+    mmss_threshold_minutes: 60
+    max_plausible_minutes: 10000
+    max_nap_minutes: 720
+    max_exercise_minutes: 360
+normalize:
+  swap_threshold_hours: 3
+cross_participant:
+  min_days: 3
+  default:
+    min_baseline_for_spike: 5
+    spike_multiplier: 4
+    low_baseline_median_lt: 15
+    low_baseline_value_gt: 180
+  metrics:
+    subjective_sol:
+      spike_abs_threshold: 120
+      low_baseline_median_lt: 30
+      low_baseline_value_gt: 240
+    waso:
+      min_baseline_for_spike: 3
+      spike_abs_threshold: 60
+      low_baseline_median_lt: 15
+      low_baseline_value_gt: 120
+    nap:
+      spike_abs_threshold: 360
+      low_baseline_median_lt: 10
+      low_baseline_value_gt: 360
+    exercise_light:
+      spike_abs_threshold: 240
+      low_baseline_median_lt: 15
+      low_baseline_value_gt: 270
+    exercise_moderate:
+      spike_abs_threshold: 180
+      low_baseline_median_lt: 10
+      low_baseline_value_gt: 210
+    exercise_vigorous:
+      spike_abs_threshold: 120
+      low_baseline_median_lt: 5
+      low_baseline_value_gt: 180
+    exercise_strength:
+      spike_abs_threshold: 120
+      low_baseline_median_lt: 5
+      low_baseline_value_gt: 150
+classification:
+  temporal:
+    min_sleep_duration_minutes: 120
+    max_sleep_duration_minutes: 780
+    min_time_in_bed_minutes: 120
+    max_time_in_bed_minutes: 960
+    max_sol_minutes: 180
+    max_waso_minutes: 240
+  metric_validation:
+    sol:
+      excessive_minutes: 120
+      negative: yes
+      window_tolerance_minutes: 15
+    se:
+      min_valid_percent: 0
+      max_valid_percent: 100
+      insane_negative_percent: -1000
+    tst_tib_ratio:
+      min_ratio: 0.5
+      max_ratio: 1.0
+    waso:
+      excessive_hours: 1.5
+  flag_severity:
+    poor_efficiency_threshold_pct: 70
+    high_sol_threshold_hours: 1
+    high_waso_threshold_hours: 1.5
+  categories:
+    clean: clean
+    error: error
+    unusual: unusual
+    equal_time_ok: equal_time_ok
+    skipped_na: skipped_na
+    reasonable_unusual: reasonable_unusual
+  auto_detection_categories:
+    timestamp_issue: TIMESTAMP_ISSUE
+    duration_issue: DURATION_ISSUE
+    amount_flag: AMOUNT_FLAG
+    self_reported_flag: SELF_REPORTED_FLAG
+    clean: CLEAN
+    clean_manually_fixed: CLEAN (Manually Fixed)
+output:
+  figure:
+    root_dir: output
+    synth_root_dir: ''
+    width_inches: 14
+    height_inches: 9
+    dpi: 150
+    subfolders:
+      pipeline_cleaning: pipeline_cleaning
+      research_ready: research_ready
+  report:
+    dir: output
+    correction_status: correction_status.csv
+    correction_status_final: correction_status_final.csv
+    flagged_self_reported: flagged_records_self_reported.csv

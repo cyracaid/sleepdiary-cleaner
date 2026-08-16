@@ -469,7 +469,7 @@ process_manual_unusual_correction <- function(data, correction,
     data$time_getup_manual[row_idx] <- data[[getup_am_col]][row_idx]
     
     operations_applied <- TRUE
-    cat(sprintf("  ✓ Undo correction: pid=%s, day=%d\n", pid, day_num))
+    cat(sprintf("  [OK] Undo correction: pid=%s, day=%d\n", pid, day_num))
     
     if (operations_applied) data$manually_corrected[row_idx] <- TRUE
     return(data)
@@ -540,7 +540,7 @@ process_manual_unusual_correction <- function(data, correction,
   
   if (operations_applied) {
     data$manually_corrected[row_idx] <- TRUE
-    cat(sprintf("  ✓ Marked as manually corrected: pid=%s, day=%d\n", pid, day_num))
+    cat(sprintf("  [OK] Marked as manually corrected: pid=%s, day=%d\n", pid, day_num))
   }
   
   return(data)
@@ -576,7 +576,7 @@ process_case3_correction <- function(data, correction,
     data$time_getup_manual[row_idx] <- data[[getup_am_col]][row_idx]
     
     operations_applied <- TRUE
-    cat(sprintf("  ✓ Undo correction: pid=%s, day=%d\n", pid, day_num))
+    cat(sprintf("  [OK] Undo correction: pid=%s, day=%d\n", pid, day_num))
     
     if (operations_applied) data$manually_corrected[row_idx] <- TRUE
     return(data)
@@ -641,7 +641,7 @@ process_case3_correction <- function(data, correction,
   
   if (operations_applied) {
     data$manually_corrected[row_idx] <- TRUE
-    cat(sprintf("  ✓ Marked as manually corrected: pid=%s, day=%d\n", pid, day_num))
+    cat(sprintf("  [OK] Marked as manually corrected: pid=%s, day=%d\n", pid, day_num))
   }
   
   return(data)
@@ -669,7 +669,7 @@ process_case2_correction <- function(data, correction,
     data$time_awake_manual[row_idx] <- data[[awake_am_col]][row_idx]
     data$time_getup_manual[row_idx] <- data[[getup_am_col]][row_idx]
     operations_applied <- TRUE
-    cat(sprintf("  ✓ Undo correction: pid=%s, day=%d\n", pid, day_num))
+    cat(sprintf("  [OK] Undo correction: pid=%s, day=%d\n", pid, day_num))
   }
   
   # Step 2: Process AM/PM conversion
@@ -1161,7 +1161,7 @@ apply_manual_corrections_and_recalculate <- function(ema_data, corrections_df, m
         time_awake_manual = !!sym(time_awake_corrected_col),
         time_getup_manual = !!sym(time_getup_corrected_col)
       )
-    cat("  ✓ Created manual columns\n")
+    cat("  [OK] Created manual columns\n")
   }
   
   if (!"manually_corrected" %in% names(ema_data)) {
@@ -1175,7 +1175,7 @@ apply_manual_corrections_and_recalculate <- function(ema_data, corrections_df, m
                                       as.numeric(difftime(!!sym(time_awake_corrected_col), !!sym(time_sleep_corrected_col), units = "mins")),
                                       NA_real_)
       )
-    cat("  ✓ Created sleep_awake_diff_min column\n")
+    cat("  [OK] Created sleep_awake_diff_min column\n")
   }
 
   
@@ -1263,7 +1263,7 @@ apply_manual_corrections_and_recalculate <- function(ema_data, corrections_df, m
       !!sym(time_getup_corrected_col) := time_getup_manual
     )
   
-  cat("  ✓ Corrected columns updated\n")
+  cat("  [OK] Corrected columns updated\n")
   
   # ============================================
   # Step 5: Check swap operations
@@ -1304,7 +1304,7 @@ apply_manual_corrections_and_recalculate <- function(ema_data, corrections_df, m
   }
   
   write_csv(corrections_df, "manual_error_correction_updated.csv", na = "")
-  cat(sprintf("  ✓ Saved updated corrections to manual_error_correction_updated.csv\n"))
+  cat(sprintf("  [OK] Saved updated corrections to manual_error_correction_updated.csv\n"))
   
   # ============================================
   # Step 8: Generate statistics
@@ -1339,7 +1339,7 @@ apply_manual_corrections_and_recalculate <- function(ema_data, corrections_df, m
   
   list2env(results, envir = .GlobalEnv)
   
-  cat("\n✓ All dataframes saved to global environment:\n")
+  cat("\n[OK] All dataframes saved to global environment:\n")
   cat("  equal_time_df: Equal time records\n")
   cat("  error_df: Error records (with duration comparison)\n")
   cat("  unusual_df: Unusual records (Reasonable unusual records removed by pid and row_id)\n")
@@ -1353,7 +1353,7 @@ apply_manual_corrections_and_recalculate <- function(ema_data, corrections_df, m
   cat("  correction_summary: Correction statistics\n")
   
   if (!is.null(duration_col)) {
-    cat("\n✓ Duration comparison added to error_df and unusual_df:\n")
+    cat("\n[OK] Duration comparison added to error_df and unusual_df:\n")
     cat("  - duration_from_data_min: Duration from original data (minutes)\n")
     cat("  - duration_calculated_min: Duration calculated from sleep times (minutes)\n")
     cat("  - duration_difference_min: Difference (minutes)\n")
@@ -1363,7 +1363,7 @@ apply_manual_corrections_and_recalculate <- function(ema_data, corrections_df, m
   
   if (exists("reasonable_unusual_df") && nrow(reasonable_unusual_df) > 0) {
     write_csv(reasonable_unusual_df, "reasonable_unusual_records.csv", na = "")
-    cat(sprintf("\n✓ Saved %d Reasonable unusual records to reasonable_unusual_records.csv\n", 
+    cat(sprintf("\n[OK] Saved %d Reasonable unusual records to reasonable_unusual_records.csv\n", 
                 nrow(reasonable_unusual_df)))
   }
   

@@ -23,26 +23,26 @@
 #     bed time < sleep time < awake time < getup time
 #
 # Input:
-#   AM_rawdata – A dataframe containing AM/PM sleep-log variables
+#   AM_rawdata - A dataframe containing AM/PM sleep-log variables
 #   (time_bed_am_hhmm_ampm, time_sleep_am_hhmm_ampm, ...).
 #
 # Output:
 #   A list with two elements:
-#     $cleaned_data       – The corrected dataframe with new columns
-#                           (*_corrected, corrected, correction_type, …)
-#     $classification_df  – A report of which records were corrected
+#     $cleaned_data       - The corrected dataframe with new columns
+#                           (*_corrected, corrected, correction_type, ...)
+#     $classification_df  - A report of which records were corrected
 #                           and what fix was applied.
 #
 # Columns written to cleaned_data:
 #   time_bed_corrected,
 #   time_sleep_corrected,
 #   time_awake_corrected,
-#   time_getup_corrected – Corrected copies of the original timestamps.
-#   corrected            – Boolean; TRUE if any fix was applied.
-#   correction_type      – Concatenated string naming the applied fix(es).
-#   has_na               – TRUE if any of the four raw timestamps is NA.
-#   data_category        – "skipped_na" for incomplete rows, NA otherwise.
-#   row_id               – Unique row number.
+#   time_getup_corrected - Corrected copies of the original timestamps.
+#   corrected            - Boolean; TRUE if any fix was applied.
+#   correction_type      - Concatenated string naming the applied fix(es).
+#   has_na               - TRUE if any of the four raw timestamps is NA.
+#   data_category        - "skipped_na" for incomplete rows, NA otherwise.
+#   row_id               - Unique row number.
 ################################################################################
 
 normalize_sleep_time_sequence <- function(AM_rawdata, flip_gap_hours = 12,
@@ -200,7 +200,7 @@ normalize_sleep_time_sequence <- function(AM_rawdata, flip_gap_hours = 12,
   #   Even after the AM/PM correction above, some records may still violate
   #   the natural order (e.g., bed recorded AFTER sleep).  When the
   #   violation is small (< 3 hours) it almost certainly reflects a
-  #   data-entry slip — the user simply wrote down the times in the wrong
+  #   data-entry slip -- the user simply wrote down the times in the wrong
   #   columns.  Since the values themselves are plausible (the gap is tiny),
   #   we swap the pair to restore the correct logical order.  Larger
   #   violations (> 3h) could indicate a genuinely unusual sleep pattern
@@ -278,7 +278,7 @@ normalize_sleep_time_sequence <- function(AM_rawdata, flip_gap_hours = 12,
   # ==========================================================================
   # Rationale:
   #   The *_checkforerrors variables are generated during the parsing /
-  #   reading step when a timestamp string cannot be cleanly interpreted —
+  #   reading step when a timestamp string cannot be cleanly interpreted --
   #   they act as a red flag indicating ambiguous or malformed input.
   #   However, once our correction logic has successfully produced a valid
   #   (non-NA) POSIXct value in the corresponding *_corrected column, the
