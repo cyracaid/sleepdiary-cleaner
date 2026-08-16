@@ -9,7 +9,7 @@
 #
 # THE PROBLEM IT SOLVES:
 #   Existing checks are entirely row-local or use global thresholds.
-#   Example: pid 6259 normally reports SOL=5-30min across 12 days,
+#   Example: a participant normally reports SOL=5-30min across 12 days,
 #   but on day 4 their subjective SOL is 400min. Looking only at
 #   day 4 in isolation, 400min triggers SOL:excessive. But looking
 #   at ALL their days shows the pattern: they always have short SOL

@@ -16,7 +16,7 @@
 #
 #   §7① Participant clustering: a subset of participants is marked
 #       "error-prone" and receives a disproportionate share of injected
-#       errors, matching the real pid-1036-style clustering (33% of one
+#       errors, matching the real-data clustering pattern (33% of one
 #       participant's SOL days were misentries) rather than IID-per-row
 #       injection, which would make cross_participant_spike evaluation
 #       meaningless.

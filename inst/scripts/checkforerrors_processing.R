@@ -481,7 +481,7 @@ for (label in names(nap_exercise_vars)) {
 #        specifically produces small, plausible-looking numbers, not large
 #        ones.
 #
-#        Real-world motivation: pid 1036 in the actual study data (see
+#        Real-world motivation: a participant in the actual study data (see
 #        work_logs/2026-06-18_cross_participant_global_check.md) had clock
 #        times leaking into the SOL field on 3/9 non-NA days, silently
 #        "normalized" into small plausible-looking minute counts by exactly

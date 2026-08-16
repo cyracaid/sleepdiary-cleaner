@@ -93,9 +93,10 @@ categories:
       injected instances should include variants Step 1.5's exact-string-
       match logic would plausibly miss (e.g. off-by-format near-matches).
     real_examples:
-      - "pid 1036: 3/9 non-NA SOL days (33%) were sleep-time entries misread
-         as SOL duration (630-660 'minutes')"
-      - "pid 2835, 4481, 6805: single-day instances, 615/765/725 'minutes'"
+      - "real data: on 3/9 non-NA SOL days (33%) of one participant, sleep-time
+         entries were misread as SOL duration (600+ 'minutes')"
+      - "real data: single-day instances across several participants,
+         600-800 'minutes' reported"
     fields_affected: [duration_totalmin_sol_estimate_am]
     source_field: time_sleep_am_hhmm    # the value that leaks into the target field
     rate_anchor_pct: 0.10   # 6/13990 in the one real audit that looked for it --
