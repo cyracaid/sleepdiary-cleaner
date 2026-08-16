@@ -148,35 +148,3 @@ threshold validation) live separately in `output/verification/<tag>/`.
 | 3 | **18 Auto-Detected Dashboard** | Flag counts match `correction_status_final.csv` | Mismatch = misalignment |
 | 4 | **02 Distribution Sleep Variables** | TST peaks 6–8 h, SOL right-skewed, WASO < 60, SE > 85% | SOL flat/bimodal = AM/PM confusion |
 | 5 | **19 Unified Quality Status** | Most records Clean/Minor; Error+Unusual < 5% | High = review manual CSVs |
-
-## 中文 — 如何读懂管线输出
-
-`run_pipeline()` 跑完后，`output/correction_status_final.csv`（运行摘要）和
-`output/step_flag_ledger.csv`（每步标记追踪）是核心。运行摘要各列含义与检查
-标准见下表：
-
-| 列 | 含义 | 检查标准 |
-|----|------|---------|
-| `n_total` | 总记录数 | 必须等于输入行数 |
-| `tst_mean_h` | 平均 TST（小时） | 6.0–8.5 h 正常 |
-| `sol_mean_min` | 平均 SOL（分钟） | 10–45 min 正常 |
-| `n_error` | 时序不可能记录 | < 1%；若 > 5% 检查问卷设计 |
-| `n_corrected` | 人工修正记录数 | 应与 `manual_error_corrections.csv` 行数一致 |
-
-**稳定性规则**：同一数据跑两次 → 每个数字必须相同。否则非确定性。
-
-ledger 用 5 个独立评估标准：`field_misentry`（Step 1.5，跨字段污染）、
-`data_category`（Step 6 起冻结，`equal_time_ok + skipped_na = n_total`）、
-`flag_severity`（Step 7 起冻结，Clean+Minor+Major = n_total − skipped_na）、
-`duration_extreme`（Too short + Too long < 5%）、`checkforerrors`（仅 Step 8）。
-
-**回归检查**：重跑前先 `file.copy` 存基线，重跑后 `identical()` 对比关键列。
-输入未变但结果不同 → 管线输出改变了，需调查。
-
-**快速检查卡**：管线完成（`correction_status_final.csv` 存在）、TST 6–8.5、
-SOL 10–45、n_error < 1%、各标准计数冻结、全记录有交代、确定性。
-
-**图表**：`latest_visualization_<tag>_n<rows>/` 每次运行覆盖，`figure_index.png`
-总览。出版用图：Figure 1 管线流程（各阶段计数）、Figure 2 校正影响（delta
-lollipop + 散点）。5 张必看图：质量仪表板、校正进度（C 检查点后才出现
-Corrected 条）、自动检测仪表板、睡眠变量分布、统一质量状态（Error+Unusual < 5%）。

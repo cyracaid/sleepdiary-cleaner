@@ -74,20 +74,3 @@ confirms the current S3 pipeline chain produces byte-identical output to the
 legacy pipeline path on real data. `verify_reference_fidelity.R` separately
 pins each of the 8 core metric formulas against a documented baseline
 (`--strict` mode is CI-wired).
-
-## 中文 — 测试覆盖率
-
-管线包含 12 个测试文件、190+ 条 testthat 断言，全部检验软件正确性——代码是否
-按设计跑——区别于方法学效度（后者见验证方法学 vignette）。测试覆盖：AM/PM 校正
-与边界、冒号格式、端到端运行、S3 构造与步骤契约、5 个 flag 评估器、全部分类
-结果、阈值边界、自动检测边界、finalize 交付契约、NA/Inf 守卫（两个真实 bug 的
-回归）、配置加载、双维护脚本字节一致性。
-
-**运行方式**：`testthat::test_package("splsleep")`（已装包，快）/
-`pkgload::load_all(".")` + `testthat::test_dir("tests/testthat")`（源码开发）/
-`devtools::test()`（推荐）。完整包检查：`devtools::check()`。`devtools` 是纯
-开发工具，刻意不是包依赖。
-
-**Snapshot 验证**（`verify_v1_3_snapshot.R`）：当前 S3 管线链与旧管线路径在
-真实数据上输出字节一致（13/13）。`verify_reference_fidelity.R` 单独把 8 个核心
-指标公式钉在文档化基线上（`--strict` 模式已接入 CI）。

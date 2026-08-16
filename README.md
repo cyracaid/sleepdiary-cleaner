@@ -1,5 +1,7 @@
 # SPL Sleep — EMA Sleep Diary Data Cleaning Pipeline
 
+[![Documentation](https://img.shields.io/badge/docs-pkgdown%20site-blue)](https://cyracaid.github.io/sleepdiary-cleaner/)
+
 > **[English](#english) · [中文](#中文)**
 
 ---
@@ -9,6 +11,17 @@
 # English Version
 
 SPL Sleep is a reproducible, auditable R pipeline for cleaning sleep EMA (ecological momentary assessment) diary data. It parses raw bedtime/sleep/awake/get-up timestamps, detects and corrects temporal and duration errors through a transparent human-in-the-loop workflow (every correction stored in a re-readable CSV), computes standard sleep metrics (TST, SOL, WASO, SE), validates self-reported durations, and generates diagnostic and research-ready figures. A schema-validated YAML config maps the pipeline to your dataset without touching code; detection thresholds and their rationale are documented in THRESHOLDS.md, and the input contract in SCHEMA.md.
+
+## Documentation
+
+Full documentation site (searchable function reference + vignettes, bilingual):
+**[https://cyracaid.github.io/sleepdiary-cleaner/](https://cyracaid.github.io/sleepdiary-cleaner/)**
+
+- [Pipeline Architecture](https://cyracaid.github.io/sleepdiary-cleaner/articles/pipeline-architecture.html) / [管线架构（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/pipeline-architecture-zh.html)
+- [Column Mapping & Config](https://cyracaid.github.io/sleepdiary-cleaner/articles/column-mapping.html) / [列映射与配置（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/column-mapping-zh.html)
+- [Interpreting the Output](https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output.html) / [如何读懂输出（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output-zh.html)
+- [Validation Methodology](https://cyracaid.github.io/sleepdiary-cleaner/articles/validation-methodology.html) / [验证方法学（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/validation-methodology-zh.html)
+- [Testing Coverage](https://cyracaid.github.io/sleepdiary-cleaner/articles/testing-coverage.html) / [测试覆盖率（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/testing-coverage-zh.html)
 
 **v1.4.3 (current)** — fixes `sleep_awake_swap_3h`, the one correction rule that real-data redundant-channel validation (Channel B) flagged as negative: the swap now requires `bed <= awake`, so it can no longer put the new sleep time before bed and worsen the SOL gap. Real-data rerun: 10 → 4 swap rows, all order-valid, 3/4 closer to self-report. v1.4.2 tracked the synthetic-error-injection benchmark harness under `validation/synthetic/` (no cleaning-logic change; that harness found the two v1.4.1 bugs). v1.4.1 was the bug-fix release on top of the v1.4.0 delivery gate: 190+ tests, R CMD CHECK 0 ERROR / 0 WARNING. v1.4.0 added `finalize_columns()` as Step 10, the column dictionary as single source of truth, reserved affect-layer columns, an export guard against negative signed minutes, and CI-verified delivery wiring. v1.4.1 fixed two review-pipeline bugs found during validation: a silent-misrepair blind spot where a clock time typed into a duration field could be "corrected" into a small, plausible-looking number without ever being flagged for human review, and a defect where the two human-review CSVs were never actually being written to disk despite the pipeline log reporting success. See [releases](https://github.com/cyracaid/sleepdiary-cleaner/releases) for full changelog. Installable via `renv::install("cyracaid/sleepdiary-cleaner")`.
 
@@ -1140,6 +1153,17 @@ MIT
 # 中文版本
 
 自动化的睡眠 EMA 日记数据清洗管线：解析原始就寝/入睡/醒来/起床时间戳，检测并修正时序和时长错误，计算睡眠指标（TST、SOL、WASO、SE），验证自报时长，生成诊断与科研图表。
+
+## 文档
+
+完整文档站（可搜索函数参考 + 教程，双语）：
+**[https://cyracaid.github.io/sleepdiary-cleaner/](https://cyracaid.github.io/sleepdiary-cleaner/)**
+
+- [管线架构（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/pipeline-architecture-zh.html) / [Pipeline Architecture](https://cyracaid.github.io/sleepdiary-cleaner/articles/pipeline-architecture.html)
+- [列映射与配置（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/column-mapping-zh.html) / [Column Mapping & Config](https://cyracaid.github.io/sleepdiary-cleaner/articles/column-mapping.html)
+- [如何读懂输出（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output-zh.html) / [Interpreting the Output](https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output.html)
+- [验证方法学（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/validation-methodology-zh.html) / [Validation Methodology](https://cyracaid.github.io/sleepdiary-cleaner/articles/validation-methodology.html)
+- [测试覆盖率（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/testing-coverage-zh.html) / [Testing Coverage](https://cyracaid.github.io/sleepdiary-cleaner/articles/testing-coverage.html)
 
 **v1.4.3（当前版本）** — 修复 `sleep_awake_swap_3h`，真实数据冗余通道验证（Channel B）标记为负面的唯一一条纠正规则：交换现在要求 `bed <= awake`，不再把新 sleep 时间放到 bed 之前、加剧 SOL 差距。守卫后真实数据重跑：swap 行 10 → 4，全部时序有效，3/4 更接近自报值。v1.4.2 将合成错误注入 benchmark harness 纳入仓库（`validation/synthetic/`，无清洗逻辑改动；该 harness 正是揪出 v1.4.1 两个 bug 的工具）。v1.4.1 是在 v1.4.0 交付门基础上的 bug 修复版本，190+ 个测试，R CMD CHECK 0 ERROR / 0 WARNING。v1.4.0 新增了 `finalize_columns()`（Step 10）、作为唯一事实来源的列字典、保留的 affect 层列、负数导出门、以及 CI 校验的交付接线。v1.4.1 修复了验证过程中发现的两处人工复核环节 bug：一处是时钟时间误填进时长字段后会被"修正"成看似合理的小数字、却从未被标记转人工审核的静默误改盲区；另一处是两份人工复核 CSV 实际上从未被写盘，尽管管线日志一直报告"已保存"。完整变更见 [releases](https://github.com/cyracaid/sleepdiary-cleaner/releases)。通过 `renv::install("cyracaid/sleepdiary-cleaner")` 安装。
 

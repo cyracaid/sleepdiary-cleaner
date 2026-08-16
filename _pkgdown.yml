@@ -3,17 +3,21 @@ destination: docs/
 template:
   bootstrap: 5
 articles:
-  - title: "Validation"
+  - title: "Validation / 验证"
     contents:
       - validation-methodology
       - validation-methodology-zh
-  - title: "Pipeline"
+  - title: "Pipeline / 管线"
     contents:
       - pipeline-architecture
-  - title: "Usage"
+      - pipeline-architecture-zh
+  - title: "Usage / 使用"
     contents:
       - column-mapping
+      - column-mapping-zh
       - interpreting-output
-  - title: "Quality"
+      - interpreting-output-zh
+  - title: "Quality / 质量"
     contents:
       - testing-coverage
+      - testing-coverage-zh

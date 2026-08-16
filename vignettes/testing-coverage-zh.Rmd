@@ -1,0 +1,68 @@
+---
+title: "测试覆盖率（中文）"
+description: "12 个测试文件、190+ 条 testthat 断言：测试验证什么、怎么运行、snapshot 验证如何工作。"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{测试覆盖率（中文）}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+管线包含 12 个测试文件、190+ 条 testthat 断言，全部检验软件正确性——代码是否
+按设计跑——区别于方法学效度（后者见验证方法学 vignette）。
+
+```{r setup, eval = FALSE}
+library(splsleep)
+```
+
+## 测试文件与覆盖
+
+| 测试文件 | 覆盖 |
+|-----------|----------|
+| `test-normalize.R` | AM/PM 校正、轻微顺序错误、跨午夜、边界情况 |
+| `test-interval.R` | 时长解析中的冒号格式边界情况 |
+| `test-pipeline.R` | 合成数据端到端运行、配置加载、列适配 |
+| `test-sleep-diary.R` | S3 构造、校验、强制转换、泛型、步骤契约断言、溯源 |
+| `test-flag-standards.R` | field misentry / data category / duration extreme / flag severity / checkforerrors 评估器；step-ledger 记录 |
+| `test-correction-engine.R` | 全部分类结果（顺序 / bed-sleep / awake-getup / 24h 错误、等时、异常、跳过 NA、多重错误、可疑潜伏期 flag）|
+| `test-classification-thresholds.R` | 每个分类阈值的边界行为（7h 错误、3h/15h 异常、可疑潜伏期）|
+| `test-auto-detection-thresholds.R` | Step 8 自动检测 flag 的 SOL/SE/TST-TIB 边界行为 |
+| `test-finalize-columns.R` | 字典 ↔ 交付列一致性、A/B 连接键唯一性、单位转换、保留列透传、导出门、缺失/可选列处理 |
+| `test-nonfinite-guards.R` | 时长与 flag-severity 评估器中的 NA/Inf 处理（两个真实 bug 的回归测试）|
+| `test-config-data.R` | 配置加载（RDS/CSV、旧键、列映射、友好报错）|
+| `test-script-copies-in-sync.R` | 每个双维护脚本在根目录与 `inst/scripts/` 的副本保持字节一致 |
+
+## 如何运行测试
+
+```r
+# 已安装包模式（快，测的是构建好的包）：
+testthat::test_package("splsleep")
+
+# 源码开发模式（测工作区当前代码；编辑代码时用这个——
+# 单独跑 test_dir() 不会加载被测包，必须先加载）：
+pkgload::load_all(".")
+testthat::test_dir("tests/testthat")
+
+# 首选开发工作流（一次调用完成加载源码 + 跑测试，需要装 devtools）：
+devtools::test()
+```
+
+完整包检查（文档、示例、测试、`verify_reference_fidelity` / 双副本检查）：
+
+```r
+devtools::check()   # 需要 devtools；等价于：R CMD check splsleep_*.tar.gz
+```
+
+`devtools` 是纯开发工具——刻意**不是**包的依赖（不在 `DESCRIPTION` 里），
+安装或运行 splsleep 本身从不需要它。
+
+## Snapshot 验证
+
+Snapshot 验证（`inst/verification/`、`verify_v1_3_snapshot.R`）确认当前 S3
+管线链在真实数据上产生与旧管线路径字节一致（byte-identical）的输出。
+`verify_reference_fidelity.R` 单独把 8 个核心指标公式钉在文档化基线上
+（`--strict` 模式已接入 CI）。

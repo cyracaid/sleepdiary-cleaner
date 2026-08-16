@@ -106,12 +106,3 @@ validation-methodology vignette, Step 7).
 | `has_correction` | Step 7 (traceability) | none, algorithmic, manual, both |
 | `flag_severity` | Step 7 (metrics) | Clean, Minor (1 flag), Major (2+ flags) |
 | `checkforerrors_summary` | Step 8 (auto-detect) | TIMESTAMP_ISSUE, DURATION_ISSUE, AMOUNT_FLAG, SELF_REPORTED_FLAG, CLEAN |
-
-## 中文 — 管线架构
-
-`run_pipeline()` 清洗管线分 10 步：原始数据 → 时间戳解析 → 区间处理 → 时序修正
-→ 时长修正 → 指标计算 → 自动检测 → 跨被试检查 → 可视化。清洗逻辑组织为八个
-规则族（上表），每族针对自由文本自报的一种失效模式，并由合成错误类验证。
-决策三态：AUTO_FIX（确定性、可逆、需佐证）→ FLAG（人工审查队列）→ AUDIT-only
-（记录不动作）。所有规则族确定性（同输入 → 同输出，snapshot 验证），故无评分者
-变异，评分者间信度不适用；人工共同审查一致性见验证方法学 vignette 第 7 步。
