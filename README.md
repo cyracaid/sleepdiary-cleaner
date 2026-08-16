@@ -731,14 +731,160 @@ Snapshot verification (`inst/verification/`, `verify_v1_3_snapshot.R`) confirms 
 
 ## Validation
 
-Testing coverage (above) proves the code does what it was designed to do. It does not prove the design itself is methodologically valid — sleep-diary cleaning has no ground truth, since nobody can know for certain what a participant meant when they typed "10:30" into a duration field. This pipeline's validation strategy runs four independent lines of evidence, deliberately chosen so each one fails in a different way: a cleaning decision that survives all four is far more defensible than one that only survives a single check.
+Testing coverage (above) proves the code does what it was designed to do. It
+does not prove the design itself is methodologically valid — sleep-diary
+cleaning has no ground truth, since nobody can know for certain what a
+participant meant when they typed "10:30" into a duration field.
 
-| Evidence | What it tests | Status |
-|---|---|---|
-| **Clean-input specificity** | Run 100% error-free synthetic data through the pipeline; a correctly-behaving pipeline should make zero corrections. Any correction on clean input is pure iatrogenic damage. | ✅ 0 corrections on 10,000 clean synthetic records |
-| **Redundant-channel validation** | Real diaries record sleep-onset latency two independent ways — self-reported duration, and derived from timestamps. Step 4's timestamp-correction logic never reads the duration columns (verified by source inspection), so comparing the two after correction is a non-circular check, run directly on real data with no synthetic injection needed. | ✅ On real production data (n=13,990): the two largest correction rules (`bed_sleep_swap_3h`, `sleep_reduce_12h_loop`) move corrected records measurably closer to self-report (Wilcoxon p < 1e-7 both). Validation surfaced a real negative effect in the smaller rule `sleep_awake_swap_3h` (7/10 worsened): **diagnosed and fixed in v1.4.3** with a `bed <= awake` swap guard (root cause: swapping when the old awake time precedes bed puts the new sleep time before bed, worsening the SOL gap). Post-guard real-data rerun: swap rows 10 → 4, all order-valid, 3/4 improved |
-| **Human co-review agreement** | Two researchers jointly reviewed every record the pipeline flagged for manual attention. | ✅ 64.0% immediate agreement on flagged temporal errors (n=75), 89.2% on statistically atypical records (n=37). Reported as raw agreement rather than inter-rater reliability / Cohen's κ, since review was collaborative (one shared worksheet) rather than independently double-coded — κ requires each rater's pre-discussion label, which this workflow never produced |
-| **Calibrated injected-error benchmark + downstream sensitivity** | Synthetic error injection with known ground truth, calibrated to empirically observed error rates; sensitivity of downstream sleep metrics (TST/SOL/WASO/SE) to cleaning-pipeline choices. | 🟡 First pass done: 0/10,000 false alterations on structurally-clean synthetic input; per-category detection results across 12 injected-error types; found and fixed 2 real bugs this way (a silent-misrepair blind spot pre-patch at 95.8%/96.0%, now 3.5%/0% — shipped in v1.4.1). Full recall/specificity/PPV-curve, cluster-bootstrap, multiverse, and downstream-sensitivity analysis not yet started. Harness and results: `validation/synthetic/` |
+Our answer is a **multi-step validation chain**. Each step asks one question,
+fails in a different way, and is deliberately independent of the others: a
+cleaning decision that survives every step is far more defensible than one
+that only survives a single check. We run the steps in this order, from
+"does the pipeline harm good data?" to "does it survive real-world
+uncertainty?".
+
+### Step 1 — Does the pipeline touch clean data? (clean-input specificity)
+
+**What we do.** Generate synthetic data with *no errors at all* (10,000
+records), run the pipeline, and count how many records it changed or flagged.
+**The rule.** On clean input the correct answer is zero of both. Any change is
+pure iatrogenic damage; any flag is a false alarm.
+
+**Result.** FCR (records altered) **0 / 9,996**; FAR_flag **0 / 1,609**;
+FAR_alter **0 / 1,609** (rule-of-three 95% upper bound ≈ 0.03%).
+**Meaning.** The pipeline does no harm to good data.
+
+### Step 2 — Does the pipeline catch known errors? (injected-error benchmark)
+
+**What we do.** Take clean synthetic data, deliberately corrupt it with known
+errors — 400 injections per error category — and record the true value of each
+injection *at injection time* (a ground-truth table). Run the pipeline on the
+corrupted data. Compare its output against the ground truth.
+
+**Result.**
+
+| Quantity | Value |
+|---|---|
+| Pooled recall (errors detected) | **0.995** [0.994, 0.997] |
+| Specificity | 1.0 |
+
+Cluster-bootstrap CIs at participant level (1,000 iterations), because
+records from the same participant are correlated.
+
+**Meaning.** 99.5% of injected errors are caught — either flagged for a human
+or auto-corrected. This benchmark is also how we found and fixed two real bugs
+that were invisible in logs and by eye (v1.4.1, see Step 3).
+
+### Step 3 — When we fix, do we fix *right*? (detection vs. value-correctness)
+
+**What we do.** Split "caught" into two numbers: **detected** (L1: flagged or
+corrected) and **value-correct** (L3: the final value actually equals the
+ground truth). The gap between them is where human review lives.
+
+**Result.** `ampm_swap`: L1 1.0, L3 0.565. `field_misentry`: L1 1.0, L3 0.018.
+Mis-repair rate (MRR) in the current run: **0 across all categories**.
+
+**Meaning.** Detection is not the same as guessing a correct value. When the
+correct restoration is uncertain (AM/PM flips, clock-time-in-duration fields),
+the pipeline flags for a human instead of guessing — that is the design
+working. The `field_misentry` L3 gap is the *fixed* state of a bug the
+benchmark caught: pre-v1.4.1, 95.8% of these entries were silently "repaired"
+to wrong but plausible values; now 0% are — they go to human review.
+
+### Step 4 — Is the pipeline better than doing nothing? (controls)
+
+**What we do.** Compare three conditions on the same corrupted data: no
+cleaning at all, a naive regex-only rule, and the full pipeline.
+
+**Result.** no_cleaning **0** / naive_rule **0.623** / pipeline **0.995**.
+**Meaning.** Raw strings give zero detection; a naive rule catches 62%; the
+full pipeline 99.5%. The +37 points over naive is the value the rule families
+add.
+
+### Step 5 — Do corrections make real data *better*? (redundant-channel, no synthetic standard)
+
+**What we do.** Real diaries measure sleep-onset latency two independent ways:
+self-reported duration, and derived from timestamps. Step 4's correction logic
+never reads the duration columns (verified by source inspection), so comparing
+the two after correction is non-circular. Run on real production data
+(n = 13,990) — no injection needed.
+
+**Result.** `bed_sleep_swap_3h` 39/39 improved (100% [91–100%]);
+`sleep_reduce_12h_loop` 38/38; all bed/sleep-relevant corrections 81/88 (92%).
+This step also surfaced a *negative* rule, `sleep_awake_swap_3h` (7/10
+worsened, p = 0.036): **diagnosed and fixed in v1.4.3** with a `bed <= awake`
+guard. Post-guard rerun: swap rows 10 → 4, 3/4 improved; 7 worsened → 1
+disclosed boundary case.
+
+**Meaning.** Corrections move values toward self-report 92% of the time, on
+real data, with a redundant-channel yardstick that needs no synthetic
+standard. The one bad rule was found *by this step* and guarded.
+
+### Step 6 — What does the pipeline find in real data? (audit, n = 13,990)
+
+**What we do.** Run the pipeline in report-only mode over all 13,990 real
+records; count what each rule family flags. No data is changed.
+
+**Result.** 0 AUTO_FIX, 1048 FLAG — of which **922 logical-window
+violations** (derived SOL longer than the bed→sleep window, max 225 min),
+140 temporal order violations, 1 redundancy-confirmed worsening (the known
+pid-6490 case), 1 cross-day spike, 0 unmapped correction notes (all 14,338
+notes map to known mechanisms).
+
+**Meaning.** The pipeline finds real, previously unknown problems in our data
+(922!) without changing a single value. This is the layer the synthetic
+benchmark cannot provide: synthetic proves *detection ability*, this proves
+*real-world prevalence*. Script: `audit_review_queue_m1_m7.R`; output
+`audit_m1_m7_decision.csv`.
+
+### Step 7 — Do the humans agree? (co-review agreement)
+
+**What we do.** Two researchers jointly reviewed every record the pipeline
+flagged. Report the proportion agreed on the spot vs. requiring discussion.
+
+**Result.** Flagged temporal errors: **64.0%** immediate agreement (n = 75),
+36.0% required discussion. Statistically atypical records: **89.2%** (n = 37),
+10.8% required discussion. The two tracks are independent and not additive;
+the flagged set grew 47 → 75 as detection rules strengthened.
+
+**Meaning.** Reported as **co-review agreement**, not inter-rater reliability
+/ Cohen's κ — the review was collaborative (one shared worksheet), so the
+independent label sets κ requires never existed. Higher agreement on atypical
+cases than on corrections is consistent with task difficulty: judging whether
+a record is unusual is easier than deciding exactly how to fix it.
+
+### Step 8 — Do our choices matter? (multiverse, downstream sensitivity, seeds)
+
+**What we do.** Vary the cleaning thresholds and rule choices across a
+specification grid; measure how much the results and downstream metrics move.
+
+**Result.**
+- Variance decomposition: the swap-threshold choice (D2) explains **44%** of
+  variation — the dominant design decision.
+- Downstream across specs: TST 7.89 h [7.76, 7.92] — robust. SOL
+  20.7 min [12.1, 48.4] — sensitive (consistent with the perception-bias
+  finding in the caveats below).
+- Decision-relevant deltas: B1 (which rows to trust) moves TST by 29.6 min;
+  B2 moves analyzable n by 1,131 records.
+- Seeds: pooled recall 0.993–0.995 across 4 seeds, FAR 0 in all.
+
+**Meaning.** TST conclusions are stable across reasonable choices; SOL
+conclusions are not, and we know which decision (swap threshold) matters most.
+
+### Honest caveats (read before using any number)
+
+1. **`cross_participant_spike` is the weakest family** — L1 0.886–0.907 across
+   seeds, value-correct 0 *by design* (it is audit-only: a single-day spike may
+   be a real event — illness, shift work — so it flags for a human and never
+   auto-fixes).
+2. **SOL flag thresholds sit inside the ±75-min Bland-Altman noise band** of
+   self-reported SOL — SOL flags are descriptive indicators routed to human
+   review, not automated error signals (verified in code: `flag_severity` feeds
+   no correction path). WASO thresholds clear the noise floor by 3.3×.
+3. **Ablation recall uses a flag-based definition** (AUTO_FIXed records never
+   enter the flag queue, so disabling a fixing rule inflates the flag count) —
+   the ablation table is reported as supplementary with a footnote; the primary
+   evidence is the multiverse variance decomposition.
 
 Full methodology, numeric results, and disclosed caveats for each completed item are written up in the dated logs under `work_logs/` (start from `work_logs/2026-08-12_week_work_log_summary_EN.md` / Chinese `2026-08-12_week_work_log_summary.md`) and, for the synthetic benchmark specifically, in `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md`.
 
@@ -749,7 +895,7 @@ Full methodology, numeric results, and disclosed caveats for each completed item
 - **FCR / FAR_alter** — false-alteration rate: the share of records the pipeline *changes* on clean input. "0/10,000" means zero records were altered on structurally-clean synthetic data (rule-of-three 95% upper bound ≈ 0.03%). Any correction on clean input would be pure iatrogenic damage.
 - **Misrepaired vs. flagged vs. missed** — the three-way split of a false correction: *silently altered to a wrong value* (worst — no human ever sees it) vs. *flagged for review but not auto-fixed* (catchable by a human) vs. *missed entirely* (no signal at all). These have very different severities and get conflated if reported as one number.
 - **Enriched sampling** — each of the 12 error categories is injected to a fixed target count (e.g. 400), not at the empirically observed real-world rate. Rare error types would otherwise get too few samples to measure; the per-category table therefore reports detection rates, not prevalence.
-- **L1/L2/L3** — verification depth tiers: L1 = any flag raised, L3 = value corrected correctly, L2 = *type* also correct. The first-pass benchmark covers L1 and L3; L2 is still future work.
+- **L1/L2/L3** — verification depth tiers: L1 = any flag raised, L3 = value corrected correctly, L2 = *type* also correct. All three are computed per category (`results/l2_tier.csv`). The headline uses L1 (detection); L3 is the stricter value-correctness number — e.g. `ampm_swap` L1 1.0 / L3 0.565, because uncertain restorations go to human review.
 
 **How to run it.**
 
@@ -760,7 +906,7 @@ Rscript validation/synthetic/run_one.R <input.rds> <project_dir> <label>
 
 The four scripts, in dependency order: `generate_clean_data.R` (builds parameterized clean data, `mode=pure` vs `mode=plausible` populations), `inject_errors.R` (participant-clustered injection, one ground-truth row per injected error), `evaluate_fcr.R` (false-alteration rate), `evaluate_detection.R` (per-category detection/recall). Do **not** pre-create empty manual-correction CSVs — the pipeline treats a *missing* manual-correction file as "no human review layer" (`file.exists()`-guarded fallback), whereas an empty file triggers a `readr` column-type error (see the header comment in `run_one.R`). Each dataset gets its own `project_dir` so `output/` is never overwritten.
 
-**Where the numbers live** — in `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md`: Test A (FCR on 10,000 structurally-pure records), Test B (flag-rate gradient across 4 populations, including the 26× gap on the insomnia-like population), the 12-category detection table, and the pre/post-patch comparison table for the two v1.4.1 fixes.
+**Where the numbers live** — in `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md`: Test A (FCR on 10,000 structurally-pure records), Test B (flag-rate gradient across 4 populations, including the 26× gap on the insomnia-like population), the 12-category detection table, and the pre/post-patch comparison table for the two v1.4.1 fixes. Full result CSVs in `validation/synthetic/results/`.
 
 ## Renv Reproducibility
 
@@ -781,6 +927,11 @@ MIT
 自动化的睡眠 EMA 日记数据清洗管线：解析原始就寝/入睡/醒来/起床时间戳，检测并修正时序和时长错误，计算睡眠指标（TST、SOL、WASO、SE），验证自报时长，生成诊断与科研图表。
 
 **v1.4.3（当前版本）** — 修复 `sleep_awake_swap_3h`，真实数据冗余通道验证（Channel B）标记为负面的唯一一条纠正规则：交换现在要求 `bed <= awake`，不再把新 sleep 时间放到 bed 之前、加剧 SOL 差距。守卫后真实数据重跑：swap 行 10 → 4，全部时序有效，3/4 更接近自报值。v1.4.2 将合成错误注入 benchmark harness 纳入仓库（`validation/synthetic/`，无清洗逻辑改动；该 harness 正是揪出 v1.4.1 两个 bug 的工具）。v1.4.1 是在 v1.4.0 交付门基础上的 bug 修复版本，190+ 个测试，R CMD CHECK 0 ERROR / 0 WARNING。v1.4.0 新增了 `finalize_columns()`（Step 10）、作为唯一事实来源的列字典、保留的 affect 层列、负数导出门、以及 CI 校验的交付接线。v1.4.1 修复了验证过程中发现的两处人工复核环节 bug：一处是时钟时间误填进时长字段后会被"修正"成看似合理的小数字、却从未被标记转人工审核的静默误改盲区；另一处是两份人工复核 CSV 实际上从未被写盘，尽管管线日志一直报告"已保存"。完整变更见 [releases](https://github.com/cyracaid/sleepdiary-cleaner/releases)。通过 `renv::install("cyracaid/sleepdiary-cleaner")` 安装。
+
+## 阶段状态
+
+* **阶段 1 — 交付管线（v1.4.0）：已完成。** 清洗逻辑已冻结；这是可复现清洗管线的 CLI 版本。
+* **阶段 2 — 分析**与**阶段 3 — 方法论文：暂停。** 刻意延后，待研究团队评审阶段 1。
 
 ## 功能特性
 
@@ -868,30 +1019,26 @@ file.copy(system.file("config_template.yaml", package = "splsleep"), "my_study.y
 run_pipeline(config = "my_study.yaml")
 ```
 
-### 开发者：跑测试
-
-```r
-# 已安装包模式（快，测的是构建好的包）：
-testthat::test_package("splsleep")
-
-# 源码开发模式（测工作区的当前代码；改代码时用这个——
-# test_dir() 单独跑不会自动加载被测包，必须先加载）：
-pkgload::load_all(".")
-testthat::test_dir("tests/testthat")
-
-# 推荐的开发工作流（一次调用完成加载源码 + 跑测试，需要装 devtools）：
-devtools::test()
-```
-
-完整包检查（文档、示例、测试、`verify_reference_fidelity` 与双份脚本一致性校验）：
-
-```r
-devtools::check()   # 需要 devtools；等价于 R CMD check splsleep_*.tar.gz
-```
-
-`devtools` 只是开发期工具——**刻意不**列为包的依赖（不在 `DESCRIPTION` 里），安装或运行 splsleep 本身永远不需要它。
-
 ## 数据说明（纯文字，无真实数据）
+
+### Agent 技能
+
+**位置**：`.opencode/skills/splsleep-pipeline/SKILL.md`
+
+该技能让 AI 助手理解管线架构、运行管线、解读检查点报告、添加人工校正、诊断问题。
+
+注册于 `opencode.jsonc`：
+
+```json
+{
+  "skills": {
+    "splsleep-pipeline": {
+      "description": "Run and maintain the sleep EMA diary data cleaning pipeline",
+      "triggers": ["splsleep", "sleep pipeline", "sleep EMA", "run_pipeline"]
+    }
+  }
+}
+```
 
 ### 管线如何处理你的数据（非破坏性模型）
 
@@ -1145,16 +1292,135 @@ identical(old$n_clean, new$n_clean)
 
 <a name="验证"></a>
 
+## 测试覆盖率
+
+管线包含 12 个测试文件、190+ 条 testthat 断言，全部检验软件正确性——代码是否按设计跑——区别于方法学效度，后者见下方[验证](#验证)一节。
+
+| 测试文件 | 覆盖 |
+|---|---|
+| `test-normalize.R` | AM/PM 校正、轻微顺序错误、跨午夜、边界情况 |
+| `test-interval.R` | 时长解析中的冒号格式边界情况 |
+| `test-pipeline.R` | 合成数据端到端运行、配置加载、列适配 |
+| `test-sleep-diary.R` | S3 构造、校验、强制转换、泛型、步骤契约断言、溯源 |
+| `test-flag-standards.R` | field misentry / data category / duration extreme / flag severity / checkforerrors 评估器；step-ledger 记录 |
+| `test-correction-engine.R` | 全部分类结果（顺序 / bed-sleep / awake-getup / 24h 错误、等时、异常、跳过 NA、多重错误、可疑潜伏期 flag） |
+| `test-classification-thresholds.R` | 每个分类阈值的边界行为（7h 错误、3h/15h 异常、可疑潜伏期） |
+| `test-auto-detection-thresholds.R` | Step 8 自动检测 flag 的 SOL/SE/TST-TIB 边界行为 |
+| `test-finalize-columns.R` | 字典 ↔ 交付列一致性、A/B 连接键唯一性、单位转换、保留列透传、导出门、缺失/可选列处理 |
+| `test-nonfinite-guards.R` | 时长与 flag-severity 评估器中的 NA/Inf 处理（两个真实 bug 的回归测试） |
+| `test-config-data.R` | 配置加载（RDS/CSV、旧键、列映射、友好报错） |
+| `test-script-copies-in-sync.R` | 每个双维护脚本在根目录与 `inst/scripts/` 的副本保持字节一致 |
+
+运行测试：
+
+```r
+# 已安装包模式（快，测的是构建好的包）：
+testthat::test_package("splsleep")
+
+# 源码开发模式（测工作区当前代码；编辑代码时用这个——
+# 单独跑 test_dir() 不会加载被测包，必须先加载）：
+pkgload::load_all(".")
+testthat::test_dir("tests/testthat")
+
+# 首选开发工作流（一次调用完成加载源码 + 跑测试，需要装 devtools）：
+devtools::test()
+```
+
+完整包检查（文档、示例、测试、`verify_reference_fidelity` / 双副本检查）：
+
+```r
+devtools::check()   # 需要 devtools；等价于：R CMD check splsleep_*.tar.gz
+```
+
+`devtools` 是纯开发工具——刻意**不是**包的依赖（不在 `DESCRIPTION` 里），安装或运行 splsleep 本身从不需要它。
+
+Snapshot 验证（`inst/verification/`、`verify_v1_3_snapshot.R`）确认当前 S3 管线链在真实数据上产生与旧管线路径字节一致（byte-identical）的输出。`verify_reference_fidelity.R` 单独把 8 个核心指标公式钉在文档化基线上（`--strict` 模式已接入 CI）。
+
 ## 验证
 
-上面的测试覆盖率证明代码按设计跑对了，不证明设计本身在方法学上站得住——睡眠日记清洗没有 ground truth，没有人能确定参与者在时长字段里填「10:30」时到底想说什么。这条管线的验证策略用四条相互独立的证据链，刻意选择让每一条的失效方式都不一样：一个能同时经受住全部四条检验的清洗决策，比只经受住其中一条的可信得多。
+上面的测试覆盖率证明代码按设计跑对了，不证明设计本身在方法学上站得住——睡眠日记清洗没有 ground truth，没有人能确定参与者在时长字段里填「10:30」时到底想说什么。
 
-| 证据 | 测的是什么 | 状态 |
-|---|---|---|
-| **干净输入特异度** | 把 100% 无错误的合成数据喂进管线，行为正确的管线应该零纠正。干净输入上出现的任何纠正都是纯粹的医源性损害。 | ✅ 10,000 条干净合成记录，零纠正 |
-| **冗余通道验证** | 真实日记里睡眠潜伏期存在两条独立测量——自报时长、时间戳推算。Step 4 的时间戳纠正逻辑从不读取自报时长列（源码检查确认），所以纠正后比较两者是非循环论证的检验，直接在真实数据上做，不需要合成注入。 | ✅ 真实生产数据（n=13,990）：两条最大的纠正规则（`bed_sleep_swap_3h`、`sleep_reduce_12h_loop`）让纠正后的记录明显更接近自报值（Wilcoxon p < 1e-7，两条都是）。验证还揪出较小规则 `sleep_awake_swap_3h` 的真实负面效应（10 例中 7 例变差）：**已在 v1.4.3 诊断并修复**——加入 `bed <= awake` 交换守卫（病根：旧 awake 时间早于 bed 时交换，会把新 sleep 时间放到 bed 之前，加剧 SOL 差距）。守卫后真实数据重跑：swap 行 10 → 4，全部时序有效，3/4 改善 |
-| **人工共同审阅一致性** | 两位研究者共同审阅了管线标记出需要人工处理的每一条记录。 | ✅ 被标记的时序错误当场一致率 64.0%（n=75），统计学异常记录当场一致率 89.2%（n=37）。报告为 raw agreement，不是 inter-rater reliability / Cohen's κ，因为审阅方式是协作式共同审阅（共用一张表），不是各自独立编码——算 κ 需要每位评分者在讨论前各自的原始标签，这个协作流程本来就没有产生这种输入 |
-| **校准过的注入错误 benchmark + 下游敏感性** | 已知 ground truth 的合成错误注入，按经验观察到的错误率校准；下游睡眠指标（TST/SOL/WASO/SE）对清洗管线选择的敏感性。 | 🟡 第一轮已完成：结构纯净合成数据 10,000 条，零误改；12 类注入错误的逐类检测结果；靠这套 harness 真的揪出并修好了 2 个 bug（field-misentry 静默误修率修补前 95.8%/96.0%，修补后 3.5%/0%——已随 v1.4.1 发布）。完整的 recall/specificity/PPV 曲线、cluster bootstrap、multiverse、下游敏感性分析还没开始。Harness 和结果见 `validation/synthetic/` |
+我们的回答是一条**多步验证链**。每步只问一个问题、以不同的方式失效、且刻意彼此独立：能经受住全部步骤的清洗决策，比只经受住单项检查的可信得多。步骤按此顺序执行，从"管线会不会伤害好数据"一直到"能不能扛住真实世界的不确定性"。
+
+### 第 1 步 — 管线会碰干净数据吗？（干净输入特异度）
+
+**做什么。** 生成*完全没有错误*的合成数据（10,000 条），跑管线，数它改了多少条、flag 了多少条。
+**规则。** 干净输入上正确答案是两者皆为零。任何改动都是纯医源性损伤；任何 flag 都是假警报。
+
+**结果。** FCR（被改记录）**0 / 9,996**；FAR_flag **0 / 1,609**；FAR_alter **0 / 1,609**（rule-of-three 95% 上限 ≈ 0.03%）。
+**意味着。** 管线对好数据零伤害。
+
+### 第 2 步 — 管线能抓住已知错误吗？（注入错误基准）
+
+**做什么。** 取干净合成数据，刻意注入已知错误——每类 400 条——并在注入时记录每条的真实值（真值表）。在损坏数据上跑管线，输出对真值比较。
+
+**结果。**
+
+| 量 | 值 |
+|---|---|
+| 合并 recall（错误被检测） | **0.995** [0.994, 0.997] |
+| 特异性 | 1.0 |
+
+CI 为参与者级 cluster bootstrap（1,000 次），因为同一参与者的记录互相关联。
+
+**意味着。** 99.5% 的注入错误被抓住——要么 flag 转人工，要么自动修正。这个基准也正是我们找到并修复两个在日志和肉眼下都不可见的真实 bug 的方法（v1.4.1，见第 3 步）。
+
+### 第 3 步 — 修复时，修得*对*吗？（检测 vs 值正确）
+
+**做什么。** 把"抓住"拆成两个数字：**检测**（L1：被 flag 或被修）与**值正确**（L3：终值确实等于真值）。两者之差就是人工审查的栖身之处。
+
+**结果。** `ampm_swap`：L1 1.0、L3 0.565。`field_misentry`：L1 1.0、L3 0.018。当前运行误修率（MRR）：**各分类均为 0**。
+
+**意味着。** 检测不等于猜对值。当正确恢复不确定时（AM/PM 翻转、时钟时间填入时长字段），管线 flag 给人类而不是猜——这是设计在工作。`field_misentry` 的 L3 缺口是基准抓住的 bug 的*修复后*状态：v1.4.1 之前，95.8% 这类条目被静默"修"成错误但合理的值；现在 0%——全部转人工审查。
+
+### 第 4 步 — 管线比什么都不做强吗？（对照）
+
+**做什么。** 在同样的损坏数据上比较三种条件：完全不清洗、朴素正则规则、完整管线。
+
+**结果。** 不清洗 **0** / 朴素规则 **0.623** / 管线 **0.995**。
+**意味着。** 原始字符串检测率 0；朴素规则抓 62%；完整管线 99.5%。比朴素高 37 个百分点就是规则族的价值。
+
+### 第 5 步 — 校正让真实数据*更好*吗？（冗余通道，无需合成标准）
+
+**做什么。** 真实日记用两种独立方式记录睡眠潜伏期：自报时长、时间戳推算。Step 4 的校正逻辑从不读取自报时长列（源码检查确认），所以校正后比较两者是非循环的。直接在真实生产数据（n = 13,990）上跑，无需注入。
+
+**结果。** `bed_sleep_swap_3h` 39/39 改进（100% [91–100%]）；`sleep_reduce_12h_loop` 38/38；全部 bed/sleep 相关校正 81/88（92%）。这一步还揪出一条*负面*规则 `sleep_awake_swap_3h`（10 例中 7 例变差，p = 0.036）：**已在 v1.4.3 诊断并修复**——加入 `bed <= awake` 守卫。守卫后重跑：swap 行 10 → 4，3/4 改进；7 变差 → 1 披露边界案例。
+
+**意味着。** 校正 92% 的情况下把真实数据里的值移向自报，使用无需合成标准的冗余通道标尺。唯一有问题的规则*是被这一步发现*并加了守卫。
+
+### 第 6 步 — 管线在真实数据里找到什么？（审计，n = 13,990）
+
+**做什么。** 以 report-only 模式跑全部 13,990 条真实记录；数各规则族 flag 了多少。不改任何数据。
+
+**结果。** 0 AUTO_FIX、1048 FLAG——其中 **922 条逻辑窗口违反**（派生 SOL 长于 bed→sleep 窗口，最大 225 分钟）、140 条时间顺序违反、1 条冗余确认的恶化（已知 pid-6490 案例）、1 条跨日尖峰、0 条未映射校正备注（14,338 条备注全部映射到已知机制）。
+
+**意味着。** 管线在我们真实数据里找到了先前未知的问题（922 条！）而未改动任何值。这是合成基准给不了的一层：合成证明*检测能力*，这层证明*真实世界流行率*。脚本：`audit_review_queue_m1_m7.R`；输出 `audit_m1_m7_decision.csv`。
+
+### 第 7 步 — 人工一致吗？（共同审查一致性）
+
+**做什么。** 两位研究者共同审阅了管线标记的每一条记录。报告"当场一致"与"需讨论后才一致"的比例。
+
+**结果。** 被标记的时序错误：**64.0%** 当场一致（n = 75），36.0% 需讨论。统计学异常记录：**89.2%**（n = 37），10.8% 需讨论。两轨独立、不可相加；flagged 集合随检测规则加强从 47 增至 75。
+
+**意味着。** 报告为**共同审查一致性**，不是 inter-rater reliability / Cohen's κ——审阅是协作式的（共用一张表），κ 所需的独立标签集从未产生。异常记录一致率高于校正记录，符合任务难度直觉：判断"是否异常"比决定"具体怎么修"容易。
+
+### 第 8 步 — 我们的选择要紧吗？（multiverse、下游敏感性、seed）
+
+**做什么。** 在规格网格上变化清洗阈值与规则选择；测量结果与下游指标移动多少。
+
+**结果。**
+- 方差分解：交换阈值选择（D2）解释 **44%** 的变异——主导性设计决策。
+- 跨规格下游：TST 7.89 小时 [7.76, 7.92]——稳健。SOL 20.7 分钟 [12.1, 48.4]——敏感（与下方注意事项的感知偏差发现一致）。
+- 决策相关偏移：B1（信任哪些行）移动 TST 29.6 分钟；B2 移动可分析 n 1,131 条。
+- Seed：合并 recall 跨 4 个 seed 0.993–0.995，FAR 全 0。
+
+**意味着。** TST 结论跨合理选择稳定；SOL 结论不稳定，且我们知道哪个决策（交换阈值）影响最大。
+
+### 诚实注意事项（用任何数字前先读）
+
+1. **`cross_participant_spike` 是最弱族** — L1 跨 seed 0.886–0.907，值正确 0 *设计使然*（它是 audit-only：单日尖峰可能是真实事件——生病、倒班——所以 flag 给人类，永不自动修）。
+2. **SOL flag 阈值落在自报 SOL 的 ±75 分钟 Bland-Altman 噪声带内** — SOL flag 是导向人工审查的描述性指标，不是自动化错误信号（代码已验证：`flag_severity` 不喂任何修正路径）。WASO 阈值高出噪声地板 3.3×。
+3. **消融 recall 采用 flag 口径**（AUTO_FIX 记录从不进 flag 队列，关掉修复规则会虚增 flag 数）— 消融表作为补充材料加脚注报告；主证据是 multiverse 方差分解。
 
 已完成项目的完整方法、具体数字结果与已披露的局限性，写在 `work_logs/` 下按日期归档的日志里（从 `work_logs/2026-08-12_week_work_log_summary.md` / 英文版 `2026-08-12_week_work_log_summary_EN.md` 看起）；合成 benchmark 部分单独写在 `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md`。
 
@@ -1165,7 +1431,7 @@ identical(old$n_clean, new$n_clean)
 - **FCR / FAR_alter** —— 误改率：干净输入上被管线*改动*的记录占比。"0/10,000" 指结构纯净合成数据上零条被改动（rule-of-three 95% 上限 ≈ 0.03%）。干净输入上的任何改动都是纯医源性损伤。
 - **Misrepaired vs. flagged vs. missed** —— 误修的三种形态：*被静默改成错值*（最严重——人工永远看不到）vs. *被标记转人工但未自动修直*（人工可拦截）vs. *完全漏检*（毫无信号）。三者严重度差异极大，合成一个数字会掩盖信号。
 - **Enriched sampling** —— 12 类错误各注入到固定目标数（如每类 400），而非按真实世界观察到的错误率。否则罕见错误类型样本太少测不准；因此逐类表报告的是检出率，不是发生率。
-- **L1/L2/L3** —— 验证深度层级：L1 = 有任意 flag，L3 = 值被正确修正，L2 = *类型*也正确。第一轮 benchmark 覆盖 L1 和 L3；L2 仍属 future work。
+- **L1/L2/L3** —— 验证深度层级：L1 = 有任意 flag，L3 = 值被正确修正，L2 = *类型*也正确。三类均已逐类计算（`results/l2_tier.csv`）。论文式头条用 L1（检测）；L3 是更严的值正确数——如 `ampm_swap` L1 1.0 / L3 0.565，因为不确定的恢复交给人工审查。
 
 **如何运行。**
 
@@ -1177,6 +1443,12 @@ Rscript validation/synthetic/run_one.R <input.rds> <project_dir> <label>
 四个脚本按依赖顺序：`generate_clean_data.R`（生成参数化干净数据，`mode=pure` vs `mode=plausible` 人群）、`inject_errors.R`（按被试聚类注入，每个注入错误一行 ground truth）、`evaluate_fcr.R`（误改率）、`evaluate_detection.R`（逐类检出/召回）。**不要**预创建空的 manual-correction CSV——管线把*缺失*的 manual-correction 文件当作"无人工复核层"（`file.exists()` 守卫回退），而空文件反而触发 `readr` 列类型报错（详见 `run_one.R` 头部注释）。每个数据集用独立的 `project_dir`，避免 `output/` 被覆盖。
 
 **数字在哪** —— `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md`：Test A（10,000 条结构纯净记录的 FCR）、Test B（4 个人群的 flag rate 梯度，含失眠样人群 26 倍差距）、12 类检出表、以及 v1.4.1 两个修复的前后对照表。
+
+## Renv 可复现性
+
+```r
+renv::restore()
+```
 
 ## 许可证
 
