@@ -2,13 +2,14 @@ Package: splsleep
 Title: Sleep EMA Diary Data Cleaning Pipeline
 Version: 1.4.3
 Authors@R: c(
-    person(given = "Cai", family = "Dong",
+    person(given = "Cyra", family = "Cai Dong",
            email = "cyracaid@gmail.com",
            role = c("aut", "cre"),
            comment = c(ORCID = "0009-0001-0706-0335")),
     person(given = "Maia", family = "ten Brink",
            role = c("aut"),
-           comment = c(ORCID = "0000-0001-6987-1339"))
+           comment = c(ORCID = "0000-0001-6987-1339",
+                       "Mentor"))
   )
 Description: Reproducible R pipeline for cleaning sleep EMA diary data:
     parses raw timestamps, detects and corrects temporal and duration errors
@@ -27,23 +28,24 @@ BugReports: https://github.com/cyracaid/sleepdiary-cleaner/issues
 Depends:
     R (>= 4.2)
 Imports:
-    corrplot,
     dplyr,
     ggplot2,
     gridExtra,
     lubridate,
-    magick,
     patchwork,
-    purrr,
     readr,
-    reshape2,
+    rlang,
     stringr,
-    tibble,
     tidyr,
     utils,
     yaml
 Suggests:
+    corrplot,
+    magick,
+    purrr,
+    reshape2,
     testthat (>= 3.0.0),
+    tibble,
     withr
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.1.0
