@@ -2,3 +2,18 @@ url: https://cyracaid.github.io/sleepdiary-cleaner/
 destination: docs/
 template:
   bootstrap: 5
+articles:
+  - title: "Validation"
+    contents:
+      - validation-methodology
+      - validation-methodology-zh
+  - title: "Pipeline"
+    contents:
+      - pipeline-architecture
+  - title: "Usage"
+    contents:
+      - column-mapping
+      - interpreting-output
+  - title: "Quality"
+    contents:
+      - testing-coverage
