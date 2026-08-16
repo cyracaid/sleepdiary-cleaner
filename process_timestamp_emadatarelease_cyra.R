@@ -1,6 +1,5 @@
 library(lubridate)
-library(tidyverse)
-library(stringi)
+library(dplyr); library(ggplot2); library(tidyr); library(readr); library(stringr); library(purrr); library(tibble)
 library(dplyr)
 
 # ============================================================================

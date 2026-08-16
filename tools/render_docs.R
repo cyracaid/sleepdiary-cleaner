@@ -19,6 +19,14 @@
 # CI keeps it honest: tests/testthat/test-generated-docs-in-sync.R re-renders
 # in memory and fails if the committed files drifted.
 
+# Force UTF-8: renv/R CMD check often run with LC_CTYPE="C", under which
+# sprintf() mangles Chinese literals into native bytes before writeLines
+# (useBytes=TRUE then writes the corruption). Must precede any string work.
+suppressWarnings(tryCatch(
+  Sys.setlocale("LC_CTYPE", "en_US.UTF-8"),
+  error = function(e) NULL
+))
+
 suppressMessages({
   library(yaml)
 })

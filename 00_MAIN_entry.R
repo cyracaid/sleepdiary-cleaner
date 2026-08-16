@@ -1,5 +1,5 @@
 library(lubridate)
-library(tidyverse)
+library(dplyr); library(ggplot2); library(tidyr); library(readr); library(stringr); library(purrr); library(tibble)
 
 # Helper: apply a processing function to multiple variables
 multi_process <- function(df, var_list, func, format = NULL) {

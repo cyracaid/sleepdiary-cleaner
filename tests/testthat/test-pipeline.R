@@ -84,14 +84,14 @@ test_that("run_pipeline completes successfully on synthetic data", {
 })
 
 test_that("Config loading works", {
-  cfg <- load_config(system.file("extdata", "synthetic_config.yaml", package = "splsleep"))
+  cfg <- splsleep:::load_config(system.file("extdata", "synthetic_config.yaml", package = "splsleep"))
   expect_true(is.list(cfg), "Config should be a list")
   expect_equal(cfg$pipeline$name, "splsleep (Synthetic Demo)")
   expect_true(!is.null(cfg$classification$metric_validation$sol$excessive_minutes))
 })
 
 test_that("Column adaptation renames correctly", {
-  cfg <- load_config(system.file("extdata", "synthetic_config.yaml", package = "splsleep"))
+  cfg <- splsleep:::load_config(system.file("extdata", "synthetic_config.yaml", package = "splsleep"))
 
   # Create test data with user-friendly column names
   test_df <- data.frame(

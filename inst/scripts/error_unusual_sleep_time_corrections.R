@@ -729,7 +729,7 @@ library(dplyr)
 library(lubridate)
 library(stringr)
 library(readr)
-library(tidyverse)
+library(dplyr); library(ggplot2); library(tidyr); library(readr); library(stringr); library(purrr); library(tibble)
 
 # ============================================
 # CASE3 Helper Functions - Time Instruction Processing
