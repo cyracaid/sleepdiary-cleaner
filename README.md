@@ -776,17 +776,17 @@ that only survives a single check. We run the steps in this order, from
 uncertainty?".
 
 ```
-                    VALIDATION CHAIN (8 steps, two data tiers)
+                    VALIDATION CHAIN (9 steps, three tiers)
                     ──────────────────────────────────────────
 
-  SYNTHETIC TIER (known ground truth, no privacy constraints)
+  SYNTHETIC TIER (ground truth we record ourselves at injection)
   ────────────────────────────────────────────────────────────
   Step 1: Clean-input specificity ─── FCR / FAR_flag / FAR_alter
           (10,000 error-free records; expect ZERO changes/flags)
                     │
                     ▼
   Step 2: Injected-error benchmark ── pooled recall 0.995 [0.994, 0.997]
-          (400 errors/category, ground truth at injection)
+          (400 errors/category; ground truth recorded at injection)
                     │
                     ▼
   Step 3: Detection vs value-correctness ── L1 vs L3 gap
@@ -800,6 +800,11 @@ uncertainty?".
   Step 5: Redundant-channel validation ── corrections move values
           toward self-report: 81/88 (92%) improved; 1 bad rule
           found & guarded (v1.4.3)
+                    │
+                    ▼
+  Step 5.5: Bland-Altman (3 analyses) ── SOL ±75-min noise band
+          → SOL flags INSIDE NOISE (descriptive, routed to human);
+          WASO 3.3× above noise (SAFE)
                     │
                     ▼
   Step 6: Report-only audit ── 0 AUTO_FIX, 1048 FLAG
@@ -847,6 +852,28 @@ records from the same participant are correlated.
 or auto-corrected. This benchmark is also how we found and fixed two real bugs
 that were invisible in logs and by eye (v1.4.1, see Step 3).
 
+**What this ground truth is — and is not (important).** The ground truth here
+is **not** an external gold standard (there is none for free-text diary
+entry — nobody can know what a participant meant by "10:30"). It is a
+*self-consistent* standard: the error definitions are ours, the corruption is
+ours, and we record the true value *at the moment we corrupt it* — before the
+pipeline ever runs. The benchmark proves the pipeline does what *we defined*
+as cleaning, not that our definition matches reality. Three mechanisms keep
+this from being circular:
+
+1. **The error taxonomy is a three-source union** — errors we have observed in
+   real data, errors reported in the literature (e.g. SHUTi, RESTING), and
+   errors that are theoretically possible but we have never caught. It is
+   deliberately *not* "the errors the pipeline already detects", which would
+   be grading ourselves on an exam written to our strengths.
+2. **A real-data layer that needs no synthetic standard at all** (Steps 5–7):
+   redundant-channel validation, report-only audit, and co-review agreement
+   all run on real data with no injection.
+3. **Closed-loop blind-spot closure** (Step 3 note): when a new error type is
+   discovered in real data, it is added to the catalog, injected, and the
+   benchmark re-run — so the taxonomy grows from reality, not from the
+   pipeline's current abilities.
+
 ### Step 3 — When we fix, do we fix *right*? (detection vs. value-correctness)
 
 **What we do.** Split "caught" into two numbers: **detected** (L1: flagged or
@@ -891,6 +918,47 @@ disclosed boundary case.
 **Meaning.** Corrections move values toward self-report 92% of the time, on
 real data, with a redundant-channel yardstick that needs no synthetic
 standard. The one bad rule was found *by this step* and guarded.
+
+### Step 5.5 — How noisy is the self-report itself? (Bland-Altman, three analyses)
+
+**What we do.** Ask a different question from Step 5: not "do corrections
+improve values?" but "how much do the two self-report measures of the same
+construct disagree in the first place?" This is *measurement characterization*
+— it quantifies the noise floor that any threshold must be judged against.
+Three analyses, all from `R/bland_altman.R` on real data (n = 13,990):
+
+| # | Analysis | Inputs (reported vs computed) | Output |
+|---|---|---|---|
+| A1 | **SOL Bland-Altman** | self-reported SOL vs computed SOL | bias, 95% LoA, half-width, % outside, proportional-bias p |
+| A2 | **WASO Bland-Altman** | self-reported WASO vs computed WASO | same as A1 |
+| A3 | **Threshold vs noise ratio** | each flag threshold ÷ its metric's LoA half-width | per-threshold verdict: CONSERVATIVE / SAFE / BORDERLINE / INSIDE NOISE |
+
+**Result.**
+
+| | Bias | LoA half-width | Threshold | Ratio | Verdict |
+|---|---|---|---|---|---|
+| A1 SOL | +1.6 min | **75.4 min** | excessive 120 min | 1.59 | ⚠️ INSIDE NOISE |
+| A1 SOL | — | 75.4 min | high severity 60 min | 0.80 | ⚠️⚠️ INSIDE NOISE |
+| A2 WASO | small | **27.3 min** | high severity 90 min | 3.29 | ✅ SAFE |
+| A3 | — | — | SE poor (70%) | — | N/A (no self-report pair) |
+| A3 | — | — | TST/TIB ratio | — | N/A (no self-report pair) |
+
+**What this means (read carefully — this is a finding, not a bug).**
+
+1. Computed and reported SOL differ by up to **±75 min** — a quantified
+   perception-bias estimate, and a publishable finding on its own.
+2. SOL flag thresholds (60/120 min) sit **inside** that noise band, so a
+   "high SOL" flag cannot distinguish a real long SOL from ordinary reporting
+   disagreement. This does **not** corrupt data: `flag_severity` is a
+   descriptive column that feeds no correction path (verified in code,
+   `R/flag_standards.R`). SOL flags are therefore **descriptive indicators
+   routed to human review**, not automated error signals.
+3. WASO thresholds clear the noise floor by **3.3×** — safe.
+4. SE and TST/TIB have no self-report counterpart, so they cannot be
+   Bland-Altman validated; stated explicitly rather than implied.
+5. LoA bound *consistency*, never *accuracy* — do not cite them as criterion
+   validity (that would require actigraphy/PSG, which this EMA-only dataset
+   lacks).
 
 ### Step 6 — What does the pipeline find in real data? (audit, n = 13,990)
 
@@ -1444,17 +1512,17 @@ Snapshot 验证（`inst/verification/`、`verify_v1_3_snapshot.R`）确认当前
 我们的回答是一条**多步验证链**。每步只问一个问题、以不同的方式失效、且刻意彼此独立：能经受住全部步骤的清洗决策，比只经受住单项检查的可信得多。步骤按此顺序执行，从"管线会不会伤害好数据"一直到"能不能扛住真实世界的不确定性"。
 
 ```
-                    验证链（8 步，两个数据层）
+                    验证链（9 步，三个层）
                     ──────────────────────────
 
-  合成层（已知 ground truth，无隐私约束）
+  合成层（ground truth 为注入时我们自行记录）
   ────────────────────────────────────────────
   第 1 步：干净输入特异度 ─── FCR / FAR_flag / FAR_alter
            （10,000 条无错误记录；期望零改动/零 flag）
                     │
                     ▼
   第 2 步：注入错误基准 ─── 合并 recall 0.995 [0.994, 0.997]
-           （每类 400 条，注入时记录 ground truth）
+           （每类 400 条；ground truth 在注入时记录）
                     │
                     ▼
   第 3 步：检测 vs 值正确 ─── L1 vs L3 差距
@@ -1467,6 +1535,10 @@ Snapshot 验证（`inst/verification/`、`verify_v1_3_snapshot.R`）确认当前
   ────────────────────────────────────────────
   第 5 步：冗余通道验证 ─── 校正把值移向自报：81/88（92%）改进；
            发现 1 条坏规则并加守卫（v1.4.3）
+                    │
+                    ▼
+  第 5.5 步：Bland-Altman（三个分析）─── SOL ±75 分钟噪声带
+           → SOL flag INSIDE NOISE（描述性，转人工）；WASO 高出噪声 3.3×（SAFE）
                     │
                     ▼
   第 6 步：Report-only 审计 ─── 0 AUTO_FIX、1048 FLAG
@@ -1505,6 +1577,12 @@ CI 为参与者级 cluster bootstrap（1,000 次），因为同一参与者的�
 
 **意味着。** 99.5% 的注入错误被抓住——要么 flag 转人工，要么自动修正。这个基准也正是我们找到并修复两个在日志和肉眼下都不可见的真实 bug 的方法（v1.4.1，见第 3 步）。
 
+**这个 ground truth 是什么、不是什么（重要）。** 这里的 ground truth **不是**外部金标准（自由文本日记录入没有金标准——没人能确定参与者填「10:30」时想说什么）。它是*自洽*标准：错误定义是我们的、损坏是我们的、真值是我们*在损坏的那一刻*、管线运行之前记录的。基准证明管线做了*我们定义*的清洗，不证明我们的定义符合现实。三件事防止它循环论证：
+
+1. **错误分类学是三源并集** — 我们在真实数据里观察到的错误、文献报告的错误（如 SHUTi、RESTING）、以及理论上可能存在但我们从未抓到的错误。刻意*不是*"管线已经能检测的错误"——那等于出一张专考我们强项的卷子。
+2. **完全不需要合成标准的真实数据层**（第 5–7 步）：冗余通道验证、report-only 审计、共同审查一致性都直接在真实数据上跑，无注入。
+3. **闭环盲点封堵**（第 3 步注）：在真实数据发现新错误类型时，加入目录、注入、重跑基准——分类学从现实生长，而不是从管线现有能力生长。
+
 ### 第 3 步 — 修复时，修得*对*吗？（检测 vs 值正确）
 
 **做什么。** 把"抓住"拆成两个数字：**检测**（L1：被 flag 或被修）与**值正确**（L3：终值确实等于真值）。两者之差就是人工审查的栖身之处。
@@ -1527,6 +1605,34 @@ CI 为参与者级 cluster bootstrap（1,000 次），因为同一参与者的�
 **结果。** `bed_sleep_swap_3h` 39/39 改进（100% [91–100%]）；`sleep_reduce_12h_loop` 38/38；全部 bed/sleep 相关校正 81/88（92%）。这一步还揪出一条*负面*规则 `sleep_awake_swap_3h`（10 例中 7 例变差，p = 0.036）：**已在 v1.4.3 诊断并修复**——加入 `bed <= awake` 守卫。守卫后重跑：swap 行 10 → 4，3/4 改进；7 变差 → 1 披露边界案例。
 
 **意味着。** 校正 92% 的情况下把真实数据里的值移向自报，使用无需合成标准的冗余通道标尺。唯一有问题的规则*是被这一步发现*并加了守卫。
+
+### 第 5.5 步 — 自报本身有多吵？（Bland-Altman，三个分析）
+
+**做什么。** 问一个与第 5 步不同的问题：不是"校正是否改进值？"而是"同一构念的两个自报测量*本来*就相差多少？"这是*测量特性描述*——量化任何阈值都必须对照的噪声地板。三个分析，全部来自 `R/bland_altman.R`，跑在真实数据上（n = 13,990）：
+
+| # | 分析 | 输入（自报 vs 计算） | 输出 |
+|---|---|---|---|
+| A1 | **SOL Bland-Altman** | 自报 SOL vs 计算 SOL | bias、95% LoA、半宽、界外百分比、比例偏差 p |
+| A2 | **WASO Bland-Altman** | 自报 WASO vs 计算 WASO | 同 A1 |
+| A3 | **阈值对噪声比** | 每个 flag 阈值 ÷ 该指标 LoA 半宽 | 各阈值判定：CONSERVATIVE / SAFE / BORDERLINE / INSIDE NOISE |
+
+**结果。**
+
+| | 偏差 | LoA 半宽 | 阈值 | 比值 | 判定 |
+|---|---|---|---|---|---|
+| A1 SOL | +1.6 分钟 | **75.4 分钟** | excessive 120 分钟 | 1.59 | ⚠️ INSIDE NOISE |
+| A1 SOL | — | 75.4 分钟 | high severity 60 分钟 | 0.80 | ⚠️⚠️ INSIDE NOISE |
+| A2 WASO | 小 | **27.3 分钟** | high severity 90 分钟 | 3.29 | ✅ SAFE |
+| A3 | — | — | SE poor（70%） | — | N/A（无自报对） |
+| A3 | — | — | TST/TIB 比 | — | N/A（无自报对） |
+
+**这意味着什么（仔细读——这是发现，不是 bug）。**
+
+1. 计算值与自报 SOL 相差最多 **±75 分钟** — 量化的感知偏差估计，本身是可发表的发现。
+2. SOL flag 阈值（60/120 分钟）落在这条噪声带**内**，所以"高 SOL"flag 无法区分真实长 SOL 与普通报告分歧。这**不会**污染数据：`flag_severity` 是描述性列，不喂任何修正路径（代码已验证，`R/flag_standards.R`）。SOL flag 因此是**导向人工审查的描述性指标**，不是自动化错误信号。
+3. WASO 阈值高出噪声地板 **3.3×** — 安全。
+4. SE 与 TST/TIB 没有自报对应物，无法做 Bland-Altman 验证；明确说明而非暗示。
+5. LoA 界定*一致性*，永不*准确度* — 不要把它们当准则效度引用（那需要体动记录/PSG，本 EMA-only 数据集没有）。
 
 ### 第 6 步 — 管线在真实数据里找到什么？（审计，n = 13,990）
 
