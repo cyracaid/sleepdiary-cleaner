@@ -4,8 +4,7 @@
 
 - **Cyra Cai Dong**. Author, maintainer.
 
-- **Maia ten Brink — Author, Mentor**. Author.  
-  Mentor
+- **Maia ten Brink — Author, Mentor**. Author.
 
 ## Citation
 
