@@ -6,7 +6,7 @@ Authors@R: c(
            email = "cyracaid@users.noreply.github.com"),
     person("Maia", "ten Brink", role = c("aut"))
   )
-Author: Cyra Cai Dong [aut, cre], Maia ten Brink [aut]
+Author: Cyra Cai Dong [aut, cre], Maia ten Brink
 Maintainer: Cyra Cai Dong <cyracaid@users.noreply.github.com>
 Description: Reproducible R pipeline for cleaning sleep EMA diary data. Parses raw timestamps, detects and corrects temporal and duration errors through a human-in-the-loop CSV workflow, computes sleep metrics (TST, SOL, WASO, SE), and generates diagnostic and research-ready figures. Configurable via YAML — maps your dataset columns without code changes. v1.4.0 adds the delivery gate: finalize_columns() as Step 10, a column dictionary as single source of truth, reserved affect-layer columns, an export guard against negative durations, and CI-wired delivery verification (190+ tests). v1.4.2 adds a calibrated synthetic-error-injection benchmark harness (validation/synthetic/) with first-pass results: 0/10,000 false alterations on clean input and per-category detection rates across 12 injected-error types.
 License: MIT + file LICENSE

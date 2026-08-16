@@ -29,6 +29,41 @@ REPO_ROOT="$(cd "$HOOK_DIR/../.." && pwd)"
 
 cd "$REPO_ROOT"
 
+# ── Gate 1: never commit real participant data / private files ─────────────
+# Hard lock (git add -f bypasses .gitignore). Audit outputs carry real pids
+# (1027-11863); private correspondence and personal logs must not ship.
+# Paths are matched on the FULL staged path so a rename (git mv) still trips
+# the gate.
+SENSITIVE_PATTERNS=(
+  '^audit_m1_m7_'
+  '^part_b_b[123]_'
+  '(^|/)work_logs/'
+  '(^|/)manual_inputs_docs/'
+  '(^|/)paper/'
+  '(^|/)figures/'
+  'ground_truth_enrichment\.csv$'
+  'cluster_bootstrap_per_row\.csv$'
+  'mrr_per_row\.csv$'
+)
+while IFS= read -r staged_path; do
+  [ -z "$staged_path" ] && continue
+  for pat in "${SENSITIVE_PATTERNS[@]}"; do
+    if [[ "$staged_path" =~ $pat ]]; then
+      cat <<'EOF' >&2
+pre-commit: REFUSED — staged path matches a sensitive-data pattern:
+  [PATH]
+Real participant sleep data / private files must NEVER be committed.
+These files live in ~/Documents/opencode/proj_splclean/sensitive_local/
+(chmod 700, FileVault-encrypted disk) and are excluded from git history
+(purge 2026-08-17). If this path is a NEW legitimate artifact, add an
+explicit exception below SENSITIVE_PATTERNS in inst/hooks/pre-commit.
+EOF
+      echo "  $staged_path" >&2
+      exit 1
+    fi
+  done
+done < <(git diff --cached --name-only)
+
 # Only run when a staged change could have touched either copy. Any script
 # registered in inst/scripts/ counts as a canary: editing one copy and not
 # the other is exactly the failure mode we guard against.

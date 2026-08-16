@@ -3,5 +3,7 @@ destination: docs/
 template:
   bootstrap: 5
 authors:
+  "Cyra Cai Dong":
+    html: "Cyra Cai Dong — Author, maintainer"
   "Maia ten Brink":
-    html: "Maia ten Brink — Author, Mentor"
+    html: "Maia ten Brink — Author, mentor"
