@@ -1,8 +1,8 @@
-"field","n_altered","n_total"
-"time_bed",0,10000
-"time_sleep",0,10000
-"time_awake",0,10000
-"time_getup",0,10000
-"duration_sol",0,10000
-"duration_waso",0,10000
-"ANY_FIELD",0,10000
+"field","n_altered","n_total","input_sha256","seed"
+"time_bed",0,9996,"164a16b1f4c60e1aa00a834ab458b5ff59a14f8e771fd2a7cb9a7d28cc38d5eb",20260812
+"time_sleep",0,9996,"164a16b1f4c60e1aa00a834ab458b5ff59a14f8e771fd2a7cb9a7d28cc38d5eb",20260812
+"time_awake",0,9996,"164a16b1f4c60e1aa00a834ab458b5ff59a14f8e771fd2a7cb9a7d28cc38d5eb",20260812
+"time_getup",0,9996,"164a16b1f4c60e1aa00a834ab458b5ff59a14f8e771fd2a7cb9a7d28cc38d5eb",20260812
+"duration_sol",0,9996,"164a16b1f4c60e1aa00a834ab458b5ff59a14f8e771fd2a7cb9a7d28cc38d5eb",20260812
+"duration_waso",0,9996,"164a16b1f4c60e1aa00a834ab458b5ff59a14f8e771fd2a7cb9a7d28cc38d5eb",20260812
+"ANY_FIELD",0,9996,"164a16b1f4c60e1aa00a834ab458b5ff59a14f8e771fd2a7cb9a7d28cc38d5eb",20260812

@@ -54,12 +54,22 @@ cat("ground_truth rows:", nrow(gt_raw), " pid col:", "pid" %in% names(gt_raw),
     " error_type col:", "error_type" %in% names(gt_raw), "\n")
 
 # ── Step 2: run pipeline ────────────────────────────────────────────────────
+# Cache keyed on input: if corrupted_enrichment.rds was regenerated (e.g.
+# new catalog categories), the cached pipeline output is STALE and must be
+# re-run. Same root cause as issues #6/#7 (stale results on untracked input)
+# — fixed here for the 5.1 main evidence line.
 run_dir <- file.path(SYN, "run_ppv")
 corrected_rds <- file.path(run_dir, "corrected_ema_data.rds")
 review_rds    <- file.path(run_dir, "review_output.rds")
+cache_key_path <- file.path(run_dir, "input_key.txt")
+input_key <- digest::digest(file = corr_rds, algo = "sha256")
+cache_hit <- file.exists(corrected_rds) &&
+             file.exists(cache_key_path) &&
+             trimws(readLines(cache_key_path, warn = FALSE)[1]) == input_key
 
-if (!file.exists(corrected_rds)) {
+if (!cache_hit) {
   cat("Running pipeline on corrupted data (run_one.R)...\n")
+  dir.create(run_dir, showWarnings = FALSE, recursive = TRUE)
   out <- system2("Rscript", c(file.path(SYN, "run_one.R"),
     corr_rds, file.path(getwd(), run_dir), "ppv_ci_benchmark"),
     stdout = TRUE, stderr = TRUE, wait = TRUE)
@@ -67,6 +77,10 @@ if (!file.exists(corrected_rds)) {
     cat(paste(tail(out, 30), collapse = "\n"), "\n")
     stop("pipeline run failed: corrected_ema_data.rds not produced")
   }
+  writeLines(input_key, cache_key_path)
+  cat(sprintf("  cached with input_key %s\n", input_key))
+} else {
+  cat(sprintf("  [cache] run_ppv valid for input %s\n", input_key))
 }
 corrected <- readRDS(corrected_rds)
 review    <- readRDS(review_rds)

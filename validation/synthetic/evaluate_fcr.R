@@ -10,12 +10,50 @@
 # the interval strings"), so a raw-string diff conflates reformatting with
 # correction. FAR_alter is about the latter only.
 #
-# Usage: Rscript evaluate_fcr.R <raw_rds> <corrected_rds> <out_csv>
+# Self-contained mode (default): generates a pure n=10,000 set via
+# generate_clean_data.R (--mode=pure, seed 20260812), runs the real pipeline
+# via run_one.R, then evaluates. Output CSV records input sha256 + seed so the
+# result is traceable and re-runnable. Previously the pure input rds was
+# generated ad hoc and lost (results CSV existed with no input) -- issue: FCR
+# not reproducible. This script now owns the whole chain.
+#
+# Usage:
+#   Rscript evaluate_fcr.R                          # self-contained (default)
+#   Rscript evaluate_fcr.R <raw_rds> <corrected_rds> <out_csv>  # legacy
+# Args: --n=10000 --seed=20260812 --out=results/fcr_pure_n10000_result.csv
+
+suppressPackageStartupMessages(library(digest))
+SYN <- "validation/synthetic"
+RES <- file.path(SYN, "results")
 
 args <- commandArgs(trailingOnly = TRUE)
-raw       <- readRDS(args[1])
-corrected <- readRDS(args[2])
-out_csv   <- args[3]
+n_help <- grep("^--n=", args, value = TRUE)
+seed_help <- grep("^--seed=", args, value = TRUE)
+out_help <- grep("^--out=", args, value = TRUE)
+n_sel   <- if (length(n_help))   as.integer(sub("--n=", "", n_help[1]))   else 10000
+seed    <- if (length(seed_help)) as.integer(sub("--seed=", "", seed_help[1])) else 20260812
+out_csv <- if (length(out_help)) sub("--out=", "", out_help[1]) else
+             file.path(RES, "fcr_pure_n10000_result.csv")
+
+# -- Self-contained chain: generate pure set -> run pipeline -> evaluate ------
+pure_rds <- file.path(tempdir(), sprintf("fcr_clean_pure_n%d.rds", n_sel))
+run_dir  <- file.path(tempdir(), "fcr_run")
+cat(sprintf("Generating pure set n=%d seed=%d...\n", n_sel, seed))
+system2("Rscript", c(file.path(SYN, "generate_clean_data.R"),
+  sprintf("--n_participants=%d", n_sel %/% 14),
+  "--n_days=14", "--mode=pure", "--population=healthy_adult",
+  sprintf("--seed=%d", seed), sprintf("--out=%s", pure_rds)),
+  stdout = TRUE, stderr = TRUE, wait = TRUE)
+stopifnot(file.exists(pure_rds))
+
+cat("Running pipeline on pure set...\n")
+system2("Rscript", c(file.path(SYN, "run_one.R"), pure_rds, run_dir, "fcr_pure"),
+  stdout = TRUE, stderr = TRUE, wait = TRUE)
+corrected_rds <- file.path(run_dir, "corrected_ema_data.rds")
+stopifnot(file.exists(corrected_rds))
+
+raw       <- readRDS(pure_rds)
+corrected <- readRDS(corrected_rds)
 
 m <- merge(
   raw[, c("pid", "day_num", "row_id",
@@ -63,7 +101,14 @@ summary_df <- data.frame(
                 sum(alt_sol, na.rm=TRUE), sum(alt_waso, na.rm=TRUE), k),
   n_total = n
 )
-write.csv(summary_df, out_csv, row.names = FALSE)
+attr(summary_df, "input_sha256") <- digest::digest(file = pure_rds, algo = "sha256")
+attr(summary_df, "seed") <- seed
+out_df <- summary_df
+out_df$input_sha256 <- attr(summary_df, "input_sha256")
+out_df$seed <- seed
+write.csv(out_df, out_csv, row.names = FALSE)
+cat(sprintf("  input_sha256: %s\n", out_df$input_sha256[1]))
+cat(sprintf("  seed: %d\n", seed))
 
 cat(sprintf("\n=== FCR (false-alteration-rate) result ===\nn=%d structurally-pure records\nrecords with >=1 field altered: %d\n", n, k))
 if (k == 0) {

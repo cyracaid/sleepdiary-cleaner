@@ -1,4 +1,4 @@
 "condition","recall","far_flag","far_alter"
 "no_cleaning",0,0,0
-"naive_rule",0.639831401475237,0,0
-"pipeline",0.987144362486828,0,0
+"naive_rule",0.623075496197366,0,0
+"pipeline",0.995177147097014,0,0

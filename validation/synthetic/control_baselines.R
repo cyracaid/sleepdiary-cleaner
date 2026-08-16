@@ -97,8 +97,12 @@ naive_far_alter <- 0  # naive rule never alters values
 # ── Real pipeline numbers (from 5.1/5.3) ────────────────────────────────────
 err <- per_row[per_row$error_type != "no_error_control", ]
 pipeline_recall <- mean(err$detected)
-pipeline_far_flag <- 0      # 5.3: 0/2255 control flagged
-pipeline_far_alter <- 0
+# Read FAR from far_flag_alter.csv (5.3) instead of hardcoding: if the
+# pipeline ever gains a false-positive path, this table must reflect it.
+far_tab <- read.csv(file.path(RES, "far_flag_alter.csv"), stringsAsFactors = FALSE)
+pipeline_far_flag  <- far_tab$rate[far_tab$metric == "FAR_flag"]
+pipeline_far_alter <- far_tab$rate[far_tab$metric == "FAR_alter"]
+if (length(pipeline_far_flag) != 1) stop("far_flag_alter.csv missing FAR_flag row")
 
 cat("\n=== Control conditions (same enrichment benchmark) ===\n")
 cat(sprintf("No-cleaning:  recall = %.4f, FAR_flag = %.4f, FAR_alter = %.4f (identity floor)\n",
