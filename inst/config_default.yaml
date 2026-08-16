@@ -246,6 +246,7 @@ classification:
     sol:
       excessive_minutes: 120               # SOL > 2h -> flag (lenient; clinical cutoff ~30min. rationale: see THRESHOLDS.md)
       negative: true                       # SOL < 0 -> flag
+      window_tolerance_minutes: 15         # SOL > bed->sleep window + tol -> flag (parse/rounding noise floor)
     se:
       min_valid_percent: 0                 # SE < 0 -> flag
       max_valid_percent: 100               # SE > 100 -> flag

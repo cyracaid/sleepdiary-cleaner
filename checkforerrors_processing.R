@@ -649,6 +649,32 @@ if (all(required_metrics %in% names(data))) {
       metric_duration_notes
     )
   }
+  # SOL vs bed->sleep window (M4 audit 2026-08-17): the sleep-to-awake window
+  # above catches SOL > the whole try-sleep period, but a SOL that fits inside
+  # try-sleep yet EXCEEDS the bed->sleep gap is still impossible (SOL is the
+  # bed->sleep latency -- it cannot be longer than the gap it occupies).
+  # The 2026-08-17 closed-loop benchmark confirmed this blind spot: injected
+  # sol_window_contradiction rows (SOL > bed->sleep window) passed silently
+  # 202/355 (recall 0.431). Mirror of the 922-row M4 audit finding on real data.
+  if (all(c("duration_totalmin_sol_estimate_am_mincalc",
+            "time_bed_corrected", "time_sleep_corrected") %in% names(data))) {
+    sol_est <- data$duration_totalmin_sol_estimate_am_mincalc
+    bed_sleep_win <- as.numeric(difftime(data$time_sleep_corrected,
+                                         data$time_bed_corrected, units = "mins"))
+    # tolerance: clean rows carry parse/rounding noise (benchmark control
+    # excess max ~10 min, median 0); injected contradictions start at 30 min.
+    # tol=15 -> FAR 0 on 1,609 control rows, catches all injected.
+    sol_win_tol <- cfg_get("classification.metric_validation.sol.window_tolerance_minutes", 15,
+                           cfg = .pipeline_cfg)
+    sol_win_bad <- !is.na(sol_est) & !is.na(bed_sleep_win) &
+      bed_sleep_win >= 0 & sol_est > bed_sleep_win + sol_win_tol
+    metric_duration_needs <- metric_duration_needs | sol_win_bad
+    metric_duration_notes <- ifelse(
+      sol_win_bad,
+      paste0(metric_duration_notes, "SOL_estimate:exceeds_bed_to_sleep_window; "),
+      metric_duration_notes
+    )
+  }
   if ("sol_duration_for_review_status" %in% names(data)) {
     sol_status <- data$sol_duration_for_review_status
     sol_untrusted <- !is.na(sol_status) & grepl("^untrusted_", sol_status)
