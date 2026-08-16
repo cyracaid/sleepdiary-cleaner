@@ -78,28 +78,29 @@ norm_overrides <- function(overrides) {
   keep[nm_sorted]
 }
 
-spec_cache_key <- function(overrides, input_rds = INPUT_RD) {
+spec_cache_key <- function(overrides, input_rds = INPUT_RD, extra_file = NULL) {
   digest::digest(list(
     input = sha256_file(input_rds),
+    extra = if (is.null(extra_file)) NA else sha256_file(extra_file),
     cfg   = sha256_file(CONFIG_RD),
     code  = code_fingerprint(),
     ov    = norm_overrides(overrides)
   ), algo = "sha256")
 }
 
-cache_path <- function(label, overrides, input_rds = INPUT_RD) {
+cache_path <- function(label, overrides, input_rds = INPUT_RD, extra_file = NULL) {
   safe <- gsub("[^A-Za-z0-9_.-]", "_", label)
-  file.path(CACHE_DIR, sprintf("%s_%s.rds", safe, spec_cache_key(overrides, input_rds)))
+  file.path(CACHE_DIR, sprintf("%s_%s.rds", safe, spec_cache_key(overrides, input_rds, extra_file)))
 }
 
-save_spec_summary <- function(label, overrides, summary, input_rds = INPUT_RD) {
+save_spec_summary <- function(label, overrides, summary, input_rds = INPUT_RD, extra_file = NULL) {
   dir.create(CACHE_DIR, showWarnings = FALSE, recursive = TRUE)
-  saveRDS(summary, cache_path(label, overrides, input_rds))
+  saveRDS(summary, cache_path(label, overrides, input_rds, extra_file))
   summary
 }
 
-load_spec_summary <- function(label, overrides, input_rds = INPUT_RD) {
-  p <- cache_path(label, overrides, input_rds)
+load_spec_summary <- function(label, overrides, input_rds = INPUT_RD, extra_file = NULL) {
+  p <- cache_path(label, overrides, input_rds, extra_file)
   if (file.exists(p)) {
     cat(sprintf("  [cache] %s (input+config unchanged)\n", label))
     readRDS(p)
@@ -110,8 +111,12 @@ load_spec_summary <- function(label, overrides, input_rds = INPUT_RD) {
 # Returns the cached summary if present. Never re-executes on cache hit.
 # input_rds: benchmark input to run the pipeline on (defaults to the
 # enrichment set; pass the real data rds for real-data spec curves).
-run_spec_once <- function(label, overrides, input_rds = INPUT_RD, verbose = TRUE) {
-  hit <- load_spec_summary(label, overrides, input_rds)
+# extra_file: optional supplementary CSV (StartDate/num_waso); enrichment
+# sets have all columns inline so default NULL is correct. Real data
+# (deidentified_intervalvars) requires sber_ema_anon_20260227.csv.
+run_spec_once <- function(label, overrides, input_rds = INPUT_RD,
+                          extra_file = NULL, verbose = TRUE) {
+  hit <- load_spec_summary(label, overrides, input_rds, extra_file)
   if (!is.null(hit)) return(hit)
 
   cfg <- yaml::read_yaml(CONFIG_RD)
@@ -124,11 +129,16 @@ run_spec_once <- function(label, overrides, input_rds = INPUT_RD, verbose = TRUE
   }
 
   # isolated run dir per spec to avoid cross-run state bleed
-  run_dir <- file.path(tempdir(), paste0("spec_", substr(spec_cache_key(overrides, input_rds), 1, 12)))
+  run_dir <- file.path(tempdir(), paste0("spec_", substr(spec_cache_key(overrides, input_rds, extra_file), 1, 12)))
   dir.create(run_dir, showWarnings = FALSE, recursive = TRUE)
   file.copy(input_rds, file.path(run_dir, "main.rds"), overwrite = TRUE)
   cfg$data$files$main <- "main.rds"
-  cfg$data$files$extra <- NULL
+  if (!is.null(extra_file)) {
+    file.copy(extra_file, file.path(run_dir, "extra.csv"), overwrite = TRUE)
+    cfg$data$files$extra <- "extra.csv"
+  } else {
+    cfg$data$files$extra <- NULL
+  }
   yaml::write_yaml(cfg, file.path(run_dir, "config.yaml"))
 
   suppressPackageStartupMessages(library(splsleep))
@@ -173,6 +183,6 @@ run_spec_once <- function(label, overrides, input_rds = INPUT_RD, verbose = TRUE
     flagged_injected = sum(flagged[d$row_id %in% inj_ids]),
     flagged_control  = sum(flagged[d$row_id %in% ctrl_ids])
   )
-  save_spec_summary(label, overrides, summary, input_rds)
+  save_spec_summary(label, overrides, summary, input_rds, extra_file)
   summary
 }

@@ -21,8 +21,9 @@ SYN <- "validation/synthetic"
 RES <- file.path(SYN, "results")
 source(file.path(SYN, "spec_cache.R"))
 
-REAL_RD <- "deidentified_intervalvars_forCD_111325.rds"
-stopifnot(file.exists(REAL_RD))
+REAL_RD    <- "deidentified_intervalvars_forCD_111325.rds"
+REAL_EXTRA <- "sber_ema_anon_20260227.csv"  # StartDate/num_waso live here
+stopifnot(file.exists(REAL_RD), file.exists(REAL_EXTRA))
 
 dims <- list(
   D1 = list(key = "timestamp.sequence.max_gap_hours",            levels = c(11, 12, 13), default = 12),
@@ -36,7 +37,7 @@ base_ov <- lapply(dims, function(x) x$default)
 dim2key <- function(ov) { out <- list(); for (nm in names(ov)) out[[dims[[nm]]$key]] <- ov[[nm]]; out }
 
 cat("=== Real-data multiverse: OAT screening ===\n")
-base <- run_spec_once("real_BASE", dim2key(base_ov), input_rds = REAL_RD)
+base <- run_spec_once("real_BASE", dim2key(base_ov), input_rds = REAL_RD, extra_file = REAL_EXTRA)
 stopifnot(!is.null(base))
 
 oat <- data.frame(spec = "BASE", mean_tst_h = base$mean_tst_h, mean_sol_min = base$mean_sol_min,
@@ -45,7 +46,7 @@ oat <- data.frame(spec = "BASE", mean_tst_h = base$mean_tst_h, mean_sol_min = ba
 for (nm in names(dims)) {
   for (lv in setdiff(dims[[nm]]$levels, dims[[nm]]$default)) {
     ov <- base_ov; ov[[nm]] <- lv
-    s <- run_spec_once(sprintf("real_%s=%g", nm, lv), dim2key(ov), input_rds = REAL_RD)
+    s <- run_spec_once(sprintf("real_%s=%g", nm, lv), dim2key(ov), input_rds = REAL_RD, extra_file = REAL_EXTRA)
     if (is.null(s)) next
     oat <- rbind(oat, data.frame(spec = sprintf("%s=%g", nm, lv), mean_tst_h = s$mean_tst_h,
                  mean_sol_min = s$mean_sol_min, mean_se_pct = s$mean_se_pct,
@@ -78,7 +79,7 @@ for (i in seq_len(nrow(grid))) {
   ov <- base_ov
   for (nm in keep) ov[[nm]] <- grid[i, nm]
   lab <- paste(paste0(keep, "=", unlist(grid[i, keep])), collapse = "_")
-  s <- run_spec_once(sprintf("real_%s", lab), dim2key(ov), input_rds = REAL_RD)
+  s <- run_spec_once(sprintf("real_%s", lab), dim2key(ov), input_rds = REAL_RD, extra_file = REAL_EXTRA)
   if (!is.null(s)) res[[lab]] <- data.frame(spec = lab, mean_tst_h = s$mean_tst_h,
       mean_sol_min = s$mean_sol_min, mean_se_pct = s$mean_se_pct,
       analyzable_n = s$analyzable_n, n_total = s$n_total, n_flagged = s$n_flagged)
