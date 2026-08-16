@@ -86,6 +86,38 @@ Raw Data ──→ Step 1: Load Data ──→ Step 2: Parse Timestamps ──�
 | `flag_severity` | Step 7 (metrics) | Clean, Minor (1 flag), Major (2+ flags) |
 | `checkforerrors_summary` | Step 8 (auto-detect) | TIMESTAMP_ISSUE, DURATION_ISSUE, AMOUNT_FLAG, SELF_REPORTED_FLAG, CLEAN |
 
+### Detection rule families
+
+The cleaning logic is organized into eight rule families. Each family targets
+one failure mode of free-text self-report, has a defined decision behavior
+(see tri-state below), and is validated against a synthetic error class that
+exercises it (see [Validation](#validation)). This is the part of the pipeline
+that does the actual work — the steps above are the scaffolding around it.
+
+| Family | Failure mode targeted | Decision on hit |
+|---|---|---|
+| **Timestamp standardization** | Non-uniform raw strings (`10.30`, `7:30`, bare hours, hms/difftime types) that can silently misparse (e.g. minutes read as seconds) | FLAG (format risk only) |
+| **Temporal order validation** | Bedtime entered after sleep onset; AM/PM flips near midnight; cross-day confusion | AUTO_FIX (needs corroboration) / FLAG |
+| **Free-text duration parsing** | SOL/WASO typed as text (`90:00` meaning 90 min, `0130`, `p` for 0) | FLAG (clock-form never auto-corrected) |
+| **Internal consistency check** | Derived SOL contradicts self-reported SOL; derived duration exceeds the bed→sleep window | AUTO_FIX component / AUDIT |
+| **Redundancy-confirmation check** | A "correction" that moves values *away* from self-report (silent worsening) | **Veto authority over AUTO_FIX** |
+| **Cross-day stability screening** | Implausible day-to-day SOL/WASO jumps within a participant | AUDIT-only (may be real signal) |
+| **Correction provenance audit** | Human correction notes no code path understands (blind spots) | AUDIT-only |
+| **Post-correction verification** | Corrected timestamps still disagree with reported durations | FLAG / PASS (release gate) |
+
+**Decision tri-state:**
+
+| Decision | Meaning |
+|---|---|
+| **AUTO_FIX** | Deterministic, reversible correction applied without human review. For temporal order, requires corroboration: order violation ∧ internal consistency ∧ redundancy confirmation. |
+| **FLAG** | Sent to the human review queue (CSV workflow); no automatic action. |
+| **AUDIT-only** | Counted and reported; never modifies data. |
+
+Every rule family is deterministic (same input → same output, snapshot-verified),
+which is why inter-rater reliability statistics do not apply — there is no
+rater variance. Human co-review agreement is reported instead (see
+[Validation](#validation), Step 7).
+
 ### Figures
 
 | Folder | Content |
@@ -828,7 +860,8 @@ records; count what each rule family flags. No data is changed.
 **Result.** 0 AUTO_FIX, 1048 FLAG — of which **922 logical-window
 violations** (derived SOL longer than the bed→sleep window, max 225 min),
 140 temporal order violations, 1 redundancy-confirmed worsening (the known
-pid-6490 case), 1 cross-day spike, 0 unmapped correction notes (all 14,338
+boundary case, independently reproduced from the work log), 1 cross-day
+spike, 0 unmapped correction notes (all 14,338
 notes map to known mechanisms).
 
 **Meaning.** The pipeline finds real, previously unknown problems in our data
@@ -995,6 +1028,34 @@ MIT
 | `has_correction` | Step 7（追溯） | none, algorithmic, manual, both |
 | `flag_severity` | Step 7（指标） | Clean, Minor（1 标记）, Major（2+ 标记） |
 | `checkforerrors_summary` | Step 8（自动） | TIMESTAMP_ISSUE, DURATION_ISSUE, AMOUNT_FLAG, SELF_REPORTED_FLAG, CLEAN |
+
+### 检测规则族
+
+清洗逻辑组织为八个规则族。每族针对自由文本自报的一种失效模式，有明确的决策行为
+（见下方三态），并由一个合成错误类验证（见[验证](#验证)）。这是管线真正干活的部分——
+上面的步骤是围绕它的脚手架。
+
+| 规则族 | 针对的失效模式 | 命中时决策 |
+|---|---|---|
+| **时间戳标准化** | 不统一的原始字符串（`10.30`、`7:30`、裸小时、hms/difftime 类型）可能静默误解析（如分钟被读成秒） | FLAG（仅格式风险） |
+| **时间顺序验证** | 就寝晚于入睡；午夜附近 AM/PM 翻转；跨日混淆 | AUTO_FIX（需佐证）/ FLAG |
+| **自由文本时长解析** | SOL/WASO 以文本输入（`90:00` 意为 90 分钟、`0130`、`p` 表 0） | FLAG（时钟形态永不自动修） |
+| **内部一致性检查** | 派生 SOL 与自报 SOL 矛盾；派生时长超过 bed→sleep 窗口 | AUTO_FIX 组成元 / AUDIT |
+| **冗余确认检查** | "校正"让值*远离*自报（静默恶化） | **对 AUTO_FIX 有否决权** |
+| **跨日稳定性筛查** | 参与者内部 SOL/WASO 逐日不可信的跳变 | AUDIT-only（可能是真实信号） |
+| **校正溯源审计** | 无代码路径理解的人工校正备注（盲点） | AUDIT-only |
+| **校正后验证** | 校正后时间戳仍与自报时长不一致 | FLAG / PASS（发布闸门） |
+
+**决策三态：**
+
+| 决策 | 含义 |
+|---|---|
+| **AUTO_FIX** | 确定性、可逆、无需人工审查即应用。时间顺序需佐证：顺序违反 ∧ 内部一致性 ∧ 冗余确认。 |
+| **FLAG** | 送人工审查队列（CSV 工作流）；不自动动作。 |
+| **AUDIT-only** | 计数并报告；从不修改数据。 |
+
+每个规则族都是确定性的（同输入 → 同输出，snapshot 验证），因此评分者间信度
+统计不适用——没有评分者变异。改为报告人工共同审查一致性（见[验证](#验证)第 7 步）。
 
 ## 快速开始
 
@@ -1392,7 +1453,7 @@ CI 为参与者级 cluster bootstrap（1,000 次），因为同一参与者的�
 
 **做什么。** 以 report-only 模式跑全部 13,990 条真实记录；数各规则族 flag 了多少。不改任何数据。
 
-**结果。** 0 AUTO_FIX、1048 FLAG——其中 **922 条逻辑窗口违反**（派生 SOL 长于 bed→sleep 窗口，最大 225 分钟）、140 条时间顺序违反、1 条冗余确认的恶化（已知 pid-6490 案例）、1 条跨日尖峰、0 条未映射校正备注（14,338 条备注全部映射到已知机制）。
+**结果。** 0 AUTO_FIX、1048 FLAG——其中 **922 条逻辑窗口违反**（派生 SOL 长于 bed→sleep 窗口，最大 225 分钟）、140 条时间顺序违反、1 条冗余确认的恶化（已知边界案例，由工作日志独立复现）、1 条跨日尖峰、0 条未映射校正备注（14,338 条备注全部映射到已知机制）。
 
 **意味着。** 管线在我们真实数据里找到了先前未知的问题（922 条！）而未改动任何值。这是合成基准给不了的一层：合成证明*检测能力*，这层证明*真实世界流行率*。脚本：`audit_review_queue_m1_m7.R`；输出 `audit_m1_m7_decision.csv`。
 
