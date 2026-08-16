@@ -11,8 +11,8 @@
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Sleep EMA Diary Data Cleaning Pipeline">
-<meta name="description" content="Reproducible R pipeline for cleaning sleep EMA diary data. Parses raw timestamps, detects and corrects temporal and duration errors through a human-in-the-loop CSV workflow, computes sleep metrics (TST, SOL, WASO, SE), and generates diagnostic and research-ready figures. Configurable via YAML — maps your dataset columns without code changes. v1.4.0 adds the delivery gate: finalize_columns() as Step 10, a column dictionary as single source of truth, reserved affect-layer columns, an export guard against negative durations, and CI-wired delivery verification (190+ tests). v1.4.2 adds a calibrated synthetic-error-injection benchmark harness (validation/synthetic/) with first-pass results: 0/10,000 false alterations on clean input and per-category detection rates across 12 injected-error types.">
-<meta property="og:description" content="Reproducible R pipeline for cleaning sleep EMA diary data. Parses raw timestamps, detects and corrects temporal and duration errors through a human-in-the-loop CSV workflow, computes sleep metrics (TST, SOL, WASO, SE), and generates diagnostic and research-ready figures. Configurable via YAML — maps your dataset columns without code changes. v1.4.0 adds the delivery gate: finalize_columns() as Step 10, a column dictionary as single source of truth, reserved affect-layer columns, an export guard against negative durations, and CI-wired delivery verification (190+ tests). v1.4.2 adds a calibrated synthetic-error-injection benchmark harness (validation/synthetic/) with first-pass results: 0/10,000 false alterations on clean input and per-category detection rates across 12 injected-error types.">
+<meta name="description" content="Reproducible R pipeline for cleaning sleep EMA diary data: parses raw timestamps, detects and corrects temporal and duration errors through a documented human-in-the-loop workflow, computes standard sleep metrics (TST, SOL, WASO, SE), and generates diagnostic and research-ready figures. Fully configurable via YAML so new studies can map their data without code changes. Developed for the Stanford Psychophysiology Laboratory's intensive-longitudinal sleep study (github.com/stanford-sber), which supplied the data requirements.">
+<meta property="og:description" content="Reproducible R pipeline for cleaning sleep EMA diary data: parses raw timestamps, detects and corrects temporal and duration errors through a documented human-in-the-loop workflow, computes standard sleep metrics (TST, SOL, WASO, SE), and generates diagnostic and research-ready figures. Fully configurable via YAML so new studies can map their data without code changes. Developed for the Stanford Psychophysiology Laboratory's intensive-longitudinal sleep study (github.com/stanford-sber), which supplied the data requirements.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -3375,8 +3375,8 @@ verification/synth_n&lt;行数&gt;/                     ← 稳定的合成数�
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Cyra Cai Dong — Author, maintainer <br><small class="roles"> Author, maintainer </small>   </li>
-<li>Maia ten Brink — Author, mentor <br><small class="roles"> Author </small>   </li>
+<li>Cai Dong <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0009-0001-0706-0335" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Maia ten Brink <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-6987-1339" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 </ul>
 </div>
 
@@ -3387,7 +3387,7 @@ verification/synth_n&lt;行数&gt;/                     ← 稳定的合成数�
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Cyra Cai Dong — Author, maintainer, Maia ten Brink — Author, mentor.</p>
+  <p>Developed by Cai Dong, Maia ten Brink.</p>
 </div>
 
 <div class="pkgdown-footer-right">
