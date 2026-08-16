@@ -119,42 +119,25 @@ write.csv(l2_df, file.path(RES, "l2_tier.csv"), row.names = FALSE)
 # Config-level: set one dimension to an extreme ("off") and measure pooled
 # recall + workload (rows entering human review = flagged) on the benchmark.
 # Baseline = 5.1 pipeline run outcomes.
+#
+# Determinism: each spec runs through spec_cache.R (run_spec_once), which
+# keys on sha256(input rds + config + overrides). Re-running this script with
+# unchanged input/config reuses cached summaries -> leave_one_out.csv is
+# stable. Regenerating corrupted_enrichment.rds invalidates the cache and
+# forces real re-execution (issue #6 root cause: the input rds is
+# .gitignore'd and was regenerated after these CSVs were produced).
 suppressPackageStartupMessages(library(yaml))
+source(file.path(SYN, "spec_cache.R"))
+
 run_ablation <- function(overrides, label) {
-  cfg <- yaml::read_yaml("inst/config_default.yaml")
-  set_nested <- function(lst, keys, val) {
-    if (length(keys) == 1) { lst[[keys]] <- val; return(lst) }
-    lst[[keys[1]]] <- set_nested(lst[[keys[1]]], keys[-1], val)
-    lst
-  }
-  for (k in names(overrides)) {
-    cfg <- set_nested(cfg, strsplit(k, ".", fixed = TRUE)[[1]], overrides[[k]])
-  }
-  dir.create("tmp_loo", showWarnings = FALSE)
-  file.copy(file.path(SYN, "corrupted_enrichment.rds"), "tmp_loo/main.rds", overwrite = TRUE)
-  cfg$data$files$main <- "main.rds"
-  cfg$data$files$extra <- NULL
-  yaml::write_yaml(cfg, "tmp_loo/config.yaml")
-  suppressPackageStartupMessages(library(splsleep))
-  ok <- tryCatch({
-    run_pipeline(config = "config.yaml", project_dir = "tmp_loo",
-                 skip_visualization = TRUE, verbose = FALSE)
-    TRUE
-  }, error = function(e) { cat("ABLATION ERROR:", label, conditionMessage(e), "\n"); FALSE })
-  if (!ok) return(NULL)
-  co <- get("corrected_ema_data", envir = .GlobalEnv)
-  rv <- get("review_output", envir = .GlobalEnv)
-  dd <- rv$data_with_flags
-  flag_cols <- grep("_checkforerrors$", names(dd), value = TRUE)
-  fm <- rep(FALSE, nrow(dd))
-  for (c in flag_cols) fm <- fm | (dd[[c]] %in% TRUE)
-  flagged <- dd$needs_review_flag %in% TRUE | fm
-  n_flag <- sum(flagged[dd$row_id %in% gt$row_id[gt$error_type != "no_error_control"]])
-  n_ctrl_flag <- sum(flagged[dd$row_id %in% gt$row_id[gt$error_type == "no_error_control"]])
+  s <- run_spec_once(label, overrides)
+  if (is.null(s)) return(NULL)
+  n_inj  <- sum(gt$error_type != "no_error_control")
+  n_ctrl <- sum(gt$error_type == "no_error_control")
   data.frame(group = label,
-             recall_flag = n_flag / sum(gt$error_type != "no_error_control"),
-             workload_flag = n_flag,
-             control_flag_rate = n_ctrl_flag / sum(gt$error_type == "no_error_control"),
+             recall_flag = s$flagged_injected / n_inj,
+             workload_flag = s$flagged_injected,
+             control_flag_rate = s$flagged_control / n_ctrl,
              stringsAsFactors = FALSE)
 }
 

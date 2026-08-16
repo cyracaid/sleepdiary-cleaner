@@ -44,6 +44,7 @@ SYN <- "validation/synthetic"
 RES <- file.path(SYN, "results", "multiverse")
 dir.create(RES, showWarnings = FALSE, recursive = TRUE)
 
+source(file.path(SYN, "spec_cache.R"))
 corr_rds <- file.path(SYN, "corrupted_enrichment.rds")
 stopifnot(file.exists(corr_rds))
 
@@ -57,54 +58,29 @@ dims <- list(
   D6 = list(key = "classification.metric_validation.tst_tib_ratio.min_ratio", levels = c(0.4, 0.5, 0.6), default = 0.5)
 )
 
-base_cfg <- yaml::read_yaml("inst/config_default.yaml")
-
-set_key <- function(cfg, key, value) {
-  parts <- strsplit(key, "\\.")[[1]]
-  node <- cfg
-  for (p in parts[-length(parts)]) node <- node[[p]]
-  node[[parts[length(parts)]]] <- value
-  # walk back is awkward in R; rebuild via recursive set
-  set_nested <- function(lst, keys, val) {
-    if (length(keys) == 1) { lst[[keys]] <- val; return(lst) }
-    lst[[keys[1]]] <- set_nested(lst[[keys[1]]], keys[-1], val)
-    lst
-  }
-  set_nested(cfg, parts, value)
+# ── Downstream quantities per spec (cached via spec_cache.R) ────────────────
+# run_spec maps a summary (from run_spec_once) to the spec_curve data.frame
+# row. Instability stage needs the per-spec category table, carried in the
+# summary's cat_table.
+# overrides uses DIM names (D1..D6); translate to config keys for spec_cache.
+dim_overrides <- function(ov) {
+  out <- list()
+  for (nm in names(ov)) out[[dims[[nm]]$key]] <- ov[[nm]]
+  out
 }
-
-# ── Downstream quantities per spec ──────────────────────────────────────────
 run_spec <- function(overrides, label) {
-  cfg <- base_cfg
-  for (nm in names(overrides)) {
-    cfg <- set_key(cfg, dims[[nm]]$key, overrides[[nm]])
-  }
-  dir.create("tmp_multiverse", showWarnings = FALSE)
-  file.copy(corr_rds, "tmp_multiverse/main.rds", overwrite = TRUE)
-  cfg$data$files$main <- "main.rds"
-  cfg$data$files$extra <- NULL
-  yaml::write_yaml(cfg, "tmp_multiverse/config.yaml")
-
-  suppressPackageStartupMessages(library(splsleep))
-  ok <- tryCatch({
-    run_pipeline(config = "config.yaml", project_dir = "tmp_multiverse",
-                 skip_visualization = TRUE, verbose = FALSE)
-    TRUE
-  }, error = function(e) { cat("SPEC ERROR:", label, "->", conditionMessage(e), "\n"); FALSE })
-  if (!ok) return(NULL)
-
-  corr <- get("corrected_ema_data", envir = .GlobalEnv)
-  n <- nrow(corr)
+  s <- run_spec_once(label, dim_overrides(overrides))
+  if (is.null(s)) return(NULL)
   data.frame(
     spec = label,
-    mean_tst_h = mean(corr$self_diffcalc_totalsleeptime_minutes, na.rm = TRUE) / 60,
-    mean_sol_min = mean(corr$self_diffcalc_sol_minutes, na.rm = TRUE),
-    mean_se_pct = mean(corr$self_diffcalc_sleepefficiency_percent, na.rm = TRUE),
-    analyzable_n = sum(!is.na(corr$self_diffcalc_totalsleeptime_minutes)),
-    n_total = n,
-    n_error = sum(corr$data_category == "error", na.rm = TRUE),
-    n_unusual = sum(corr$data_category == "unusual", na.rm = TRUE),
-    n_flagged = sum(corr$needs_review_flag %in% TRUE, na.rm = TRUE),
+    mean_tst_h = s$mean_tst_h,
+    mean_sol_min = s$mean_sol_min,
+    mean_se_pct = s$mean_se_pct,
+    analyzable_n = s$analyzable_n,
+    n_total = s$n_total,
+    n_error = s$n_error,
+    n_unusual = s$n_unusual,
+    n_flagged = s$n_flagged,
     status_flip_from_base = NA_character_,
     stringsAsFactors = FALSE
   )
@@ -173,10 +149,11 @@ for (ov_lab in c("BASE", "D2=1", "D2=6", "D4=60", "D4=80")) {
   ov <- base_overrides
   if (grepl("D2", ov_lab)) ov[["D2"]] <- as.numeric(sub("D2=", "", ov_lab))
   if (grepl("D4", ov_lab)) ov[["D4"]] <- as.numeric(sub("D4=", "", ov_lab))
-  r <- run_spec(ov, ov_lab)
-  if (is.null(r)) next
-  corr <- get("corrected_ema_data", envir = .GlobalEnv)
-  inst <- rbind(inst, data.frame(spec = ov_lab, cat = corr$data_category, stringsAsFactors = FALSE))
+  s <- run_spec_once(ov_lab, dim_overrides(ov))
+  if (is.null(s)) next
+  ct <- s$cat_table
+  inst <- rbind(inst, data.frame(spec = ov_lab, cat = as.character(ct$cat),
+                                 n = ct$Freq, stringsAsFactors = FALSE))
 }
 if (nrow(inst) > 0) {
   tab <- table(inst$spec, inst$cat)
