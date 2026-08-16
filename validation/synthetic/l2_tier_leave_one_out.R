@@ -60,12 +60,14 @@ expected_signal <- c(
   ampm_swap = "reduce_12h_loop|Temporal",
   field_misentry_sol = "DurationReinterp",
   field_misentry_waso = "DurationReinterp",
-  format_no_colon = "padded|00:00|dd:00|Interval",
-  format_malformed_colon = "colon|dd:00|00:00|Interval",
+  format_no_colon = "padded|00:00|dd:00|Interval|min assumed|digits",
+  format_malformed_colon = "colon|dd:00|00:00|Interval|min assumed|valid minutes|00dd|all zeros",
   mmss_confusion = "DurationReinterp",
   implausible_duration = "Interval",
   cross_participant_spike = "CrossParticipant",
-  compound_ampm_and_swap = "reduce_12h_loop|swap_3h|Temporal"
+  compound_ampm_and_swap = "reduce_12h_loop|swap_3h|Temporal",
+  adjacent_swap_large_gap_left_clean = "Temporal|swap|bed_to_sleep|order",
+  sol_window_contradiction = "bed_to_sleep|exceeds_sleep|exceeds|Interval"
 )
 
 # Pipeline signal per row: correction_type (corrected) + auto_error_desc and
