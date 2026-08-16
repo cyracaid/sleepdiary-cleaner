@@ -69,11 +69,8 @@
 # ============================================================================
 
 calculate_sleep_time_vars_end <- function(data, cfg = NULL) {
-  
-  # Load required libraries
-  library(dplyr)
-  library(lubridate)
-  
+  # dplyr + lubridate used via NAMESPACE imports
+
   # Print the name of the dataframe being processed
   data_name <- deparse(substitute(data))
   cat(sprintf("\n=== Calculating sleep time variables for: %s ===\n", data_name))

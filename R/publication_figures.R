@@ -3,7 +3,7 @@
 # No helper summarise_corrections() -- counts computed inline.
 # Dependencies: ggplot2 (already in Imports), no new packages.
 
-library(ggplot2)
+# ggplot2 used via NAMESPACE import (no library() call in package code).
 
 # --------------------------------------------------------------
 # Data extraction helpers (inline, not exported functions)
@@ -314,7 +314,6 @@ figure_cleaning_effect <- function() {
           plot.title = element_text(face = "bold", size = 11))
 
   if (requireNamespace("patchwork", quietly = TRUE)) {
-    library(patchwork)
     combined <- (p_sol + p_tst) / p_scatter +
       plot_annotation(
         title = "Figure 2. Effect of the cleaning pipeline on sleep metrics",

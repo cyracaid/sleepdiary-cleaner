@@ -2,7 +2,6 @@
 \name{sleep_diary}
 \alias{sleep_diary}
 \alias{new_sleep_diary}
-\alias{as_sleep_diary}
 \alias{is_sleep_diary}
 \alias{validate_sleep_diary}
 \title{The sleep\_diary S3 class}

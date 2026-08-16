@@ -99,11 +99,7 @@ utils::globalVariables(c(
 # ============================================================================
 
 calculate_sleep_time_vars_end <- function(data, cfg = NULL) {
-  library(dplyr)
-  library(lubridate)
-  
-  # Load required libraries
-
+  # dplyr + lubridate used via NAMESPACE imports
 
   # Print the name of the dataframe being processed
   data_name <- deparse(substitute(data))

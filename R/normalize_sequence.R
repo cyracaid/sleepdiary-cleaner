@@ -47,9 +47,7 @@
 
 normalize_sleep_time_sequence <- function(AM_rawdata, flip_gap_hours = 12,
                                           swap_threshold_hours = 3) {
-  require(dplyr)
-  require(lubridate)
-  # Load required libraries
+  # dplyr + lubridate used via NAMESPACE imports
 
 
   # ==========================================================================
