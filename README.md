@@ -775,6 +775,46 @@ that only survives a single check. We run the steps in this order, from
 "does the pipeline harm good data?" to "does it survive real-world
 uncertainty?".
 
+```
+                    VALIDATION CHAIN (8 steps, two data tiers)
+                    ──────────────────────────────────────────
+
+  SYNTHETIC TIER (known ground truth, no privacy constraints)
+  ────────────────────────────────────────────────────────────
+  Step 1: Clean-input specificity ─── FCR / FAR_flag / FAR_alter
+          (10,000 error-free records; expect ZERO changes/flags)
+                    │
+                    ▼
+  Step 2: Injected-error benchmark ── pooled recall 0.995 [0.994, 0.997]
+          (400 errors/category, ground truth at injection)
+                    │
+                    ▼
+  Step 3: Detection vs value-correctness ── L1 vs L3 gap
+          (e.g. ampm_swap L1 1.0 / L3 0.565 → routed to human)
+                    │
+                    ▼
+  Step 4: Controls ── no_cleaning 0 / naive_rule 0.623 / pipeline 0.995
+
+  REAL-DATA TIER (n = 13,990, no synthetic standard needed)
+  ────────────────────────────────────────────────────────────
+  Step 5: Redundant-channel validation ── corrections move values
+          toward self-report: 81/88 (92%) improved; 1 bad rule
+          found & guarded (v1.4.3)
+                    │
+                    ▼
+  Step 6: Report-only audit ── 0 AUTO_FIX, 1048 FLAG
+          (922 window violations, 140 order violations, ...)
+                    │
+                    ▼
+  Step 7: Human co-review agreement ── 64.0% (n=75) / 89.2% (n=37)
+
+  ROBUSTNESS TIER (does the choice matter?)
+  ────────────────────────────────────────────────────────────
+  Step 8: Multiverse + downstream + seeds ── D2 = 44% (swap
+          threshold dominates); TST robust, SOL sensitive
+          (12.1–48.4 min); recall stable 0.993–0.995 across seeds
+```
+
 ### Step 1 — Does the pipeline touch clean data? (clean-input specificity)
 
 **What we do.** Generate synthetic data with *no errors at all* (10,000
@@ -1402,6 +1442,45 @@ Snapshot 验证（`inst/verification/`、`verify_v1_3_snapshot.R`）确认当前
 上面的测试覆盖率证明代码按设计跑对了，不证明设计本身在方法学上站得住——睡眠日记清洗没有 ground truth，没有人能确定参与者在时长字段里填「10:30」时到底想说什么。
 
 我们的回答是一条**多步验证链**。每步只问一个问题、以不同的方式失效、且刻意彼此独立：能经受住全部步骤的清洗决策，比只经受住单项检查的可信得多。步骤按此顺序执行，从"管线会不会伤害好数据"一直到"能不能扛住真实世界的不确定性"。
+
+```
+                    验证链（8 步，两个数据层）
+                    ──────────────────────────
+
+  合成层（已知 ground truth，无隐私约束）
+  ────────────────────────────────────────────
+  第 1 步：干净输入特异度 ─── FCR / FAR_flag / FAR_alter
+           （10,000 条无错误记录；期望零改动/零 flag）
+                    │
+                    ▼
+  第 2 步：注入错误基准 ─── 合并 recall 0.995 [0.994, 0.997]
+           （每类 400 条，注入时记录 ground truth）
+                    │
+                    ▼
+  第 3 步：检测 vs 值正确 ─── L1 vs L3 差距
+           （如 ampm_swap L1 1.0 / L3 0.565 → 转人工）
+                    │
+                    ▼
+  第 4 步：对照 ─── 不清洗 0 / 朴素规则 0.623 / 管线 0.995
+
+  真实数据层（n = 13,990，无需合成标准）
+  ────────────────────────────────────────────
+  第 5 步：冗余通道验证 ─── 校正把值移向自报：81/88（92%）改进；
+           发现 1 条坏规则并加守卫（v1.4.3）
+                    │
+                    ▼
+  第 6 步：Report-only 审计 ─── 0 AUTO_FIX、1048 FLAG
+           （922 窗口违反、140 顺序违反……）
+                    │
+                    ▼
+  第 7 步：人工共同审查一致性 ─── 64.0%（n=75）/ 89.2%（n=37）
+
+  鲁棒性层（选择要紧吗？）
+  ────────────────────────────────────────────
+  第 8 步：Multiverse + 下游 + seed ─── D2 = 44%（交换阈值主导）；
+           TST 稳健、SOL 敏感（12.1–48.4 分钟）；
+           跨 seed recall 稳定 0.993–0.995
+```
 
 ### 第 1 步 — 管线会碰干净数据吗？（干净输入特异度）
 
