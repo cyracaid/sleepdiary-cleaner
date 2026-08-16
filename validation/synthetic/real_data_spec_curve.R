@@ -68,7 +68,13 @@ for (nm in names(dims)) {
   if (d_tst < 5 && d_n < 1 && d_fl < 1) keep <- setdiff(keep, nm)
 }
 if (length(keep) == 0) keep <- "D2"
-cat(sprintf("\nReal-data OAT survivors: %s\n", paste(keep, collapse = ", ")))
+# HONEST READING: on the real dataset all six dimensions fall below the
+# survival rule (max |ΔTST| 0.93 min, max |Δn| 0.70% — see oat_screening).
+# The fallback keeps the script runnable; the correct conclusion is that
+# downstream quantities are INSENSITIVE to cleaning thresholds on real data.
+# Spec curve below is therefore the D2-only fallback, not a selection result.
+cat(sprintf("\nReal-data OAT survivors: %s %s\n", paste(keep, collapse = ", "),
+    if (length(keep) == 1 && keep == "D2") "(fallback — NO dimension passed the survival rule on real data)" else ""))
 
 # Full factorial on survivors (cached)
 levs <- lapply(keep, function(nm) dims[[nm]]$levels); names(levs) <- keep
