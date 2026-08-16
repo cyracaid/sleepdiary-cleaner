@@ -2600,7 +2600,7 @@ if (all(c("time_bed_corrected", "time_getup_corrected") %in% names(corrected_ema
 
     sr_long <- sr %>%
       select(pid, day_type, bed_hour, getup_hour) %>%
-      reshape2::melt(id.vars = c("pid", "day_type"), variable.name = "event", value.name = "hour") %>%
+      tidyr::pivot_longer(cols = c("bed_hour", "getup_hour"), names_to = "event", values_to = "hour") %>%
       mutate(event = ifelse(event == "bed_hour", "Bedtime", "Get-up Time"))
 
     p_r25 <- ggplot(sr_long, aes(x = day_type, y = hour, fill = day_type)) +
