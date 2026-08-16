@@ -56,7 +56,7 @@
 - `cannabis_doses`
 - `StartDate`
 
-**Runtime dependencies:** 15 packages in Imports (`renv::install()` covers all)
+**Runtime dependencies:** 14 packages in Imports (`renv::install()` covers all)
 
 <!-- AUTO:SKILL_FACTS_END -->
 

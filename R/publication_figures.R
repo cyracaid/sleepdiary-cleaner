@@ -5,6 +5,13 @@
 
 # ggplot2 used via NAMESPACE import (no library() call in package code).
 
+# aes() NSE column names (time/value) are data-frame columns, not globals.
+utils::globalVariables(c(
+  "time", "value", "StartDate", "after", "before", "fill",
+  "temp_col", "x", "xend", "y", "yend",
+  "severity", "correction", "label"
+))
+
 # --------------------------------------------------------------
 # Data extraction helpers (inline, not exported functions)
 # --------------------------------------------------------------

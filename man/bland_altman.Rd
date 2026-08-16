@@ -28,7 +28,7 @@ bland_altman(data, reported_col, computed_col,
   and \code{plot}.
 }
 \references{
-  Bland, J. M., \& Altman, D. G. (1986). Statistical methods for
+  Bland, J. M. and Altman, D. G. (1986). Statistical methods for
   assessing agreement between two methods of clinical measurement.
   \emph{The Lancet}, 327(8476), 307-310.
 }

@@ -25,6 +25,9 @@
 # Input:
 #   AM_rawdata - A dataframe containing AM/PM sleep-log variables
 #   (time_bed_am_hhmm_ampm, time_sleep_am_hhmm_ampm, ...).
+# dplyr NSE column names used in mutate() below — not globals.
+utils::globalVariables(c("time_bed_am_hhmm_ampm", "time_sleep_am_hhmm_ampm",
+                         "time_awake_am_hhmm_ampm", "time_getup_am_hhmm_ampm"))
 #
 # Output:
 #   A list with two elements:

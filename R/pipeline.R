@@ -9,7 +9,9 @@ scripts_dir <- function() {
 utils::globalVariables(c(
   "corrected_ema_data", "ema_data_release_timecalc",
   "review_output", "checkforerrors_summary",
-  "pipeline_config", "splsleep_scripts_dir"
+  "pipeline_config", "splsleep_scripts_dir",
+  # functions sourced from inst/scripts at runtime (report_correction_status.R)
+  "report_status", "final_summary", "generate_correction_files", "generate_figure_index"
 ))
 
 # -- Internal helpers (used only by run_pipeline / run_setup / run_visualization) --

@@ -57,6 +57,11 @@ test_that("00_MAIN_entry auto-runs the full legacy chain on synthetic data", {
 
   runner <- tempfile("splsmoke_run_", fileext = ".R")
   writeLines(c(
+    # Force UTF-8: R CMD check runs the sandbox subprocess under the check
+    # session charset (ASCII on macOS CI), and 00_MAIN_entry's checkpoint
+    # banner prints Δ/→ (U+0394/U+2192) — mbcsToSbcs chokes on those in C
+    # locale and the auto-run exits non-zero before writing artifacts.
+    "suppressWarnings(tryCatch(Sys.setlocale('LC_CTYPE', 'en_US.UTF-8'), error = function(e) NULL))",
     "root_pkg <- if (basename(getwd()) == 'testthat') dirname(dirname(getwd())) else getwd()",
     "suppressMessages(pkgload::load_all(root_pkg, quiet = TRUE))",
     "library(splsleep)",

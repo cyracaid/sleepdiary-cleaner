@@ -28,24 +28,22 @@ BugReports: https://github.com/cyracaid/sleepdiary-cleaner/issues
 Depends:
     R (>= 4.2)
 Imports:
+    corrplot,
     dplyr,
     ggplot2,
     gridExtra,
     lubridate,
+    magick,
     patchwork,
     readr,
+    reshape2,
     rlang,
     stringr,
     tidyr,
     utils,
     yaml
 Suggests:
-    corrplot,
-    magick,
-    purrr,
-    reshape2,
     testthat (>= 3.0.0),
-    tibble,
     withr
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.1.0

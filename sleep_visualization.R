@@ -918,7 +918,7 @@ if("sol_h" %in% names(clean_df)) vars_to_plot <- c(vars_to_plot, SOL = "sol_h")
 if("sleep_efficiency_pct" %in% names(clean_df)) vars_to_plot <- c(vars_to_plot, sleep_efficiency = "sleep_efficiency_pct")
 
 if(length(vars_to_plot) > 0) {
-  # Wide → long: reshape 5 sleep metrics into key-value pairs for faceted plotting
+  # Wide -> long: reshape 5 sleep metrics into key-value pairs for faceted plotting
   long_df <- clean_df %>%
     select(all_of(vars_to_plot)) %>%
     pivot_longer(cols = everything(), names_to = "variable", values_to = "value") %>%
@@ -1107,7 +1107,7 @@ if("sol_h" %in% names(clean_df)) available_vars <- c(available_vars, `SOL` = "so
 if("sleep_efficiency_pct" %in% names(clean_df)) available_vars <- c(available_vars, `Sleep Efficiency` = "sleep_efficiency_pct")
 
 if(length(available_vars) > 0) {
-  # Wide → long: reshape sleep metrics into a single column for faceted violin plots
+  # Wide -> long: reshape sleep metrics into a single column for faceted violin plots
   long_df2 <- clean_df %>%
     select(all_of(available_vars)) %>%
     pivot_longer(cols = everything(), names_to = "variable", values_to = "value") %>%
@@ -1493,7 +1493,7 @@ if(length(flag_columns) >= 2) {
 # ============================================================================
 # WHAT IT SHOWS: Three-panel summary table of pipeline correction progress.
 #   Panel 1 — Core metrics per step (Total, Clean, Error, Unusual, etc.)
-#   Panel 2 — Step-to-step changes (Δ Clean, Δ Error, Δ Unusual, Δ Corrected)
+#   Panel 2 — Step-to-step changes (delta Clean, delta Error, delta Unusual, delta Corrected)
 #   Panel 3 — Sleep metrics for steps where available (Valid N, TST, SOL)
 # DATA SOURCE: correction_status.csv from report_correction_status.R
 # ============================================================================
@@ -1533,10 +1533,10 @@ if (file.exists(cp_file)) {
   # Panel 2 — Step-to-step deltas
   delta_df <- data.frame(
     Step = cp$step_label,
-    `Δ Clean`    = c(NA, diff(cp$n_clean)),
-    `Δ Error`    = c(NA, diff(cp$n_error)),
-    `Δ Unusual`  = c(NA, diff(cp$n_unusual)),
-    `Δ Corrected` = c(NA, diff(ifelse(is.na(cp$n_corrected), 0, cp$n_corrected))),
+    `delta Clean`    = c(NA, diff(cp$n_clean)),
+    `delta Error`    = c(NA, diff(cp$n_error)),
+    `delta Unusual`  = c(NA, diff(cp$n_unusual)),
+    `delta Corrected` = c(NA, diff(ifelse(is.na(cp$n_corrected), 0, cp$n_corrected))),
     check.names = FALSE
   )
 
@@ -1570,7 +1570,7 @@ if (file.exists(cp_file)) {
   p12 <- grid.arrange(
     textGrob("Figure 12: Pipeline Correction Progress",
              gp = gpar(fontsize = 14, fontface = "bold"), just = "left", x = 0.03),
-    textGrob(sprintf("Run %s  |  Checkpoints A→E → Steps 4→8  |  Δ = change from previous step",
+    textGrob(sprintf("Run %s  |  Checkpoints A->E -> Steps 4->8  |  delta = change from previous step",
                      latest_run),
              gp = gpar(fontsize = 9, col = "gray40"), just = "left", x = 0.03),
     t1, t2, t3, ncol = 1,
