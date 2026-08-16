@@ -5,16 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Interpreting the Pipeline Output • splsleep</title>
+<title>如何读懂管线输出（中文） • splsleep</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Interpreting the Pipeline Output">
-<meta name="description" content="How to read correction_status_final.csv, the step flag ledger, regression checks, and the diagnostic figures — what each output means and what to check for.
-">
-<meta property="og:description" content="How to read correction_status_final.csv, the step flag ledger, regression checks, and the diagnostic figures — what each output means and what to check for.
-">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="如何读懂管线输出（中文）">
+<meta name="description" content="怎么读 correction_status_final.csv、step flag ledger、回归检查与诊断图表——每个输出的含义和检查要点。">
+<meta property="og:description" content="怎么读 correction_status_final.csv、step flag ledger、回归检查与诊断图表——每个输出的含义和检查要点。">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -55,27 +53,25 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>Interpreting the Pipeline Output</h1>
+      <h1>如何读懂管线输出（中文）</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/vignettes/interpreting-output.Rmd" class="external-link"><code>vignettes/interpreting-output.Rmd</code></a></small>
-      <div class="d-none name"><code>interpreting-output.Rmd</code></div>
+      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/vignettes/interpreting-output-zh.Rmd" class="external-link"><code>vignettes/interpreting-output-zh.Rmd</code></a></small>
+      <div class="d-none name"><code>interpreting-output-zh.Rmd</code></div>
     </div>
 
     
     
-<p>After <code><a href="../reference/run_pipeline.html">run_pipeline()</a></code> finishes, two CSV files tell you
-everything. This vignette explains how to read them, how to
-regression-check against a previous run, and how to read the
-figures.</p>
+<p><code><a href="../reference/run_pipeline.html">run_pipeline()</a></code> 跑完后，两个 CSV
+文件告诉你一切。本文说明怎么读它们、怎么
+对比上一次运行做回归检查、以及怎么看图。</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">splsleep</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
-<h2 id="outputcorrection_status_final-csv-the-run-summary-open-this-first">1. <code>output/correction_status_final.csv</code> — The Run Summary
-(Open This First)<a class="anchor" aria-label="anchor" href="#outputcorrection_status_final-csv-the-run-summary-open-this-first"></a>
+<h2 id="outputcorrection_status_final-csv-运行摘要先看这个">1. <code>output/correction_status_final.csv</code> —
+运行摘要（先看这个）<a class="anchor" aria-label="anchor" href="#outputcorrection_status_final-csv-%E8%BF%90%E8%A1%8C%E6%91%98%E8%A6%81%E5%85%88%E7%9C%8B%E8%BF%99%E4%B8%AA"></a>
 </h2>
-<p>One row per pipeline run. It answers: <em>“did the cleaning work as
-expected?”</em></p>
+<p>每次运行一行。回答”清洗是否按预期工作？”</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"output/correction_status_final.csv"</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
@@ -85,88 +81,78 @@ expected?”</em></p>
 <col width="33%">
 </colgroup>
 <thead><tr class="header">
-<th>Column</th>
-<th>It tells you…</th>
-<th>Check this</th>
+<th>列</th>
+<th>它告诉你…</th>
+<th>检查这个</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td><code>n_total</code></td>
-<td>Total records in your data</td>
-<td>Must equal your input row count. If smaller, records were dropped
-somewhere.</td>
+<td>总记录数</td>
+<td>必须等于输入行数。若更小，某处丢了记录。</td>
 </tr>
 <tr class="even">
 <td><code>tst_mean_h</code></td>
-<td>Mean total sleep time in hours</td>
-<td>6.0–8.5 h is normal for most adult studies. If &lt; 5 or &gt; 10,
-something is off with the timestamp parsing or the study population is
-unusual.</td>
+<td>平均总睡眠时间（小时）</td>
+<td>大多数成人研究 6.0–8.5 h 正常。若 &lt; 5 或 &gt;
+10，时间戳解析或研究人群异常。</td>
 </tr>
 <tr class="odd">
 <td><code>sol_mean_min</code></td>
-<td>Mean sleep onset latency in minutes</td>
-<td>10–45 min is normal. If &gt; 60, either the population has high
-insomnia or AM/PM confusion was not fully corrected.</td>
+<td>平均入睡潜伏期（分钟）</td>
+<td>10–45 min 正常。若 &gt; 60，人群失眠率高或 AM/PM
+混淆未完全修正。</td>
 </tr>
 <tr class="even">
 <td><code>n_clean</code></td>
-<td>Records that passed every check</td>
-<td>Should be stable across runs (same data = same count).</td>
+<td>通过所有检查的记录</td>
+<td>同数据多次运行应相同。</td>
 </tr>
 <tr class="odd">
 <td><code>n_error</code></td>
-<td>Records with impossible temporal order (e.g., getup before
-bedtime)</td>
-<td>Should be &lt; 1% of total. If &gt; 5%, review the survey design or
-data collection.</td>
+<td>时序不可能记录（如 getup 早于 bed）</td>
+<td>应 &lt; 总记录 1%。若 &gt; 5%，审查问卷设计。</td>
 </tr>
 <tr class="even">
 <td><code>n_corrected</code></td>
-<td>Records manually corrected via your CSV files</td>
-<td>Should match the number of rows in your
-<code>manual_error_corrections.csv</code>.</td>
+<td>经 CSV 人工修正的记录</td>
+<td>应与 <code>manual_error_corrections.csv</code> 行数一致。</td>
 </tr>
 <tr class="odd">
 <td><code>timestamp_issue</code></td>
-<td>Timestamps that could not be parsed into a valid time</td>
-<td>0 is normal. &gt; 0 means some participants entered non-standard
-time formats.</td>
+<td>无法解析为有效时间的时间戳</td>
+<td>0 正常。&gt; 0 表示参与者填了非标准时间格式。</td>
 </tr>
 <tr class="even">
 <td><code>duration_issue</code></td>
-<td>Sleep metrics (SOL, SE, TST) outside configured thresholds</td>
-<td>Small numbers are normal. If very large, your thresholds may be too
-strict or the data has quality problems.</td>
+<td>超出配置阈值的睡眠指标</td>
+<td>少量正常。若很大，阈值太严或数据质量有问题。</td>
 </tr>
 <tr class="odd">
 <td><code>amount_flag</code></td>
-<td>Substance-use entries with unusual values</td>
-<td>Should be 0 or very low.</td>
+<td>异常物质使用条目</td>
+<td>应为 0 或很低。</td>
 </tr>
 <tr class="even">
 <td><code>self_reported_flag</code></td>
-<td>Records where self-reported SOL/WASO disagrees with the computed
-value</td>
-<td>Indicates perception bias. Check Figure 20 (SOL Perception
-Bias).</td>
+<td>自报 SOL/WASO 与计算值分歧的记录</td>
+<td>指示感知偏差。看图 20（SOL 感知偏差）。</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Stability rule:</strong> Run twice on the same data → every
-number must be identical. If not, something is non-deterministic.</p>
+<p><strong>稳定性规则</strong>：同一数据跑两次 →
+每个数字必须相同。否则非确定性。</p>
 </div>
 <div class="section level2">
-<h2 id="outputstep_flag_ledger-csv-the-per-step-flag-tracker-open-second">2. <code>output/step_flag_ledger.csv</code> — The Per-Step Flag
-Tracker (Open Second)<a class="anchor" aria-label="anchor" href="#outputstep_flag_ledger-csv-the-per-step-flag-tracker-open-second"></a>
+<h2 id="outputstep_flag_ledger-csv-每步标记追踪第二个看">2. <code>output/step_flag_ledger.csv</code> —
+每步标记追踪（第二个看）<a class="anchor" aria-label="anchor" href="#outputstep_flag_ledger-csv-%E6%AF%8F%E6%AD%A5%E6%A0%87%E8%AE%B0%E8%BF%BD%E8%B8%AA%E7%AC%AC%E4%BA%8C%E4%B8%AA%E7%9C%8B"></a>
 </h2>
-<p>One row per step × per standard × per category. It answers: <em>“at
-which step did which flag appear, and did it persist?”</em></p>
+<p>每行 = 步骤 × 标准 × 类别。回答”哪个步骤出现哪种标记，是否持续？”</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ledger</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"output/step_flag_ledger.csv"</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="va">ledger</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">step_id</span>, <span class="va">standard</span><span class="op">)</span></span></code></pre></div>
-<p>The ledger uses 5 independent evaluation systems:</p>
+<p>ledger 用 5 个独立评估系统：</p>
 <table class="table">
 <colgroup>
 <col width="14%">
@@ -175,17 +161,16 @@ which step did which flag appear, and did it persist?”</em></p>
 <col width="23%">
 </colgroup>
 <thead><tr class="header">
-<th>Standard</th>
-<th align="center">First step with numbers</th>
-<th>What it evaluates</th>
-<th>Key categories</th>
+<th>标准</th>
+<th align="center">首个有数字的步骤</th>
+<th>评估什么</th>
+<th>关键类别</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td><code>field_misentry</code></td>
 <td align="center">1.5</td>
-<td>Whether a duration estimate (SOL, WASO) exactly matches a timestamp
-— may indicate “typed in wrong box”</td>
+<td>时长估计（SOL、WASO）是否恰好匹配时间戳——可能”填错框”</td>
 <td>
 <code>none</code>, <code>SOL=time_sleep</code>,
 <code>SOL=time_bed</code>, <code>WASO=time_awake</code>,
@@ -195,8 +180,7 @@ which step did which flag appear, and did it persist?”</em></p>
 <tr class="even">
 <td><code>data_category</code></td>
 <td align="center">4</td>
-<td>Temporal order and plausibility of the bed → sleep → awake → getup
-sequence</td>
+<td>bed → sleep → awake → getup 序列的时序与合理性</td>
 <td>
 <code>clean</code>, <code>error</code>, <code>unusual</code>,
 <code>equal_time_ok</code>, <code>skipped_na</code>
@@ -205,8 +189,7 @@ sequence</td>
 <tr class="odd">
 <td><code>flag_severity</code></td>
 <td align="center">7</td>
-<td>How many derived-metric flags (low SE, high SOL, high WASO) each
-record triggered</td>
+<td>每条记录触发多少派生指标标记</td>
 <td>
 <code>Clean</code>, <code>Minor (1 flag)</code>,
 <code>Major (2+ flags)</code>
@@ -215,7 +198,7 @@ record triggered</td>
 <tr class="even">
 <td><code>duration_extreme</code></td>
 <td align="center">7</td>
-<td>Total sleep time outside physiologically plausible bounds</td>
+<td>生理合理界外的总睡眠时间</td>
 <td>
 <code>OK</code>, <code>Too short (&lt; 3 h)</code>,
 <code>Too long (&gt; 12 h)</code>
@@ -224,7 +207,7 @@ record triggered</td>
 <tr class="odd">
 <td><code>checkforerrors</code></td>
 <td align="center">8</td>
-<td>Summary of all auto-detection flags assembled in Step 8</td>
+<td>Step 8 汇总的自动检测标记</td>
 <td>
 <code>TIMESTAMP_ISSUE</code>, <code>DURATION_ISSUE</code>,
 <code>AMOUNT_FLAG</code>, <code>SELF_REPORTED_FLAG</code>
@@ -232,57 +215,52 @@ record triggered</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Conceptual rule:</strong> Standards are computed once and
-never re-computed. If a standard’s counts change after its first
-computation step, something is wrong.</p>
-<p><strong>Validation rules:</strong></p>
+<p><strong>概念规则</strong>：标准只计算一次、从不重算。若某标准计数在其首次计算步骤后改变，
+就有问题。</p>
+<p><strong>验证规则</strong>：</p>
 <ol style="list-style-type: decimal">
 <li>
-<code>field_misentry</code> — populated from Step 1.5 onward. Any
-<code>SOL=time_bed</code> or <code>WASO=time_getup</code> with
-<code>count &gt; 0</code> = potential cross-field contamination.</li>
+<code>field_misentry</code> — Step 1.5 起有数。任何
+<code>SOL=time_bed</code> 或 <code>WASO=time_getup</code>
+<code>count &gt; 0</code> = 潜在跨字段污染。</li>
 <li>
-<code>data_category</code> — from Step 6 onward the numbers must be
-<strong>stable</strong>:
-<code>equal_time_ok + skipped_na = n_total</code>.</li>
+<code>data_category</code> — Step 6
+起数字必须<strong>稳定</strong>：<code>equal_time_ok + skipped_na = n_total</code>。</li>
 <li>
-<code>flag_severity</code> — from Step 7 onward identical across
-Steps 7, 8, 8.5:
-<code>Clean + Minor + Major = n_total - skipped_na</code>.</li>
+<code>flag_severity</code> — Step 7 起 Steps 7/8/8.5 完全相同：
+<code>Clean + Minor + Major = n_total - skipped_na</code>。</li>
 <li>
-<code>duration_extreme</code> — <code>Too short + Too long</code>
-should be &lt; 5% of <code>n_total</code>.</li>
+<code>duration_extreme</code> — <code>Too short + Too long</code> 应
+&lt; 总记录 5%。</li>
 <li>
-<code>checkforerrors</code> — populated at Step 8 only.</li>
+<code>checkforerrors</code> — 仅 Step 8 有数据。</li>
 </ol>
-<p><strong>Example (synthetic data, 280 rows):</strong></p>
+<p><strong>示例（合成数据，280 行）</strong>：</p>
 <pre><code>Step 7 (Compute metrics):
   data_category:    equal_time_ok = 266, skipped_na = 14        266 + 14 = 280 ✓
   flag_severity:    Clean = 251, Minor = 28, Major = 1         251 + 28 + 1 = 280 - 14 ✓
   duration_extreme: OK = 262, Too short = 1, Too long = 0</code></pre>
 </div>
 <div class="section level2">
-<h2 id="regression-check-compare-against-a-previous-run">3. Regression Check (compare against a previous run)<a class="anchor" aria-label="anchor" href="#regression-check-compare-against-a-previous-run"></a>
+<h2 id="回归检查对比上次运行">3. 回归检查（对比上次运行）<a class="anchor" aria-label="anchor" href="#%E5%9B%9E%E5%BD%92%E6%A3%80%E6%9F%A5%E5%AF%B9%E6%AF%94%E4%B8%8A%E6%AC%A1%E8%BF%90%E8%A1%8C"></a>
 </h2>
-<p><code>output/correction_status_old.csv</code> is not written by any
-pipeline script — you create it yourself as a saved baseline before
-rerunning:</p>
+<p><code>output/correction_status_old.csv</code>
+不是任何管线脚本写的——重跑前你自己另存一份 基线：</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># BEFORE rerunning: save the current output as your baseline.</span></span>
+<code class="sourceCode R"><span><span class="co"># 重跑之前：把当前结果存成基线</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span><span class="st">"output/correction_status_final.csv"</span>, <span class="st">"output/correction_status_old.csv"</span>,</span>
 <span>          overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co"># ... rerun the pipeline here ...</span></span>
-<span><span class="co"># AFTER rerunning: compare against the baseline.</span></span>
+<span><span class="co"># ……在此重跑管线……</span></span>
+<span><span class="co"># 重跑之后：和基线对比</span></span>
 <span><span class="va">old</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"output/correction_status_old.csv"</span><span class="op">)</span></span>
 <span><span class="va">new</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"output/correction_status_final.csv"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">old</span><span class="op">$</span><span class="va">tst_mean_h</span>, <span class="va">new</span><span class="op">$</span><span class="va">tst_mean_h</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">old</span><span class="op">$</span><span class="va">sol_mean_min</span>, <span class="va">new</span><span class="op">$</span><span class="va">sol_mean_min</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">old</span><span class="op">$</span><span class="va">n_clean</span>, <span class="va">new</span><span class="op">$</span><span class="va">n_clean</span><span class="op">)</span></span></code></pre></div>
-<p>If they differ and the input data did not change, the pipeline output
-has changed. Investigate.</p>
+<p>输入数据没变但结果不同 → 管线输出变了，需调查。</p>
 </div>
 <div class="section level2">
-<h2 id="quick-reference-card">4. Quick Reference Card<a class="anchor" aria-label="anchor" href="#quick-reference-card"></a>
+<h2 id="快速检查卡">4. 快速检查卡<a class="anchor" aria-label="anchor" href="#%E5%BF%AB%E9%80%9F%E6%A3%80%E6%9F%A5%E5%8D%A1"></a>
 </h2>
 <table class="table">
 <colgroup>
@@ -291,66 +269,65 @@ has changed. Investigate.</p>
 <col width="31%">
 </colgroup>
 <thead><tr class="header">
-<th>Check</th>
-<th>What to run</th>
-<th>Pass if</th>
+<th>检查项</th>
+<th>如何验证</th>
+<th>通过条件</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>Pipeline finished</td>
+<td>管线完成</td>
 <td><code>file.exists("output/correction_status_final.csv")</code></td>
 <td><code>TRUE</code></td>
 </tr>
 <tr class="even">
-<td>Reasonable TST</td>
+<td>TST 合理</td>
 <td>
-<code>tst_mean_h</code> between 6–8.5</td>
-<td>Yes</td>
+<code>tst_mean_h</code> 在 6–8.5</td>
+<td>是</td>
 </tr>
 <tr class="odd">
-<td>Reasonable SOL</td>
+<td>SOL 合理</td>
 <td>
-<code>sol_mean_min</code> between 10–45</td>
-<td>Yes</td>
+<code>sol_mean_min</code> 在 10–45</td>
+<td>是</td>
 </tr>
 <tr class="even">
-<td>Few errors</td>
+<td>错误少</td>
 <td><code>n_error &lt; 0.01 * n_total</code></td>
-<td>Yes</td>
+<td>是</td>
 </tr>
 <tr class="odd">
-<td>data_category stable</td>
-<td>Counts identical across Steps 6–8.5</td>
-<td>Yes</td>
+<td>data_category 稳定</td>
+<td>Steps 6–8.5 计数相同</td>
+<td>是</td>
 </tr>
 <tr class="even">
-<td>flag_severity stable</td>
-<td>Counts identical across Steps 7–8.5</td>
-<td>Yes</td>
+<td>flag_severity 稳定</td>
+<td>Steps 7–8.5 计数相同</td>
+<td>是</td>
 </tr>
 <tr class="odd">
-<td>All records accounted</td>
+<td>全记录有交代</td>
 <td><code>equal_time_ok + skipped_na = n_total</code></td>
-<td>Yes</td>
+<td>是</td>
 </tr>
 <tr class="even">
-<td>Deterministic</td>
-<td>Same input → same output every time</td>
-<td>Yes</td>
+<td>确定性</td>
+<td>同输入 → 同输出，每次</td>
+<td>是</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section level2">
-<h2 id="how-to-read-the-figures">5. How to Read the Figures<a class="anchor" aria-label="anchor" href="#how-to-read-the-figures"></a>
+<h2 id="如何看图">5. 如何看图<a class="anchor" aria-label="anchor" href="#%E5%A6%82%E4%BD%95%E7%9C%8B%E5%9B%BE"></a>
 </h2>
-<p>Figures are saved to
-<code>latest_visualization_&lt;tag&gt;_n&lt;rows&gt;/</code>
-(overwritten each run — no history). A <code>figure_index.png</code>
-contact sheet shows all figures at a glance. Stable verification
-artifacts (snapshots, Bland-Altman plots, threshold validation) live
-separately in <code>output/verification/&lt;tag&gt;/</code>.</p>
-<p><strong>Publication figures (for a Methods section):</strong></p>
+<p>图保存在
+<code>latest_visualization_&lt;tag&gt;_n&lt;rows&gt;/</code>（每次运行覆盖——无历史）。
+<code>figure_index.png</code>
+总览所有图。稳定验证产物（snapshot、Bland-Altman 图、阈值 验证）单独在
+<code>output/verification/&lt;tag&gt;/</code>。</p>
+<p><strong>出版用图（Methods 部分）：</strong></p>
 <table class="table">
 <colgroup>
 <col width="27%">
@@ -358,26 +335,26 @@ separately in <code>output/verification/&lt;tag&gt;/</code>.</p>
 <col width="51%">
 </colgroup>
 <thead><tr class="header">
-<th>Figure</th>
-<th>File</th>
-<th>What it shows</th>
+<th>图</th>
+<th>文件</th>
+<th>显示什么</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td><strong>Figure 1 — Pipeline Flow</strong></td>
+<td><strong>图 1 — 管线流程</strong></td>
 <td><code>pipeline_cleaning/01_Pipeline_Flow_Diagram.png</code></td>
-<td>Vertical flow diagram: raw → parsed → algo-corrected →
-manual-corrected → final valid, with counts and % at each stage</td>
+<td>垂直流程图：raw → 解析 → 算法修正 → 人工修正 →
+最终有效，各阶段计数与 %</td>
 </tr>
 <tr class="even">
-<td><strong>Figure 2 — Correction Impact</strong></td>
+<td><strong>图 2 — 修正影响</strong></td>
 <td><code>research_ready/02_Correction_Impact.png</code></td>
-<td>A/B delta lollipops (only modified records, TST &amp; SOL) +
-identity scatter + before/after summary table</td>
+<td>A/B delta lollipop（仅修正记录，TST &amp; SOL）+ 一致性散点 +
+前后汇总表</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Five must-check figures:</strong></p>
+<p><strong>5 张必看检查图：</strong></p>
 <table class="table">
 <colgroup>
 <col width="14%">
@@ -386,43 +363,41 @@ identity scatter + before/after summary table</td>
 <col width="21%">
 </colgroup>
 <thead><tr class="header">
-<th align="center">Step</th>
-<th>Figure</th>
-<th>Should look like</th>
-<th>If not?</th>
+<th align="center">步骤</th>
+<th>图</th>
+<th>应该像</th>
+<th>若不是？</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td align="center">1</td>
-<td><strong>01 Final Data Quality Dashboard</strong></td>
-<td>Bell-shaped TST/SOL/WASO/SE histograms, no spikes at 0 or
-extremes</td>
-<td>Spike at 0 = missing data/parsing failure</td>
+<td><strong>01 最终数据质量仪表板</strong></td>
+<td>TST/SOL/WASO/SE 直方图钟形，无 0 或极端尖峰</td>
+<td>0 尖峰 = 缺失数据/解析失败</td>
 </tr>
 <tr class="even">
 <td align="center">2</td>
-<td><strong>12 Pipeline Correction Progress</strong></td>
-<td>Corrected bar appears ONLY at C (Step 6.5), flat after</td>
-<td>Change after C = instability</td>
+<td><strong>12 管线修正进度</strong></td>
+<td>Corrected 条仅在 C（Step 6.5）出现，之后平</td>
+<td>C 后变化 = 不稳定</td>
 </tr>
 <tr class="odd">
 <td align="center">3</td>
-<td><strong>18 Auto-Detected Dashboard</strong></td>
-<td>Flag counts match <code>correction_status_final.csv</code>
-</td>
-<td>Mismatch = misalignment</td>
+<td><strong>18 自动检测仪表板</strong></td>
+<td>flag 计数与 <code>correction_status_final.csv</code> 匹配</td>
+<td>不匹配 = 错位</td>
 </tr>
 <tr class="even">
 <td align="center">4</td>
-<td><strong>02 Distribution Sleep Variables</strong></td>
-<td>TST peaks 6–8 h, SOL right-skewed, WASO &lt; 60, SE &gt; 85%</td>
-<td>SOL flat/bimodal = AM/PM confusion</td>
+<td><strong>02 睡眠变量分布</strong></td>
+<td>TST 峰 6–8 h，SOL 右偏，WASO &lt; 60，SE &gt; 85%</td>
+<td>SOL 平/双峰 = AM/PM 混淆</td>
 </tr>
 <tr class="odd">
 <td align="center">5</td>
-<td><strong>19 Unified Quality Status</strong></td>
-<td>Most records Clean/Minor; Error+Unusual &lt; 5%</td>
-<td>High = review manual CSVs</td>
+<td><strong>19 统一质量状态</strong></td>
+<td>多数记录 Clean/Minor；Error+Unusual &lt; 5%</td>
+<td>高 = 审人工 CSV</td>
 </tr>
 </tbody>
 </table>

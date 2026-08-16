@@ -5,16 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Column Mapping, Config &amp; Data Format • splsleep</title>
+<title>列映射、配置与数据格式（中文） • splsleep</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Column Mapping, Config &amp; Data Format">
-<meta name="description" content="How to adapt splsleep to your own dataset: YAML column mapping, threshold configuration, timestamp format, input data structure, and manual correction CSV templates.
-">
-<meta property="og:description" content="How to adapt splsleep to your own dataset: YAML column mapping, threshold configuration, timestamp format, input data structure, and manual correction CSV templates.
-">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="列映射、配置与数据格式（中文）">
+<meta name="description" content="如何把 splsleep 适配到自己的数据集：YAML 列映射、阈值配置、时间戳格式、输入数据结构与人工修正 CSV 模板。">
+<meta property="og:description" content="如何把 splsleep 适配到自己的数据集：YAML 列映射、阈值配置、时间戳格式、输入数据结构与人工修正 CSV 模板。">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -55,84 +53,80 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>Column Mapping, Config &amp; Data Format</h1>
+      <h1>列映射、配置与数据格式（中文）</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/vignettes/column-mapping.Rmd" class="external-link"><code>vignettes/column-mapping.Rmd</code></a></small>
-      <div class="d-none name"><code>column-mapping.Rmd</code></div>
+      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/vignettes/column-mapping-zh.Rmd" class="external-link"><code>vignettes/column-mapping-zh.Rmd</code></a></small>
+      <div class="d-none name"><code>column-mapping-zh.Rmd</code></div>
     </div>
 
     
     
-<p>splsleep is fully configurable via a YAML configuration file: map
-your dataset’s column names to pipeline internals and adjust thresholds
-without modifying any R code.</p>
+<p>splsleep 通过 YAML
+配置文件完全可配置：把数据集的列名映射到管线内部变量、
+调整阈值，无需修改任何 R 代码。</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">splsleep</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
-<h2 id="install-and-run">Install and run<a class="anchor" aria-label="anchor" href="#install-and-run"></a>
+<h2 id="安装与运行">安装与运行<a class="anchor" aria-label="anchor" href="#%E5%AE%89%E8%A3%85%E4%B8%8E%E8%BF%90%E8%A1%8C"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Install from GitHub</span></span>
+<code class="sourceCode R"><span><span class="co"># 从 GitHub 安装</span></span>
 <span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Load and run</span></span>
+<span><span class="co"># 加载并运行</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">splsleep</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/run_pipeline.html">run_pipeline</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="using-with-your-own-dataset">Using with your own dataset<a class="anchor" aria-label="anchor" href="#using-with-your-own-dataset"></a>
+<h2 id="适配自己的数据集">适配自己的数据集<a class="anchor" aria-label="anchor" href="#%E9%80%82%E9%85%8D%E8%87%AA%E5%B7%B1%E7%9A%84%E6%95%B0%E6%8D%AE%E9%9B%86"></a>
 </h2>
-<p>The pipeline is fully configurable via a YAML configuration file.
-This lets you map your dataset’s column names to pipeline variables and
-adjust thresholds without modifying any R code.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Step 1: Copy the configuration template</span></span>
+<code class="sourceCode R"><span><span class="co"># 第 1 步：复制配置模板</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">splsleep</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"config_template.yaml"</span>, package <span class="op">=</span> <span class="st">"splsleep"</span><span class="op">)</span>,</span>
 <span>          <span class="st">"my_study.yaml"</span><span class="op">)</span></span></code></pre></div>
-<p><strong>Step 2: Edit <code>my_study.yaml</code></strong></p>
-<p>The file starts with the only two things you must change:</p>
+<p><strong>第 2 步：编辑 <code>my_study.yaml</code></strong></p>
+<p>文件开头只有两项必须改：</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">data</span><span class="kw">:</span></span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="at">  </span><span class="fu">files</span><span class="kw">:</span></span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="at">    </span><span class="fu">main</span><span class="kw">:</span><span class="at"> </span><span class="st">"your_data.rds"</span><span class="co">        # Your sleep diary file (.rds or .csv)</span></span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="at">    </span><span class="fu">extra</span><span class="kw">:</span><span class="at"> </span><span class="st">""</span><span class="co">                    # Leave empty unless StartDate lives in a separate file</span></span></code></pre></div>
-<p>Three common scenarios: - <strong>Everything in one file</strong>
-(most datasets): <code>main: "my_data.rds"</code>,
-<code>extra: ""</code> - <strong>Data split across two files</strong>:
-<code>main: "ema_vars.rds"</code>, <code>extra: "dates.csv"</code> -
-<strong>Your data is a CSV</strong>: <code>main: "my_data.csv"</code>,
-<code>extra: ""</code> — the <code>.csv</code> extension is
-auto-detected</p>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="at">    </span><span class="fu">main</span><span class="kw">:</span><span class="at"> </span><span class="st">"your_data.rds"</span><span class="co">        # 你的睡眠日记文件（.rds 或 .csv）</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="at">    </span><span class="fu">extra</span><span class="kw">:</span><span class="at"> </span><span class="st">""</span><span class="co">                    # 除非 StartDate 在单独文件里，否则留空</span></span></code></pre></div>
+<p>三种常见场景： -
+<strong>全部在一个文件</strong>（大多数数据集）：<code>main: "my_data.rds"</code>，<code>extra: ""</code>
+-
+<strong>数据分两个文件</strong>：<code>main: "ema_vars.rds"</code>，<code>extra: "dates.csv"</code>
+- <strong>你的数据是
+CSV</strong>：<code>main: "my_data.csv"</code>，<code>extra: ""</code> —
+<code>.csv</code> 扩展名自动检测</p>
 <div class="section level3">
-<h3 id="column-mapping">Column Mapping<a class="anchor" aria-label="anchor" href="#column-mapping"></a>
+<h3 id="列映射">列映射<a class="anchor" aria-label="anchor" href="#%E5%88%97%E6%98%A0%E5%B0%84"></a>
 </h3>
-<p>Map your dataset’s column names to the pipeline’s internal
-variables:</p>
+<p>把数据集的列名映射到管线的内部变量：</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">column_mapping</span><span class="kw">:</span></span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="at">  </span><span class="fu">identifiers</span><span class="kw">:</span></span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="at">    </span><span class="fu">pid</span><span class="kw">:</span><span class="at"> </span><span class="st">"subject_id"</span><span class="co">          # your participant ID column</span></span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="at">    </span><span class="fu">day_num</span><span class="kw">:</span><span class="at"> </span><span class="st">"study_day"</span><span class="co">       # your day number column</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="at">    </span><span class="fu">pid</span><span class="kw">:</span><span class="at"> </span><span class="st">"subject_id"</span><span class="co">          # 你的参与者 ID 列</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="at">    </span><span class="fu">day_num</span><span class="kw">:</span><span class="at"> </span><span class="st">"study_day"</span><span class="co">       # 你的研究日数列</span></span>
 <span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="at">  </span><span class="fu">timestamp</span><span class="kw">:</span></span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="at">    </span><span class="fu">time_bed_hhmm</span><span class="kw">:</span><span class="at"> </span><span class="st">"bedtime"</span><span class="co">   # your bedtime HH:MM column</span></span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="at">    </span><span class="fu">time_bed_ampm</span><span class="kw">:</span><span class="at"> </span><span class="st">"bed_ampm"</span><span class="co">  # your bedtime AM/PM column</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="at">    </span><span class="fu">time_bed_hhmm</span><span class="kw">:</span><span class="at"> </span><span class="st">"bedtime"</span><span class="co">   # 你的就寝时间 HH:MM 列</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="at">    </span><span class="fu">time_bed_ampm</span><span class="kw">:</span><span class="at"> </span><span class="st">"bed_ampm"</span><span class="co">  # 你的就寝 AM/PM 列</span></span>
 <span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="at">    </span><span class="fu">time_sleep_hhmm</span><span class="kw">:</span><span class="at"> </span><span class="st">"sleeptime"</span></span>
 <span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="at">    </span><span class="fu">time_sleep_ampm</span><span class="kw">:</span><span class="at"> </span><span class="st">"sleep_ampm"</span></span>
 <span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="at">  </span><span class="fu">duration</span><span class="kw">:</span></span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="at">    </span><span class="fu">sol</span><span class="kw">:</span><span class="at"> </span><span class="st">"sleep_onset_latency"</span><span class="co"> # your SOL column (minutes)</span></span>
-<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="at">    </span><span class="fu">waso</span><span class="kw">:</span><span class="at"> </span><span class="st">"wake_after_onset"</span><span class="co">   # your WASO column (minutes)</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="at">    </span><span class="fu">sol</span><span class="kw">:</span><span class="at"> </span><span class="st">"sleep_onset_latency"</span><span class="co"> # 你的 SOL 列（分钟）</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="at">    </span><span class="fu">waso</span><span class="kw">:</span><span class="at"> </span><span class="st">"wake_after_onset"</span><span class="co">   # 你的 WASO 列（分钟）</span></span>
 <span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="at">  </span><span class="fu">substance</span><span class="kw">:</span></span>
 <span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="at">    </span><span class="fu">caffeine</span><span class="kw">:</span><span class="at"> </span><span class="st">"caffeine_cups"</span></span>
 <span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="at">    </span><span class="fu">alcohol</span><span class="kw">:</span><span class="at"> </span><span class="st">"alcohol_drinks"</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="thresholds">Thresholds<a class="anchor" aria-label="anchor" href="#thresholds"></a>
+<h3 id="阈值">阈值<a class="anchor" aria-label="anchor" href="#%E9%98%88%E5%80%BC"></a>
 </h3>
-<p>Adjust detection sensitivity for your study population:</p>
+<p>按你的研究人群调整检测灵敏度：</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">classification</span><span class="kw">:</span></span>
 <span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="at">  </span><span class="fu">metric_validation</span><span class="kw">:</span></span>
 <span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="at">    </span><span class="fu">sol</span><span class="kw">:</span></span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="at">      </span><span class="fu">excessive_minutes</span><span class="kw">:</span><span class="at"> </span><span class="dv">120</span><span class="co">   # SOL &gt; 2h → flagged</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="at">      </span><span class="fu">excessive_minutes</span><span class="kw">:</span><span class="at"> </span><span class="dv">120</span><span class="co">   # SOL &gt; 2h → 标记</span></span>
 <span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="at">    </span><span class="fu">se</span><span class="kw">:</span></span>
 <span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="at">      </span><span class="fu">min_valid_percent</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
 <span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="at">      </span><span class="fu">max_valid_percent</span><span class="kw">:</span><span class="at"> </span><span class="dv">100</span></span>
@@ -140,34 +134,31 @@ variables:</p>
 <span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="at">      </span><span class="fu">min_ratio</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.5</span></span>
 <span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="at">      </span><span class="fu">max_ratio</span><span class="kw">:</span><span class="at"> </span><span class="fl">1.0</span></span>
 <span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="at">  </span><span class="fu">flag_severity</span><span class="kw">:</span></span>
-<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="at">    </span><span class="fu">poor_efficiency_threshold_pct</span><span class="kw">:</span><span class="at"> </span><span class="dv">70</span><span class="co">   # SE &lt; 70% → flag</span></span>
-<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="at">    </span><span class="fu">high_sol_threshold_hours</span><span class="kw">:</span><span class="at"> </span><span class="dv">1</span><span class="co">         # SOL &gt; 1h → flag</span></span>
-<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="at">    </span><span class="fu">high_waso_threshold_hours</span><span class="kw">:</span><span class="at"> </span><span class="fl">1.5</span><span class="co">      # WASO &gt; 1.5h → flag</span></span></code></pre></div>
-<p>Threshold rationale lives in <code>THRESHOLDS.md</code> — defaults
-are deliberately lenient for healthy-adult samples; revisit for clinical
-populations.</p>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="at">    </span><span class="fu">poor_efficiency_threshold_pct</span><span class="kw">:</span><span class="at"> </span><span class="dv">70</span><span class="co">   # SE &lt; 70% → 标记</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="at">    </span><span class="fu">high_sol_threshold_hours</span><span class="kw">:</span><span class="at"> </span><span class="dv">1</span><span class="co">         # SOL &gt; 1h → 标记</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="at">    </span><span class="fu">high_waso_threshold_hours</span><span class="kw">:</span><span class="at"> </span><span class="fl">1.5</span><span class="co">      # WASO &gt; 1.5h → 标记</span></span></code></pre></div>
+<p>阈值依据见
+<code>THRESHOLDS.md</code>——默认值对健康成人样本故意宽松；临床人群需重审。</p>
 </div>
 <div class="section level3">
-<h3 id="timestamp-format">Timestamp Format<a class="anchor" aria-label="anchor" href="#timestamp-format"></a>
+<h3 id="时间戳格式">时间戳格式<a class="anchor" aria-label="anchor" href="#%E6%97%B6%E9%97%B4%E6%88%B3%E6%A0%BC%E5%BC%8F"></a>
 </h3>
 <div class="sourceCode" id="cb7"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">timestamp</span><span class="kw">:</span></span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="at">  </span><span class="fu">input_format</span><span class="kw">:</span><span class="at"> </span><span class="st">"hh:mm AM/PM"</span><span class="co">   # or "HH:MM", "HH:MM:SS"</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="at">  </span><span class="fu">input_format</span><span class="kw">:</span><span class="at"> </span><span class="st">"hh:mm AM/PM"</span><span class="co">   # 或 "HH:MM", "HH:MM:SS"</span></span>
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="at">  </span><span class="fu">ampm</span><span class="kw">:</span></span>
 <span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="at">    </span><span class="fu">enabled</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
 <span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="at">    </span><span class="fu">pm_keywords</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="st">"PM"</span><span class="kw">,</span><span class="at"> </span><span class="st">"pm"</span><span class="kw">]</span></span></code></pre></div>
-<p><strong>Step 3: Run with your configuration</strong></p>
+<p><strong>第 3 步：用你的配置运行</strong></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/run_pipeline.html">run_pipeline</a></span><span class="op">(</span>config <span class="op">=</span> <span class="st">"my_study_config.yaml"</span><span class="op">)</span></span></code></pre></div>
-<p>All pipeline scripts automatically read the config; no R code changes
-needed.</p>
+<p>所有管线脚本自动读取配置；无需改 R 代码。</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="input-data-structure">Input data structure<a class="anchor" aria-label="anchor" href="#input-data-structure"></a>
+<h2 id="输入数据结构">输入数据结构<a class="anchor" aria-label="anchor" href="#%E8%BE%93%E5%85%A5%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"></a>
 </h2>
-<p><strong>This repository contains no raw participant data.</strong>
-All CSV files with participant data are gitignored. Templates with
-synthetic data live in <code>templates/</code>.</p>
+<p><strong>本仓库不含原始参与者数据。</strong> 所有含参与者数据的 CSV
+都被 gitignore。 含合成数据的模板在 <code>templates/</code>。</p>
 <table class="table">
 <colgroup>
 <col width="33%">
@@ -175,62 +166,62 @@ synthetic data live in <code>templates/</code>.</p>
 <col width="33%">
 </colgroup>
 <thead><tr class="header">
-<th>Column group</th>
-<th>Variables</th>
-<th>Description</th>
+<th>列组</th>
+<th>变量</th>
+<th>说明</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>Identifiers</td>
+<td>标识符</td>
 <td>pid, day_num, row_id, participant</td>
-<td>Participant and record IDs</td>
+<td>参与者和记录 ID</td>
 </tr>
 <tr class="even">
-<td>Date</td>
+<td>日期</td>
 <td>StartDate</td>
-<td>Calendar date of the EMA session</td>
+<td>EMA 会话的日历日期</td>
 </tr>
 <tr class="odd">
-<td>Raw timestamps (HH:MM)</td>
+<td>原始时间戳（HH:MM）</td>
 <td>time_bed_am_hhmm, time_sleep_am_hhmm, time_awake_am_hhmm,
 time_getup_am_hhmm</td>
-<td>Self-reported bed/sleep/awake/getup clock times</td>
+<td>自报就寝/入睡/醒来/起床时钟时间</td>
 </tr>
 <tr class="even">
-<td>Raw timestamps (AM/PM)</td>
+<td>原始时间戳（AM/PM）</td>
 <td>time_bed_am_ampm, time_sleep_am_ampm, time_awake_am_ampm,
 time_getup_am_ampm</td>
-<td>AM/PM indicator for each timestamp</td>
+<td>每个时间戳的 AM/PM 指示</td>
 </tr>
 <tr class="odd">
-<td>Raw durations</td>
+<td>原始时长</td>
 <td>duration_totalmin_sol_estimate_am,
 duration_totalmin_waso_estimate_am</td>
-<td>Self-reported SOL and WASO in minutes</td>
+<td>自报 SOL 和 WASO（分钟）</td>
 </tr>
 <tr class="even">
-<td>Nap/Exercise</td>
+<td>小睡/运动</td>
 <td>duration_totalmin_napstoday_PM,
 exercise_PM_totalmin_[Light|Moderate|Vigorous|Strength]</td>
-<td>Self-reported nap and exercise durations</td>
+<td>自报小睡和运动时长</td>
 </tr>
 <tr class="odd">
-<td>Substance use</td>
+<td>物质使用</td>
 <td>caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1,
 alcoholtoday_PM_NumAlcoholicDrinks_1, nicotine_amount_pm_doses,
 cannabis_amount_pm_doses</td>
-<td>Self-reported substance use</td>
+<td>自报物质使用</td>
 </tr>
 <tr class="even">
-<td>WASO count</td>
+<td>WASO 次数</td>
 <td>num_waso_estimate_am, num_waso_am</td>
-<td>Number of wake bouts</td>
+<td>醒来次数</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section level2">
-<h2 id="manual-correction-csv-templates">Manual correction CSV templates<a class="anchor" aria-label="anchor" href="#manual-correction-csv-templates"></a>
+<h2 id="人工修正-csv-模板">人工修正 CSV 模板<a class="anchor" aria-label="anchor" href="#%E4%BA%BA%E5%B7%A5%E4%BF%AE%E6%AD%A3-csv-%E6%A8%A1%E6%9D%BF"></a>
 </h2>
 <table class="table">
 <colgroup>
@@ -239,89 +230,89 @@ cannabis_amount_pm_doses</td>
 <col width="33%">
 </colgroup>
 <thead><tr class="header">
-<th>Template File</th>
-<th>Live File</th>
-<th>Purpose</th>
+<th>模板文件</th>
+<th>正式文件</th>
+<th>用途</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td><code>templates/template_manual_error_corrections.csv</code></td>
 <td><code>manual_error_corrections.csv</code></td>
-<td>Timestamp corrections (AM/PM, order)</td>
+<td>时间戳修正（AM/PM、顺序）</td>
 </tr>
 <tr class="even">
 <td><code>templates/template_manual_unusual_corrections.csv</code></td>
 <td><code>manual_unusual_corrections.csv</code></td>
-<td>Accepted unusual patterns</td>
+<td>接受的异常模式</td>
 </tr>
 <tr class="odd">
 <td><code>templates/template_manual_nap_exercise_corrections.csv</code></td>
 <td><code>manual_nap_exercise_corrections.csv</code></td>
-<td>Nap/exercise duration corrections</td>
+<td>小睡/运动时长修正</td>
 </tr>
 <tr class="even">
 <td><code>templates/template_manual_sleep_metric_duration_corrections.csv</code></td>
 <td><code>manual_sleep_metric_duration_corrections.csv</code></td>
-<td>SOL/WASO metric corrections</td>
+<td>SOL/WASO 指标修正</td>
 </tr>
 <tr class="odd">
 <td><code>templates/template_manual_metric_review_acceptances.csv</code></td>
 <td><code>manual_metric_review_acceptances.csv</code></td>
-<td>Human-accepted metric flags</td>
+<td>人工接受的指标标记</td>
 </tr>
 <tr class="even">
 <td><code>templates/template_second_review_checklist.csv</code></td>
 <td><code>second_review_checklist.csv</code></td>
-<td>Second-person verification decisions</td>
+<td>第二人验证决定</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section level2">
-<h2 id="output">Output<a class="anchor" aria-label="anchor" href="#output"></a>
+<h2 id="输出">输出<a class="anchor" aria-label="anchor" href="#%E8%BE%93%E5%87%BA"></a>
 </h2>
 <table class="table">
 <colgroup>
-<col width="37%">
-<col width="62%">
+<col width="50%">
+<col width="50%">
 </colgroup>
 <thead><tr class="header">
-<th>File</th>
-<th>Contents</th>
+<th>文件</th>
+<th>内容</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td><code>output/correction_status_final.csv</code></td>
-<td>Per-run summary: n_total, tst, sol, error/corrected/flag counts</td>
+<td>每次运行摘要：n_total, tst, sol, error/corrected/flag 计数</td>
 </tr>
 <tr class="even">
 <td><code>output/appendix_step_ledger.csv</code></td>
-<td>Per-step flag tracking ledger</td>
+<td>逐步标记追踪账本</td>
 </tr>
 <tr class="odd">
 <td><code>output/flagged_records_self_reported.csv</code></td>
-<td>Records flagged as SELF_REPORTED_FLAG</td>
+<td>标为 SELF_REPORTED_FLAG 的记录</td>
 </tr>
 <tr class="even">
 <td><code>latest_visualization_*/figure_index.png</code></td>
-<td>Contact-sheet index of all generated figures</td>
+<td>所有生成图的总览</td>
 </tr>
 <tr class="odd">
 <td>
 <code>output/verification/real_n13990/</code>,
 <code>verification/synth_n280/</code>
 </td>
-<td>Stable, never-overwritten verification artifacts</td>
+<td>稳定、永不被覆盖的验证产物</td>
 </tr>
 </tbody>
 </table>
-<p>Key rules the output structure encodes: -
-<code>latest_visualization_&lt;tag&gt;_n&lt;rows&gt;/</code> is
-“latest”, not “history” — wiped on every visualization run. -
-<code>verification/&lt;tag&gt;_n&lt;rows&gt;/</code> is a sibling that
-is never touched by the wipe. - Real-tagged output only ever lands under
-<code>output/</code> (gitignored); synthetic output routes outside
-<code>output/</code>.</p>
+<p>输出结构的关键规则： -
+<code>latest_visualization_&lt;tag&gt;_n&lt;rows&gt;/</code>
+是”最新”而非”历史”——每次可视化运行清空重建。 -
+<code>verification/&lt;tag&gt;_n&lt;rows&gt;/</code>
+是同级目录，永不被清空逻辑触碰。 - 真实数据输出只落在
+<code>output/</code>（gitignore）；合成输出路由到 <code>output/</code>
+之外。</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

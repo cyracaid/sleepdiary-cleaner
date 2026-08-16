@@ -306,19 +306,6 @@ CLEAN</td>
 </tbody>
 </table>
 </div>
-<div class="section level2">
-<h2 id="中文-管线架构">中文 — 管线架构<a class="anchor" aria-label="anchor" href="#%E4%B8%AD%E6%96%87-%E7%AE%A1%E7%BA%BF%E6%9E%B6%E6%9E%84"></a>
-</h2>
-<p><code><a href="../reference/run_pipeline.html">run_pipeline()</a></code> 清洗管线分 10 步：原始数据 → 时间戳解析 →
-区间处理 → 时序修正 → 时长修正 → 指标计算 → 自动检测 → 跨被试检查 →
-可视化。清洗逻辑组织为八个
-规则族（上表），每族针对自由文本自报的一种失效模式，并由合成错误类验证。
-决策三态：AUTO_FIX（确定性、可逆、需佐证）→ FLAG（人工审查队列）→
-AUDIT-only （记录不动作）。所有规则族确定性（同输入 → 同输出，snapshot
-验证），故无评分者
-变异，评分者间信度不适用；人工共同审查一致性见验证方法学 vignette 第 7
-步。</p>
-</div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>

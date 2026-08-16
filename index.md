@@ -1,5 +1,7 @@
 # SPL Sleep — EMA Sleep Diary Data Cleaning Pipeline
 
+[![Documentation](https://img.shields.io/badge/docs-pkgdown%20site-blue)](https://cyracaid.github.io/sleepdiary-cleaner/)
+
 > **[English](#english) · [中文](#%E4%B8%AD%E6%96%87)**
 
 ------------------------------------------------------------------------
@@ -16,6 +18,32 @@ diagnostic and research-ready figures. A schema-validated YAML config
 maps the pipeline to your dataset without touching code; detection
 thresholds and their rationale are documented in THRESHOLDS.md, and the
 input contract in SCHEMA.md.
+
+## Documentation
+
+Full documentation site (searchable function reference + vignettes,
+bilingual): **<https://cyracaid.github.io/sleepdiary-cleaner/>**
+
+- [Pipeline
+  Architecture](https://cyracaid.github.io/sleepdiary-cleaner/articles/pipeline-architecture.html)
+  /
+  [管线架构（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/pipeline-architecture-zh.html)
+- [Column Mapping &
+  Config](https://cyracaid.github.io/sleepdiary-cleaner/articles/column-mapping.html)
+  /
+  [列映射与配置（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/column-mapping-zh.html)
+- [Interpreting the
+  Output](https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output.html)
+  /
+  [如何读懂输出（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output-zh.html)
+- [Validation
+  Methodology](https://cyracaid.github.io/sleepdiary-cleaner/articles/validation-methodology.html)
+  /
+  [验证方法学（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/validation-methodology-zh.html)
+- [Testing
+  Coverage](https://cyracaid.github.io/sleepdiary-cleaner/articles/testing-coverage.html)
+  /
+  [测试覆盖率（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/testing-coverage-zh.html)
 
 **v1.4.3 (current)** — fixes `sleep_awake_swap_3h`, the one correction
 rule that real-data redundant-channel validation (Channel B) flagged as
@@ -1330,6 +1358,27 @@ MIT
 
 自动化的睡眠 EMA
 日记数据清洗管线：解析原始就寝/入睡/醒来/起床时间戳，检测并修正时序和时长错误，计算睡眠指标（TST、SOL、WASO、SE），验证自报时长，生成诊断与科研图表。
+
+## 文档
+
+完整文档站（可搜索函数参考 + 教程，双语）：
+**<https://cyracaid.github.io/sleepdiary-cleaner/>**
+
+- [管线架构（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/pipeline-architecture-zh.html)
+  / [Pipeline
+  Architecture](https://cyracaid.github.io/sleepdiary-cleaner/articles/pipeline-architecture.html)
+- [列映射与配置（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/column-mapping-zh.html)
+  / [Column Mapping &
+  Config](https://cyracaid.github.io/sleepdiary-cleaner/articles/column-mapping.html)
+- [如何读懂输出（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output-zh.html)
+  / [Interpreting the
+  Output](https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output.html)
+- [验证方法学（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/validation-methodology-zh.html)
+  / [Validation
+  Methodology](https://cyracaid.github.io/sleepdiary-cleaner/articles/validation-methodology.html)
+- [测试覆盖率（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/testing-coverage-zh.html)
+  / [Testing
+  Coverage](https://cyracaid.github.io/sleepdiary-cleaner/articles/testing-coverage.html)
 
 **v1.4.3（当前版本）** — 修复
 `sleep_awake_swap_3h`，真实数据冗余通道验证（Channel

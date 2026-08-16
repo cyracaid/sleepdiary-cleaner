@@ -5,16 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Testing Coverage • splsleep</title>
+<title>测试覆盖率（中文） • splsleep</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Testing Coverage">
-<meta name="description" content="The 190+ testthat expectations across 12 test files: what the tests verify, how to run them, and how snapshot verification works.
-">
-<meta property="og:description" content="The 190+ testthat expectations across 12 test files: what the tests verify, how to run them, and how snapshot verification works.
-">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="测试覆盖率（中文）">
+<meta name="description" content="12 个测试文件、190+ 条 testthat 断言：测试验证什么、怎么运行、snapshot 验证如何工作。">
+<meta property="og:description" content="12 个测试文件、190+ 条 testthat 断言：测试验证什么、怎么运行、snapshot 验证如何工作。">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -55,23 +53,22 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>Testing Coverage</h1>
+      <h1>测试覆盖率（中文）</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/vignettes/testing-coverage.Rmd" class="external-link"><code>vignettes/testing-coverage.Rmd</code></a></small>
-      <div class="d-none name"><code>testing-coverage.Rmd</code></div>
+      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/vignettes/testing-coverage-zh.Rmd" class="external-link"><code>vignettes/testing-coverage-zh.Rmd</code></a></small>
+      <div class="d-none name"><code>testing-coverage-zh.Rmd</code></div>
     </div>
 
     
     
-<p>The pipeline includes 190+ testthat expectations across 12 test
-files, all exercising software correctness — does the code do what it
-was designed to do — as distinct from methodological validity, which is
-covered in the validation-methodology vignette.</p>
+<p>管线包含 12 个测试文件、190+ 条 testthat
+断言，全部检验软件正确性——代码是否
+按设计跑——区别于方法学效度（后者见验证方法学 vignette）。</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">splsleep</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
-<h2 id="test-files-and-coverage">Test files and coverage<a class="anchor" aria-label="anchor" href="#test-files-and-coverage"></a>
+<h2 id="测试文件与覆盖">测试文件与覆盖<a class="anchor" aria-label="anchor" href="#%E6%B5%8B%E8%AF%95%E6%96%87%E4%BB%B6%E4%B8%8E%E8%A6%86%E7%9B%96"></a>
 </h2>
 <table class="table">
 <colgroup>
@@ -79,107 +76,97 @@ covered in the validation-methodology vignette.</p>
 <col width="47%">
 </colgroup>
 <thead><tr class="header">
-<th>Test File</th>
-<th>Coverage</th>
+<th>测试文件</th>
+<th>覆盖</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td><code>test-normalize.R</code></td>
-<td>AM/PM correction, minor order errors, midnight crossing, edge
-cases</td>
+<td>AM/PM 校正、轻微顺序错误、跨午夜、边界情况</td>
 </tr>
 <tr class="even">
 <td><code>test-interval.R</code></td>
-<td>Colon-format edge cases in duration parsing</td>
+<td>时长解析中的冒号格式边界情况</td>
 </tr>
 <tr class="odd">
 <td><code>test-pipeline.R</code></td>
-<td>End-to-end run on synthetic data, config loading, column
-adaptation</td>
+<td>合成数据端到端运行、配置加载、列适配</td>
 </tr>
 <tr class="even">
 <td><code>test-sleep-diary.R</code></td>
-<td>S3 construction, validation, coercion, generics, step-contract
-assertion, provenance</td>
+<td>S3 构造、校验、强制转换、泛型、步骤契约断言、溯源</td>
 </tr>
 <tr class="odd">
 <td><code>test-flag-standards.R</code></td>
-<td>Flag evaluators for field misentry, data category, duration extreme,
-flag severity, checkforerrors; step-ledger logging</td>
+<td>field misentry / data category / duration extreme / flag severity /
+checkforerrors 评估器；step-ledger 记录</td>
 </tr>
 <tr class="even">
 <td><code>test-correction-engine.R</code></td>
-<td>Every classification outcome (order/bed-sleep/awake-getup/24h
-errors, equal-time, unusual, skipped-NA, multiple errors,
-suspicious-latency flags)</td>
+<td>全部分类结果（顺序 / bed-sleep / awake-getup / 24h
+错误、等时、异常、跳过 NA、多重错误、可疑潜伏期 flag）</td>
 </tr>
 <tr class="odd">
 <td><code>test-classification-thresholds.R</code></td>
-<td>Boundary behavior at every classification threshold (7h error,
-3h/15h unusual, suspicious-latency)</td>
+<td>每个分类阈值的边界行为（7h 错误、3h/15h 异常、可疑潜伏期）</td>
 </tr>
 <tr class="even">
 <td><code>test-auto-detection-thresholds.R</code></td>
-<td>SOL/SE/TST-TIB boundary behavior for the Step 8 auto-detection
-flags</td>
+<td>Step 8 自动检测 flag 的 SOL/SE/TST-TIB 边界行为</td>
 </tr>
 <tr class="odd">
 <td><code>test-finalize-columns.R</code></td>
-<td>Dictionary ↔︎ delivered-column consistency, A/B join key uniqueness,
-unit transforms, reserved-column pass-through, export guard,
-missing/optional-column handling</td>
+<td>字典 ↔︎ 交付列一致性、A/B
+连接键唯一性、单位转换、保留列透传、导出门、缺失/可选列处理</td>
 </tr>
 <tr class="even">
 <td><code>test-nonfinite-guards.R</code></td>
-<td>NA/Inf handling in duration and flag-severity evaluators (regression
-tests for two real bugs)</td>
+<td>时长与 flag-severity 评估器中的 NA/Inf 处理（两个真实 bug
+的回归测试）</td>
 </tr>
 <tr class="odd">
 <td><code>test-config-data.R</code></td>
-<td>Config file loading (RDS/CSV, legacy keys, column mapping, friendly
-error messages)</td>
+<td>配置加载（RDS/CSV、旧键、列映射、友好报错）</td>
 </tr>
 <tr class="even">
 <td><code>test-script-copies-in-sync.R</code></td>
-<td>Root and <code>inst/scripts/</code> copies of every dual-maintained
-script stay byte-identical</td>
+<td>每个双维护脚本在根目录与 <code>inst/scripts/</code>
+的副本保持字节一致</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section level2">
-<h2 id="how-to-run-the-tests">How to run the tests<a class="anchor" aria-label="anchor" href="#how-to-run-the-tests"></a>
+<h2 id="如何运行测试">如何运行测试<a class="anchor" aria-label="anchor" href="#%E5%A6%82%E4%BD%95%E8%BF%90%E8%A1%8C%E6%B5%8B%E8%AF%95"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Installed-package mode (fast, tests the built package):</span></span>
+<code class="sourceCode R"><span><span class="co"># 已安装包模式（快，测的是构建好的包）：</span></span>
 <span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_package.html" class="external-link">test_package</a></span><span class="op">(</span><span class="st">"splsleep"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Source-development mode (tests the working tree; use this when editing</span></span>
-<span><span class="co"># code — test_dir() alone does NOT load the package, so load it first):</span></span>
+<span><span class="co"># 源码开发模式（测工作区当前代码；编辑代码时用这个——</span></span>
+<span><span class="co"># 单独跑 test_dir() 不会加载被测包，必须先加载）：</span></span>
 <span><span class="fu">pkgload</span><span class="fu">::</span><span class="fu"><a href="https://pkgload.r-lib.org/reference/load_all.html" class="external-link">load_all</a></span><span class="op">(</span><span class="st">"."</span><span class="op">)</span></span>
 <span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_dir.html" class="external-link">test_dir</a></span><span class="op">(</span><span class="st">"tests/testthat"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Preferred dev workflow (loads source + runs tests in one call, needs</span></span>
-<span><span class="co"># devtools installed):</span></span>
+<span><span class="co"># 首选开发工作流（一次调用完成加载源码 + 跑测试，需要装 devtools）：</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>Full package check (documentation, examples, tests, and the
-<code>verify_reference_fidelity</code> / dual-copy checks):</p>
+<p>完整包检查（文档、示例、测试、<code>verify_reference_fidelity</code>
+/ 双副本检查）：</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">check</span><span class="op">(</span><span class="op">)</span>   <span class="co"># needs devtools; equivalently: R CMD check splsleep_*.tar.gz</span></span></code></pre></div>
-<p><code>devtools</code> is a development-only tool — it is
-intentionally <strong>not</strong> a dependency of the package (not in
-<code>DESCRIPTION</code>), so it is never required to install or run
-splsleep itself.</p>
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">check</span><span class="op">(</span><span class="op">)</span>   <span class="co"># 需要 devtools；等价于：R CMD check splsleep_*.tar.gz</span></span></code></pre></div>
+<p><code>devtools</code>
+是纯开发工具——刻意<strong>不是</strong>包的依赖（不在
+<code>DESCRIPTION</code> 里）， 安装或运行 splsleep 本身从不需要它。</p>
 </div>
 <div class="section level2">
-<h2 id="snapshot-verification">Snapshot verification<a class="anchor" aria-label="anchor" href="#snapshot-verification"></a>
+<h2 id="snapshot-验证">Snapshot 验证<a class="anchor" aria-label="anchor" href="#snapshot-%E9%AA%8C%E8%AF%81"></a>
 </h2>
-<p>Snapshot verification (<code>inst/verification/</code>,
-<code>verify_v1_3_snapshot.R</code>) confirms the current S3 pipeline
-chain produces byte-identical output to the legacy pipeline path on real
-data. <code>verify_reference_fidelity.R</code> separately pins each of
-the 8 core metric formulas against a documented baseline
-(<code>--strict</code> mode is CI-wired).</p>
+<p>Snapshot
+验证（<code>inst/verification/</code>、<code>verify_v1_3_snapshot.R</code>）确认当前
+S3 管线链在真实数据上产生与旧管线路径字节一致（byte-identical）的输出。
+<code>verify_reference_fidelity.R</code> 单独把 8
+个核心指标公式钉在文档化基线上 （<code>--strict</code> 模式已接入
+CI）。</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
