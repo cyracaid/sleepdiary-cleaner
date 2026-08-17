@@ -22,6 +22,10 @@ test_that("00_MAIN_entry auto-runs the full legacy chain on synthetic data", {
   # artifact to the working directory, so it must run in a throwaway dir.
   sandbox <- tempfile("splsmoke_")
   dir.create(sandbox, recursive = TRUE, showWarnings = FALSE)
+  # Windows tempfile() returns backslashes; the runner script embeds this path
+  # verbatim, and Rscript would parse "\U"/"\T" as escapes ("'\U' used without
+  # hex digits"). Normalize every path we inject into the subprocess script.
+  sandbox  <- normalizePath(sandbox, winslash = "/")
   on.exit(unlink(sandbox, recursive = TRUE, force = TRUE), add = TRUE)
 
   src_data <- dirname(cfg_path)
@@ -49,6 +53,7 @@ test_that("00_MAIN_entry auto-runs the full legacy chain on synthetic data", {
     c("inst/scripts", system.file("scripts", package = "splsleep")),
     pattern = "^00_MAIN_entry\\.R$", full.names = TRUE, recursive = TRUE
   )[1])
+  scripts_dir <- normalizePath(scripts_dir, winslash = "/")
 
   # Config discovery: legacy setup reads pipeline_config.yaml in cwd first
   # (see 00a_setup.R / load_config) - write one pointing at sandbox data.
