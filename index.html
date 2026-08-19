@@ -1683,6 +1683,7 @@ and read its detailed interpretation.</code></pre>
 <h2 id="validation">Validation<a class="anchor" aria-label="anchor" href="#validation"></a>
 </h2>
 <p>Testing coverage (above) proves the code does what it was designed to do. It does not prove the design itself is methodologically valid — sleep-diary cleaning has no ground truth, since nobody can know for certain what a participant meant when they typed “10:30” into a duration field.</p>
+<p>This pipeline treats plausible sleep-timing variability as signal, not noise, consistent with its intended use in sleep–affect association studies — it flags disagreements for human review rather than silently normalizing them toward internal consistency.</p>
 <p>Our answer is a <strong>multi-step validation chain</strong>. Each step asks one question, fails in a different way, and is deliberately independent of the others: a cleaning decision that survives every step is far more defensible than one that only survives a single check. We run the steps in this order, from “does the pipeline harm good data?” to “does it survive real-world uncertainty?”.</p>
 <pre><code>                    VALIDATION CHAIN (9 steps, three tiers)
                     ──────────────────────────────────────────
@@ -3067,6 +3068,7 @@ verification/synth_n&lt;行数&gt;/                     ← 稳定的合成数�
 <h2 id="验证">验证<a class="anchor" aria-label="anchor" href="#%E9%AA%8C%E8%AF%81"></a>
 </h2>
 <p>上面的测试覆盖率证明代码按设计跑对了，不证明设计本身在方法学上站得住——睡眠日记清洗没有 ground truth，没有人能确定参与者在时长字段里填「10:30」时到底想说什么。</p>
+<p>本管线把合理的睡眠时程变异当作<strong>信号而非噪声</strong>，与其在”睡眠–情绪”关联研究中的预期用途一致——它对分歧做 flag 转人工审查，而不是把它们静默归一化为内部一致。</p>
 <p>我们的回答是一条<strong>多步验证链</strong>。每步只问一个问题、以不同的方式失效、且刻意彼此独立：能经受住全部步骤的清洗决策，比只经受住单项检查的可信得多。步骤按此顺序执行，从”管线会不会伤害好数据”一直到”能不能扛住真实世界的不确定性”。</p>
 <pre><code>                    验证链（9 步，三个层）
                     ──────────────────────────
