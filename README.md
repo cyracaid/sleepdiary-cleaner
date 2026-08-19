@@ -86,7 +86,7 @@ Raw Data ──→ Step 1: Load Data ──→ Step 2: Parse Timestamps ──�
 | 6-7 | Correct & compute metrics (S3 chain) | Manual + duration corrections; TST/SOL/WASO/SE metrics; has_correction enum |
 | 8 | Auto-detect remaining issues | TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED flag classification |
 | 8.5 | Cross-participant consistency check | Global consistency audit across participants |
-| 9 | Generate diagnostic figures | 24 figures + figure_index.png contact sheet + RUN_INFO.txt |
+| 9 | Generate diagnostic figures | 30 figures (14 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt |
 | 10 | Build delivered datasets | finalize_columns() selects/renames to Dataset A/B per column dictionary |
 
 <!-- AUTO:ARCH_END -->
@@ -1236,7 +1236,7 @@ MIT
 | 6-7 | Correct & compute metrics (S3 chain) | Manual + duration corrections; TST/SOL/WASO/SE metrics; has_correction enum |
 | 8 | Auto-detect remaining issues | TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED flag classification |
 | 8.5 | Cross-participant consistency check | Global consistency audit across participants |
-| 9 | Generate diagnostic figures | 24 figures + figure_index.png contact sheet + RUN_INFO.txt |
+| 9 | Generate diagnostic figures | 30 figures (14 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt |
 | 10 | Build delivered datasets | finalize_columns() selects/renames to Dataset A/B per column dictionary |
 
 <!-- AUTO:ARCH_ZH_END -->

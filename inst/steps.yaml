@@ -34,7 +34,7 @@ steps:
     description: "Global consistency audit across participants"
   - id: "9"
     label: "Generate diagnostic figures"
-    description: "24 figures + figure_index.png contact sheet + RUN_INFO.txt"
+    description: "30 figures (14 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt"
   - id: "10"
     label: "Build delivered datasets"
     description: "finalize_columns() selects/renames to Dataset A/B per column dictionary"
