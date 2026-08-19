@@ -27,7 +27,7 @@ Full documentation site (searchable function reference + vignettes, bilingual):
 
 ## Phase status
 
-* **Phase 1 — delivery pipeline (v1.4.0): complete.** Cleaning logic is frozen;
+* **Phase 1 — delivery pipeline (v1.4.3): complete.** Cleaning logic is frozen;
   this is the CLI release of the reproducible cleaning pipeline.
 * **Phase 2 — analytics** and **Phase 3 — methods paper: paused.** Deliberately
   deferred while Phase 1 is reviewed by the study team.
@@ -1184,7 +1184,7 @@ MIT
 
 ## 阶段状态
 
-* **阶段 1 — 交付管线（v1.4.0）：已完成。** 清洗逻辑已冻结；这是可复现清洗管线的 CLI 版本。
+* **阶段 1 — 交付管线（v1.4.3）：已完成。** 清洗逻辑已冻结；这是可复现清洗管线的 CLI 版本。
 * **阶段 2 — 分析**与**阶段 3 — 方法论文：暂停。** 刻意延后，待研究团队评审阶段 1。
 
 ## 功能特性
