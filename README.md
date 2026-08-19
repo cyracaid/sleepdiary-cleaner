@@ -890,7 +890,9 @@ this from being circular:
 3. **Closed-loop blind-spot closure** (Step 3 note): when a new error type is
    discovered in real data, it is added to the catalog, injected, and the
    benchmark re-run — so the taxonomy grows from reality, not from the
-   pipeline's current abilities.
+   pipeline's current abilities. Two concrete closures: `sol_window` recall
+   0.43 → 1.0 and `format_no_colon` recall 0.11 → 1.0 (both blind-spot
+   categories, injected and closed by this loop).
 
 ### Step 3 — When we fix, do we fix *right*? (detection vs. value-correctness)
 
@@ -1699,7 +1701,7 @@ CI 为参与者级 cluster bootstrap（1,000 次），因为同一参与者的�
 
 1. **错误分类学是三源并集** — 我们在真实数据里观察到的错误、文献报告的错误（如 SHUTi、RESTING）、以及理论上可能存在但我们从未抓到的错误。刻意*不是*"管线已经能检测的错误"——那等于出一张专考我们强项的卷子。
 2. **完全不需要合成标准的真实数据层**（第 5–7 步）：冗余通道验证、report-only 审计、共同审查一致性都直接在真实数据上跑，无注入。
-3. **闭环盲点封堵**（第 3 步注）：在真实数据发现新错误类型时，加入目录、注入、重跑基准——分类学从现实生长，而不是从管线现有能力生长。
+3. **闭环盲点封堵**（第 3 步注）：在真实数据发现新错误类型时，加入目录、注入、重跑基准——分类学从现实生长，而不是从管线现有能力生长。两个具体闭环：`sol_window` recall 0.43 → 1.0、`format_no_colon` recall 0.11 → 1.0（均为盲点类别，经此闭环注入并封堵）。
 
 ### 第 3 步 — 修复时，修得*对*吗？（检测 vs 值正确）
 
