@@ -47,8 +47,8 @@ check_environment <- function() {
     names(required_files) <- NULL
   } else {
     required_files <- c(
-      "deidentified_intervalvars_forCD_111325.rds",
-      "sber_ema_anon_20260227.csv",
+      "your_data.rds",
+      "your_extra_data.csv",
       "second_review_checklist.csv",
       "manual_error_corrections.csv",
       "manual_unusual_corrections.csv",

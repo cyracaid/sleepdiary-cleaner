@@ -113,7 +113,7 @@ load_spec_summary <- function(label, overrides, input_rds = INPUT_RD, extra_file
 # enrichment set; pass the real data rds for real-data spec curves).
 # extra_file: optional supplementary CSV (StartDate/num_waso); enrichment
 # sets have all columns inline so default NULL is correct. Real data
-# (deidentified_intervalvars) requires sber_ema_anon_20260227.csv.
+# requires the supplementary anon CSV named in config data.files.extra.
 run_spec_once <- function(label, overrides, input_rds = INPUT_RD,
                           extra_file = NULL, verbose = TRUE) {
   hit <- load_spec_summary(label, overrides, input_rds, extra_file)

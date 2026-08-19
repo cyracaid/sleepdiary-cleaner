@@ -21,9 +21,15 @@ SYN <- "validation/synthetic"
 RES <- file.path(SYN, "results")
 source(file.path(SYN, "spec_cache.R"))
 
-REAL_RD    <- "deidentified_intervalvars_forCD_111325.rds"
-REAL_EXTRA <- "sber_ema_anon_20260227.csv"  # StartDate/num_waso live here
-stopifnot(file.exists(REAL_RD), file.exists(REAL_EXTRA))
+# Real data filenames come from inst/config_default.yaml ("data.files.main/
+# extra"). That file ships placeholder names (your_data.rds / your_extra_data.csv);
+# point them at your local real-data exports (never committed) before running.
+REAL_RD    <- yaml::read_yaml(CONFIG_RD)$data$files$main
+REAL_EXTRA <- yaml::read_yaml(CONFIG_RD)$data$files$extra
+if (!file.exists(REAL_RD) || (nzchar(REAL_EXTRA) && !file.exists(REAL_EXTRA))) {
+  stop(sprintf("Real data files not found (%s / %s). Set data.files.main/extra in %s to your local exports.",
+               REAL_RD, REAL_EXTRA, CONFIG_RD))
+}
 
 dims <- list(
   D1 = list(key = "timestamp.sequence.max_gap_hours",            levels = c(11, 12, 13), default = 12),

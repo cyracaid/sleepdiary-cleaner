@@ -112,7 +112,7 @@ alc_col <- .s_col("alcohol",  "alcoholtoday_PM_NumAlcoholicDrinks_1")
 nic_col <- .s_col("nicotine", "nicotine_amount_pm_doses")
 can_col <- .s_col("cannabis", "cannabis_amount_pm_doses")
 
-  raw_csv <- cfg_get("data.files.extra", "sber_ema_anon_20260227.csv", cfg = .pipeline_cfg)
+  raw_csv <- cfg_get("data.files.extra", "your_extra_data.csv", cfg = .pipeline_cfg)
 corrected_ema_data <- fix_substance_text(corrected_ema_data, raw_csv,
                                          caf_col, "caffeine")
 
@@ -310,7 +310,7 @@ detect_input_anomaly <- function(df, val_col, label, raw_vals_char = NULL) {
 }
 
 # Load raw CSV values for text-preserving detection
-  raw_csv_fname <- cfg_get("data.files.extra", "sber_ema_anon_20260227.csv", cfg = .pipeline_cfg)
+  raw_csv_fname <- cfg_get("data.files.extra", "your_extra_data.csv", cfg = .pipeline_cfg)
 raw_csv_data <- NULL
 if (!is.null(raw_csv_fname) && file.exists(raw_csv_fname)) {
   raw_csv_data <- read.csv(raw_csv_fname, stringsAsFactors = FALSE)

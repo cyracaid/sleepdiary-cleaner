@@ -15,17 +15,20 @@ pipeline:
 # =============================================================================
 data:
   files:
-    main: "deidentified_intervalvars_forCD_111325.rds"
+    main: "your_data.rds"
     # -- Your main sleep diary file. Accepts .rds (R data) or .csv (plain text).
     #   Required columns: pid, day_num, sleep time columns, SOL, WASO.
     #   Full contract: see SCHEMA.md
+    #   NOTE: placeholder name. Configure your actual export filename locally;
+    #   real data files are never committed to the repo.
 
-    extra: "sber_ema_anon_20260227.csv"
+    extra: "your_extra_data.csv"
     # -- Optional supplementary file. Leave "" if your main file already
     #   contains StartDate and num_waso_estimate_am.
     #   When provided: StartDate, num_waso (-> num_waso_am), num_waso_estimate_am
     #   are copied from this file into the main data.
     #   Row count must match the main file exactly.
+    #   NOTE: placeholder name; configure your actual export filename locally.
 
     # Compatibility: the legacy keys main_rds / main_csv are still recognised
     # when no "main" or "extra" key is present. They will be removed in v2.0.

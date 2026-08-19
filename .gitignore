@@ -1,7 +1,8 @@
 # Raw data (never commit)
 *.rds
 !inst/extdata/*.rds
-sber_ema_anon_20260227.csv
+# Real-data anon exports (local only, placeholder-named in config_default.yaml)
+sber_ema_anon_*.csv
 
 # Worklog (local only)
 worklog/
