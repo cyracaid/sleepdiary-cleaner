@@ -34,7 +34,7 @@ Full documentation site (searchable function reference + vignettes, bilingual):
 
 ## Features
 
-- **9-step pipeline**: raw data → timestamp parsing → interval processing → temporal correction → duration correction → metric computation → auto-detection → cross-participant consistency → visualization
+- **10-step pipeline**: raw data → timestamp parsing → interval processing → temporal correction → duration correction → metric computation → auto-detection → cross-participant consistency → visualization → final column finalization
 - **Manual correction CSV workflow**: human review decisions stored in CSVs, re-read on each pipeline run
 - **Configurable thresholds**: SOL/SE/TST-TIB flag thresholds, timestamp format, column names — all set in a YAML config file
 - **Checkpoint reporter**: per-step clean/error/unusual/corrected counts printed and saved to CSV
@@ -828,9 +828,10 @@ uncertainty?".
 
   ROBUSTNESS TIER (does the choice matter?)
   ────────────────────────────────────────────────────────────
-  Step 8: Multiverse + downstream + seeds ── D2 = 44% (swap
-          threshold dominates); TST robust, SOL sensitive
-          (12.1–48.4 min); recall stable 0.993–0.995 across seeds
+  Step 8: Multiverse + downstream + seeds ── full grid: D2 = 44%
+          (seed-fragile → main curve D1-only, full factorial in
+          appendix); TST robust, SOL sensitive (22.7–58.1 min);
+          recall stable 0.993–0.995 across seeds
 ```
 
 ### Step 1 — Does the pipeline touch clean data? (clean-input specificity)
@@ -1035,8 +1036,8 @@ specification grid.
    a **specification curve** (Simonsohn-style plot of the metric across all
    specs) and a **variance decomposition** (how much of the variation each
    dimension explains). Script: `validation/synthetic/multiverse.R`; results
-   in `results/multiverse/` (`spec_curve.csv`, `variance_decomposition.csv`,
-   `instability.csv`, `oat_screening.csv`).
+   in `validation/synthetic/results/multiverse/` (`spec_curve.csv`,
+   `variance_decomposition.csv`, `instability.csv`, `oat_screening.csv`).
 2. **Downstream sensitivity.** The same grid, but measuring the *deliverable*
    quantities the study team actually uses: mean TST, mean SOL, and analyzable
    n (records that survive the cleaning decisions). Script:
@@ -1049,24 +1050,33 @@ specification grid.
 
 *Multiverse — which choice dominates?*
 
+Full-factorial variance decomposition (`spec_curve_full.csv`, 9 specs):
+
 | Dimension | Share of variation |
 |---|---|
 | D2 (adjacent-swap threshold) | **44%** |
 | D1 (AM/PM flip trigger) | 10% |
 | others | remainder |
 
-The swap-threshold choice is the dominant design decision: 44% of the
-variation in outcomes across specs comes from that one parameter. This is why
-the multiverse exists — it tells us *where* the pipeline's behavior is most
-sensitive, so a user knows which default to scrutinize first.
+The swap-threshold choice looks like the dominant design decision in the full
+grid. **But D2 is seed-fragile**: one-at-a-time (OAT) screening under seed
+20260817 keeps D1 + D2 as the surviving dimensions, while seed 20260915
+reduces the surviving set to D1 only. A dimension that disappears when the
+random seed changes is not a robust finding, so the *main* specification
+curve (`spec_curve.csv`) is reported **D1-only** — the 3-spec intersection of
+D1 choices that survives across seeds — and the full factorial lives in the
+appendix as `spec_curve_full.csv`. D2's 44% is real within that grid but is
+treated as a warning to scrutinize the swap default, not as a headline
+robustness claim. `variance_decomposition.R` reads the full factorial; the
+main curve reports the D1-only subset.
 
 *Downstream — do the delivered metrics move?*
 
 | Quantity | Base spec | Across specs |
 |---|---|---|
-| mean TST (h) | 7.89 | [7.76, 7.92] — robust (±0.08 h) |
-| mean SOL (min) | 20.7 | [12.1, 48.4] — **sensitive** |
-| analyzable n | 6,611 | [6,333, 6,692] |
+| mean TST (h) | 8.06 | [8.06, 8.07] — robust (±0.01 h) |
+| mean SOL (min) | 31.2 | [22.7, 58.1] — **sensitive** |
+| analyzable n | 6,581 | [6,327, 6,660] |
 
 TST conclusions are stable across reasonable cleaning choices; SOL conclusions
 are not. The SOL sensitivity is consistent with what Step 5.5 found: SOL
@@ -1092,12 +1102,13 @@ disclosed as audit-only in the caveats below. Full per-seed table in
 `seed_sensitivity.csv`.
 
 **Meaning.** Three separate questions, three clear answers: (1) *which decision
-matters most?* — the swap threshold, at 44% of variation, so that default is
-the one to document and defend; (2) *which conclusions are robust?* — TST
-yes (±0.08 h), SOL no (12–48 min), and we now know why (perception bias,
-Step 5.5); (3) *are the numbers reproducible?* — yes across seeds (recall
-0.993–0.995, FAR 0), with the single known-weak family disclosed rather than
-hidden.
+matters most?* — within the full grid, the swap threshold dominates at 44% of
+variation, but that share is seed-fragile, so the main curve is reported
+D1-only and D2 is a documented sensitivity warning, not a headline claim;
+(2) *which conclusions are robust?* — TST yes (±0.01 h on the D1-only main
+curve), SOL no (23–58 min), and we now know why (perception bias, Step 5.5);
+(3) *are the numbers reproducible?* — yes across seeds (recall 0.993–0.995,
+FAR 0), with the single known-weak family disclosed rather than hidden.
 
 ### Honest caveats (read before using any number)
 
@@ -1123,7 +1134,7 @@ Full methodology, numeric results, and disclosed caveats for each completed item
 - **FCR / FAR_alter** — false-alteration rate: the share of records the pipeline *changes* on clean input. "0/10,000" means zero records were altered on structurally-clean synthetic data (rule-of-three 95% upper bound ≈ 0.03%). Any correction on clean input would be pure iatrogenic damage.
 - **Misrepaired vs. flagged vs. missed** — the three-way split of a false correction: *silently altered to a wrong value* (worst — no human ever sees it) vs. *flagged for review but not auto-fixed* (catchable by a human) vs. *missed entirely* (no signal at all). These have very different severities and get conflated if reported as one number.
 - **Enriched sampling** — each of the 12 error categories is injected to a fixed target count (e.g. 400), not at the empirically observed real-world rate. Rare error types would otherwise get too few samples to measure; the per-category table therefore reports detection rates, not prevalence.
-- **L1/L2/L3** — verification depth tiers: L1 = any flag raised, L3 = value corrected correctly, L2 = *type* also correct. All three are computed per category (`results/l2_tier.csv`). The headline uses L1 (detection); L3 is the stricter value-correctness number — e.g. `ampm_swap` L1 1.0 / L3 0.565, because uncertain restorations go to human review.
+- **L1/L2/L3** — verification depth tiers: L1 = any flag raised, L3 = value corrected correctly, L2 = *type* also correct. All three are computed per category (`validation/synthetic/results/l2_tier.csv`). The headline uses L1 (detection); L3 is the stricter value-correctness number — e.g. `ampm_swap` L1 1.0 / L3 0.565, because uncertain restorations go to human review.
 
 **How to run it.**
 
@@ -1647,8 +1658,9 @@ Snapshot 验证（`inst/verification/`、`verify_v1_3_snapshot.R`）确认当前
 
   鲁棒性层（选择要紧吗？）
   ────────────────────────────────────────────
-  第 8 步：Multiverse + 下游 + seed ─── D2 = 44%（交换阈值主导）；
-           TST 稳健、SOL 敏感（12.1–48.4 分钟）；
+  第 8 步：Multiverse + 下游 + seed ─── 全网格：D2 = 44%
+           （seed 脆弱 → 主曲线 D1-only，全因子进附录）；
+           TST 稳健、SOL 敏感（22.7–58.1 分钟）；
            跨 seed recall 稳定 0.993–0.995
 ```
 
@@ -1763,7 +1775,7 @@ CI 为参与者级 cluster bootstrap（1,000 次），因为同一参与者的�
    （那是逻辑，不是选择）。先用 one-at-a-time（OAT）筛选，再跑全因子网格；每个
    规格跑真实管线并记录相同输出。两个输出契约：**规格曲线**（Simonsohn 风格，
    全部规格上的指标图）与**方差分解**（每个维度解释多少变异）。脚本：
-   `validation/synthetic/multiverse.R`；结果在 `results/multiverse/`
+   `validation/synthetic/multiverse.R`；结果在 `validation/synthetic/results/multiverse/`
    （`spec_curve.csv`、`variance_decomposition.csv`、`instability.csv`、
    `oat_screening.csv`）。
 2. **下游敏感性。** 同一网格，但测量研究团队实际使用的*交付量*：平均 TST、
@@ -1782,17 +1794,21 @@ CI 为参与者级 cluster bootstrap（1,000 次），因为同一参与者的�
 | D1（AM/PM 翻转触发） | 10% |
 | 其余 | 剩余 |
 
-交换阈值选择是主导性设计决策：跨规格结果变异的 44% 来自这一个参数。这正是
-multiverse 存在的意义——它告诉我们管线行为*哪里*最敏感，让用户知道先审查
-哪个默认值。
+在全因子网格里交换阈值看起来是主导性设计决策（44% 的变异）。**但 D2 是
+seed 脆弱的**：OAT 筛查在 seed 20260817 下保留 D1 + D2 两个存活维度，而
+seed 20260915 下只剩 D1。一个换随机种子就消失的维度不是稳健发现，所以*主*
+规格曲线（`spec_curve.csv`）按 **D1-only** 报告——跨 seed 存活的 3 个 D1 选择
+的交集——全因子版本以附录形式放在 `spec_curve_full.csv`。D2 的 44% 在该网格内
+真实存在，但只当作"先审查交换默认值"的警示，不作为头条稳健性声明。
+`variance_decomposition.R` 读全因子；主曲线报告 D1-only 子集。
 
 *下游 — 交付指标动吗？*
 
 | 量 | 基线规格 | 跨规格 |
 |---|---|---|
-| 平均 TST（小时） | 7.89 | [7.76, 7.92] — 稳健（±0.08 小时） |
-| 平均 SOL（分钟） | 20.7 | [12.1, 48.4] — **敏感** |
-| 可分析 n | 6,611 | [6,333, 6,692] |
+| 平均 TST（小时） | 8.06 | [8.06, 8.07] — 稳健（±0.01 小时） |
+| 平均 SOL（分钟） | 31.2 | [22.7, 58.1] — **敏感** |
+| 可分析 n | 6,581 | [6,327, 6,660] |
 
 TST 结论跨合理清洗选择稳定；SOL 结论不稳定。SOL 的敏感性呼应第 5.5 步的发现：
 SOL 自报落在 ±75 分钟噪声带内，所以 SOL 是清洗选择与感知偏差交互最强的指标。
@@ -1812,9 +1828,10 @@ SOL 自报落在 ±75 分钟噪声带内，所以 SOL 是清洗选择与感知�
 `cross_participant_spike`——已在下方注意事项中披露为 audit-only。完整逐 seed
 表见 `seed_sensitivity.csv`。
 
-**意味着。** 三个独立问题、三个清晰答案：(1) *哪个决策最重要？* — 交换阈值，
-占变异 44%，所以那个默认值是需要文档化并捍卫的。(2) *哪些结论稳健？* —
-TST 是（±0.08 小时），SOL 否（12–48 分钟），而且我们现在知道原因（感知偏差，
+**意味着。** 三个独立问题、三个清晰答案：(1) *哪个决策最重要？* — 全因子网格内
+交换阈值占变异 44%，但该占比 seed 脆弱，所以主曲线按 D1-only 报告，D2 作为
+已记录的敏感性警示而非头条声明；(2) *哪些结论稳健？* — TST 是（D1-only 主曲线
+±0.01 小时），SOL 否（23–58 分钟），而且我们现在知道原因（感知偏差，
 第 5.5 步）。(3) *数字可复现吗？* — 跨 seed 是（recall 0.993–0.995，FAR 0），
 唯一已知弱族被披露而非隐藏。
 
@@ -1833,7 +1850,7 @@ TST 是（±0.08 小时），SOL 否（12–48 分钟），而且我们现在知
 - **FCR / FAR_alter** —— 误改率：干净输入上被管线*改动*的记录占比。"0/10,000" 指结构纯净合成数据上零条被改动（rule-of-three 95% 上限 ≈ 0.03%）。干净输入上的任何改动都是纯医源性损伤。
 - **Misrepaired vs. flagged vs. missed** —— 误修的三种形态：*被静默改成错值*（最严重——人工永远看不到）vs. *被标记转人工但未自动修直*（人工可拦截）vs. *完全漏检*（毫无信号）。三者严重度差异极大，合成一个数字会掩盖信号。
 - **Enriched sampling** —— 12 类错误各注入到固定目标数（如每类 400），而非按真实世界观察到的错误率。否则罕见错误类型样本太少测不准；因此逐类表报告的是检出率，不是发生率。
-- **L1/L2/L3** —— 验证深度层级：L1 = 有任意 flag，L3 = 值被正确修正，L2 = *类型*也正确。三类均已逐类计算（`results/l2_tier.csv`）。论文式头条用 L1（检测）；L3 是更严的值正确数——如 `ampm_swap` L1 1.0 / L3 0.565，因为不确定的恢复交给人工审查。
+- **L1/L2/L3** —— 验证深度层级：L1 = 有任意 flag，L3 = 值被正确修正，L2 = *类型*也正确。三类均已逐类计算（`validation/synthetic/results/l2_tier.csv`）。论文式头条用 L1（检测）；L3 是更严的值正确数——如 `ampm_swap` L1 1.0 / L3 0.565，因为不确定的恢复交给人工审查。
 
 **如何运行。**
 

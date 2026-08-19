@@ -75,9 +75,10 @@ deliberately independent of the others.
 
   ROBUSTNESS TIER (does the choice matter?)
   ────────────────────────────────────────────────────────────
-  Step 8: Multiverse + downstream + seeds ── D2 = 44% (swap
-          threshold dominates); TST robust, SOL sensitive
-          (12.1–48.4 min); recall stable 0.993–0.995 across seeds
+  Step 8: Multiverse + downstream + seeds ── full grid: D2 = 44%
+          (seed-fragile → main curve D1-only, full factorial in
+          appendix); TST robust, SOL sensitive (22.7–58.1 min);
+          recall stable 0.993–0.995 across seeds
 ```
 
 ## Step 1 — Does the pipeline touch clean data? (clean-input specificity)
@@ -290,17 +291,23 @@ specification grid.
 
 | Dimension | Share of variation |
 |---|---|
-| D2 (adjacent-swap threshold) | **44%** |
+| D2 (adjacent-swap threshold) | **44%** (seed-fragile) |
 | D1 (AM/PM flip trigger) | 10% |
 | others | remainder |
+
+D2's 44% holds only inside the full factorial grid and is **seed-fragile**:
+one-at-a-time (OAT) screening keeps D1 + D2 under seed 20260817 but reduces
+the surviving set to D1 only under seed 20260915. The *main* specification
+curve is therefore reported **D1-only** (3 specs — the cross-seed intersection),
+and the full factorial lives in the appendix as `spec_curve_full.csv`.
 
 *Downstream — do the delivered metrics move?*
 
 | Quantity | Base spec | Across specs |
 |---|---|---|
-| mean TST (h) | 7.89 | [7.76, 7.92] — robust (±0.08 h) |
-| mean SOL (min) | 20.7 | [12.1, 48.4] — **sensitive** |
-| analyzable n | 6,611 | [6,333, 6,692] |
+| mean TST (h) | 8.06 | [8.06, 8.07] — robust (±0.01 h) |
+| mean SOL (min) | 31.2 | [22.7, 58.1] — **sensitive** |
+| analyzable n | 6,581 | [6,327, 6,660] |
 
 *Decision-relevant deltas (B1/B2):* B1 (which rows to trust) moves mean TST by
 **29.6 min**; B2 (WASO trust gate variant) moves analyzable n by **1,131
@@ -312,8 +319,10 @@ all; the one family that wobbles (0.886–0.907) is the known-weak
 `cross_participant_spike` — already disclosed as audit-only below.
 
 **Meaning.** Three separate questions, three clear answers: (1) *which decision
-matters most?* — the swap threshold, at 44% of variation; (2) *which
-conclusions are robust?* — TST yes (±0.08 h), SOL no (12–48 min), and we now
+matters most?* — the swap threshold dominates the full grid at 44% of
+variation, but that share is seed-fragile, so the main curve is D1-only and
+D2 is a documented sensitivity warning; (2) *which conclusions are robust?* —
+TST yes (±0.01 h on the D1-only main curve), SOL no (23–58 min), and we now
 know why (perception bias, Step 5.5); (3) *are the numbers reproducible?* —
 yes across seeds (recall 0.993–0.995, FAR 0), with the single known-weak
 family disclosed rather than hidden.
