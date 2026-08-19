@@ -60,10 +60,10 @@
 - [Testing
   Coverage](https://cyracaid.github.io/sleepdiary-cleaner/articles/testing-coverage.md):
 
-  The 190+ testthat expectations across 12 test files: what the tests
+  The 200+ testthat expectations across 16 test files: what the tests
   verify, how to run them, and how snapshot verification works.
 
 - [测试覆盖率（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/testing-coverage-zh.md):
 
-  12 个测试文件、190+ 条 testthat 断言：测试验证什么、怎么运行、snapshot
+  16 个测试文件、200+ 条 testthat 断言：测试验证什么、怎么运行、snapshot
   验证如何工作。

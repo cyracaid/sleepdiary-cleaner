@@ -99,7 +99,7 @@ full changelog. Installable via
   [`adapt_columns()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/adapt_columns.md)
   maps your dataset’s column names to pipeline internals via YAML config
   — no code changes
-- **190+ tests**: covering correction engine, classification thresholds,
+- **200+ tests**: covering correction engine, classification thresholds,
   auto-detection logic, config validation, and the finalize/guard
   delivery contract
 
@@ -873,25 +873,29 @@ it — before that step, its `count` is NA.
 
 ## Testing Coverage
 
-The pipeline includes 190+ testthat expectations across 12 test files,
+The pipeline includes 200+ testthat expectations across 16 test files,
 all exercising software correctness — does the code do what it was
 designed to do — as distinct from methodological validity, which is
 covered in [Validation](#validation) below.
 
-| Test File                          | Coverage                                                                                                                                                          |
-|------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `test-normalize.R`                 | AM/PM correction, minor order errors, midnight crossing, edge cases                                                                                               |
-| `test-interval.R`                  | Colon-format edge cases in duration parsing                                                                                                                       |
-| `test-pipeline.R`                  | End-to-end run on synthetic data, config loading, column adaptation                                                                                               |
-| `test-sleep-diary.R`               | S3 construction, validation, coercion, generics, step-contract assertion, provenance                                                                              |
-| `test-flag-standards.R`            | Flag evaluators for field misentry, data category, duration extreme, flag severity, checkforerrors; step-ledger logging                                           |
-| `test-correction-engine.R`         | Every classification outcome (order/bed-sleep/awake-getup/24h errors, equal-time, unusual, skipped-NA, multiple errors, suspicious-latency flags)                 |
-| `test-classification-thresholds.R` | Boundary behavior at every classification threshold (7h error, 3h/15h unusual, suspicious-latency)                                                                |
-| `test-auto-detection-thresholds.R` | SOL/SE/TST-TIB boundary behavior for the Step 8 auto-detection flags                                                                                              |
-| `test-finalize-columns.R`          | Dictionary ↔︎ delivered-column consistency, A/B join key uniqueness, unit transforms, reserved-column pass-through, export guard, missing/optional-column handling |
-| `test-nonfinite-guards.R`          | NA/Inf handling in duration and flag-severity evaluators (regression tests for two real bugs)                                                                     |
-| `test-config-data.R`               | Config file loading (RDS/CSV, legacy keys, column mapping, friendly error messages)                                                                               |
-| `test-script-copies-in-sync.R`     | Root and `inst/scripts/` copies of every dual-maintained script stay byte-identical                                                                               |
+| Test File                          | Coverage                                                                                                                                                                                                  |
+|------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `test-normalize.R`                 | AM/PM correction, minor order errors, midnight crossing, edge cases                                                                                                                                       |
+| `test-interval.R`                  | Colon-format edge cases in duration parsing                                                                                                                                                               |
+| `test-pipeline.R`                  | End-to-end run on synthetic data, config loading, column adaptation                                                                                                                                       |
+| `test-sleep-diary.R`               | S3 construction, validation, coercion, generics, step-contract assertion, provenance                                                                                                                      |
+| `test-flag-standards.R`            | Flag evaluators for field misentry, data category, duration extreme, flag severity, checkforerrors; step-ledger logging                                                                                   |
+| `test-correction-engine.R`         | Every classification outcome (order/bed-sleep/awake-getup/24h errors, equal-time, unusual, skipped-NA, multiple errors, suspicious-latency flags)                                                         |
+| `test-classification-thresholds.R` | Boundary behavior at every classification threshold (7h error, 3h/15h unusual, suspicious-latency)                                                                                                        |
+| `test-auto-detection-thresholds.R` | SOL/SE/TST-TIB boundary behavior for the Step 8 auto-detection flags                                                                                                                                      |
+| `test-finalize-columns.R`          | Dictionary ↔︎ delivered-column consistency, A/B join key uniqueness, unit transforms, reserved-column pass-through, export guard, missing/optional-column handling                                         |
+| `test-nonfinite-guards.R`          | NA/Inf handling in duration and flag-severity evaluators (regression tests for two real bugs)                                                                                                             |
+| `test-config-data.R`               | Config file loading (RDS/CSV, legacy keys, column mapping, friendly error messages)                                                                                                                       |
+| `test-script-copies-in-sync.R`     | Root and `inst/scripts/` copies of every dual-maintained script stay byte-identical                                                                                                                       |
+| `test-generated-docs-in-sync.R`    | AUTO-generated docs under `docs-dev/` stay byte-identical to their committed versions                                                                                                                     |
+| `test-global-leakage.R`            | Pipeline internals never leak into the global environment between runs (regression guard for the step-script handoff)                                                                                     |
+| `test-internalised-in-sync.R`      | `R/` package wrappers and the `inst/scripts/` step scripts stay in sync (dual-maintenance regression gate)                                                                                                |
+| `test-smoke-legacy-entry.R`        | Legacy `00_MAIN_entry.R` auto-run path (different code path from [`run_pipeline()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_pipeline.md)) executes end-to-end in a sandbox subprocess |
 
 Run tests with:
 
@@ -1433,7 +1437,7 @@ CSV 实际上从未被写盘，尽管管线日志一直报告”已保存”。�
   both）+ 每步审计账本
 - **列映射**：[`adapt_columns()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/adapt_columns.md)
   通过 YAML 配置映射数据集列名 — 无需修改代码
-- **190+ 个测试**（12
+- **200+ 个测试**（16
   个测试文件）：覆盖修正引擎、分类阈值、自动检测逻辑、配置验证、[`finalize_columns()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/finalize_columns.md)
   交付契约——测的是”代码有没有按设计跑”，跟”设计本身站不站得住”是两回事，后者见下方[验证](#%E9%AA%8C%E8%AF%81)一节
 
@@ -1843,23 +1847,27 @@ commit）。`figure_index.png`
 
 ## 测试覆盖率
 
-管线包含 12 个测试文件、190+ 条 testthat
+管线包含 16 个测试文件、200+ 条 testthat
 断言，全部检验软件正确性——代码是否按设计跑——区别于方法学效度，后者见下方[验证](#%E9%AA%8C%E8%AF%81)一节。
 
-| 测试文件                           | 覆盖                                                                                                        |
-|------------------------------------|-------------------------------------------------------------------------------------------------------------|
-| `test-normalize.R`                 | AM/PM 校正、轻微顺序错误、跨午夜、边界情况                                                                  |
-| `test-interval.R`                  | 时长解析中的冒号格式边界情况                                                                                |
-| `test-pipeline.R`                  | 合成数据端到端运行、配置加载、列适配                                                                        |
-| `test-sleep-diary.R`               | S3 构造、校验、强制转换、泛型、步骤契约断言、溯源                                                           |
-| `test-flag-standards.R`            | field misentry / data category / duration extreme / flag severity / checkforerrors 评估器；step-ledger 记录 |
-| `test-correction-engine.R`         | 全部分类结果（顺序 / bed-sleep / awake-getup / 24h 错误、等时、异常、跳过 NA、多重错误、可疑潜伏期 flag）   |
-| `test-classification-thresholds.R` | 每个分类阈值的边界行为（7h 错误、3h/15h 异常、可疑潜伏期）                                                  |
-| `test-auto-detection-thresholds.R` | Step 8 自动检测 flag 的 SOL/SE/TST-TIB 边界行为                                                             |
-| `test-finalize-columns.R`          | 字典 ↔︎ 交付列一致性、A/B 连接键唯一性、单位转换、保留列透传、导出门、缺失/可选列处理                        |
-| `test-nonfinite-guards.R`          | 时长与 flag-severity 评估器中的 NA/Inf 处理（两个真实 bug 的回归测试）                                      |
-| `test-config-data.R`               | 配置加载（RDS/CSV、旧键、列映射、友好报错）                                                                 |
-| `test-script-copies-in-sync.R`     | 每个双维护脚本在根目录与 `inst/scripts/` 的副本保持字节一致                                                 |
+| 测试文件                           | 覆盖                                                                                                                                                                         |
+|------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `test-normalize.R`                 | AM/PM 校正、轻微顺序错误、跨午夜、边界情况                                                                                                                                   |
+| `test-interval.R`                  | 时长解析中的冒号格式边界情况                                                                                                                                                 |
+| `test-pipeline.R`                  | 合成数据端到端运行、配置加载、列适配                                                                                                                                         |
+| `test-sleep-diary.R`               | S3 构造、校验、强制转换、泛型、步骤契约断言、溯源                                                                                                                            |
+| `test-flag-standards.R`            | field misentry / data category / duration extreme / flag severity / checkforerrors 评估器；step-ledger 记录                                                                  |
+| `test-correction-engine.R`         | 全部分类结果（顺序 / bed-sleep / awake-getup / 24h 错误、等时、异常、跳过 NA、多重错误、可疑潜伏期 flag）                                                                    |
+| `test-classification-thresholds.R` | 每个分类阈值的边界行为（7h 错误、3h/15h 异常、可疑潜伏期）                                                                                                                   |
+| `test-auto-detection-thresholds.R` | Step 8 自动检测 flag 的 SOL/SE/TST-TIB 边界行为                                                                                                                              |
+| `test-finalize-columns.R`          | 字典 ↔︎ 交付列一致性、A/B 连接键唯一性、单位转换、保留列透传、导出门、缺失/可选列处理                                                                                         |
+| `test-nonfinite-guards.R`          | 时长与 flag-severity 评估器中的 NA/Inf 处理（两个真实 bug 的回归测试）                                                                                                       |
+| `test-config-data.R`               | 配置加载（RDS/CSV、旧键、列映射、友好报错）                                                                                                                                  |
+| `test-script-copies-in-sync.R`     | 每个双维护脚本在根目录与 `inst/scripts/` 的副本保持字节一致                                                                                                                  |
+| `test-generated-docs-in-sync.R`    | `docs-dev/` 下 AUTO 生成的文档与其提交版本保持字节一致                                                                                                                       |
+| `test-global-leakage.R`            | 管线内部变量永不泄漏到全局环境（步骤脚本交接的回归护栏）                                                                                                                     |
+| `test-internalised-in-sync.R`      | `R/` 包封装与 `inst/scripts/` 步骤脚本保持同步（双维护回归门）                                                                                                               |
+| `test-smoke-legacy-entry.R`        | 旧版 `00_MAIN_entry.R` 自动运行路径（与 [`run_pipeline()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_pipeline.md) 不同的代码路径）在沙箱子进程内端到端执行 |
 
 运行测试：
 

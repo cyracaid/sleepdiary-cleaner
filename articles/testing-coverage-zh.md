@@ -1,6 +1,6 @@
 # 测试覆盖率（中文）
 
-管线包含 12 个测试文件、190+ 条 testthat
+管线包含 16 个测试文件、200+ 条 testthat
 断言，全部检验软件正确性——代码是否
 按设计跑——区别于方法学效度（后者见验证方法学 vignette）。
 
@@ -10,20 +10,24 @@ library(splsleep)
 
 ## 测试文件与覆盖
 
-| 测试文件                           | 覆盖                                                                                                        |
-|------------------------------------|-------------------------------------------------------------------------------------------------------------|
-| `test-normalize.R`                 | AM/PM 校正、轻微顺序错误、跨午夜、边界情况                                                                  |
-| `test-interval.R`                  | 时长解析中的冒号格式边界情况                                                                                |
-| `test-pipeline.R`                  | 合成数据端到端运行、配置加载、列适配                                                                        |
-| `test-sleep-diary.R`               | S3 构造、校验、强制转换、泛型、步骤契约断言、溯源                                                           |
-| `test-flag-standards.R`            | field misentry / data category / duration extreme / flag severity / checkforerrors 评估器；step-ledger 记录 |
-| `test-correction-engine.R`         | 全部分类结果（顺序 / bed-sleep / awake-getup / 24h 错误、等时、异常、跳过 NA、多重错误、可疑潜伏期 flag）   |
-| `test-classification-thresholds.R` | 每个分类阈值的边界行为（7h 错误、3h/15h 异常、可疑潜伏期）                                                  |
-| `test-auto-detection-thresholds.R` | Step 8 自动检测 flag 的 SOL/SE/TST-TIB 边界行为                                                             |
-| `test-finalize-columns.R`          | 字典 ↔︎ 交付列一致性、A/B 连接键唯一性、单位转换、保留列透传、导出门、缺失/可选列处理                        |
-| `test-nonfinite-guards.R`          | 时长与 flag-severity 评估器中的 NA/Inf 处理（两个真实 bug 的回归测试）                                      |
-| `test-config-data.R`               | 配置加载（RDS/CSV、旧键、列映射、友好报错）                                                                 |
-| `test-script-copies-in-sync.R`     | 每个双维护脚本在根目录与 `inst/scripts/` 的副本保持字节一致                                                 |
+| 测试文件                           | 覆盖                                                                                                                                                                         |
+|------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `test-normalize.R`                 | AM/PM 校正、轻微顺序错误、跨午夜、边界情况                                                                                                                                   |
+| `test-interval.R`                  | 时长解析中的冒号格式边界情况                                                                                                                                                 |
+| `test-pipeline.R`                  | 合成数据端到端运行、配置加载、列适配                                                                                                                                         |
+| `test-sleep-diary.R`               | S3 构造、校验、强制转换、泛型、步骤契约断言、溯源                                                                                                                            |
+| `test-flag-standards.R`            | field misentry / data category / duration extreme / flag severity / checkforerrors 评估器；step-ledger 记录                                                                  |
+| `test-correction-engine.R`         | 全部分类结果（顺序 / bed-sleep / awake-getup / 24h 错误、等时、异常、跳过 NA、多重错误、可疑潜伏期 flag）                                                                    |
+| `test-classification-thresholds.R` | 每个分类阈值的边界行为（7h 错误、3h/15h 异常、可疑潜伏期）                                                                                                                   |
+| `test-auto-detection-thresholds.R` | Step 8 自动检测 flag 的 SOL/SE/TST-TIB 边界行为                                                                                                                              |
+| `test-finalize-columns.R`          | 字典 ↔︎ 交付列一致性、A/B 连接键唯一性、单位转换、保留列透传、导出门、缺失/可选列处理                                                                                         |
+| `test-nonfinite-guards.R`          | 时长与 flag-severity 评估器中的 NA/Inf 处理（两个真实 bug 的回归测试）                                                                                                       |
+| `test-config-data.R`               | 配置加载（RDS/CSV、旧键、列映射、友好报错）                                                                                                                                  |
+| `test-script-copies-in-sync.R`     | 每个双维护脚本在根目录与 `inst/scripts/` 的副本保持字节一致                                                                                                                  |
+| `test-generated-docs-in-sync.R`    | `docs-dev/` 下 AUTO 生成的文档与其提交版本保持字节一致                                                                                                                       |
+| `test-global-leakage.R`            | 管线内部变量永不泄漏到全局环境（步骤脚本交接的回归护栏）                                                                                                                     |
+| `test-internalised-in-sync.R`      | `R/` 包封装与 `inst/scripts/` 步骤脚本保持同步（双维护回归门）                                                                                                               |
+| `test-smoke-legacy-entry.R`        | 旧版 `00_MAIN_entry.R` 自动运行路径（与 [`run_pipeline()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_pipeline.md) 不同的代码路径）在沙箱子进程内端到端执行 |
 
 ## 如何运行测试
 

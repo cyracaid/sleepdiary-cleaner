@@ -11,8 +11,8 @@
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="测试覆盖率（中文）">
-<meta name="description" content="12 个测试文件、190+ 条 testthat 断言：测试验证什么、怎么运行、snapshot 验证如何工作。">
-<meta property="og:description" content="12 个测试文件、190+ 条 testthat 断言：测试验证什么、怎么运行、snapshot 验证如何工作。">
+<meta name="description" content="16 个测试文件、200+ 条 testthat 断言：测试验证什么、怎么运行、snapshot 验证如何工作。">
+<meta property="og:description" content="16 个测试文件、200+ 条 testthat 断言：测试验证什么、怎么运行、snapshot 验证如何工作。">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -62,7 +62,7 @@
 
     
     
-<p>管线包含 12 个测试文件、190+ 条 testthat
+<p>管线包含 16 个测试文件、200+ 条 testthat
 断言，全部检验软件正确性——代码是否
 按设计跑——区别于方法学效度（后者见验证方法学 vignette）。</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
@@ -132,6 +132,28 @@ checkforerrors 评估器；step-ledger 记录</td>
 <td><code>test-script-copies-in-sync.R</code></td>
 <td>每个双维护脚本在根目录与 <code>inst/scripts/</code>
 的副本保持字节一致</td>
+</tr>
+<tr class="odd">
+<td><code>test-generated-docs-in-sync.R</code></td>
+<td>
+<code>docs-dev/</code> 下 AUTO
+生成的文档与其提交版本保持字节一致</td>
+</tr>
+<tr class="even">
+<td><code>test-global-leakage.R</code></td>
+<td>管线内部变量永不泄漏到全局环境（步骤脚本交接的回归护栏）</td>
+</tr>
+<tr class="odd">
+<td><code>test-internalised-in-sync.R</code></td>
+<td>
+<code>R/</code> 包封装与 <code>inst/scripts/</code>
+步骤脚本保持同步（双维护回归门）</td>
+</tr>
+<tr class="even">
+<td><code>test-smoke-legacy-entry.R</code></td>
+<td>旧版 <code>00_MAIN_entry.R</code> 自动运行路径（与
+<code><a href="../reference/run_pipeline.html">run_pipeline()</a></code>
+不同的代码路径）在沙箱子进程内端到端执行</td>
 </tr>
 </tbody>
 </table>

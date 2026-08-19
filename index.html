@@ -115,7 +115,7 @@
 <li>
 <strong>Column mapping</strong>: <code><a href="reference/adapt_columns.html">adapt_columns()</a></code> maps your dataset’s column names to pipeline internals via YAML config — no code changes</li>
 <li>
-<strong>190+ tests</strong>: covering correction engine, classification thresholds, auto-detection logic, config validation, and the finalize/guard delivery contract</li>
+<strong>200+ tests</strong>: covering correction engine, classification thresholds, auto-detection logic, config validation, and the finalize/guard delivery contract</li>
 </ul>
 </div>
 <div class="section level2">
@@ -1581,7 +1581,7 @@ and read its detailed interpretation.</code></pre>
 <div class="section level2">
 <h2 id="testing-coverage">Testing Coverage<a class="anchor" aria-label="anchor" href="#testing-coverage"></a>
 </h2>
-<p>The pipeline includes 190+ testthat expectations across 12 test files, all exercising software correctness — does the code do what it was designed to do — as distinct from methodological validity, which is covered in <a href="#validation">Validation</a> below.</p>
+<p>The pipeline includes 200+ testthat expectations across 16 test files, all exercising software correctness — does the code do what it was designed to do — as distinct from methodological validity, which is covered in <a href="#validation">Validation</a> below.</p>
 <table class="table">
 <colgroup>
 <col width="52%">
@@ -1639,6 +1639,23 @@ and read its detailed interpretation.</code></pre>
 <tr class="even">
 <td><code>test-script-copies-in-sync.R</code></td>
 <td>Root and <code>inst/scripts/</code> copies of every dual-maintained script stay byte-identical</td>
+</tr>
+<tr class="odd">
+<td><code>test-generated-docs-in-sync.R</code></td>
+<td>AUTO-generated docs under <code>docs-dev/</code> stay byte-identical to their committed versions</td>
+</tr>
+<tr class="even">
+<td><code>test-global-leakage.R</code></td>
+<td>Pipeline internals never leak into the global environment between runs (regression guard for the step-script handoff)</td>
+</tr>
+<tr class="odd">
+<td><code>test-internalised-in-sync.R</code></td>
+<td>
+<code>R/</code> package wrappers and the <code>inst/scripts/</code> step scripts stay in sync (dual-maintenance regression gate)</td>
+</tr>
+<tr class="even">
+<td><code>test-smoke-legacy-entry.R</code></td>
+<td>Legacy <code>00_MAIN_entry.R</code> auto-run path (different code path from <code><a href="reference/run_pipeline.html">run_pipeline()</a></code>) executes end-to-end in a sandbox subprocess</td>
 </tr>
 </tbody>
 </table>
@@ -2089,7 +2106,7 @@ and read its detailed interpretation.</code></pre>
 <li>
 <strong>列映射</strong>：<code><a href="reference/adapt_columns.html">adapt_columns()</a></code> 通过 YAML 配置映射数据集列名 — 无需修改代码</li>
 <li>
-<strong>190+ 个测试</strong>（12 个测试文件）：覆盖修正引擎、分类阈值、自动检测逻辑、配置验证、<code><a href="reference/finalize_columns.html">finalize_columns()</a></code> 交付契约——测的是”代码有没有按设计跑”，跟”设计本身站不站得住”是两回事，后者见下方<a href="#%E9%AA%8C%E8%AF%81">验证</a>一节</li>
+<strong>200+ 个测试</strong>（16 个测试文件）：覆盖修正引擎、分类阈值、自动检测逻辑、配置验证、<code><a href="reference/finalize_columns.html">finalize_columns()</a></code> 交付契约——测的是”代码有没有按设计跑”，跟”设计本身站不站得住”是两回事，后者见下方<a href="#%E9%AA%8C%E8%AF%81">验证</a>一节</li>
 </ul>
 </div>
 <div class="section level2">
@@ -2949,7 +2966,7 @@ verification/synth_n&lt;行数&gt;/                     ← 稳定的合成数�
 <div class="section level2">
 <h2 id="测试覆盖率">测试覆盖率<a class="anchor" aria-label="anchor" href="#%E6%B5%8B%E8%AF%95%E8%A6%86%E7%9B%96%E7%8E%87"></a>
 </h2>
-<p>管线包含 12 个测试文件、190+ 条 testthat 断言，全部检验软件正确性——代码是否按设计跑——区别于方法学效度，后者见下方<a href="#%E9%AA%8C%E8%AF%81">验证</a>一节。</p>
+<p>管线包含 16 个测试文件、200+ 条 testthat 断言，全部检验软件正确性——代码是否按设计跑——区别于方法学效度，后者见下方<a href="#%E9%AA%8C%E8%AF%81">验证</a>一节。</p>
 <table class="table">
 <colgroup>
 <col width="50%">
@@ -3007,6 +3024,24 @@ verification/synth_n&lt;行数&gt;/                     ← 稳定的合成数�
 <tr class="even">
 <td><code>test-script-copies-in-sync.R</code></td>
 <td>每个双维护脚本在根目录与 <code>inst/scripts/</code> 的副本保持字节一致</td>
+</tr>
+<tr class="odd">
+<td><code>test-generated-docs-in-sync.R</code></td>
+<td>
+<code>docs-dev/</code> 下 AUTO 生成的文档与其提交版本保持字节一致</td>
+</tr>
+<tr class="even">
+<td><code>test-global-leakage.R</code></td>
+<td>管线内部变量永不泄漏到全局环境（步骤脚本交接的回归护栏）</td>
+</tr>
+<tr class="odd">
+<td><code>test-internalised-in-sync.R</code></td>
+<td>
+<code>R/</code> 包封装与 <code>inst/scripts/</code> 步骤脚本保持同步（双维护回归门）</td>
+</tr>
+<tr class="even">
+<td><code>test-smoke-legacy-entry.R</code></td>
+<td>旧版 <code>00_MAIN_entry.R</code> 自动运行路径（与 <code><a href="reference/run_pipeline.html">run_pipeline()</a></code> 不同的代码路径）在沙箱子进程内端到端执行</td>
 </tr>
 </tbody>
 </table>
