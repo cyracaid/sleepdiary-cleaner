@@ -2,7 +2,7 @@
 
 ## Overview
 
-An R pipeline that cleans EMA sleep diary data and produces 24 diagnostic figures. The pipeline has 9 main sequential steps (with sub-steps 1.5/5.5/5.75/6.5/8.5/8.75), from raw CSV/RDS loading through automatic error detection. Human correction feedback is applied via CSV files at steps 5.5-6.5. The entry point is `00_MAIN_entry.R`; run `run_pipeline()` (installed package) or `source("00_MAIN_entry.R")` (development).
+An R pipeline that cleans EMA sleep diary data and produces 24 diagnostic figures. The pipeline has 10 steps (1, 1.5, 2–4, 5, 5.75, 6–7, 8, 8.5, 9, 10 — source of truth: `inst/steps.yaml`), from raw CSV/RDS loading through final column finalization. Human correction feedback is applied via CSV files at steps 5–7. The entry point is `00_MAIN_entry.R`; run `run_pipeline()` (installed package) or `source("00_MAIN_entry.R")` (development).
 
 Classification categories (TIMESTAMP_ISSUE / DURATION_ISSUE / AMOUNT_FLAG / NEEDS_REVIEW) are **data-type labels, not exclusion criteria** — no data is removed based on category membership.
 
@@ -18,7 +18,7 @@ raw data (RDS + CSV)
     │  Merge RDS (processed EMA vars) and CSV (start date, WASO counts).
     │  Uses row-order alignment (not keyed join — ensure CSV row order matches RDS).
     │  Columns added: StartDate, num_waso (→ num_waso_am), num_waso_estimate_am
-    │  Output: df (intermediate, rows = 13,990)
+    │  Output: df (intermediate, row count = study-dependent)
     │
     ▼
 [1.5] CROSS-PARTICIPANT FIELD-MISENTRY ─ cross_participant_field_misentry_check.R
@@ -256,8 +256,8 @@ Pipeline scripts exist in two physical locations — this is by design, not debt
 Both copies must be kept byte-identical by hand; `test-script-copies-in-sync.R` fails if they drift. On 2026-08-05 five scripts (apply_metric_review_acceptances, apply_nap_exercise_corrections, apply_second_review, apply_sleep_metric_duration_corrections, calculate_sleep_time_end) diverged — inst/scripts read paths via cfg_get() while root hardcoded filenames; default config hid the divergence until `data.files.*` was overridden. Commit 80c7e657. When refactoring, edit both copies and re-run the sync test.
 
 ### Data Sources
-- `deidentified_intervalvars_forCD_111325.rds` — pre-processed EMA variables from the survey platform
-- `sber_ema_anon_20260227.csv` — raw survey responses (provides StartDate, num_waso, num_waso_estimate_am)
+- `<deidentified_ema_vars>.rds` — pre-processed EMA variables from the survey platform (study-specific deidentified export; real filename differs per study)
+- `<sber_ema_export>.csv` — raw survey responses (provides StartDate, num_waso, num_waso_estimate_am)
 
 The merge in step 1 uses row-order alignment (`df$StartDate <- full_df$StartDate`), not a keyed join. The CSV row order must exactly match the RDS. This is fragile — if the CSV is regenerated with different sorting, the merge silently corrupts.
 
@@ -316,7 +316,7 @@ NEEDS_REVIEW=731    CLEAN=13,204       CLEAN(Manually Fixed)=53  (= 94.4%)
 
 | Symptom | Likely Cause | Fix |
 |---------|-------------|-----|
-| `Error in readRDS` or `file not found` | Missing data files in working directory | Place `deidentified_intervalvars_forCD_111325.rds` and `sber_ema_anon_20260227.csv` in the working directory |
+| `Error in readRDS` or `file not found` | Missing data files in working directory | Place the study's deidentified RDS and CSV export files in the working directory |
 | `Error in read_csv("manual_error_corrections.csv")` | First run — reviewed CSV doesn't exist yet | Create empty placeholder CSVs (see First-Run Bootstrap above) |
 | Figures 13-18 empty | `checkforerrors_processing.R` not run before visualization | Ensure pipeline runs sequentially; step 8 must precede step 9 |
 | `object 'checkforerrors_processed' not found` | Running `sleep_visualization.R` standalone | Always run via `00_MAIN_entry.R`; the viz file is not self-contained |
