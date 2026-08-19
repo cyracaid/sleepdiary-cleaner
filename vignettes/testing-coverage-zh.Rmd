@@ -1,6 +1,6 @@
 ---
 title: "测试覆盖率（中文）"
-description: "12 个测试文件、190+ 条 testthat 断言：测试验证什么、怎么运行、snapshot 验证如何工作。"
+description: "16 个测试文件、200+ 条 testthat 断言：测试验证什么、怎么运行、snapshot 验证如何工作。"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{测试覆盖率（中文）}
@@ -12,7 +12,7 @@ vignette: >
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
-管线包含 12 个测试文件、190+ 条 testthat 断言，全部检验软件正确性——代码是否
+管线包含 16 个测试文件、200+ 条 testthat 断言，全部检验软件正确性——代码是否
 按设计跑——区别于方法学效度（后者见验证方法学 vignette）。
 
 ```{r setup, eval = FALSE}
@@ -35,6 +35,10 @@ library(splsleep)
 | `test-nonfinite-guards.R` | 时长与 flag-severity 评估器中的 NA/Inf 处理（两个真实 bug 的回归测试）|
 | `test-config-data.R` | 配置加载（RDS/CSV、旧键、列映射、友好报错）|
 | `test-script-copies-in-sync.R` | 每个双维护脚本在根目录与 `inst/scripts/` 的副本保持字节一致 |
+| `test-generated-docs-in-sync.R` | `docs-dev/` 下 AUTO 生成的文档与其提交版本保持字节一致 |
+| `test-global-leakage.R` | 管线内部变量永不泄漏到全局环境（步骤脚本交接的回归护栏） |
+| `test-internalised-in-sync.R` | `R/` 包封装与 `inst/scripts/` 步骤脚本保持同步（双维护回归门） |
+| `test-smoke-legacy-entry.R` | 旧版 `00_MAIN_entry.R` 自动运行路径（与 `run_pipeline()` 不同的代码路径）在沙箱子进程内端到端执行 |
 
 ## 如何运行测试
 

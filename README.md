@@ -42,7 +42,7 @@ Full documentation site (searchable function reference + vignettes, bilingual):
 - **R package**: `library(splsleep); run_pipeline()` — installable, versioned, dependency-managed
 - **Correction traceability**: `has_correction` enum column (none / algorithmic / manual / both) plus per-step audit ledger
 - **Column mapping**: `adapt_columns()` maps your dataset's column names to pipeline internals via YAML config — no code changes
-- **190+ tests**: covering correction engine, classification thresholds, auto-detection logic, config validation, and the finalize/guard delivery contract
+- **200+ tests**: covering correction engine, classification thresholds, auto-detection logic, config validation, and the finalize/guard delivery contract
 
 ## Pipeline Architecture
 
@@ -729,7 +729,7 @@ Step 7 (Compute metrics):
 
 ## Testing Coverage
 
-The pipeline includes 190+ testthat expectations across 12 test files, all exercising software correctness — does the code do what it was designed to do — as distinct from methodological validity, which is covered in [Validation](#validation) below.
+The pipeline includes 200+ testthat expectations across 16 test files, all exercising software correctness — does the code do what it was designed to do — as distinct from methodological validity, which is covered in [Validation](#validation) below.
 
 | Test File | Coverage |
 |-----------|----------|
@@ -745,6 +745,10 @@ The pipeline includes 190+ testthat expectations across 12 test files, all exerc
 | `test-nonfinite-guards.R` | NA/Inf handling in duration and flag-severity evaluators (regression tests for two real bugs) |
 | `test-config-data.R` | Config file loading (RDS/CSV, legacy keys, column mapping, friendly error messages) |
 | `test-script-copies-in-sync.R` | Root and `inst/scripts/` copies of every dual-maintained script stay byte-identical |
+| `test-generated-docs-in-sync.R` | AUTO-generated docs under `docs-dev/` stay byte-identical to their committed versions |
+| `test-global-leakage.R` | Pipeline internals never leak into the global environment between runs (regression guard for the step-script handoff) |
+| `test-internalised-in-sync.R` | `R/` package wrappers and the `inst/scripts/` step scripts stay in sync (dual-maintenance regression gate) |
+| `test-smoke-legacy-entry.R` | Legacy `00_MAIN_entry.R` auto-run path (different code path from `run_pipeline()`) executes end-to-end in a sandbox subprocess |
 
 Run tests with:
 
@@ -1193,7 +1197,7 @@ MIT
 - **R 包**：`library(splsleep); run_pipeline()` — 可安装、版本化
 - **修正追溯**：`has_correction` enum 列（none / algorithmic / manual / both）+ 每步审计账本
 - **列映射**：`adapt_columns()` 通过 YAML 配置映射数据集列名 — 无需修改代码
-- **190+ 个测试**（12 个测试文件）：覆盖修正引擎、分类阈值、自动检测逻辑、配置验证、`finalize_columns()` 交付契约——测的是"代码有没有按设计跑"，跟"设计本身站不站得住"是两回事，后者见下方[验证](#验证)一节
+- **200+ 个测试**（16 个测试文件）：覆盖修正引擎、分类阈值、自动检测逻辑、配置验证、`finalize_columns()` 交付契约——测的是"代码有没有按设计跑"，跟"设计本身站不站得住"是两回事，后者见下方[验证](#验证)一节
 
 ## 管线架构
 
@@ -1572,7 +1576,7 @@ identical(old$n_clean, new$n_clean)
 
 ## 测试覆盖率
 
-管线包含 12 个测试文件、190+ 条 testthat 断言，全部检验软件正确性——代码是否按设计跑——区别于方法学效度，后者见下方[验证](#验证)一节。
+管线包含 16 个测试文件、200+ 条 testthat 断言，全部检验软件正确性——代码是否按设计跑——区别于方法学效度，后者见下方[验证](#验证)一节。
 
 | 测试文件 | 覆盖 |
 |---|---|
@@ -1588,6 +1592,10 @@ identical(old$n_clean, new$n_clean)
 | `test-nonfinite-guards.R` | 时长与 flag-severity 评估器中的 NA/Inf 处理（两个真实 bug 的回归测试） |
 | `test-config-data.R` | 配置加载（RDS/CSV、旧键、列映射、友好报错） |
 | `test-script-copies-in-sync.R` | 每个双维护脚本在根目录与 `inst/scripts/` 的副本保持字节一致 |
+| `test-generated-docs-in-sync.R` | `docs-dev/` 下 AUTO 生成的文档与其提交版本保持字节一致 |
+| `test-global-leakage.R` | 管线内部变量永不泄漏到全局环境（步骤脚本交接的回归护栏） |
+| `test-internalised-in-sync.R` | `R/` 包封装与 `inst/scripts/` 步骤脚本保持同步（双维护回归门） |
+| `test-smoke-legacy-entry.R` | 旧版 `00_MAIN_entry.R` 自动运行路径（与 `run_pipeline()` 不同的代码路径）在沙箱子进程内端到端执行 |
 
 运行测试：
 
