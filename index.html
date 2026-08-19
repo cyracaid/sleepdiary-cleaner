@@ -511,7 +511,7 @@ Output: N records, each with additional classification columns
 <div class="section level2">
 <h2 id="data-format-text-only--templates-provided">Data Format (Text Only — Templates Provided)<a class="anchor" aria-label="anchor" href="#data-format-text-only--templates-provided"></a>
 </h2>
-<p><strong>This repository contains no raw participant data, no real identifiers, and no actual study responses.</strong> All CSV files containing participant data are excluded via <code>.gitignore</code> and purged from git history.</p>
+<p><strong>This repository contains no raw participant data, no real identifiers, and no actual study responses.</strong> All CSV files containing participant data are excluded via <code>.gitignore</code> and purged from git history. Older git history may mention the de-identified export filenames (“deidentified_intervalvars_forCD_111325”, “sber_ema_anon_20260227” — both <em>already anonymized</em> names); these strings contain no participant identifiers, the files themselves were never git-tracked, and the residue was assessed and deliberately kept (2026-08-19). Trigger for a history rewrite is only re-appearance of individually re-identifiable data, not naming residue.</p>
 <p>Template CSV files with synthetic data are in <a href="templates/"><code>templates/</code></a>. Copy these to create your own correction files.</p>
 <div class="section level3">
 <h3 id="input-data-structure-text-description">Input Data Structure (Text Description)<a class="anchor" aria-label="anchor" href="#input-data-structure-text-description"></a>
