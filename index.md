@@ -70,7 +70,7 @@ full changelog. Installable via
 
 ## Phase status
 
-- **Phase 1 — delivery pipeline (v1.4.0): complete.** Cleaning logic is
+- **Phase 1 — delivery pipeline (v1.4.3): complete.** Cleaning logic is
   frozen; this is the CLI release of the reproducible cleaning pipeline.
 - **Phase 2 — analytics** and **Phase 3 — methods paper: paused.**
   Deliberately deferred while Phase 1 is reviewed by the study team.
@@ -131,18 +131,18 @@ full changelog. Installable via
 
 **10 steps** (source: `inst/steps.yaml`):
 
-| Step | Label                                | Description                                                                   |
-|------|--------------------------------------|-------------------------------------------------------------------------------|
-| 1    | Load data                            | .rds/.csv auto-detected; schema validated; optional supplementary file merged |
-| 1.5  | Field-misentry check                 | SOL/WASO clock-time vs duration-field misentry detection on raw data          |
-| 2-4  | Parse & normalize (S3 chain)         | Parse timestamps → parse intervals → normalize sequence                       |
-| 5    | Classify records                     | Generate manual review CSVs for human approval                                |
-| 5.75 | Second-review consensus              | Apply second-review checklist consensus                                       |
-| 6-7  | Correct & compute metrics (S3 chain) | Manual + duration corrections; TST/SOL/WASO/SE metrics; has_correction enum   |
-| 8    | Auto-detect remaining issues         | TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED flag classification                   |
-| 8.5  | Cross-participant consistency check  | Global consistency audit across participants                                  |
-| 9    | Generate diagnostic figures          | 24 figures + figure_index.png contact sheet + RUN_INFO.txt                    |
-| 10   | Build delivered datasets             | finalize_columns() selects/renames to Dataset A/B per column dictionary       |
+| Step | Label                                | Description                                                                      |
+|------|--------------------------------------|----------------------------------------------------------------------------------|
+| 1    | Load data                            | .rds/.csv auto-detected; schema validated; optional supplementary file merged    |
+| 1.5  | Field-misentry check                 | SOL/WASO clock-time vs duration-field misentry detection on raw data             |
+| 2-4  | Parse & normalize (S3 chain)         | Parse timestamps → parse intervals → normalize sequence                          |
+| 5    | Classify records                     | Generate manual review CSVs for human approval                                   |
+| 5.75 | Second-review consensus              | Apply second-review checklist consensus                                          |
+| 6-7  | Correct & compute metrics (S3 chain) | Manual + duration corrections; TST/SOL/WASO/SE metrics; has_correction enum      |
+| 8    | Auto-detect remaining issues         | TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED flag classification                      |
+| 8.5  | Cross-participant consistency check  | Global consistency audit across participants                                     |
+| 9    | Generate diagnostic figures          | 30 figures (14 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt |
+| 10   | Build delivered datasets             | finalize_columns() selects/renames to Dataset A/B per column dictionary          |
 
 ### Classification Systems
 
@@ -1236,9 +1236,9 @@ disappears when the random seed changes is not a robust finding, so the
 the 3-spec intersection of D1 choices that survives across seeds — and
 the full factorial lives in the appendix as `spec_curve_full.csv`. D2’s
 44% is real within that grid but is treated as a warning to scrutinize
-the swap default, not as a headline robustness claim.
-`variance_decomposition.R` reads the full factorial; the main curve
-reports the D1-only subset.
+the swap default, not as a headline robustness claim. `multiverse.R`
+reads the full factorial and writes both curves; the main curve reports
+the D1-only subset.
 
 *Downstream — do the delivered metrics move?*
 
@@ -1299,10 +1299,12 @@ single known-weak family disclosed rather than hidden.
     decomposition.
 
 Full methodology, numeric results, and disclosed caveats for each
-completed item are written up in the dated logs under `work_logs/`
-(start from `work_logs/2026-08-12_week_work_log_summary_EN.md` / Chinese
-`2026-08-12_week_work_log_summary.md`) and, for the synthetic benchmark
-specifically, in `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md`.
+completed item are written up in
+`validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md` (synthetic
+benchmark) and in the validation vignette (see
+[Validation](#validation)). Dated run-by-run logs under `work_logs/` are
+intentionally not committed to the public repository (privacy cleanup,
+2026-08-17).
 
 ### Synthetic benchmark — glossary, how to run, where the numbers live
 
@@ -1414,7 +1416,7 @@ CSV 实际上从未被写盘，尽管管线日志一直报告”已保存”。�
 
 ## 阶段状态
 
-- **阶段 1 — 交付管线（v1.4.0）：已完成。**
+- **阶段 1 — 交付管线（v1.4.3）：已完成。**
   清洗逻辑已冻结；这是可复现清洗管线的 CLI 版本。
 - **阶段 2 — 分析**与**阶段 3 — 方法论文：暂停。**
   刻意延后，待研究团队评审阶段 1。
@@ -1464,18 +1466,18 @@ CSV 实际上从未被写盘，尽管管线日志一直报告”已保存”。�
 
 **10 个步骤**（来源：`inst/steps.yaml`）：
 
-| 步骤 | 名称                                 | 说明                                                                          |
-|------|--------------------------------------|-------------------------------------------------------------------------------|
-| 1    | Load data                            | .rds/.csv auto-detected; schema validated; optional supplementary file merged |
-| 1.5  | Field-misentry check                 | SOL/WASO clock-time vs duration-field misentry detection on raw data          |
-| 2-4  | Parse & normalize (S3 chain)         | Parse timestamps → parse intervals → normalize sequence                       |
-| 5    | Classify records                     | Generate manual review CSVs for human approval                                |
-| 5.75 | Second-review consensus              | Apply second-review checklist consensus                                       |
-| 6-7  | Correct & compute metrics (S3 chain) | Manual + duration corrections; TST/SOL/WASO/SE metrics; has_correction enum   |
-| 8    | Auto-detect remaining issues         | TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED flag classification                   |
-| 8.5  | Cross-participant consistency check  | Global consistency audit across participants                                  |
-| 9    | Generate diagnostic figures          | 24 figures + figure_index.png contact sheet + RUN_INFO.txt                    |
-| 10   | Build delivered datasets             | finalize_columns() selects/renames to Dataset A/B per column dictionary       |
+| 步骤 | 名称                                 | 说明                                                                             |
+|------|--------------------------------------|----------------------------------------------------------------------------------|
+| 1    | Load data                            | .rds/.csv auto-detected; schema validated; optional supplementary file merged    |
+| 1.5  | Field-misentry check                 | SOL/WASO clock-time vs duration-field misentry detection on raw data             |
+| 2-4  | Parse & normalize (S3 chain)         | Parse timestamps → parse intervals → normalize sequence                          |
+| 5    | Classify records                     | Generate manual review CSVs for human approval                                   |
+| 5.75 | Second-review consensus              | Apply second-review checklist consensus                                          |
+| 6-7  | Correct & compute metrics (S3 chain) | Manual + duration corrections; TST/SOL/WASO/SE metrics; has_correction enum      |
+| 8    | Auto-detect remaining issues         | TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED flag classification                      |
+| 8.5  | Cross-participant consistency check  | Global consistency audit across participants                                     |
+| 9    | Generate diagnostic figures          | 30 figures (14 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt |
+| 10   | Build delivered datasets             | finalize_columns() selects/renames to Dataset A/B per column dictionary          |
 
 ### 分类体系
 
@@ -2142,7 +2144,7 @@ D1。一个换随机种子就消失的维度不是稳健发现，所以*主*
 选择 的交集——全因子版本以附录形式放在 `spec_curve_full.csv`。D2 的 44%
 在该网格内
 真实存在，但只当作”先审查交换默认值”的警示，不作为头条稳健性声明。
-`variance_decomposition.R` 读全因子；主曲线报告 D1-only 子集。
+`multiverse.R` 读全因子并写出两条曲线；主曲线报告 D1-only 子集。
 
 *下游 — 交付指标动吗？*
 
@@ -2193,10 +2195,11 @@ D1-only 报告，D2 作为 已记录的敏感性警示而非头条声明；(2)
     队列，关掉修复规则会虚增 flag 数）—
     消融表作为补充材料加脚注报告；主证据是 multiverse 方差分解。
 
-已完成项目的完整方法、具体数字结果与已披露的局限性，写在 `work_logs/`
-下按日期归档的日志里（从 `work_logs/2026-08-12_week_work_log_summary.md`
-/ 英文版 `2026-08-12_week_work_log_summary_EN.md` 看起）；合成 benchmark
-部分单独写在 `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md`。
+已完成项目的完整方法、具体数字结果与已披露的局限性，写在
+`validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md`（合成
+benchmark）与 验证
+vignette（见上方[验证](#%E9%AA%8C%E8%AF%81)一节）。`work_logs/`
+下按日期归档的运行日志 有意不提交到公开仓库（2026-08-17 隐私清理）。
 
 ### 合成 benchmark —— 术语、如何运行、数字在哪
 

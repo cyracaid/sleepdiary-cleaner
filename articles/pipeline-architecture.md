@@ -36,18 +36,18 @@ library(splsleep)
 
 **10 steps** (source: `inst/steps.yaml`):
 
-| Step | Label                                | Description                                                                   |
-|------|--------------------------------------|-------------------------------------------------------------------------------|
-| 1    | Load data                            | .rds/.csv auto-detected; schema validated; optional supplementary file merged |
-| 1.5  | Field-misentry check                 | SOL/WASO clock-time vs duration-field misentry detection on raw data          |
-| 2-4  | Parse & normalize (S3 chain)         | Parse timestamps → parse intervals → normalize sequence                       |
-| 5    | Classify records                     | Generate manual review CSVs for human approval                                |
-| 5.75 | Second-review consensus              | Apply second-review checklist consensus                                       |
-| 6-7  | Correct & compute metrics (S3 chain) | Manual + duration corrections; TST/SOL/WASO/SE metrics; has_correction enum   |
-| 8    | Auto-detect remaining issues         | TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED flag classification                   |
-| 8.5  | Cross-participant consistency check  | Global consistency audit across participants                                  |
-| 9    | Generate diagnostic figures          | 24 figures + figure_index.png contact sheet + RUN_INFO.txt                    |
-| 10   | Build delivered datasets             | finalize_columns() selects/renames to Dataset A/B per column dictionary       |
+| Step | Label                                | Description                                                                      |
+|------|--------------------------------------|----------------------------------------------------------------------------------|
+| 1    | Load data                            | .rds/.csv auto-detected; schema validated; optional supplementary file merged    |
+| 1.5  | Field-misentry check                 | SOL/WASO clock-time vs duration-field misentry detection on raw data             |
+| 2-4  | Parse & normalize (S3 chain)         | Parse timestamps → parse intervals → normalize sequence                          |
+| 5    | Classify records                     | Generate manual review CSVs for human approval                                   |
+| 5.75 | Second-review consensus              | Apply second-review checklist consensus                                          |
+| 6-7  | Correct & compute metrics (S3 chain) | Manual + duration corrections; TST/SOL/WASO/SE metrics; has_correction enum      |
+| 8    | Auto-detect remaining issues         | TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED flag classification                      |
+| 8.5  | Cross-participant consistency check  | Global consistency audit across participants                                     |
+| 9    | Generate diagnostic figures          | 30 figures (14 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt |
+| 10   | Build delivered datasets             | finalize_columns() selects/renames to Dataset A/B per column dictionary          |
 
 ## Detection rule families
 

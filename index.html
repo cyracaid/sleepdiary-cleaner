@@ -89,7 +89,7 @@
 </h2>
 <ul>
 <li>
-<strong>Phase 1 — delivery pipeline (v1.4.0): complete.</strong> Cleaning logic is frozen; this is the CLI release of the reproducible cleaning pipeline.</li>
+<strong>Phase 1 — delivery pipeline (v1.4.3): complete.</strong> Cleaning logic is frozen; this is the CLI release of the reproducible cleaning pipeline.</li>
 <li>
 <strong>Phase 2 — analytics</strong> and <strong>Phase 3 — methods paper: paused.</strong> Deliberately deferred while Phase 1 is reviewed by the study team.</li>
 </ul>
@@ -201,7 +201,7 @@
 <tr class="odd">
 <td>9</td>
 <td>Generate diagnostic figures</td>
-<td>24 figures + figure_index.png contact sheet + RUN_INFO.txt</td>
+<td>30 figures (14 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt</td>
 </tr>
 <tr class="even">
 <td>10</td>
@@ -1945,7 +1945,7 @@ and read its detailed interpretation.</code></pre>
 </tr>
 </tbody>
 </table>
-<p>The swap-threshold choice looks like the dominant design decision in the full grid. <strong>But D2 is seed-fragile</strong>: one-at-a-time (OAT) screening under seed 20260817 keeps D1 + D2 as the surviving dimensions, while seed 20260915 reduces the surviving set to D1 only. A dimension that disappears when the random seed changes is not a robust finding, so the <em>main</em> specification curve (<code>spec_curve.csv</code>) is reported <strong>D1-only</strong> — the 3-spec intersection of D1 choices that survives across seeds — and the full factorial lives in the appendix as <code>spec_curve_full.csv</code>. D2’s 44% is real within that grid but is treated as a warning to scrutinize the swap default, not as a headline robustness claim. <code>variance_decomposition.R</code> reads the full factorial; the main curve reports the D1-only subset.</p>
+<p>The swap-threshold choice looks like the dominant design decision in the full grid. <strong>But D2 is seed-fragile</strong>: one-at-a-time (OAT) screening under seed 20260817 keeps D1 + D2 as the surviving dimensions, while seed 20260915 reduces the surviving set to D1 only. A dimension that disappears when the random seed changes is not a robust finding, so the <em>main</em> specification curve (<code>spec_curve.csv</code>) is reported <strong>D1-only</strong> — the 3-spec intersection of D1 choices that survives across seeds — and the full factorial lives in the appendix as <code>spec_curve_full.csv</code>. D2’s 44% is real within that grid but is treated as a warning to scrutinize the swap default, not as a headline robustness claim. <code>multiverse.R</code> reads the full factorial and writes both curves; the main curve reports the D1-only subset.</p>
 <p><em>Downstream — do the delivered metrics move?</em></p>
 <table class="table">
 <thead><tr class="header">
@@ -2011,7 +2011,7 @@ and read its detailed interpretation.</code></pre>
 <li>
 <strong>Ablation recall uses a flag-based definition</strong> (AUTO_FIXed records never enter the flag queue, so disabling a fixing rule inflates the flag count) — the ablation table is reported as supplementary with a footnote; the primary evidence is the multiverse variance decomposition.</li>
 </ol>
-<p>Full methodology, numeric results, and disclosed caveats for each completed item are written up in the dated logs under <code>work_logs/</code> (start from <code>work_logs/2026-08-12_week_work_log_summary_EN.md</code> / Chinese <code>2026-08-12_week_work_log_summary.md</code>) and, for the synthetic benchmark specifically, in <code>validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md</code>.</p>
+<p>Full methodology, numeric results, and disclosed caveats for each completed item are written up in <code>validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md</code> (synthetic benchmark) and in the validation vignette (see <a href="#validation">Validation</a>). Dated run-by-run logs under <code>work_logs/</code> are intentionally not committed to the public repository (privacy cleanup, 2026-08-17).</p>
 </div>
 <div class="section level3">
 <h3 id="synthetic-benchmark--glossary-how-to-run-where-the-numbers-live">Synthetic benchmark — glossary, how to run, where the numbers live<a class="anchor" aria-label="anchor" href="#synthetic-benchmark--glossary-how-to-run-where-the-numbers-live"></a>
@@ -2080,7 +2080,7 @@ and read its detailed interpretation.</code></pre>
 </h2>
 <ul>
 <li>
-<strong>阶段 1 — 交付管线（v1.4.0）：已完成。</strong> 清洗逻辑已冻结；这是可复现清洗管线的 CLI 版本。</li>
+<strong>阶段 1 — 交付管线（v1.4.3）：已完成。</strong> 清洗逻辑已冻结；这是可复现清洗管线的 CLI 版本。</li>
 <li>
 <strong>阶段 2 — 分析</strong>与<strong>阶段 3 — 方法论文：暂停。</strong> 刻意延后，待研究团队评审阶段 1。</li>
 </ul>
@@ -2187,7 +2187,7 @@ and read its detailed interpretation.</code></pre>
 <tr class="odd">
 <td>9</td>
 <td>Generate diagnostic figures</td>
-<td>24 figures + figure_index.png contact sheet + RUN_INFO.txt</td>
+<td>30 figures (14 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt</td>
 </tr>
 <tr class="even">
 <td>10</td>
@@ -3326,7 +3326,7 @@ verification/synth_n&lt;行数&gt;/                     ← 稳定的合成数�
 </tr>
 </tbody>
 </table>
-<p>在全因子网格里交换阈值看起来是主导性设计决策（44% 的变异）。<strong>但 D2 是 seed 脆弱的</strong>：OAT 筛查在 seed 20260817 下保留 D1 + D2 两个存活维度，而 seed 20260915 下只剩 D1。一个换随机种子就消失的维度不是稳健发现，所以<em>主</em> 规格曲线（<code>spec_curve.csv</code>）按 <strong>D1-only</strong> 报告——跨 seed 存活的 3 个 D1 选择 的交集——全因子版本以附录形式放在 <code>spec_curve_full.csv</code>。D2 的 44% 在该网格内 真实存在，但只当作”先审查交换默认值”的警示，不作为头条稳健性声明。 <code>variance_decomposition.R</code> 读全因子；主曲线报告 D1-only 子集。</p>
+<p>在全因子网格里交换阈值看起来是主导性设计决策（44% 的变异）。<strong>但 D2 是 seed 脆弱的</strong>：OAT 筛查在 seed 20260817 下保留 D1 + D2 两个存活维度，而 seed 20260915 下只剩 D1。一个换随机种子就消失的维度不是稳健发现，所以<em>主</em> 规格曲线（<code>spec_curve.csv</code>）按 <strong>D1-only</strong> 报告——跨 seed 存活的 3 个 D1 选择 的交集——全因子版本以附录形式放在 <code>spec_curve_full.csv</code>。D2 的 44% 在该网格内 真实存在，但只当作”先审查交换默认值”的警示，不作为头条稳健性声明。 <code>multiverse.R</code> 读全因子并写出两条曲线；主曲线报告 D1-only 子集。</p>
 <p><em>下游 — 交付指标动吗？</em></p>
 <table class="table">
 <thead><tr class="header">
@@ -3388,7 +3388,7 @@ verification/synth_n&lt;行数&gt;/                     ← 稳定的合成数�
 <li>
 <strong>消融 recall 采用 flag 口径</strong>（AUTO_FIX 记录从不进 flag 队列，关掉修复规则会虚增 flag 数）— 消融表作为补充材料加脚注报告；主证据是 multiverse 方差分解。</li>
 </ol>
-<p>已完成项目的完整方法、具体数字结果与已披露的局限性，写在 <code>work_logs/</code> 下按日期归档的日志里（从 <code>work_logs/2026-08-12_week_work_log_summary.md</code> / 英文版 <code>2026-08-12_week_work_log_summary_EN.md</code> 看起）；合成 benchmark 部分单独写在 <code>validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md</code>。</p>
+<p>已完成项目的完整方法、具体数字结果与已披露的局限性，写在 <code>validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md</code>（合成 benchmark）与 验证 vignette（见上方<a href="#%E9%AA%8C%E8%AF%81">验证</a>一节）。<code>work_logs/</code> 下按日期归档的运行日志 有意不提交到公开仓库（2026-08-17 隐私清理）。</p>
 </div>
 <div class="section level3">
 <h3 id="合成-benchmark--术语如何运行数字在哪">合成 benchmark —— 术语、如何运行、数字在哪<a class="anchor" aria-label="anchor" href="#%E5%90%88%E6%88%90-benchmark--%E6%9C%AF%E8%AF%AD%E5%A6%82%E4%BD%95%E8%BF%90%E8%A1%8C%E6%95%B0%E5%AD%97%E5%9C%A8%E5%93%AA"></a>
