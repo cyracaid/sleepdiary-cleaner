@@ -1071,8 +1071,8 @@ curve (`spec_curve.csv`) is reported **D1-only** — the 3-spec intersection of
 D1 choices that survives across seeds — and the full factorial lives in the
 appendix as `spec_curve_full.csv`. D2's 44% is real within that grid but is
 treated as a warning to scrutinize the swap default, not as a headline
-robustness claim. `variance_decomposition.R` reads the full factorial; the
-main curve reports the D1-only subset.
+robustness claim. `multiverse.R` reads the full factorial and writes both
+curves; the main curve reports the D1-only subset.
 
 *Downstream — do the delivered metrics move?*
 
@@ -1129,7 +1129,7 @@ FAR 0), with the single known-weak family disclosed rather than hidden.
    the ablation table is reported as supplementary with a footnote; the primary
    evidence is the multiverse variance decomposition.
 
-Full methodology, numeric results, and disclosed caveats for each completed item are written up in the dated logs under `work_logs/` (start from `work_logs/2026-08-12_week_work_log_summary_EN.md` / Chinese `2026-08-12_week_work_log_summary.md`) and, for the synthetic benchmark specifically, in `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md`.
+Full methodology, numeric results, and disclosed caveats for each completed item are written up in `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md` (synthetic benchmark) and in the validation vignette (see [Validation](#validation)). Dated run-by-run logs under `work_logs/` are intentionally not committed to the public repository (privacy cleanup, 2026-08-17).
 
 ### Synthetic benchmark — glossary, how to run, where the numbers live
 
@@ -1808,7 +1808,7 @@ seed 20260915 下只剩 D1。一个换随机种子就消失的维度不是稳健
 规格曲线（`spec_curve.csv`）按 **D1-only** 报告——跨 seed 存活的 3 个 D1 选择
 的交集——全因子版本以附录形式放在 `spec_curve_full.csv`。D2 的 44% 在该网格内
 真实存在，但只当作"先审查交换默认值"的警示，不作为头条稳健性声明。
-`variance_decomposition.R` 读全因子；主曲线报告 D1-only 子集。
+`multiverse.R` 读全因子并写出两条曲线；主曲线报告 D1-only 子集。
 
 *下游 — 交付指标动吗？*
 
@@ -1849,7 +1849,10 @@ SOL 自报落在 ±75 分钟噪声带内，所以 SOL 是清洗选择与感知�
 2. **SOL flag 阈值落在自报 SOL 的 ±75 分钟 Bland-Altman 噪声带内** — SOL flag 是导向人工审查的描述性指标，不是自动化错误信号（代码已验证：`flag_severity` 不喂任何修正路径）。WASO 阈值高出噪声地板 3.3×。
 3. **消融 recall 采用 flag 口径**（AUTO_FIX 记录从不进 flag 队列，关掉修复规则会虚增 flag 数）— 消融表作为补充材料加脚注报告；主证据是 multiverse 方差分解。
 
-已完成项目的完整方法、具体数字结果与已披露的局限性，写在 `work_logs/` 下按日期归档的日志里（从 `work_logs/2026-08-12_week_work_log_summary.md` / 英文版 `2026-08-12_week_work_log_summary_EN.md` 看起）；合成 benchmark 部分单独写在 `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md`。
+已完成项目的完整方法、具体数字结果与已披露的局限性，写在
+`validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md`（合成 benchmark）与
+验证 vignette（见上方[验证](#验证)一节）。`work_logs/` 下按日期归档的运行日志
+有意不提交到公开仓库（2026-08-17 隐私清理）。
 
 ### 合成 benchmark —— 术语、如何运行、数字在哪
 
