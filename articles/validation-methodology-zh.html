@@ -114,8 +114,9 @@ truth：没有人能确定参与者在时长字段里填「10:30」时
 
   鲁棒性层（选择要紧吗？）
   ────────────────────────────────────────────
-  第 8 步：Multiverse + 下游 + seed ─── D2 = 44%（交换阈值主导）；
-           TST 稳健、SOL 敏感（12.1–48.4 分钟）；
+  第 8 步：Multiverse + 下游 + seed ─── 全网格：D2 = 44%
+           （seed 脆弱 → 主曲线 D1-only，全因子进附录）；
+           TST 稳健、SOL 敏感（22.7–58.1 分钟）；
            跨 seed recall 稳定 0.993–0.995</code></pre>
 </div>
 <div class="section level2">
@@ -397,7 +398,8 @@ SOL、可分析 n。</li>
 <tbody>
 <tr class="odd">
 <td>D2（相邻交换阈值）</td>
-<td><strong>44%</strong></td>
+<td>
+<strong>44%</strong>（seed 脆弱）</td>
 </tr>
 <tr class="even">
 <td>D1（AM/PM 翻转触发）</td>
@@ -409,6 +411,11 @@ SOL、可分析 n。</li>
 </tr>
 </tbody>
 </table>
+<p>D2 的 44% 只在全因子网格内成立且 <strong>seed 脆弱</strong>：OAT
+筛查在 seed 20260817 下 保留 D1 + D2，但在 seed 20260915 下只剩
+D1。<em>主</em>规格曲线因此按 <strong>D1-only</strong> 报告（3
+个规格——跨 seed 交集），全因子版本以附录形式放在
+<code>spec_curve_full.csv</code>。</p>
 <p><em>下游 — 交付指标动吗？</em></p>
 <table class="table">
 <thead><tr class="header">
@@ -419,19 +426,19 @@ SOL、可分析 n。</li>
 <tbody>
 <tr class="odd">
 <td>平均 TST（小时）</td>
-<td>7.89</td>
-<td>[7.76, 7.92] — 稳健（±0.08 小时）</td>
+<td>8.06</td>
+<td>[8.06, 8.07] — 稳健（±0.01 小时）</td>
 </tr>
 <tr class="even">
 <td>平均 SOL（分钟）</td>
-<td>20.7</td>
-<td>[12.1, 48.4] — <strong>敏感</strong>
+<td>31.2</td>
+<td>[22.7, 58.1] — <strong>敏感</strong>
 </td>
 </tr>
 <tr class="odd">
 <td>可分析 n</td>
-<td>6,611</td>
-<td>[6,333, 6,692]</td>
+<td>6,581</td>
+<td>[6,327, 6,660]</td>
 </tr>
 </tbody>
 </table>
@@ -443,9 +450,10 @@ SOL、可分析 n。</li>
 全为 0；唯一摆动（0.886–0.907）的族是已知最弱族
 <code>cross_participant_spike</code>——已披露为 audit-only。</p>
 <p><strong>意味着。</strong> 三个独立问题、三个清晰答案：(1)
-<em>哪个决策最重要？</em> — 交换阈值，占变异 44%；(2)
-<em>哪些结论稳健？</em> — TST 是（±0.08 小时），SOL 否（12–48
-分钟），而且我们现在知道原因（感知偏差，第 5.5 步）；(3)
+<em>哪个决策最重要？</em> — 交换阈值占 全因子网格变异 44%，但该占比 seed
+脆弱，所以主曲线是 D1-only，D2 作为已记录的 敏感性警示；(2)
+<em>哪些结论稳健？</em> — TST 是（D1-only 主曲线 ±0.01 小时），SOL 否
+（23–58 分钟），而且我们现在知道原因（感知偏差，第 5.5 步）；(3)
 <em>数字可复现吗？</em> — 跨 seed 是（recall 0.993–0.995，FAR
 0），唯一已知弱族被披露而非隐藏。</p>
 </div>

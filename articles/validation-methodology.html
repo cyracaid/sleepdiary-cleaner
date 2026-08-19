@@ -120,9 +120,10 @@ a different way, and is deliberately independent of the others.</p>
 
   ROBUSTNESS TIER (does the choice matter?)
   ────────────────────────────────────────────────────────────
-  Step 8: Multiverse + downstream + seeds ── D2 = 44% (swap
-          threshold dominates); TST robust, SOL sensitive
-          (12.1–48.4 min); recall stable 0.993–0.995 across seeds</code></pre>
+  Step 8: Multiverse + downstream + seeds ── full grid: D2 = 44%
+          (seed-fragile → main curve D1-only, full factorial in
+          appendix); TST robust, SOL sensitive (22.7–58.1 min);
+          recall stable 0.993–0.995 across seeds</code></pre>
 </div>
 <div class="section level2">
 <h2 id="step-1-does-the-pipeline-touch-clean-data-clean-input-specificity">Step 1 — Does the pipeline touch clean data? (clean-input
@@ -472,7 +473,8 @@ move.</li>
 <tbody>
 <tr class="odd">
 <td>D2 (adjacent-swap threshold)</td>
-<td><strong>44%</strong></td>
+<td>
+<strong>44%</strong> (seed-fragile)</td>
 </tr>
 <tr class="even">
 <td>D1 (AM/PM flip trigger)</td>
@@ -484,6 +486,13 @@ move.</li>
 </tr>
 </tbody>
 </table>
+<p>D2’s 44% holds only inside the full factorial grid and is
+<strong>seed-fragile</strong>: one-at-a-time (OAT) screening keeps D1 +
+D2 under seed 20260817 but reduces the surviving set to D1 only under
+seed 20260915. The <em>main</em> specification curve is therefore
+reported <strong>D1-only</strong> (3 specs — the cross-seed
+intersection), and the full factorial lives in the appendix as
+<code>spec_curve_full.csv</code>.</p>
 <p><em>Downstream — do the delivered metrics move?</em></p>
 <table class="table">
 <thead><tr class="header">
@@ -494,19 +503,19 @@ move.</li>
 <tbody>
 <tr class="odd">
 <td>mean TST (h)</td>
-<td>7.89</td>
-<td>[7.76, 7.92] — robust (±0.08 h)</td>
+<td>8.06</td>
+<td>[8.06, 8.07] — robust (±0.01 h)</td>
 </tr>
 <tr class="even">
 <td>mean SOL (min)</td>
-<td>20.7</td>
-<td>[12.1, 48.4] — <strong>sensitive</strong>
+<td>31.2</td>
+<td>[22.7, 58.1] — <strong>sensitive</strong>
 </td>
 </tr>
 <tr class="odd">
 <td>analyzable n</td>
-<td>6,611</td>
-<td>[6,333, 6,692]</td>
+<td>6,581</td>
+<td>[6,327, 6,660]</td>
 </tr>
 </tbody>
 </table>
@@ -520,12 +529,14 @@ control FAR 0 in all; the one family that wobbles (0.886–0.907) is the
 known-weak <code>cross_participant_spike</code> — already disclosed as
 audit-only below.</p>
 <p><strong>Meaning.</strong> Three separate questions, three clear
-answers: (1) <em>which decision matters most?</em> — the swap threshold,
-at 44% of variation; (2) <em>which conclusions are robust?</em> — TST
-yes (±0.08 h), SOL no (12–48 min), and we now know why (perception bias,
-Step 5.5); (3) <em>are the numbers reproducible?</em> — yes across seeds
-(recall 0.993–0.995, FAR 0), with the single known-weak family disclosed
-rather than hidden.</p>
+answers: (1) <em>which decision matters most?</em> — the swap threshold
+dominates the full grid at 44% of variation, but that share is
+seed-fragile, so the main curve is D1-only and D2 is a documented
+sensitivity warning; (2) <em>which conclusions are robust?</em> — TST
+yes (±0.01 h on the D1-only main curve), SOL no (23–58 min), and we now
+know why (perception bias, Step 5.5); (3) <em>are the numbers
+reproducible?</em> — yes across seeds (recall 0.993–0.995, FAR 0), with
+the single known-weak family disclosed rather than hidden.</p>
 </div>
 <div class="section level2">
 <h2 id="honest-caveats-read-before-using-any-number">Honest caveats (read before using any number)<a class="anchor" aria-label="anchor" href="#honest-caveats-read-before-using-any-number"></a>

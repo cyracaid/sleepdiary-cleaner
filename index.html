@@ -99,7 +99,7 @@
 </h2>
 <ul>
 <li>
-<strong>9-step pipeline</strong>: raw data → timestamp parsing → interval processing → temporal correction → duration correction → metric computation → auto-detection → cross-participant consistency → visualization</li>
+<strong>10-step pipeline</strong>: raw data → timestamp parsing → interval processing → temporal correction → duration correction → metric computation → auto-detection → cross-participant consistency → visualization → final column finalization</li>
 <li>
 <strong>Manual correction CSV workflow</strong>: human review decisions stored in CSVs, re-read on each pipeline run</li>
 <li>
@@ -1706,9 +1706,10 @@ and read its detailed interpretation.</code></pre>
 
   ROBUSTNESS TIER (does the choice matter?)
   ────────────────────────────────────────────────────────────
-  Step 8: Multiverse + downstream + seeds ── D2 = 44% (swap
-          threshold dominates); TST robust, SOL sensitive
-          (12.1–48.4 min); recall stable 0.993–0.995 across seeds</code></pre>
+  Step 8: Multiverse + downstream + seeds ── full grid: D2 = 44%
+          (seed-fragile → main curve D1-only, full factorial in
+          appendix); TST robust, SOL sensitive (22.7–58.1 min);
+          recall stable 0.993–0.995 across seeds</code></pre>
 <div class="section level3">
 <h3 id="step-1--does-the-pipeline-touch-clean-data-clean-input-specificity">Step 1 — Does the pipeline touch clean data? (clean-input specificity)<a class="anchor" aria-label="anchor" href="#step-1--does-the-pipeline-touch-clean-data-clean-input-specificity"></a>
 </h3>
@@ -1898,7 +1899,7 @@ and read its detailed interpretation.</code></pre>
 <p><strong>What we do.</strong> Three analyses, in increasing order of scope:</p>
 <ol style="list-style-type: decimal">
 <li>
-<strong>Multiverse analysis (specification curve).</strong> Define the cleaning choices that are genuinely open (continuous thresholds — 12 h, 3 h, midnight 6, mmss 60, SOL 120/180, SE 70, WASO 1.5, TST/TIB 0.5, CP 4× — plus discrete branches: which rows to trust, cross-participant layer on/off, manual-review layer on/off). Hard constraints are excluded (those are logic, not choice). Screen with one-at-a-time (OAT) runs, then a full factorial grid; each spec runs the real pipeline and records the same outputs. Two output contracts: a <strong>specification curve</strong> (Simonsohn-style plot of the metric across all specs) and a <strong>variance decomposition</strong> (how much of the variation each dimension explains). Script: <code>validation/synthetic/multiverse.R</code>; results in <code>results/multiverse/</code> (<code>spec_curve.csv</code>, <code>variance_decomposition.csv</code>, <code>instability.csv</code>, <code>oat_screening.csv</code>).</li>
+<strong>Multiverse analysis (specification curve).</strong> Define the cleaning choices that are genuinely open (continuous thresholds — 12 h, 3 h, midnight 6, mmss 60, SOL 120/180, SE 70, WASO 1.5, TST/TIB 0.5, CP 4× — plus discrete branches: which rows to trust, cross-participant layer on/off, manual-review layer on/off). Hard constraints are excluded (those are logic, not choice). Screen with one-at-a-time (OAT) runs, then a full factorial grid; each spec runs the real pipeline and records the same outputs. Two output contracts: a <strong>specification curve</strong> (Simonsohn-style plot of the metric across all specs) and a <strong>variance decomposition</strong> (how much of the variation each dimension explains). Script: <code>validation/synthetic/multiverse.R</code>; results in <code>validation/synthetic/results/multiverse/</code> (<code>spec_curve.csv</code>, <code>variance_decomposition.csv</code>, <code>instability.csv</code>, <code>oat_screening.csv</code>).</li>
 <li>
 <strong>Downstream sensitivity.</strong> The same grid, but measuring the <em>deliverable</em> quantities the study team actually uses: mean TST, mean SOL, and analyzable n (records that survive the cleaning decisions). Script: <code>validation/synthetic/downstream_sensitivity.R</code>.</li>
 <li>
@@ -1906,6 +1907,7 @@ and read its detailed interpretation.</code></pre>
 </ol>
 <p><strong>Result.</strong></p>
 <p><em>Multiverse — which choice dominates?</em></p>
+<p>Full-factorial variance decomposition (<code>spec_curve_full.csv</code>, 9 specs):</p>
 <table class="table">
 <thead><tr class="header">
 <th>Dimension</th>
@@ -1926,7 +1928,7 @@ and read its detailed interpretation.</code></pre>
 </tr>
 </tbody>
 </table>
-<p>The swap-threshold choice is the dominant design decision: 44% of the variation in outcomes across specs comes from that one parameter. This is why the multiverse exists — it tells us <em>where</em> the pipeline’s behavior is most sensitive, so a user knows which default to scrutinize first.</p>
+<p>The swap-threshold choice looks like the dominant design decision in the full grid. <strong>But D2 is seed-fragile</strong>: one-at-a-time (OAT) screening under seed 20260817 keeps D1 + D2 as the surviving dimensions, while seed 20260915 reduces the surviving set to D1 only. A dimension that disappears when the random seed changes is not a robust finding, so the <em>main</em> specification curve (<code>spec_curve.csv</code>) is reported <strong>D1-only</strong> — the 3-spec intersection of D1 choices that survives across seeds — and the full factorial lives in the appendix as <code>spec_curve_full.csv</code>. D2’s 44% is real within that grid but is treated as a warning to scrutinize the swap default, not as a headline robustness claim. <code>variance_decomposition.R</code> reads the full factorial; the main curve reports the D1-only subset.</p>
 <p><em>Downstream — do the delivered metrics move?</em></p>
 <table class="table">
 <thead><tr class="header">
@@ -1937,19 +1939,19 @@ and read its detailed interpretation.</code></pre>
 <tbody>
 <tr class="odd">
 <td>mean TST (h)</td>
-<td>7.89</td>
-<td>[7.76, 7.92] — robust (±0.08 h)</td>
+<td>8.06</td>
+<td>[8.06, 8.07] — robust (±0.01 h)</td>
 </tr>
 <tr class="even">
 <td>mean SOL (min)</td>
-<td>20.7</td>
-<td>[12.1, 48.4] — <strong>sensitive</strong>
+<td>31.2</td>
+<td>[22.7, 58.1] — <strong>sensitive</strong>
 </td>
 </tr>
 <tr class="odd">
 <td>analyzable n</td>
-<td>6,611</td>
-<td>[6,333, 6,692]</td>
+<td>6,581</td>
+<td>[6,327, 6,660]</td>
 </tr>
 </tbody>
 </table>
@@ -1979,7 +1981,7 @@ and read its detailed interpretation.</code></pre>
 </table>
 <p>These are not errors — they are the honest range of what a <em>different reasonable</em> decision produces. The study team needs to know this range before interpreting any single number.</p>
 <p><em>Seed — 换随机种子数字动吗？</em> pooled recall stable at 0.993–0.995 across 4 seeds, control FAR 0 in all; the one family that wobbles (0.886–0.907) is the known-weak <code>cross_participant_spike</code> — already disclosed as audit-only in the caveats below. Full per-seed table in <code>seed_sensitivity.csv</code>.</p>
-<p><strong>Meaning.</strong> Three separate questions, three clear answers: (1) <em>which decision matters most?</em> — the swap threshold, at 44% of variation, so that default is the one to document and defend; (2) <em>which conclusions are robust?</em> — TST yes (±0.08 h), SOL no (12–48 min), and we now know why (perception bias, Step 5.5); (3) <em>are the numbers reproducible?</em> — yes across seeds (recall 0.993–0.995, FAR 0), with the single known-weak family disclosed rather than hidden.</p>
+<p><strong>Meaning.</strong> Three separate questions, three clear answers: (1) <em>which decision matters most?</em> — within the full grid, the swap threshold dominates at 44% of variation, but that share is seed-fragile, so the main curve is reported D1-only and D2 is a documented sensitivity warning, not a headline claim; (2) <em>which conclusions are robust?</em> — TST yes (±0.01 h on the D1-only main curve), SOL no (23–58 min), and we now know why (perception bias, Step 5.5); (3) <em>are the numbers reproducible?</em> — yes across seeds (recall 0.993–0.995, FAR 0), with the single known-weak family disclosed rather than hidden.</p>
 </div>
 <div class="section level3">
 <h3 id="honest-caveats-read-before-using-any-number">Honest caveats (read before using any number)<a class="anchor" aria-label="anchor" href="#honest-caveats-read-before-using-any-number"></a>
@@ -2006,7 +2008,7 @@ and read its detailed interpretation.</code></pre>
 <li>
 <strong>Enriched sampling</strong> — each of the 12 error categories is injected to a fixed target count (e.g. 400), not at the empirically observed real-world rate. Rare error types would otherwise get too few samples to measure; the per-category table therefore reports detection rates, not prevalence.</li>
 <li>
-<strong>L1/L2/L3</strong> — verification depth tiers: L1 = any flag raised, L3 = value corrected correctly, L2 = <em>type</em> also correct. All three are computed per category (<code>results/l2_tier.csv</code>). The headline uses L1 (detection); L3 is the stricter value-correctness number — e.g. <code>ampm_swap</code> L1 1.0 / L3 0.565, because uncertain restorations go to human review.</li>
+<strong>L1/L2/L3</strong> — verification depth tiers: L1 = any flag raised, L3 = value corrected correctly, L2 = <em>type</em> also correct. All three are computed per category (<code>validation/synthetic/results/l2_tier.csv</code>). The headline uses L1 (detection); L3 is the stricter value-correctness number — e.g. <code>ampm_swap</code> L1 1.0 / L3 0.565, because uncertain restorations go to human review.</li>
 </ul>
 <p><strong>How to run it.</strong></p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="co"># from the repo root, after renv::restore() and installing splsleep</span></span>
@@ -3068,8 +3070,9 @@ verification/synth_n&lt;行数&gt;/                     ← 稳定的合成数�
 
   鲁棒性层（选择要紧吗？）
   ────────────────────────────────────────────
-  第 8 步：Multiverse + 下游 + seed ─── D2 = 44%（交换阈值主导）；
-           TST 稳健、SOL 敏感（12.1–48.4 分钟）；
+  第 8 步：Multiverse + 下游 + seed ─── 全网格：D2 = 44%
+           （seed 脆弱 → 主曲线 D1-only，全因子进附录）；
+           TST 稳健、SOL 敏感（22.7–58.1 分钟）；
            跨 seed recall 稳定 0.993–0.995</code></pre>
 <div class="section level3">
 <h3 id="第-1-步--管线会碰干净数据吗干净输入特异度">第 1 步 — 管线会碰干净数据吗？（干净输入特异度）<a class="anchor" aria-label="anchor" href="#%E7%AC%AC-1-%E6%AD%A5--%E7%AE%A1%E7%BA%BF%E4%BC%9A%E7%A2%B0%E5%B9%B2%E5%87%80%E6%95%B0%E6%8D%AE%E5%90%97%E5%B9%B2%E5%87%80%E8%BE%93%E5%85%A5%E7%89%B9%E5%BC%82%E5%BA%A6"></a>
@@ -3260,7 +3263,7 @@ verification/synth_n&lt;行数&gt;/                     ← 稳定的合成数�
 <p><strong>做什么。</strong> 三个分析，范围递增：</p>
 <ol style="list-style-type: decimal">
 <li>
-<strong>Multiverse 分析（规格曲线）。</strong> 定义真正开放的清洗选择（连续阈值——12h、 3h、midnight 6、mmss 60、SOL 120/180、SE 70、WASO 1.5、TST/TIB 0.5、CP 4×—— 加上离散分支：信任哪些行、跨参与者层开关、人工审查层开关）。硬约束排除 （那是逻辑，不是选择）。先用 one-at-a-time（OAT）筛选，再跑全因子网格；每个 规格跑真实管线并记录相同输出。两个输出契约：<strong>规格曲线</strong>（Simonsohn 风格， 全部规格上的指标图）与<strong>方差分解</strong>（每个维度解释多少变异）。脚本： <code>validation/synthetic/multiverse.R</code>；结果在 <code>results/multiverse/</code> （<code>spec_curve.csv</code>、<code>variance_decomposition.csv</code>、<code>instability.csv</code>、 <code>oat_screening.csv</code>）。</li>
+<strong>Multiverse 分析（规格曲线）。</strong> 定义真正开放的清洗选择（连续阈值——12h、 3h、midnight 6、mmss 60、SOL 120/180、SE 70、WASO 1.5、TST/TIB 0.5、CP 4×—— 加上离散分支：信任哪些行、跨参与者层开关、人工审查层开关）。硬约束排除 （那是逻辑，不是选择）。先用 one-at-a-time（OAT）筛选，再跑全因子网格；每个 规格跑真实管线并记录相同输出。两个输出契约：<strong>规格曲线</strong>（Simonsohn 风格， 全部规格上的指标图）与<strong>方差分解</strong>（每个维度解释多少变异）。脚本： <code>validation/synthetic/multiverse.R</code>；结果在 <code>validation/synthetic/results/multiverse/</code> （<code>spec_curve.csv</code>、<code>variance_decomposition.csv</code>、<code>instability.csv</code>、 <code>oat_screening.csv</code>）。</li>
 <li>
 <strong>下游敏感性。</strong> 同一网格，但测量研究团队实际使用的<em>交付量</em>：平均 TST、 平均 SOL、可分析 n（经受住清洗决策的记录数）。脚本： <code>validation/synthetic/downstream_sensitivity.R</code>。</li>
 <li>
@@ -3288,7 +3291,7 @@ verification/synth_n&lt;行数&gt;/                     ← 稳定的合成数�
 </tr>
 </tbody>
 </table>
-<p>交换阈值选择是主导性设计决策：跨规格结果变异的 44% 来自这一个参数。这正是 multiverse 存在的意义——它告诉我们管线行为<em>哪里</em>最敏感，让用户知道先审查 哪个默认值。</p>
+<p>在全因子网格里交换阈值看起来是主导性设计决策（44% 的变异）。<strong>但 D2 是 seed 脆弱的</strong>：OAT 筛查在 seed 20260817 下保留 D1 + D2 两个存活维度，而 seed 20260915 下只剩 D1。一个换随机种子就消失的维度不是稳健发现，所以<em>主</em> 规格曲线（<code>spec_curve.csv</code>）按 <strong>D1-only</strong> 报告——跨 seed 存活的 3 个 D1 选择 的交集——全因子版本以附录形式放在 <code>spec_curve_full.csv</code>。D2 的 44% 在该网格内 真实存在，但只当作”先审查交换默认值”的警示，不作为头条稳健性声明。 <code>variance_decomposition.R</code> 读全因子；主曲线报告 D1-only 子集。</p>
 <p><em>下游 — 交付指标动吗？</em></p>
 <table class="table">
 <thead><tr class="header">
@@ -3299,19 +3302,19 @@ verification/synth_n&lt;行数&gt;/                     ← 稳定的合成数�
 <tbody>
 <tr class="odd">
 <td>平均 TST（小时）</td>
-<td>7.89</td>
-<td>[7.76, 7.92] — 稳健（±0.08 小时）</td>
+<td>8.06</td>
+<td>[8.06, 8.07] — 稳健（±0.01 小时）</td>
 </tr>
 <tr class="even">
 <td>平均 SOL（分钟）</td>
-<td>20.7</td>
-<td>[12.1, 48.4] — <strong>敏感</strong>
+<td>31.2</td>
+<td>[22.7, 58.1] — <strong>敏感</strong>
 </td>
 </tr>
 <tr class="odd">
 <td>可分析 n</td>
-<td>6,611</td>
-<td>[6,333, 6,692]</td>
+<td>6,581</td>
+<td>[6,327, 6,660]</td>
 </tr>
 </tbody>
 </table>
@@ -3337,7 +3340,7 @@ verification/synth_n&lt;行数&gt;/                     ← 稳定的合成数�
 </table>
 <p>这些不是错误——它们是<em>不同但合理</em>的决策会产生的诚实区间。研究团队在解读任何 单个数字前需要知道这个区间。</p>
 <p><em>Seed — 换随机种子数字动吗？</em> 合并 recall 跨 4 个 seed 稳定在 0.993–0.995， 对照 FAR 全为 0；唯一摆动（0.886–0.907）的族是已知最弱族 <code>cross_participant_spike</code>——已在下方注意事项中披露为 audit-only。完整逐 seed 表见 <code>seed_sensitivity.csv</code>。</p>
-<p><strong>意味着。</strong> 三个独立问题、三个清晰答案：(1) <em>哪个决策最重要？</em> — 交换阈值， 占变异 44%，所以那个默认值是需要文档化并捍卫的。(2) <em>哪些结论稳健？</em> — TST 是（±0.08 小时），SOL 否（12–48 分钟），而且我们现在知道原因（感知偏差， 第 5.5 步）。(3) <em>数字可复现吗？</em> — 跨 seed 是（recall 0.993–0.995，FAR 0）， 唯一已知弱族被披露而非隐藏。</p>
+<p><strong>意味着。</strong> 三个独立问题、三个清晰答案：(1) <em>哪个决策最重要？</em> — 全因子网格内 交换阈值占变异 44%，但该占比 seed 脆弱，所以主曲线按 D1-only 报告，D2 作为 已记录的敏感性警示而非头条声明；(2) <em>哪些结论稳健？</em> — TST 是（D1-only 主曲线 ±0.01 小时），SOL 否（23–58 分钟），而且我们现在知道原因（感知偏差， 第 5.5 步）。(3) <em>数字可复现吗？</em> — 跨 seed 是（recall 0.993–0.995，FAR 0）， 唯一已知弱族被披露而非隐藏。</p>
 </div>
 <div class="section level3">
 <h3 id="诚实注意事项用任何数字前先读">诚实注意事项（用任何数字前先读）<a class="anchor" aria-label="anchor" href="#%E8%AF%9A%E5%AE%9E%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%E7%94%A8%E4%BB%BB%E4%BD%95%E6%95%B0%E5%AD%97%E5%89%8D%E5%85%88%E8%AF%BB"></a>
@@ -3364,7 +3367,7 @@ verification/synth_n&lt;行数&gt;/                     ← 稳定的合成数�
 <li>
 <strong>Enriched sampling</strong> —— 12 类错误各注入到固定目标数（如每类 400），而非按真实世界观察到的错误率。否则罕见错误类型样本太少测不准；因此逐类表报告的是检出率，不是发生率。</li>
 <li>
-<strong>L1/L2/L3</strong> —— 验证深度层级：L1 = 有任意 flag，L3 = 值被正确修正，L2 = <em>类型</em>也正确。三类均已逐类计算（<code>results/l2_tier.csv</code>）。论文式头条用 L1（检测）；L3 是更严的值正确数——如 <code>ampm_swap</code> L1 1.0 / L3 0.565，因为不确定的恢复交给人工审查。</li>
+<strong>L1/L2/L3</strong> —— 验证深度层级：L1 = 有任意 flag，L3 = 值被正确修正，L2 = <em>类型</em>也正确。三类均已逐类计算（<code>validation/synthetic/results/l2_tier.csv</code>）。论文式头条用 L1（检测）；L3 是更严的值正确数——如 <code>ampm_swap</code> L1 1.0 / L3 0.565，因为不确定的恢复交给人工审查。</li>
 </ul>
 <p><strong>如何运行。</strong></p>
 <div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" tabindex="-1"></a><span class="co"># 在仓库根目录，renv::restore() 并安装 splsleep 之后</span></span>
