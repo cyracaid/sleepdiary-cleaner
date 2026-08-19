@@ -170,7 +170,9 @@ SHUTi、RESTING）、以及理论上可能存在但我们从未抓到的错误�
 <li>
 <strong>完全不需要合成标准的真实数据层</strong>（第 5–7 步）。</li>
 <li>
-<strong>闭环盲点封堵</strong>：在真实数据发现新错误类型时，加入目录、注入、重跑基准。</li>
+<strong>闭环盲点封堵</strong>：在真实数据发现新错误类型时，加入目录、注入、重跑基准。两个具体闭环：<code>sol_window</code>
+recall 0.43 → 1.0、<code>format_no_colon</code> recall 0.11 →
+1.0（均为盲点类别，经此闭环注入并封堵）。</li>
 </ol>
 </div>
 <div class="section level2">

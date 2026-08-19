@@ -116,7 +116,9 @@ matches reality. Three mechanisms keep this from being circular:
     5–7).
 3.  **Closed-loop blind-spot closure**: when a new error type is
     discovered in real data, it is added to the catalog, injected, and
-    the benchmark re-run.
+    the benchmark re-run. Two concrete closures: `sol_window` recall
+    0.43 → 1.0 and `format_no_colon` recall 0.11 → 1.0 (both blind-spot
+    categories, injected and closed by this loop).
 
 ## Step 3 — When we fix, do we fix *right*? (detection vs. value-correctness)
 

@@ -1051,7 +1051,10 @@ matches reality. Three mechanisms keep this from being circular:
 3.  **Closed-loop blind-spot closure** (Step 3 note): when a new error
     type is discovered in real data, it is added to the catalog,
     injected, and the benchmark re-run — so the taxonomy grows from
-    reality, not from the pipeline’s current abilities.
+    reality, not from the pipeline’s current abilities. Two concrete
+    closures: `sol_window` recall 0.43 → 1.0 and `format_no_colon`
+    recall 0.11 → 1.0 (both blind-spot categories, injected and closed
+    by this loop).
 
 ### Step 3 — When we fix, do we fix *right*? (detection vs. value-correctness)
 
@@ -1997,7 +2000,9 @@ bug 的方法（v1.4.1，见第 3 步）。
     步）：冗余通道验证、report-only
     审计、共同审查一致性都直接在真实数据上跑，无注入。
 3.  **闭环盲点封堵**（第 3
-    步注）：在真实数据发现新错误类型时，加入目录、注入、重跑基准——分类学从现实生长，而不是从管线现有能力生长。
+    步注）：在真实数据发现新错误类型时，加入目录、注入、重跑基准——分类学从现实生长，而不是从管线现有能力生长。两个具体闭环：`sol_window`
+    recall 0.43 → 1.0、`format_no_colon` recall 0.11 →
+    1.0（均为盲点类别，经此闭环注入并封堵）。
 
 ### 第 3 步 — 修复时，修得*对*吗？（检测 vs 值正确）
 

@@ -1764,7 +1764,7 @@ and read its detailed interpretation.</code></pre>
 <li>
 <strong>A real-data layer that needs no synthetic standard at all</strong> (Steps 5–7): redundant-channel validation, report-only audit, and co-review agreement all run on real data with no injection.</li>
 <li>
-<strong>Closed-loop blind-spot closure</strong> (Step 3 note): when a new error type is discovered in real data, it is added to the catalog, injected, and the benchmark re-run — so the taxonomy grows from reality, not from the pipeline’s current abilities.</li>
+<strong>Closed-loop blind-spot closure</strong> (Step 3 note): when a new error type is discovered in real data, it is added to the catalog, injected, and the benchmark re-run — so the taxonomy grows from reality, not from the pipeline’s current abilities. Two concrete closures: <code>sol_window</code> recall 0.43 → 1.0 and <code>format_no_colon</code> recall 0.11 → 1.0 (both blind-spot categories, injected and closed by this loop).</li>
 </ol>
 </div>
 <div class="section level3">
@@ -3146,7 +3146,7 @@ verification/synth_n&lt;行数&gt;/                     ← 稳定的合成数�
 <li>
 <strong>完全不需要合成标准的真实数据层</strong>（第 5–7 步）：冗余通道验证、report-only 审计、共同审查一致性都直接在真实数据上跑，无注入。</li>
 <li>
-<strong>闭环盲点封堵</strong>（第 3 步注）：在真实数据发现新错误类型时，加入目录、注入、重跑基准——分类学从现实生长，而不是从管线现有能力生长。</li>
+<strong>闭环盲点封堵</strong>（第 3 步注）：在真实数据发现新错误类型时，加入目录、注入、重跑基准——分类学从现实生长，而不是从管线现有能力生长。两个具体闭环：<code>sol_window</code> recall 0.43 → 1.0、<code>format_no_colon</code> recall 0.11 → 1.0（均为盲点类别，经此闭环注入并封堵）。</li>
 </ol>
 </div>
 <div class="section level3">

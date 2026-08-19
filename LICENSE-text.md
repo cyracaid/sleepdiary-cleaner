@@ -1,4 +1,4 @@
 # License
 
     YEAR: 2026
-    COPYRIGHT HOLDER: Cyra Sloblucyra
+    COPYRIGHT HOLDER: Cai Dong and Maia ten Brink
