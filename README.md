@@ -785,6 +785,11 @@ does not prove the design itself is methodologically valid — sleep-diary
 cleaning has no ground truth, since nobody can know for certain what a
 participant meant when they typed "10:30" into a duration field.
 
+This pipeline treats plausible sleep-timing variability as signal, not
+noise, consistent with its intended use in sleep–affect association
+studies — it flags disagreements for human review rather than silently
+normalizing them toward internal consistency.
+
 Our answer is a **multi-step validation chain**. Each step asks one question,
 fails in a different way, and is deliberately independent of the others: a
 cleaning decision that survives every step is far more defensible than one
@@ -1627,6 +1632,8 @@ Snapshot 验证（`inst/verification/`、`verify_v1_3_snapshot.R`）确认当前
 ## 验证
 
 上面的测试覆盖率证明代码按设计跑对了，不证明设计本身在方法学上站得住——睡眠日记清洗没有 ground truth，没有人能确定参与者在时长字段里填「10:30」时到底想说什么。
+
+本管线把合理的睡眠时程变异当作**信号而非噪声**，与其在"睡眠–情绪"关联研究中的预期用途一致——它对分歧做 flag 转人工审查，而不是把它们静默归一化为内部一致。
 
 我们的回答是一条**多步验证链**。每步只问一个问题、以不同的方式失效、且刻意彼此独立：能经受住全部步骤的清洗决策，比只经受住单项检查的可信得多。步骤按此顺序执行，从"管线会不会伤害好数据"一直到"能不能扛住真实世界的不确定性"。
 
