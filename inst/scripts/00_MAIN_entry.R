@@ -17,7 +17,7 @@ multi_process <- function(df, var_list, func, format = NULL) {
 # What this pipeline does:
 #   Takes raw EMA sleep diary data → parses timestamps → detects errors →
 #   applies manual corrections → calculates sleep metrics → flags remaining
-#   input anomalies → generates 24 diagnostic figures.
+#   input anomalies → generates 30 diagnostic figures (14 QC + 16 research).
 #
 # Each step sources its own R file with local = TRUE (isolated environment).
 # Data flows from one step to the next via the ema_data_release_* / corrected_ema_data objects.

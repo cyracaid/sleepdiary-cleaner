@@ -2,7 +2,7 @@
 
 ## Overview
 
-An R pipeline that cleans EMA sleep diary data and produces 24 diagnostic figures. The pipeline has 10 steps (1, 1.5, 2–4, 5, 5.75, 6–7, 8, 8.5, 9, 10 — source of truth: `inst/steps.yaml`), from raw CSV/RDS loading through final column finalization. Human correction feedback is applied via CSV files at steps 5–7. The entry point is `00_MAIN_entry.R`; run `run_pipeline()` (installed package) or `source("00_MAIN_entry.R")` (development).
+An R pipeline that cleans EMA sleep diary data and produces 30 diagnostic figures (14 QC + 16 research). The pipeline has 10 steps (1, 1.5, 2–4, 5, 5.75, 6–7, 8, 8.5, 9, 10 — source of truth: `inst/steps.yaml`), from raw CSV/RDS loading through final column finalization. Human correction feedback is applied via CSV files at steps 5–7. The entry point is `00_MAIN_entry.R`; run `run_pipeline()` (installed package) or `source("00_MAIN_entry.R")` (development).
 
 Classification categories (TIMESTAMP_ISSUE / DURATION_ISSUE / AMOUNT_FLAG / NEEDS_REVIEW) are **data-type labels, not exclusion criteria** — no data is removed based on category membership.
 
@@ -230,11 +230,11 @@ Step 8 Part B originally re-ran `difftime()` calculations already done in steps 
 | `error_unusual_sleep_time_corrections.R` | 2078 | Step 6 — Correction engine (core) |
 | `calculate_sleep_time_end.R` | 139 | Step 7 — Sleep metrics calculation |
 | `checkforerrors_processing.R` | 612 | Step 8 — Auto error detection + substance anomaly |
-| `sleep_visualization.R` | 2540 | Step 9 — 28 diagnostic figures (Figure 5 removed, Figure 12 = step table) |
+| `sleep_visualization.R` | 2540 | Step 9 — 30 diagnostic figures (14 QC + 16 research) |
 | `report_correction_status.R` | 494 | Checkpoint reporter + log_step() per-step slicer (30-dim metrics → step_log.csv) |
 | `R/pipeline.R` | 150 | Package entry points: run_pipeline, run_visualization, run_figure_index, etc. |
 | `R/config.R` | 128 | Config loader: load_config, config_get, adapt_columns, validate_columns |
-| `make_figure_index.R` | 124 | Contact-sheet generator (28-figure thumbnail index) |
+| `make_figure_index.R` | 124 | Contact-sheet generator (30-figure thumbnail index) |
 | `README_figures_navigation.md` | 57 | Figure navigation: 3-tier triage guide |
 
 ---

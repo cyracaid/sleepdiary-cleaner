@@ -1,6 +1,6 @@
 ## Reading the Figures — Start Here
 
-The pipeline generates ~27 figures. **You do not need to read all of them.** Use the
+The pipeline generates 30 figures (14 QC + 16 research). **You do not need to read all of them.** Use the
 three-figure triage below to judge data quality in under a minute, then drill down only
 if something looks off.
 
