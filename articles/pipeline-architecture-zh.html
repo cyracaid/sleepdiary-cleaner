@@ -291,6 +291,91 @@ CLEAN</td>
 </tbody>
 </table>
 </div>
+<div class="section level2">
+<h2 id="图表">图表<a class="anchor" aria-label="anchor" href="#%E5%9B%BE%E8%A1%A8"></a>
+</h2>
+<p>生成的图表分两个文件夹，让管线质检视图（每次运行都有）和分析视图（仅当研究包含相关变量时）不混淆。</p>
+<table class="table">
+<colgroup>
+<col width="57%">
+<col width="42%">
+</colgroup>
+<thead><tr class="header">
+<th>文件夹</th>
+<th>内容</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>pipeline_cleaning/</code></td>
+<td>管线流程图、数据质量仪表板、标记构成、逐被试标记率、步骤标记账本</td>
+</tr>
+<tr class="even">
+<td><code>research_ready/</code></td>
+<td>修正影响（前后对比）、睡眠变量分布、知觉偏差、物质使用、睡眠规律性、相关矩阵</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level2">
+<h2 id="非破坏性模型">非破坏性模型<a class="anchor" aria-label="anchor" href="#%E9%9D%9E%E7%A0%B4%E5%9D%8F%E6%80%A7%E6%A8%A1%E5%9E%8B"></a>
+</h2>
+<p><strong>管线从不删除任何记录。</strong> 清洗的意思是<em>打标记 +
+增加修正列</em>，不是删行。<code>corrected_ema_data</code>
+的行数永远等于你输入的行数。</p>
+<pre><code>输入：N 条原始记录
+输出：N 条记录，每条多了分类列（data_category, flag_severity）
+     和修正列（time_*_corrected）。原始列原样保留。</code></pre>
+<ul>
+<li>
+<strong>什么都不丢。</strong>
+原始时间戳（<code>time_bed_am_hhmm_ampm</code>
+等）留在数据里，修正版新增为 <code>time_bed_corrected</code>
+列——每条修正都能和原值对照。</li>
+<li>
+<strong>每条记录被打标记，不是被删除。</strong> 验证失败的记录标上
+<code>data_category = "error"</code> 或
+<code>"unusual"</code>，但仍然在数据集里。你之后自己决定分析时是否包含它们。</li>
+<li>
+<strong>“最终干净数据集”是推荐的分析子集，不是一个物理上独立的文件。</strong>
+它 = <code>data_category</code> 为 <code>clean</code> 或
+<code>equal_time_ok</code> 的记录：</li>
+</ul>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">clean_data</span> <span class="op">&lt;-</span> <span class="va">corrected_ema_data</span><span class="op">[</span><span class="va">corrected_ema_data</span><span class="op">$</span><span class="va">data_category</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"clean"</span>, <span class="st">"equal_time_ok"</span><span class="op">)</span>, <span class="op">]</span></span></code></pre></div>
+<p><strong>一个例外：</strong>
+四个睡眠时间戳全部缺失的记录（<code>data_category = "skipped_na"</code>）保留在文件里，但
+TST/SOL/WASO 指标是
+<code>NA</code>——时间戳缺失无法计算睡眠指标。它们可用于依从性/流失分析（如”每个被试完成了多少天”），但不能用于睡眠指标分析。</p>
+<table class="table">
+<thead><tr class="header">
+<th>记录类型</th>
+<th align="center">还在数据里？</th>
+<th align="center">有睡眠指标？</th>
+<th align="center">适合睡眠分析？</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>clean / equal_time_ok</td>
+<td align="center">是</td>
+<td align="center">是</td>
+<td align="center">
+<strong>是</strong>（推荐）</td>
+</tr>
+<tr class="even">
+<td>error / unusual（被标记）</td>
+<td align="center">是</td>
+<td align="center">是</td>
+<td align="center">谨慎——研究者决定</td>
+</tr>
+<tr class="odd">
+<td>skipped_na（时间戳缺失）</td>
+<td align="center">是</td>
+<td align="center">否（NA）</td>
+<td align="center">否——仅依从性分析</td>
+</tr>
+</tbody>
+</table>
+</div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>

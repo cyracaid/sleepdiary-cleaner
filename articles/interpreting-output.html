@@ -166,6 +166,52 @@ which step did which flag appear, and did it persist?”</em></p>
 <code class="sourceCode R"><span><span class="va">ledger</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"output/step_flag_ledger.csv"</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="va">ledger</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">step_id</span>, <span class="va">standard</span><span class="op">)</span></span></code></pre></div>
+<p>Each row answers: <em>“at this step, using this standard, how many
+records fell into this category?”</em></p>
+<div class="section level3">
+<h3 id="column-layout">Column layout<a class="anchor" aria-label="anchor" href="#column-layout"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="42%">
+<col width="57%">
+</colgroup>
+<thead><tr class="header">
+<th>Column</th>
+<th>What it is</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>step_id</code></td>
+<td>Pipeline step number</td>
+</tr>
+<tr class="even">
+<td><code>label</code></td>
+<td>Human-readable step name</td>
+</tr>
+<tr class="odd">
+<td><code>n_total</code></td>
+<td>Total records in the pipeline at this point</td>
+</tr>
+<tr class="even">
+<td><code>standard</code></td>
+<td>The evaluation system being tracked (see below)</td>
+</tr>
+<tr class="odd">
+<td><code>category</code></td>
+<td>The specific category within that standard</td>
+</tr>
+<tr class="even">
+<td><code>count</code></td>
+<td>Number of records in this category (NA = not yet computed at this
+step)</td>
+</tr>
+<tr class="odd">
+<td><code>n_corrected</code></td>
+<td>Records manually corrected at this step</td>
+</tr>
+</tbody>
+</table>
 <p>The ledger uses 5 independent evaluation systems:</p>
 <table class="table">
 <colgroup>
@@ -260,6 +306,7 @@ should be &lt; 5% of <code>n_total</code>.</li>
   data_category:    equal_time_ok = 266, skipped_na = 14        266 + 14 = 280 ✓
   flag_severity:    Clean = 251, Minor = 28, Major = 1         251 + 28 + 1 = 280 - 14 ✓
   duration_extreme: OK = 262, Too short = 1, Too long = 0</code></pre>
+</div>
 </div>
 <div class="section level2">
 <h2 id="regression-check-compare-against-a-previous-run">3. Regression Check (compare against a previous run)<a class="anchor" aria-label="anchor" href="#regression-check-compare-against-a-previous-run"></a>

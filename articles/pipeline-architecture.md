@@ -90,3 +90,54 @@ reported instead (see the validation-methodology vignette, Step 7).
 | `has_correction`         | Step 7 (traceability) | none, algorithmic, manual, both                                         |
 | `flag_severity`          | Step 7 (metrics)      | Clean, Minor (1 flag), Major (2+ flags)                                 |
 | `checkforerrors_summary` | Step 8 (auto-detect)  | TIMESTAMP_ISSUE, DURATION_ISSUE, AMOUNT_FLAG, SELF_REPORTED_FLAG, CLEAN |
+
+## Figures
+
+Generated figures are split into two folders so pipeline-quality views
+(every run) and analysis views (only when the study contains the
+relevant variables) do not get confused.
+
+| Folder               | Content                                                                                                                                    |
+|----------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| `pipeline_cleaning/` | Pipeline flow diagram, data quality dashboard, flag composition, per-participant flag rate, step flag ledger                               |
+| `research_ready/`    | Correction impact (before/after delta), sleep variable distributions, perception bias, substance use, sleep regularity, correlation matrix |
+
+## Non-destructive model
+
+**The pipeline never deletes a record.** Cleaning means *adding labels
+and corrected columns*, not removing rows. The number of records in
+`corrected_ema_data` always equals the number of records you put in.
+
+    Input:  N raw records
+    Output: N records, each with additional classification columns
+            (data_category, flag_severity) and corrected-value columns
+            (time_*_corrected). Raw columns are preserved untouched.
+
+- **Nothing is lost.** Raw timestamps (`time_bed_am_hhmm_ampm`, etc.)
+  stay in the data. Corrected versions are added as new columns
+  (`time_bed_corrected`), so every correction is auditable against the
+  original value.
+- **Every record is labelled, not removed.** Records that fail
+  validation are tagged (`data_category = "error"` or `"unusual"`) but
+  remain in the dataset. You decide later whether to include or exclude
+  them in analysis.
+- **“Final Clean Dataset” is a recommended analysis subset, not a
+  physically separate file.** It is the records where `data_category` is
+  `clean` or `equal_time_ok`:
+
+``` r
+clean_data <- corrected_ema_data[corrected_ema_data$data_category %in% c("clean", "equal_time_ok"), ]
+```
+
+**One exception:** records with all four sleep timestamps missing
+(`data_category = "skipped_na"`) stay in the file, but their
+TST/SOL/WASO metrics are `NA` — sleep metrics cannot be computed without
+timestamps. They are available for compliance/attrition analyses
+(e.g. “how many days did each participant complete”) but not for
+sleep-metric analyses.
+
+| Record type                | Still in the data? | Has sleep metrics? |     Suitable for sleep analysis?     |
+|----------------------------|:------------------:|:------------------:|:------------------------------------:|
+| clean / equal_time_ok      |        Yes         |        Yes         |        **Yes** (recommended)         |
+| error / unusual (flagged)  |        Yes         |        Yes         | With caution — researcher’s decision |
+| skipped_na (no timestamps) |        Yes         |      No (NA)       |    No — compliance analysis only     |

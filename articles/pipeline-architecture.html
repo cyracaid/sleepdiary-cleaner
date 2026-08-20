@@ -307,6 +307,108 @@ CLEAN</td>
 </tbody>
 </table>
 </div>
+<div class="section level2">
+<h2 id="figures">Figures<a class="anchor" aria-label="anchor" href="#figures"></a>
+</h2>
+<p>Generated figures are split into two folders so pipeline-quality
+views (every run) and analysis views (only when the study contains the
+relevant variables) do not get confused.</p>
+<table class="table">
+<colgroup>
+<col width="47%">
+<col width="52%">
+</colgroup>
+<thead><tr class="header">
+<th>Folder</th>
+<th>Content</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>pipeline_cleaning/</code></td>
+<td>Pipeline flow diagram, data quality dashboard, flag composition,
+per-participant flag rate, step flag ledger</td>
+</tr>
+<tr class="even">
+<td><code>research_ready/</code></td>
+<td>Correction impact (before/after delta), sleep variable
+distributions, perception bias, substance use, sleep regularity,
+correlation matrix</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level2">
+<h2 id="non-destructive-model">Non-destructive model<a class="anchor" aria-label="anchor" href="#non-destructive-model"></a>
+</h2>
+<p><strong>The pipeline never deletes a record.</strong> Cleaning means
+<em>adding labels and corrected columns</em>, not removing rows. The
+number of records in <code>corrected_ema_data</code> always equals the
+number of records you put in.</p>
+<pre><code>Input:  N raw records
+Output: N records, each with additional classification columns
+        (data_category, flag_severity) and corrected-value columns
+        (time_*_corrected). Raw columns are preserved untouched.</code></pre>
+<ul>
+<li>
+<strong>Nothing is lost.</strong> Raw timestamps
+(<code>time_bed_am_hhmm_ampm</code>, etc.) stay in the data. Corrected
+versions are added as new columns (<code>time_bed_corrected</code>), so
+every correction is auditable against the original value.</li>
+<li>
+<strong>Every record is labelled, not removed.</strong> Records that
+fail validation are tagged (<code>data_category = "error"</code> or
+<code>"unusual"</code>) but remain in the dataset. You decide later
+whether to include or exclude them in analysis.</li>
+<li>
+<strong>“Final Clean Dataset” is a recommended analysis subset, not
+a physically separate file.</strong> It is the records where
+<code>data_category</code> is <code>clean</code> or
+<code>equal_time_ok</code>:</li>
+</ul>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">clean_data</span> <span class="op">&lt;-</span> <span class="va">corrected_ema_data</span><span class="op">[</span><span class="va">corrected_ema_data</span><span class="op">$</span><span class="va">data_category</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"clean"</span>, <span class="st">"equal_time_ok"</span><span class="op">)</span>, <span class="op">]</span></span></code></pre></div>
+<p><strong>One exception:</strong> records with all four sleep
+timestamps missing (<code>data_category = "skipped_na"</code>) stay in
+the file, but their TST/SOL/WASO metrics are <code>NA</code> — sleep
+metrics cannot be computed without timestamps. They are available for
+compliance/attrition analyses (e.g. “how many days did each participant
+complete”) but not for sleep-metric analyses.</p>
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="44%">
+<col width="18%">
+<col width="18%">
+<col width="18%">
+</colgroup>
+<thead><tr class="header">
+<th>Record type</th>
+<th align="center">Still in the data?</th>
+<th align="center">Has sleep metrics?</th>
+<th align="center">Suitable for sleep analysis?</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>clean / equal_time_ok</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">
+<strong>Yes</strong> (recommended)</td>
+</tr>
+<tr class="even">
+<td>error / unusual (flagged)</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">With caution — researcher’s decision</td>
+</tr>
+<tr class="odd">
+<td>skipped_na (no timestamps)</td>
+<td align="center">Yes</td>
+<td align="center">No (NA)</td>
+<td align="center">No — compliance analysis only</td>
+</tr>
+</tbody>
+</table>
+</div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>

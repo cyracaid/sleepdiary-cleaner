@@ -87,3 +87,45 @@ vignette 第 7 步）。
 | `has_correction`         | Step 7（追溯） | none, algorithmic, manual, both                                         |
 | `flag_severity`          | Step 7（指标） | Clean, Minor（1 标记）, Major（2+ 标记）                                |
 | `checkforerrors_summary` | Step 8（自动） | TIMESTAMP_ISSUE, DURATION_ISSUE, AMOUNT_FLAG, SELF_REPORTED_FLAG, CLEAN |
+
+## 图表
+
+生成的图表分两个文件夹，让管线质检视图（每次运行都有）和分析视图（仅当研究包含相关变量时）不混淆。
+
+| 文件夹               | 内容                                                                         |
+|----------------------|------------------------------------------------------------------------------|
+| `pipeline_cleaning/` | 管线流程图、数据质量仪表板、标记构成、逐被试标记率、步骤标记账本             |
+| `research_ready/`    | 修正影响（前后对比）、睡眠变量分布、知觉偏差、物质使用、睡眠规律性、相关矩阵 |
+
+## 非破坏性模型
+
+**管线从不删除任何记录。** 清洗的意思是*打标记 +
+增加修正列*，不是删行。`corrected_ema_data` 的行数永远等于你输入的行数。
+
+    输入：N 条原始记录
+    输出：N 条记录，每条多了分类列（data_category, flag_severity）
+         和修正列（time_*_corrected）。原始列原样保留。
+
+- **什么都不丢。** 原始时间戳（`time_bed_am_hhmm_ampm`
+  等）留在数据里，修正版新增为 `time_bed_corrected`
+  列——每条修正都能和原值对照。
+- **每条记录被打标记，不是被删除。** 验证失败的记录标上
+  `data_category = "error"` 或
+  `"unusual"`，但仍然在数据集里。你之后自己决定分析时是否包含它们。
+- **“最终干净数据集”是推荐的分析子集，不是一个物理上独立的文件。** 它 =
+  `data_category` 为 `clean` 或 `equal_time_ok` 的记录：
+
+``` r
+clean_data <- corrected_ema_data[corrected_ema_data$data_category %in% c("clean", "equal_time_ok"), ]
+```
+
+**一个例外：**
+四个睡眠时间戳全部缺失的记录（`data_category = "skipped_na"`）保留在文件里，但
+TST/SOL/WASO 指标是
+`NA`——时间戳缺失无法计算睡眠指标。它们可用于依从性/流失分析（如”每个被试完成了多少天”），但不能用于睡眠指标分析。
+
+| 记录类型                  | 还在数据里？ | 有睡眠指标？ |  适合睡眠分析？  |
+|---------------------------|:------------:|:------------:|:----------------:|
+| clean / equal_time_ok     |      是      |      是      |  **是**（推荐）  |
+| error / unusual（被标记） |      是      |      是      | 谨慎——研究者决定 |
+| skipped_na（时间戳缺失）  |      是      |   否（NA）   | 否——仅依从性分析 |
