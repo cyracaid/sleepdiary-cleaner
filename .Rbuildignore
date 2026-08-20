@@ -107,3 +107,6 @@
 ^manuscript_notes$
 ^sensitive_local$
 ^cran-comments\.md$
+^tests/R_CMD_CHECK\.log$
+^tests/testthat/_problems$
+^tests/testthat/testthat-problems\.rds$
