@@ -29,7 +29,7 @@ a different way, and is deliberately independent of the others.
               (10,000 error-free records; expect ZERO changes/flags)
                         │
                         ▼
-      Step 2: Injected-error benchmark ── pooled recall 0.995 [0.994, 0.997]
+      Step 2: Injected-error benchmark ── pooled recall 0.995 [0.993, 0.997]
               (400 errors/category; ground truth recorded at injection)
                         │
                         ▼
@@ -87,7 +87,7 @@ ground truth.
 
 | Quantity                        | Value                      |
 |---------------------------------|----------------------------|
-| Pooled recall (errors detected) | **0.995** \[0.994, 0.997\] |
+| Pooled recall (errors detected) | **0.995** \[0.993, 0.997\] |
 | Specificity                     | 1.0                        |
 
 Cluster-bootstrap CIs at participant level (1,000 iterations), because

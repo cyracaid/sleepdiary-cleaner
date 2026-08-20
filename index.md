@@ -363,9 +363,8 @@ residue was assessed and deliberately kept (2026-08-19). Trigger for a
 history rewrite is only re-appearance of individually re-identifiable
 data, not naming residue.
 
-Template CSV files with synthetic data are in
-[`templates/`](https://cyracaid.github.io/sleepdiary-cleaner/templates/).
-Copy these to create your own correction files.
+Template CSV files with synthetic data are in `templates/`. Copy these
+to create your own correction files.
 
 ### Input Data Structure (Text Description)
 
@@ -966,7 +965,7 @@ survive real-world uncertainty?”.
               (10,000 error-free records; expect ZERO changes/flags)
                         │
                         ▼
-      Step 2: Injected-error benchmark ── pooled recall 0.995 [0.994, 0.997]
+      Step 2: Injected-error benchmark ── pooled recall 0.995 [0.993, 0.997]
               (400 errors/category; ground truth recorded at injection)
                         │
                         ▼
@@ -1024,7 +1023,7 @@ ground truth.
 
 | Quantity                        | Value                      |
 |---------------------------------|----------------------------|
-| Pooled recall (errors detected) | **0.995** \[0.994, 0.997\] |
+| Pooled recall (errors detected) | **0.995** \[0.993, 0.997\] |
 | Specificity                     | 1.0                        |
 
 Cluster-bootstrap CIs at participant level (1,000 iterations), because
@@ -1615,8 +1614,7 @@ TST/SOL/WASO 指标是
 **本仓库不含任何原始参与者数据。** 所有真实数据 CSV 已从 git
 历史彻底清除。
 
-模板文件（含假数据）在
-[`templates/`](https://cyracaid.github.io/sleepdiary-cleaner/templates/)，展示列结构。
+模板文件（含假数据）在 `templates/`，展示列结构。
 
 ### 主要输入数据
 
@@ -1935,7 +1933,7 @@ flag 转人工审查，而不是把它们静默归一化为内部一致。
                （10,000 条无错误记录；期望零改动/零 flag）
                         │
                         ▼
-      第 2 步：注入错误基准 ─── 合并 recall 0.995 [0.994, 0.997]
+      第 2 步：注入错误基准 ─── 合并 recall 0.995 [0.993, 0.997]
                （每类 400 条；ground truth 在注入时记录）
                         │
                         ▼
@@ -1988,7 +1986,7 @@ flag 转人工审查，而不是把它们静默归一化为内部一致。
 
 | 量                        | 值                         |
 |---------------------------|----------------------------|
-| 合并 recall（错误被检测） | **0.995** \[0.994, 0.997\] |
+| 合并 recall（错误被检测） | **0.995** \[0.993, 0.997\] |
 | 特异性                    | 1.0                        |
 
 CI 为参与者级 cluster bootstrap（1,000

@@ -512,7 +512,7 @@ Output: N records, each with additional classification columns
 <h2 id="data-format-text-only--templates-provided">Data Format (Text Only — Templates Provided)<a class="anchor" aria-label="anchor" href="#data-format-text-only--templates-provided"></a>
 </h2>
 <p><strong>This repository contains no raw participant data, no real identifiers, and no actual study responses.</strong> All CSV files containing participant data are excluded via <code>.gitignore</code> and purged from git history. Older git history may mention the de-identified export filenames (“deidentified_intervalvars_forCD_111325”, “sber_ema_anon_20260227” — both <em>already anonymized</em> names); these strings contain no participant identifiers, the files themselves were never git-tracked, and the residue was assessed and deliberately kept (2026-08-19). Trigger for a history rewrite is only re-appearance of individually re-identifiable data, not naming residue.</p>
-<p>Template CSV files with synthetic data are in <a href="templates/"><code>templates/</code></a>. Copy these to create your own correction files.</p>
+<p>Template CSV files with synthetic data are in <code>templates/</code>. Copy these to create your own correction files.</p>
 <div class="section level3">
 <h3 id="input-data-structure-text-description">Input Data Structure (Text Description)<a class="anchor" aria-label="anchor" href="#input-data-structure-text-description"></a>
 </h3>
@@ -1694,7 +1694,7 @@ and read its detailed interpretation.</code></pre>
           (10,000 error-free records; expect ZERO changes/flags)
                     │
                     ▼
-  Step 2: Injected-error benchmark ── pooled recall 0.995 [0.994, 0.997]
+  Step 2: Injected-error benchmark ── pooled recall 0.995 [0.993, 0.997]
           (400 errors/category; ground truth recorded at injection)
                     │
                     ▼
@@ -1748,7 +1748,7 @@ and read its detailed interpretation.</code></pre>
 <tr class="odd">
 <td>Pooled recall (errors detected)</td>
 <td>
-<strong>0.995</strong> [0.994, 0.997]</td>
+<strong>0.995</strong> [0.993, 0.997]</td>
 </tr>
 <tr class="even">
 <td>Specificity</td>
@@ -2412,7 +2412,7 @@ and read its detailed interpretation.</code></pre>
 </tbody>
 </table>
 <p><strong>本仓库不含任何原始参与者数据。</strong> 所有真实数据 CSV 已从 git 历史彻底清除。</p>
-<p>模板文件（含假数据）在 <a href="templates/"><code>templates/</code></a>，展示列结构。</p>
+<p>模板文件（含假数据）在 <code>templates/</code>，展示列结构。</p>
 </div>
 <div class="section level3">
 <h3 id="主要输入数据">主要输入数据<a class="anchor" aria-label="anchor" href="#%E4%B8%BB%E8%A6%81%E8%BE%93%E5%85%A5%E6%95%B0%E6%8D%AE"></a>
@@ -3079,7 +3079,7 @@ verification/synth_n&lt;行数&gt;/                     ← 稳定的合成数�
            （10,000 条无错误记录；期望零改动/零 flag）
                     │
                     ▼
-  第 2 步：注入错误基准 ─── 合并 recall 0.995 [0.994, 0.997]
+  第 2 步：注入错误基准 ─── 合并 recall 0.995 [0.993, 0.997]
            （每类 400 条；ground truth 在注入时记录）
                     │
                     ▼
@@ -3131,7 +3131,7 @@ verification/synth_n&lt;行数&gt;/                     ← 稳定的合成数�
 <tr class="odd">
 <td>合并 recall（错误被检测）</td>
 <td>
-<strong>0.995</strong> [0.994, 0.997]</td>
+<strong>0.995</strong> [0.993, 0.997]</td>
 </tr>
 <tr class="even">
 <td>特异性</td>
