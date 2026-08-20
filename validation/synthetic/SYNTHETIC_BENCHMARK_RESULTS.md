@@ -34,7 +34,7 @@ the error taxonomy, and the aggregate result tables below).
   the pipeline's derived values directly against `ground_truth.csv`'s
   `true_value` column.
 - `results/` — aggregate result tables, including
-  `recall_specificity_ci.csv` (pooled recall 0.995 [0.994, 0.997],
+  `recall_specificity_ci.csv` (pooled recall 0.995 [0.993, 0.997],
   specificity 1.0), `far_flag_alter.csv` (0/1,609 both), `fcr_pure_n10000_result.csv`,
   `control_baselines.csv` (0 / 0.623 / 0.995), `mrr_magnitude.csv` (MRR 0),
   `l2_tier.csv`, `results/multiverse/` (spec curve, variance decomposition

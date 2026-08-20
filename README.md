@@ -807,7 +807,7 @@ uncertainty?".
           (10,000 error-free records; expect ZERO changes/flags)
                     │
                     ▼
-  Step 2: Injected-error benchmark ── pooled recall 0.995 [0.994, 0.997]
+  Step 2: Injected-error benchmark ── pooled recall 0.995 [0.993, 0.997]
           (400 errors/category; ground truth recorded at injection)
                     │
                     ▼
@@ -865,7 +865,7 @@ corrupted data. Compare its output against the ground truth.
 
 | Quantity | Value |
 |---|---|
-| Pooled recall (errors detected) | **0.995** [0.994, 0.997] |
+| Pooled recall (errors detected) | **0.995** [0.993, 0.997] |
 | Specificity | 1.0 |
 
 Cluster-bootstrap CIs at participant level (1,000 iterations), because
@@ -1647,7 +1647,7 @@ Snapshot 验证（`inst/verification/`、`verify_v1_3_snapshot.R`）确认当前
            （10,000 条无错误记录；期望零改动/零 flag）
                     │
                     ▼
-  第 2 步：注入错误基准 ─── 合并 recall 0.995 [0.994, 0.997]
+  第 2 步：注入错误基准 ─── 合并 recall 0.995 [0.993, 0.997]
            （每类 400 条；ground truth 在注入时记录）
                     │
                     ▼
@@ -1697,7 +1697,7 @@ Snapshot 验证（`inst/verification/`、`verify_v1_3_snapshot.R`）确认当前
 
 | 量 | 值 |
 |---|---|
-| 合并 recall（错误被检测） | **0.995** [0.994, 0.997] |
+| 合并 recall（错误被检测） | **0.995** [0.993, 0.997] |
 | 特异性 | 1.0 |
 
 CI 为参与者级 cluster bootstrap（1,000 次），因为同一参与者的记录互相关联。
