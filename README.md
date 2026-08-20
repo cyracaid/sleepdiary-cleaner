@@ -149,5 +149,4 @@ file.copy(system.file("config_template.yaml", package = "sleepcleanr"),
 | 10 | Build delivered datasets | finalize_columns() selects/renames to Dataset A/B per column dictionary |
 
 <!-- AUTO:ARCH_ZH_END -->
-NA
-<!-- AUTO:ARCH_ZH_END -->
+
