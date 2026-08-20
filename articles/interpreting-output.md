@@ -7,7 +7,7 @@ to read them, how to regression-check against a previous run, and how to
 read the figures.
 
 ``` r
-library(splsleep)
+library(sleepcleanr)
 ```
 
 ## 1. `output/correction_status_final.csv` — The Run Summary (Open This First)

@@ -6,7 +6,7 @@ designed to do — as distinct from methodological validity, which is
 covered in the validation-methodology vignette.
 
 ``` r
-library(splsleep)
+library(sleepcleanr)
 ```
 
 ## Test files and coverage
@@ -34,7 +34,7 @@ library(splsleep)
 
 ``` r
 # Installed-package mode (fast, tests the built package):
-testthat::test_package("splsleep")
+testthat::test_package("sleepcleanr")
 
 # Source-development mode (tests the working tree; use this when editing
 # code — test_dir() alone does NOT load the package, so load it first):
@@ -50,12 +50,12 @@ Full package check (documentation, examples, tests, and the
 `verify_reference_fidelity` / dual-copy checks):
 
 ``` r
-devtools::check()   # needs devtools; equivalently: R CMD check splsleep_*.tar.gz
+devtools::check()   # needs devtools; equivalently: R CMD check sleepcleanr_*.tar.gz
 ```
 
 `devtools` is a development-only tool — it is intentionally **not** a
 dependency of the package (not in `DESCRIPTION`), so it is never
-required to install or run splsleep itself.
+required to install or run sleepcleanr itself.
 
 ## Snapshot verification
 

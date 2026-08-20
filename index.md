@@ -91,7 +91,7 @@ full changelog. Installable via
   pipeline flow, correction impact) and `research_ready/` (sleep
   metrics, substance use, perception)
 - **R package**:
-  [`library(splsleep); run_pipeline()`](https://github.com/cyracaid/sleepdiary-cleaner)
+  [`library(sleepcleanr); run_pipeline()`](https://github.com/cyracaid/sleepdiary-cleaner)
   — installable, versioned, dependency-managed
 - **Correction traceability**: `has_correction` enum column (none /
   algorithmic / manual / both) plus per-step audit ledger
@@ -207,7 +207,7 @@ reported instead (see [Validation](#validation), Step 7).
 renv::install("cyracaid/sleepdiary-cleaner")
 
 # Load and run
-library(splsleep)
+library(sleepcleanr)
 run_pipeline()
 ```
 
@@ -219,8 +219,8 @@ adjust thresholds without modifying any R code.
 
 ``` r
 # Step 1: Copy the configuration template
-library(splsleep)
-file.copy(system.file("config_template.yaml", package = "splsleep"),
+library(sleepcleanr)
+file.copy(system.file("config_template.yaml", package = "sleepcleanr"),
           "my_study.yaml")
 ```
 
@@ -473,7 +473,7 @@ Key rules this structure encodes:
 
 ## Agent Skill
 
-**Location**: `.opencode/skills/splsleep-pipeline/SKILL.md`
+**Location**: `.opencode/skills/sleepcleanr-pipeline/SKILL.md`
 
 The skill enables AI assistants to understand the pipeline architecture,
 run the pipeline, interpret checkpoint reports, add manual corrections,
@@ -484,9 +484,9 @@ Registered in `opencode.jsonc`:
 ``` json
 {
   "skills": {
-    "splsleep-pipeline": {
+    "sleepcleanr-pipeline": {
       "description": "Run and maintain the sleep EMA diary data cleaning pipeline",
-      "triggers": ["splsleep", "sleep pipeline", "sleep EMA", "run_pipeline"]
+      "triggers": ["sleepcleanr", "sleep pipeline", "sleep EMA", "run_pipeline"]
     }
   }
 }
@@ -907,7 +907,7 @@ Run tests with:
 
 ``` r
 # Installed-package mode (fast, tests the built package):
-testthat::test_package("splsleep")
+testthat::test_package("sleepcleanr")
 
 # Source-development mode (tests the working tree; use this when editing
 # code — test_dir() alone does NOT load the package, so load it first):
@@ -923,12 +923,12 @@ Full package check (documentation, examples, tests, and the
 `verify_reference_fidelity` / dual-copy checks):
 
 ``` r
-devtools::check()   # needs devtools; equivalently: R CMD check splsleep_*.tar.gz
+devtools::check()   # needs devtools; equivalently: R CMD check sleepcleanr_*.tar.gz
 ```
 
 `devtools` is a development-only tool — it is intentionally **not** a
 dependency of the package (not in `DESCRIPTION`), so it is never
-required to install or run splsleep itself.
+required to install or run sleepcleanr itself.
 
 Snapshot verification (`inst/verification/`, `verify_v1_3_snapshot.R`)
 confirms the current S3 pipeline chain produces byte-identical output to
@@ -1350,7 +1350,7 @@ intentionally not committed to the public repository (privacy cleanup,
 **How to run it.**
 
 ``` r
-# from the repo root, after renv::restore() and installing splsleep
+# from the repo root, after renv::restore() and installing sleepcleanr
 Rscript validation/synthetic/run_one.R <input.rds> <project_dir> <label>
 ```
 
@@ -1447,7 +1447,7 @@ CSV 实际上从未被写盘，尽管管线日志一直报告”已保存”。�
 - **诊断图表**：分为 `pipeline_cleaning/`（质控、管线流程、修正影响）和
   `research_ready/`（睡眠指标、物质使用、知觉偏差）
 - **R
-  包**：[`library(splsleep); run_pipeline()`](https://github.com/cyracaid/sleepdiary-cleaner)
+  包**：[`library(sleepcleanr); run_pipeline()`](https://github.com/cyracaid/sleepdiary-cleaner)
   — 可安装、版本化
 - **修正追溯**：`has_correction` enum 列（none / algorithmic / manual /
   both）+ 每步审计账本
@@ -1539,7 +1539,7 @@ CSV 实际上从未被写盘，尽管管线日志一直报告”已保存”。�
 ``` r
 # 从 GitHub 安装
 renv::install("cyracaid/sleepdiary-cleaner")
-library(splsleep)
+library(sleepcleanr)
 run_pipeline()
 ```
 
@@ -1547,7 +1547,7 @@ run_pipeline()
 
 ``` r
 # 复制配置模板
-file.copy(system.file("config_template.yaml", package = "splsleep"), "my_study.yaml")
+file.copy(system.file("config_template.yaml", package = "sleepcleanr"), "my_study.yaml")
 
 # 编辑 my_study.yaml → 设置数据文件路径，可选映射列名、调阈值
 
@@ -1559,7 +1559,7 @@ run_pipeline(config = "my_study.yaml")
 
 ### Agent 技能
 
-**位置**：`.opencode/skills/splsleep-pipeline/SKILL.md`
+**位置**：`.opencode/skills/sleepcleanr-pipeline/SKILL.md`
 
 该技能让 AI
 助手理解管线架构、运行管线、解读检查点报告、添加人工校正、诊断问题。
@@ -1569,9 +1569,9 @@ run_pipeline(config = "my_study.yaml")
 ``` json
 {
   "skills": {
-    "splsleep-pipeline": {
+    "sleepcleanr-pipeline": {
       "description": "Run and maintain the sleep EMA diary data cleaning pipeline",
-      "triggers": ["splsleep", "sleep pipeline", "sleep EMA", "run_pipeline"]
+      "triggers": ["sleepcleanr", "sleep pipeline", "sleep EMA", "run_pipeline"]
     }
   }
 }
@@ -1888,7 +1888,7 @@ commit）。`figure_index.png`
 
 ``` r
 # 已安装包模式（快，测的是构建好的包）：
-testthat::test_package("splsleep")
+testthat::test_package("sleepcleanr")
 
 # 源码开发模式（测工作区当前代码；编辑代码时用这个——
 # 单独跑 test_dir() 不会加载被测包，必须先加载）：
@@ -1903,11 +1903,11 @@ devtools::test()
 双副本检查）：
 
 ``` r
-devtools::check()   # 需要 devtools；等价于：R CMD check splsleep_*.tar.gz
+devtools::check()   # 需要 devtools；等价于：R CMD check sleepcleanr_*.tar.gz
 ```
 
 `devtools` 是纯开发工具——刻意**不是**包的依赖（不在 `DESCRIPTION`
-里），安装或运行 splsleep 本身从不需要它。
+里），安装或运行 sleepcleanr 本身从不需要它。
 
 Snapshot 验证（`inst/verification/`、`verify_v1_3_snapshot.R`）确认当前
 S3
@@ -2240,7 +2240,7 @@ vignette（见上方[验证](#%E9%AA%8C%E8%AF%81)一节）。`work_logs/`
 **如何运行。**
 
 ``` r
-# 在仓库根目录，renv::restore() 并安装 splsleep 之后
+# 在仓库根目录，renv::restore() 并安装 sleepcleanr 之后
 Rscript validation/synthetic/run_one.R <input.rds> <project_dir> <label>
 ```
 

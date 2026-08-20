@@ -6,7 +6,7 @@
 吵？在真实数据里找到什么？人工一致吗？我们的选择要紧吗？
 
 ``` r
-library(splsleep)
+library(sleepcleanr)
 ```
 
 ## 为什么要验证

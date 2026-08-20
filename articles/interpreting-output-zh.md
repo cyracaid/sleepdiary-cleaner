@@ -5,7 +5,7 @@
 对比上一次运行做回归检查、以及怎么看图。
 
 ``` r
-library(splsleep)
+library(sleepcleanr)
 ```
 
 ## 1. `output/correction_status_final.csv` — 运行摘要（先看这个）

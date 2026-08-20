@@ -1,11 +1,11 @@
 # Pipeline Architecture
 
-This vignette documents how the splsleep pipeline is structured: the
+This vignette documents how the sleepcleanr pipeline is structured: the
 steps, the rule families that do the actual cleaning, and the
 classification systems that label every record.
 
 ``` r
-library(splsleep)
+library(sleepcleanr)
 ```
 
 ## Pipeline steps

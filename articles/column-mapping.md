@@ -1,11 +1,11 @@
 # Column Mapping, Config & Data Format
 
-splsleep is fully configurable via a YAML configuration file: map your
-dataset’s column names to pipeline internals and adjust thresholds
+sleepcleanr is fully configurable via a YAML configuration file: map
+your dataset’s column names to pipeline internals and adjust thresholds
 without modifying any R code.
 
 ``` r
-library(splsleep)
+library(sleepcleanr)
 ```
 
 ## Install and run
@@ -15,7 +15,7 @@ library(splsleep)
 renv::install("cyracaid/sleepdiary-cleaner")
 
 # Load and run
-library(splsleep)
+library(sleepcleanr)
 run_pipeline()
 ```
 
@@ -27,8 +27,8 @@ adjust thresholds without modifying any R code.
 
 ``` r
 # Step 1: Copy the configuration template
-library(splsleep)
-file.copy(system.file("config_template.yaml", package = "splsleep"),
+library(sleepcleanr)
+file.copy(system.file("config_template.yaml", package = "sleepcleanr"),
           "my_study.yaml")
 ```
 

@@ -8,7 +8,7 @@ noisy is the self-report itself? what does it find in real data? do the
 humans agree? do our choices matter?
 
 ``` r
-library(splsleep)
+library(sleepcleanr)
 ```
 
 ## Why validation at all

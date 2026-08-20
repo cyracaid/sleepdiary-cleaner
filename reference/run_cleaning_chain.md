@@ -14,7 +14,7 @@ run_cleaning_chain(
   corrections_df = data.frame(),
   manual_unusual_df = data.frame(),
   cfg = NULL,
-  verbose = getOption("splsleep.verbose", TRUE)
+  verbose = getOption("sleepcleanr.verbose", TRUE)
 )
 ```
 

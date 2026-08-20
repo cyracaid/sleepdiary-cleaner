@@ -1,11 +1,11 @@
 # 列映射、配置与数据格式（中文）
 
-splsleep 通过 YAML
+sleepcleanr 通过 YAML
 配置文件完全可配置：把数据集的列名映射到管线内部变量、
 调整阈值，无需修改任何 R 代码。
 
 ``` r
-library(splsleep)
+library(sleepcleanr)
 ```
 
 ## 安装与运行
@@ -15,7 +15,7 @@ library(splsleep)
 renv::install("cyracaid/sleepdiary-cleaner")
 
 # 加载并运行
-library(splsleep)
+library(sleepcleanr)
 run_pipeline()
 ```
 
@@ -23,8 +23,8 @@ run_pipeline()
 
 ``` r
 # 第 1 步：复制配置模板
-library(splsleep)
-file.copy(system.file("config_template.yaml", package = "splsleep"),
+library(sleepcleanr)
+file.copy(system.file("config_template.yaml", package = "sleepcleanr"),
           "my_study.yaml")
 ```
 

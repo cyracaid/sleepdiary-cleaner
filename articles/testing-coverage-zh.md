@@ -5,7 +5,7 @@
 按设计跑——区别于方法学效度（后者见验证方法学 vignette）。
 
 ``` r
-library(splsleep)
+library(sleepcleanr)
 ```
 
 ## 测试文件与覆盖
@@ -33,7 +33,7 @@ library(splsleep)
 
 ``` r
 # 已安装包模式（快，测的是构建好的包）：
-testthat::test_package("splsleep")
+testthat::test_package("sleepcleanr")
 
 # 源码开发模式（测工作区当前代码；编辑代码时用这个——
 # 单独跑 test_dir() 不会加载被测包，必须先加载）：
@@ -48,11 +48,11 @@ devtools::test()
 双副本检查）：
 
 ``` r
-devtools::check()   # 需要 devtools；等价于：R CMD check splsleep_*.tar.gz
+devtools::check()   # 需要 devtools；等价于：R CMD check sleepcleanr_*.tar.gz
 ```
 
 `devtools` 是纯开发工具——刻意**不是**包的依赖（不在 `DESCRIPTION` 里），
-安装或运行 splsleep 本身从不需要它。
+安装或运行 sleepcleanr 本身从不需要它。
 
 ## Snapshot 验证
 
