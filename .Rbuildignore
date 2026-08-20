@@ -10,7 +10,11 @@
 ^data-raw$
 ^templates$
 ^opencode\.jsonc$
-^vignettes$
+# Vignettes deliberately NOT ignored: DESCRIPTION declares VignetteBuilder
+# knitr, so vignettes must ship or R CMD check reports a VignetteBuilder
+# field with no prebuilt vignette index. Vignettes are prose-only; each has
+# one include=FALSE setup chunk and one eval=FALSE library call. No real
+# data, no network.
 ^doc$
 ^Meta$
 ^pipeline$
@@ -102,3 +106,4 @@
 ^sber_ema_.*\.csv$
 ^manuscript_notes$
 ^sensitive_local$
+^cran-comments\.md$
