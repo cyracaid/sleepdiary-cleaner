@@ -58,6 +58,21 @@ library(dplyr)
 ledger %>% filter(!is.na(count)) %>% arrange(step_id, standard)
 ```
 
+Each row answers: *"at this step, using this standard, how many records fell
+into this category?"*
+
+### Column layout
+
+| Column | What it is |
+|--------|-----------|
+| `step_id` | Pipeline step number |
+| `label` | Human-readable step name |
+| `n_total` | Total records in the pipeline at this point |
+| `standard` | The evaluation system being tracked (see below) |
+| `category` | The specific category within that standard |
+| `count` | Number of records in this category (NA = not yet computed at this step) |
+| `n_corrected` | Records manually corrected at this step |
+
 The ledger uses 5 independent evaluation systems:
 
 | Standard | First step with numbers | What it evaluates | Key categories |
