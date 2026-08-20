@@ -1,5 +1,5 @@
 "metric","est","lo","hi"
-"recall_pooled",0.995177147097014,0.993801332067142,0.996653635857274
+"recall_pooled",0.995177147097014,0.993283456689666,0.997028328266003
 "specificity_control",1,1,1
 "adjacent_swap_large_gap_left_clean",1,1,1
 "adjacent_swap_time_awake_am_time_getup_am",1,1,1
@@ -7,11 +7,11 @@
 "adjacent_swap_time_sleep_am_time_awake_am",1,1,1
 "ampm_swap",1,1,1
 "compound_ampm_and_swap",1,1,1
-"cross_participant_spike",0.906779661016949,0.880794701986755,0.93421052631579
+"cross_participant_spike",0.906779661016949,0.870115753811406,0.943971529524937
 "field_misentry_sol",1,1,1
 "field_misentry_waso",1,1,1
 "format_malformed_colon",1,1,1
 "format_no_colon",1,1,1
 "implausible_duration",1,1,1
-"mmss_confusion",0.99,0.983673469387755,0.996296977124183
+"mmss_confusion",0.99,0.979324127906977,0.997711267605634
 "sol_window_contradiction",1,1,1

@@ -176,14 +176,30 @@ err <- gt[gt$error_type != "no_error_control", ]
 ctrl <- gt[gt$error_type == "no_error_control", ]
 cat("\ninjected errors:", nrow(err), " control rows:", nrow(ctrl), "\n")
 
+# Participant-level cluster bootstrap.
+#
+# IMPORTANT — multiplicity. Clusters (participants) are drawn WITH replacement,
+# and a participant drawn k times must contribute its rows k times. Selecting
+# rows with `df[df$pid %in% idx, ]` would NOT do that: `%in%` is set membership,
+# so repeat draws collapse to a single copy and each resample degenerates into a
+# random ~63% subsample of participants counted once each. That is subsampling,
+# not a bootstrap, and it understates the interval (measured on this dataset:
+# half-width 0.00145 instead of 0.00190, ~21% too narrow).
+#
+# Pre-aggregating to per-participant (sum, count) and indexing those by the
+# drawn names preserves multiplicity — R returns duplicates when a named vector
+# is indexed by a repeated name — and is also much faster than re-subsetting the
+# data frame B times.
 cluster_boot <- function(df, n_boot = 2000, metric) {
-  pids <- unique(df$pid)
-  est <- function(idx) {
-    sub <- df[df$pid %in% idx, ]
-    switch(metric,
-      recall = mean(sub$detected),
-      specificity = mean(!sub$detected_flag))  # control: flag rate is the false-positive signal
-  }
+  hits <- switch(metric,
+    recall      = df$detected,
+    specificity = !df$detected_flag,  # control: flag rate is the false-positive signal
+    stop("unknown metric: ", metric))
+  by_pid <- split(as.numeric(hits), df$pid)
+  n_by   <- vapply(by_pid, length, integer(1))
+  s_by   <- vapply(by_pid, sum, numeric(1))
+  pids   <- names(by_pid)
+  est <- function(idx) sum(s_by[idx]) / sum(n_by[idx])
   obs <- est(pids)
   b <- replicate(n_boot, est(sample(pids, length(pids), replace = TRUE)))
   c(est = obs,
@@ -205,9 +221,14 @@ cat_ci <- lapply(sort(unique(err$error_type)), function(ct) {
                       lo = NA_real_, hi = NA_real_))
   }
   est <- mean(sub$detected)
+  # multiplicity-preserving cluster bootstrap (see cluster_boot above)
+  by_c <- split(as.numeric(sub$detected), sub$pid)
+  n_c  <- vapply(by_c, length, integer(1))
+  s_c  <- vapply(by_c, sum, numeric(1))
+  pids_c <- names(by_c)
   b <- replicate(1000, {
     idx <- sample(pids_c, length(pids_c), replace = TRUE)
-    mean(sub$detected[sub$pid %in% idx])
+    sum(s_c[idx]) / sum(n_c[idx])
   })
   data.frame(category = ct, n = nrow(sub), recall = est,
              lo = unname(quantile(b, 0.025, na.rm = TRUE)),
@@ -224,14 +245,19 @@ spec   <- boot_spec["est"]
 ppv <- function(pi) (pi * recall) / (pi * recall + (1 - pi) * (1 - spec))
 
 # bootstrap PPV band: recompute from bootstrap draws
-pids_err <- unique(err$pid); pids_ctrl <- unique(ctrl$pid)
+# multiplicity-preserving cluster bootstrap for the PPV band (see cluster_boot)
+by_err  <- split(as.numeric(err$detected), err$pid)
+n_err   <- vapply(by_err, length, integer(1)); s_err <- vapply(by_err, sum, numeric(1))
+by_ctrl <- split(as.numeric(!ctrl$detected_flag), ctrl$pid)
+n_ctrl  <- vapply(by_ctrl, length, integer(1)); s_ctrl <- vapply(by_ctrl, sum, numeric(1))
+pids_err <- names(by_err); pids_ctrl <- names(by_ctrl)
 ppv_boot <- function(n_boot = 500) {
   out <- matrix(NA_real_, nrow = length(pi_seq), ncol = n_boot)
   for (b in seq_len(n_boot)) {
     ie <- sample(pids_err, length(pids_err), replace = TRUE)
     ic <- sample(pids_ctrl, length(pids_ctrl), replace = TRUE)
-    re <- mean(err$detected[err$pid %in% ie])
-    sp <- mean(!ctrl$detected_flag[ctrl$pid %in% ic])
+    re <- sum(s_err[ie]) / sum(n_err[ie])
+    sp <- sum(s_ctrl[ic]) / sum(n_ctrl[ic])
     out[, b] <- (pi_seq * re) / (pi_seq * re + (1 - pi_seq) * (1 - sp))
   }
   out
