@@ -20,6 +20,16 @@
 
 This is a new submission, so the "New submission" note is expected.
 
+> checking CRAN incoming feasibility ... NOTE
+>   Possibly misspelled words in DESCRIPTION:
+>   EMA (2:14, 14:57)
+>   TST (17:14)
+>   WASO (17:24)
+
+EMA, TST and WASO are domain abbreviations (ecological momentary
+assessment, total sleep time, wake after sleep onset) used in the
+sleep diary field; they are not misspellings.
+
 > checking R code for possible problems ... NOTE
 > Found the following assignments to the global environment:
 > File 'splsleep/R/manual_corrections.R': ...
