@@ -1,9 +1,9 @@
-# splsleep Pipeline Configuration
+# sleepcleanr Pipeline Configuration
 # =============================================================================
 # This config drives the study dataset. For your OWN data, copy
 # inst/config_template.yaml -> my_study.yaml and edit the "data" section.
 #
-# Quick start: library(splsleep); run_pipeline(config = "my_study.yaml")
+# Quick start: library(sleepcleanr); run_pipeline(config = "my_study.yaml")
 # =============================================================================
 
 pipeline:

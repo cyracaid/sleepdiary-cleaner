@@ -1,6 +1,6 @@
 ---
 title: "管线架构（中文）"
-description: "splsleep 清洗管线的 10 步结构、8 个检测规则族、决策三态与分类体系。"
+description: "sleepcleanr 清洗管线的 10 步结构、8 个检测规则族、决策三态与分类体系。"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{管线架构（中文）}
@@ -12,11 +12,11 @@ vignette: >
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
-本文档说明 splsleep 管线的结构：清洗步骤、真正干活的规则族、以及给每条记录
+本文档说明 sleepcleanr 管线的结构：清洗步骤、真正干活的规则族、以及给每条记录
 打标签的分类体系。
 
 ```{r setup, eval = FALSE}
-library(splsleep)
+library(sleepcleanr)
 ```
 
 ## 管线步骤

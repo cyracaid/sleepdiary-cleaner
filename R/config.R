@@ -9,7 +9,7 @@
 #' @keywords internal
 load_config <- function(config_file = NULL) {
   if (is.null(config_file)) {
-    config_file <- system.file("config_default.yaml", package = "splsleep")
+    config_file <- system.file("config_default.yaml", package = "sleepcleanr")
     if (config_file == "") {
       dev_path <- file.path(getwd(), "inst", "config_default.yaml")
       if (file.exists(dev_path)) config_file <- dev_path

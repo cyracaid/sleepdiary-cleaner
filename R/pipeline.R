@@ -1,5 +1,5 @@
 scripts_dir <- function() {
-  pkg_dir <- system.file("scripts", package = "splsleep")
+  pkg_dir <- system.file("scripts", package = "sleepcleanr")
   if (nchar(pkg_dir) > 0 && dir.exists(pkg_dir)) return(pkg_dir)
   getwd()
 }
@@ -9,7 +9,7 @@ scripts_dir <- function() {
 utils::globalVariables(c(
   "corrected_ema_data", "ema_data_release_timecalc",
   "review_output", "checkforerrors_summary",
-  "pipeline_config", "splsleep_scripts_dir",
+  "pipeline_config", "sleepcleanr_scripts_dir",
   # functions sourced from inst/scripts at runtime (report_correction_status.R)
   "report_status", "final_summary", "generate_correction_files", "generate_figure_index"
 ))
@@ -33,7 +33,7 @@ utils::globalVariables(c(
 .pipeline_init <- function(config, project_dir, verbose) {
   old_wd <- setwd(project_dir)
   sdir   <- scripts_dir()
-  assign("splsleep_scripts_dir", sdir, envir = .GlobalEnv)
+  assign("sleepcleanr_scripts_dir", sdir, envir = .GlobalEnv)
 
   if (is.character(config) || is.null(config)) {
     cfg <- load_config(config)
@@ -45,17 +45,17 @@ utils::globalVariables(c(
 
   # Keep .GlobalEnv assignment for backward compatibility with source() steps
   assign("pipeline_config", cfg, envir = .GlobalEnv)
-  assign("splsleep_loaded", TRUE, envir = .GlobalEnv)
+  assign("sleepcleanr_loaded", TRUE, envir = .GlobalEnv)
 
   if (verbose) cat(sprintf("\n=== SPL Sleep Pipeline (%s) ===\n",
-    if (is.null(cfg$pipeline$name)) "splsleep" else cfg$pipeline$name))
-  options(splsleep.verbose = verbose)
+    if (is.null(cfg$pipeline$name)) "sleepcleanr" else cfg$pipeline$name))
+  options(sleepcleanr.verbose = verbose)
 
   list(cfg = cfg, sdir = sdir, old_wd = old_wd)
 }
 
 .pipeline_cleanup <- function(old_wd) {
-  options(splsleep.verbose = NULL)
+  options(sleepcleanr.verbose = NULL)
   setwd(old_wd)
 }
 

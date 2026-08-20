@@ -1,8 +1,8 @@
-# splsleep -- Configuration Template
+# sleepcleanr -- Configuration Template
 # =============================================================================
 # 1. Copy this file -> e.g. "my_study.yaml"
 # 2. Fill in the 2 settings below
-# 3. Run: library(splsleep); run_pipeline(config = "my_study.yaml")
+# 3. Run: library(sleepcleanr); run_pipeline(config = "my_study.yaml")
 # =============================================================================
 
 pipeline:

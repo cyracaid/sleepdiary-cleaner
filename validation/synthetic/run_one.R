@@ -1,15 +1,15 @@
 # run_one.R
-# Runs splsleep::run_pipeline() on one synthetic dataset in an isolated
+# Runs sleepcleanr::run_pipeline() on one synthetic dataset in an isolated
 # project_dir, per the four execution notes:
 #   (1) manual-correction files created EMPTY (with headers), not omitted
 #   (2) after the run, checks flag distributions, doesn't just check "did it crash"
 #   (3) each dataset gets its OWN project_dir so output/ never gets overwritten
-#   (4) uses the installed splsleep 1.4.0 (confirmed inst/scripts identical to
+#   (4) uses the installed sleepcleanr 1.4.0 (confirmed inst/scripts identical to
 #       the uploads source tree, so the installed copy is current)
 #
 # Usage: Rscript run_one.R <input_rds> <project_dir> <label>
 
-suppressPackageStartupMessages(library(splsleep))
+suppressPackageStartupMessages(library(sleepcleanr))
 
 args <- commandArgs(trailingOnly = TRUE)
 input_rds   <- args[1]
@@ -46,7 +46,7 @@ file.copy(input_rds, file.path(project_dir, "main.rds"), overwrite = TRUE)
 # absent, not present-but-empty.
 
 # Minimal config: bundled default, only data.files.main overridden.
-cfg <- yaml::read_yaml(system.file("config_default.yaml", package = "splsleep"))
+cfg <- yaml::read_yaml(system.file("config_default.yaml", package = "sleepcleanr"))
 cfg$data$files$main <- "main.rds"
 cfg$data$files$extra <- NULL
 config_path <- file.path(project_dir, "config.yaml")
@@ -55,7 +55,7 @@ yaml::write_yaml(cfg, config_path)
 cat(sprintf("\n########## RUNNING: %s ##########\n", label))
 t0 <- Sys.time()
 ok <- tryCatch({
-  splsleep::run_pipeline(config = "config.yaml", project_dir = project_dir,
+  sleepcleanr::run_pipeline(config = "config.yaml", project_dir = project_dir,
                           skip_visualization = TRUE, verbose = TRUE)
   TRUE
 }, error = function(e) {

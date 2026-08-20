@@ -45,11 +45,11 @@ sha256_file <- function(path) {
 code_fingerprint <- function() {
   repo_r <- list.files("R", pattern = "\\.R$", full.names = TRUE)
   inst_s <- list.files("inst/scripts", pattern = "\\.R$", full.names = TRUE)
-  sdir <- system.file("scripts", package = "splsleep")
+  sdir <- system.file("scripts", package = "sleepcleanr")
   pkg_s <- if (nzchar(sdir)) list.files(sdir, pattern = "\\.R$", full.names = TRUE) else character()
   all_files <- unique(c(repo_r, inst_s, pkg_s))
   digest::digest(list(
-    pkg_version = tryCatch(as.character(utils::packageVersion("splsleep")), error = function(e) "unknown"),
+    pkg_version = tryCatch(as.character(utils::packageVersion("sleepcleanr")), error = function(e) "unknown"),
     files = lapply(all_files, sha256_file)
   ), algo = "sha256")
 }
@@ -141,7 +141,7 @@ run_spec_once <- function(label, overrides, input_rds = INPUT_RD,
   }
   yaml::write_yaml(cfg, file.path(run_dir, "config.yaml"))
 
-  suppressPackageStartupMessages(library(splsleep))
+  suppressPackageStartupMessages(library(sleepcleanr))
   old_wd <- getwd()
   ok <- tryCatch({
     run_pipeline(config = "config.yaml", project_dir = run_dir,

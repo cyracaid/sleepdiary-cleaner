@@ -1,4 +1,4 @@
-# splsleep 1.4.3
+# sleepcleanr 1.4.3
 
 Fixes a correction rule flagged by the redundant-channel validation on real
 data (Channel B, 2026-08-12/13).
@@ -13,7 +13,7 @@ data (Channel B, 2026-08-12/13).
   order-valid, 3/4 closer to self-report. Guarded rows are left uncorrected
   and picked up by the downstream temporal-order check for human review.
 
-# splsleep 1.4.2
+# sleepcleanr 1.4.2
 
 Adds the calibrated synthetic-error-injection benchmark harness to the
 tracked repo (`validation/synthetic/`). No cleaning logic changed.
@@ -45,7 +45,7 @@ sleep-metric sensitivity analysis. See `benchmark-design.md`.
 
 ---
 
-# splsleep 1.4.1
+# sleepcleanr 1.4.1
 
 Bug-fix release. No cleaning logic changed outside the two items below.
 
@@ -76,7 +76,7 @@ Bug-fix release. No cleaning logic changed outside the two items below.
 
 ---
 
-# splsleep 1.4.0
+# sleepcleanr 1.4.0
 
 Delivery release. **No cleaning logic changed.** Run-to-run figures are
 identical to 1.3.9: Clean 1,908 / Unusual 31 / Equal 903 / Corrected 81 /
@@ -175,7 +175,7 @@ mean TST 7.71 h / mean SOL 28.8 min.
   deliberately not changed: three records, all either flagged or already
   corrected. See open issues S7.
 
-# splsleep 1.3.3
+# sleepcleanr 1.3.3
 
 Bug-fix release. No cleaning logic changed other than the guard described below.
 
@@ -232,7 +232,7 @@ them over the root copies. No behaviour change under `config_default.yaml`.
 All 20 shared scripts are now byte-identical and `KNOWN_DIVERGENT` in the sync
 test is empty.
 
-# splsleep 1.3.0 (in development)
+# sleepcleanr 1.3.0 (in development)
 
 Phase 1 of the v2.0 roadmap: the trustworthy-cleaning foundation. This release
 adds an interface contract without changing any cleaning result.
@@ -301,7 +301,7 @@ adds an interface contract without changing any cleaning result.
 
 ---
 
-# splsleep 1.2.0
+# sleepcleanr 1.2.0
 
 * Per-step flag ledger (`log_step()`, `flag_standards.R`) with
   `output/step_flag_ledger.csv`.

@@ -38,7 +38,7 @@ run_cleaning_chain <- function(data,
                                corrections_df = data.frame(),
                                manual_unusual_df = data.frame(),
                                cfg = NULL,
-                               verbose = getOption("splsleep.verbose", TRUE)) {
+                               verbose = getOption("sleepcleanr.verbose", TRUE)) {
   if (is.null(cfg)) {
     cfg <- get0("pipeline_config", envir = .GlobalEnv, ifnotfound = NULL)
   }
@@ -50,7 +50,7 @@ run_cleaning_chain <- function(data,
   }
   if (is.null(x$cfg)) x$cfg <- cfg
 
-  old <- options(splsleep.verbose = verbose)
+  old <- options(sleepcleanr.verbose = verbose)
   on.exit(options(old), add = TRUE)
 
   x <- step_process_timestamps(x)

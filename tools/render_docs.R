@@ -12,7 +12,7 @@
 #   inst/extdata/column_dictionary.csv (status == "implemented")
 #
 # Output targets (between AUTO markers):
-#   .opencode/skills/splsleep-pipeline/SKILL.md
+#   .opencode/skills/sleepcleanr-pipeline/SKILL.md
 #   README.md
 #
 # Usage: Rscript tools/render_docs.R   (from repo root)
@@ -41,7 +41,7 @@ repo_root <- function() {
     d <- up
   }
   # Installed-package fallback (no DESCRIPTION upstream).
-  p <- tryCatch(system.file(package = "splsleep"), error = function(e) "")
+  p <- tryCatch(system.file(package = "sleepcleanr"), error = function(e) "")
   if (nzchar(p)) return(p)
   getwd()
 }
@@ -143,7 +143,7 @@ main <- function() {
   ver <- pkg_version()
   n_imp <- length(pkg_imports())
 
-  skill_path <- file.path(root, ".opencode", "skills", "splsleep-pipeline", "SKILL.md")
+  skill_path <- file.path(root, ".opencode", "skills", "sleepcleanr-pipeline", "SKILL.md")
   readme_path <- file.path(root, "README.md")
 
   if (!file.exists(skill_path)) stop("SKILL.md not found at ", skill_path)

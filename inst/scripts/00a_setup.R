@@ -78,6 +78,6 @@ check_environment <- function() {
 }
 
 # Auto-run only when NOT sourced from run_pipeline()
-if (!exists("splsleep_loaded")) {
+if (!exists("sleepcleanr_loaded")) {
   check_environment()
 }

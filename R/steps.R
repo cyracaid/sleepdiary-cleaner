@@ -26,12 +26,12 @@ NULL
 #' @param step_label Character. Human-readable step name.
 #' @param fn Function taking a data frame and returning a data frame.
 #' @param verbose Logical. Print progress. Defaults to the
-#'   \code{splsleep.verbose} option.
+#'   \code{sleepcleanr.verbose} option.
 #' @return A new \code{sleep_diary} object.
 #' @keywords internal
 #' @noRd
 .run_step <- function(x, step_id, step_label, fn,
-                      verbose = getOption("splsleep.verbose", TRUE)) {
+                      verbose = getOption("sleepcleanr.verbose", TRUE)) {
   validate_sleep_diary(x)
 
   data_in <- x$data

@@ -5,15 +5,15 @@ echo "=== SPL Sleep Pipeline ==="
 echo ""
 
 # Install/update the package if needed
-if ! Rscript -e 'library(splsleep)' 2>/dev/null; then
-  echo "Installing splsleep package..."
+if ! Rscript -e 'library(sleepcleanr)' 2>/dev/null; then
+  echo "Installing sleepcleanr package..."
   Rscript -e 'devtools::install(".", dependencies = TRUE, upgrade = "never")'
 fi
 
 # Run the pipeline via the package
 Rscript -e '
-library(splsleep)
-splsleep_loaded <- TRUE
+library(sleepcleanr)
+sleepcleanr_loaded <- TRUE
 run_pipeline()
 '
 

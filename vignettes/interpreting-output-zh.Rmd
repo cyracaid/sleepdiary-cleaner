@@ -16,7 +16,7 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 对比上一次运行做回归检查、以及怎么看图。
 
 ```{r setup, eval = FALSE}
-library(splsleep)
+library(sleepcleanr)
 ```
 
 ## 1. `output/correction_status_final.csv` — 运行摘要（先看这个）

@@ -7,11 +7,11 @@
 # layer produces bit-identical output to the original scripts.
 #
 # Usage:
-#   cd /path/to/splsleep
+#   cd /path/to/sleepcleanr
 #   Rscript verify_v1_3_snapshot.R
 # ============================================================================
 
-cat("\n=== splsleep v1.3.0 snapshot verification ===\n")
+cat("\n=== sleepcleanr v1.3.0 snapshot verification ===\n")
 cat("R version:", R.version.string, "\n")
 cat("Working dir:", getwd(), "\n\n")
 
@@ -42,8 +42,8 @@ cfg <- yaml::read_yaml(cfg_path)
 
 # Store config globally (the legacy pipeline reads pipeline_config)
 assign("pipeline_config", cfg, envir = .GlobalEnv)
-assign("splsleep_scripts_dir", sdir, envir = .GlobalEnv)
-options(splsleep.verbose = FALSE)
+assign("sleepcleanr_scripts_dir", sdir, envir = .GlobalEnv)
+options(sleepcleanr.verbose = FALSE)
 
 # Load the development package: internalised step functions live in its
 # namespace. The legacy (script-copy) pipeline below still sources
@@ -67,8 +67,8 @@ init_step_ledger()
 # (local duplicate removed, TECH_DEBT 6).
 .cfg_helpers <- new.env()
 if (!file.exists("R/config.R")) {
-  stop("R/config.R not found. This script must be run from the splsleep ",
-       "source checkout root (cd /path/to/splsleep; Rscript ",
+  stop("R/config.R not found. This script must be run from the sleepcleanr ",
+       "source checkout root (cd /path/to/sleepcleanr; Rscript ",
        "verify_v1_3_snapshot.R), same as the rest of this script assumes.")
 }
 source("R/config.R", local = .cfg_helpers)

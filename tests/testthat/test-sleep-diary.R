@@ -119,7 +119,7 @@ test_that("a step rejects a non-data-frame return value", {
   x <- new_sleep_diary(make_df())
 
   expect_error(
-    splsleep:::.run_step(x, "9", "Bad step", function(df) "oops",
+    sleepcleanr:::.run_step(x, "9", "Bad step", function(df) "oops",
                          verbose = FALSE),
     "not a data frame"
   )
@@ -128,7 +128,7 @@ test_that("a step rejects a non-data-frame return value", {
 test_that("a step records provenance and grows the history", {
   x <- new_sleep_diary(make_df(5), step_id = "1", step_label = "Load data")
 
-  y <- splsleep:::.run_step(x, "2", "Add a column", function(df) {
+  y <- sleepcleanr:::.run_step(x, "2", "Add a column", function(df) {
     df$new_col <- 1
     df
   }, verbose = FALSE)

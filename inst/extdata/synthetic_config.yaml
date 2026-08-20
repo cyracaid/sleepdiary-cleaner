@@ -1,11 +1,11 @@
-# splsleep Pipeline Configuration -- Synthetic Demo Data
+# sleepcleanr Pipeline Configuration -- Synthetic Demo Data
 # =============================================================================
 # This config uses the bundled synthetic dataset in inst/extdata/.
 # It demonstrates how to map column names for a new dataset.
 # =============================================================================
 
 pipeline:
-  name: "splsleep (Synthetic Demo)"
+  name: "sleepcleanr (Synthetic Demo)"
   version: "1.0.0"
 
 data:

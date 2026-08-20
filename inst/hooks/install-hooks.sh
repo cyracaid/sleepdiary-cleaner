@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# install-hooks.sh — install the splsleep pre-commit hook.
+# install-hooks.sh — install the sleepcleanr pre-commit hook.
 #
 # Copies inst/hooks/pre-commit into .git/hooks/ so the local repository
 # refuses commits whose root copy of a pipeline script has drifted from its

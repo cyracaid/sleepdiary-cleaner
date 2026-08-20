@@ -1,7 +1,7 @@
 # test-interval.R — process_interval colon edge cases
 # process_interval lives in inst/scripts/, sourced at runtime by pipeline
 # (its library() calls may fail on CI where Suggest packages aren't installed)
-sdir <- system.file("scripts", package = "splsleep")
+sdir <- system.file("scripts", package = "sleepcleanr")
 if (sdir == "") sdir <- file.path(getwd(), "inst", "scripts")
 src <- file.path(sdir, "process_interval.R")
 if (file.exists(src)) tryCatch(source(src, local = TRUE), error = function(e) NULL)

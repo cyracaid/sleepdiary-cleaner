@@ -1,9 +1,9 @@
 # error_catalog.yaml
 #
-# Error taxonomy for the splsleep synthetic benchmark.
+# Error taxonomy for the sleepcleanr synthetic benchmark.
 # See validation/benchmark_design.md §7 for the design rationale --
 # in particular §7④: this catalog is deliberately built as a UNION of three
-# sources, not just "errors splsleep has historically caught", to avoid
+# sources, not just "errors sleepcleanr has historically caught", to avoid
 # calibrating the benchmark against its own blind spots.
 #
 #   [observed]   -- seen in this project's real data / work_logs
@@ -22,7 +22,7 @@ meta:
   anchors:
     shuti_2023_pct: 1.07        # 487/45598 needed date or AM/PM correction
     resting_2024_pct: 5.7       # diaries needing post-hoc correction
-    splsleep_real_pct: 0.60     # 84/13990 entered human review queue
+    sleepcleanr_real_pct: 0.60     # 84/13990 entered human review queue
                                  # (47 flagged errors + 37 atypical cases;
                                  #  NOTE: manual_error_corrections.csv has
                                  #  n=75 rows -- the 84 vs 75 discrepancy is

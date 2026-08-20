@@ -1,7 +1,7 @@
 ---
 title: "Validation Methodology"
 description: >
-  How the splsleep cleaning pipeline is validated: the 9-step chain from
+  How the sleepcleanr cleaning pipeline is validated: the 9-step chain from
   clean-input specificity through injected-error benchmarks, Bland-Altman
   measurement characterization, real-data audit, and multiverse robustness.
 output: rmarkdown::html_vignette
@@ -23,7 +23,7 @@ itself? what does it find in real data? do the humans agree? do our choices
 matter?
 
 ```{r setup, eval = FALSE}
-library(splsleep)
+library(sleepcleanr)
 ```
 
 ## Why validation at all

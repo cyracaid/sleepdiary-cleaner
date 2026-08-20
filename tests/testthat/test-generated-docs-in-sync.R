@@ -26,7 +26,7 @@ test_that("SKILL.md facts region matches render_docs.R output", {
     "<!-- AUTO:SKILL_FACTS_END -->"
   )
 
-  skill <- file.path(root, ".opencode", "skills", "splsleep-pipeline", "SKILL.md")
+  skill <- file.path(root, ".opencode", "skills", "sleepcleanr-pipeline", "SKILL.md")
   skip_if_not(file.exists(skill), "SKILL.md not found")
   committed <- readLines(skill, warn = FALSE, encoding = "UTF-8")
   i_start <- which(trimws(committed) == "<!-- AUTO:SKILL_FACTS_START -->")

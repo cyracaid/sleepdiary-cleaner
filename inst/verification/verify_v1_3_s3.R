@@ -8,7 +8,7 @@
 # It sources the four R/ files the S3 layer needs, runs the same assertions as
 # tests/testthat/test-sleep-diary.R, and prints one PASS/FAIL line per check.
 
-cat("\n=== splsleep v1.3.0 S3 layer verification (base R only) ===\n")
+cat("\n=== sleepcleanr v1.3.0 S3 layer verification (base R only) ===\n")
 cat("R version:", R.version.string, "\n")
 cat("Working dir:", getwd(), "\n\n")
 
@@ -17,7 +17,7 @@ cat("Working dir:", getwd(), "\n\n")
 needed <- c("R/flag_standards.R", "R/log_step.R", "R/sleep_diary.R", "R/steps.R")
 for (f in needed) {
   if (!file.exists(f)) {
-    stop("Cannot find ", f, ". Run this from the splsleep project root.")
+    stop("Cannot find ", f, ". Run this from the sleepcleanr project root.")
   }
 }
 # steps.R references scripts_dir() at call time only; stub it so sourcing is

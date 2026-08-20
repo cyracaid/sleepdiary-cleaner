@@ -35,7 +35,7 @@ multi_process <- function(df, var_list, func, format = NULL) {
   run_pipeline(config = cfg, project_dir = ".", verbose = TRUE)
 }
 
-# ── Auto-run (non-interactive, when NOT called from splsleep package) ──
-if (!interactive() && !exists("splsleep_loaded")) {
+# ── Auto-run (non-interactive, when NOT called from sleepcleanr package) ──
+if (!interactive() && !exists("sleepcleanr_loaded")) {
   .run_pipeline_internal()
 }

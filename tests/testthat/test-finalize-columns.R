@@ -10,7 +10,7 @@
 # a safe key.
 
 .dict_path <- function() {
-  p <- system.file("extdata", "column_dictionary.csv", package = "splsleep")
+  p <- system.file("extdata", "column_dictionary.csv", package = "sleepcleanr")
   if (!nzchar(p)) p <- file.path("..", "..", "inst", "extdata", "column_dictionary.csv")
   if (!file.exists(p)) p <- file.path("inst", "extdata", "column_dictionary.csv")
   p

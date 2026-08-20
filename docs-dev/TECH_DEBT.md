@@ -1,4 +1,4 @@
-# Technical Debt — splsleep v1.4.0
+# Technical Debt — sleepcleanr v1.4.0
 
 Tracked code-quality items that are intentionally deferred to a future release.
 Each entry states what the debt is, why it exists, and when it should be resolved.
@@ -152,7 +152,7 @@ other, not against R/config.R.
 
 **Resolution:** Export `cfg_get` (already exported) and make the verifier
 call the package version with explicit `cfg`; delete the local definition.
-Requires the verifier to `library(splsleep)` (or `pkgload::load_all`) first —
+Requires the verifier to `library(sleepcleanr)` (or `pkgload::load_all`) first —
 it already does for other package functions.
 
 ---

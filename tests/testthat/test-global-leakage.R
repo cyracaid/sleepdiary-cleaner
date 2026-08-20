@@ -1,7 +1,7 @@
 # test-global-leakage.R — assert the legacy chain writes only its protocol objects.
 #
 # The source()d scripts (00_MAIN_entry.R + step scripts) share data through
-# .GlobalEnv by design: pipeline_config / splsleep_scripts_dir / corrected_ema_data
+# .GlobalEnv by design: pipeline_config / sleepcleanr_scripts_dir / corrected_ema_data
 # / review_output / checkforerrors_summary / reasonable_unusual_df are the
 # explicit assign() protocol, and a handful of top-level working objects
 # (clean_df, error_df, ...) are the legacy chain's accepted data-passing style.
@@ -12,7 +12,7 @@
 # whitelist is the frozen contract; anything outside it fails.
 
 test_that("legacy chain writes only protocol globals", {
-  cfg_path <- system.file("extdata", "synthetic_config.yaml", package = "splsleep")
+  cfg_path <- system.file("extdata", "synthetic_config.yaml", package = "sleepcleanr")
   if (cfg_path == "") cfg_path <- file.path(getwd(), "inst", "extdata", "synthetic_config.yaml")
   skip_if_not(file.exists(cfg_path), "synthetic_config.yaml not found")
 
@@ -29,12 +29,12 @@ test_that("legacy chain writes only protocol globals", {
   yaml::write_yaml(cfg, file.path(sandbox, "pipeline_config.yaml"))
 
   scripts_dir <- dirname(list.files(
-    c("inst/scripts", system.file("scripts", package = "splsleep")),
+    c("inst/scripts", system.file("scripts", package = "sleepcleanr")),
     pattern = "^00_MAIN_entry\\.R$", full.names = TRUE, recursive = TRUE
   )[1])
 
   whitelist <- c(
-    "pipeline_config", "splsleep_scripts_dir", "splsleep_loaded",
+    "pipeline_config", "sleepcleanr_scripts_dir", "sleepcleanr_loaded",
     "corrected_ema_data", "ema_data_release_timecalc", "review_output",
     "checkforerrors_summary", "reasonable_unusual_df", "multi_process",
     # error_unusual publishes its result set via list2env(..., .GlobalEnv):
@@ -48,11 +48,11 @@ test_that("legacy chain writes only protocol globals", {
     "root_pkg <- if (basename(getwd()) == 'testthat') dirname(dirname(getwd())) else getwd()",
     "suppressMessages(pkgload::load_all(root_pkg, quiet = TRUE))",
     sprintf("setwd(%s)", shQuote(sandbox)),
-    sprintf("assign('splsleep_scripts_dir', %s, envir = .GlobalEnv)", shQuote(scripts_dir)),
+    sprintf("assign('sleepcleanr_scripts_dir', %s, envir = .GlobalEnv)", shQuote(scripts_dir)),
     "assign('pipeline_config', yaml::read_yaml('pipeline_config.yaml'), envir = .GlobalEnv)",
     "base0 <- ls(globalenv())",
     "res <- tryCatch({",
-    "  suppressMessages(suppressWarnings(source(file.path(get0('splsleep_scripts_dir'), '00_MAIN_entry.R'), local = FALSE)))",
+    "  suppressMessages(suppressWarnings(source(file.path(get0('sleepcleanr_scripts_dir'), '00_MAIN_entry.R'), local = FALSE)))",
     "  TRUE",
     "}, error = function(e) e)",
     "if (!isTRUE(res)) { cat('LEAK_FAIL:', conditionMessage(res), '\n'); quit(status = 1) }",

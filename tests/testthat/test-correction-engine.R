@@ -4,7 +4,7 @@ context("Correction engine — recalculate_and_mark_errors thresholds")
 # inst/scripts/error_unusual_sleep_time_corrections.R). Previously this file
 # hand-transcribed the classification logic, which tested a copy, not the
 # shipped code. Now every scenario runs the real internalised function via
-# splsleep:::, so threshold drift in production fails these tests.
+# sleepcleanr:::, so threshold drift in production fails these tests.
 .classify <- function(bed, sleep, awake, getup) {
   df <- data.frame(
     time_bed_corrected   = as.POSIXct(bed,   tz = "UTC"),
@@ -13,7 +13,7 @@ context("Correction engine — recalculate_and_mark_errors thresholds")
     time_getup_corrected = as.POSIXct(getup, tz = "UTC")
   )
   res <- suppressOutput(
-    splsleep:::recalculate_and_mark_errors(
+    sleepcleanr:::recalculate_and_mark_errors(
       df,
       bed_corr_col   = "time_bed_corrected",
       sleep_corr_col = "time_sleep_corrected",
@@ -121,7 +121,7 @@ test_that("internalised vs script-copy: non-empty corrections bit-identical", {
   root <- if (basename(getwd()) == "testthat") dirname(dirname(getwd())) else getwd()
   # R CMD check runs tests against the built package: the script copies live
   # in the installed inst/scripts/, not the source tree.
-  scripts_dir_path <- system.file("scripts", package = "splsleep")
+  scripts_dir_path <- system.file("scripts", package = "sleepcleanr")
   if (!nzchar(scripts_dir_path)) scripts_dir_path <- file.path(root, "inst", "scripts")
 
   # 20-row synthetic diary. apply_manual_corrections_and_recalculate matches
@@ -175,7 +175,7 @@ test_that("internalised vs script-copy: non-empty corrections bit-identical", {
     type = "output"
   )
   capture.output(
-    out_pkg <- splsleep:::apply_manual_corrections_and_recalculate(df, corrections_df, NULL),
+    out_pkg <- sleepcleanr:::apply_manual_corrections_and_recalculate(df, corrections_df, NULL),
     type = "output"
   )
 

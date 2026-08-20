@@ -1,4 +1,4 @@
 library(testthat)
-library(splsleep)
+library(sleepcleanr)
 
-test_check("splsleep")
+test_check("sleepcleanr")

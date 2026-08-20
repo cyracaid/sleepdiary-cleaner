@@ -34,10 +34,10 @@
 ^manual_sleep_metric_duration_corrections\.csv$
 ^manual_metric_review_acceptances\.csv$
 ^second_review_checklist\.csv$
-^splsleep\.Rcheck$
+^sleepcleanr\.Rcheck$
 ^..Rcheck$
 ^..Rcheck$
-^splsleep_ci\.Rcheck$
+^sleepcleanr_ci\.Rcheck$
 ^verify_v1_3_s3\.R$
 ^verify_finalize_columns\.R$
 ^verify_reference_fidelity\.R$
@@ -60,8 +60,8 @@
 ^ARCHITECTURE\.md$
 ^00_MAIN_entry\.R$
 ^00a_setup\.R$
-^splsleep_1\.0\.0\.tar\.gz$
-^splsleep_1\.1\.0\.tar\.gz$
+^sleepcleanr_1\.0\.0\.tar\.gz$
+^sleepcleanr_1\.1\.0\.tar\.gz$
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^Rplots\.pdf$
@@ -71,8 +71,8 @@
 ^docs$
 ^docs-dev$
 ^pkgdown$
-^splsleep\.Rcheck$
-^splsleep_.*\.tar\.gz$
+^sleepcleanr\.Rcheck$
+^sleepcleanr_.*\.tar\.gz$
 ^00_MAIN_entry.R$
 ^00a_setup.R$
 ^apply_metric_review_acceptances.R$

@@ -1,4 +1,4 @@
-# splsleep Package Test Results
+# sleepcleanr Package Test Results
 
 **Date:** 2026-08-19
 **R version:** 4.6.0

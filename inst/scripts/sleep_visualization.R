@@ -2836,7 +2836,7 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) && "revi
 # what they are looking at without asking. It also gives the manuscript Methods
 # section something citable.
 .run_info <- c(
-  "splsleep figure output",
+  "sleepcleanr figure output",
   "========================================",
   sprintf("Run time    : %s", format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z")),
   sprintf("Dataset tag : %s", .data_tag),
@@ -2845,8 +2845,8 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) && "revi
   sprintf("Input CSV   : %s",
           tryCatch(basename(cfg_get("data.files.extra", "", cfg = .pipeline_cfg)),
                    error = function(e) "unknown")),
-  sprintf("Package     : splsleep %s",
-          tryCatch(as.character(utils::packageVersion("splsleep")),
+  sprintf("Package     : sleepcleanr %s",
+          tryCatch(as.character(utils::packageVersion("sleepcleanr")),
                    error = function(e) "unknown")),
   sprintf("Git commit  : %s",
           tryCatch(substr(system("git rev-parse HEAD", intern = TRUE, ignore.stderr = TRUE), 1, 7),

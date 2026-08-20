@@ -34,7 +34,7 @@ finalize_columns <- function(data,
 
   # ---- 1. Load the dictionary ------------------------------------------------
   if (is.null(dict_path)) {
-    dict_path <- system.file("extdata", "column_dictionary.csv", package = "splsleep")
+    dict_path <- system.file("extdata", "column_dictionary.csv", package = "sleepcleanr")
     if (!nzchar(dict_path)) {
       dict_path <- file.path("inst", "extdata", "column_dictionary.csv")  # dev mode
     }

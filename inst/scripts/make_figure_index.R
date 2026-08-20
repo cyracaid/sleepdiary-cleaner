@@ -114,7 +114,7 @@ generate_figure_index <- function(viz_dir = "latest_visualization") {
   cat(sprintf("Figure index written to: %s  (%d figures)\n", out_path, nrow(reg)))
 }
 
-if (interactive() || !exists("splsleep_loaded")) {
+if (interactive() || !exists("sleepcleanr_loaded")) {
   args <- commandArgs(trailingOnly = TRUE)
   viz_dir <- if (length(args) >= 1) args[1] else "latest_visualization"
   generate_figure_index(viz_dir)

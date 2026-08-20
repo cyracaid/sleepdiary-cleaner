@@ -46,7 +46,7 @@ cat(sprintf("Analyzable n:  base %d | range [%d, %d] | max shift %d records (%.1
 
 # ── B. Real-data B1/B2 headlines ────────────────────────────────────────────
 # B1: sleep-onset semantics — TST excludes vs includes SOL.
-# The 2026-08-10 decision: sleeponset WITHOUT self-report SOL (splsleep
+# The 2026-08-10 decision: sleeponset WITHOUT self-report SOL (sleepcleanr
 # implementation). If SOL were added: mean TST shifts ~29 min (7.71 -> 7.23).
 # Recompute from cleaned real data: mean(TST) and mean(TST + SOL).
 real <- readRDS("output/cleaned_data_full.rds")

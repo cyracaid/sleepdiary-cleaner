@@ -32,7 +32,7 @@ sleep diary field; they are not misspellings.
 
 > checking R code for possible problems ... NOTE
 > Found the following assignments to the global environment:
-> File 'splsleep/R/manual_corrections.R': ...
+> File 'sleepcleanr/R/manual_corrections.R': ...
 
 See "Notes for the reviewer" below.
 

@@ -1,7 +1,7 @@
 # test-normalize.R — normalize_sleep_time_sequence edge cases
 # normalize_sleep_time_sequence lives in inst/scripts/, sourced at pipeline runtime
 # (its library() calls may fail on CI where Suggest packages aren't installed)
-sdir <- system.file("scripts", package = "splsleep")
+sdir <- system.file("scripts", package = "sleepcleanr")
 if (sdir == "") sdir <- file.path(getwd(), "inst", "scripts")
 src <- file.path(sdir, "normalize_sleep_time_sequence.R")
 if (file.exists(src)) tryCatch(source(src, local = TRUE), error = function(e) NULL)

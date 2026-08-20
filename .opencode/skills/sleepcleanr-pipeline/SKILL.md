@@ -1,4 +1,4 @@
-# splsleep-pipeline Skill
+# sleepcleanr-pipeline Skill
 
 <!-- AUTO:SKILL_FACTS_START -->
 
@@ -72,13 +72,13 @@ Configurable via YAML — maps your dataset columns without code changes.
 
 ```r
 renv::install("cyracaid/sleepdiary-cleaner")
-library(splsleep)
+library(sleepcleanr)
 run_pipeline()
 ```
 
 For your own data:
 ```r
-file.copy(system.file("config_template.yaml", package = "splsleep"), "my_study.yaml")
+file.copy(system.file("config_template.yaml", package = "sleepcleanr"), "my_study.yaml")
 # Edit my_study.yaml → set data.files.main to your file
 run_pipeline(config = "my_study.yaml")
 ```

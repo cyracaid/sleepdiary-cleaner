@@ -67,7 +67,7 @@ renv/sandbox/
 # Package build
 *.tar.gz
 src/
-splsleep.Rcheck/
+sleepcleanr.Rcheck/
 # Build artifacts
 manual_error_correction_updated.csv
 reasonable_unusual_records.csv

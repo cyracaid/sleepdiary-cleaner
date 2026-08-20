@@ -6,8 +6,8 @@
 #
 # WHY THIS EXISTS
 # ---------------
-# verify_v1_3_snapshot.R compares "splsleep old path" against "splsleep S3
-# chain". It proves the refactor did not change results. It CANNOT prove that# splsleep is faithful to the reference implementation
+# verify_v1_3_snapshot.R compares "sleepcleanr old path" against "sleepcleanr S3
+# chain". It proves the refactor did not change results. It CANNOT prove that# sleepcleanr is faithful to the reference implementation
 # (R01_online_sleepdiary_manualclean / calculate_sleep_time_vars.R), because a
 # deviation that predates the snapshot is carried by both sides and compares
 # equal. B1 (sleeponset) sat undetected for exactly that reason.
@@ -124,7 +124,7 @@ run_sandboxed <- function(expr) {
 # filename missed it; searching by content (self_diffcalc_sleeponset) found it
 # immediately.
 #
-# Caveat on provenance: this is splsleep's OWN 2026-05-19 ancestor, not the
+# Caveat on provenance: this is sleepcleanr's OWN 2026-05-19 ancestor, not the
 # upstream R01_online_sleepdiary_manualclean file. The screenshot of R01 that
 # prompted the B1 audit reads "+ time_sleep_am_hhmm_ampm" where this reads
 # "+ time_sleep_corrected" -- same lineage, not the same file. So this baseline
@@ -138,7 +138,7 @@ run_sandboxed <- function(expr) {
 BASELINE_DEFAULT <- file.path("inst", "verification",
                               "baseline_formulas_2026-05-19.R")
 BASELINE_ORIGIN  <- file.path("archive", "2026-07-25",
-                              "spl_pipeline_package_2026-05-19", "splsleep",
+                              "spl_pipeline_package_2026-05-19", "sleepcleanr",
                               "calculate_sleep_time_end.R")
 ref_path <- Sys.getenv("SPLSLEEP_REFERENCE_IMPL", BASELINE_DEFAULT)
 ref_available <- nzchar(ref_path) && file.exists(ref_path)
@@ -264,13 +264,13 @@ reg <- data.frame(
              "MATCHES", "DEVIATION", "DEVIATION", "DEVIATION"),
   evidence = c(
     "baseline L119 difftime(sleep_corrected, bed_corrected) -- identical",
-    "baseline L126 adds minutes(sol_mincalc); splsleep does not. B1, approved 2026-08-09, work log section 1",
+    "baseline L126 adds minutes(sol_mincalc); sleepcleanr does not. B1, approved 2026-08-09, work log section 1",
     "baseline L131 difftime(awake, sleep) -- identical",
     "baseline L138 difftime(getup, bed) -- identical",
     "baseline L144 difftime(awake, sleeponset) -- identical formula (values differ only via sleeponset)",
-    "baseline L150 subtracts raw waso_mincalc; splsleep subtracts waso_mincalc_used. B2 trust gate, approved 2026-08-09",
-    "baseline L158 bare TST/trysleep; splsleep guards trysleep <= 0 to NA. Without it a zero window yields Inf, and is.na(Inf) is FALSE",
-    "baseline L167 bare waso/num_waso; splsleep requires trusted WASO and num_waso > 0"
+    "baseline L150 subtracts raw waso_mincalc; sleepcleanr subtracts waso_mincalc_used. B2 trust gate, approved 2026-08-09",
+    "baseline L158 bare TST/trysleep; sleepcleanr guards trysleep <= 0 to NA. Without it a zero window yields Inf, and is.na(Inf) is FALSE",
+    "baseline L167 bare waso/num_waso; sleepcleanr requires trusted WASO and num_waso > 0"
   ),
   stringsAsFactors = FALSE
 )
@@ -292,7 +292,7 @@ n_dev <- sum(reg$status == "DEVIATION")
 cat("\n  baseline: ")
 if (ref_available) {
   cat(ref_path, "\n")
-  cat("  (splsleep's own 2026-05-19 ancestor -- same lineage as the upstream\n")
+  cat("  (sleepcleanr's own 2026-05-19 ancestor -- same lineage as the upstream\n")
   cat("   R01 file, not byte-identical to it. Answers 'have our formulas\n")
   cat("   drifted from where they started', nothing stronger.)\n")
 } else {

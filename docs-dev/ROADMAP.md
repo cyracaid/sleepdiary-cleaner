@@ -1,4 +1,4 @@
-# splsleep v2.0 — 可信清洗路线图
+# sleepcleanr v2.0 — 可信清洗路线图
 
 > 核心命题：**我的 cleaning 是可信的（trustworthy）**
 >

@@ -1,7 +1,7 @@
 ---
 title: "验证方法学"
 description: >
-  splsleep 清洗管线的验证方法：从干净输入特异度、注入错误基准、Bland-Altman
+  sleepcleanr 清洗管线的验证方法：从干净输入特异度、注入错误基准、Bland-Altman
   测量特性描述、真实数据审计到 multiverse 鲁棒性分析的九步验证链。
 output: rmarkdown::html_vignette
 vignette: >
@@ -19,7 +19,7 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 吵？在真实数据里找到什么？人工一致吗？我们的选择要紧吗？
 
 ```{r setup, eval = FALSE}
-library(splsleep)
+library(sleepcleanr)
 ```
 
 ## 为什么要验证
