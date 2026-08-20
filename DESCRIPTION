@@ -31,7 +31,7 @@ Imports:
     corrplot,
     dplyr,
     ggplot2,
-    gridExtra,
+    gtable,
     lubridate,
     magick,
     patchwork,
@@ -42,6 +42,7 @@ Imports:
     utils,
     yaml
 Suggests:
+    gridExtra,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
