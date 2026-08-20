@@ -278,7 +278,7 @@ clean_data <- corrected_ema_data[corrected_ema_data$data_category %in% c("clean"
 
 **This repository contains no raw participant data, no real identifiers, and no actual study responses.** All CSV files containing participant data are excluded via `.gitignore` and purged from git history. Older git history may mention the de-identified export filenames ("deidentified_intervalvars_forCD_111325", "sber_ema_anon_20260227" — both *already anonymized* names); these strings contain no participant identifiers, the files themselves were never git-tracked, and the residue was assessed and deliberately kept (2026-08-19). Trigger for a history rewrite is only re-appearance of individually re-identifiable data, not naming residue.
 
-Template CSV files with synthetic data are in [`templates/`](templates/). Copy these to create your own correction files.
+Template CSV files with synthetic data are in `templates/`. Copy these to create your own correction files.
 
 ### Input Data Structure (Text Description)
 
@@ -1357,7 +1357,7 @@ clean_data <- corrected_ema_data[corrected_ema_data$data_category %in% c("clean"
 
 **本仓库不含任何原始参与者数据。** 所有真实数据 CSV 已从 git 历史彻底清除。
 
-模板文件（含假数据）在 [`templates/`](templates/)，展示列结构。
+模板文件（含假数据）在 `templates/`，展示列结构。
 
 ### 主要输入数据
 
