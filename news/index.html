@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,6 +33,10 @@
       <small>Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.4.4" id="sleepcleanr-144">sleepcleanr 1.4.4<a class="anchor" aria-label="anchor" href="#sleepcleanr-144"></a></h2>
+<p>Adds the silent-error audit disposition layer: Dataset B now carries a per-row <code>audit_disposition</code> roll-up column (none/keep/keep_flagged/ corrected_manual/set_na/mixed) sourced from a private field-level ledger (<code>audit_dispositions.csv</code>, gitignored), with hard consistency guards linking value-changing dispositions to the manual-corrections file. NA writes in <code>sleep_metric_duration_corrections</code> are now honored as explicit original-value removal (set_na). Field-misentry check now resolves the SOL column from config (MM:SS-era export compatibility).</p>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.4.3" id="sleepcleanr-143">sleepcleanr 1.4.3<a class="anchor" aria-label="anchor" href="#sleepcleanr-143"></a></h2>
 <p>Fixes a correction rule flagged by the redundant-channel validation on real data (Channel B, 2026-08-12/13).</p>
@@ -180,6 +184,10 @@
 <li>
 <code>R CMD check</code>: 0 errors, 0 warnings, 3 acceptable notes. GitHub Actions green.</li>
 </ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.4.4" id="sleepcleanr-144-1">sleepcleanr 1.4.4<a class="anchor" aria-label="anchor" href="#sleepcleanr-144-1"></a></h2>
+<p>Adds the silent-error audit disposition layer: Dataset B now carries a per-row <code>audit_disposition</code> roll-up column (none/keep/keep_flagged/ corrected_manual/set_na/mixed) sourced from a private field-level ledger (<code>audit_dispositions.csv</code>, gitignored), with hard consistency guards linking value-changing dispositions to the manual-corrections file. NA writes in <code>sleep_metric_duration_corrections</code> are now honored as explicit original-value removal (set_na). Field-misentry check now resolves the SOL column from config (MM:SS-era export compatibility).</p>
+</div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

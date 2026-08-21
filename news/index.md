@@ -1,5 +1,16 @@
 # Changelog
 
+## sleepcleanr 1.4.4
+
+Adds the silent-error audit disposition layer: Dataset B now carries a
+per-row `audit_disposition` roll-up column (none/keep/keep_flagged/
+corrected_manual/set_na/mixed) sourced from a private field-level ledger
+(`audit_dispositions.csv`, gitignored), with hard consistency guards
+linking value-changing dispositions to the manual-corrections file. NA
+writes in `sleep_metric_duration_corrections` are now honored as
+explicit original-value removal (set_na). Field-misentry check now
+resolves the SOL column from config (MM:SS-era export compatibility).
+
 ## sleepcleanr 1.4.3
 
 Fixes a correction rule flagged by the redundant-channel validation on
@@ -378,3 +389,14 @@ release adds an interface contract without changing any cleaning result.
 - `main_csv` made optional; data integrity audit added.
 - `R CMD check`: 0 errors, 0 warnings, 3 acceptable notes. GitHub
   Actions green.
+
+## sleepcleanr 1.4.4
+
+Adds the silent-error audit disposition layer: Dataset B now carries a
+per-row `audit_disposition` roll-up column (none/keep/keep_flagged/
+corrected_manual/set_na/mixed) sourced from a private field-level ledger
+(`audit_dispositions.csv`, gitignored), with hard consistency guards
+linking value-changing dispositions to the manual-corrections file. NA
+writes in `sleep_metric_duration_corrections` are now honored as
+explicit original-value removal (set_na). Field-misentry check now
+resolves the SOL column from config (MM:SS-era export compatibility).

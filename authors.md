@@ -15,13 +15,13 @@ Source:
 [`DESCRIPTION`](https://github.com/cyracaid/sleepdiary-cleaner/blob/main/DESCRIPTION)
 
 Dong C, ten Brink M (2026). *sleepcleanr: Sleep EMA Diary Data Cleaning
-Pipeline*. R package version 1.4.3,
+Pipeline*. R package version 1.4.4,
 <https://github.com/cyracaid/sleepdiary-cleaner>.
 
     @Manual{,
       title = {sleepcleanr: Sleep EMA Diary Data Cleaning Pipeline},
       author = {Cai Dong and Maia {ten Brink}},
       year = {2026},
-      note = {R package version 1.4.3},
+      note = {R package version 1.4.4},
       url = {https://github.com/cyracaid/sleepdiary-cleaner},
     }
