@@ -120,7 +120,7 @@ bland_altman <- function(data,
       plot.caption  = ggplot2::element_text(size = 8, colour = "grey60")
     )
 
-  invisible(list(
+  out <- list(
     bias          = bias,
     lower_loa     = lower_loa,
     upper_loa     = upper_loa,
@@ -130,7 +130,9 @@ bland_altman <- function(data,
     n_pairs       = n_pairs,
     pct_outside   = pct_outside,
     plot          = p
-  ))
+  )
+  class(out) <- "bland_altman"
+  invisible(out)
 }
 
 #' Print a Bland-Altman summary

@@ -98,6 +98,22 @@ process_timestamp <- function(df, varname, format) {
     concat.tstamp.ampm.cstr = data.frame(tstamp.varname.cstr, stringsAsFactors = FALSE)
     concat.tstamp.ampm.cstr[[ampm.varname]] <- df[[ampm.varname]]
 
+    # Study-export AM/PM dialects in the bed/sleep ampm column, verified
+    # against the archived pre-processed export (deidentified_intervalvars_
+    # forCD_111325.rds):
+    #   "C" -> "AM"  (C-count 1013 == decoded AM-count 1013 exactly)
+    #   "l" -> "PM"  (l-count 1847 == decoded PM-count 1847 exactly)
+    # Normalise to standard AM/PM so the 12h/24h logic below is not skipped.
+    {
+      diag_ap <- trimws(as.character(concat.tstamp.ampm.cstr[[ampm.varname]]))
+      is_C <- diag_ap %in% c("C", "c")
+      is_l <- diag_ap %in% c("l", "L")
+      concat.tstamp.ampm.cstr[[ampm.varname]] <-
+        ifelse(is_l, "PM",
+        ifelse(is_C, "AM",
+               diag_ap))
+    }
+
     concat.tstamp.ampm.cstr = concat.tstamp.ampm.cstr %>%
       mutate(!!paste0(varname, "_hhmm_orig") := tstamp.varname.cstr) %>%
       separate(col = !!paste0(varname, "_hhmm_orig"), into = c(paste0(varname, "_h"), paste0(varname, "_m")), sep = ":", fill = "right", extra = "drop") %>%

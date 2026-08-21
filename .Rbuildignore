@@ -112,3 +112,15 @@
 ^tests/testthat/testthat-problems\.rds$
 ^audit_dispositions\.csv$
 ^audit_dispositions\.csv\..*$
+# ── 🔴 REAL / PRIVATE DATA — never ship ─────────────────────────────
+^sber_ema_anon_.*\.csv$
+^deidentified_.*\.rds$
+^manual_.*\.csv$
+^\[NEW\].*\.csv$
+^audit_dispositions\.csv$
+^audit_m1_m7_.*\.csv$
+^cross_participant_.*\.csv$
+^metrics_ai_review\.csv$
+^reasonable_unusual_records\.csv$
+^second_review_checklist\.csv$
+^figures$

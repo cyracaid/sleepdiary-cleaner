@@ -242,7 +242,11 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
     cols <- intersect(c("pid", "day_num", "self_diffcalc_sol_minutes",
       "self_diffcalc_sleepefficiency_percent", "sol_category",
       "se_category", "tst_tib_ratio_category", "auto_error_desc"), names(ndf))
-    utils::write.csv(ndf[, cols, drop = FALSE], "output/flagged_records_self_reported.csv", row.names = FALSE)
+    utils::write.csv(ndf[, cols, drop = FALSE],
+                     file.path(cfg_get("output.report.dir", "output", cfg = cfg),
+                               cfg_get("output.report.flagged_self_reported",
+                                       "flagged_records_self_reported.csv", cfg = cfg)),
+                     row.names = FALSE)
     if (verbose) cat(sprintf("  Exported %d SELF-REPORTED FLAG records\n", nrow(ndf)))
   }
   log_step(corrected_ema_data, "8", "Auto-detect", cfg)
@@ -259,7 +263,8 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
     source(file.path(sdir, "sleep_visualization.R"), local = TRUE)
   }
 
-  write_step_ledger("output/step_flag_ledger.csv")
+  write_step_ledger(file.path(cfg_get("output.report.dir", "output", cfg = cfg),
+                              "step_flag_ledger.csv"))
 
   if (file.exists(file.path(sdir, "audit_data_integrity.R"))) {
     source(file.path(sdir, "audit_data_integrity.R"), local = TRUE)

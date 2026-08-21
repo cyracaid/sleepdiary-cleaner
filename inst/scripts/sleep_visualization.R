@@ -2398,13 +2398,20 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
   plot_data <- data.frame()
   stats_table <- data.frame()
   
+  # Non-NA/non-Inf numeric filter: exports may carry character or blank
+  # values ("", "1.5", Inf) which seq/breaks and min/max/median then choke on.
+  .finite_values <- function(x) {
+    xv <- suppressWarnings(as.numeric(x))
+    xv[is.finite(xv)]
+  }
+
   for (subst in names(subst_list)) {
     info <- subst_list[[subst]]
     col_name <- info$col
     
     if (col_name %in% names(corrected_ema_data)) {
       values <- corrected_ema_data[[col_name]]
-      non_na <- values[!is.na(values)]
+      non_na <- .finite_values(values)
       
       if (length(non_na) > 0) {
         # Add to plot data
@@ -2491,12 +2498,18 @@ cat("\n\n")
 # --------------------------------------------------------------------------
 # Figure 23: Caffeine Consumption Distribution
 # --------------------------------------------------------------------------
+# Non-NA/non-Inf numeric filter (defined defensively here: the Figure 22
+# block that usually carries it may be skipped entirely).
+.finite_values <- function(x) {
+  xv <- suppressWarnings(as.numeric(x))
+  xv[is.finite(xv)]
+}
 cat("Generating Figure 23 (Caffeine consumption)...\n")
 
 caf_col <- "caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1"
 if (exists("corrected_ema_data") && caf_col %in% names(corrected_ema_data)) {
   caf_vals <- corrected_ema_data[[caf_col]]
-  caf_non_na <- caf_vals[!is.na(caf_vals)]
+  caf_non_na <- .finite_values(caf_vals)
 
   if (length(caf_non_na) > 0) {
     caf_df <- data.frame(caffeine_cups = caf_non_na)
@@ -2531,7 +2544,7 @@ cat("Generating Figure 24 (Alcohol consumption)...\n")
 alc_col <- "alcoholtoday_PM_NumAlcoholicDrinks_1"
 if (exists("corrected_ema_data") && alc_col %in% names(corrected_ema_data)) {
   alc_vals <- corrected_ema_data[[alc_col]]
-  alc_non_na <- alc_vals[!is.na(alc_vals)]
+  alc_non_na <- .finite_values(alc_vals)
 
   if (length(alc_non_na) > 0) {
     alc_df <- data.frame(alcohol_drinks = alc_non_na)

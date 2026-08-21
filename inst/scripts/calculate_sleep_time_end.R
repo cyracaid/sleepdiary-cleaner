@@ -251,8 +251,9 @@ calculate_sleep_time_vars_end <- function(data, cfg = NULL) {
   }
   
   # ---- Block 3: Persist clean data ----
-  dir.create("output", showWarnings = FALSE)
-  saveRDS(cleaned_data, "output/corrected_ema_data.rds")
+  out_dir <- cfg_get("output.report.dir", "output", cfg = cfg)
+  dir.create(out_dir, showWarnings = FALSE)
+  saveRDS(cleaned_data, file.path(out_dir, "corrected_ema_data.rds"))
   
   return(cleaned_data)
 }
