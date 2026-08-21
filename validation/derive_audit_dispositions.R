@@ -36,6 +36,24 @@ first_row_id <- function(pid, day) {
   as.character(b$row_id[hit[1]])
 }
 
+# Authoritative pid+day -> row_id mapping: the manual-corrections file (the
+# same keying the pipeline applier and the attach guard use). Fall back to the
+# first Dataset-B row only when a (pid, day, variable) has no manual record.
+sol_var <- "duration_totalmin_sol_estimate_am"
+waso_var <- "duration_totalmin_waso_estimate_am"
+manual_file <- "manual_sleep_metric_duration_corrections.csv"
+manual_tbl <- if (file.exists(manual_file)) {
+  read.csv(manual_file, stringsAsFactors = FALSE, check.names = FALSE)
+} else NULL
+row_id_from_manual <- function(i) {
+  if (is.null(manual_tbl)) return(NA_character_)
+  v <- if (trimws(ws$field[i]) == "WASO") waso_var else sol_var
+  hit <- which(trimws(as.character(manual_tbl$pid)) == trimws(as.character(ws$pid[i])) &
+                 as.integer(manual_tbl$day_num) == as.integer(ws$day[i]) &
+                 trimws(manual_tbl$variable) == v)
+  if (length(hit) == 0) NA_character_ else as.character(manual_tbl$row_id[hit[1]])
+}
+
 map_disp <- function(h) {
   h <- gsub("[\n\r]+", " ", h)
   ifelse(grepl("^NA \\(duration_sol", h), "set_na",
@@ -46,7 +64,10 @@ map_disp <- function(h) {
 out <- data.frame(
   pid          = trimws(as.character(ws$pid)),
   day_num      = as.integer(ws$day),
-  row_id       = vapply(seq_len(nrow(ws)), function(i) first_row_id(ws$pid[i], ws$day[i]), character(1)),
+  row_id       = vapply(seq_len(nrow(ws)), function(i) {
+    m <- row_id_from_manual(i)
+    if (is.na(m)) first_row_id(ws$pid[i], ws$day[i]) else m
+  }, character(1)),
   field        = trimws(ws$field),
   disposition  = map_disp(ws$human_decision),
   decided_by   = "audit_20260820",
