@@ -72,3 +72,44 @@ test_that("write_step_ledger writes CSV", {
   csv <- read.csv(path, stringsAsFactors = FALSE)
   expect_true(nrow(csv) > 0)
 })
+
+test_that("eval_flag_severity: threshold scoring with default cutoffs", {
+  d <- data.frame(sleep_efficiency_pct = c(50, 90, 50, 90),
+                  sol_h = c(0.5, 2, 2, 0.5),
+                  waso_h = c(1, 1, 2, 1))
+  s <- eval_flag_severity(d, cfg = NULL)
+  # r1: poor se only; r2: high sol only; r3: poor se + high waso; r4: clean
+  expect_equal(s, c("Minor issues (1 flag)", "Minor issues (1 flag)",
+                    "Major issues (2+ flags)", "Clean"))
+})
+
+test_that("eval_flag_severity: non-finite metrics are unknown, not clean", {
+  d <- data.frame(sleep_efficiency_pct = c(NA, Inf, 50),
+                  sol_h = c(NA, NaN, 1.5),
+                  waso_h = c(NA, 1, 1))
+  s <- eval_flag_severity(d, cfg = NULL)
+  # NA row: no finite metric -> 0 flags -> "Clean" by design (unknown misses
+  # the poor-efficiency flag); Inf efficiency must not score as clean-poor.
+  expect_equal(s[3], "Major issues (2+ flags)")
+})
+
+test_that("eval_flag_severity: config-cutoff override", {
+  d <- data.frame(sleep_efficiency_pct = 80, sol_h = 0.8, waso_h = 1.4)
+  cfg <- list(classification = list(flag_severity = list(
+    poor_efficiency_threshold_pct = 85, high_sol_threshold_hours = 1,
+    high_waso_threshold_hours = 1.5)))
+  # poor se only under strict cutoff -> 1 flag; defaults -> 0 flags
+  expect_equal(eval_flag_severity(d, cfg), "Minor issues (1 flag)")
+  expect_equal(eval_flag_severity(d, cfg = NULL), "Clean")
+})
+
+test_that("eval_flag_severity: existing column returned verbatim", {
+  d <- data.frame(flag_severity = c("Clean", "Critical"), x = 1:2)
+  expect_equal(eval_flag_severity(d, cfg = NULL), c("Clean", "Critical"))
+})
+
+test_that("eval_duration_extreme: duration classification (sleep_duration_h)", {
+  d <- data.frame(sleep_duration_h = c(13, 2.5, 8, NA, Inf))
+  out <- eval_duration_extreme(d, cfg = NULL)
+  expect_equal(out, c("Too long (>12h)", "Too short (<3h)", "OK", NA_character_, NA_character_))
+})

@@ -199,3 +199,40 @@ test_that("Dataset B carries audit_disposition (none) when no ledger exists", {
   expect_true(all(res$prepost$audit_disposition == "none"))
   expect_false("audit_disposition" %in% names(res$final))
 })
+
+test_that("finalize path: audited values, disposition, and manual flag all land in B", {
+  skip_if_not(file.exists(.dict_path()), "column_dictionary.csv not found")
+  withr::local_options(sleepcleanr.audit_ledger = tempfile(fileext = ".csv"),
+                       sleepcleanr.audit_manual_corrections = tempfile(fileext = ".csv"))
+  d <- .fake_data(3)
+  d$row_id <- c(1L, 2L, 3L)
+  d$day_num <- c(1L, 2L, 3L)
+  mc <- "duration_totalmin_sol_estimate_am_mincalc"
+  # emulate Step 6.5 outcome: value changes already in the data (real chain:
+  # applier mutates corrected_ema_data; finalize only selects/renames + attach)
+  d[[mc]] <- c(NA_real_, 3.0, 3.5)
+  d$has_correction <- c("manual", "manual", "none")
+  d$correction_type <- c("audit_20260820", "audit_20260820", NA)
+
+  led <- data.frame(pid = "1001", day_num = c(1, 2, 3), row_id = c(1, 2, 3),
+    field = "SOL", disposition = c("set_na", "corrected_manual", "keep"),
+    decided_by = "audit_20260820", annotators = c("", "cyra;maia", ""),
+    decision_date = "2026-08-20", evidence_note = "", stringsAsFactors = FALSE)
+  write.csv(led, getOption("sleepcleanr.audit_ledger"), row.names = FALSE)
+  man <- data.frame(pid = "1001", day_num = c(1, 2), row_id = c(1, 2),
+    variable = "duration_totalmin_sol_estimate_am",
+    corrected_mincalc = c("", "3.0"), stringsAsFactors = FALSE)
+  write.csv(man, getOption("sleepcleanr.audit_manual_corrections"), row.names = FALSE)
+
+  res <- finalize_columns(d, review_data = .fake_review(3),
+                          dict_path = .dict_path(), write = FALSE, verbose = FALSE)
+  pb <- res$prepost
+  expect_identical(pb$audit_disposition, c("set_na", "corrected_manual", "keep"))
+  expect_equal(pb$sol_selfreport_minutes, c(NA, 3.0, 3.5))
+  expect_identical(pb$has_correction[1:2], c("manual", "manual"))
+  expect_identical(pb$has_correction[3], "none")
+  # ledger keep rows must not touch values
+  expect_equal(pb$sol_selfreport_minutes[3], 3.5)
+  # A stays audit-free (already asserted) and values preserved
+  expect_equal(res$final$sol_selfreport_minutes, c(NA, 3.0, 3.5))
+})
