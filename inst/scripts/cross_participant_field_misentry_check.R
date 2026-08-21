@@ -20,14 +20,19 @@ if (!file.exists(rds_path)) {
 
 raw <- readRDS(rds_path)
 
-# ── Per-row check: does the HH:MM string of SOL/WASO exactly match a time column? ──
-raw$mis_sol_sleep <- !is.na(raw$duration_totalmin_sol_estimate_am) &
-  !is.na(raw$time_sleep_am_hhmm) &
-  raw$duration_totalmin_sol_estimate_am == raw$time_sleep_am_hhmm
+# SOL column name is mapping-driven (MM:SS-era exports store SOL under the
+# *_hhmm column; the old totalmin name does not exist in them).
+sol_col <- config_get(.pipeline_cfg, "column_mapping.duration.sol",
+                      "duration_totalmin_sol_estimate_am")
 
-raw$mis_sol_bed <- !is.na(raw$duration_totalmin_sol_estimate_am) &
+# ── Per-row check: does the HH:MM string of SOL/WASO exactly match a time column? ──
+raw$mis_sol_sleep <- !is.na(raw[[sol_col]]) &
+  !is.na(raw$time_sleep_am_hhmm) &
+  raw[[sol_col]] == raw$time_sleep_am_hhmm
+
+raw$mis_sol_bed <- !is.na(raw[[sol_col]]) &
   !is.na(raw$time_bed_am_hhmm) &
-  raw$duration_totalmin_sol_estimate_am == raw$time_bed_am_hhmm
+  raw[[sol_col]] == raw$time_bed_am_hhmm
 
 raw$mis_waso_awake <- !is.na(raw$duration_totalmin_waso_estimate_am) &
   !is.na(raw$time_awake_am_hhmm) &
@@ -46,7 +51,7 @@ n_flag <- length(flagged_idx)
 
 if (n_flag > 0) {
   keep_cols <- c("pid", "day_num", "row_id",
-    "duration_totalmin_sol_estimate_am",
+    sol_col,
     "duration_totalmin_waso_estimate_am",
     "time_bed_am_hhmm", "time_bed_am_ampm",
     "time_sleep_am_hhmm", "time_sleep_am_ampm",

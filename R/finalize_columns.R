@@ -63,6 +63,14 @@ finalize_columns <- function(data,
             paste(pending$source_column, collapse = ", "))
   }
 
+  # ---- 1b. Attach the silent-error audit disposition (Dataset B only) ---------
+  # The audit ledger (audit_dispositions.csv, gitignored) records per-field
+  # human decisions (keep/keep_flagged/corrected_manual/set_na). It is attached
+  # here as a per-row roll-up so Dataset B can carry the outcome; Dataset A is
+  # untouched. No ledger -> column all "none". Value changes never flow through
+  # here -- they go through manual_sleep_metric_duration_corrections.csv.
+  data <- audit_dispositions_attach(data)
+
   # ---- 2. Resolve each column to its source object ----------------------------
   if (!is.null(review_data)) {
     stopifnot(is.data.frame(review_data))

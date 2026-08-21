@@ -111,3 +111,7 @@ validation/synthetic/run_ppv/input_key.txt
 /validation/synthetic/ground_truth_enrichment.csv
 /validation/synthetic/results/cluster_bootstrap_per_row.csv
 /validation/synthetic/results/mrr_per_row.csv
+
+# Silent-error audit ledger
+audit_dispositions.csv
+audit_dispositions.csv.*

@@ -188,3 +188,14 @@ test_that("declared defaults fill legitimately-optional columns", {
     }
   }
 })
+
+test_that("Dataset B carries audit_disposition (none) when no ledger exists", {
+  skip_if_not(file.exists(.dict_path()), "column_dictionary.csv not found")
+  withr::local_options(sleepcleanr.audit_ledger = tempfile(fileext = ".csv"),
+                       sleepcleanr.audit_manual_corrections = tempfile(fileext = ".csv"))
+  res <- finalize_columns(.fake_data(), review_data = .fake_review(),
+                          dict_path = .dict_path(), write = FALSE, verbose = FALSE)
+  expect_true("audit_disposition" %in% names(res$prepost))
+  expect_true(all(res$prepost$audit_disposition == "none"))
+  expect_false("audit_disposition" %in% names(res$final))
+})

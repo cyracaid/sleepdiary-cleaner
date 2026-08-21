@@ -110,3 +110,5 @@
 ^tests/R_CMD_CHECK\.log$
 ^tests/testthat/_problems$
 ^tests/testthat/testthat-problems\.rds$
+^audit_dispositions\.csv$
+^audit_dispositions\.csv\..*$

@@ -45,3 +45,4 @@ pos_affect,,,pos_affect,,none,affect_score,reserved,Affect layer (positive affec
 neg_affect,,,neg_affect,,none,affect_score,reserved,Affect layer (negative affect EMA score). NOT cleaned by this pipeline: pass-through only  never flagged/imputed/corrected. Reserved declaration.
 stress_today_pm,,,stress_today_pm,,none,affect_score,reserved,Affect layer (evening stress rating per EMA protocol). NOT cleaned by this pipeline: pass-through only. Reserved declaration.
 copestress_today_pm,,,copestress_today_pm,,none,affect_score,reserved,Affect layer (evening coping stress rating). NOT cleaned by this pipeline: pass-through only. Reserved declaration.
+audit_disposition,corrected_ema_data,,,audit_disposition,none,category,implemented,Silent-error audit outcome (188-row review): per-row roll-up of private ledger. Levels none/keep/keep_flagged/corrected_manual/set_na/mixed. B only; field-level detail in private audit_dispositions.csv.

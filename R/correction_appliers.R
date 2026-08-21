@@ -173,7 +173,7 @@ apply_sleep_metric_duration_corrections <- function(data, cfg = NULL) {
     err_col <- paste0(var_name, "_checkforerrors")
     audit_col <- paste0(var_name, "_correctionsmade")
 
-    if (!(min_col %in% names(data)) || is.na(correct_min)) {
+    if (!(min_col %in% names(data))) {
       cat(sprintf("  Skipping correction row: pid=%s day=%s variable=%s\n",
                   pid_val, day_val, var_name))
       skipped_count <- skipped_count + 1
@@ -194,7 +194,11 @@ apply_sleep_metric_duration_corrections <- function(data, cfg = NULL) {
     # directly (e.g., 10:30 -> 10.5 minutes). Do not let older manual rows that
     # used objective SOL as a workaround overwrite the parser-derived value.
     existing_audit <- if (audit_col %in% names(data)) data[[audit_col]][idx] else NA_character_
-    if (!is.na(existing_audit) &&
+    # NA writes (explicit original-value removal decided in the 2026-08-20
+    # audit) override the parser; non-NA writes from older objective-SOL
+    # workaround rows still defer to the parser-derived value.
+    if (!is.na(correct_min) &&
+        !is.na(existing_audit) &&
         grepl("sleep metric duration MM:SS threshold conversion", existing_audit, fixed = TRUE)) {
       if (err_col %in% names(data)) {
         data[[err_col]][idx] <- FALSE
