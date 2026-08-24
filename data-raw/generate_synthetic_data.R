@@ -66,6 +66,22 @@ na_idx <- sample(n, round(n * 0.05))
 has_na <- rep(FALSE, n)
 has_na[na_idx] <- TRUE
 
+# Simulate the study export's AM/PM dialect: the real export stores "C"
+# (AM-meaning, e.g. 00:20 / 1:05 / 12:30-as-midnight) or "l" (PM-meaning,
+# pre-midnight beds) in the bed/sleep ampm column instead of AM/PM. The
+# parser folds both back to standard AM/PM (C -> AM, l -> PM), so marking a
+# row only re-labels it -- the hhmm stays untouched and the parsed time is
+# identical. This makes the synthetic fixture exercise the decoder end-to-end
+# without disturbing any downstream expectations.
+is_am <- bed_ampm == "AM"
+is_pm <- !is_am & !is.na(bed_ampm)
+c_row <- is_am & (runif(n) < 0.35)
+l_row <- is_pm & (runif(n) < 0.65)
+bed_ampm[c_row]  <- "C"
+sleep_ampm[c_row] <- "C"
+bed_ampm[l_row]  <- "l"
+sleep_ampm[l_row] <- "l"
+
 df <- data.frame(
   pid = rows$pid,
   day_num = rows$day_num,
