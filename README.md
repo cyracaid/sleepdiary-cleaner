@@ -1,6 +1,6 @@
 # sleepcleanr — Reproducible cleaning pipeline for sleep EMA diary data
 
-[![Documentation](https://img.shields.io/badge/docs-pkgdown%20site-blue)](https://cyracaid.github.io/sleepdiary-cleaner/)
+[![Docs](https://img.shields.io/badge/📖-docs-blue)](https://cyracaid.github.io/sleepdiary-cleaner/)
 [![GitHub stars](https://img.shields.io/github/stars/cyracaid/sleepdiary-cleaner?style=flat-square)](https://github.com/cyracaid/sleepdiary-cleaner/stargazers)
 [![Last commit](https://img.shields.io/github/last-commit/cyracaid/sleepdiary-cleaner?style=flat-square)](https://github.com/cyracaid/sleepdiary-cleaner/commits/main)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
