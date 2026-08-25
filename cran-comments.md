@@ -8,8 +8,8 @@ sleep metrics (TST, SOL, WASO, SE), and generates diagnostic and
 research-ready figures. All study-specific mappings are configured via YAML,
 so new studies can be added without code changes. Developed for the Stanford
 Psychophysiology Laboratory's intensive-longitudinal sleep study
-(github.com/stanford-sber). Formerly released as `splsleep`; renamed to
-`sleepcleanr` in this version.
+(github.com/stanford-sber). Formerly named `splsleep`; renamed to
+`sleepcleanr` in this version. This is the package's first CRAN submission.
 
 ## Test environments
 
