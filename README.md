@@ -5,7 +5,7 @@
 [![Last commit](https://img.shields.io/github/last-commit/cyracaid/sleepdiary-cleaner?style=flat-square)](https://github.com/cyracaid/sleepdiary-cleaner/commits/main)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Awesome PR](https://img.shields.io/badge/awesome--R-PR%20open-blue)](https://github.com/qinwf/awesome-R/pull/276)
-[![awesomeskills.dev](https://img.shields.io/badge/awesomeskills-dev-listed-green)](https://www.awesomeskills.dev/zh-CN/skill/cyracaid-sleepdiary-cleaner)
+[![awesomeskills.dev](https://img.shields.io/badge/listed%20on-awesomeskills.dev-brightgreen)](https://www.awesomeskills.dev/zh-CN/skill/cyracaid-sleepdiary-cleaner)
 [![Codecov](https://codecov.io/gh/cyracaid/sleepdiary-cleaner/branch/main/graph/badge.svg)](https://codecov.io/gh/cyracaid/sleepdiary-cleaner)
 
 > **[English](#english) · [中文](#中文)**
