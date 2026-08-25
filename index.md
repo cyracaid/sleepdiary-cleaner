@@ -9,6 +9,7 @@ commit](https://img.shields.io/github/last-commit/cyracaid/sleepdiary-cleaner?st
 [![License:
 MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
+[![Codecov](https://codecov.io/gh/cyracaid/sleepdiary-cleaner/branch/main/graph/badge.svg)](https://codecov.io/gh/cyracaid/sleepdiary-cleaner)
 
 > **[English](#english) · [中文](#%E4%B8%AD%E6%96%87)**
 
