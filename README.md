@@ -20,6 +20,11 @@ schema-validated YAML config maps the pipeline to your dataset without
 touching code. Developed for the Stanford Psychophysiology Laboratory's
 intensive-longitudinal sleep study.
 
+> **Naming note:** The R package is called **sleepcleanr** (CRAN convention: no
+> hyphens). The GitHub repository is **sleepdiary-cleaner**. They are the same
+> project — install via `renv::install("cyracaid/sleepdiary-cleaner")` and then
+> `library(sleepcleanr)`.
+
 ## Install
 
 ```r
@@ -91,6 +96,10 @@ issues.
 CSV）检测并修正时序与时长错误，计算标准睡眠指标（TST、SOL、WASO、SE），并生成
 诊断与科研图表。经 schema 校验的 YAML 配置可将管线映射到你的数据集，无需改代码。
 为斯坦福心理生理学实验室的高强度纵向睡眠研究开发。
+
+> **命名说明：** R 包名为 **sleepcleanr**（CRAN 规范不允许连字符），
+> GitHub 仓库名为 **sleepdiary-cleaner**。两者是同一项目 — 安装用
+> `renv::install("cyracaid/sleepdiary-cleaner")`，加载用 `library(sleepcleanr)`。
 
 ## 安装
 
