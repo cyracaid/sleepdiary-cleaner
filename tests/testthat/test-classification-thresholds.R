@@ -1,5 +1,3 @@
-context("Classification logic — generate_correction_files thresholds")
-
 # The classification thresholds are defined as:
 #   bed_sleep_diff_error   > 7 hours
 #   awake_getup_diff_error > 7 hours

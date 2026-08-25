@@ -1,5 +1,3 @@
-context("Config — data.files.main/extra and column mapping")
-
 test_that("main: RDS without extra works", {
   skip_if_not_installed("yaml")
   tmp   <- file.path(tempdir(), "test_config")
