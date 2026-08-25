@@ -1,3 +1,16 @@
+## Package summary
+
+`sleepcleanr` is a reproducible R pipeline for cleaning intensive-longitudinal
+sleep EMA diary data. It parses raw timestamp columns, detects and corrects
+temporal and duration errors through a documented human-in-the-loop workflow
+(with an audit ledger recording every disposition decision), computes standard
+sleep metrics (TST, SOL, WASO, SE), and generates diagnostic and
+research-ready figures. All study-specific mappings are configured via YAML,
+so new studies can be added without code changes. Developed for the Stanford
+Psychophysiology Laboratory's intensive-longitudinal sleep study
+(github.com/stanford-sber). Formerly released as `splsleep`; renamed to
+`sleepcleanr` in this version.
+
 ## Test environments
 
 - Local: macOS (darwin), R 4.6.0 (2026-04-24), `R CMD check --as-cran --no-manual`

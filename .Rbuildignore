@@ -124,3 +124,5 @@
 ^reasonable_unusual_records\.csv$
 ^second_review_checklist\.csv$
 ^figures$
+^AGENTS\.md$
+^real_data_config\.yaml$

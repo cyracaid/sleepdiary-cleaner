@@ -190,26 +190,26 @@ apply_sleep_metrics <- function(data) {
   cat(sprintf("\n=== Calculating sleep time variables for: %s ===\n", data_name))
   
   required_cols <- c(
-    "time_bed_corrected",
-    "time_sleep_corrected", 
-    "time_awake_corrected",
-    "time_getup_corrected",
-    "num_waso_estimate_am",
-    "duration_totalmin_sol_estimate_am_mincalc",
-    "duration_totalmin_waso_estimate_am_mincalc"
-  )
-  
-  missing_cols <- setdiff(required_cols, names(data))
-  
-  if (length(missing_cols) > 0) {
-    stop(sprintf("\n❌ Missing required columns in %s: %s", data_name, paste(missing_cols, collapse = ", ")))
-  }
-  
-  cat(sprintf("\n✓ All required columns found in %s\n", data_name))
+     "time_bed_corrected",
+     "time_sleep_corrected", 
+     "time_awake_corrected",
+     "time_getup_corrected",
+     # "num_waso_estimate_am",  # OPTIONAL — may not be in source data
+     "duration_totalmin_sol_estimate_am_mincalc",
+     "duration_totalmin_waso_estimate_am_mincalc"
+   )
+   
+   missing_cols <- setdiff(required_cols, names(data))
+   
+   if (length(missing_cols) > 0) {
+     stop(sprintf("\n❌ Missing required columns in %s: %s", data_name, paste(missing_cols, collapse = ", ")))
+   }
+   
+   cat(sprintf("\n✓ All required columns found in %s\n", data_name))
 
-  if (!"duration_totalmin_waso_estimate_am_checkforerrors" %in% names(data)) {
-    data$duration_totalmin_waso_estimate_am_checkforerrors <- FALSE
-  }
+   if (!"duration_totalmin_waso_estimate_am_checkforerrors" %in% names(data)) {
+     data$duration_totalmin_waso_estimate_am_checkforerrors <- FALSE
+   }
   if (!"duration_totalmin_sol_estimate_am_checkforerrors" %in% names(data)) {
     data$duration_totalmin_sol_estimate_am_checkforerrors <- FALSE
   }
@@ -249,18 +249,22 @@ apply_sleep_metrics <- function(data) {
         as.numeric(duration_totalmin_waso_estimate_am_mincalc),
         NA_real_
       )
-    ) %>%
-    mutate(self_diffcalc_totalsleeptime_minutes = self_diffcalc_sleepperiod_minutes - duration_totalmin_waso_estimate_am_mincalc_used) %>%
-    mutate(self_diffcalc_sleepefficiency_percent = self_diffcalc_totalsleeptime_minutes / self_diffcalc_totaltrysleep_minutes) %>%
-    mutate(num_waso_estimate_am = as.numeric(num_waso_estimate_am)) %>%
-    mutate(avg_waso_estimate_am_minutes = if_else(
-      !is.na(duration_totalmin_waso_estimate_am_mincalc_used) &
-        !is.na(num_waso_estimate_am) & num_waso_estimate_am > 0,
-      duration_totalmin_waso_estimate_am_mincalc_used / num_waso_estimate_am,
-      NA_real_
-    ))
-  
-  return(cleaned_data)
+     ) %>%
+     mutate(self_diffcalc_totalsleeptime_minutes = self_diffcalc_sleepperiod_minutes - duration_totalmin_waso_estimate_am_mincalc_used) %>%
+     mutate(self_diffcalc_sleepefficiency_percent = self_diffcalc_totalsleeptime_minutes / self_diffcalc_totaltrysleep_minutes) %>%
+     {if ("num_waso_estimate_am" %in% names(.)) {
+       mutate(., num_waso_estimate_am = as.numeric(num_waso_estimate_am)) %>%
+       mutate(avg_waso_estimate_am_minutes = if_else(
+         !is.na(duration_totalmin_waso_estimate_am_mincalc_used) &
+           !is.na(num_waso_estimate_am) & num_waso_estimate_am > 0,
+         duration_totalmin_waso_estimate_am_mincalc_used / num_waso_estimate_am,
+         NA_real_
+       ))
+     } else {
+       mutate(., avg_waso_estimate_am_minutes = NA_real_)
+     }}
+   
+   return(cleaned_data)
 }
 
 # ============================================================================
@@ -328,7 +332,7 @@ cat(sprintf("\n✓ clean_df created with %d rows\n", nrow(clean_df)))
 # Required duration columns for sleep metrics. Do not synthesize missing
 # durations as zero; that would turn unknown input into false sleep facts.
 missing_cols_list <- c(
-  "num_waso_estimate_am",
+  # "num_waso_estimate_am",  # OPTIONAL — may not be in source data
   "duration_totalmin_sol_estimate_am_mincalc",
   "duration_totalmin_waso_estimate_am_mincalc"
 )

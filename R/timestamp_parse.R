@@ -186,9 +186,16 @@ process_timestamp <- function(df, varname, format) {
       return(df)
     }
 
-    # Attach date to create full POSIXct (combine HH:MM AM/PM with StartDate)
-    df_timeproc = df_timeproc %>%
-      mutate(!!as.symbol(paste0(varname, "_hhmm_ampm")) := paste0(substr(StartDate, 1, 10), " ", !!as.symbol(paste0(varname, "_hhmm_ampm"))))
+    # Attach date to create full POSIXct (combine HH:MM AM/PM with StartDate, or fallback to generic date)
+    if ("StartDate" %in% names(df_timeproc)) {
+      df_timeproc = df_timeproc %>%
+        mutate(!!as.symbol(paste0(varname, "_hhmm_ampm")) := paste0(substr(StartDate, 1, 10), " ", !!as.symbol(paste0(varname, "_hhmm_ampm"))))
+    } else {
+      # Fallback: use a generic date (2000-01-01) when StartDate unavailable
+      # This allows parsing without date info; only time-of-day structure is preserved
+      df_timeproc = df_timeproc %>%
+        mutate(!!as.symbol(paste0(varname, "_hhmm_ampm")) := paste0("2000-01-01", " ", !!as.symbol(paste0(varname, "_hhmm_ampm"))))
+    }
 
     tstamp.hhmmampm.varname.isna <- which(is.na(tstamp.hhmmampm.varname))
     df_timeproc[tstamp.hhmmampm.varname.isna, paste0(varname, "_hhmm_ampm")] <- NA

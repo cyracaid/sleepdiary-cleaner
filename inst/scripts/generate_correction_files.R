@@ -403,8 +403,8 @@ generate_correction_files <- function(ema_data_release_timecalc) {
       time_awake_am_hhmm_ampm, time_awake_am_checkforerrors,
       time_getup_am_hhmm_ampm, time_getup_am_checkforerrors,
       
-      # Number of WASO (Wake After Sleep Onset) episodes
-      num_waso_estimate_am,
+      # Number of WASO (Wake After Sleep Onset) episodes (optional)
+      any_of("num_waso_estimate_am"),
       
       # Algorithm-corrected timestamps (the values used in diff calculations)
       !!sym(col_mapping$bed_corrected), !!sym(col_mapping$sleep_corrected), 
@@ -478,7 +478,7 @@ generate_correction_files <- function(ema_data_release_timecalc) {
       time_getup_am_hhmm_ampm, time_getup_am_checkforerrors,
       
       # Number of WASO episodes
-      num_waso_estimate_am,
+      any_of("num_waso_estimate_am"),
       
       # Algorithm-corrected timestamps
       !!sym(col_mapping$bed_corrected), !!sym(col_mapping$sleep_corrected), 
@@ -537,7 +537,7 @@ generate_correction_files <- function(ema_data_release_timecalc) {
       time_getup_am_hhmm_ampm, time_getup_am_checkforerrors,
       
       # Number of WASO episodes
-      num_waso_estimate_am,
+      any_of("num_waso_estimate_am"),
       
       # Algorithm-corrected timestamps
       !!sym(col_mapping$bed_corrected), !!sym(col_mapping$sleep_corrected), 
@@ -622,7 +622,7 @@ generate_correction_files <- function(ema_data_release_timecalc) {
       time_awake_am_checkforerrors, time_getup_am_checkforerrors,
       
       # Number of WASO episodes
-      num_waso_estimate_am,
+      any_of("num_waso_estimate_am"),
       
       # Algorithm-corrected timestamps (used in automated checks)
       time_bed_corrected, time_sleep_corrected,
@@ -679,7 +679,7 @@ generate_correction_files <- function(ema_data_release_timecalc) {
       time_awake_am_checkforerrors, time_getup_am_checkforerrors,
       
       # Number of WASO episodes
-      num_waso_estimate_am,
+      any_of("num_waso_estimate_am"),
       
       # Algorithm-corrected timestamps
       time_bed_corrected, time_sleep_corrected,

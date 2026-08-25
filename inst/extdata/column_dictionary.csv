@@ -15,7 +15,7 @@ awake_getup_diff_h,corrected_ema_data,,waso_computed_minutes,,x60,minutes,implem
 avg_waso_estimate_am_minutes,corrected_ema_data,,waso_avg_bout_selfreport_minutes,,none,minutes,implemented,Mean duration per awakening bout = self-reported WASO / self-reported bout count. BOTH numerator and denominator are self-reported.
 duration_totalmin_sol_estimate_am_mincalc,corrected_ema_data,,sol_selfreport_minutes,sol_selfreport_minutes,none,minutes,implemented,Participant's own SOL estimate. Pairs with sol_computed_minutes for discrepancy analysis.
 duration_totalmin_waso_estimate_am_mincalc,corrected_ema_data,,waso_selfreport_minutes,,none,minutes,implemented,Participant's own total WASO estimate. Pairs with waso_computed_minutes but does not track it night to night (r=0.013). Values are heavily rounded to multiples of 5 which attenuates any correlation.
-num_waso_estimate_am,corrected_ema_data,,num_waso_bouts_selfreport,,none,count,implemented,Self-reported number of awakenings
+num_waso_estimate_am,corrected_ema_data,NA,num_waso_bouts_selfreport,,none,count,implemented,Self-reported number of awakenings
 duration_totalmin_napstoday_PM_mincalc,corrected_ema_data,,nap_selfreport_totalminutes,,none,minutes,implemented,Self-reported total nap duration. No nap timestamps exist  so nap timing discrepancy cannot be computed.
 exercisetoday_PM_totalmin_Light_mincalc,corrected_ema_data,NA,exercise_light_minutes,,none,minutes,implemented,Light exercise duration
 exercisetoday_PM_totalmin_Moderate_mincalc,corrected_ema_data,NA,exercise_moderate_minutes,,none,minutes,implemented,Moderate exercise duration
@@ -36,7 +36,7 @@ caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1,corrected_ema_data,,caffeine_num,,
 alcoholtoday_PM_NumAlcoholicDrinks_1,corrected_ema_data,,alcohol_num,,none,count,implemented,Alcoholic drinks
 nicotine_amount_pm_doses,corrected_ema_data,,nicotine_doses,,none,count,implemented,Nicotine doses
 cannabis_amount_pm_doses,corrected_ema_data,,cannabis_doses,,none,count,implemented,Cannabis doses
-StartDate,corrected_ema_data,,StartDate,,none,character,implemented,Survey date as recorded. Character type -- parse before plotting on a calendar axis.
+StartDate,corrected_ema_data,NA,StartDate,,none,character,implemented,Survey date as recorded. Character type -- parse before plotting on a calendar axis.
 time_bed_am_hhmm_ampm,corrected_ema_data,,,bedtime_precorrection,none,timestamp,implemented,Parsed bedtime before any correction (Step 2)
 time_sleep_am_hhmm_ampm,corrected_ema_data,,,sleeponset_precorrection,none,timestamp,implemented,Parsed sleep onset before any correction (Step 2)
 time_awake_am_hhmm_ampm,corrected_ema_data,,,awakening_precorrection,none,timestamp,implemented,Parsed awakening before any correction (Step 2)

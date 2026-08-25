@@ -115,3 +115,7 @@ validation/synthetic/run_ppv/input_key.txt
 # Silent-error audit ledger
 audit_dispositions.csv
 audit_dispositions.csv.*
+
+# local-only, real-study config — never commit/ship
+real_data_config.yaml
+AGENTS.md
