@@ -1,5 +1,3 @@
-context("Correction engine — recalculate_and_mark_errors thresholds")
-
 # Thin wrapper over the PRODUCTION classifier (R/manual_corrections.R, formerly
 # inst/scripts/error_unusual_sleep_time_corrections.R). Previously this file
 # hand-transcribed the classification logic, which tested a copy, not the

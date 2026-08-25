@@ -1,5 +1,3 @@
-context("Auto-detection — Part C metric validation thresholds")
-
 # Part C of checkforerrors_processing.R validates sleep metrics:
 #   SOL:  < 0 → flag, > 120 min → flag (excessive)
 #   SE:   < 0 → flag, > 100 → flag, < -1000 → insane
