@@ -7,7 +7,9 @@ stars](https://img.shields.io/github/stars/cyracaid/sleepdiary-cleaner?style=fla
 commit](https://img.shields.io/github/last-commit/cyracaid/sleepdiary-cleaner?style=flat-square)](https://github.com/cyracaid/sleepdiary-cleaner/commits/main)
 [![License:
 MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
+[![Awesome
+PR](https://img.shields.io/badge/awesome--R-PR%20open-blue)](https://github.com/qinwf/awesome-R/pull/276)
+[![awesomeskills.dev](https://img.shields.io/badge/awesomeskills-dev-listed-green)](https://www.awesomeskills.dev/zh-CN/skill/cyracaid-sleepdiary-cleaner)
 [![Codecov](https://codecov.io/gh/cyracaid/sleepdiary-cleaner/branch/main/graph/badge.svg)](https://codecov.io/gh/cyracaid/sleepdiary-cleaner)
 
 > **[English](#english) · [中文](#%E4%B8%AD%E6%96%87)**
@@ -56,6 +58,26 @@ Psychophysiology Laboratory’s intensive-longitudinal sleep study.
   unit tests passing
 - 🎯 **Research-ready** — generates publication-quality figures +
   correlation matrices
+
+### Validation Map
+
+    SYNTHETIC TIER (ground truth)
+    ──────────────────────────────
+    Step 1  Clean-input specificity ── 10k clean records → 0 changes/flags
+    Step 2  Injected-error benchmark ── recall 0.995 [0.993, 0.997]
+    Step 3  Detection vs correctness ── L1 vs L3 gap → routes to human
+    Step 4  Controls ── no_cleaning 0 / naive_rule 0.623 / pipeline 0.995
+
+    REAL-DATA TIER (n = 13,990)
+    ──────────────────────────────
+    Step 5  Redundant-channel ── 81/88 corrections improve (92%)
+    Step 5.5  Bland-Altman ── SOL ±75-min noise band; WASO 3.3× above noise
+    Step 6  Report-only audit ── 0 AUTO_FIX, 1,048 FLAG
+    Step 7  Human co-review ── 64–89% agreement
+
+    ROBUSTNESS TIER
+    ──────────────────────────────
+    Step 8  Multiverse + seeds ── recall stable 0.993–0.995
 
 > **Naming note:** The R package is called **sleepcleanr** (CRAN
 > convention: no hyphens). The GitHub repository is

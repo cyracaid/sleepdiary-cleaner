@@ -50,7 +50,7 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="sleepcleanr--reproducible-cleaning-pipeline-for-sleep-ema-diary-data">sleepcleanr — Reproducible cleaning pipeline for sleep EMA diary data<a class="anchor" aria-label="anchor" href="#sleepcleanr--reproducible-cleaning-pipeline-for-sleep-ema-diary-data"></a>
 </h1></div>
-<p><a href="https://cyracaid.github.io/sleepdiary-cleaner/"><img src="https://img.shields.io/badge/%F0%9F%93%96-docs-blue" alt="Docs"></a> <a href="https://github.com/cyracaid/sleepdiary-cleaner/stargazers" class="external-link"><img src="https://img.shields.io/github/stars/cyracaid/sleepdiary-cleaner?style=flat-square" alt="GitHub stars"></a> <a href="https://github.com/cyracaid/sleepdiary-cleaner/commits/main" class="external-link"><img src="https://img.shields.io/github/last-commit/cyracaid/sleepdiary-cleaner?style=flat-square" alt="Last commit"></a> <a href="https://opensource.org/licenses/MIT" class="external-link"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a> <a href="https://awesome.re" class="external-link"><img src="https://awesome.re/badge.svg" alt="Awesome"></a> <a href="https://codecov.io/gh/cyracaid/sleepdiary-cleaner" class="external-link"><img src="https://codecov.io/gh/cyracaid/sleepdiary-cleaner/branch/main/graph/badge.svg" alt="Codecov"></a></p>
+<p><a href="https://cyracaid.github.io/sleepdiary-cleaner/"><img src="https://img.shields.io/badge/%F0%9F%93%96-docs-blue" alt="Docs"></a> <a href="https://github.com/cyracaid/sleepdiary-cleaner/stargazers" class="external-link"><img src="https://img.shields.io/github/stars/cyracaid/sleepdiary-cleaner?style=flat-square" alt="GitHub stars"></a> <a href="https://github.com/cyracaid/sleepdiary-cleaner/commits/main" class="external-link"><img src="https://img.shields.io/github/last-commit/cyracaid/sleepdiary-cleaner?style=flat-square" alt="Last commit"></a> <a href="https://opensource.org/licenses/MIT" class="external-link"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a> <a href="https://github.com/qinwf/awesome-R/pull/276" class="external-link"><img src="https://img.shields.io/badge/awesome--R-PR%20open-blue" alt="Awesome PR"></a> <a href="https://www.awesomeskills.dev/zh-CN/skill/cyracaid-sleepdiary-cleaner" class="external-link"><img src="https://img.shields.io/badge/awesomeskills-dev-listed-green" alt="awesomeskills.dev"></a> <a href="https://codecov.io/gh/cyracaid/sleepdiary-cleaner" class="external-link"><img src="https://codecov.io/gh/cyracaid/sleepdiary-cleaner/branch/main/graph/badge.svg" alt="Codecov"></a></p>
 <blockquote>
 <p><strong><a href="#english">English</a> · <a href="#%E4%B8%AD%E6%96%87">中文</a></strong></p>
 </blockquote>
@@ -87,21 +87,42 @@
 <li>🚀 <strong>Reproducible</strong> — YAML config, full pipeline documentation, 308 unit tests passing</li>
 <li>🎯 <strong>Research-ready</strong> — generates publication-quality figures + correlation matrices</li>
 </ul>
+<div class="section level3">
+<h3 id="validation-map">Validation Map<a class="anchor" aria-label="anchor" href="#validation-map"></a>
+</h3>
+<pre><code>SYNTHETIC TIER (ground truth)
+──────────────────────────────
+Step 1  Clean-input specificity ── 10k clean records → 0 changes/flags
+Step 2  Injected-error benchmark ── recall 0.995 [0.993, 0.997]
+Step 3  Detection vs correctness ── L1 vs L3 gap → routes to human
+Step 4  Controls ── no_cleaning 0 / naive_rule 0.623 / pipeline 0.995
+
+REAL-DATA TIER (n = 13,990)
+──────────────────────────────
+Step 5  Redundant-channel ── 81/88 corrections improve (92%)
+Step 5.5  Bland-Altman ── SOL ±75-min noise band; WASO 3.3× above noise
+Step 6  Report-only audit ── 0 AUTO_FIX, 1,048 FLAG
+Step 7  Human co-review ── 64–89% agreement
+
+ROBUSTNESS TIER
+──────────────────────────────
+Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <blockquote>
 <p><strong>Naming note:</strong> The R package is called <strong>sleepcleanr</strong> (CRAN convention: no hyphens). The GitHub repository is <strong>sleepdiary-cleaner</strong>. They are the same project — install via <code>renv::install("cyracaid/sleepdiary-cleaner")</code> and then <code><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">library(sleepcleanr)</a></code>.</p>
 </blockquote>
 </div>
+</div>
 <div class="section level2">
 <h2 id="install">Install<a class="anchor" aria-label="anchor" href="#install"></a>
 </h2>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># From GitHub (CRAN release pending)</span></span>
 <span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
 </h2>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Demo run on the bundled synthetic fixture</span></span>
@@ -216,14 +237,14 @@
 <div class="section level2">
 <h2 id="安装">安装<a class="anchor" aria-label="anchor" href="#%E5%AE%89%E8%A3%85"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 从 GitHub 安装（CRAN 发布待定）</span></span>
 <span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="快速开始">快速开始<a class="anchor" aria-label="anchor" href="#%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B"></a>
 </h2>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 用内置合成数据跑演示</span></span>
