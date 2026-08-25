@@ -1,12 +1,13 @@
 # sleepcleanr — Reproducible cleaning pipeline for sleep EMA diary data
 
-[![Docs](https://img.shields.io/badge/📖-docs-blue)](https://cyracaid.github.io/sleepdiary-cleaner/)
+[![CRAN](https://img.shields.io/cran/v/sleepcleanr?style=flat-square&color=blue)](https://cran.r-project.org/package=sleepcleanr)
 [![GitHub stars](https://img.shields.io/github/stars/cyracaid/sleepdiary-cleaner?style=flat-square)](https://github.com/cyracaid/sleepdiary-cleaner/stargazers)
-[![Last commit](https://img.shields.io/github/last-commit/cyracaid/sleepdiary-cleaner?style=flat-square)](https://github.com/cyracaid/sleepdiary-cleaner/commits/main)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Awesome PR](https://img.shields.io/badge/awesome--R-PR%20open-blue)](https://github.com/qinwf/awesome-R/pull/276)
-[![awesomeskills.dev](https://img.shields.io/badge/listed%20on-awesomeskills.dev-brightgreen)](https://www.awesomeskills.dev/zh-CN/skill/cyracaid-sleepdiary-cleaner)
-[![Codecov](https://codecov.io/gh/cyracaid/sleepdiary-cleaner/branch/main/graph/badge.svg)](https://codecov.io/gh/cyracaid/sleepdiary-cleaner)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)](https://opensource.org/licenses/MIT)
+[![R-CMD-check](https://img.shields.io/github/actions/workflow/status/cyracaid/sleepdiary-cleaner/R-CMD-check.yaml?style=flat-square&label=R--CMD--check)](https://github.com/cyracaid/sleepdiary-cleaner/actions/workflows/R-CMD-check.yaml)
+[![Codecov](https://img.shields.io/codecov/c/github/cyracaid/sleepdiary-cleaner?style=flat-square&color=orange)](https://codecov.io/gh/cyracaid/sleepdiary-cleaner)
+[![Docs](https://img.shields.io/badge/docs-pkgdown-blue?style=flat-square)](https://cyracaid.github.io/sleepdiary-cleaner/)
+[![awesomeskills](https://img.shields.io/badge/awesomeskills.dev-listed-brightgreen?style=flat-square)](https://www.awesomeskills.dev/zh-CN/skill/cyracaid-sleepdiary-cleaner)
+[![awesome-R PR](https://img.shields.io/badge/awesome--R-PR--276-open-orange?style=flat-square)](https://github.com/qinwf/awesome-R/pull/276)
 
 > **[English](#english) · [中文](#中文)**
 
