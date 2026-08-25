@@ -1,6 +1,14 @@
 # sleepcleanr — Reproducible cleaning pipeline for sleep EMA diary data
 
 [![Documentation](https://img.shields.io/badge/docs-pkgdown%20site-blue)](https://cyracaid.github.io/sleepdiary-cleaner/)
+[![R-CMD-check](https://img.shields.io/github/actions/workflow/status/cyracaid/sleepdiary-cleaner/R-CMD-check.yaml?branch=main&label=R--CMD--check&style=flat-square)](https://github.com/cyracaid/sleepdiary-cleaner/actions/workflows/R-CMD-check.yaml)
+[![GitHub
+stars](https://img.shields.io/github/stars/cyracaid/sleepdiary-cleaner?style=flat-square)](https://github.com/cyracaid/sleepdiary-cleaner/stargazers)
+[![Last
+commit](https://img.shields.io/github/last-commit/cyracaid/sleepdiary-cleaner?style=flat-square)](https://github.com/cyracaid/sleepdiary-cleaner/commits/main)
+[![License:
+MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
 
 > **[English](#english) · [中文](#%E4%B8%AD%E6%96%87)**
 
@@ -17,6 +25,37 @@ correction stored in re-readable CSVs), computes standard sleep metrics
 figures. A schema-validated YAML config maps the pipeline to your
 dataset without touching code. Developed for the Stanford
 Psychophysiology Laboratory’s intensive-longitudinal sleep study.
+
+## The Pipeline at a Glance
+
+    Messy sleep diary data (CSV / RDS)
+             ↓
+       Timestamp parsing & normalization
+             ↓
+       Error detection (order, duration, timezone)
+             ↓
+       Human-in-the-loop review (flagged records only)
+             ↓
+       Correction ledger (full audit trail)
+             ↓
+       Sleep metrics (TST, SOL, WASO, SE)
+             ↓
+       30+ diagnostic & research-ready figures
+             ↓
+       Dataset A (final clean) + Dataset B (audit ledger)
+
+**Why sleepcleanr?**
+
+- 🔍 **Detects** not auto-fixes — 1,048 records flagged for manual
+  review, 0 silent corrections
+- 📊 **Auditable** — every change logged and reversible; non-destructive
+  architecture
+- ✅ **Validated** — 9-step validation chain: synthetic (0.995 recall) +
+  real data (92% improved) + robustness proof
+- 🚀 **Reproducible** — YAML config, full pipeline documentation, 308
+  unit tests passing
+- 🎯 **Research-ready** — generates publication-quality figures +
+  correlation matrices
 
 > **Naming note:** The R package is called **sleepcleanr** (CRAN
 > convention: no hyphens). The GitHub repository is

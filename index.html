@@ -50,7 +50,7 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="sleepcleanr--reproducible-cleaning-pipeline-for-sleep-ema-diary-data">sleepcleanr — Reproducible cleaning pipeline for sleep EMA diary data<a class="anchor" aria-label="anchor" href="#sleepcleanr--reproducible-cleaning-pipeline-for-sleep-ema-diary-data"></a>
 </h1></div>
-<p><a href="https://cyracaid.github.io/sleepdiary-cleaner/"><img src="https://img.shields.io/badge/docs-pkgdown%20site-blue" alt="Documentation"></a></p>
+<p><a href="https://cyracaid.github.io/sleepdiary-cleaner/"><img src="https://img.shields.io/badge/docs-pkgdown%20site-blue" alt="Documentation"></a> <a href="https://github.com/cyracaid/sleepdiary-cleaner/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://img.shields.io/github/actions/workflow/status/cyracaid/sleepdiary-cleaner/R-CMD-check.yaml?branch=main&amp;label=R--CMD--check&amp;style=flat-square" alt="R-CMD-check"></a> <a href="https://github.com/cyracaid/sleepdiary-cleaner/stargazers" class="external-link"><img src="https://img.shields.io/github/stars/cyracaid/sleepdiary-cleaner?style=flat-square" alt="GitHub stars"></a> <a href="https://github.com/cyracaid/sleepdiary-cleaner/commits/main" class="external-link"><img src="https://img.shields.io/github/last-commit/cyracaid/sleepdiary-cleaner?style=flat-square" alt="Last commit"></a> <a href="https://opensource.org/licenses/MIT" class="external-link"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a> <a href="https://awesome.re" class="external-link"><img src="https://awesome.re/badge.svg" alt="Awesome"></a></p>
 <blockquote>
 <p><strong><a href="#english">English</a> · <a href="#%E4%B8%AD%E6%96%87">中文</a></strong></p>
 </blockquote>
@@ -61,20 +61,47 @@
 <h1 id="english">English<a class="anchor" aria-label="anchor" href="#english"></a>
 </h1>
 <p><strong>sleepcleanr</strong> is a reproducible, auditable R pipeline for cleaning sleep EMA (ecological momentary assessment) diary data: it parses raw bedtime/sleep/awake/get-up timestamps, detects and corrects temporal and duration errors through a transparent human-in-the-loop workflow (every correction stored in re-readable CSVs), computes standard sleep metrics (TST, SOL, WASO, SE), and generates diagnostic and research-ready figures. A schema-validated YAML config maps the pipeline to your dataset without touching code. Developed for the Stanford Psychophysiology Laboratory’s intensive-longitudinal sleep study.</p>
+<div class="section level2">
+<h2 id="the-pipeline-at-a-glance">The Pipeline at a Glance<a class="anchor" aria-label="anchor" href="#the-pipeline-at-a-glance"></a>
+</h2>
+<pre><code>Messy sleep diary data (CSV / RDS)
+         ↓
+   Timestamp parsing &amp; normalization
+         ↓
+   Error detection (order, duration, timezone)
+         ↓
+   Human-in-the-loop review (flagged records only)
+         ↓
+   Correction ledger (full audit trail)
+         ↓
+   Sleep metrics (TST, SOL, WASO, SE)
+         ↓
+   30+ diagnostic &amp; research-ready figures
+         ↓
+   Dataset A (final clean) + Dataset B (audit ledger)</code></pre>
+<p><strong>Why sleepcleanr?</strong></p>
+<ul>
+<li>🔍 <strong>Detects</strong> not auto-fixes — 1,048 records flagged for manual review, 0 silent corrections</li>
+<li>📊 <strong>Auditable</strong> — every change logged and reversible; non-destructive architecture</li>
+<li>✅ <strong>Validated</strong> — 9-step validation chain: synthetic (0.995 recall) + real data (92% improved) + robustness proof</li>
+<li>🚀 <strong>Reproducible</strong> — YAML config, full pipeline documentation, 308 unit tests passing</li>
+<li>🎯 <strong>Research-ready</strong> — generates publication-quality figures + correlation matrices</li>
+</ul>
 <blockquote>
 <p><strong>Naming note:</strong> The R package is called <strong>sleepcleanr</strong> (CRAN convention: no hyphens). The GitHub repository is <strong>sleepdiary-cleaner</strong>. They are the same project — install via <code>renv::install("cyracaid/sleepdiary-cleaner")</code> and then <code><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">library(sleepcleanr)</a></code>.</p>
 </blockquote>
+</div>
 <div class="section level2">
 <h2 id="install">Install<a class="anchor" aria-label="anchor" href="#install"></a>
 </h2>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># From GitHub (CRAN release pending)</span></span>
 <span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
 </h2>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Demo run on the bundled synthetic fixture</span></span>
@@ -189,14 +216,14 @@
 <div class="section level2">
 <h2 id="安装">安装<a class="anchor" aria-label="anchor" href="#%E5%AE%89%E8%A3%85"></a>
 </h2>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 从 GitHub 安装（CRAN 发布待定）</span></span>
 <span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="快速开始">快速开始<a class="anchor" aria-label="anchor" href="#%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 用内置合成数据跑演示</span></span>
