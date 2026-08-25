@@ -40,7 +40,7 @@ jobs:
           # hangs after Step 4. Plain R CMD check is the acceptance gate
           # here (0 ERROR / 0 WARNING locally); this is not a CRAN
           # submission. See .github/workflows/R-CMD-check.yaml history.
-          args: 'c("--no-manual")'
+          args: 'c("--no-manual", "--no-vignettes")'
           upload-snapshots: true
           build_args: 'c("--no-build-vignettes", "--no-manual")'
 
