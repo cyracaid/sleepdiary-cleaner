@@ -10,7 +10,7 @@ MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)](https://
 [![Docs](https://img.shields.io/badge/docs-pkgdown-blue?style=flat-square)](https://cyracaid.github.io/sleepdiary-cleaner/)
 [![awesomeskills](https://img.shields.io/badge/awesomeskills.dev-listed-brightgreen?style=flat-square)](https://www.awesomeskills.dev/zh-CN/skill/cyracaid-sleepdiary-cleaner)
 [![awesome-R
-PR](https://img.shields.io/badge/awesome--R-PR--276-open-orange?style=flat-square)](https://github.com/qinwf/awesome-R/pull/276)
+PR](https://img.shields.io/badge/awesome--R-PR_276-open?style=flat-square)](https://github.com/qinwf/awesome-R/pull/276)
 
 > **[English](#english) · [中文](#%E4%B8%AD%E6%96%87)**
 
