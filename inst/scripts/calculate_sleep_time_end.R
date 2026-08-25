@@ -84,7 +84,7 @@ calculate_sleep_time_vars_end <- function(data, cfg = NULL) {
     "time_sleep_corrected",       # Self-reported sleep onset time
     "time_awake_corrected",       # Final morning awakening time
     "time_getup_corrected",       # Time they got out of bed
-    "num_waso_estimate_am",       # Number of WASO bouts (temporarily commented out)
+    # "num_waso_estimate_am",       # Number of WASO bouts (OPTIONAL — may not be in source data)
     "duration_totalmin_sol_estimate_am_mincalc",  # Estimated SOL in minutes (from morning questionnaire)
     "duration_totalmin_waso_estimate_am_mincalc"  # Estimated total WASO duration in minutes
   )
@@ -210,13 +210,18 @@ calculate_sleep_time_vars_end <- function(data, cfg = NULL) {
     # 8. WASO average bout duration
     # Average length of each trusted WASO interruption. If the bout count is
     # missing/zero or WASO is untrusted, leave this derived metric unknown.
-    mutate(num_waso_estimate_am = as.numeric(num_waso_estimate_am)) %>%
-    mutate(avg_waso_estimate_am_minutes = if_else(
-      !is.na(duration_totalmin_waso_estimate_am_mincalc_used) &
-        !is.na(num_waso_estimate_am) & num_waso_estimate_am > 0,
-      duration_totalmin_waso_estimate_am_mincalc_used / num_waso_estimate_am,
-      NA_real_
-    ))
+    # If num_waso_estimate_am column is not available, avg_waso remains NA.
+    {if ("num_waso_estimate_am" %in% names(.)) {
+      mutate(., num_waso_estimate_am = as.numeric(num_waso_estimate_am)) %>%
+      mutate(avg_waso_estimate_am_minutes = if_else(
+        !is.na(duration_totalmin_waso_estimate_am_mincalc_used) &
+          !is.na(num_waso_estimate_am) & num_waso_estimate_am > 0,
+        duration_totalmin_waso_estimate_am_mincalc_used / num_waso_estimate_am,
+        NA_real_
+      ))
+    } else {
+      mutate(., avg_waso_estimate_am_minutes = NA_real_)
+    }}
   
   # --- Calculation metadata ---
   # Store audit information on the returned dataframe so downstream consumers
