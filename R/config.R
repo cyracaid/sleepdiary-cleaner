@@ -6,7 +6,7 @@
 #' @param config_file Character. Path to a YAML config file, or NULL to use
 #'   the bundled default (\code{inst/config_default.yaml}).
 #' @return List of pipeline configuration values.
-#' @keywords internal
+#' @export
 load_config <- function(config_file = NULL) {
   if (is.null(config_file)) {
     config_file <- system.file("config_default.yaml", package = "sleepcleanr")

@@ -17,4 +17,3 @@ List of pipeline configuration values.
 Reads a YAML config file and returns a list of settings.
 Falls back to the bundled default config if no file is specified.
 }
-\keyword{internal}

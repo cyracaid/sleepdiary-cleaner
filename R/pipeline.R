@@ -292,6 +292,23 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
     finalize_columns(corrected_ema_data, review_data = rv, verbose = verbose)
   }
 
+  # -- Step 11: Generate figure_index contact sheet ---------------------------
+  if (!skip_visualization) {
+    if (verbose) cat("\n=== Step 11: Generating figure index ===\n")
+    # Compute viz_dir using same logic as sleep_visualization.R
+    viz_dir <- figure_run_dir(cfg = cfg, 
+                              data_tag = if (!is.null(cfg$pipeline$data_tag)) 
+                                          cfg$pipeline$data_tag else "real",
+                              n_records = nrow(corrected_ema_data))
+    tryCatch(
+      run_figure_index(viz_dir),
+      error = function(e) {
+        if (verbose) cat("⚠ Warning: figure_index generation failed:\n", conditionMessage(e), "\n")
+        # Non-fatal: figures are already generated, just missing the contact sheet
+      }
+    )
+  }
+
   if (verbose) cat("\n[OK] Pipeline complete!\n")
   invisible(TRUE)
 }
@@ -360,3 +377,62 @@ run_figure_index <- function(viz_dir = "latest_visualization") {
   generate_figure_index(viz_dir)
   invisible(TRUE)
 }
+
+#' Run the complete pipeline on bundled synthetic demo data
+#'
+#' Convenience function that runs the full pipeline using the synthetic
+#' EMA diary dataset bundled with sleepcleanr. Useful for testing, demos,
+#' and validation without needing real data.
+#'
+#' Synthetic data includes deliberately injected errors across all rule categories
+#' to benchmark detection and correction performance. Results are written to
+#' \code{output/latest_visualization_synth_nXXX/} in the current working directory.
+#'
+#' @param project_dir Character. Path to the project root (where output/ will be created).
+#'   Default ".".
+#' @param verbose Logical. Print progress. Default TRUE.
+#'
+#' @return Invisibly TRUE on successful completion.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'   # Run the full pipeline on synthetic data in the current directory
+#'   run_synthetic_demo()
+#'
+#'   # Run in a specific directory
+#'   run_synthetic_demo(project_dir = "~/my_sleepcleanr_run")
+#' }
+run_synthetic_demo <- function(project_dir = ".", verbose = TRUE) {
+  # Locate bundled synthetic data and config
+  data_main <- system.file("extdata", "synthetic_sleep_data.rds", package = "sleepcleanr")
+  data_extra <- system.file("extdata", "synthetic_ema_data.csv", package = "sleepcleanr")
+  cfg_path <- system.file("extdata", "synthetic_config.yaml", package = "sleepcleanr")
+
+  if (data_main == "" || data_extra == "" || cfg_path == "") {
+    stop("Bundled synthetic data or config not found. Is sleepcleanr correctly installed?")
+  }
+
+  if (verbose) {
+    cat("\n=== Running sleepcleanr on Bundled Synthetic Demo Data ===\n")
+    cat("Data: ", data_main, "\n")
+    cat("      ", data_extra, "\n")
+    cat("Config:", cfg_path, "\n\n")
+  }
+
+  # Load config and override data paths to point to bundled files
+  cfg <- load_config(cfg_path)
+  cfg$data$files$main <- data_main
+  cfg$data$files$extra <- data_extra
+  # Clear manual correction stubs (they don't exist in bundled package)
+  cfg$data$files$manual_error <- NULL
+  cfg$data$files$manual_unusual <- NULL
+  cfg$data$files$manual_nap_exercise <- NULL
+  cfg$data$files$manual_metric_duration <- NULL
+  cfg$data$files$manual_metric_accept <- NULL
+  cfg$data$files$second_review <- NULL
+
+  # Run the full pipeline
+  run_pipeline(config = cfg, project_dir = project_dir, verbose = verbose)
+}
+
