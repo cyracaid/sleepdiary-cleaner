@@ -110,6 +110,9 @@ file.copy(system.file("config_template.yaml", package = "sleepcleanr"),
 
 - Full docs site (searchable reference + vignettes, bilingual):
   <https://cyracaid.github.io/sleepdiary-cleaner/>
+- **Validation Report** (evidence package, machine-read from result
+  CSVs):
+  [`VALIDATION_REPORT.md`](https://cyracaid.github.io/sleepdiary-cleaner/VALIDATION_REPORT.md)
 - vignette(“pipeline-architecture”) — structure, rule families,
   classification
 - vignette(“column-mapping”) — mapping your dataset via YAML
@@ -186,6 +189,8 @@ file.copy(system.file("config_template.yaml", package = "sleepcleanr"),
 
 - 完整文档站（可检索函数参考 + 双语 vignette）：
   <https://cyracaid.github.io/sleepdiary-cleaner/>
+- **验证报告**（证据包，数字从结果 CSV 机器读取）：
+  [`VALIDATION_REPORT.md`](https://cyracaid.github.io/sleepdiary-cleaner/VALIDATION_REPORT.md)
 - vignette(“pipeline-architecture-zh”) — 结构、规则族、分类体系
 - vignette(“column-mapping-zh”) — 用 YAML 映射你的数据集
 - vignette(“interpreting-output-zh”) — 读 `correction_status_final.csv`
