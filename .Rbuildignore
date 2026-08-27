@@ -126,3 +126,5 @@
 ^figures$
 ^AGENTS\.md$
 ^real_data_config\.yaml$
+^inst/doc/\.gitkeep$
+^VALIDATION_REPORT\.md$
