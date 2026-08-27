@@ -13,12 +13,9 @@ Psychophysiology Laboratory's intensive-longitudinal sleep study
 
 ## Test environments
 
-- Local: macOS (darwin), R 4.6.0 (2026-04-24), `R CMD check --as-cran --no-manual`
-  - Manual (PDF) build skipped locally because `pdflatex` is not installed
-    on this machine; LaTeX is available on CRAN servers, and the manual
-    already passes the Rd-to-LaTeX conversion stage, so this is an
-    environment limitation only.
-  - Test suite: 307 testthat expectations pass, 0 fail (21 test files,
+- Local: macOS (darwin), R 4.6.0 (2026-04-24), `R CMD check --as-cran`
+  - Manual (PDF) build passes (TinyTeX/TeX available locally).
+  - Test suite: 254 testthat expectations pass, 0 fail (21 test files,
     including the synthetic-fixture pipeline smoke test).
 - GitHub Actions, `R CMD check` (`--as-cran`):
   - ubuntu-latest
@@ -52,10 +49,12 @@ See "Notes for the reviewer" below.
 - Real study data are not bundled. All examples, tests and vignettes run
   against the synthetic fixture in `inst/extdata/`; real-data outputs are
   excluded from the source tarball (`.Rbuildignore`).
-- A local check without `--no-manual` reports one ERROR solely because
-  `pdflatex` is missing from this machine; the error message is
-  `pdflatex is not available` (from `texi2dvi`) and is unrelated to the
-  package contents. CRAN servers ship TeX and will build the manual normally.
+- A previous submission failed `checking tests` on the Debian (R-devel)
+  pre-test with `CCTZ: Unrecognized output timezone: "US/Pacific"`. The
+  legacy `US/Pacific` alias is not recognized by lubridate's CCTZ on
+  Debian; it has been replaced with the canonical `America/Los_Angeles`
+  in `R/timestamp_parse.R` and the legacy `inst/scripts/process_timestamp_
+  emadatarelease_cyra.R` copy. No other timezone aliases remain.
 
 ## Reverse dependencies
 

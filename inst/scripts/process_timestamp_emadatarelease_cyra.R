@@ -160,7 +160,7 @@ process_timestamp <- function(df, varname, format) {
     
     # Convert to proper date-time object
     df_timeproc = df_timeproc %>% 
-      mutate(!!as.symbol(paste0(varname, "_hhmm_ampm")) := lubridate::parse_date_time(!!as.symbol(paste0(varname, "_hhmm_ampm")), "%Y-%m-%d %H:%M %p", tz = "US/Pacific"))
+      mutate(!!as.symbol(paste0(varname, "_hhmm_ampm")) := lubridate::parse_date_time(!!as.symbol(paste0(varname, "_hhmm_ampm")), "%Y-%m-%d %H:%M %p", tz = "America/Los_Angeles"))
     
     # Evening variables (bed/sleep): if parsed time > 15:00 (3 PM), subtract one day
     # so bedtimes after midnight map to the correct date

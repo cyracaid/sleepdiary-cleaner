@@ -1,3 +1,13 @@
+# sleepcleanr 1.4.5
+
+CRAN resubmission: fixes the Debian check ERROR by replacing the legacy
+`US/Pacific` timezone alias (not recognized by lubridate's CCTZ on Debian)
+with the canonical IANA name `America/Los_Angeles` in the timestamp parser
+(`R/timestamp_parse.R` and the legacy `inst/scripts/process_timestamp_
+emadatarelease_cyra.R` copy). Also drops the stray `inst/doc/.gitkeep`
+hidden file from the build, adds `VALIDATION_REPORT.md` to `.Rbuildignore`,
+and updates the README codecov (301) and stargazers (404) badge links.
+
 # sleepcleanr 1.4.4
 
 Adds the silent-error audit disposition layer: Dataset B now carries a
