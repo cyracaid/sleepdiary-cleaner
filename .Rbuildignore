@@ -64,7 +64,7 @@
 ^sleepcleanr_1\.1\.0\.tar\.gz$
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^Rplots\.pdf$
+Rplots\.pdf$
 ^\[NEW\].*\.csv$
 ^validation$
 ^tools$
