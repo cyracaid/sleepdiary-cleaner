@@ -59,6 +59,31 @@ Psychophysiology Laboratory’s intensive-longitudinal sleep study.
 - 🎯 **Research-ready** — generates publication-quality figures +
   correlation matrices
 
+### Why the hybrid (automated + human) design?
+
+sleepcleanr is deliberately **not** fully automated and **not**
+all-manual-flag:
+
+- **Not fully auto:** high-confidence, order/AM-PM-only rules correct
+  harmlessly; but value-level errors (e.g. SOL vs the bed→sleep window)
+  must not be overwritten — a plausible large SOL is real psychological
+  signal, and silently “fixing” it would bias the sleep–affect
+  associations the pipeline exists to serve.
+- **Not all-flag:** a 1,048-row FLAG queue is unmanageable by hand.
+  High-confidence rules chew the deterministic cases; FLAG keeps only
+  the ambiguous ones for human review.
+
+The outcome is not “the pipeline makes a mess clean” — it makes the mess
+**explicit**: every candidate error is surfaced or logged, never
+silently hidden.
+
+> **Thresholds are references, not gospel.** The swap/flip thresholds
+> shipped here (e.g. 3-hour adjacent swap, 12-hour AM/PM flip) were
+> validated on our dataset(s) — see VALIDATION_REPORT. Your study’s
+> diaries may fall inside or outside these cut-offs; they are
+> YAML-configurable and should be re-checked against your own data, not
+> copied blindly.
+
 ### Validation Map
 
     SYNTHETIC TIER (ground truth)
@@ -158,6 +183,26 @@ CSV）检测并修正时序与时长错误，计算标准睡眠指标（TST、SO
 诊断与科研图表。经 schema 校验的 YAML
 配置可将管线映射到你的数据集，无需改代码。
 为斯坦福心理生理学实验室的高强度纵向睡眠研究开发。
+
+### 为什么是”自动 + 人工”混合设计？
+
+sleepcleanr 刻意**既非全自动、也非全部人工 flag**：
+
+- **不全自动：** 高置信、仅涉时序/AM-PM
+  的规则才安全自动修正；但值级错误（如 SOL
+  与就寝→入睡窗口的矛盾）绝不覆盖 — 一个看似偏大的 SOL
+  是真实的心理信号，静默”修正”会破坏管线所服务的睡眠–情绪关联。
+- **不全 flag**：1048 行 FLAG
+  队列手动看不过来。高置信规则吃掉确定性个案；FLAG
+  只把歧义个案留给人审。
+
+结果不是”管线把 mess 洗干净”，而是把 mess
+**显式化**：每个候选错误要么被呈现，要么被记录，永不被静默隐藏。
+
+> **阈值只是参考，不是教条。** 这里的 swap/flip 阈值（如 3
+> 小时相邻对调、12 小时 AM/PM 翻转）在我们的数据集上验证过 — 见
+> VALIDATION_REPORT。你的研究日记可能落在这区间内或外；它们都是 YAML
+> 可配置的，应按你自己的数据重新审视，而非盲抄。
 
 > **命名说明：** R 包名为 **sleepcleanr**（CRAN 规范不允许连字符），
 > GitHub 仓库名为 **sleepdiary-cleaner**。两者是同一项目 — 安装用
@@ -283,6 +328,8 @@ skill：`.opencode/skills/sleepcleanr-pipeline/SKILL.md`，说明如何
   : Start a fresh ledger (call once at the top of run_pipeline).
 - [`is_sleep_diary()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/is_sleep_diary.md)
   : Test whether an object is a sleep_diary
+- [`load_config()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/load_config.md)
+  : Load pipeline configuration
 - [`log_step()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/log_step.md)
   : Record the flag state after a step.
 - [`missing_handler`](https://cyracaid.github.io/sleepdiary-cleaner/reference/missing_handler.md)
@@ -317,6 +364,8 @@ skill：`.opencode/skills/sleepcleanr-pipeline/SKILL.md`，说明如何
   : Run the reporting stage
 - [`run_setup()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_setup.md)
   : Run the setup-only stage (package / input-file checks)
+- [`run_synthetic_demo()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_synthetic_demo.md)
+  : Run the complete pipeline on bundled synthetic demo data
 - [`run_visualization()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_visualization.md)
   : Run only the visualization stage on already-cleaned data
 - [`sleep_diary`](https://cyracaid.github.io/sleepdiary-cleaner/reference/sleep_diary.md)

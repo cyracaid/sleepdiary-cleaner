@@ -58,6 +58,8 @@
   : Start a fresh ledger (call once at the top of run_pipeline).
 - [`is_sleep_diary()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/is_sleep_diary.md)
   : Test whether an object is a sleep_diary
+- [`load_config()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/load_config.md)
+  : Load pipeline configuration
 - [`log_step()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/log_step.md)
   : Record the flag state after a step.
 - [`missing_handler`](https://cyracaid.github.io/sleepdiary-cleaner/reference/missing_handler.md)
@@ -92,6 +94,8 @@
   : Run the reporting stage
 - [`run_setup()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_setup.md)
   : Run the setup-only stage (package / input-file checks)
+- [`run_synthetic_demo()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_synthetic_demo.md)
+  : Run the complete pipeline on bundled synthetic demo data
 - [`run_visualization()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_visualization.md)
   : Run only the visualization stage on already-cleaned data
 - [`sleep_diary`](https://cyracaid.github.io/sleepdiary-cleaner/reference/sleep_diary.md)

@@ -61,19 +61,20 @@
 </tr><tr class="odd"><td><code>time_awake_hhmm</code></td>
 <td><code>time_awake_am_hhmm</code></td>
 <td>character</td>
-<td>Final awakening HH:MM</td>
+<td>
+<strong>Final awakening</strong> HH:MM — last wake before get-up (see Operational definitions)</td>
 </tr><tr class="even"><td><code>time_getup_hhmm</code></td>
 <td><code>time_getup_am_hhmm</code></td>
 <td>character</td>
-<td>Get-up HH:MM</td>
+<td>Get-up HH:MM — the moment the participant left bed</td>
 </tr><tr class="odd"><td><code>sol</code></td>
 <td><code>duration_totalmin_sol_estimate_am</code></td>
 <td>numeric</td>
-<td>Self-reported SOL (min)</td>
+<td>Self-reported SOL (min) — bed → sleep-onset latency</td>
 </tr><tr class="even"><td><code>waso</code></td>
 <td><code>duration_totalmin_waso_estimate_am</code></td>
 <td>numeric</td>
-<td>Self-reported WASO (min)</td>
+<td>Self-reported WASO (min) — <em>total</em> minutes awake after sleep onset (all middle-of-night wakings)</td>
 </tr></tbody></table></div>
 <div class="section level2">
 <h2 id="required-only-when-timestampampmenabled-true">Required only when <code>timestamp.ampm.enabled: true</code>
@@ -121,6 +122,46 @@
 <td>numeric</td>
 <td>Substance figures</td>
 </tr></tbody></table></div>
+<div class="section level2">
+<h2 id="operational-definitions-canonical">Operational definitions (canonical)<a class="anchor" aria-label="anchor" href="#operational-definitions-canonical"></a></h2>
+<p>These are the constructs the timestamp and duration columns encode. They follow the Consensus Sleep Diary (CSD) item wording; derivations are defined in the sleep-metrics code.</p>
+<table class="table"><colgroup><col width="25%"><col width="25%"><col width="25%"><col width="25%"></colgroup><thead><tr class="header"><th>Variable</th>
+<th>Operational definition</th>
+<th>Self-report anchor</th>
+<th>CSD analog</th>
+</tr></thead><tbody><tr class="odd"><td><code>time_bed_hhmm</code></td>
+<td>Time participant <strong>got into bed</strong> to sleep</td>
+<td>—</td>
+<td>Q1 “What time did you get into bed?”</td>
+</tr><tr class="even"><td><code>time_sleep_hhmm</code></td>
+<td>Time <strong>fall-asleep</strong> was attempted/succeeded (sleep onset)</td>
+<td><code>sol</code></td>
+<td>Q2 “What time did you try to go to sleep?” / Q3 “How long did it take you to fall asleep?”</td>
+</tr><tr class="odd"><td><code>time_awake_hhmm</code></td>
+<td>
+<strong>Final awakening</strong> — the last wake-up of the night, ending the main sleep period (NOT middle-of-night wakings)</td>
+<td>—</td>
+<td>Q5 “What time was your final awakening?”</td>
+</tr><tr class="even"><td><code>time_getup_hhmm</code></td>
+<td>
+<strong>Get-up time</strong> — when the participant left bed, ≥ final awakening</td>
+<td>—</td>
+<td>Q6 “What time did you get out of bed?”</td>
+</tr><tr class="odd"><td><code>sol</code></td>
+<td>Sleep-onset latency: bed(or sleep attempt) → sleep onset, minutes</td>
+<td><code>sol</code></td>
+<td>Q3</td>
+</tr><tr class="even"><td><code>waso</code></td>
+<td>
+<strong>Total</strong> wake-after-sleep-onset: sum of ALL middle-of-night wakings (minutes), excluding the final awakening</td>
+<td><code>waso</code></td>
+<td>Q6?/Q7 (wake-up count × duration)</td>
+</tr><tr class="odd"><td><code>waso_count</code></td>
+<td>Number of middle-of-night waking bouts</td>
+<td><code>num_waso_estimate_am</code></td>
+<td>CSD wake-count item</td>
+</tr></tbody></table><p><strong>Key distinction — <code>time_awake_hhmm</code> (final awakening) vs WASO (middle wakings):</strong> <code>time_awake_hhmm</code> is a single timestamp, the <em>last</em> wake of the night; it is the end boundary of TST. WASO is the <em>summed duration</em> of all earlier middle-of-night wakings and contributes to SE/TST — it is a duration, not a timestamp. <strong>These are different constructs and are never interchangeable.</strong> Cleaning found repeated cases where participants entered their number/timing of middle wakings (WASO material) into the <code>time_awake</code> field; such entries must be flagged, not silently accepted as final-awakening times.</p>
+</div>
 </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
