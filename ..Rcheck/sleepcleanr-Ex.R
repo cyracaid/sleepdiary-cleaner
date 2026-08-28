@@ -1,0 +1,106 @@
+pkgname <- "sleepcleanr"
+source(file.path(R.home("share"), "R", "examples-header.R"))
+options(warn = 1)
+library('sleepcleanr')
+
+base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
+base::assign(".old_wd", base::getwd(), pos = 'CheckExEnv')
+cleanEx()
+nameEx("flag_statistical_outliers")
+### * flag_statistical_outliers
+
+flush(stderr()); flush(stdout())
+
+### Name: flag_statistical_outliers
+### Title: Per-participant statistical outlier detection via IQR
+### Aliases: flag_statistical_outliers
+
+### ** Examples
+
+## Not run: 
+##D flagged <- flag_statistical_outliers(corrected_ema_data)
+##D table(flagged$iqr_outlier)
+## End(Not run)
+
+
+
+
+cleanEx()
+nameEx("handle_missing")
+### * handle_missing
+
+flush(stderr()); flush(stdout())
+
+### Name: handle_missing
+### Title: Tag missing-data reason codes and optionally carry forward
+###   single-day gaps
+### Aliases: handle_missing
+
+### ** Examples
+
+## Not run: 
+##D handled <- handle_missing(corrected_ema_data)
+##D table(handled$missing_reason)
+##D 
+##D # LOCF disabled -- only reason codes
+##D handled <- handle_missing(corrected_ema_data, max_gap = 0)
+## End(Not run)
+
+
+
+
+cleanEx()
+nameEx("run_cleaning_chain")
+### * run_cleaning_chain
+
+flush(stderr()); flush(stdout())
+
+### Name: run_cleaning_chain
+### Title: The S3 cleaning chain
+### Aliases: run_cleaning_chain
+
+### ** Examples
+
+## Not run: 
+##D cleaned <- run_cleaning_chain(raw_df, corrections, unusual)
+##D summary(cleaned)
+##D plot(cleaned)
+##D corrected_ema_data <- as.data.frame(cleaned)
+## End(Not run)
+
+
+
+cleanEx()
+nameEx("run_synthetic_demo")
+### * run_synthetic_demo
+
+flush(stderr()); flush(stdout())
+
+### Name: run_synthetic_demo
+### Title: Run the complete pipeline on bundled synthetic demo data
+### Aliases: run_synthetic_demo
+
+### ** Examples
+
+## Not run: 
+##D   # Run the full pipeline on synthetic data in the current directory
+##D   run_synthetic_demo()
+##D 
+##D   # Run in a specific directory
+##D   run_synthetic_demo(project_dir = "~/my_sleepcleanr_run")
+## End(Not run)
+
+
+
+### * <FOOTER>
+###
+cleanEx()
+options(digits = 7L)
+base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
+grDevices::dev.off()
+###
+### Local variables: ***
+### mode: outline-minor ***
+### outline-regexp: "\\(> \\)?### [*]+" ***
+### End: ***
+quit('no')

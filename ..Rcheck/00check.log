@@ -1,0 +1,218 @@
+* using log directory '/Users/sloblucyra/Documents/splsleep/..Rcheck'
+* using R version 4.6.0 (2026-04-24)
+* using platform: aarch64-apple-darwin23
+* R was compiled by
+    Apple clang version 17.0.0 (clang-1700.3.19.1)
+    GNU Fortran (GCC) 14.2.0
+* running under: macOS Sequoia 15.4.1
+* using session charset: ASCII
+* current time: 2026-08-28 00:05:14 UTC
+* checking for file './DESCRIPTION' ... OK
+* this is package 'sleepcleanr' version '1.4.5'
+* package encoding: UTF-8
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... NOTE
+Found the following apparent object files/libraries:
+  renv/library/macos/R-4.6/aarch64-apple-darwin23/renv/libs/renv.so
+Object files/libraries should not be included in a source package.
+
+Subdirectory 'renv/library/macos/R-4.6/aarch64-apple-darwin23/renv' seems to contain an installed version of the package.
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... NOTE
+Found the following hidden files and directories:
+  .DS_Store
+  .Rprofile
+  .gitignore
+  .opencode/.gitignore
+  latest_visualization_synth_n280/.DS_Store
+  output/.DS_Store
+  output/latest_visualization_real/.DS_Store
+  output/verification/.DS_Store
+  renv/.gitignore
+  ..Rcheck
+  .git
+  .github
+  .opencode
+These were most likely included in error. See section 'Package
+structure' in the 'Writing R Extensions' manual.
+* checking for portable file names ... NOTE
+Found the following non-portable file paths:
+  sleepcleanr/output/latest_visualization_real_n13990/pipeline_cleaning/06_Sleep_Duration_Post_Correction.png
+  sleepcleanr/output/latest_visualization_real_n13990/pipeline_cleaning/07_Flag_Composition_Stacked.png
+  sleepcleanr/output/latest_visualization_real_n13990/pipeline_cleaning/08_Sleep_Duration_by_Category.png
+  sleepcleanr/output/latest_visualization_real_n13990/pipeline_cleaning/12_Pipeline_Correction_Progress.png
+  sleepcleanr/output/latest_visualization_real_n13990/pipeline_cleaning/13_Error_Category_Distribution.png
+  sleepcleanr/output/latest_visualization_real_n13990/pipeline_cleaning/P26_PerParticipant_Flag_Rate.png
+  sleepcleanr/output/latest_visualization_real_n13990/research_ready/02_Distribution_Sleep_Variables.png
+  sleepcleanr/output/latest_visualization_real_n13990/research_ready/03_Sleep_Duration_Distribution.png
+  sleepcleanr/output/latest_visualization_real_n13990/research_ready/04_Sleep_Duration_vs_Time_in_Bed.png
+  sleepcleanr/output/latest_visualization_real_n13990/research_ready/05_Variability_Sleep_Variables.png
+  sleepcleanr/output/latest_visualization_real_n13990/research_ready/09_Bedtime_vs_Getup_Distribution.png
+  sleepcleanr/output/latest_visualization_real_n13990/research_ready/R25_Sleep_Regularity_Weekday_Weekend.png
+  sleepcleanr/output/latest_visualization_real_n13990/research_ready/R26_Sleep_Composition_TIB_Breakdown.png
+  sleepcleanr/output/latest_visualization_real_n13990/research_ready/R27_Sleep_Metrics_Correlation_Matrix.png
+  sleepcleanr/renv/library/macos/R-4.6/aarch64-apple-darwin23/renv/schema/draft-07.renv.lock.schema.json
+  sleepcleanr/sleepcleanr.Rcheck/00_pkg_src/sleepcleanr/inst/scripts/apply_sleep_metric_duration_corrections.R
+  sleepcleanr/sleepcleanr.Rcheck/00_pkg_src/sleepcleanr/inst/scripts/cross_participant_field_misentry_check.R
+  sleepcleanr/sleepcleanr.Rcheck/00_pkg_src/sleepcleanr/inst/scripts/error_unusual_sleep_time_corrections.R
+  sleepcleanr/sleepcleanr.Rcheck/00_pkg_src/sleepcleanr/inst/scripts/process_timestamp_emadatarelease_cyra.R
+  sleepcleanr/sleepcleanr.Rcheck/00_pkg_src/sleepcleanr/tests/testthat/test-auto-detection-thresholds.R
+  sleepcleanr/sleepcleanr.Rcheck/00_pkg_src/sleepcleanr/tests/testthat/test-classification-thresholds.R
+
+Tarballs are only required to store paths of up to 100 bytes and cannot
+store those of more than 256 bytes, with restrictions including to 100
+bytes for the final component.
+See section 'Package structure' in the 'Writing R Extensions' manual.
+* checking for sufficient/correct file permissions ... OK
+* checking whether package 'sleepcleanr' can be installed ... OK
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking DESCRIPTION meta-information ... NOTE
+Checking should be performed on sources prepared by 'R CMD build'.
+* checking top-level files ... OK
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... WARNING
+Found the following directories with names of check directories:
+  ./..Rcheck
+  ./sleepcleanr.Rcheck
+Most likely, these were included erroneously.
+* checking code files for non-ASCII characters ... WARNING
+Found the following file with non-ASCII characters:
+  R/pipeline.R
+Portable packages must use only ASCII characters in their R code and
+NAMESPACE directives, except perhaps in comments.
+Use \uxxxx escapes for other characters.
+Function 'tools::showNonASCIIfile' can help in finding non-ASCII
+characters in files.
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking loading without being on the library search path ... OK
+* checking dependencies in R code ... NOTE
+Namespaces in Imports field not imported from:
+  'corrplot' 'magick'
+  All declared Imports should be used.
+* checking S3 generic/method consistency ... OK
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... NOTE
+figure_cleaning_effect: no visible global function definition for
+  'ggplot'
+figure_cleaning_effect: no visible global function definition for 'aes'
+figure_cleaning_effect: no visible global function definition for
+  'geom_violin'
+figure_cleaning_effect: no visible global function definition for
+  'geom_boxplot'
+figure_cleaning_effect: no visible global function definition for
+  'stat_summary'
+figure_cleaning_effect: no visible global function definition for
+  'scale_fill_manual'
+figure_cleaning_effect: no visible global function definition for
+  'labs'
+figure_cleaning_effect: no visible global function definition for
+  'annotate'
+figure_cleaning_effect: no visible global function definition for
+  'theme_minimal'
+figure_cleaning_effect: no visible global function definition for
+  'theme'
+figure_cleaning_effect: no visible global function definition for
+  'element_text'
+figure_cleaning_effect: no visible global function definition for
+  'geom_histogram'
+figure_cleaning_effect: no visible global function definition for
+  'geom_vline'
+figure_cleaning_effect: no visible global function definition for
+  'geom_abline'
+figure_cleaning_effect: no visible global function definition for
+  'geom_point'
+figure_cleaning_effect: no visible global function definition for
+  'scale_colour_manual'
+figure_cleaning_effect: no visible global function definition for
+  'coord_fixed'
+figure_cleaning_effect: no visible global function definition for
+  'plot_annotation'
+figure_cleaning_effect: no visible global function definition for
+  'ggsave'
+figure_pipeline_workflow: no visible global function definition for
+  'ggplot'
+figure_pipeline_workflow: no visible global function definition for
+  'geom_segment'
+figure_pipeline_workflow: no visible global function definition for
+  'aes'
+figure_pipeline_workflow: no visible global function definition for
+  'arrow'
+figure_pipeline_workflow: no visible global function definition for
+  'unit'
+figure_pipeline_workflow: no visible global function definition for
+  'geom_tile'
+figure_pipeline_workflow: no visible global function definition for
+  'geom_text'
+figure_pipeline_workflow: no visible global function definition for
+  'annotate'
+figure_pipeline_workflow: no visible global function definition for
+  'coord_cartesian'
+figure_pipeline_workflow: no visible global function definition for
+  'labs'
+figure_pipeline_workflow: no visible global function definition for
+  'theme_void'
+figure_pipeline_workflow: no visible global function definition for
+  'theme'
+figure_pipeline_workflow: no visible global function definition for
+  'element_text'
+figure_pipeline_workflow: no visible global function definition for
+  'margin'
+figure_pipeline_workflow: no visible global function definition for
+  'ggsave'
+Undefined global functions or variables:
+  aes annotate arrow coord_cartesian coord_fixed element_text
+  geom_abline geom_boxplot geom_histogram geom_point geom_segment
+  geom_text geom_tile geom_violin geom_vline ggplot ggsave labs margin
+  plot_annotation scale_colour_manual scale_fill_manual stat_summary
+  theme theme_minimal theme_void unit
+* checking Rd files ... OK
+* checking Rd metadata ... OK
+* checking Rd cross-references ... OK
+* checking for missing documentation entries ... OK
+* checking for code/documentation mismatches ... OK
+* checking Rd \usage sections ... OK
+* checking Rd contents ... OK
+* checking for unstated dependencies in examples ... OK
+* checking files in 'vignettes' ... WARNING
+Files in the 'vignettes' directory but no files in 'inst/doc':
+  'column-mapping-zh.Rmd' 'column-mapping.Rmd'
+  'interpreting-output-zh.Rmd' 'interpreting-output.Rmd'
+  'pipeline-architecture-zh.Rmd' 'pipeline-architecture.Rmd'
+  'testing-coverage-zh.Rmd' 'testing-coverage.Rmd'
+  'validation-methodology-zh.Rmd' 'validation-methodology.Rmd'
+* checking examples ... OK
+* checking for unstated dependencies in 'tests' ... OK
+* checking tests ... OK
+  Running 'testthat.R'
+* checking for unstated dependencies in vignettes ... OK
+* checking package vignettes ... WARNING
+Directory 'inst/doc' does not exist.
+Package vignettes without corresponding single PDF/HTML:
+  'column-mapping-zh.Rmd'
+  'column-mapping.Rmd'
+  'interpreting-output-zh.Rmd'
+  'interpreting-output.Rmd'
+  'pipeline-architecture-zh.Rmd'
+  'pipeline-architecture.Rmd'
+  'testing-coverage-zh.Rmd'
+  'testing-coverage.Rmd'
+  'validation-methodology-zh.Rmd'
+  'validation-methodology.Rmd'
+* checking re-building of vignette outputs ... OK
+* checking PDF version of manual ... WARNING
+LaTeX errors when creating PDF version.
+This typically indicates Rd problems.
+* checking PDF version of manual without index ... ERROR
+Re-running with no redirection of stdout/stderr.
+* DONE
+Status: 1 ERROR, 5 WARNINGs, 6 NOTEs

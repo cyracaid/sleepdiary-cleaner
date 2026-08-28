@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+#
+# pre-commit — root vs inst/scripts copy-consistency gate.
+#
+# The repo root and inst/scripts/ each carry a copy of the same pipeline
+# scripts (00_MAIN_entry.R sources the root copy in dev mode;
+# run_pipeline() ships and sources the inst/scripts copy). A silent
+# divergence means tests and production can execute different cleaning code
+# (see tests/testthat/test-script-copies-in-sync.R for the 2026-08-05
+# incident that motivated this).
+#
+# tests/testthat/test-script-copies-in-sync.R already gates divergence in CI
+# -- but only after a commit is pushed. CI has no chance to stop a commit
+# whose root copy was edited and whose inst/scripts copy was forgotten.
+# This hook fills that local gap: it aborts the commit before it exists.
+#
+# This hook is only ever a failsafe. It shares the exact comparison logic
+# with the CI test, so a hook miss (e.g. hook not installed) is still caught
+# on the next push.
+#
+# Install:  bash inst/hooks/install-hooks.sh
+# Verify:   ls -la .git/hooks/pre-commit
+
+set -euo pipefail
+
+# Resolve the repo root from the hook's own location.
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_ROOT="$(cd "$HOOK_DIR/../.." && pwd)"
+
+cd "$REPO_ROOT"
+
+# ── Gate 1: never commit real participant data / private files ─────────────
+# Hard lock (git add -f bypasses .gitignore). Audit outputs carry real pids
+# (1027-11863); private correspondence and personal logs must not ship.
+# Paths are matched on the FULL staged path so a rename (git mv) still trips
+# the gate.
+SENSITIVE_PATTERNS=(
+  '^audit_m1_m7_'
+  '^part_b_b[123]_'
+  '(^|/)work_logs/'
+  '(^|/)manual_inputs_docs/'
+  '(^|/)paper/'
+  '(^|/)figures/'
+  '(^|/)docs/'
+  '(^|/)output/'
+  '(^|/)deidentified_'
+  'ground_truth_enrichment\.csv$'
+  'cluster_bootstrap_per_row\.csv$'
+  'mrr_per_row\.csv$'
+)
+while IFS= read -r staged_path; do
+  [ -z "$staged_path" ] && continue
+  for pat in "${SENSITIVE_PATTERNS[@]}"; do
+    if [[ "$staged_path" =~ $pat ]]; then
+      cat <<'EOF' >&2
+pre-commit: REFUSED — staged path matches a sensitive-data pattern:
+  [PATH]
+Real participant sleep data / private files must NEVER be committed.
+These files live in ~/Documents/opencode/proj_splclean/sensitive_local/
+(chmod 700, FileVault-encrypted disk) and are excluded from git history
+(purge 2026-08-17). If this path is a NEW legitimate artifact, add an
+explicit exception below SENSITIVE_PATTERNS in inst/hooks/pre-commit.
+EOF
+      echo "  $staged_path" >&2
+      exit 1
+    fi
+  done
+done < <(git diff --cached --name-only)
+
+# Dedup gate: inst/scripts/ is the ONLY home for pipeline scripts.
+# Root-level duplicates were removed 2026-08-17 (Phase 1 dedup). The only
+# allowed root .R files are the legacy dev entry points (00_MAIN_entry.R,
+# 00a_setup.R) and verify_* dev tools. A root duplicate reappearing is a
+# dedup regression -- block it.
+staged=$(git diff --cached --name-only | sed 's#.*/##' | sort -u)
+touchable=$(for f in inst/scripts/*.R; do basename "$f"; done | sort -u)
+if [ -z "$(comm -12 <(printf '%s\n' "$staged") <(printf '%s\n' "$touchable"))" ]; then
+  exit 0
+fi
+
+Rscript -e '
+root <- getwd()
+inst_dir <- file.path(root, "inst", "scripts")
+files <- list.files(inst_dir)
+scripts <- files[tools::file_ext(files) == "R"]
+if (length(scripts) == 0) quit(status = 0)
+
+allowed_root <- c("00_MAIN_entry.R", "00a_setup.R")
+unexpected <- scripts[file.exists(file.path(root, scripts)) &
+                        !(scripts %in% allowed_root)]
+
+if (length(unexpected) > 0) {
+  cat("pre-commit: root-level duplicate of inst/scripts file(s):\n")
+  cat(paste0("  ", unexpected, collapse = "\n"), "\n")
+  cat("Pipeline scripts live ONLY in inst/scripts/ (dedup 2026-08-17).\n")
+  cat("Remove the root duplicate before committing.\n")
+  quit(status = 1)
+}
+cat("pre-commit: no root-level inst/scripts duplicates.\n")
+'
