@@ -123,6 +123,67 @@ actually being written — the `write.csv()` calls were commented out while
 the pipeline log unconditionally printed "Files saved." Also fixed in
 v1.4.1.
 
+### Addendum (2026-09-02): the "Patch verification" numbers above were never
+### backed by a re-run CSV — now they are, and the real breakdown is different
+
+The "Patch verification" table above was hand-derived at the time (silent
+misrepair count + overall-caught count from an ad-hoc check), never from a
+regenerated `results/*.csv`. `detection_outcomes_v4.csv` — the one CSV this
+whole doc's earlier table is built from — is genuinely the **first-pass,
+pre-patch** run (its own row labels above say so), and nothing ever
+replaced it with a post-patch equivalent. Separately, `error_catalog.yaml`
+and `ground_truth_enrichment.csv` grew two more categories
+(`adjacent_swap_large_gap_left_clean`, `sol_window_contradiction`) and
+`cross_participant_spike`/`no_error_control`'s injected counts changed
+after that CSV was written, so it was stale for reasons beyond the patch
+too.
+
+Re-ran the full harness 2026-09-02 against the currently-installed
+`sleepcleanr` 1.4.5 (Part A4 patch included): `run_one.R` on the full,
+current `corrupted_enrichment.rds` (n=7,000) → `evaluate_detection.R`
+(v4) against the current `ground_truth_enrichment.csv` → written to
+`results/detection_outcomes_v4_current.csv` (the original
+`detection_outcomes_v4.csv` is left untouched as the pre-patch record cited
+above). 6 of 15 categories matched the original file exactly
+(`adjacent_swap_time_awake_am_time_getup_am`,
+`adjacent_swap_time_bed_am_time_sleep_am`,
+`adjacent_swap_time_sleep_am_time_awake_am`, `format_malformed_colon`,
+`format_no_colon`, `implausible_duration` — all fully deterministic,
+non-random categories), which is the evidence that this re-run is a
+faithful reproduction of the same harness, not a different setup producing
+different numbers by accident.
+
+**field_misentry, real current breakdown:**
+
+| | field_misentry_sol | field_misentry_waso |
+|---|---|---|
+| CORRECT (auto-fixed to the true value) | 7/400 (1.8%) | 13/400 (3.2%) |
+| FLAGGED_UNRESOLVED (caught, routed to human review) | 393/400 (98.2%) | 387/400 (96.8%) |
+| MISREPAIRED (silently changed to a wrong value) | **0/400 (0%)** | **0/400 (0%)** |
+
+The core claim holds and is now stronger than originally stated: the
+silent-misrepair bug Part A4 targets is fully closed for both fields (0%,
+not the previously-claimed residual 3.5% for SOL — the "01:XX" edge case
+described above no longer reproduces on this run; worth a closer look at
+whether it was fixed by a later, unrelated change, but not re-investigated
+here). **However**, "overall caught 96.5%/100%" in the table above is true
+only under a looser definition of "caught" that counts
+`FLAGGED_UNRESOLVED` together with `CORRECT` — almost none of that 96.5%/
+100% is the pipeline actually landing on the right value by itself (1.8%/
+3.2% are); the patch's real effect is converting a silent wrong-answer into
+a human-review flag, not into an automatic fix. Both are legitimate, safe
+outcomes for a data-cleaning pipeline, but they are different claims, and a
+reader skimming "overall caught: 96.5%" next to "silently corrected to a
+wrong value" framing would reasonably assume the former means
+auto-corrected. Left both tables above as originally written (development
+history), rather than edited after the fact, per this project's own
+provenance-preservation practice — but treat `detection_outcomes_v4_
+current.csv` and this addendum, not the tables above, as the current
+description of pipeline behavior.
+
+See `2026-09-04_work_log.md` for the fuller trail (why this was checked,
+the two-stage discovery, full per-category diff against the original CSV).
+
 ## What's solid vs. what needs another pass
 
 **Solid:** FCR test A (0/10,000 on parsed-truth values); Test B population

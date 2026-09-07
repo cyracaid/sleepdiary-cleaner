@@ -22,6 +22,13 @@ that label every record.
 library(sleepcleanr)
 ```
 
+## Terminology
+
+Sleep-diary metric abbreviations used throughout this vignette: **SOL**
+(Sleep Onset Latency), **WASO** (Wake After Sleep Onset), **TST** (Total
+Sleep Time), **SE** (Sleep Efficiency). **QC** below refers to quality
+control.
+
 ## Pipeline steps
 
 ```

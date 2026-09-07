@@ -67,7 +67,13 @@ renv/sandbox/
 # Package build
 *.tar.gz
 src/
-sleepcleanr.Rcheck/
+# Any R CMD check output directory, whatever it's named (normally
+# <pkgname>.Rcheck, but a check run from the wrong working directory can
+# produce a differently-named one, e.g. the accidentally-committed
+# "..Rcheck/" found and cleaned up 2026-09-07 -- see 2026-09-04_work_log.md).
+# One glob covers the known-good name and any future variant, rather than
+# hardcoding each exact directory name as it's discovered.
+*.Rcheck/
 # Build artifacts
 manual_error_correction_updated.csv
 reasonable_unusual_records.csv
@@ -97,6 +103,10 @@ validation/synthetic/run_ppv/input_key.txt
 /part_b_b1_silent_alteration.csv
 /part_b_b2_redundant_worsening.csv
 /part_b_b3_note_inventory.csv
+# timegap candidate derivation (validation/derive_timegap_candidates.R) --
+# real pid/day_num + raw timestamps, regenerated each run. Never commit.
+/timegap_candidates_3to6h.csv
+/timegap_candidates_summary.csv
 # Private correspondence (local only).
 /manual_inputs_docs/
 # Personal work logs (local only).
@@ -119,3 +129,11 @@ audit_dispositions.csv.*
 # local-only, real-study config — never commit/ship
 real_data_config.yaml
 AGENTS.md
+# Disambiguation worksheets/reports (validation/disambiguate_timegap_candidates.R,
+# validation/compute_disambiguation_agreement.R) -- real pid/day_num/timestamps,
+# regenerated each run. Never commit.
+disambiguation_worksheet_cyra.csv
+disambiguation_worksheet_maia.csv
+disambiguation_agreement_report.csv
+disambiguation_disagreements.csv
+disambiguation_already_resolved.csv

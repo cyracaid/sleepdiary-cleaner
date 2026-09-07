@@ -88,6 +88,23 @@ data:
 # See inst/config_default.yaml for the full list of mappable columns.
 
 # =============================================================================
+# VISUALIZATION OPTIONS (optional -- defaults enable all)
+# =============================================================================
+# Revised 2026-09-02: 13C/13D are back, rebuilt on real data (see
+# inst/config_default.yaml's comment above the same block for the story).
+# visualization:
+#   # Figure 13B: Adjacent timestamp gap distribution (raw, pre-correction).
+#   # The 3-6h band it highlights is a locked definition, not configurable.
+#   gap_analysis:
+#     enabled: true
+#   # Figure 13C: synthetic error-injection detection-outcome heatmap.
+#   detection_outcomes:
+#     enabled: true
+#   # Figure 13D: thresholds vs Bland-Altman measurement-noise ratio.
+#   threshold_noise:
+#     enabled: true
+
+# =============================================================================
 # THRESHOLDS (optional -- defaults are sensible for most sleep studies)
 # =============================================================================
 # See THRESHOLDS.md for the rationale behind each default.

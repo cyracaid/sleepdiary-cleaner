@@ -1712,6 +1712,202 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
   save_png(p13, "13_Error_Category_Distribution", subdir = "pipeline_cleaning")
   cat("✓ Figure 13 completed\n\n")
   
+  # ----------------------------------------------------------------------------
+  # Helper: compute adjacent timestamp gaps from clean_df's already-decoded,
+  # already date-anchored *_hhmm_ampm columns (process_timestamp() output --
+  # see R/timestamp_parse.R). Do not reimplement AM/PM decoding here; this is
+  # exactly the class of bug that produced a false "590/126/134" candidate
+  # count earlier in this audit (see 2026-09-04_work_log.md).
+  # Recovered 2026-09-07: this block and Figures 13B/13C/13D below were
+  # previously appended after the script's own COMPLETE FIGURE SUMMARY
+  # section (and duplicated ~127x by a broken edit loop) instead of being
+  # inserted here, so none of it ever ran. Rebuilt from the last-committed
+  # clean baseline (git HEAD) plus this logic, recovered intact from the
+  # corrupted working copy and re-verified line by line.
+  # ----------------------------------------------------------------------------
+  compute_adjacent_gaps <- function(df) {
+    req <- c("time_bed_am_hhmm_ampm", "time_sleep_am_hhmm_ampm",
+             "time_awake_am_hhmm_ampm", "time_getup_am_hhmm_ampm")
+    if (!all(req %in% names(df))) return(NULL)
+    df %>%
+      transmute(
+        gap_bed_sleep   = as.numeric(difftime(time_sleep_am_hhmm_ampm,
+                                                 time_bed_am_hhmm_ampm,   units = "hours")),
+        gap_sleep_awake = as.numeric(difftime(time_awake_am_hhmm_ampm,
+                                                 time_sleep_am_hhmm_ampm, units = "hours")),
+        gap_awake_getup = as.numeric(difftime(time_getup_am_hhmm_ampm,
+                                                 time_awake_am_hhmm_ampm, units = "hours"))
+      ) %>%
+      tidyr::pivot_longer(everything(), names_to = "pair", values_to = "gap_hours") %>%
+      filter(!is.na(gap_hours))
+  }
+
+  # --------------------------------------------------------------------------
+  # Figure 13B: Adjacent Timestamp Gap Distribution (raw, pre-correction)
+  # --------------------------------------------------------------------------
+  if (cfg_get("visualization.gap_analysis.enabled", TRUE, cfg = .pipeline_cfg)) {
+    cat("Generating Figure 13B (Adjacent Timestamp Gap Distribution)...\n")
+    gaps <- compute_adjacent_gaps(clean_df)
+    if (!is.null(gaps) && nrow(gaps) > 0) {
+      pair_labels <- c(
+        gap_bed_sleep   = "Bed -> Sleep",
+        gap_sleep_awake = "Sleep -> Awake (TST)",
+        gap_awake_getup = "Awake -> Getup"
+      )
+      gaps$pair_label <- factor(pair_labels[gaps$pair], levels = unname(pair_labels))
+
+      # The 3-6h negative band is the locked candidate definition from
+      # validation/derive_timegap_candidates.R (2026-09-02: 46 rows total,
+      # gap_sleep_awake=39 / gap_awake_getup=6 / gap_bed_sleep=1). Counted
+      # LIVE from this run's data, never hardcoded -- a label that can drift
+      # out of sync with the real number is exactly what this audit exists
+      # to prevent.
+      band_counts <- gaps %>%
+        filter(gap_hours < 0, abs(gap_hours) >= 3, abs(gap_hours) <= 6) %>%
+        count(pair_label, name = "n_candidates", .drop = FALSE)
+
+      flagged_color <- "#D32F2F"  # house convention: flagged/problematic data
+      clean_color   <- "#1976D2"  # house convention: clean/acceptable data
+
+      p13b <- ggplot(gaps, aes(x = gap_hours)) +
+        annotate("rect", xmin = -6, xmax = -3, ymin = 0, ymax = Inf,
+                 fill = flagged_color, alpha = 0.12) +
+        geom_vline(xintercept = c(-6, -3), linetype = "dashed",
+                   color = flagged_color, linewidth = 0.6) +
+        geom_histogram(binwidth = 0.25, fill = clean_color, alpha = 0.8, color = NA) +
+        geom_text(data = band_counts,
+                  aes(x = -4.5, y = Inf, label = paste0("n=", n_candidates)),
+                  inherit.aes = FALSE, color = flagged_color, vjust = 1.6,
+                  size = 3.2, fontface = "bold") +
+        facet_wrap(~ pair_label, scales = "free", ncol = 1) +
+        labs(
+          title = "Figure 13B: Adjacent Timestamp Gap Distribution (raw, pre-correction)",
+          subtitle = paste0("Shaded band = 3-6h negative gap, the locked AM/PM-decode / ",
+                            "field-swap candidate definition. Counts computed live from this run."),
+          x = "Gap (hours) -- negative = the later event's clock time precedes the earlier one's",
+          y = "Count"
+        ) +
+        theme_minimal(base_size = 13) +
+        theme(strip.text = element_text(face = "bold"),
+              plot.subtitle = element_text(size = 9))
+
+      print(p13b)
+      save_png(p13b, "13B_Adjacent_Timestamp_Gaps", subdir = "pipeline_cleaning")
+      cat(sprintf("✓ Figure 13B completed (candidates: %s)\n\n",
+                  paste(sprintf("%s=%d", as.character(band_counts$pair_label),
+                                band_counts$n_candidates), collapse = ", ")))
+    } else {
+      cat("⚠ Cannot generate Figure 13B: timestamp columns missing or no valid gaps\n\n")
+    }
+  } else {
+    cat("⊘ Figure 13B skipped (visualization.gap_analysis.enabled = false)\n\n")
+  }
+
+  # --------------------------------------------------------------------------
+  # Figure 13C: Synthetic Error-Injection Detection Outcomes (heatmap)
+  # --------------------------------------------------------------------------
+  if (cfg_get("visualization.detection_outcomes.enabled", TRUE, cfg = .pipeline_cfg)) {
+    cat("Generating Figure 13C (Detection Outcomes Heatmap)...\n")
+    det_path <- "validation/synthetic/results/detection_outcomes_v4_current.csv"
+    if (file.exists(det_path)) {
+      det_raw <- read.csv(det_path, stringsAsFactors = FALSE)
+      det <- det_raw %>% filter(category != "no_error_control")
+      outcome_cols <- c("CORRECT", "FLAGGED_UNRESOLVED", "MISREPAIRED", "MISSED", "NO_MATCH")
+      outcome_cols <- outcome_cols[outcome_cols %in% names(det)]
+      det_long <- det %>%
+        select(category, n, all_of(outcome_cols)) %>%
+        pivot_longer(all_of(outcome_cols), names_to = "outcome", values_to = "count") %>%
+        mutate(pct = 100 * count / n,
+               outcome = factor(outcome, levels = outcome_cols))
+      cat_order <- det %>% arrange(desc(CORRECT / n)) %>% pull(category)
+      det_long$category <- factor(det_long$category, levels = rev(cat_order))
+      modal_n <- as.numeric(names(sort(table(det$n), decreasing = TRUE))[1])
+      off_modal <- det %>% filter(n != modal_n)
+      off_modal_note <- if (nrow(off_modal) > 0) {
+        paste0(" ", paste(sprintf("%s n=%d (not %d)", off_modal$category, off_modal$n, modal_n),
+                           collapse = "; "), " -- see category description in error_catalog.yaml.")
+      } else ""
+
+      p13c <- ggplot(det_long, aes(x = outcome, y = category, fill = pct)) +
+        geom_tile(color = "white", linewidth = 0.6) +
+        geom_text(aes(label = ifelse(pct > 0, sprintf("%.0f%%", pct), "")),
+                   size = 3.2, color = "grey15") +
+        scale_fill_gradient(low = "white", high = "#1976D2", limits = c(0, 100),
+                             name = "% of n") +
+        labs(
+          title = "Figure 13C: Synthetic Error-Injection Detection Outcomes",
+          subtitle = paste0(
+            "n = ", format(sum(det$n), big.mark = ","),
+            " injected rows across ", length(unique(det$category)),
+            " error categories (ground truth: validation/synthetic/ground_truth_enrichment.csv). ",
+            off_modal_note,
+            " no_error_control excluded (specificity check, reported separately)."
+          ),
+          x = NULL, y = NULL
+        ) +
+        theme_minimal(base_size = 12) +
+        theme(axis.text.x = element_text(angle = 30, hjust = 1),
+              plot.subtitle = element_text(size = 8),
+              panel.grid = element_blank())
+
+      print(p13c)
+      save_png(p13c, "13C_Detection_Outcomes_Heatmap", subdir = "pipeline_cleaning")
+      cat(sprintf("✓ Figure 13C completed (%d categories, %s total injected rows)\n\n",
+                  length(unique(det$category)), format(sum(det$n), big.mark = ",")))
+    } else {
+      cat(sprintf("⚠ Cannot generate Figure 13C: %s not found (run the validation/synthetic/ benchmark harness first)\n\n",
+                    det_path))
+    }
+  } else {
+    cat("⊘ Figure 13C skipped (visualization.detection_outcomes.enabled = false)\n\n")
+  }
+
+  # --------------------------------------------------------------------------
+  # Figure 13D: Cleaning Thresholds vs Bland-Altman Measurement-Noise Ratio
+  # --------------------------------------------------------------------------
+  if (cfg_get("visualization.threshold_noise.enabled", TRUE, cfg = .pipeline_cfg)) {
+    cat("Generating Figure 13D (Threshold vs Noise Ratio)...\n")
+    if (exists(".ba_result") && !is.null(.ba_result)) {
+      ba_df <- as.data.frame(.ba_result)
+      n_no_ba <- sum(is.na(ba_df$ratio_to_noise))
+      ba_df <- ba_df[!is.na(ba_df$ratio_to_noise), ]
+      if (nrow(ba_df) > 0) {
+        ba_df$threshold_name <- factor(ba_df$threshold_name,
+                                        levels = ba_df$threshold_name[order(ba_df$ratio_to_noise)])
+        p13d <- ggplot(ba_df, aes(x = ratio_to_noise, y = threshold_name, fill = ratio_to_noise)) +
+          geom_vline(xintercept = c(2, 3), linetype = "dashed", color = "grey40", linewidth = 0.5) +
+          geom_col(width = 0.6) +
+          geom_text(aes(label = sprintf("%.1fx", ratio_to_noise)),
+                    hjust = -0.15, size = 3.4, color = "grey20") +
+          scale_fill_gradient2(low = "#D32F2F", mid = "grey85", high = "#1976D2",
+                                midpoint = 3, guide = "none") +
+          labs(
+            title = "Figure 13D: Cleaning Thresholds vs Bland-Altman Measurement Noise",
+            subtitle = paste0(
+              "Ratio = threshold value / 95% limits-of-agreement half-width (self-report vs ",
+              "pipeline-computed). Dashed lines at 2x (borderline) and 3x (safe) per ",
+              "validate_thresholds()'s own rule.",
+              if (n_no_ba > 0) sprintf(" %d threshold(s) omitted -- no self-report counterpart to validate against (e.g. SE, TST/TIB ratio).", n_no_ba) else ""
+            ),
+            x = "Threshold / measurement-noise ratio", y = NULL
+          ) +
+          theme_minimal(base_size = 13) +
+          theme(plot.subtitle = element_text(size = 8.5))
+
+        print(p13d)
+        save_png(p13d, "13D_Threshold_vs_Noise_Ratio", subdir = "pipeline_cleaning")
+        cat(sprintf("✓ Figure 13D completed (%s)\n\n",
+                    paste(sprintf("%s=%.1fx", ba_df$threshold_name, ba_df$ratio_to_noise), collapse = ", ")))
+      } else {
+        cat("⚠ Cannot generate Figure 13D: no thresholds have a valid noise ratio (no BA data)\n\n")
+      }
+    } else {
+      cat("⚠ Cannot generate Figure 13D: .ba_result not available (corrected_ema_data missing or validate_thresholds() failed earlier in this run)\n\n")
+    }
+  } else {
+    cat("⊘ Figure 13D skipped (visualization.threshold_noise.enabled = false)\n\n")
+  }
+
   # --------------------------------------------------------------------------
   # Figure 14: Sleep Duration - Clean vs Flagged (PRE-CORRECTION / AUTO-DETECTION)
   # DATA SOURCE: checkforerrors_processed (from _checkforerrors flags)

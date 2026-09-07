@@ -116,6 +116,48 @@ categories:
     source_field: time_awake_am_hhmm
     rate_anchor_pct: 0.05   # conservative; deliberately not zero
 
+  awake_misread_as_waso:
+    provenance: [observed, blind_spot]
+    status: not_yet_implemented   # taxonomy entry only -- no injector function in
+                                    # inject_errors.R yet; found 2026-09-03, added
+                                    # here so it is tracked for the Phase I injector
+                                    # build rather than living only in a work log.
+    description: >
+      The participant misreads "what time did you finally wake up" and answers
+      with a MIDDLE-OF-THE-NIGHT brief-waking moment (a WASO event) instead of
+      their true final wake time. This corrupts time_awake_am itself (a
+      CLOCK-TIME field) -- it is NOT the same mechanism as field_misentry_waso
+      (which is a clock time leaking into the WASO DURATION field), and it is
+      not produced by any AM/PM or adjacent-swap mechanism either, since the
+      participant is answering the question they meant to answer, just with
+      the wrong event in mind. Found while investigating the disambiguation
+      worksheet's gap_sleep_awake candidates (validation/disambiguate_timegap_
+      candidates.R v5->v6): cross-tabulating manual_error_corrections.csv's
+      problem_humanidentified text by which field pair was corrected showed
+      this concentrates in gap_awake_getup corrections (6/6 already-resolved
+      cases of that type), not gap_sleep_awake (only 1/13) -- i.e. it is a
+      real, distinct, evidenced mechanism, just not the one this project's
+      disambiguation work is currently scoring for.
+    real_examples:
+      - "PID 6985: 7 rows, notes read like 'awake time is likely WASO time, not
+         final awake'"
+      - "PID 10516 day 12, PID 10599 day 4: same pattern, single-day instances"
+      - "PID 8876: 3 rows, same pattern"
+    fields_affected: [time_awake_am]
+    rate_anchor_pct: 0.09   # 12/13990 (6985 x7 + 10516 x1 + 10599 x1 + 8876 x3) in the
+                             # gap_awake_getup slice of manual_error_corrections.csv --
+                             # almost certainly an undercount for the same reason
+                             # field_misentry_waso's is: nothing in the pipeline looks
+                             # for this mechanism specifically, so only cases that also
+                             # tripped an unrelated check ever reached human review.
+    next_step: >
+      Needs a rendering design (what fraction of time_awake_am to replace with
+      a plausible mid-night WASO-shaped value, and how to keep it
+      distinguishable in ground_truth.csv from a genuine WASO report) before an
+      injector function can be written -- belongs with the rest of Phase I's
+      taxonomy-to-injector work (development-evidence-audit.md's "error
+      taxonomy (union of sources) + injector" line item), not a one-off patch.
+
   format_no_colon:
     provenance: [observed]
     description: >
