@@ -1,6 +1,6 @@
 # sleepcleanr — Validation Report
 
-_Rendered 2026-09-03 by `validation/render_validation_report.R`. All synthetic numbers are read directly from the result CSVs — nothing below is hand-typed._
+_Rendered 2026-09-07 by `validation/render_validation_report.R`. All synthetic numbers are read directly from the result CSVs — nothing below is hand-typed._
 
 ## Summary
 
