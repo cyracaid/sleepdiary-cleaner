@@ -49,7 +49,9 @@ Psychophysiology Laboratory’s intensive-longitudinal sleep study.
 **Why sleepcleanr?**
 
 - 🔍 **Detects** not auto-fixes — 1,048 records flagged for manual
-  review, 0 silent corrections
+  review, 0 silent corrections (field-misentry silent-misrepair bug, 96%
+  in v1.4.0, fixed in v1.4.4+; current benchmark: 0% silent misrepair
+  for SOL/WASO)
 - 📊 **Auditable** — every change logged and reversible; non-destructive
   architecture
 - ✅ **Validated** — 9-step validation chain: synthetic (0.995 recall) +
@@ -84,6 +86,62 @@ silently hidden.
 > YAML-configurable and should be re-checked against your own data, not
 > copied blindly.
 
+### Flag System & Human Review Workflow
+
+sleepcleanr uses a structured flag system to route records through the
+human-in-the-loop review process. Every record can carry multiple flags;
+flags are **additive** (a record may carry several simultaneously) and
+**never silently cleared** — they persist until explicitly resolved by
+human action.
+
+| Flag / Column                 | Trigger                                                   | Meaning                                                             | Resolution                                                                                                        |
+|-------------------------------|-----------------------------------------------------------|---------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
+| `needs_review_flag`           | Any detection rule fires                                  | Record needs human attention                                        | Human reviews → sets `manually_corrected=TRUE` OR `human_metric_review_status=confirmed_not_error_do_not_correct` |
+| `auto_error_desc`             | Auto-detection logic                                      | Machine-readable description of why flagged                         | Reference for human reviewer                                                                                      |
+| `error_type` / `unusual_type` | Step 5 classification                                     | Categorized error type (TIMESTAMP, DURATION, SELF_REPORTED, etc.)   | Informs reviewer; drives Figure 13 classification                                                                 |
+| `manually_corrected`          | Human applied correction via `apply_manual_corrections.R` | Record was explicitly fixed by human                                | Set to `TRUE` by `apply_manual_corrections.R`                                                                     |
+| `human_metric_review_status`  | Human metric review decision                              | `confirmed_not_error_do_not_correct` = reviewed & confirmed correct | Set by `apply_metric_review_acceptances.R` / `apply_metric_review_acceptances()`                                  |
+| `human_metric_review_note`    | Reviewer’s free-text note                                 | Context for future auditors                                         | Free text                                                                                                         |
+| `correction_type`             | Applied correction type                                   | e.g., `bed_sleep_swap_3h`, `sleep_reduce_12h_loop`                  | Populated by correction engine                                                                                    |
+
+**Flag lifecycle:**
+
+    Record flagged (needs_review_flag=TRUE)
+        ↓ Human reviews
+        ├── Confirmed error → apply_manual_corrections.R → manually_corrected=TRUE
+        ├── Confirmed OK → human_metric_review_status="confirmed_not_error_do_not_correct"
+        └── Deferred / unsure → needs_review_flag remains TRUE
+
+**Key design principles:**
+
+1.  **Flags are never silently cleared** — a flag persists until
+    explicit human action (`manually_corrected=TRUE` or
+    `human_metric_review_status=confirmed_not_error_do_not_correct`).
+2.  **Flags are additive** — a record can carry multiple flags
+    simultaneously (e.g., TIMESTAMP + DURATION + SELF_REPORTED).
+3.  **Resolution is explicit** — a flag is “resolved” only by setting
+    `manually_corrected=TRUE` or
+    `human_metric_review_status=confirmed_not_error_do_not_correct`;
+    there is no implicit “auto-resolve”.
+4.  **Flags persist in outputs** — Dataset A (full) retains all flags
+    for audit; Dataset B (minimal) includes only `needs_review_flag` and
+    `correction_type` for downstream analysis.
+
+**Current flag categories** (from `checkforerrors_processing.R`):
+
+| Category          | Sub-types                                        | Meaning                                            |
+|-------------------|--------------------------------------------------|----------------------------------------------------|
+| **TIMESTAMP**     | Clock-time format errors (bed/sleep/awake/getup) | e.g., hour\>23, malformed colon                    |
+| **DURATION**      | Interval/format errors (SOL, WASO)               | e.g., MM:SS vs HH:MM confusion                     |
+| **AMOUNT**        | Substance input anomalies                        | negative, excessive digits, filler codes (888/999) |
+| **SELF_REPORTED** | SOL/WASO vs timestamp-window mismatch            | SOL \> bed→sleep window, SE\>100%, etc.            |
+
+**Flag statistics (v1.4.5, n=13,990):** 1,048 records flagged (7.5%); 0
+AUTO_FIX; 0 silent corrections. Breakdown: 922 TIMESTAMP (window
+violations), 140 DURATION (order violations), 1 SELF_REPORTED (extreme),
+1 redundancy-confirmed worsening. See `VALIDATION_REPORT.md` for full
+breakdown.
+
 ### Validation Map
 
     SYNTHETIC TIER (ground truth)
@@ -109,6 +167,20 @@ silently hidden.
 > **sleepdiary-cleaner**. They are the same project — install via
 > `renv::install("cyracaid/sleepdiary-cleaner")` and then
 > [`library(sleepcleanr)`](https://github.com/cyracaid/sleepdiary-cleaner).
+
+> **Validation statistics source:** All validation statistics above
+> (recall 0.995, 92% improvement, 0% silent misrepair for SOL/WASO,
+> etc.) are derived from benchmarks run against the current
+> `sleepcleanr` v1.4.5+ codebase (commit fd6bbd0). The synthetic
+> benchmark
+> (`validation/synthetic/results/detection_outcomes_v4_current.csv`,
+> 4,736 injected rows) and real-data audit (n=13,990) were executed
+> against the current codebase (commit fd6bbd0). These statistics
+> reflect the current pipeline behavior and supersede any earlier
+> pre-patch numbers cited in earlier documentation. See
+> `VALIDATION_REPORT.md` and
+> `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md` for the full
+> evidence package.
 
 ## Install
 
@@ -171,6 +243,75 @@ and diagnose issues.
 | 8.5  | Cross-participant consistency check  | Global consistency audit across participants                                     |
 | 9    | Generate diagnostic figures          | 30 figures (14 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt |
 | 10   | Build delivered datasets             | finalize_columns() selects/renames to Dataset A/B per column dictionary          |
+
+## Sync Human Review Status
+
+sleepcleanr provides a utility to synchronize human review status fields
+in the metric review acceptance CSV file.
+
+> **Known issue (flagged 2026-09-07, not yet fixed):** the current
+> implementation crashes on a genuine first/bootstrap run (missing
+> `resolved_at`/`resolved_by` columns raise
+> `object 'resolved_at' not found`), and the `review_resolution` split
+> it produces on already-populated data does not reproduce from a clean
+> run of the logic below — the numbers shown in this section’s example
+> output should not yet be treated as verified. Treat this utility as
+> unreviewed until the crash and the provenance question are resolved.
+
+### `sync_human_review_status()`
+
+Automatically synchronizes review status fields in
+`manual_metric_review_acceptances.csv` based on human review traces.
+
+``` r
+library(sleepcleanr)
+sync_human_review_status("manual_metric_review_acceptances.csv")
+```
+
+**What it does:**
+
+1.  **Detects human review traces** by checking:
+    - `human_metric_review_note` (non-empty reviewer notes)
+    - `resolved_at` (resolution timestamp)
+    - `resolved_by` (resolution actor)
+2.  **Updates three columns** based on detected traces:
+    - `review_resolution`: `"corrected"` / `"flagged_unresolved"` /
+      `"legacy"`
+    - `resolved_at`: Resolution date (only for `corrected`)
+    - `resolved_by`: `"system"` / `"pending"` / `"legacy"`
+
+**Resolution Logic:** \| Condition \| `review_resolution` \|
+`resolved_at` \| `resolved_by` \| \|———–\|———————\|—————\|—————\| \|
+Explicit `corrected` flag \| `"corrected"` \| Today \| `"system"` \| \|
+Human traces + legacy/NA \| `"flagged_unresolved"` \| NA \| `"pending"`
+\| \| Human traces + legacy/NA \| `"flagged_unresolved"` \| NA \|
+`"pending"` \| \| No traces + legacy \| `"legacy"` \| NA \| `"legacy"`
+\|
+
+**Usage:**
+
+``` r
+library(sleepcleanr)
+sync_human_review_status("manual_metric_review_acceptances.csv")
+```
+
+**Output:**
+
+    ✓ Synced 161 rows: 1 corrected, 43 flagged, 117 legacy
+
+**Integration in Pipeline:** Automatically runs at pipeline Step 11
+(after all corrections, before visualization):
+
+``` r
+run_pipeline(config = "my_study.yaml")  # Automatically runs sync_human_review_status() at Step 11
+```
+
+**Manual invocation:**
+
+``` r
+library(sleepcleanr)
+sync_human_review_status("manual_metric_review_acceptances.csv")
+```
 
 ------------------------------------------------------------------------
 

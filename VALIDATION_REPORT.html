@@ -35,7 +35,7 @@
 
 <div id="sleepcleanr--validation-report" class="section level1">
 
-<p><em>Rendered 2026-08-27 by <code>validation/render_validation_report.R</code>. All synthetic numbers are read directly from the result CSVs — nothing below is hand-typed.</em></p>
+<p><em>Rendered 2026-09-07 by <code>validation/render_validation_report.R</code>. All synthetic numbers are read directly from the result CSVs — nothing below is hand-typed.</em></p>
 <div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a></h2>
 <p>sleepcleanr is a deterministic, auditable cleaning pipeline for sleep-EMA diary data. It is validated on two independent layers: a <strong>synthetic benchmark</strong> with known ground truth (pooled recall <strong>0.995 [0.993, 0.997]</strong>, specificity 1.0) and a <strong>real-data audit</strong> (n = 13990). The pipeline treats plausible sleep-timing variability as signal, not noise — it flags disagreements for human review rather than silently normalizing them.</p>
@@ -135,32 +135,8 @@
 <td>2</td>
 </tr><tr class="even"><td>Open (needs human call)</td>
 <td>2</td>
-</tr></tbody></table><p>The dominant outcome is KEEP: every plausible large SOL is left untouched even when it exceeds the timestamp window, because removing it would bias the sleep–affect associations the pipeline exists to serve.</p>
-<p><strong>Three-state gap persistence (raw → automated → human):</strong></p>
-<p>Deviation is measured as |timestamp-derived SOL − self-reported SOL| (minutes). Baseline is 0 by construction (self-report is the anchor); the entries below are how far each intervention’s retained value sits from the written entry.</p>
-<table class="table"><colgroup><col width="20%"><col width="20%"><col width="20%"><col width="20%"><col width="20%"></colgroup><thead><tr class="header"><th>State</th>
-<th>n</th>
-<th>median gap vs self-report</th>
-<th>mean gap</th>
-<th>next</th>
-</tr></thead><tbody><tr class="odd"><td>as written (anchor)</td>
-<td>50</td>
-<td>0</td>
-<td>0</td>
-<td>—</td>
-</tr><tr class="even"><td>automated timestamp-derived</td>
-<td>50</td>
-<td><strong>47.5</strong></td>
-<td>61.6</td>
-<td>AI proposes moving off the written value by ~1h because the timestamp window contradicts the entry</td>
-</tr><tr class="odd"><td>human review outcome</td>
-<td>50</td>
-<td><strong>0</strong></td>
-<td>3.5</td>
-<td>human KEEPS the written value (KEEP-dominant); only the 2 <code>minutes_override</code> (9696) were revised (to trust the user’s format, not the timestamp)</td>
-</tr></tbody></table><ul><li>50/50 automated-pipeline rows carry a non-zero gap; after human review <strong>1/50</strong> retains a non-zero deviation (median gap collapses 47.5 → 0 min).</li>
-<li>Read: human review is the decisive layer for SOL; automated timestamp-derivation disagrees with self-report in essentially every flagged case and must not auto-apply. This is the quantitative support behind the KEEP-dominant outcome above.</li>
-</ul></div>
+</tr></tbody></table><p>The dominant outcome is KEEP: a plausible large SOL is left untouched even when it exceeds the timestamp window, because removing it would bias the sleep–affect associations the pipeline exists to serve.</p>
+</div>
 <div class="section level2">
 <h2 id="bland-altman-measurement-characterization">Bland-Altman measurement characterization<a class="anchor" aria-label="anchor" href="#bland-altman-measurement-characterization"></a></h2>
 <table class="table"><colgroup><col width="25%"><col width="25%"><col width="25%"><col width="25%"></colgroup><thead><tr class="header"><th>Metric</th>
@@ -214,10 +190,6 @@ B1 TST shift / B2 n shift | 29.6 min / 1131 records | | |</p>
 <strong>SOL thresholds sit inside the ±75-min Bland-Altman noise band</strong> — SOL flags are descriptive, routed to human review; never cited as accuracy.</li>
 <li>
 <strong>Ablation recall uses a flag-based definition</strong> (AUTO_FIXed records never enter the flag queue) — reported as supplementary; primary evidence is the multiverse variance decomposition.</li>
-<li>
-<strong>awake_getup_swap_3h is a pure order-validity fix, not value-corrected</strong> (P0-3). All 9 real <code>awake_getup_swap_3h</code> corrections are order violations (get-up timestamp precedes final awakening); the fix swaps them into legal order while <strong>preserving the gap magnitude exactly 9/9</strong> (e.g. −159 ↔︎ +159 min). It does not touch magnitude, so the SOL-anchored Channel B metric does <strong>not</strong> apply here (SOL is a different construct, and the gap has no self-report counterpart). <strong>Decision: retain as correction; evidence strength is order-validity only (order fixed, magnitude unchanged), not value-accuracy.</strong> A final-awakening/WASO self-report column would be needed to score it against ground truth.</li>
-<li>
-<strong>Cross-population evidence is synthetic-proxy, not second real dataset</strong> (P1-3). Plausible-mode synthetic inputs cover four population presets (healthy_adult, insomnia_like, short_sleeper, shift_like), so the shipped thresholds are not tuned to a single healthy sample; the population-stratified flag-rate gradient runs 0.0% (healthy_adult) → 7.7% (insomnia_like), ~26× — see <code>THRESHOLDS.md</code>. Whether a row is flagged at all is population-dependent, exactly as intended. Cross-study generalization on a <em>second real</em> dataset remains future work.</li>
 </ol></div>
 <div class="section level2">
 <h2 id="reproducibility">Reproducibility<a class="anchor" aria-label="anchor" href="#reproducibility"></a></h2>

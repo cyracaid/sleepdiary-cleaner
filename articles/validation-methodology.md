@@ -11,6 +11,25 @@ humans agree? do our choices matter?
 library(sleepcleanr)
 ```
 
+## Terminology
+
+This vignette uses several standard sleep-diary metric abbreviations
+throughout, defined once here rather than spelled out at every
+occurrence:
+
+- **SOL** — Sleep Onset Latency (minutes from getting into bed to
+  falling asleep)
+- **WASO** — Wake After Sleep Onset (total minutes awake during the
+  night after first falling asleep)
+- **TST** — Total Sleep Time
+- **TIB** — Time in Bed
+- **SE** — Sleep Efficiency (TST / TIB, as a percentage)
+- **PSG** — Polysomnography (the sleep-lab gold-standard measurement
+  this dataset does not have; see below)
+- **EMA** — Ecological Momentary Assessment (the self-report diary
+  method this dataset uses instead of PSG)
+- **MAD** — Median Absolute Deviation
+
 ## Why validation at all
 
 Sleep-diary cleaning has no ground truth: nobody can know for certain
@@ -138,6 +157,55 @@ of guessing — that is the design working. The `field_misentry`
 **value-correct gap** is the *fixed* state of a bug the benchmark
 caught: pre-v1.4.1, 95.8% of these entries were silently “repaired” to
 wrong but plausible values; now 0% are — they go to human review.
+
+**The silent-misrepair bug and its fix.** An initial synthetic benchmark
+(2026-08-12, pre-patch) injected 400 field-misentry errors into each of
+the SOL and WASO fields and ran the then-current pipeline. The results
+showed pervasive silent misrepair: **field_misentry_sol** was silently
+misrepaired in 383/400 cases (95.8%); **field_misentry_waso** in 384/400
+(96.0%). Only 4.2% (SOL) and 3.0% (WASO) were caught or corrected at all
+— the worst failure mode for a data-cleaning pipeline.
+
+The fix (commit `5dd0e27`, 2026-08-12, Part A4 in
+`checkforerrors_processing.R`) added a targeted check that flags
+suspicious clock-time-shaped duration entries for human review instead
+of silently accepting a reinterpreted value. However, the synthetic
+benchmark result files committed to the repository one hour after the
+patch (commit `18c3ed1`) were the *pre-patch* run that originally
+discovered the bug — not a post-patch re-run. A “Patch verification”
+table in the project documentation cited post-patch numbers (SOL 95.8% →
+3.5% misrepaired; WASO 95.8% → 0%) but those figures were hand-derived
+from an ad-hoc check, not from a regenerated benchmark CSV; no
+post-patch CSV existed in the repository.
+
+We re-ran the full benchmark end-to-end on 2026-09-02 against the
+currently installed `sleepcleanr` 1.4.5 (Part A4 patch included) — full
+`corrupted_enrichment.rds` (n=7,000, all 15 error categories together,
+participant-clustered injection), evaluated with `evaluate_detection.R`
+(v4) against the current `ground_truth_enrichment.csv`. This produced
+the first real post-patch numbers for this finding:
+
+|                                                         | field_misentry_sol | field_misentry_waso |
+|---------------------------------------------------------|--------------------|---------------------|
+| **CORRECT** (auto-fixed to the true value)              | 7/400 (1.8%)       | 13/400 (3.2%)       |
+| **FLAGGED_UNRESOLVED** (caught, routed to human review) | 393/400 (98.2%)    | 387/400 (96.8%)     |
+| **MISREPAIRED** (silently wrong)                        | **0/400 (0%)**     | **0/400 (0%)**      |
+
+The silent-misrepair bug is **fully closed** for both fields — 0%
+misrepaired, actually stronger than the earlier hand-derived claim of a
+3.5% residual for SOL (that residual does not reproduce on the current
+code; not further investigated, but noted as an open thread rather than
+claiming certainty about why).
+
+**Important nuance:** the pipeline now routes virtually all
+field-misentry cases to human review (FLAGGED_UNRESOLVED: 98.2% SOL,
+96.8% WASO). Only 1.8% (SOL) and 3.2% (WASO) are auto-corrected to the
+correct value (CORRECT). The previously cited “96.5% caught” figure
+conflated auto-correction with human-review routing; the pipeline’s real
+effect is converting a silent wrong answer into a **human-review flag**,
+not an automatic fix. Both are legitimate, safe outcomes — neither
+delivers a wrong value silently — but they are different claims and
+should be reported separately.
 
 ## Step 4 — Is the pipeline better than doing nothing? (controls)
 

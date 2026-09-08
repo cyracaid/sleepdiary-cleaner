@@ -10,6 +10,12 @@ read the figures.
 library(sleepcleanr)
 ```
 
+## Terminology
+
+Sleep-diary metric abbreviations used throughout this vignette: **SOL**
+(Sleep Onset Latency), **TST** (Total Sleep Time), **WASO** (Wake After
+Sleep Onset), **SE** (Sleep Efficiency).
+
 ## 1. `output/correction_status_final.csv` — The Run Summary (Open This First)
 
 One row per pipeline run. It answers: *“did the cleaning work as

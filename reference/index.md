@@ -118,6 +118,8 @@
   : Summarise IQR outlier flags
 - [`summary(`*`<sleep_diary>`*`)`](https://cyracaid.github.io/sleepdiary-cleaner/reference/summary.sleep_diary.md)
   : Tabulate the whole pipeline chain recorded in a sleep_diary
+- [`sync_human_review_status`](https://cyracaid.github.io/sleepdiary-cleaner/reference/sync_human_review_status.md)
+  : Sync Human Review Status
 - [`tally_standard()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/tally_standard.md)
   : Tally one standard's labels into a fixed-level count vector. Returns
   all-NA (named by levels) if the label vector is entirely NA.

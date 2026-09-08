@@ -8,6 +8,12 @@ without modifying any R code.
 library(sleepcleanr)
 ```
 
+## Terminology
+
+Two sleep-diary metric abbreviations appear in the column mapping and
+threshold tables below: **SOL** (Sleep Onset Latency) and **WASO** (Wake
+After Sleep Onset).
+
 ## Install and run
 
 ``` r

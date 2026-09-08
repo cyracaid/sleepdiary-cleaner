@@ -81,7 +81,7 @@
    Dataset A (final clean) + Dataset B (audit ledger)</code></pre>
 <p><strong>Why sleepcleanr?</strong></p>
 <ul>
-<li>🔍 <strong>Detects</strong> not auto-fixes — 1,048 records flagged for manual review, 0 silent corrections</li>
+<li>🔍 <strong>Detects</strong> not auto-fixes — 1,048 records flagged for manual review, 0 silent corrections (field-misentry silent-misrepair bug, 96% in v1.4.0, fixed in v1.4.4+; current benchmark: 0% silent misrepair for SOL/WASO)</li>
 <li>📊 <strong>Auditable</strong> — every change logged and reversible; non-destructive architecture</li>
 <li>✅ <strong>Validated</strong> — 9-step validation chain: synthetic (0.995 recall) + real data (92% improved) + robustness proof</li>
 <li>🚀 <strong>Reproducible</strong> — YAML config, full pipeline documentation, 308 unit tests passing</li>
@@ -101,6 +101,130 @@
 <blockquote>
 <p><strong>Thresholds are references, not gospel.</strong> The swap/flip thresholds shipped here (e.g. 3-hour adjacent swap, 12-hour AM/PM flip) were validated on our dataset(s) — see VALIDATION_REPORT. Your study’s diaries may fall inside or outside these cut-offs; they are YAML-configurable and should be re-checked against your own data, not copied blindly.</p>
 </blockquote>
+</div>
+<div class="section level3">
+<h3 id="flag-system--human-review-workflow">Flag System &amp; Human Review Workflow<a class="anchor" aria-label="anchor" href="#flag-system--human-review-workflow"></a>
+</h3>
+<p>sleepcleanr uses a structured flag system to route records through the human-in-the-loop review process. Every record can carry multiple flags; flags are <strong>additive</strong> (a record may carry several simultaneously) and <strong>never silently cleared</strong> — they persist until explicitly resolved by human action.</p>
+<table class="table">
+<colgroup>
+<col width="25%">
+<col width="25%">
+<col width="25%">
+<col width="25%">
+</colgroup>
+<thead><tr class="header">
+<th>Flag / Column</th>
+<th>Trigger</th>
+<th>Meaning</th>
+<th>Resolution</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>needs_review_flag</code></td>
+<td>Any detection rule fires</td>
+<td>Record needs human attention</td>
+<td>Human reviews → sets <code>manually_corrected=TRUE</code> OR <code>human_metric_review_status=confirmed_not_error_do_not_correct</code>
+</td>
+</tr>
+<tr class="even">
+<td><code>auto_error_desc</code></td>
+<td>Auto-detection logic</td>
+<td>Machine-readable description of why flagged</td>
+<td>Reference for human reviewer</td>
+</tr>
+<tr class="odd">
+<td>
+<code>error_type</code> / <code>unusual_type</code>
+</td>
+<td>Step 5 classification</td>
+<td>Categorized error type (TIMESTAMP, DURATION, SELF_REPORTED, etc.)</td>
+<td>Informs reviewer; drives Figure 13 classification</td>
+</tr>
+<tr class="even">
+<td><code>manually_corrected</code></td>
+<td>Human applied correction via <code>apply_manual_corrections.R</code>
+</td>
+<td>Record was explicitly fixed by human</td>
+<td>Set to <code>TRUE</code> by <code>apply_manual_corrections.R</code>
+</td>
+</tr>
+<tr class="odd">
+<td><code>human_metric_review_status</code></td>
+<td>Human metric review decision</td>
+<td>
+<code>confirmed_not_error_do_not_correct</code> = reviewed &amp; confirmed correct</td>
+<td>Set by <code>apply_metric_review_acceptances.R</code> / <code>apply_metric_review_acceptances()</code>
+</td>
+</tr>
+<tr class="even">
+<td><code>human_metric_review_note</code></td>
+<td>Reviewer’s free-text note</td>
+<td>Context for future auditors</td>
+<td>Free text</td>
+</tr>
+<tr class="odd">
+<td><code>correction_type</code></td>
+<td>Applied correction type</td>
+<td>e.g., <code>bed_sleep_swap_3h</code>, <code>sleep_reduce_12h_loop</code>
+</td>
+<td>Populated by correction engine</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Flag lifecycle:</strong></p>
+<pre><code>Record flagged (needs_review_flag=TRUE)
+    ↓ Human reviews
+    ├── Confirmed error → apply_manual_corrections.R → manually_corrected=TRUE
+    ├── Confirmed OK → human_metric_review_status="confirmed_not_error_do_not_correct"
+    └── Deferred / unsure → needs_review_flag remains TRUE</code></pre>
+<p><strong>Key design principles:</strong></p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>Flags are never silently cleared</strong> — a flag persists until explicit human action (<code>manually_corrected=TRUE</code> or <code>human_metric_review_status=confirmed_not_error_do_not_correct</code>).</li>
+<li>
+<strong>Flags are additive</strong> — a record can carry multiple flags simultaneously (e.g., TIMESTAMP + DURATION + SELF_REPORTED).</li>
+<li>
+<strong>Resolution is explicit</strong> — a flag is “resolved” only by setting <code>manually_corrected=TRUE</code> or <code>human_metric_review_status=confirmed_not_error_do_not_correct</code>; there is no implicit “auto-resolve”.</li>
+<li>
+<strong>Flags persist in outputs</strong> — Dataset A (full) retains all flags for audit; Dataset B (minimal) includes only <code>needs_review_flag</code> and <code>correction_type</code> for downstream analysis.</li>
+</ol>
+<p><strong>Current flag categories</strong> (from <code>checkforerrors_processing.R</code>):</p>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th>Category</th>
+<th>Sub-types</th>
+<th>Meaning</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><strong>TIMESTAMP</strong></td>
+<td>Clock-time format errors (bed/sleep/awake/getup)</td>
+<td>e.g., hour&gt;23, malformed colon</td>
+</tr>
+<tr class="even">
+<td><strong>DURATION</strong></td>
+<td>Interval/format errors (SOL, WASO)</td>
+<td>e.g., MM:SS vs HH:MM confusion</td>
+</tr>
+<tr class="odd">
+<td><strong>AMOUNT</strong></td>
+<td>Substance input anomalies</td>
+<td>negative, excessive digits, filler codes (888/999)</td>
+</tr>
+<tr class="even">
+<td><strong>SELF_REPORTED</strong></td>
+<td>SOL/WASO vs timestamp-window mismatch</td>
+<td>SOL &gt; bed→sleep window, SE&gt;100%, etc.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Flag statistics (v1.4.5, n=13,990):</strong> 1,048 records flagged (7.5%); 0 AUTO_FIX; 0 silent corrections. Breakdown: 922 TIMESTAMP (window violations), 140 DURATION (order violations), 1 SELF_REPORTED (extreme), 1 redundancy-confirmed worsening. See <code>VALIDATION_REPORT.md</code> for full breakdown.</p>
 </div>
 <div class="section level3">
 <h3 id="validation-map">Validation Map<a class="anchor" aria-label="anchor" href="#validation-map"></a>
@@ -125,19 +249,22 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <blockquote>
 <p><strong>Naming note:</strong> The R package is called <strong>sleepcleanr</strong> (CRAN convention: no hyphens). The GitHub repository is <strong>sleepdiary-cleaner</strong>. They are the same project — install via <code>renv::install("cyracaid/sleepdiary-cleaner")</code> and then <code><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">library(sleepcleanr)</a></code>.</p>
 </blockquote>
+<blockquote>
+<p><strong>Validation statistics source:</strong> All validation statistics above (recall 0.995, 92% improvement, 0% silent misrepair for SOL/WASO, etc.) are derived from benchmarks run against the current <code>sleepcleanr</code> v1.4.5+ codebase (commit fd6bbd0). The synthetic benchmark (<code>validation/synthetic/results/detection_outcomes_v4_current.csv</code>, 4,736 injected rows) and real-data audit (n=13,990) were executed against the current codebase (commit fd6bbd0). These statistics reflect the current pipeline behavior and supersede any earlier pre-patch numbers cited in earlier documentation. See <code>VALIDATION_REPORT.md</code> and <code>validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md</code> for the full evidence package.</p>
+</blockquote>
 </div>
 </div>
 <div class="section level2">
 <h2 id="install">Install<a class="anchor" aria-label="anchor" href="#install"></a>
 </h2>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># From GitHub (CRAN release pending)</span></span>
 <span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Demo run on the bundled synthetic fixture</span></span>
@@ -240,7 +367,66 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 </tr>
 </tbody>
 </table>
-<!-- AUTO:ARCH_END --><hr>
+<!-- AUTO:ARCH_END -->
+</div>
+</div>
+<div class="section level2">
+<h2 id="sync-human-review-status">Sync Human Review Status<a class="anchor" aria-label="anchor" href="#sync-human-review-status"></a>
+</h2>
+<p>sleepcleanr provides a utility to synchronize human review status fields in the metric review acceptance CSV file.</p>
+<blockquote>
+<p><strong>Known issue (flagged 2026-09-07, not yet fixed):</strong> the current implementation crashes on a genuine first/bootstrap run (missing <code>resolved_at</code>/<code>resolved_by</code> columns raise <code>object 'resolved_at' not found</code>), and the <code>review_resolution</code> split it produces on already-populated data does not reproduce from a clean run of the logic below — the numbers shown in this section’s example output should not yet be treated as verified. Treat this utility as unreviewed until the crash and the provenance question are resolved.</p>
+</blockquote>
+<div class="section level3">
+<h3 id="sync_human_review_status">
+<code>sync_human_review_status()</code><a class="anchor" aria-label="anchor" href="#sync_human_review_status"></a>
+</h3>
+<p>Automatically synchronizes review status fields in <code>manual_metric_review_acceptances.csv</code> based on human review traces.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/sync_human_review_status.html">sync_human_review_status</a></span><span class="op">(</span><span class="st">"manual_metric_review_acceptances.csv"</span><span class="op">)</span></span></code></pre></div>
+<p><strong>What it does:</strong></p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>Detects human review traces</strong> by checking:
+<ul>
+<li>
+<code>human_metric_review_note</code> (non-empty reviewer notes)</li>
+<li>
+<code>resolved_at</code> (resolution timestamp)</li>
+<li>
+<code>resolved_by</code> (resolution actor)</li>
+</ul>
+</li>
+<li>
+<strong>Updates three columns</strong> based on detected traces:
+<ul>
+<li>
+<code>review_resolution</code>: <code>"corrected"</code> / <code>"flagged_unresolved"</code> / <code>"legacy"</code>
+</li>
+<li>
+<code>resolved_at</code>: Resolution date (only for <code>corrected</code>)</li>
+<li>
+<code>resolved_by</code>: <code>"system"</code> / <code>"pending"</code> / <code>"legacy"</code>
+</li>
+</ul>
+</li>
+</ol>
+<p><strong>Resolution Logic:</strong> | Condition | <code>review_resolution</code> | <code>resolved_at</code> | <code>resolved_by</code> | |———–|———————|—————|—————| | Explicit <code>corrected</code> flag | <code>"corrected"</code> | Today | <code>"system"</code> | | Human traces + legacy/NA | <code>"flagged_unresolved"</code> | NA | <code>"pending"</code> | | Human traces + legacy/NA | <code>"flagged_unresolved"</code> | NA | <code>"pending"</code> | | No traces + legacy | <code>"legacy"</code> | NA | <code>"legacy"</code> |</p>
+<p><strong>Usage:</strong></p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/sync_human_review_status.html">sync_human_review_status</a></span><span class="op">(</span><span class="st">"manual_metric_review_acceptances.csv"</span><span class="op">)</span></span></code></pre></div>
+<p><strong>Output:</strong></p>
+<pre><code>✓ Synced 161 rows: 1 corrected, 43 flagged, 117 legacy</code></pre>
+<p><strong>Integration in Pipeline:</strong> Automatically runs at pipeline Step 11 (after all corrections, before visualization):</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/run_pipeline.html">run_pipeline</a></span><span class="op">(</span>config <span class="op">=</span> <span class="st">"my_study.yaml"</span><span class="op">)</span>  <span class="co"># Automatically runs sync_human_review_status() at Step 11</span></span></code></pre></div>
+<p><strong>Manual invocation:</strong></p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/sync_human_review_status.html">sync_human_review_status</a></span><span class="op">(</span><span class="st">"manual_metric_review_acceptances.csv"</span><span class="op">)</span></span></code></pre></div>
+<hr>
 <p><a name="%E4%B8%AD%E6%96%87"></a></p>
 </div>
 </div>
@@ -270,14 +456,14 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <div class="section level2">
 <h2 id="安装">安装<a class="anchor" aria-label="anchor" href="#%E5%AE%89%E8%A3%85"></a>
 </h2>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 从 GitHub 安装（CRAN 发布待定）</span></span>
 <span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="快速开始">快速开始<a class="anchor" aria-label="anchor" href="#%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B"></a>
 </h2>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 用内置合成数据跑演示</span></span>

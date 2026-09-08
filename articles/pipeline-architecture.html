@@ -70,6 +70,15 @@ classification systems that label every record.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
+<h2 id="terminology">Terminology<a class="anchor" aria-label="anchor" href="#terminology"></a>
+</h2>
+<p>Sleep-diary metric abbreviations used throughout this vignette:
+<strong>SOL</strong> (Sleep Onset Latency), <strong>WASO</strong> (Wake
+After Sleep Onset), <strong>TST</strong> (Total Sleep Time),
+<strong>SE</strong> (Sleep Efficiency). <strong>QC</strong> below refers
+to quality control.</p>
+</div>
+<div class="section level2">
 <h2 id="pipeline-steps">Pipeline steps<a class="anchor" aria-label="anchor" href="#pipeline-steps"></a>
 </h2>
 <pre><code>Raw Data ──→ Step 1: Load Data ──→ Step 2: Parse Timestamps ──→ Step 3: Parse Intervals ──→ Step 4: Normalize Sequence

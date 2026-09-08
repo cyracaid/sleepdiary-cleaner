@@ -8,6 +8,13 @@ classification systems that label every record.
 library(sleepcleanr)
 ```
 
+## Terminology
+
+Sleep-diary metric abbreviations used throughout this vignette: **SOL**
+(Sleep Onset Latency), **WASO** (Wake After Sleep Onset), **TST** (Total
+Sleep Time), **SE** (Sleep Efficiency). **QC** below refers to quality
+control.
+
 ## Pipeline steps
 
     Raw Data ──→ Step 1: Load Data ──→ Step 2: Parse Timestamps ──→ Step 3: Parse Intervals ──→ Step 4: Normalize Sequence

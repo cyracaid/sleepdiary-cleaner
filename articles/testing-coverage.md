@@ -9,6 +9,13 @@ covered in the validation-methodology vignette.
 library(sleepcleanr)
 ```
 
+## Terminology
+
+Sleep-diary metric abbreviations referenced in the coverage table below:
+**SOL** (Sleep Onset Latency), **SE** (Sleep Efficiency), **TST** (Total
+Sleep Time), **TIB** (Time in Bed). **CI** below means continuous
+integration (automated testing on every commit).
+
 ## Test files and coverage
 
 | Test File                          | Coverage                                                                                                                                                                                                  |

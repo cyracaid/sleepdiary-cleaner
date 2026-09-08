@@ -189,6 +189,67 @@ recall 0.43 → 1.0、<code>format_no_colon</code> recall 0.11 →
 给人类而不是猜——这是设计在工作。<code>field_misentry</code> 的 L3
 缺口是基准抓住的 bug 的<em>修复后</em>状态：v1.4.1 之前，95.8%
 这类条目被静默”修”成错误但合理的值；现在 0%——全部转人工审查。</p>
+<p><strong>静默误修 bug 与修复。</strong>
+初始合成基准（2026-08-12，补丁前）在 SOL 和 WASO 字段各注入 400 个
+field-misentry
+错误并运行当时的管线。结果显示普遍存在静默误修：<strong>field_misentry_sol</strong>
+在 383/400 例（95.8%）中被静默误修；<strong>field_misentry_waso</strong>
+在 384/400 例（96.0%）。仅 4.2%（SOL）和
+3.0%（WASO）被捕获或修正——这是数据清洗管线最坏的失效模式。</p>
+<p>修复（commit
+<code>5dd0e27</code>，2026-08-12，<code>checkforerrors_processing.R</code>
+中的 Part
+A4）增加了针对性检查，标记可疑的钟表时间形态时长条目供人工复核，而非静默接受重新解释的值。然而，提交到仓库的合成基准结果文件（commit
+<code>18c3ed1</code>，补丁一小时后）是<em>发现 bug 时的 pre-patch
+运行</em>——而非补丁后的重跑。项目文档中的”补丁验证”表引用了补丁后数字（SOL
+95.8% → 3.5% 误修；WASO 95.8% → 0%），但这些数字源于当时的 ad-hoc
+核查，并非重新生成的基准 CSV；仓库中当时不存在补丁后的 CSV。</p>
+<p>我们于 2026-09-02 对当前安装的 <code>sleepcleanr</code> 1.4.5（含
+Part A4 补丁）进行了完整端到端基准重跑——完整
+<code>corrupted_enrichment.rds</code>（n=7,000，全部 15
+类错误、按参与者聚类注入），用
+<code>evaluate_detection.R</code>（v4）结合当前
+<code>ground_truth_enrichment.csv</code>
+评估。这产生了该发现的首个真实补丁后数字：</p>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th></th>
+<th>field_misentry_sol</th>
+<th>field_misentry_waso</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>
+<strong>CORRECT</strong>（自动修正到真值）</td>
+<td>7/400 (1.8%)</td>
+<td>13/400 (3.2%)</td>
+</tr>
+<tr class="even">
+<td>
+<strong>FLAGGED_UNRESOLVED</strong>（捕获，转人工复核）</td>
+<td>393/400 (98.2%)</td>
+<td>387/400 (96.8%)</td>
+</tr>
+<tr class="odd">
+<td>
+<strong>MISREPAIRED</strong>（静默改错）</td>
+<td><strong>0/400 (0%)</strong></td>
+<td><strong>0/400 (0%)</strong></td>
+</tr>
+</tbody>
+</table>
+<p>静默误修 bug 对两字段<strong>完全闭环</strong>——0%
+误修，实为比早期手工推导的 SOL 3.5%
+残留更强（该残留在当前代码上不复现；未深究，作为开放线索而非定论）。</p>
+<p><strong>关键细微差别：</strong> 管线现将几乎所有 field-misentry
+案例路由至人工复核（FLAGGED_UNRESOLVED：SOL 98.2%，WASO 96.8%）。仅
+1.8%（SOL）和 3.2%（WASO）自动修正为真值（CORRECT）。早先文档中”96.5%
+caught”表述混淆了自动修正与人工复核路由；管线真实作用是将静默错误答案转为<strong>人工复核标记</strong>，非自动修正。两者均为合法、安全的结果——均不静默给出错误值——但属不同性质的主张，应分开报告。</p>
 </div>
 <div class="section level2">
 <h2 id="第-4-步-管线比什么都不做强吗对照">第 4 步 — 管线比什么都不做强吗？（对照）<a class="anchor" aria-label="anchor" href="#%E7%AC%AC-4-%E6%AD%A5-%E7%AE%A1%E7%BA%BF%E6%AF%94%E4%BB%80%E4%B9%88%E9%83%BD%E4%B8%8D%E5%81%9A%E5%BC%BA%E5%90%97%E5%AF%B9%E7%85%A7"></a>

@@ -1,6 +1,6 @@
 # sleepcleanr — Validation Report
 
-*Rendered 2026-08-27 by `validation/render_validation_report.R`. All
+*Rendered 2026-09-07 by `validation/render_validation_report.R`. All
 synthetic numbers are read directly from the result CSVs — nothing below
 is hand-typed.*
 
@@ -83,30 +83,9 @@ open.
 | Modified                            | 2     |
 | Open (needs human call)             | 2     |
 
-The dominant outcome is KEEP: every plausible large SOL is left
-untouched even when it exceeds the timestamp window, because removing it
-would bias the sleep–affect associations the pipeline exists to serve.
-
-**Three-state gap persistence (raw → automated → human):**
-
-Deviation is measured as \|timestamp-derived SOL − self-reported SOL\|
-(minutes). Baseline is 0 by construction (self-report is the anchor);
-the entries below are how far each intervention’s retained value sits
-from the written entry.
-
-| State                       | n   | median gap vs self-report | mean gap | next                                                                                                                                             |
-|-----------------------------|-----|---------------------------|----------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| as written (anchor)         | 50  | 0                         | 0        | —                                                                                                                                                |
-| automated timestamp-derived | 50  | **47.5**                  | 61.6     | AI proposes moving off the written value by ~1h because the timestamp window contradicts the entry                                               |
-| human review outcome        | 50  | **0**                     | 3.5      | human KEEPS the written value (KEEP-dominant); only the 2 `minutes_override` (9696) were revised (to trust the user’s format, not the timestamp) |
-
-- 50/50 automated-pipeline rows carry a non-zero gap; after human review
-  **1/50** retains a non-zero deviation (median gap collapses 47.5 → 0
-  min).
-- Read: human review is the decisive layer for SOL; automated
-  timestamp-derivation disagrees with self-report in essentially every
-  flagged case and must not auto-apply. This is the quantitative support
-  behind the KEEP-dominant outcome above.
+The dominant outcome is KEEP: a plausible large SOL is left untouched
+even when it exceeds the timestamp window, because removing it would
+bias the sleep–affect associations the pipeline exists to serve.
 
 ## Bland-Altman measurement characterization
 
@@ -157,26 +136,6 @@ requires never existed.
 3.  **Ablation recall uses a flag-based definition** (AUTO_FIXed records
     never enter the flag queue) — reported as supplementary; primary
     evidence is the multiverse variance decomposition.
-4.  **awake_getup_swap_3h is a pure order-validity fix, not
-    value-corrected** (P0-3). All 9 real `awake_getup_swap_3h`
-    corrections are order violations (get-up timestamp precedes final
-    awakening); the fix swaps them into legal order while **preserving
-    the gap magnitude exactly 9/9** (e.g. −159 ↔︎ +159 min). It does not
-    touch magnitude, so the SOL-anchored Channel B metric does **not**
-    apply here (SOL is a different construct, and the gap has no
-    self-report counterpart). **Decision: retain as correction; evidence
-    strength is order-validity only (order fixed, magnitude unchanged),
-    not value-accuracy.** A final-awakening/WASO self-report column
-    would be needed to score it against ground truth.
-5.  **Cross-population evidence is synthetic-proxy, not second real
-    dataset** (P1-3). Plausible-mode synthetic inputs cover four
-    population presets (healthy_adult, insomnia_like, short_sleeper,
-    shift_like), so the shipped thresholds are not tuned to a single
-    healthy sample; the population-stratified flag-rate gradient runs
-    0.0% (healthy_adult) → 7.7% (insomnia_like), ~26× — see
-    `THRESHOLDS.md`. Whether a row is flagged at all is
-    population-dependent, exactly as intended. Cross-study
-    generalization on a *second real* dataset remains future work.
 
 ## Reproducibility
 
