@@ -1,15 +1,22 @@
 # Pipeline workflow figure (Figure 1) + Before/After figure (Figure 2)
 # Publication-quality. Extracts all numbers from existing pipeline outputs.
 # No helper summarise_corrections() -- counts computed inline.
-# Dependencies: ggplot2 (already in Imports), no new packages.
+# Dependencies: ggplot2, patchwork (both in Imports)
 
-# ggplot2 used via NAMESPACE import (no library() call in package code).
+#' @importFrom ggplot2 ggplot aes geom_segment geom_tile geom_text geom_violin
+#' @importFrom ggplot2 geom_boxplot geom_abline geom_histogram geom_point geom_vline
+#' @importFrom ggplot2 stat_summary scale_fill_manual scale_colour_manual
+#' @importFrom ggplot2 annotate coord_cartesian coord_fixed labs theme_void theme_minimal
+#' @importFrom ggplot2 theme element_text margin unit arrow ggsave
+#' @importFrom patchwork plot_annotation
+#' @importFrom utils globalVariables
+NULL
 
 # aes() NSE column names (time/value) are data-frame columns, not globals.
 utils::globalVariables(c(
   "time", "value", "StartDate", "after", "before", "fill",
   "temp_col", "x", "xend", "y", "yend",
-  "severity", "correction", "label"
+  "severity", "correction", "label", "tst", "value"
 ))
 
 # --------------------------------------------------------------

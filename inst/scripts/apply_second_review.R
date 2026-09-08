@@ -46,7 +46,7 @@ append_with_antijoin <- function(existing_file, new_rows, join_cols = c("pid", "
 
 apply_second_review <- function(checklist_path = NULL) {
   if (is.null(checklist_path)) {
-    checklist_path <- cfg_get("data.files.second_review", "second_review_checklist.csv", cfg = .pipeline_cfg)
+    checklist_path <- cfg_get("data.files.second_review", "second_review_checklist.csv", cfg = pipeline_config)
   }
 
   if (!file.exists(checklist_path)) {

@@ -200,6 +200,65 @@ issues.
 
 <!-- AUTO:ARCH_END -->
 
+## Sync Human Review Status
+
+sleepcleanr provides a utility to synchronize human review status fields in the metric review acceptance CSV file.
+
+> **Known issue (flagged 2026-09-07, not yet fixed):** the current implementation crashes on a genuine first/bootstrap run (missing `resolved_at`/`resolved_by` columns raise `object 'resolved_at' not found`), and the `review_resolution` split it produces on already-populated data does not reproduce from a clean run of the logic below — the numbers shown in this section's example output should not yet be treated as verified. Treat this utility as unreviewed until the crash and the provenance question are resolved.
+
+### `sync_human_review_status()`
+
+Automatically synchronizes review status fields in `manual_metric_review_acceptances.csv` based on human review traces.
+
+```r
+library(sleepcleanr)
+sync_human_review_status("manual_metric_review_acceptances.csv")
+```
+
+**What it does:**
+
+1. **Detects human review traces** by checking:
+   - `human_metric_review_note` (non-empty reviewer notes)
+   - `resolved_at` (resolution timestamp)
+   - `resolved_by` (resolution actor)
+
+2. **Updates three columns** based on detected traces:
+   - `review_resolution`: `"corrected"` / `"flagged_unresolved"` / `"legacy"`
+   - `resolved_at`: Resolution date (only for `corrected`)
+   - `resolved_by`: `"system"` / `"pending"` / `"legacy"`
+
+**Resolution Logic:**
+| Condition | `review_resolution` | `resolved_at` | `resolved_by` |
+|-----------|---------------------|---------------|---------------|
+| Explicit `corrected` flag | `"corrected"` | Today | `"system"` |
+| Human traces + legacy/NA | `"flagged_unresolved"` | NA | `"pending"` |
+| Human traces + legacy/NA | `"flagged_unresolved"` | NA | `"pending"` |
+| No traces + legacy | `"legacy"` | NA | `"legacy"` |
+
+**Usage:**
+```r
+library(sleepcleanr)
+sync_human_review_status("manual_metric_review_acceptances.csv")
+```
+
+**Output:**
+```
+✓ Synced 161 rows: 1 corrected, 43 flagged, 117 legacy
+```
+
+**Integration in Pipeline:**
+Automatically runs at pipeline Step 11 (after all corrections, before visualization):
+```r
+run_pipeline(config = "my_study.yaml")  # Automatically runs sync_human_review_status() at Step 11
+```
+
+**Manual invocation:**
+```r
+library(sleepcleanr)
+sync_human_review_status("manual_metric_review_acceptances.csv")
+```
+
+
 ---
 
 <a name="中文"></a>
@@ -288,120 +347,3 @@ file.copy(system.file("config_template.yaml", package = "sleepcleanr"),
 <!-- AUTO:ARCH_ZH_END -->
 
 
-## Sync Human Review Status
-
-sleepcleanr provides a utility to synchronize human review status fields in the metric review acceptance CSV file.
-
-### `sync_human_review_status()`
-
-Automatically synchronizes review status fields in `manual_metric_review_acceptances.csv` based on human review traces.
-
-```r
-library(sleepcleanr)
-sync_human_review_status("manual_metric_review_acceptances.csv")
-```
-
-**What it does:**
-
-1. **Detects human review traces** by checking:
-   - `human_metric_review_note` (non-empty reviewer notes)
-   - `resolved_at` (resolution timestamp)
-   - `resolved_by` (resolution actor)
-
-2. **Updates three columns** based on detected traces:
-   - `review_resolution`: `"corrected"` / `"flagged_unresolved"` / `"legacy"`
-   - `resolved_at`: Resolution date (only for `corrected`)
-   - `resolved_by`: `"system"` / `"pending"` / `"legacy"`
-
-**Resolution Logic:**
-| Condition | `review_resolution` | `resolved_at` | `resolved_by` |
-|-----------|---------------------|---------------|---------------|
-| Explicit `corrected` flag | `"corrected"` | Today | `"system"` |
-| Human traces + legacy/NA | `"flagged_unresolved"` | NA | `"pending"` |
-| Human traces + legacy/NA | `"flagged_unresolved"` | NA | `"pending"` |
-| No traces + legacy | `"legacy"` | NA | `"legacy"` |
-
-**Usage:**
-```r
-library(sleepcleanr)
-sync_human_review_status("manual_metric_review_acceptances.csv")
-```
-
-**Output:**
-```
-✓ Synced 161 rows: 1 corrected, 43 flagged, 117 legacy
-```
-
-**Integration in Pipeline:**
-Automatically runs at pipeline Step 11 (after all corrections, before visualization):
-```r
-run_pipeline(config = "my_study.yaml")  # Automatically runs sync_human_review_status() at Step 11
-```
-
-**Manual invocation:**
-```r
-library(sleepcleanr)
-sync_human_review_status("manual_metric_review_acceptances.csv")
-```
-
-## Sync Human Review Status
-
-sleepcleanr provides a utility to synchronize human review status fields in the metric review acceptance CSV file.
-
-### `sync_human_review_status()`
-
-Automatically synchronizes review status fields in `manual_metric_review_acceptances.csv` based on human review traces.
-
-```r
-library(sleepcleanr)
-sync_human_review_status("manual_metric_review_acceptances.csv")
-```
-
-**What it does:**
-
-1. **Detects human review traces** by checking:
-   - `human_metric_review_note` (non-empty reviewer notes)
-   - `resolved_at` (resolution timestamp)
-   - `resolved_by` (resolution actor)
-
-2. **Updates three columns** based on detected traces:
-   - `review_resolution`: `"corrected"` / `"flagged_unresolved"` / `"legacy"`
-   - `resolved_at`: Resolution date (only for `corrected`)
-   - `resolved_by`: `"system"` / `"pending"` / `"legacy"`
-
-**Resolution Logic:**
-
-| Condition | `review_resolution` | `resolved_at` | `resolved_by` |
-|-----------|---------------------|---------------|---------------|
-| Explicit `corrected` flag | `"corrected"` | Today | `"system"` |
-| Human traces + legacy/NA | `"flagged_unresolved"` | NA | `"pending"` |
-| Human traces + legacy/NA | `"flagged_unresolved"` | NA | `"pending"` |
-| No traces + legacy | `"legacy"` | NA | `"legacy"` |
-
-**Usage:**
-```r
-library(sleepcleanr)
-sync_human_review_status("manual_metric_review_acceptances.csv")
-```
-
-**Output:**
-```
-✓ Synced 161 rows: 1 corrected, 43 flagged, 117 legacy
-```
-
-**Integration in Pipeline:**
-Automatically runs at pipeline Step 11 (after all corrections, before visualization):
-```r
-run_pipeline(config = "my_study.yaml")  # Automatically runs sync_human_review_status() at Step 11
-```
-
-**Manual invocation:**
-```r
-library(sleepcleanr)
-sync_human_review_status("manual_metric_review_acceptances.csv")
-```
-
-**Output:**
-```
-✓ Synced 161 rows: 1 corrected, 43 flagged, 117 legacy
-```

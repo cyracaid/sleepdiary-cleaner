@@ -50,6 +50,7 @@ export(step_process_intervals)
 export(step_process_timestamps)
 export(summarise_missing)
 export(summarise_outliers)
+export(sync_human_review_status)
 export(validate_column_types)
 export(validate_columns)
 export(validate_no_r_code_in_paths)
@@ -72,10 +73,40 @@ importFrom(dplyr,
   pull,
   rename,
   row_number,
+  rowwise,
   select,
   summarise,
   sym,
+  ungroup,
   vars
+)
+importFrom(ggplot2,
+  aes,
+  annotate,
+  arrow,
+  coord_cartesian,
+  coord_fixed,
+  element_text,
+  geom_abline,
+  geom_boxplot,
+  geom_histogram,
+  geom_point,
+  geom_segment,
+  geom_text,
+  geom_tile,
+  geom_violin,
+  geom_vline,
+  ggplot,
+  ggsave,
+  labs,
+  margin,
+  scale_colour_manual,
+  scale_fill_manual,
+  stat_summary,
+  theme,
+  theme_minimal,
+  theme_void,
+  unit
 )
 importFrom(lubridate,
   as_datetime,
@@ -92,8 +123,10 @@ importFrom(lubridate,
   second,
   ymd_hms
 )
+importFrom(patchwork,plot_annotation)
 importFrom(readr,
   cols,
+  read_csv,
   write_csv
 )
 importFrom(rlang,
@@ -117,4 +150,7 @@ importFrom(tidyr,
   complete,
   separate
 )
-importFrom(utils,read.csv)
+importFrom(utils,
+  globalVariables,
+  read.csv
+)

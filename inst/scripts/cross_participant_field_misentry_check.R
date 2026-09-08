@@ -13,7 +13,7 @@
 
 cat("=== Field-Misentry Check: SOL/WASO vs time columns ===\n")
 
-rds_path <- cfg_get("data.files.main", "your_data.rds", cfg = .pipeline_cfg)
+rds_path <- cfg_get("data.files.main", "your_data.rds", cfg = pipeline_config)
 if (!file.exists(rds_path)) {
   stop(sprintf("Raw data not found: %s. Run from sleepcleanr/ directory.", rds_path))
 }
@@ -22,7 +22,7 @@ raw <- readRDS(rds_path)
 
 # SOL column name is mapping-driven (MM:SS-era exports store SOL under the
 # *_hhmm column; the old totalmin name does not exist in them).
-sol_col <- config_get(.pipeline_cfg, "column_mapping.duration.sol",
+sol_col <- config_get(pipeline_config, "column_mapping.duration.sol",
                       "duration_totalmin_sol_estimate_am")
 
 # ── Per-row check: does the HH:MM string of SOL/WASO exactly match a time column? ──
