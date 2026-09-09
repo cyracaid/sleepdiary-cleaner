@@ -137,3 +137,5 @@ disambiguation_worksheet_maia.csv
 disambiguation_agreement_report.csv
 disambiguation_disagreements.csv
 disambiguation_already_resolved.csv
+# v2 renamed worksheets (2026-09-08) -- same real-data privacy rule
+manual_disambiguation_*.csv
