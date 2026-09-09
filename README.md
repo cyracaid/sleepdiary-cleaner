@@ -49,7 +49,7 @@ Messy sleep diary data (CSV / RDS)
 
 **Why sleepcleanr?**
 
-- 🔍 **Detects** not auto-fixes — 1,048 records flagged for manual review, 0 silent corrections (field-misentry silent-misrepair bug, 96% in v1.4.0, fixed in v1.4.4+; current benchmark: 0% silent misrepair for SOL/WASO)
+- 🔍 **Detects** not auto-fixes — 1,048 records flagged for manual review, 0 silent misrepairs (field-misentry silent-misrepair bug, 96% in v1.4.0, fixed in v1.4.4+; current benchmark: 0% silent misrepair for SOL/WASO)
 - 📊 **Auditable** — every change logged and reversible; non-destructive architecture
 - ✅ **Validated** — 9-step validation chain: synthetic (0.995 recall) + real data (92% improved) + robustness proof
 - 🚀 **Reproducible** — YAML config, full pipeline documentation, 308 unit tests passing
@@ -97,12 +97,12 @@ Record flagged (needs_review_flag=TRUE)
 3. **Resolution is explicit** — a flag is "resolved" only by setting `manually_corrected=TRUE` or `human_metric_review_status=confirmed_not_error_do_not_correct`; there is no implicit "auto-resolve".
 4. **Flags persist in outputs** — Dataset A (full) retains all flags for audit; Dataset B (minimal) includes only `needs_review_flag` and `correction_type` for downstream analysis.
 
-**Current flag categories** (from `checkforerrors_processing.R`):
+**Current flag categories** (from `checkforerrors_processing.R` and METHODS Stage 7):
 
 | Category | Sub-types | Meaning |
 |---|---|---|
-| **TIMESTAMP** | Clock-time format errors (bed/sleep/awake/getup) | e.g., hour>23, malformed colon |
-| **DURATION** | Interval/format errors (SOL, WASO) | e.g., MM:SS vs HH:MM confusion |
+| **TIMESTAMP** | Sequence/range violations (bed/sleep/awake/getup times) | e.g., hour>23, malformed colon, inverted sequences |
+| **DURATION** | Interval/format errors (SOL, WASO) | e.g., MM:SS vs HH:MM confusion, plausibility violations |
 | **AMOUNT** | Substance input anomalies | negative, excessive digits, filler codes (888/999) |
 | **SELF_REPORTED** | SOL/WASO vs timestamp-window mismatch | SOL > bed→sleep window, SE>100%, etc. |
 
@@ -204,7 +204,7 @@ issues.
 
 sleepcleanr provides a utility to synchronize human review status fields in the metric review acceptance CSV file.
 
-> **Known issue (flagged 2026-09-07, not yet fixed):** the current implementation crashes on a genuine first/bootstrap run (missing `resolved_at`/`resolved_by` columns raise `object 'resolved_at' not found`), and the `review_resolution` split it produces on already-populated data does not reproduce from a clean run of the logic below — the numbers shown in this section's example output should not yet be treated as verified. Treat this utility as unreviewed until the crash and the provenance question are resolved.
+> **Resolved (v1.4.5, commit 4812fcc):** The earlier known issue where `sync_human_review_status()` crashed on bootstrap runs and did not reproduce from clean state has been fixed. The function now correctly handles first-time runs and produces reproducible results.
 
 ### `sync_human_review_status()`
 
