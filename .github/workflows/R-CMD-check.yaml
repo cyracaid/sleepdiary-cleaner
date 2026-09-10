@@ -35,6 +35,7 @@ jobs:
 
       - uses: r-lib/actions/check-r-package@v2
         with:
+          error_on: 'error'
           # Drop --as-cran: it runs tests in a build-tree copy where the
           # smoke-legacy-entry subprocess (pkgload::load_all + visualization)
           # hangs after Step 4. Plain R CMD check is the acceptance gate
