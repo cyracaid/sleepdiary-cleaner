@@ -258,8 +258,9 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <h2 id="install">Install<a class="anchor" aria-label="anchor" href="#install"></a>
 </h2>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># From GitHub (CRAN release pending)</span></span>
-<span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># From GitHub (available on CRAN as sleepcleanr)</span></span>
+<span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner"</span><span class="op">)</span></span>
+<span><span class="co"># or: install.packages("sleepcleanr")</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
@@ -457,8 +458,9 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <h2 id="安装">安装<a class="anchor" aria-label="anchor" href="#%E5%AE%89%E8%A3%85"></a>
 </h2>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># 从 GitHub 安装（CRAN 发布待定）</span></span>
-<span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># 从 GitHub 安装（已上线 CRAN，包名 sleepcleanr）</span></span>
+<span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner"</span><span class="op">)</span></span>
+<span><span class="co"># 或: install.packages("sleepcleanr")</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="快速开始">快速开始<a class="anchor" aria-label="anchor" href="#%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B"></a>
@@ -516,53 +518,53 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <tbody>
 <tr class="odd">
 <td>1</td>
-<td>Load data</td>
-<td>.rds/.csv auto-detected; schema validated; optional supplementary file merged</td>
+<td>数据加载</td>
+<td>.rds/.csv 自动检测；schema 校验；可选辅助文件合并</td>
 </tr>
 <tr class="even">
 <td>1.5</td>
-<td>Field-misentry check</td>
-<td>SOL/WASO clock-time vs duration-field misentry detection on raw data</td>
+<td>字段错误检查</td>
+<td>SOL/WASO 时钟时间 vs 时长字段误入检测</td>
 </tr>
 <tr class="odd">
 <td>2-4</td>
-<td>Parse &amp; normalize (S3 chain)</td>
-<td>Parse timestamps → parse intervals → normalize sequence</td>
+<td>解析与标准化 (S3 链)</td>
+<td>解析时间戳 → 解析时长 → 标准化序列</td>
 </tr>
 <tr class="even">
 <td>5</td>
-<td>Classify records</td>
-<td>Generate manual review CSVs for human approval</td>
+<td>记录分类</td>
+<td>生成人工审核 CSV 供批准</td>
 </tr>
 <tr class="odd">
 <td>5.75</td>
-<td>Second-review consensus</td>
-<td>Apply second-review checklist consensus</td>
+<td>二次审核共识</td>
+<td>应用二次审核清单共识</td>
 </tr>
 <tr class="even">
 <td>6-7</td>
-<td>Correct &amp; compute metrics (S3 chain)</td>
-<td>Manual + duration corrections; TST/SOL/WASO/SE metrics; has_correction enum</td>
+<td>修正与计算指标 (S3 链)</td>
+<td>人工 + 时长修正；TST/SOL/WASO/SE 指标；has_correction 枚举</td>
 </tr>
 <tr class="odd">
 <td>8</td>
-<td>Auto-detect remaining issues</td>
-<td>TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED flag classification</td>
+<td>自动检测剩余问题</td>
+<td>TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED 标志分类</td>
 </tr>
 <tr class="even">
 <td>8.5</td>
-<td>Cross-participant consistency check</td>
-<td>Global consistency audit across participants</td>
+<td>跨参与者一致性检查</td>
+<td>全局一致性审计</td>
 </tr>
 <tr class="odd">
 <td>9</td>
-<td>Generate diagnostic figures</td>
-<td>30 figures (14 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt</td>
+<td>生成诊断图表</td>
+<td>30 张图表（14 QC + 16 科研）+ 图表索引 + RUN_INFO</td>
 </tr>
 <tr class="even">
 <td>10</td>
-<td>Build delivered datasets</td>
-<td>finalize_columns() selects/renames to Dataset A/B per column dictionary</td>
+<td>构建交付数据集</td>
+<td>按列字典选择/重命名为 Dataset A/B</td>
 </tr>
 </tbody>
 </table>
