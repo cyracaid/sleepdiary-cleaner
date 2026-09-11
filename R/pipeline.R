@@ -303,7 +303,7 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
     tryCatch(
       run_figure_index(viz_dir),
       error = function(e) {
-        if (verbose) cat("⚠ Warning: figure_index generation failed:\n", conditionMessage(e), "\n")
+        if (verbose) cat("[WARNING] figure_index generation failed:\n", conditionMessage(e), "\n")
         # Non-fatal: figures are already generated, just missing the contact sheet
       }
     )
