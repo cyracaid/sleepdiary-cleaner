@@ -12,7 +12,7 @@
 #' @param filename Output PNG filename without extension.
 #' @export
 figure12_step_flag_table <- function(cfg = NULL, output_dir = ".", save_png = NULL,
-                                      filename = "12_Pipeline_Correction_Progress") {
+                                      filename = "A1_Step_Flag_Ledger") {
   long <- get_step_ledger_long()
   if (nrow(long) == 0) {
     cat("WARNING: Step ledger empty -- did run_pipeline call init_step_ledger()/log_step()? Skipping Figure 12.\n")
@@ -57,7 +57,7 @@ figure12_step_flag_table <- function(cfg = NULL, output_dir = ".", save_png = NU
   disp_chr <- disp
   for (j in 2:ncol(disp_chr)) disp_chr[[j]] <- fmt(disp[[j]])
 
-  # ── Table via grid/gtable only (gridExtra dropped from Imports) ─────────────
+  # -- Table via grid/gtable only (gridExtra dropped from Imports) -------------
   # Visual contract matches the old gridExtra::tableGrob(ttheme_minimal):
   #   - column header: bold, centred in cell
   #   - body cells:    right-aligned (hjust = 1, x = 0.95), zebra-striped rows
@@ -99,8 +99,8 @@ figure12_step_flag_table <- function(cfg = NULL, output_dir = ".", save_png = NU
   tab <- gtable::gtable_add_grob(tab, body_grobs, t = rep(seq_len(nr) + 1L, each = nc),
                                  l = rep(seq_len(nc), nr), z = 1)
 
-  # ── Vertical stack: title / subtitle / table / legend ───────────────────────
-  title <- grid::textGrob("Figure 12: Per-Step Flag Ledger",
+  # -- Vertical stack: title / subtitle / table / legend -----------------------
+  title <- grid::textGrob("1.1 \u2014 Step Flag Ledger",
                     gp = grid::gpar(fontsize = 14, fontface = "bold"))
   sub <- grid::textGrob(paste0("Records in each final-standard flag category at every pipeline step. ",
                          "\u2014 = not yet computable at that step (first number = generation point). ",

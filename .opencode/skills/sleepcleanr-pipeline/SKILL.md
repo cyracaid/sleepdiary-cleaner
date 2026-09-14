@@ -116,7 +116,7 @@ Template: `inst/config_template.yaml`
 
 - `01_Pipeline_Flow_Diagram` — record flow with counts and percentages
 - `02_Correction_Impact` — delta lollipops + identity scatter + summary table
-- `12_Pipeline_Correction_Progress` — checkpoint convergence
+- `A1_Step_Flag_Ledger` — per-step flag counts (merges former Fig 12 checkpoint convergence)
 - `figure_index.png` — contact sheet of all figures
 
 ## Repo
