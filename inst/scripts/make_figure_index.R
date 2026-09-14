@@ -24,7 +24,7 @@ generate_figure_index <- function(viz_dir) {
     c("pipeline_cleaning/18_Auto_Detected_Dashboard.png",       1, "Auto-detected issues dashboard"),
     c("pipeline_cleaning/19_Unified_Quality_Status.png",        2, "Final unified quality status"),
     c("research_ready/02_Correction_Impact.png",                3, "Correction impact (delta lollipops + scatter)"),
-    c("research_ready/02_Distribution_Sleep_Variables.png",     3, "Key sleep-variable distributions"),
+    c("research_ready/02B_Distribution_Sleep_Variables.png",    3, "Key sleep-variable distributions"),
     c("research_ready/03_Sleep_Duration_Distribution.png",      3, "TST distribution"),
     c("research_ready/04_Sleep_Duration_vs_Time_in_Bed.png",    3, "TST vs Time in Bed"),
     c("research_ready/04B_SOL_vs_Sleep_Duration.png",           3, "SOL vs TST"),

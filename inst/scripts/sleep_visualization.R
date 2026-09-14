@@ -761,10 +761,11 @@ if(all(c("data_category", "manually_corrected", "corrected") %in% names(correcte
 }
 
 # ----------------------------------------------------------------------------
-# Figure 2: Distribution of Sleep Variables
-# ============================================================================
 # Figure 2: Impact of Corrections on Sleep Metrics
 # ============================================================================
+# (Note: the stray duplicate "Figure 2: Distribution of Sleep Variables" header
+# that used to sit directly above this one has been removed -- that section is
+# below, now correctly labeled Figure 2B. See VISUALIZATION_TREE_PROPOSAL.md §0.)
 # WHAT THIS FIGURE SHOWS:
 # The magnitude of changes introduced by algorithmic and manual corrections.
 # Only 81 / 13,990 records (0.58%) were modified, so this figure leads with
@@ -912,7 +913,7 @@ if (has_raw_times && has_metrics) {
 # subpopulations with different sleep patterns or data quality issues. Long
 # tails in WASO or SOL suggest problematic records worth investigating.
 # ============================================================================
-cat("Generating Figure 2...\n")
+cat("Generating Figure 2B...\n")
 
 vars_to_plot <- c()
 if("sleep_duration_h" %in% names(clean_df)) vars_to_plot <- c(vars_to_plot, sleep_duration = "sleep_duration_h")
@@ -932,12 +933,12 @@ if(length(vars_to_plot) > 0) {
     geom_histogram(aes(y = after_stat(density)), bins = 40, fill = "#2E7D32", alpha = 0.5) +
     geom_density(color = "#D32F2F", size = 1) +
     facet_wrap(~variable, scales = "free") +
-    labs(title = "Figure 2: Distribution of Sleep Variables",
+    labs(title = "Figure 2B: Distribution of Sleep Variables",
          subtitle = "Histograms with density curves for key sleep metrics (based on final corrected data)",
          x = "Value", y = "Density")
   print(p2)
-  save_png(p2, "02_Distribution_Sleep_Variables", subdir = "research_ready")
-  cat("✓ Figure 2 completed\n\n")
+  save_png(p2, "02B_Distribution_Sleep_Variables", subdir = "research_ready")
+  cat("✓ Figure 2B completed\n\n")
 }
 
 # ----------------------------------------------------------------------------
@@ -2944,7 +2945,8 @@ cat("FIGURES 1-12 (Based on FINAL CORRECTED DATA - Post-Correction):\n")
 cat("  Source: corrected_ema_data from apply_manual_corrections_and_recalculate()\n")
 cat("  What they show: Final dataset after all manual corrections applied\n")
 cat("  Figure 1: Final Data Quality Dashboard (Post-Correction)\n")
-cat("  Figure 2: Distribution of Sleep Variables\n")
+cat("  Figure 2: Impact of Corrections on Sleep Metrics\n")
+cat("  Figure 2B: Distribution of Sleep Variables\n")
 cat("  Figure 3: Sleep Duration Distribution\n")
 cat("  Figure 4: Sleep Duration vs Time in Bed (COLOR-CODED)\n")
 cat("  Figure 4B: SOL vs Sleep Duration (COLOR-CODED)\n")

@@ -38,7 +38,7 @@ dominating the flags), the dataset is ready. Otherwise, use Tier 2 below to diag
 
 | Figure | Content |
 |--------|---------|
-| `02_Distribution_Sleep_Variables.png` | Distributions of key sleep variables. |
+| `02B_Distribution_Sleep_Variables.png` | Distributions of key sleep variables. |
 | `03_Sleep_Duration_Distribution.png` | Total Sleep Time (TST) distribution. |
 | `04_Sleep_Duration_vs_Time_in_Bed.png` | TST vs. Time in Bed (with correlation). |
 | `04B_SOL_vs_Sleep_Duration.png` | Sleep-onset latency vs. TST. |
