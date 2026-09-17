@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,6 +33,34 @@
       <small>Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.4.6" id="sleepcleanr-146">sleepcleanr 1.4.6<a class="anchor" aria-label="anchor" href="#sleepcleanr-146"></a></h2>
+<p>Data-first entry, provenance, and figure-hardening release.</p>
+<div class="section level3">
+<h3 id="new-api-clean_sleep_diary-1-4-6">New API: <code>clean_sleep_diary()</code>
+<a class="anchor" aria-label="anchor" href="#new-api-clean_sleep_diary-1-4-6"></a></h3>
+<ul><li>One-call entry: <code>clean_sleep_diary("my.csv")</code> (also .rds / .xlsx / data.frame) with no config file required; column names are inferred and every schema inference decision is recorded, never silently guessed.</li>
+<li>
+<code><a href="../reference/guess_column_mapping.html">guess_column_mapping()</a></code> returns per-column records (user_col, internal_col, match_rule, confidence, status, candidate_set); ambiguous ties are never silently resolved; absent required fields fail loudly.</li>
+<li>
+<code>dry_run = TRUE</code> previews the mapping and writes only <code>dry_run_manifest.json</code> (never a cleaned dataset); raw input is never modified.</li>
+<li>Provenance manifest (JSON): input md5 hash as identity, git commit (NULL outside a repo), UTC timestamp, environment (R version, platform, package versions), full effective config, per-step ledger, output paths.</li>
+<li>
+<code><a href="../reference/run_pipeline.html">run_pipeline()</a></code> gains an optional <code>data = NULL</code> argument; default NULL is the zero-change backward-compatible path (invariant-tested).</li>
+</ul></div>
+<div class="section level3">
+<h3 id="validation-hardening-1-4-6">Validation hardening<a class="anchor" aria-label="anchor" href="#validation-hardening-1-4-6"></a></h3>
+<ul><li>
+<code>validation/synthetic/operating_point_sweep.R</code>: 20-point grid (swap 1-5 h x flip 8-14 h) with a predefined selection rule; result: flat plateau, defaults (3, 12) validated as an operating point.</li>
+<li>
+<code>validation/synthetic/benchmark_table.R</code>: per-category detection-vs- correction table with precision / FAR / false-correction columns; fixes the control-row miscompute in detection_outcomes_v4_current.csv.</li>
+<li>Citation metadata: CITATION.cff, inst/CITATION, .zenodo.json (DOI placeholder).</li>
+</ul></div>
+<div class="section level3">
+<h3 id="figure-robustness-1-4-6">Figure robustness<a class="anchor" aria-label="anchor" href="#figure-robustness-1-4-6"></a></h3>
+<ul><li>Review PDF built from saved PNGs (print() of patchwork corrupts on non-interactive devices); Fig 13 uses measured table heights so the canvas grows instead of tables overflowing; Fig 15 reads Step-6 classification and degrades to per-type counts on single-date data; Fig 11/14/16 report skip reasons (<code>.mark_skip()</code>); missing-figure report (console + CSV + contact sheet footer); A1 ledger Step column width fixed.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.4.5" id="sleepcleanr-145">sleepcleanr 1.4.5<a class="anchor" aria-label="anchor" href="#sleepcleanr-145"></a></h2>
 <p>CRAN resubmission: fixes the Debian check ERROR by replacing the legacy <code>US/Pacific</code> timezone alias (not recognized by lubridate’s CCTZ on Debian) with the canonical IANA name <code>America/Los_Angeles</code> in the timestamp parser (<code>R/timestamp_parse.R</code> and the legacy <code>inst/scripts/process_timestamp_ emadatarelease_cyra.R</code> copy). Also drops the stray <code>inst/doc/.gitkeep</code> hidden file from the build, adds <code>VALIDATION_REPORT.md</code> to <code>.Rbuildignore</code>, and updates the README codecov (301) and stargazers (404) badge links.</p>
