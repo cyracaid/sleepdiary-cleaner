@@ -35,13 +35,11 @@ jobs:
 
       - uses: r-lib/actions/check-r-package@v2
         with:
-          # error-on (hyphenated, not error_on): fail only on ERRORs, matching
-          # the 2d698b9 intent. The pre-fix 'error_on' was an invalid input so
-          # r-lib defaulted to error-on: warning, turning every WARNING red
-          # (vignette weave-output WARNINGs were red on all 3 platforms since
-          # 2d698b9 -- the --no-vignettes arg makes R CMD check expect weave
-          # outputs in inst/doc that were never built).
-          error-on: 'error'
+          # error-on is injected literally into R code (error_on = (${{ inputs.error-on }}))
+          # so the value must carry quotes: '"error"' -> error_on = ("error").
+          # The pre-fix error_on key was invalid input, dropped, defaulting to
+          # error-on: "warning" -> every WARNING red since 2d698b9.
+          error-on: '"error"'
           # Drop --as-cran: it runs tests in a build-tree copy where the
           # smoke-legacy-entry subprocess (pkgload::load_all + visualization)
           # hangs after Step 4. Plain R CMD check is the acceptance gate
