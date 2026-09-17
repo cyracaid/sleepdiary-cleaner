@@ -12,7 +12,7 @@
 #                Uses: checkforerrors_df from algorithm detection
 #                Shows: Potential issues needing human review
 #
-# Figure 1:      Final data quality dashboard (corrected data)
+# Figure 1:      Pipeline record flow diagram (post-correction)
 # Figure 18:     Auto-detected issues dashboard (raw algorithm output)
 # ============================================================================
 # OVERVIEW
@@ -658,32 +658,31 @@ cat(paste(rep("=", 80), collapse = ""))
 cat("\n\n")
 
 # ----------------------------------------------------------------------------
-# Figure 1: Final Data Quality Dashboard (Post-Correction)
+# Figure 1: Pipeline Record Flow Diagram (Post-Correction)
 # ----------------------------------------------------------------------------
 # DATA SOURCE: corrected_ema_data (final dataset after all corrections)
-# KEY COLUMNS: data_category, manually_corrected
-# WHAT IT SHOWS: Final distribution of records after applying manual corrections
-#                - Manually Corrected: Records fixed by human review
-#                - Error (Needs Review): Records with errors not yet corrected
-#                - Unusual (Acceptable): Unusual but valid patterns
-#                - Clean: Records passing all quality checks
-#                - Equal Time: Auto-accepted zero-difference records
-#                - Missing Data: Records with NA values
+# KEY COLUMNS: data_category, manually_corrected, corrected
 # ============================================================================
 # WHAT THIS FIGURE SHOWS:
-# A two-panel dashboard of final data classification. Left panel: key metrics
-# (total records, corrections made, errors still pending). Right panel: pie
-# chart of all records broken into Clean, Manually Corrected, Error, Unusual,
-# and other categories.
+# A vertical flow diagram tracing every record through the pipeline: Raw
+# Load -> Parsed (non-NA) -> Algo-Corrected -> Manual-Corrected -> Final
+# Valid, each stage with count and % of total raw input. A side annotation
+# gives the final breakdown (Not Reported / Clean / Unusual / Error /
+# Equal Time).
 #
 # INTERPRETATION:
-# Most records should be Clean. A high percentage of Manually Corrected or
-# Error records suggests systematic issues in data collection or entry. The
-# "Needs Review" count should decrease as corrections are applied over time.
+# Most records should reach "Final Valid" and land in Clean. A high share
+# lost to "Not Reported" or ending in "Error (Reviewed)" suggests
+# systematic issues in data collection or entry. This figure shows how
+# much was corrected and how -- it does not mean corrected records are
+# "less trustworthy": see Figure 2 for what correction changed and did
+# not change.
 # ============================================================================
-# WHAT THIS FIGURE SHOWS:
-# A vertical flow diagram tracing every record through the pipeline.
-# Each stage with counts and % of total raw input.
+# NOTE (2026-09-17): earlier revisions of this file described Figure 1 as
+# a two-panel "quality dashboard" (metrics + pie chart) in this header and
+# in the run-end summary. That was never implemented -- the flow diagram
+# below is and has been the actual Figure 1. Comments and log text were
+# corrected to match; the figure itself is unchanged.
 # ============================================================================
 cat("Generating Figure 1 (Pipeline Flow Diagram)...\n")
 
@@ -1874,47 +1873,113 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
   }
   
   # --------------------------------------------------------------------------
-  # Figure 15: Error Timeline Over Study Period (Auto-Detection)
+  # Figure 15: Timing of Flagged Temporal Patterns Over the Study Period
   # --------------------------------------------------------------------------
-  # DATA SOURCE: checkforerrors_processed
-  # WHAT IT SHOWS: Stacked area chart showing when errors/reviews occur over time
+  # DATA SOURCE: clean_df$error_type / clean_df$unusual_type (2026-09-17:
+  # was checkforerrors_processed$error_category -- see note below)
   # ==========================================================================
-  # WHAT THIS FIGURE SHOWS:
-  # Stacked area chart of error frequency over the study timeline, with each
-  # error category shown in a different color.
+  # NOTE (2026-09-17): this figure was silently blank on the real (N=237)
+  # dataset. Root cause, confirmed by Cyra: checkforerrors_processed only
+  # carries records still in the auto-detection REVIEW QUEUE. On the real
+  # run, 272 SELF_REPORTED_FLAG + 149 metric-threshold rows had all already
+  # been reviewed and accepted as valid (confirmed_not_error_do_not_correct)
+  # -- correctly suppressed, not a bug -- leaving 1 row (an exercise flag)
+  # with no time_bed_corrected, filtered out below, so timeline_data had 0
+  # rows and nothing was drawn. That's an empty review QUEUE, not an empty
+  # error HISTORY -- exactly the queue-vs-broken distinction
+  # .explain_no_review_figures() exists for (~L476), which this figure
+  # wasn't wired into.
   #
-  # INTERPRETATION:
-  # Errors concentrated at the study start suggest a learning curve or
-  # instruction issues. Spikes on specific dates may indicate protocol changes,
-  # technical problems, or data collection disruptions. A steady rate of errors
-  # throughout suggests ongoing, systemic issues. The absence of errors after
-  # a certain date could mean the problem was fixed—or that data entry stopped.
+  # Fix: read clean_df's error_type/unusual_type instead -- the pipeline's
+  # original per-record temporal classification from Step 6, populated for
+  # every record regardless of later human review, so this plots the full
+  # study period rather than only whatever is still queued (34 real rows on
+  # the N=237 dataset). If this is still empty, print the same explanation
+  # used for Figures 13-18 instead of silently writing nothing.
+  #
+  # WHAT THIS FIGURE SHOWS:
+  # Stacked area chart of when timestamp-order and awake/getup/bed-sleep
+  # "suspicious pattern" flags occur over the study timeline, by type.
+  #
+  # INTERPRETATION (non-destructive framing): a flag here does not mean the
+  # record was wrong. Most flagged records were manually reviewed and kept
+  # unchanged (see Figure 2) -- self-report/measured mismatches are
+  # preserved as data, not corrected toward an assumed ground truth. This
+  # figure shows WHEN patterns worth a look occurred, not a defect count.
+  # Patterns concentrated at the study start suggest a learning curve or
+  # instruction issues; spikes on specific dates may indicate protocol
+  # changes or data collection disruptions.
   # ==========================================================================
-  cat("Generating FIGURE 15 (Error timeline - Auto-detection)...\n")
-  
-  if("time_bed_corrected" %in% names(checkforerrors_processed)) {
-    
-    timeline_data <- checkforerrors_processed %>%
-      filter(!is.na(time_bed_corrected), !is.na(error_category)) %>%
-      mutate(date = as.Date(time_bed_corrected)) %>%
-      group_by(date, error_category) %>%
+  cat("Generating FIGURE 15 (Timing of flagged temporal patterns)...\n")
+
+  # Data source: corrected_ema_data (Step 6 classification output), NOT
+  # clean_df (= ema_data_release_timecalc, the Step-4 snapshot which has no
+  # error_type/unusual_type columns). Fall back to clean_df if the Step-6
+  # object is unavailable (synthetic/standalone runs).
+  fig15_src <- if (exists("corrected_ema_data", envir = .GlobalEnv) &&
+                   is.data.frame(corrected_ema_data) &&
+                   all(c("time_bed_corrected", "error_type", "unusual_type") %in% names(corrected_ema_data))) {
+    corrected_ema_data
+  } else {
+    clean_df
+  }
+
+  if (all(c("time_bed_corrected", "error_type", "unusual_type") %in% names(fig15_src))) {
+
+    timeline_data <- fig15_src %>%
+      filter(!is.na(time_bed_corrected), !is.na(error_type) | !is.na(unusual_type)) %>%
+      mutate(date = as.Date(time_bed_corrected),
+             pattern_type = ifelse(!is.na(error_type), error_type, unusual_type)) %>%
+      group_by(date, pattern_type) %>%
       summarise(count = n(), .groups = "drop")
-    
-    if(nrow(timeline_data) > 0) {
-      p15 <- ggplot(timeline_data, aes(x = date, y = count, fill = error_category)) +
-        geom_area(position = "stack", alpha = 0.7) +
-        scale_fill_brewer(palette = "Set2", name = "Error Category") +
-        labs(title = "Figure 15: Error Timeline Over Study Period (Auto-Detection)",
-             subtitle = "Stacked area chart showing when algorithm-detected errors occur",
-             x = "Date", 
-             y = "Number of Records Needing Review") +
-        theme(legend.position = "bottom",
-              legend.text = element_text(size = 8))
-      
+
+    if (nrow(timeline_data) > 0) {
+      # De-anonymized / de-identified datasets often normalize all corrected
+      # timestamps to a single (or near-single) study date, so a timeline has
+      # no x-axis spread and geom_area renders an empty panel. Detect that
+      # and degrade to a per-type count bar instead of a silent blank figure.
+      n_dates <- dplyr::n_distinct(timeline_data$date)
+      if (n_dates >= 2) {
+        p15 <- ggplot(timeline_data, aes(x = date, y = count, fill = pattern_type)) +
+          geom_area(position = "stack", alpha = 0.7) +
+          scale_fill_brewer(palette = "Set2", name = "Pattern Type") +
+          labs(title = "Figure 15: Timing of Flagged Temporal Patterns Over the Study Period",
+               subtitle = paste0("Records with a timestamp-order or awake/getup/bed-sleep pattern flag (Step 6 classification), by date. ",
+                                 "A flag is not a verdict that the record is wrong -- most were reviewed and kept unchanged (see Figure 2)."),
+               x = "Date",
+               y = "Number of Records") +
+          theme(legend.position = "bottom",
+                legend.text = element_text(size = 8))
+      } else {
+        # single study date: collapse to per-pattern-type counts
+        cat(sprintf("  (data has only %d study date(s) in corrected timestamps; drawing per-type counts instead of a timeline)\n", n_dates))
+        p15 <- timeline_data %>%
+          mutate(date = NULL) %>%
+          group_by(pattern_type) %>%
+          summarise(count = sum(count), .groups = "drop") %>%
+          ggplot(aes(x = pattern_type, y = count, fill = pattern_type)) +
+          geom_col(alpha = 0.85, width = 0.6) +
+          scale_fill_brewer(palette = "Set2", name = "Pattern Type") +
+          labs(title = "Figure 15: Flagged Temporal Patterns (single study date -- counts)",
+               subtitle = paste0("Corrected timestamps in this dataset carry only ", n_dates,
+                                 " study date(s), so a timeline cannot be drawn; per-type counts shown instead. ",
+                                 "A flag is not a verdict that the record is wrong -- most were reviewed and kept unchanged (see Figure 2)."),
+               x = "Pattern Type",
+               y = "Number of Records") +
+          theme(legend.position = "none",
+                axis.text.x = element_text(angle = 30, hjust = 1, size = 9))
+      }
+
       print(p15)
-  save_png(p15, "15_Error_Timeline", subdir = "pipeline_cleaning")
+      save_png(p15, "15_Error_Timeline", subdir = "pipeline_cleaning")
       cat("✓ Figure 15 completed\n\n")
+    } else {
+      cat("ℹ Figure 15: no timestamped error_type/unusual_type records found -- nothing to plot.\n")
+      .explain_no_review_figures()
     }
+  } else {
+    cat("⚠ Missing time_bed_corrected/error_type/unusual_type in clean_df -- skipping Figure 15\n")
+    .explain_no_review_figures()
   }
   
   # --------------------------------------------------------------------------
@@ -2882,7 +2947,7 @@ cat("\n\n")
 cat("FIGURES 1-12 (Based on FINAL CORRECTED DATA - Post-Correction):\n")
 cat("  Source: corrected_ema_data from apply_manual_corrections_and_recalculate()\n")
 cat("  What they show: Final dataset after all manual corrections applied\n")
-cat("  Figure 1: Final Data Quality Dashboard (Post-Correction)\n")
+cat("  Figure 1: Pipeline Record Flow Diagram (Post-Correction)\n")
 cat("  Figure 2: Impact of Corrections on Sleep Metrics\n")
 cat("  Figure 2B: Distribution of Sleep Variables\n")
 cat("  Figure 3: Sleep Duration Distribution\n")
@@ -2903,9 +2968,9 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
   cat("  What they show: Algorithm-detected potential issues needing human review\n")
   cat("  Figure 13: Error Category Distribution (Auto-Detection)\n")
   cat("  Figure 14: Flagged vs Clean Sleep Duration (Auto-Detection)\n")
-  cat("  Figure 15: Error Timeline Over Study Period (Auto-Detection)\n")
+  cat("  Figure 15: Timing of Flagged Temporal Patterns Over the Study Period\n")
   cat("  Figure 16: Most Common Error Patterns (Auto-Detection)\n")
-  cat("  Figure 17: Top 15 Participants with Most Review Flags (Auto-Detection)\n")
+  cat("  Figure 17: Top 15 Participants by Flag Rate (Auto-Detection)\n")
   cat("  Figure 18: Auto-Detected Review Flags Dashboard\n\n")
 } else {
   cat("FIGURES 13-18: NOT GENERATED (the human-review queue is empty)\n")
