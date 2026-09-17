@@ -1,6 +1,6 @@
 # sleepcleanr — Validation Report
 
-*Rendered 2026-09-07 by `validation/render_validation_report.R`. All
+*Rendered 2026-09-17 by `validation/render_validation_report.R`. All
 synthetic numbers are read directly from the result CSVs — nothing below
 is hand-typed.*
 
@@ -54,7 +54,37 @@ no external gold standard exists for free-text diary entry).
 | Controls: no_cleaning / naive / pipeline | 0.000 / 0.623 / 0.995                    | control_baselines.csv      |
 | Mis-repair rate (MRR)                    | see mrr_magnitude.csv (0 in current run) | mrr_magnitude.csv          |
 
-## Real-data audit
+### Per-category benchmark (detection vs correction separated)
+
+Detection (“the pipeline acted”) and correction (“it got the right
+value”) are reported separately. `false_correction` = misrepaired
+(changed to a wrong value); `missed` = untouched, still wrong,
+unflagged. The clean-control block is reported on its own line — the raw
+`detection_outcomes_v4_current.csv` counted its 1,609 rows as MISSED and
+`correct_pct` 0, which read as “0% correct” when they simply carry no
+injected error; that miscompute is corrected here.
+
+| Category                                  | n    | detected | correctly detected | flagged unresolved | false correction | missed | recall | misrepair rate |
+|-------------------------------------------|------|----------|--------------------|--------------------|------------------|--------|--------|----------------|
+| adjacent_swap_large_gap_left_clean        | 400  | 400      | 243                | 157                | 0                | 0      | 1.000  | 0.000          |
+| adjacent_swap_time_awake_am_time_getup_am | 400  | 400      | 400                | 0                  | 0                | 0      | 1.000  | 0.000          |
+| adjacent_swap_time_bed_am_time_sleep_am   | 400  | 400      | 400                | 0                  | 0                | 0      | 1.000  | 0.000          |
+| adjacent_swap_time_sleep_am_time_awake_am | 400  | 400      | 0                  | 400                | 0                | 0      | 1.000  | 0.000          |
+| ampm_swap                                 | 400  | 400      | 226                | 174                | 0                | 0      | 1.000  | 0.000          |
+| compound_ampm_and_swap                    | 400  | 400      | 152                | 248                | 0                | 0      | 1.000  | 0.000          |
+| cross_participant_spike                   | 236  | 236      | 0                  | 214                | 22               | 0      | 1.000  | 0.093          |
+| field_misentry_sol                        | 400  | 400      | 7                  | 393                | 0                | 0      | 1.000  | 0.000          |
+| field_misentry_waso                       | 400  | 400      | 13                 | 387                | 0                | 0      | 1.000  | 0.000          |
+| format_malformed_colon                    | 400  | 400      | 400                | 0                  | 0                | 0      | 1.000  | 0.000          |
+| format_no_colon                           | 400  | 400      | 400                | 0                  | 0                | 0      | 1.000  | 0.000          |
+| implausible_duration                      | 400  | 400      | 0                  | 400                | 0                | 0      | 1.000  | 0.000          |
+| mmss_confusion                            | 400  | 400      | 378                | 18                 | 4                | 0      | 1.000  | 0.010          |
+| sol_window_contradiction                  | 355  | 355      | 0                  | 355                | 0                | 0      | 1.000  | 0.000          |
+| **CONTROL (no_error_control)**            | 1609 | —        | —                  | —                  | —                | —      | —      | —              |
+
+Pooled precision = 1.000 (flagged injected / (flagged injected + flagged
+control)); control FAR_flag 0/1609, FAR_alter 0/1609. Source:
+benchmark_table.csv. \## Real-data audit
 
 Report-only run over all 13990 real diary records. No data is modified
 (0 AUTO_FIX).
@@ -114,6 +144,39 @@ B1 TST shift / B2 n shift \| 29.6 min / 1131 records \| \| \|
 Seed sensitivity: pooled recall 0.994–0.995 across 4 seeds; control FAR
 0 in all.
 
+## Threshold operating-point analysis
+
+Answers “why 3 h and 12 h?” by sweeping the two rule-defining thresholds
+on the fixed synthetic benchmark (same corrupted input + same ground
+truth for every point; only the pipeline detection thresholds change).
+Selection rule predefined, not post-hoc: **primary recall ≥ 0.95 →
+secondary min FAR_flag → tie nearest (3,12)**.
+
+| swap (h) | flip (h) | recall | FAR_flag | FAR_alter | precision |
+|----------|----------|--------|----------|-----------|-----------|
+| 1        | 8        | 0.9954 | 0.0000   | 0.0000    | 1.000     |
+| 1        | 10       | 0.9954 | 0.0000   | 0.0000    | 1.000     |
+| 1        | 12       | 0.9950 | 0.0000   | 0.0000    | 1.000     |
+| 1        | 14       | 0.9952 | 0.0000   | 0.0000    | 1.000     |
+| 2        | 8        | 0.9954 | 0.0000   | 0.0000    | 1.000     |
+| 2        | 10       | 0.9954 | 0.0000   | 0.0000    | 1.000     |
+| 2        | 12       | 0.9950 | 0.0000   | 0.0000    | 1.000     |
+| 2        | 14       | 0.9952 | 0.0000   | 0.0000    | 1.000     |
+| 3        | 8        | 0.9954 | 0.0000   | 0.0000    | 1.000     |
+| 3        | 10       | 0.9954 | 0.0000   | 0.0000    | 1.000     |
+| 3        | 12       | 0.9952 | 0.0000   | 0.0000    | 1.000     |
+| 3        | 14       | 0.9954 | 0.0000   | 0.0000    | 1.000     |
+| 4        | 8        | 0.9954 | 0.0000   | 0.0000    | 1.000     |
+| 4        | 10       | 0.9954 | 0.0000   | 0.0000    | 1.000     |
+| 4        | 12       | 0.9952 | 0.0000   | 0.0000    | 1.000     |
+| 4        | 14       | 0.9957 | 0.0000   | 0.0000    | 1.000     |
+| 5        | 8        | 0.9954 | 0.0000   | 0.0000    | 1.000     |
+| 5        | 10       | 0.9954 | 0.0000   | 0.0000    | 1.000     |
+| 5        | 12       | 0.9954 | 0.0000   | 0.0000    | 1.000     |
+| 5        | 14       | 0.9955 | 0.0000   | 0.0000    | 1.000     |
+
+Selection rule outcome: swap 3 h, flip 12 h (recall 0.9952, FAR 0.0000).
+
 ## Human co-review agreement
 
 Reported as co-review agreement, not Cohen’s κ — the review was
@@ -130,18 +193,26 @@ requires never existed.
 1.  **cross_participant_spike is the weakest family** — L1 0.886–0.907
     across seeds, value-correct 0 by design (audit-only: a spike may be
     real).
+
 2.  **SOL thresholds sit inside the ±75-min Bland-Altman noise band** —
     SOL flags are descriptive, routed to human review; never cited as
     accuracy.
+
 3.  **Ablation recall uses a flag-based definition** (AUTO_FIXed records
     never enter the flag queue) — reported as supplementary; primary
     evidence is the multiverse variance decomposition.
 
-## Reproducibility
+4.  **Operating-point analysis is synthetic-only** — real data has no
+    ground truth, so recall is undefined there (the real-data spec curve
+    measures downstream means only, which cannot move: n_flagged = 0
+    under every spec). The plateau verdict holds on the synthetic
+    benchmark; real-world threshold choice should be re-checked on
+    external data. \## Reproducibility
 
 ``` r
 # from the repo root, after renv::restore() and installing splsleep
 Rscript validation/synthetic/ppv_cluster_ci.R   # synthetic benchmark (recall/spec/FAR)
+Rscript validation/synthetic/operating_point_sweep.R  # threshold operating-point analysis
 Rscript validation/audit_review_queue_m1_m7.R   # real-data audit (requires local data)
 Rscript validation/render_validation_report.R   # re-render this report from the CSVs
 ```

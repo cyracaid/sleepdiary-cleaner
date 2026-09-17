@@ -12,16 +12,17 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/cyracaid/sleepdiary-cleaner/blob/main/DESCRIPTION)
+[`inst/CITATION`](https://github.com/cyracaid/sleepdiary-cleaner/blob/main/inst/CITATION)
 
-Dong C, ten Brink M (2026). *sleepcleanr: Sleep EMA Diary Data Cleaning
-Pipeline*. R package version 1.4.5,
-<https://github.com/cyracaid/sleepdiary-cleaner>.
+Dong, C., & ten Brink, M. (2026). sleepcleanr: Reproducible Sleep EMA
+Diary Data Cleaning Pipeline (Version 1.4.5) \[R package\].
+https://github.com/cyracaid/sleepdiary-cleaner
+doi:10.5281/zenodo.0000000
 
     @Manual{,
-      title = {sleepcleanr: Sleep EMA Diary Data Cleaning Pipeline},
+      title = {sleepcleanr: Reproducible Sleep EMA Diary Data Cleaning Pipeline},
       author = {Cai Dong and Maia {ten Brink}},
       year = {2026},
-      note = {R package version 1.4.5},
       url = {https://github.com/cyracaid/sleepdiary-cleaner},
+      doi = {10.5281/zenodo.0000000},
     }

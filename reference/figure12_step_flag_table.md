@@ -12,7 +12,7 @@ figure12_step_flag_table(
   cfg = NULL,
   output_dir = ".",
   save_png = NULL,
-  filename = "12_Pipeline_Correction_Progress"
+  filename = "A1_Step_Flag_Ledger"
 )
 ```
 

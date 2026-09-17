@@ -274,7 +274,16 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <span><span class="co"># Your own study: copy the config template, map your columns, run again</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"config_template.yaml"</span>, package <span class="op">=</span> <span class="st">"sleepcleanr"</span><span class="op">)</span>,</span>
 <span>          <span class="st">"my_study.yaml"</span><span class="op">)</span></span>
-<span><span class="co"># edit my_study.yaml → run_pipeline(config = "my_study.yaml")</span></span></code></pre></div>
+<span><span class="co"># edit my_study.yaml → run_pipeline(config = "my_study.yaml")</span></span>
+<span></span>
+<span><span class="co"># Data-first entry (no config file needed): column names are inferred and</span></span>
+<span><span class="co"># every schema decision is recorded in the run manifest.</span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/clean_sleep_diary.html">clean_sleep_diary</a></span><span class="op">(</span><span class="st">"my_diary.csv"</span><span class="op">)</span>          <span class="co"># .csv / .rds / .xlsx / data.frame</span></span>
+<span><span class="va">res</span><span class="op">$</span><span class="va">cleaned</span>                                       <span class="co"># cleaned Dataset A</span></span>
+<span><span class="va">res</span><span class="op">$</span><span class="va">guesses</span>                                       <span class="co"># how each column was mapped</span></span>
+<span><span class="va">res</span><span class="op">$</span><span class="va">manifest</span>                                      <span class="co"># provenance: input hash, config, step ledger</span></span>
+<span><span class="co"># Preview the inferred mapping without running anything:</span></span>
+<span><span class="fu"><a href="reference/clean_sleep_diary.html">clean_sleep_diary</a></span><span class="op">(</span><span class="st">"my_diary.csv"</span>, dry_run <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># writes dry_run_manifest.json, no data written</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="learn-more">Learn more<a class="anchor" aria-label="anchor" href="#learn-more"></a>
@@ -291,6 +300,7 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 </li>
 <li>vignette(“validation-methodology”) — how the rules were validated (synthetic + real data)</li>
 <li>vignette(“testing-coverage”) — test suite coverage</li>
+<li>vignette(“data-first”) — <code><a href="reference/clean_sleep_diary.html">clean_sleep_diary()</a></code>: no-config entry, column auto-guess, run manifest</li>
 <li>Changelog: <a href="https://github.com/cyracaid/sleepdiary-cleaner/releases" class="external-link uri">https://github.com/cyracaid/sleepdiary-cleaner/releases</a>
 </li>
 </ul>
@@ -518,53 +528,53 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <tbody>
 <tr class="odd">
 <td>1</td>
-<td>数据加载</td>
-<td>.rds/.csv 自动检测；schema 校验；可选辅助文件合并</td>
+<td>Load data</td>
+<td>.rds/.csv auto-detected; schema validated; optional supplementary file merged</td>
 </tr>
 <tr class="even">
 <td>1.5</td>
-<td>字段错误检查</td>
-<td>SOL/WASO 时钟时间 vs 时长字段误入检测</td>
+<td>Field-misentry check</td>
+<td>SOL/WASO clock-time vs duration-field misentry detection on raw data</td>
 </tr>
 <tr class="odd">
 <td>2-4</td>
-<td>解析与标准化 (S3 链)</td>
-<td>解析时间戳 → 解析时长 → 标准化序列</td>
+<td>Parse &amp; normalize (S3 chain)</td>
+<td>Parse timestamps → parse intervals → normalize sequence</td>
 </tr>
 <tr class="even">
 <td>5</td>
-<td>记录分类</td>
-<td>生成人工审核 CSV 供批准</td>
+<td>Classify records</td>
+<td>Generate manual review CSVs for human approval</td>
 </tr>
 <tr class="odd">
 <td>5.75</td>
-<td>二次审核共识</td>
-<td>应用二次审核清单共识</td>
+<td>Second-review consensus</td>
+<td>Apply second-review checklist consensus</td>
 </tr>
 <tr class="even">
 <td>6-7</td>
-<td>修正与计算指标 (S3 链)</td>
-<td>人工 + 时长修正；TST/SOL/WASO/SE 指标；has_correction 枚举</td>
+<td>Correct &amp; compute metrics (S3 chain)</td>
+<td>Manual + duration corrections; TST/SOL/WASO/SE metrics; has_correction enum</td>
 </tr>
 <tr class="odd">
 <td>8</td>
-<td>自动检测剩余问题</td>
-<td>TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED 标志分类</td>
+<td>Auto-detect remaining issues</td>
+<td>TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED flag classification</td>
 </tr>
 <tr class="even">
 <td>8.5</td>
-<td>跨参与者一致性检查</td>
-<td>全局一致性审计</td>
+<td>Cross-participant consistency check</td>
+<td>Global consistency audit across participants</td>
 </tr>
 <tr class="odd">
 <td>9</td>
-<td>生成诊断图表</td>
-<td>30 张图表（14 QC + 16 科研）+ 图表索引 + RUN_INFO</td>
+<td>Generate diagnostic figures</td>
+<td>30 figures (14 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt</td>
 </tr>
 <tr class="even">
 <td>10</td>
-<td>构建交付数据集</td>
-<td>按列字典选择/重命名为 Dataset A/B</td>
+<td>Build delivered datasets</td>
+<td>finalize_columns() selects/renames to Dataset A/B per column dictionary</td>
 </tr>
 </tbody>
 </table>

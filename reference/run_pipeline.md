@@ -15,7 +15,8 @@ run_pipeline(
   project_dir = ".",
   skip_visualization = FALSE,
   finalize = TRUE,
-  verbose = TRUE
+  verbose = TRUE,
+  data = NULL
 )
 ```
 
@@ -47,6 +48,16 @@ run_pipeline(
 - verbose:
 
   Logical. Print progress. Default TRUE.
+
+- data:
+
+  Data frame. Optional data-first entry: supply the raw data directly
+  instead of reading `data.files.main` from the config. When NULL
+  (default) the pipeline reads from the config exactly as before
+  (`data = NULL` is the backward-compatible zero-change path). When
+  supplied, the file-reading branch of Step 1 is skipped and the
+  config's column_mapping is applied to `data`. Used by
+  [`clean_sleep_diary()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/clean_sleep_diary.md).
 
 ## Value
 

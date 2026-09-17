@@ -35,7 +35,7 @@
 
 <div id="sleepcleanr--validation-report" class="section level1">
 
-<p><em>Rendered 2026-09-07 by <code>validation/render_validation_report.R</code>. All synthetic numbers are read directly from the result CSVs — nothing below is hand-typed.</em></p>
+<p><em>Rendered 2026-09-17 by <code>validation/render_validation_report.R</code>. All synthetic numbers are read directly from the result CSVs — nothing below is hand-typed.</em></p>
 <div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a></h2>
 <p>sleepcleanr is a deterministic, auditable cleaning pipeline for sleep-EMA diary data. It is validated on two independent layers: a <strong>synthetic benchmark</strong> with known ground truth (pooled recall <strong>0.995 [0.993, 0.997]</strong>, specificity 1.0) and a <strong>real-data audit</strong> (n = 13990). The pipeline treats plausible sleep-timing variability as signal, not noise — it flags disagreements for human review rather than silently normalizing them.</p>
@@ -105,9 +105,154 @@
 </tr><tr class="even"><td>Mis-repair rate (MRR)</td>
 <td>see mrr_magnitude.csv (0 in current run)</td>
 <td>mrr_magnitude.csv</td>
-</tr></tbody></table></div>
-<div class="section level2">
-<h2 id="real-data-audit">Real-data audit<a class="anchor" aria-label="anchor" href="#real-data-audit"></a></h2>
+</tr></tbody></table><div class="section level3">
+<h3 id="per-category-benchmark-detection-vs-correction-separated">Per-category benchmark (detection vs correction separated)<a class="anchor" aria-label="anchor" href="#per-category-benchmark-detection-vs-correction-separated"></a></h3>
+<p>Detection (“the pipeline acted”) and correction (“it got the right value”) are reported separately. <code>false_correction</code> = misrepaired (changed to a wrong value); <code>missed</code> = untouched, still wrong, unflagged. The clean-control block is reported on its own line — the raw <code>detection_outcomes_v4_current.csv</code> counted its 1,609 rows as MISSED and <code>correct_pct</code> 0, which read as “0% correct” when they simply carry no injected error; that miscompute is corrected here.</p>
+<table style="width:100%;" class="table"><colgroup><col width="11%"><col width="11%"><col width="11%"><col width="11%"><col width="11%"><col width="11%"><col width="11%"><col width="11%"><col width="11%"></colgroup><thead><tr class="header"><th>Category</th>
+<th>n</th>
+<th>detected</th>
+<th>correctly detected</th>
+<th>flagged unresolved</th>
+<th>false correction</th>
+<th>missed</th>
+<th>recall</th>
+<th>misrepair rate</th>
+</tr></thead><tbody><tr class="odd"><td>adjacent_swap_large_gap_left_clean</td>
+<td>400</td>
+<td>400</td>
+<td>243</td>
+<td>157</td>
+<td>0</td>
+<td>0</td>
+<td>1.000</td>
+<td>0.000</td>
+</tr><tr class="even"><td>adjacent_swap_time_awake_am_time_getup_am</td>
+<td>400</td>
+<td>400</td>
+<td>400</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1.000</td>
+<td>0.000</td>
+</tr><tr class="odd"><td>adjacent_swap_time_bed_am_time_sleep_am</td>
+<td>400</td>
+<td>400</td>
+<td>400</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1.000</td>
+<td>0.000</td>
+</tr><tr class="even"><td>adjacent_swap_time_sleep_am_time_awake_am</td>
+<td>400</td>
+<td>400</td>
+<td>0</td>
+<td>400</td>
+<td>0</td>
+<td>0</td>
+<td>1.000</td>
+<td>0.000</td>
+</tr><tr class="odd"><td>ampm_swap</td>
+<td>400</td>
+<td>400</td>
+<td>226</td>
+<td>174</td>
+<td>0</td>
+<td>0</td>
+<td>1.000</td>
+<td>0.000</td>
+</tr><tr class="even"><td>compound_ampm_and_swap</td>
+<td>400</td>
+<td>400</td>
+<td>152</td>
+<td>248</td>
+<td>0</td>
+<td>0</td>
+<td>1.000</td>
+<td>0.000</td>
+</tr><tr class="odd"><td>cross_participant_spike</td>
+<td>236</td>
+<td>236</td>
+<td>0</td>
+<td>214</td>
+<td>22</td>
+<td>0</td>
+<td>1.000</td>
+<td>0.093</td>
+</tr><tr class="even"><td>field_misentry_sol</td>
+<td>400</td>
+<td>400</td>
+<td>7</td>
+<td>393</td>
+<td>0</td>
+<td>0</td>
+<td>1.000</td>
+<td>0.000</td>
+</tr><tr class="odd"><td>field_misentry_waso</td>
+<td>400</td>
+<td>400</td>
+<td>13</td>
+<td>387</td>
+<td>0</td>
+<td>0</td>
+<td>1.000</td>
+<td>0.000</td>
+</tr><tr class="even"><td>format_malformed_colon</td>
+<td>400</td>
+<td>400</td>
+<td>400</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1.000</td>
+<td>0.000</td>
+</tr><tr class="odd"><td>format_no_colon</td>
+<td>400</td>
+<td>400</td>
+<td>400</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1.000</td>
+<td>0.000</td>
+</tr><tr class="even"><td>implausible_duration</td>
+<td>400</td>
+<td>400</td>
+<td>0</td>
+<td>400</td>
+<td>0</td>
+<td>0</td>
+<td>1.000</td>
+<td>0.000</td>
+</tr><tr class="odd"><td>mmss_confusion</td>
+<td>400</td>
+<td>400</td>
+<td>378</td>
+<td>18</td>
+<td>4</td>
+<td>0</td>
+<td>1.000</td>
+<td>0.010</td>
+</tr><tr class="even"><td>sol_window_contradiction</td>
+<td>355</td>
+<td>355</td>
+<td>0</td>
+<td>355</td>
+<td>0</td>
+<td>0</td>
+<td>1.000</td>
+<td>0.000</td>
+</tr><tr class="odd"><td><strong>CONTROL (no_error_control)</strong></td>
+<td>1609</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr></tbody></table><p>Pooled precision = 1.000 (flagged injected / (flagged injected + flagged control)); control FAR_flag 0/1609, FAR_alter 0/1609. Source: benchmark_table.csv. ## Real-data audit</p>
 <p>Report-only run over all 13990 real diary records. No data is modified (0 AUTO_FIX).</p>
 <table class="table"><colgroup><col width="50%"><col width="50%"></colgroup><thead><tr class="header"><th>Quantity</th>
 <th>Value</th>
@@ -136,6 +281,7 @@
 </tr><tr class="even"><td>Open (needs human call)</td>
 <td>2</td>
 </tr></tbody></table><p>The dominant outcome is KEEP: a plausible large SOL is left untouched even when it exceeds the timestamp window, because removing it would bias the sleep–affect associations the pipeline exists to serve.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="bland-altman-measurement-characterization">Bland-Altman measurement characterization<a class="anchor" aria-label="anchor" href="#bland-altman-measurement-characterization"></a></h2>
@@ -170,6 +316,137 @@ B1 TST shift / B2 n shift | 29.6 min / 1131 records | | |</p>
 <p>Seed sensitivity: pooled recall 0.994–0.995 across 4 seeds; control FAR 0 in all.</p>
 </div>
 <div class="section level2">
+<h2 id="threshold-operating-point-analysis">Threshold operating-point analysis<a class="anchor" aria-label="anchor" href="#threshold-operating-point-analysis"></a></h2>
+<p>Answers “why 3 h and 12 h?” by sweeping the two rule-defining thresholds on the fixed synthetic benchmark (same corrupted input + same ground truth for every point; only the pipeline detection thresholds change). Selection rule predefined, not post-hoc: <strong>primary recall ≥ 0.95 → secondary min FAR_flag → tie nearest (3,12)</strong>.</p>
+<table class="table"><thead><tr class="header"><th>swap (h)</th>
+<th>flip (h)</th>
+<th>recall</th>
+<th>FAR_flag</th>
+<th>FAR_alter</th>
+<th>precision</th>
+</tr></thead><tbody><tr class="odd"><td>1</td>
+<td>8</td>
+<td>0.9954</td>
+<td>0.0000</td>
+<td>0.0000</td>
+<td>1.000</td>
+</tr><tr class="even"><td>1</td>
+<td>10</td>
+<td>0.9954</td>
+<td>0.0000</td>
+<td>0.0000</td>
+<td>1.000</td>
+</tr><tr class="odd"><td>1</td>
+<td>12</td>
+<td>0.9950</td>
+<td>0.0000</td>
+<td>0.0000</td>
+<td>1.000</td>
+</tr><tr class="even"><td>1</td>
+<td>14</td>
+<td>0.9952</td>
+<td>0.0000</td>
+<td>0.0000</td>
+<td>1.000</td>
+</tr><tr class="odd"><td>2</td>
+<td>8</td>
+<td>0.9954</td>
+<td>0.0000</td>
+<td>0.0000</td>
+<td>1.000</td>
+</tr><tr class="even"><td>2</td>
+<td>10</td>
+<td>0.9954</td>
+<td>0.0000</td>
+<td>0.0000</td>
+<td>1.000</td>
+</tr><tr class="odd"><td>2</td>
+<td>12</td>
+<td>0.9950</td>
+<td>0.0000</td>
+<td>0.0000</td>
+<td>1.000</td>
+</tr><tr class="even"><td>2</td>
+<td>14</td>
+<td>0.9952</td>
+<td>0.0000</td>
+<td>0.0000</td>
+<td>1.000</td>
+</tr><tr class="odd"><td>3</td>
+<td>8</td>
+<td>0.9954</td>
+<td>0.0000</td>
+<td>0.0000</td>
+<td>1.000</td>
+</tr><tr class="even"><td>3</td>
+<td>10</td>
+<td>0.9954</td>
+<td>0.0000</td>
+<td>0.0000</td>
+<td>1.000</td>
+</tr><tr class="odd"><td>3</td>
+<td>12</td>
+<td>0.9952</td>
+<td>0.0000</td>
+<td>0.0000</td>
+<td>1.000</td>
+</tr><tr class="even"><td>3</td>
+<td>14</td>
+<td>0.9954</td>
+<td>0.0000</td>
+<td>0.0000</td>
+<td>1.000</td>
+</tr><tr class="odd"><td>4</td>
+<td>8</td>
+<td>0.9954</td>
+<td>0.0000</td>
+<td>0.0000</td>
+<td>1.000</td>
+</tr><tr class="even"><td>4</td>
+<td>10</td>
+<td>0.9954</td>
+<td>0.0000</td>
+<td>0.0000</td>
+<td>1.000</td>
+</tr><tr class="odd"><td>4</td>
+<td>12</td>
+<td>0.9952</td>
+<td>0.0000</td>
+<td>0.0000</td>
+<td>1.000</td>
+</tr><tr class="even"><td>4</td>
+<td>14</td>
+<td>0.9957</td>
+<td>0.0000</td>
+<td>0.0000</td>
+<td>1.000</td>
+</tr><tr class="odd"><td>5</td>
+<td>8</td>
+<td>0.9954</td>
+<td>0.0000</td>
+<td>0.0000</td>
+<td>1.000</td>
+</tr><tr class="even"><td>5</td>
+<td>10</td>
+<td>0.9954</td>
+<td>0.0000</td>
+<td>0.0000</td>
+<td>1.000</td>
+</tr><tr class="odd"><td>5</td>
+<td>12</td>
+<td>0.9954</td>
+<td>0.0000</td>
+<td>0.0000</td>
+<td>1.000</td>
+</tr><tr class="even"><td>5</td>
+<td>14</td>
+<td>0.9955</td>
+<td>0.0000</td>
+<td>0.0000</td>
+<td>1.000</td>
+</tr></tbody></table><p>Selection rule outcome: swap 3 h, flip 12 h (recall 0.9952, FAR 0.0000).</p>
+</div>
+<div class="section level2">
 <h2 id="human-co-review-agreement">Human co-review agreement<a class="anchor" aria-label="anchor" href="#human-co-review-agreement"></a></h2>
 <p>Reported as co-review agreement, not Cohen’s κ — the review was collaborative (one shared worksheet), so the independent label sets κ requires never existed.</p>
 <table class="table"><thead><tr class="header"><th>Track</th>
@@ -184,19 +461,15 @@ B1 TST shift / B2 n shift | 29.6 min / 1131 records | | |</p>
 </tr></tbody></table></div>
 <div class="section level2">
 <h2 id="honest-caveats">Honest caveats<a class="anchor" aria-label="anchor" href="#honest-caveats"></a></h2>
-<ol style="list-style-type: decimal"><li>
-<strong>cross_participant_spike is the weakest family</strong> — L1 0.886–0.907 across seeds, value-correct 0 by design (audit-only: a spike may be real).</li>
-<li>
-<strong>SOL thresholds sit inside the ±75-min Bland-Altman noise band</strong> — SOL flags are descriptive, routed to human review; never cited as accuracy.</li>
-<li>
-<strong>Ablation recall uses a flag-based definition</strong> (AUTO_FIXed records never enter the flag queue) — reported as supplementary; primary evidence is the multiverse variance decomposition.</li>
-</ol></div>
-<div class="section level2">
-<h2 id="reproducibility">Reproducibility<a class="anchor" aria-label="anchor" href="#reproducibility"></a></h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co"># from the repo root, after renv::restore() and installing splsleep</span></span>
+<ol style="list-style-type: decimal"><li><p><strong>cross_participant_spike is the weakest family</strong> — L1 0.886–0.907 across seeds, value-correct 0 by design (audit-only: a spike may be real).</p></li>
+<li><p><strong>SOL thresholds sit inside the ±75-min Bland-Altman noise band</strong> — SOL flags are descriptive, routed to human review; never cited as accuracy.</p></li>
+<li><p><strong>Ablation recall uses a flag-based definition</strong> (AUTO_FIXed records never enter the flag queue) — reported as supplementary; primary evidence is the multiverse variance decomposition.</p></li>
+<li><p><strong>Operating-point analysis is synthetic-only</strong> — real data has no ground truth, so recall is undefined there (the real-data spec curve measures downstream means only, which cannot move: n_flagged = 0 under every spec). The plateau verdict holds on the synthetic benchmark; real-world threshold choice should be re-checked on external data. ## Reproducibility</p></li>
+</ol><div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co"># from the repo root, after renv::restore() and installing splsleep</span></span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>Rscript validation<span class="sc">/</span>synthetic<span class="sc">/</span>ppv_cluster_ci.R   <span class="co"># synthetic benchmark (recall/spec/FAR)</span></span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>Rscript validation<span class="sc">/</span>audit_review_queue_m1_m7.R   <span class="co"># real-data audit (requires local data)</span></span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>Rscript validation<span class="sc">/</span>render_validation_report.R   <span class="co"># re-render this report from the CSVs</span></span></code></pre></div>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>Rscript validation<span class="sc">/</span>synthetic<span class="sc">/</span>operating_point_sweep.R  <span class="co"># threshold operating-point analysis</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>Rscript validation<span class="sc">/</span>audit_review_queue_m1_m7.R   <span class="co"># real-data audit (requires local data)</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>Rscript validation<span class="sc">/</span>render_validation_report.R   <span class="co"># re-render this report from the CSVs</span></span></code></pre></div>
 <p>The synthetic layer is fully reproducible from committed CSVs. The real-data audit requires the gitignored local dataset.</p>
 </div>
 </div>

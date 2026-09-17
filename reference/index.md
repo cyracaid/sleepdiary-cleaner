@@ -17,6 +17,8 @@
 - [`cfg_get()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/cfg_get.md)
   : Safe config_get – fetches pipeline_config from global env
   automatically
+- [`clean_sleep_diary()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/clean_sleep_diary.md)
+  : Clean a sleep diary: data-first entry point
 - [`cleaning_chain`](https://cyracaid.github.io/sleepdiary-cleaner/reference/cleaning_chain.md)
   : Pipeline step adapters and the cleaning chain
 - [`dim(`*`<sleep_diary>`*`)`](https://cyracaid.github.io/sleepdiary-cleaner/reference/dim.sleep_diary.md)
@@ -51,6 +53,8 @@
   : Flatten the ledger into a long data frame
 - [`get_step_ledger_wide()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/get_step_ledger_wide.md)
   : Wide ledger for one standard
+- [`guess_column_mapping()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/guess_column_mapping.md)
+  : Guess column mapping from raw column names
 - [`handle_missing()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/handle_missing.md)
   : Tag missing-data reason codes and optionally carry forward
   single-day gaps

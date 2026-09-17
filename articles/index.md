@@ -31,6 +31,9 @@
 
 ### Usage / 使用
 
+- [Data-first entry:
+  clean_sleep_diary()](https://cyracaid.github.io/sleepdiary-cleaner/articles/data-first.md):
+
 - [Column Mapping, Config & Data
   Format](https://cyracaid.github.io/sleepdiary-cleaner/articles/column-mapping.md):
 

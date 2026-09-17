@@ -6,6 +6,7 @@
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/VALIDATION_REPORT.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/articles/column-mapping-zh.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/articles/column-mapping.html</loc></url>
+<url><loc>https://cyracaid.github.io/sleepdiary-cleaner/articles/data-first.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/articles/index.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output-zh.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output.html</loc></url>
@@ -25,6 +26,7 @@
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/assert_contract_columns.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/bland_altman.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/cfg_get.html</loc></url>
+<url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/clean_sleep_diary.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/cleaning_chain.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/config_col.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/config_get.html</loc></url>
@@ -44,6 +46,7 @@
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/flag_statistical_outliers.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/get_step_ledger_long.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/get_step_ledger_wide.html</loc></url>
+<url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/guess_column_mapping.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/handle_missing.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/index.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/init_step_ledger.html</loc></url>
