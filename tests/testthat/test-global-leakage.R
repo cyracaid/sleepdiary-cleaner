@@ -46,7 +46,15 @@ test_that("legacy chain writes only protocol globals", {
   runner <- tempfile("splleak_run_", fileext = ".R")
   writeLines(c(
     "root_pkg <- if (basename(getwd()) == 'testthat') dirname(dirname(getwd())) else getwd()",
-    "suppressMessages(pkgload::load_all(root_pkg, quiet = TRUE))",
+    "# load_all only from a real source tree (.Rbuildignore present): under",
+    "# R CMD check / covr the tests run against the installed package where",
+    "# the probe path has a misleading DESCRIPTION; library(sleepcleanr)",
+    "# below is the correct code in those environments.",
+    "if (file.exists(file.path(root_pkg, '.Rbuildignore')) &&",
+    "    dir.exists(file.path(root_pkg, 'R'))) {",
+    "  suppressMessages(pkgload::load_all(root_pkg, quiet = TRUE))",
+    "}",
+    "suppressMessages(library(sleepcleanr))",
     sprintf("setwd(%s)", shQuote(sandbox)),
     sprintf("assign('sleepcleanr_scripts_dir', %s, envir = .GlobalEnv)", shQuote(scripts_dir)),
     "assign('pipeline_config', yaml::read_yaml('pipeline_config.yaml'), envir = .GlobalEnv)",
