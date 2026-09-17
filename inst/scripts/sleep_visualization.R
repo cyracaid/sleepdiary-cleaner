@@ -184,15 +184,17 @@ cat(sprintf("\nFigures auto-saving to: %s/\n", output_dir))
 # collation useful for once -- a same-size, non-clipped, flip-through PDF
 # of every figure in generation order.
 # ----------------------------------------------------------------------------
+# Review PDF collation is built at the END of the script from the saved PNGs
+# (magick), NOT by printing plots into a pdf() device. Root cause (2026-09-18,
+# confirmed by pixel analysis): print() of a PATCHWORK object into a non-
+# interactive device (pdf()/png() via Rscript) renders the layout corrupt --
+# the whole page collapses into a dark mass (99.7% dark pixels vs the same
+# plot via ggsave, which renders cleanly). Every patchwork figure in the old
+# all_figures_review.pdf (Fig 2, 13, 13B/C/D, P26...) therefore looked like a
+# pile of overlapping tables. Building the PDF from the already-saved PNGs
+# makes it pixel-identical to what the user sees in the PNG deliverables.
+# ----------------------------------------------------------------------------
 .default_device_opened <- FALSE
-if (!interactive()) {
-  .pdf_w <- cfg_get("output.figure.width_inches", 14, cfg = pipeline_config)
-  .pdf_h <- cfg_get("output.figure.height_inches", 9, cfg = pipeline_config)
-  grDevices::pdf(file.path(output_dir, "all_figures_review.pdf"), width = .pdf_w, height = .pdf_h)
-  .default_device_opened <- TRUE
-  cat(sprintf("✓ Review PDF collation: %s/all_figures_review.pdf (%.0fx%.0fin per page, matches saved figures)\n",
-              output_dir, .pdf_w, .pdf_h))
-}
 
 # ----------------------------------------------------------------------------
 # Per-figure skip-reason registry (2026-09-17)
@@ -933,8 +935,11 @@ if (has_raw_times && has_metrics) {
   )
   tbl_grob <- tableGrob(sum_tbl, rows = NULL, theme = ttheme_minimal(base_size = 9))
 
-  p2 <- (p2a | p2b) / p2c / tbl_grob +
-    plot_layout(heights = c(2, 2, 0.5)) +
+  p2 <- (p2a | p2b) / p2c / plot_spacer() / tbl_grob +
+    # explicit inches for the table row so patchwork does not squeeze it into
+    # a sliver that overlaps p2c's x-axis labels (same fix pattern as Fig 13);
+    # spacer keeps rotated/overflowing label area clear of the table.
+    plot_layout(heights = c(2, 2, 0.15, unit(1.4, "in"))) +
     plot_annotation(
       title    = "Figure 2: Impact of Corrections on Sleep Metrics",
       subtitle = "Correction is non-destructive: only clear input errors are corrected. Gray points (most\nof the data) are intentionally left unchanged -- self-report/measured discrepancies are\nretained as data, not treated as errors to fix toward an assumed ground truth.",
@@ -3346,7 +3351,26 @@ if (exists("generate_figure_index")) {
   generate_figure_index(output_dir)
 }
 
-if (isTRUE(.default_device_opened)) {
-  grDevices::dev.off()
-  cat(sprintf("✓ Review PDF collation closed: %s/all_figures_review.pdf\n", output_dir))
+# ----------------------------------------------------------------------------
+# Review PDF collation: assemble from the saved PNGs so the PDF matches the
+# PNG deliverables pixel-for-pixel (print()-of-patchwork renders corrupt on
+# non-interactive devices; see header note). Skips figures that were not
+# generated this run.
+# ----------------------------------------------------------------------------
+if (requireNamespace("magick", quietly = TRUE)) {
+  .pdf_pngs <- sort(list.files(
+    c(file.path(output_dir, "pipeline_cleaning"), file.path(output_dir, "research_ready")),
+    pattern = "\\.png$", full.names = TRUE))
+  if (length(.pdf_pngs) > 0) {
+    .pdf_imgs <- lapply(.pdf_pngs, magick::image_read)
+    .pdf_img  <- do.call(magick::image_join, .pdf_imgs)
+    .pdf_out  <- file.path(output_dir, "all_figures_review.pdf")
+    magick::image_write(.pdf_img, .pdf_out, format = "pdf")
+    cat(sprintf("✓ Review PDF collation: %s (%d pages, built from saved PNGs)\n",
+                .pdf_out, length(.pdf_pngs)))
+  } else {
+    cat("⚠ Review PDF collation: no PNGs found to assemble\n")
+  }
+} else {
+  cat("⚠ Review PDF collation skipped: package 'magick' not installed\n")
 }
