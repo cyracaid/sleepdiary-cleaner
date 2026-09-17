@@ -1,6 +1,6 @@
 ## Reading the Figures — Start Here
 
-The pipeline generates 30 figures (14 QC + 16 research). **You do not need to read all of them.** Use the
+The pipeline generates 29 figures (13 QC + 16 research). **You do not need to read all of them.** Use the
 three-figure triage below to judge data quality in under a minute, then drill down only
 if something looks off.
 
@@ -8,9 +8,9 @@ if something looks off.
 
 | # | Figure | The question it answers |
 |---|--------|-------------------------|
-| 1 | `pipeline_cleaning/01_Final_Data_Quality_Dashboard.png` | **Is my data usable?** Share of records that are clean vs. flagged *after* all corrections. |
+| 1 | `pipeline_cleaning/01_Pipeline_Flow_Diagram.png` | **Is my data usable?** How records moved through cleaning, and the final Clean / Unusual / Error / Equal-Time breakdown. |
 | 2 | `pipeline_cleaning/A1_Step_Flag_Ledger.png` | **Did cleaning actually work?** Per-step flag counts and convergence (merges former Fig 12). |
-| 3 | `pipeline_cleaning/P26_PerParticipant_Flag_Rate.png` | **Who should I exclude?** Per-participant flag rate — spot participants with systematically bad data. |
+| 3 | `pipeline_cleaning/P26_PerParticipant_Flag_Rate.png` | **Who's worth a second look?** Ranked table of the participants with the highest flagged-record rate. A high rate flags records worth checking by hand -- it is not a verdict that the data is wrong. |
 
 If all three look reasonable (low residual flag rate, counts converged, no participant
 dominating the flags), the dataset is ready. Otherwise, use Tier 2 below to diagnose.
@@ -26,17 +26,17 @@ dominating the flags), the dataset is ready. Otherwise, use Tier 2 below to diag
 | `11_Flag_Cooccurrence_Heatmap.png` | Which quality issues tend to co-occur (root-cause clustering). |
 | `16_Common_Error_Patterns.png` | The most frequent specific error patterns to prioritize fixing. |
 | `15_Error_Timeline.png` | *When* errors cluster over the study period (device/protocol signal). |
-| `17_Top_Participants_Flags.png` | Top 15 participants by auto-detected flags. |
+| `17_Top_Participants_Flags.png` | Top 15 participants by auto-detected flag *rate* (flags / that participant's own observed days). |
 | `18_Auto_Detected_Dashboard.png` | Split of auto-flagged records: still-to-review vs. already-corrected. |
 | `06_Sleep_Duration_Post_Correction.png` | Sleep-duration distribution before vs. after manual correction. |
 | `14_Sleep_Duration_Pre_Correction.png` | Pre-correction (algorithm-only) distribution, for comparison. |
-| `08_Sleep_Duration_by_Category.png` | Sleep duration across clean / unusual / error categories. |
 | `10_Extreme_Sleep_Duration.png` | Extreme durations with efficiency context — outlier hunting. |
 
 ### Tier 3 — Research outputs (use *after* you trust the data — `research_ready/`)
 
 | Figure | Content |
 |--------|---------|
+| `02_Correction_Impact.png` | Before/after correction impact (delta lollipops + identity scatter). |
 | `02B_Distribution_Sleep_Variables.png` | Distributions of key sleep variables. |
 | `03_Sleep_Duration_Distribution.png` | Total Sleep Time (TST) distribution. |
 | `04_Sleep_Duration_vs_Time_in_Bed.png` | TST vs. Time in Bed (with correlation). |
@@ -44,6 +44,7 @@ dominating the flags), the dataset is ready. Otherwise, use Tier 2 below to diag
 | `09_Bedtime_vs_Getup_Distribution.png` | Circadian timing pattern. |
 | `R25_Sleep_Regularity_Weekday_Weekend.png` | Weekday vs. weekend regularity. |
 | `R26_Sleep_Composition_TIB_Breakdown.png` | Time-in-bed composition breakdown. |
+| `R27_Sleep_Metrics_Correlation_Matrix.png` | Pairwise correlations among sleep metrics. |
 | `20_SOL_Perception_Bias.png` | Subjective vs. objective SOL bias. |
 | `20B_WASO_Perception_Bias.png` | Subjective vs. objective WASO bias. |
 | `21_Substance_Use_Availability.png` | Substance-use data availability (non-NA coverage). |

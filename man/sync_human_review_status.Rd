@@ -4,13 +4,13 @@
 \alias{sync_human_review_status}
 \title{Sync Human Review Status}
 \arguments{
-\item{csv_path}{CSV 文件路径}
+\item{csv_path}{Path to CSV file}
 
-\item{overwrite}{是否覆盖已有字段（默认 TRUE）}
+\item{overwrite}{Whether to overwrite existing fields (default TRUE)}
 }
 \value{
-更新后的 data.frame（不可见返回）
+Updated data.frame (returned invisibly)
 }
 \description{
-读取 manual_metric_review_acceptances.csv，根据人工处理痕迹自动同步 review_resolution / resolved_at / resolved_by 字段
+Read manual_metric_review_acceptances.csv and auto-sync review_resolution / resolved_at / resolved_by based on human review traces
 }

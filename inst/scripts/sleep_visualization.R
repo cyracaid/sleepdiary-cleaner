@@ -886,10 +886,12 @@ if (has_raw_times && has_metrics) {
   p2 <- (p2a | p2b) / p2c / tbl_grob +
     plot_layout(heights = c(2, 2, 0.5)) +
     plot_annotation(
-      title   = "Figure 2: Impact of Corrections on Sleep Metrics",
-      caption = .anno,
-      theme   = theme(plot.title    = element_text(hjust = 0.5, size = 14, face = "bold"),
-                      plot.caption  = element_text(hjust = 0.5, size = 9, color = "#616161"))
+      title    = "Figure 2: Impact of Corrections on Sleep Metrics",
+      subtitle = "Correction is non-destructive: only clear input errors are corrected. Gray points (most\nof the data) are intentionally left unchanged -- self-report/measured discrepancies are\nretained as data, not treated as errors to fix toward an assumed ground truth.",
+      caption  = .anno,
+      theme    = theme(plot.title    = element_text(hjust = 0.5, size = 14, face = "bold"),
+                       plot.subtitle = element_text(hjust = 0.5, size = 9, color = "#424242"),
+                       plot.caption  = element_text(hjust = 0.5, size = 9, color = "#616161"))
     )
 
   print(p2)
@@ -1275,43 +1277,16 @@ if(all(c("sleep_duration_h", "flag_severity") %in% names(clean_df))) {
 }
 
 # ----------------------------------------------------------------------------
-# Figure 8: Sleep Duration by Data Category
+# Figure 8: REMOVED (was "Sleep Duration by Data Category")
 # ----------------------------------------------------------------------------
-# DATA SOURCE: clean_df + unusual_df + error_df
-# WHAT IT SHOWS: Violin plots comparing sleep duration across clean, unusual, and error categories
-# ============================================================================
-# WHAT THIS FIGURE SHOWS:
-# Violin plots comparing sleep duration distributions across the three
-# original data categories: clean, unusual, and error.
-#
-# INTERPRETATION:
-# Clean records should show the tightest, most clinically normal distribution.
-# Unusual records should be wider but still plausible. Error records should
-# show the widest spread and most extreme values. If all three categories
-# have similar distributions, the original classification criteria may not
-# be effectively separating problematic from healthy data.
-# ============================================================================
-cat("Generating Figure 8...\n")
-
-combined_all <- bind_rows(
-  clean_df %>% mutate(category = "clean"),
-  if(exists("unusual_df") && is.data.frame(unusual_df) && nrow(unusual_df) > 0) unusual_df %>% mutate(category = "unusual") else NULL,
-  if(exists("error_df") && is.data.frame(error_df) && nrow(error_df) > 0) error_df %>% mutate(category = "error") else NULL
-) %>% filter(!is.na(sleep_duration_h))
-
-if(nrow(combined_all) > 0) {
-  p8 <- ggplot(combined_all, aes(x = category, y = sleep_duration_h, fill = category)) +
-    geom_violin(trim = FALSE, alpha = 0.4) +
-    geom_boxplot(width = 0.15, outlier.shape = NA) +
-    scale_fill_manual(values = c("clean" = "#2E7D32", "unusual" = "#FF8C00", "error" = "#D32F2F")) +
-    labs(title = "Figure 8: Sleep Duration by Data Category",
-         subtitle = "Comparison across clean, unusual, and error categories (based on final corrected data)",
-         x = "", y = "Sleep Duration (hours)") +
-    theme(legend.position = "none")
-  print(p8)
-  save_png(p8, "08_Sleep_Duration_by_Category", subdir = "pipeline_cleaning")
-  cat("✓ Figure 8 completed\n\n")
-}
+# Dropped per VISUALIZATION_TREE_PROPOSAL.md: degenerated to a single violin
+# whenever the clean/unusual/error categories were unbalanced (the common
+# case, not an edge case) -- a named failure mode for grouped violin/box
+# comparisons at unbalanced group sizes, not a one-off rendering issue.
+# Figure 07 (Flag Composition Stacked) covers the same question -- data
+# quality vs. sleep-duration range -- without this failure mode, since it
+# keeps N visible as bar height rather than needing three comparable
+# violin/box shapes.
 
 # ----------------------------------------------------------------------------
 # Figure 9: Bedtime vs Get-up Time Distribution
@@ -2019,48 +1994,67 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
   # --------------------------------------------------------------------------
   # Figure 17: Flagged Records by Participant (Auto-Detection)
   # --------------------------------------------------------------------------
-  # DATA SOURCE: checkforerrors_processed
-  # WHAT IT SHOWS: Top 15 participants with most algorithm-detected flags
+  # DATA SOURCE: checkforerrors_processed (flag count), clean_df (each
+  # participant's own total observed days, used only as a denominator)
+  # WHAT IT SHOWS: Top 15 participants by algorithm-detected flag RATE
+  # (flags / that participant's own total observed days), not raw count.
   # ==========================================================================
   # WHAT THIS FIGURE SHOWS:
-  # Bar chart of the 15 participants with the highest number of algorithm-
-  # detected flags, ranked from most to least.
+  # Bar chart of the 15 participants with the highest share of their
+  # observed days carrying an algorithm-detected flag, ranked from most to
+  # least.
+  #
+  # WHY RATE, NOT RAW COUNT: participants are observed for very different
+  # numbers of days. A raw flag count confounds "flagged a lot" with
+  # "observed for a long time" -- 5 flags out of 75 days (7%) is not the
+  # same as 5 flags out of 5 days (100%). Normalizing by each participant's
+  # own total observed days makes the bars comparable across participants.
   #
   # INTERPRETATION:
-  # A few participants with many flags suggests individual-level issues
-  # (non-compliance, misunderstanding of instructions, consistently poor data
-  # quality). If many participants have a similar (low) number of flags, the
-  # issues are likely systemic. Participants at the very top may need their
-  # data excluded or specially handled in analysis.
+  # A few participants with a high flag RATE suggests individual-level
+  # issues (non-compliance, misunderstanding instructions, consistently
+  # lower data quality on the days they did report). A flag does not mean
+  # the record is wrong -- many flags mark a self-report vs. measured
+  # discrepancy that this pipeline deliberately preserves as data, not an
+  # error to correct (see Figure 2 / 20 / 20B). High-rate participants are
+  # worth a manual look, not automatic exclusion.
   # ==========================================================================
-  cat("Generating FIGURE 17 (Flagged records by participant - Auto-detection)...\n")
-  
-  if("pid" %in% names(checkforerrors_processed)) {
-    
+  cat("Generating FIGURE 17 (Flagged records by participant - Auto-detection, rate-normalized)...\n")
+
+  if("pid" %in% names(checkforerrors_processed) && "pid" %in% names(clean_df)) {
+
+    pid_totals <- clean_df %>%
+      group_by(pid) %>%
+      summarise(total_days = n(), .groups = "drop")
+
     participant_errors <- checkforerrors_processed %>%
       group_by(pid) %>%
       summarise(error_count = n(), .groups = "drop") %>%
-      arrange(desc(error_count)) %>%
+      left_join(pid_totals, by = "pid") %>%
+      filter(!is.na(total_days), total_days > 0) %>%
+      mutate(flag_rate_pct = error_count / total_days * 100) %>%
+      arrange(desc(flag_rate_pct)) %>%
       mutate(rank = row_number(),
              pid_label = ifelse(rank <= 15, as.character(pid), "Other")) %>%
       filter(pid_label != "Other")
-    
+
     if(nrow(participant_errors) > 0) {
-      p17 <- ggplot(participant_errors, 
-                    aes(x = reorder(pid_label, -error_count), y = error_count, fill = error_count)) +
+      p17 <- ggplot(participant_errors,
+                    aes(x = reorder(pid_label, -flag_rate_pct), y = flag_rate_pct, fill = flag_rate_pct)) +
         geom_bar(stat = "identity", alpha = 0.7) +
-        geom_text(aes(label = error_count), vjust = -0.3, size = 3) +
-        scale_fill_gradient(low = "#FF8C00", high = "#D32F2F", name = "Flag Count") +
-        labs(title = "Figure 17: Top 15 Participants with Most Review Flags (Auto-Detection)",
-             subtitle = sprintf("Total participants with algorithm-detected issues: %d", length(unique(checkforerrors_processed$pid))),
-             x = "Participant ID", 
-             y = "Number of Records Needing Review") +
+        geom_text(aes(label = sprintf("%.0f%% (%d/%d)", flag_rate_pct, error_count, total_days)),
+                  vjust = -0.3, size = 2.8) +
+        scale_fill_gradient(low = "#FF8C00", high = "#D32F2F", name = "Flag Rate (%)") +
+        labs(title = "Figure 17: Top 15 Participants by Flag Rate (Auto-Detection)",
+             subtitle = sprintf("Flags as %% of each participant's own total observed days. Total participants with algorithm-detected issues: %d", length(unique(checkforerrors_processed$pid))),
+             x = "Participant ID",
+             y = "% of Observed Days Flagged") +
         theme(axis.text.x = element_text(angle = 45, hjust = 1),
               legend.position = "bottom")
-      
+
       print(p17)
   save_png(p17, "17_Top_Participants_Flags", subdir = "pipeline_cleaning")
-      cat("✓ Figure 17 completed\n\n")
+      cat("✓ Figure 17 completed (rate-normalized)\n\n")
     }
   }
   
@@ -2233,10 +2227,25 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
   # --------------------------------------------------------------------------
   
   # --------------------------------------------------------------------------
-  # Figure P26: Per-Participant Final Flag Rate
+  # Figure P26: Per-Participant Final Flag Rate (Ranked Table)
   # --------------------------------------------------------------------------
-  cat("Generating FIGURE P26 (Per-Participant Flag Rate)...\n")
-  
+  # REDESIGNED (per VISUALIZATION_TREE_PROPOSAL.md; MultiQC "General
+  # Statistics table" precedent for one-metric-per-sample at large N): the
+  # per-participant rate calculation below is unchanged and was already
+  # correct -- only the render form was the problem. At N in the hundreds
+  # (this benchmark: N=237), one bar per participant is unreadable. This
+  # now renders as a sorted table of the participants with the highest
+  # flagged-record rate -- the ones worth a second look first -- instead
+  # of a full-width bar-per-participant chart.
+  #
+  # Non-destructive framing: a high flag rate does NOT mean the data is
+  # "bad" or "wrong". A flag marks a record that differs from an automatic
+  # expectation, including self-report vs. measured discrepancies that
+  # this pipeline deliberately preserves rather than corrects (see Figure
+  # 2 / 20 / 20B). "Worth a second look," not "discard."
+  # --------------------------------------------------------------------------
+  cat("Generating FIGURE P26 (Per-Participant Flag Rate - Ranked Table)...\n")
+
   if ("flag_severity" %in% names(clean_df) && "pid" %in% names(clean_df)) {
     pid_flags <- clean_df %>%
       filter(!is.na(flag_severity)) %>%
@@ -2245,33 +2254,77 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
       group_by(pid) %>%
       mutate(total = sum(n), pct = n / total * 100) %>%
       ungroup()
-    
-    pid_order <- pid_flags %>%
-      filter(flag_severity == "Clean") %>%
-      arrange(desc(pct)) %>%
-      pull(pid)
-    
-    pid_flags$pid <- factor(pid_flags$pid, levels = rev(pid_order))
-    
-    p_p26 <- ggplot(pid_flags, aes(x = pid, y = pct, fill = flag_severity)) +
-      geom_col(alpha = 0.8, width = 0.9) +
-      scale_fill_manual(values = c("Clean" = "#2E7D32",
-                                   "Minor issues (1 flag)" = "#FF8C00",
-                                   "Major issues (2+ flags)" = "#D32F2F"),
-                        name = "Data Quality") +
-      labs(title = "Figure P26: Per-Participant Data Quality (Final Corrected Data)",
-           subtitle = paste0("Each bar = one participant (N=", length(unique(clean_df$pid)),
-                             "). Sorted by Clean% descending. Minor = 1 flag, Major = 2+ flags from {SE<",
-                             cfg_get("classification.flag_severity.poor_efficiency_threshold_pct", 70),
-                             "%, SOL>", cfg_get("classification.flag_severity.high_sol_threshold_hours", 1),
-                             "h, WASO>", cfg_get("classification.flag_severity.high_waso_threshold_hours", 1.5), "h}."),
-           x = "Participant ID", y = "% of Participant's Records") +
-      theme_minimal(base_size = 9) +
-      theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 5),
-            legend.position = "bottom")
+
+    n_participants <- length(unique(pid_flags$pid))
+
+    pid_wide <- pid_flags %>%
+      select(pid, flag_severity, pct) %>%
+      pivot_wider(names_from = flag_severity, values_from = pct, values_fill = 0)
+    for (col in c("Clean", "Minor issues (1 flag)", "Major issues (2+ flags)")) {
+      if (!col %in% names(pid_wide)) pid_wide[[col]] <- 0
+    }
+    totals <- pid_flags %>% distinct(pid, total)
+    pid_wide <- pid_wide %>%
+      left_join(totals, by = "pid") %>%
+      mutate(flagged_pct = 100 - Clean) %>%
+      arrange(desc(flagged_pct))
+
+    n_show <- min(20, nrow(pid_wide))
+    worst_n <- pid_wide %>% slice_head(n = n_show)
+
+    display_tbl <- data.frame(
+      `Participant ID` = as.character(worst_n$pid),
+      `Total Records`  = worst_n$total,
+      `Clean %`        = sprintf("%.0f%%", worst_n$Clean),
+      `Minor Flag %`   = sprintf("%.0f%%", worst_n$`Minor issues (1 flag)`),
+      `Major Flag %`   = sprintf("%.0f%%", worst_n$`Major issues (2+ flags)`),
+      check.names = FALSE,
+      stringsAsFactors = FALSE
+    )
+
+    # Light background tint on the higher-rate rows so a reader can scan
+    # without reading every number -- reuses the same green/orange/red
+    # identity as the Clean/Minor/Major legend below, just lightened. This
+    # is a "worth a look first" ranking aid, not a judgment that the row
+    # is bad data (see the non-destructive note above).
+    row_fill <- ifelse(worst_n$flagged_pct >= 50, scales::alpha("#D32F2F", 0.15),
+                 ifelse(worst_n$flagged_pct >= 20, scales::alpha("#FF8C00", 0.15), NA))
+    core_bg <- matrix(rep(row_fill, ncol(display_tbl)), ncol = ncol(display_tbl))
+
+    p26_tab <- tableGrob(display_tbl, rows = NULL,
+                          theme = ttheme_minimal(
+                            base_size = 9,
+                            core = list(fg_params = list(hjust = 0, x = 0.03),
+                                        bg_params = list(fill = core_bg)),
+                            colhead = list(fg_params = list(hjust = 0, x = 0.03, fontface = "bold"))
+                          ))
+
+    overall_clean_pct <- clean_df %>%
+      filter(!is.na(flag_severity)) %>%
+      summarise(pct = mean(flag_severity == "Clean") * 100) %>%
+      pull(pct)
+    n_high_flag <- sum(pid_wide$flagged_pct >= 20)
+
+    p26_title <- ggplot() + theme_void() +
+      labs(title = "Figure P26: Participants Worth a Second Look (Highest Flagged-Record Rate)",
+           subtitle = sprintf(
+             paste0("Showing the %d of %d participants with the highest %% of their own records flagged ",
+                    "(Minor + Major). Overall %.0f%% of all records are Clean; %d participant(s) are at or ",
+                    "above 20%% flagged.\nA high rate marks records worth a manual look -- not data that is ",
+                    "wrong. Self-report/measured discrepancies are preserved by design, not corrected ",
+                    "(see Figure 2). Minor = 1 flag, Major = 2+ flags from {SE<%s%%, SOL>%sh, WASO>%sh}."),
+             n_show, n_participants, overall_clean_pct, n_high_flag,
+             cfg_get("classification.flag_severity.poor_efficiency_threshold_pct", 70),
+             cfg_get("classification.flag_severity.high_sol_threshold_hours", 1),
+             cfg_get("classification.flag_severity.high_waso_threshold_hours", 1.5))) +
+      theme(plot.title = element_text(hjust = 0.5, size = 13, face = "bold"),
+            plot.subtitle = element_text(hjust = 0.5, size = 8, color = "#424242"))
+
+    p_p26 <- (p26_title / p26_tab) + plot_layout(heights = c(0.35, 1))
+
     print(p_p26)
     save_png(p_p26, "P26_PerParticipant_Flag_Rate", subdir = "pipeline_cleaning")
-    cat("✓ Figure P26 completed\n\n")
+    cat("✓ Figure P26 completed (table form)\n\n")
   } else {
     cat("⚠ Missing flag_severity or pid — skipping Figure P26\n\n")
   }
@@ -2317,8 +2370,9 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
       annotate("text", x = 15, y = Inf, label = "Minor (15min)", vjust = 2, color = "orange") +
       annotate("text", x = 60, y = Inf, label = "Red Line (60min)", vjust = 2, color = "red") +
       labs(title = "Figure 20: SOL Perception Bias (Subjective vs Objective)",
-      subtitle = paste0("Absolute difference: subjective SOL (self-reported duration_totalmin_sol_estimate_am) vs objective SOL (time_sleep - time_bed). ",
-                        "N=", length(valid_rows), " | Clinical: <15min typical, >60min significant discrepancy."),
+      subtitle = paste0("Absolute difference: subjective SOL (self-reported) vs objective SOL (time_sleep - time_bed). N=", length(valid_rows), ".\n",
+                        "This gap is preserved, not corrected -- perception/measurement mismatch is signal, not error. ",
+                        "The >60min line flags cases worth a manual look for a possible input error, not a discrepancy to \"fix.\""),
            x = "Absolute difference (minutes)", y = "Count") +
       scale_x_continuous(limits = c(0, 200)) +
       theme_minimal(base_size = 12)
@@ -2371,8 +2425,9 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
           annotate("text", x = 60, y = Inf, label = "Red Line (60min)", vjust = 2, color = "red") +
            labs(title = "Figure 20B: Self-Reported Nighttime Wakefulness vs Post-Awakening Time in Bed",
             subtitle = paste0("Note: self-reported WASO (within sleep period) and post-awakening interval (getup − awake) are different time windows. ",
-                              "The latter captures time spent in bed after final awakening, not wakefulness during sleep. ",
-                              "N=", length(valid_waso_rows), " | Clinical: <15min typical, >60min significant discrepancy."),
+                              "The latter captures time spent in bed after final awakening, not wakefulness during sleep. N=", length(valid_waso_rows), ".\n",
+                              "This gap is preserved, not corrected -- perception/measurement mismatch is signal, not error. ",
+                              "The >60min line flags cases worth a manual look for a possible input error, not a discrepancy to \"fix.\""),
                x = "Absolute difference (minutes)", y = "Count") +
           scale_x_continuous(limits = c(0, 200)) +
           theme_minimal(base_size = 12)
@@ -2836,7 +2891,7 @@ cat("  Figure 4B: SOL vs Sleep Duration (COLOR-CODED)\n")
 cat("  Figure 5: Variability of Sleep Variables (Violin Plot)\n")
 cat("  Figure 6: Clean vs Unusual Comparison\n")
 cat("  Figure 7: Flag Composition (Stacked Histogram)\n")
-cat("  Figure 8: Sleep Duration by Data Category\n")
+cat("  [Figure 8 removed -- see VISUALIZATION_TREE_PROPOSAL.md]\n")
 cat("  Figure 9: Bedtime vs Get-up Time Distribution\n")
 cat("  Figure 10: Extreme Durations with Efficiency (COLOR-CODED)\n")
 cat("  Figure 11: Flag Co-occurrence Heatmap\n")
