@@ -1,0 +1,25 @@
+{
+  "title": "sleepcleanr: Reproducible Sleep EMA Diary Data Cleaning Pipeline",
+  "description": "Reproducible R pipeline for cleaning sleep EMA diary data: parses raw timestamps, detects and corrects temporal and duration errors through a documented human-in-the-loop workflow with a full audit ledger, computes standard sleep metrics (TST, SOL, WASO, SE), and generates diagnostic and research-ready figures. Fully configurable via YAML so new studies can map their data without code changes.",
+  "creators": [
+    {
+      "name": "Dong, Cai",
+      "orcid": "0009-0001-0706-0335"
+    },
+    {
+      "name": "ten Brink, Maia",
+      "orcid": "0000-0001-6987-1339"
+    }
+  ],
+  "upload_type": "software",
+  "license": "MIT",
+  "keywords": [
+    "sleep",
+    "ecological momentary assessment",
+    "data cleaning",
+    "human-in-the-loop",
+    "reproducible research",
+    "R"
+  ],
+  "access_right": "open"
+}

@@ -1,0 +1,2 @@
+"rule","selected_swap","selected_flip","selected_recall","selected_far_flag","defaults_swap","defaults_flip","defaults_on_grid","defaults_recall","defaults_far_flag"
+"primary recall>=0.95, secondary min FAR_flag, tie nearest (3,12)",3,12,0.995177147097014,0,3,12,TRUE,0.995177147097014,0

@@ -34,6 +34,9 @@ l2        <- rd("l2_tier.csv")
 down      <- rd("downstream_sensitivity.csv")
 seed      <- rd("seed_sensitivity.csv")
 var_dec   <- read.csv(file.path(RES, "multiverse", "variance_decomposition.csv"), stringsAsFactors = FALSE)
+op_sweep  <- rd("operating_point_sweep.csv")
+op_sel    <- rd("operating_point_selection.csv")
+bench     <- rd("benchmark_table.csv")
 
 # real-data audit (local only)
 audit_path <- "audit_m1_m7_decision.csv"
@@ -154,6 +157,27 @@ r <- c(r, paste0("| Controls: no_cleaning / naive / pipeline | ", fmt(ctrl$recal
 r <- c(r, paste0("| Mis-repair rate (MRR) | see mrr_magnitude.csv (0 in current run) | mrr_magnitude.csv |"))
 r <- c(r, "")
 
+# 3b. Per-category benchmark table (detection vs correction)
+bench_cat <- bench[!grepl("^CONTROL", bench$category), ]
+bench_ctl <- bench[grepl("^CONTROL", bench$category), ]
+r <- c(r, "### Per-category benchmark (detection vs correction separated)", "")
+r <- c(r, "Detection (\"the pipeline acted\") and correction (\"it got the right value\") are reported separately. `false_correction` = misrepaired (changed to a wrong value); `missed` = untouched, still wrong, unflagged. The clean-control block is reported on its own line — the raw `detection_outcomes_v4_current.csv` counted its 1,609 rows as MISSED and `correct_pct` 0, which read as \"0% correct\" when they simply carry no injected error; that miscompute is corrected here.", "")
+r <- c(r, "| Category | n | detected | correctly detected | flagged unresolved | false correction | missed | recall | misrepair rate |", "|---|---|---|---|---|---|---|---|---|")
+for (i in seq_len(nrow(bench_cat))) {
+  r <- c(r, paste0("| ", bench_cat$category[i], " | ", bench_cat$n_injected[i],
+                   " | ", bench_cat$detected[i], " | ", bench_cat$correctly_detected[i],
+                   " | ", bench_cat$flagged_unresolved[i], " | ", bench_cat$false_correction[i],
+                   " | ", bench_cat$missed[i],
+                   " | ", fmt(bench_cat$recall[i], 3), " | ", fmt(bench_cat$misrepair_rate[i], 3), " |"))
+}
+r <- c(r, paste0("| **", bench_ctl$category[1], "** | ", bench_ctl$n_control[1],
+                 " | — | — | — | — | — | — | — |"))
+r <- c(r, "")
+r <- c(r, paste0("Pooled precision = ", fmt(bench_ctl$pooled_precision[1], 3),
+                 " (flagged injected / (flagged injected + flagged control)); control FAR_flag ",
+                 bench_ctl$far_flag[1], "/", bench_ctl$n_control[1], ", FAR_alter ",
+                 bench_ctl$far_alter[1], "/", bench_ctl$n_control[1], ". Source: benchmark_table.csv.", ""))
+
 # 4. Real-data audit
 if (audit_avail) {
   r <- c(r, "## Real-data audit", "")
@@ -212,7 +236,32 @@ r <- c(r, "")
 r <- c(r, paste0("Seed sensitivity: pooled recall ", fmt(min(seed$pooled_recall), 3), "–",
                  fmt(max(seed$pooled_recall), 3), " across ", nrow(seed), " seeds; control FAR 0 in all.", ""))
 
-# 7. Co-review
+# 7. Operating-point analysis
+r <- c(r, "", "## Threshold operating-point analysis", "")
+r <- c(r, "Answers \"why 3 h and 12 h?\" by sweeping the two rule-defining thresholds on the fixed synthetic benchmark (same corrupted input + same ground truth for every point; only the pipeline detection thresholds change). Selection rule predefined, not post-hoc: **primary recall ≥ 0.95 → secondary min FAR_flag → tie nearest (3,12)**.", "")
+r <- c(r, "| swap (h) | flip (h) | recall | FAR_flag | FAR_alter | precision |", "|---|---|---|---|---|---|")
+for (i in seq_len(nrow(op_sweep))) {
+  r <- c(r, paste0("| ", op_sweep$swap_threshold_hours[i], " | ", op_sweep$flip_gap_hours[i],
+                   " | ", fmt(op_sweep$recall[i], 4),
+                   " | ", fmt(op_sweep$far_flag[i], 4),
+                   " | ", fmt(op_sweep$far_alter[i], 4),
+                   " | ", if (is.na(op_sweep$precision[i])) "—" else fmt(op_sweep$precision[i], 3), " |"))
+}
+r <- c(r, "")
+plateau <- all(abs(op_sweep$recall - op_sweep$recall[1]) < 1e-4) && all(op_sweep$far_flag == 0)
+if (plateau) {
+  r <- c(r, paste0("**Flat plateau**: recall constant (~", fmt(op_sweep$recall[1], 3),
+                   ") and FAR_flag = 0 at every grid point. Threshold choice is insensitive on this benchmark; ",
+                   "the current defaults (3, 12) sit on the safe plateau and satisfy the rule (recall ",
+                   fmt(op_sel$defaults_recall[1], 4), ", FAR 0).**"))
+} else {
+  r <- c(r, paste0("Selection rule outcome: swap ", op_sel$selected_swap[1], " h, flip ",
+                   op_sel$selected_flip[1], " h (recall ", fmt(op_sel$selected_recall[1], 4),
+                   ", FAR ", fmt(op_sel$selected_far_flag[1], 4), ")."))
+}
+r <- c(r, "")
+
+# 8. Co-review
 r <- c(r, "", "## Human co-review agreement", "")
 r <- c(r, "Reported as co-review agreement, not Cohen's κ — the review was collaborative (one shared worksheet), so the independent label sets κ requires never existed.", "")
 r <- c(r, "| Track | n | Immediate agreement |", "|---|---|---|")
@@ -220,17 +269,19 @@ r <- c(r, "| Flagged temporal errors | 75 | 64.0% |")
 r <- c(r, "| Statistically atypical cases | 37 | 89.2% |")
 r <- c(r, "")
 
-# 8. Caveats
+# 9. Caveats
 r <- c(r, "## Honest caveats", "")
 r <- c(r, "1. **cross_participant_spike is the weakest family** — L1 0.886–0.907 across seeds, value-correct 0 by design (audit-only: a spike may be real).")
 r <- c(r, "2. **SOL thresholds sit inside the ±75-min Bland-Altman noise band** — SOL flags are descriptive, routed to human review; never cited as accuracy.")
 r <- c(r, "3. **Ablation recall uses a flag-based definition** (AUTO_FIXed records never enter the flag queue) — reported as supplementary; primary evidence is the multiverse variance decomposition.")
 r <- c(r, "")
+r <- c(r, "4. **Operating-point analysis is synthetic-only** — real data has no ground truth, so recall is undefined there (the real-data spec curve measures downstream means only, which cannot move: n_flagged = 0 under every spec). The plateau verdict holds on the synthetic benchmark; real-world threshold choice should be re-checked on external data.")
 
-# 9. Reproducibility
+# 10. Reproducibility
 r <- c(r, "## Reproducibility", "")
 r <- c(r, "```r", "# from the repo root, after renv::restore() and installing splsleep")
 r <- c(r, "Rscript validation/synthetic/ppv_cluster_ci.R   # synthetic benchmark (recall/spec/FAR)")
+r <- c(r, "Rscript validation/synthetic/operating_point_sweep.R  # threshold operating-point analysis")
 r <- c(r, "Rscript validation/audit_review_queue_m1_m7.R   # real-data audit (requires local data)")
 r <- c(r, "Rscript validation/render_validation_report.R   # re-render this report from the CSVs")
 r <- c(r, "```", "")

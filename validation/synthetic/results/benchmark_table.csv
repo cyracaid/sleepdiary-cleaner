@@ -1,0 +1,16 @@
+"category","n_injected","detected","correctly_detected","flagged_unresolved","false_correction","missed","recall","misrepair_rate","pooled_precision","far_flag","far_alter","n_control"
+"adjacent_swap_large_gap_left_clean",400,400,243,157,0,0,1,0,NA,NA,NA,NA
+"adjacent_swap_time_awake_am_time_getup_am",400,400,400,0,0,0,1,0,NA,NA,NA,NA
+"adjacent_swap_time_bed_am_time_sleep_am",400,400,400,0,0,0,1,0,NA,NA,NA,NA
+"adjacent_swap_time_sleep_am_time_awake_am",400,400,0,400,0,0,1,0,NA,NA,NA,NA
+"ampm_swap",400,400,226,174,0,0,1,0,NA,NA,NA,NA
+"compound_ampm_and_swap",400,400,152,248,0,0,1,0,NA,NA,NA,NA
+"cross_participant_spike",236,236,0,214,22,0,1,0.0932,NA,NA,NA,NA
+"field_misentry_sol",400,400,7,393,0,0,1,0,NA,NA,NA,NA
+"field_misentry_waso",400,400,13,387,0,0,1,0,NA,NA,NA,NA
+"format_malformed_colon",400,400,400,0,0,0,1,0,NA,NA,NA,NA
+"format_no_colon",400,400,400,0,0,0,1,0,NA,NA,NA,NA
+"implausible_duration",400,400,0,400,0,0,1,0,NA,NA,NA,NA
+"mmss_confusion",400,400,378,18,4,0,1,0.01,NA,NA,NA,NA
+"sol_window_contradiction",355,355,0,355,0,0,1,0,NA,NA,NA,NA
+"CONTROL (no_error_control)",NA,NA,NA,NA,NA,NA,NA,NA,1,0,0,1609
