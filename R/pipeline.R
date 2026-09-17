@@ -77,11 +77,18 @@ utils::globalVariables(c(
 #'   this step had to be invoked by hand, which meant a plain
 #'   \code{run_pipeline()} produced no Dataset A or B at all.
 #' @param verbose Logical. Print progress. Default TRUE.
+#' @param data Data frame. Optional data-first entry: supply the raw data
+#'   directly instead of reading \code{data.files.main} from the config.
+#'   When NULL (default) the pipeline reads from the config exactly as before
+#'   (\code{data = NULL} is the backward-compatible zero-change path). When
+#'   supplied, the file-reading branch of Step 1 is skipped and the config's
+#'   column_mapping is applied to \code{data}. Used by
+#'   \code{clean_sleep_diary()}.
 #'
 #' @return Invisibly returns TRUE on successful completion.
 #' @export
 run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = FALSE,
-                         finalize = TRUE, verbose = TRUE) {
+                         finalize = TRUE, verbose = TRUE, data = NULL) {
   env <- .pipeline_init(config, project_dir, verbose)
   on.exit(.pipeline_cleanup(env$old_wd), add = TRUE)
   cfg  <- env$cfg
@@ -92,43 +99,52 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
 
   # -- Step 1: Load data ------------------------------------------------
   if (verbose) cat("\n=== Step 1: Loading data ===\n")
-  main_file <- .resolve_data_key(cfg, "data.files.main")
-  extra_file <- .resolve_data_key(cfg, "data.files.extra")
+  if (is.null(data)) {
+    main_file <- .resolve_data_key(cfg, "data.files.main")
+    extra_file <- .resolve_data_key(cfg, "data.files.extra")
 
-  if (is.null(main_file) || nchar(main_file) == 0) {
-    stop("No data file configured. Set 'data.files.main' in your config YAML.")
-  }
-  if (!file.exists(main_file)) {
-    stop(sprintf(
-      "\n  Cannot find your data file:\n    %s\n\n  Options:\n    1. Place your file at the path above, or\n    2. Edit your config YAML and change 'data.files.main' to point to your file\n\n  Accepted formats: .rds (R data) or .csv (plain text)\n  Required columns: see SCHEMA.md\n",
-      main_file
-    ))
-  }
-
-  is_csv <- grepl("\\.csv$", main_file, ignore.case = TRUE)
-  if (verbose) cat(sprintf("  Reading %s: %s\n", if (is_csv) "CSV" else "RDS", basename(main_file)))
-  if (is_csv) {
-    df <- utils::read.csv(main_file, stringsAsFactors = FALSE)
-  } else {
-    df <- readRDS(main_file)
-  }
-
-  # Optional supplementary file (extra columns: StartDate, WASO counts)
-  if (!is.null(extra_file) && nchar(extra_file) > 0 && file.exists(extra_file)) {
-    if (verbose) cat(sprintf("  Reading extra: %s\n", basename(extra_file)))
-    extra_df <- utils::read.csv(extra_file, stringsAsFactors = FALSE)
-    if (nrow(extra_df) != nrow(df)) {
+    if (is.null(main_file) || nchar(main_file) == 0) {
+      stop("No data file configured. Set 'data.files.main' in your config YAML.")
+    }
+    if (!file.exists(main_file)) {
       stop(sprintf(
-        "Row mismatch: extra file %s has %d rows, main data has %d. They must match 1:1 by row position.",
-        basename(extra_file), nrow(extra_df), nrow(df)
+        "\n  Cannot find your data file:\n    %s\n\n  Options:\n    1. Place your file at the path above, or\n    2. Edit your config YAML and change 'data.files.main' to point to your file\n\n  Accepted formats: .rds (R data) or .csv (plain text)\n  Required columns: see SCHEMA.md\n",
+        main_file
       ))
     }
-    if ("StartDate" %in% names(extra_df)) df$StartDate <- extra_df$StartDate
-    if ("num_waso" %in% names(extra_df)) df$num_waso_am <- extra_df$num_waso
-    if ("num_waso_estimate_am" %in% names(extra_df)) df$num_waso_estimate_am <- extra_df$num_waso_estimate_am
-    rm(extra_df); if (verbose) gc()
+
+    is_csv <- grepl("\\.csv$", main_file, ignore.case = TRUE)
+    if (verbose) cat(sprintf("  Reading %s: %s\n", if (is_csv) "CSV" else "RDS", basename(main_file)))
+    if (is_csv) {
+      df <- utils::read.csv(main_file, stringsAsFactors = FALSE)
+    } else {
+      df <- readRDS(main_file)
+    }
+
+    # Optional supplementary file (extra columns: StartDate, WASO counts)
+    if (!is.null(extra_file) && nchar(extra_file) > 0 && file.exists(extra_file)) {
+      if (verbose) cat(sprintf("  Reading extra: %s\n", basename(extra_file)))
+      extra_df <- utils::read.csv(extra_file, stringsAsFactors = FALSE)
+      if (nrow(extra_df) != nrow(df)) {
+        stop(sprintf(
+          "Row mismatch: extra file %s has %d rows, main data has %d. They must match 1:1 by row position.",
+          basename(extra_file), nrow(extra_df), nrow(df)
+        ))
+      }
+      if ("StartDate" %in% names(extra_df)) df$StartDate <- extra_df$StartDate
+      if ("num_waso" %in% names(extra_df)) df$num_waso_am <- extra_df$num_waso
+      if ("num_waso_estimate_am" %in% names(extra_df)) df$num_waso_estimate_am <- extra_df$num_waso_estimate_am
+      rm(extra_df); if (verbose) gc()
+    } else {
+      if (verbose) cat("  No extra file -- assuming main data contains all columns\n")
+    }
   } else {
-    if (verbose) cat("  No extra file -- assuming main data contains all columns\n")
+    # Data-first entry (clean_sleep_diary): caller supplies the data.frame.
+    if (!is.data.frame(data)) {
+      stop("'data' must be a data.frame (or NULL to read data.files.main from the config).")
+    }
+    df <- data
+    if (verbose) cat(sprintf("  Using provided data.frame (%d rows x %d cols)\n", nrow(df), ncol(df)))
   }
 
   if (!"StartDate" %in% names(df) && verbose) {

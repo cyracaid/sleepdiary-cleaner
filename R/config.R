@@ -207,7 +207,18 @@ adapt_columns <- function(data, config) {
     time_awake_hhmm  = "time_awake_am_hhmm",
     time_awake_ampm  = "time_awake_am_ampm",
     time_getup_hhmm  = "time_getup_am_hhmm",
-    time_getup_ampm  = "time_getup_am_ampm"
+    time_getup_ampm  = "time_getup_am_ampm",
+    # duration + count fields: downstream sourced scripts hardcode the long
+    # form (e.g. cross_participant_field_misentry_check.R reads
+    # duration_totalmin_sol_estimate_am directly), so mapped user columns must
+    # land on the long canonical name, not on the logical key.
+    sol              = "duration_totalmin_sol_estimate_am",
+    waso             = "duration_totalmin_waso_estimate_am",
+    nap              = "duration_totalmin_napstoday_PM",
+    waso_count       = "num_waso_estimate_am",
+    caffeine         = "caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1",
+    alcohol          = "alcoholtoday_PM_NumAlcoholicDrinks_1",
+    date_bed         = "StartDate"
   )
 
   mapping <- config_get(config, "column_mapping", list())

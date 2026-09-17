@@ -158,6 +158,15 @@ run_pipeline()
 file.copy(system.file("config_template.yaml", package = "sleepcleanr"),
           "my_study.yaml")
 # edit my_study.yaml → run_pipeline(config = "my_study.yaml")
+
+# Data-first entry (no config file needed): column names are inferred and
+# every schema decision is recorded in the run manifest.
+res <- clean_sleep_diary("my_diary.csv")          # .csv / .rds / .xlsx / data.frame
+res$cleaned                                       # cleaned Dataset A
+res$guesses                                       # how each column was mapped
+res$manifest                                      # provenance: input hash, config, step ledger
+# Preview the inferred mapping without running anything:
+clean_sleep_diary("my_diary.csv", dry_run = TRUE) # writes dry_run_manifest.json, no data written
 ```
 
 ## Learn more
@@ -171,6 +180,7 @@ file.copy(system.file("config_template.yaml", package = "sleepcleanr"),
 - vignette("interpreting-output") — reading `correction_status_final.csv` and `step_flag_ledger.csv`
 - vignette("validation-methodology") — how the rules were validated (synthetic + real data)
 - vignette("testing-coverage") — test suite coverage
+- vignette("data-first") — `clean_sleep_diary()`: no-config entry, column auto-guess, run manifest
 - Changelog: <https://github.com/cyracaid/sleepdiary-cleaner/releases>
 
 ## For developers / AI assistants
@@ -335,16 +345,16 @@ file.copy(system.file("config_template.yaml", package = "sleepcleanr"),
 
 | 步骤 | 名称 | 说明 |
 |------|------|------|
-| 1 | 数据加载 | .rds/.csv 自动检测；schema 校验；可选辅助文件合并 |
-| 1.5 | 字段错误检查 | SOL/WASO 时钟时间 vs 时长字段误入检测 |
-| 2-4 | 解析与标准化 (S3 链) | 解析时间戳 → 解析时长 → 标准化序列 |
-| 5 | 记录分类 | 生成人工审核 CSV 供批准 |
-| 5.75 | 二次审核共识 | 应用二次审核清单共识 |
-| 6-7 | 修正与计算指标 (S3 链) | 人工 + 时长修正；TST/SOL/WASO/SE 指标；has_correction 枚举 |
-| 8 | 自动检测剩余问题 | TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED 标志分类 |
-| 8.5 | 跨参与者一致性检查 | 全局一致性审计 |
-| 9 | 生成诊断图表 | 30 张图表（14 QC + 16 科研）+ 图表索引 + RUN_INFO |
-| 10 | 构建交付数据集 | 按列字典选择/重命名为 Dataset A/B |
+| 1 | Load data | .rds/.csv auto-detected; schema validated; optional supplementary file merged |
+| 1.5 | Field-misentry check | SOL/WASO clock-time vs duration-field misentry detection on raw data |
+| 2-4 | Parse & normalize (S3 chain) | Parse timestamps → parse intervals → normalize sequence |
+| 5 | Classify records | Generate manual review CSVs for human approval |
+| 5.75 | Second-review consensus | Apply second-review checklist consensus |
+| 6-7 | Correct & compute metrics (S3 chain) | Manual + duration corrections; TST/SOL/WASO/SE metrics; has_correction enum |
+| 8 | Auto-detect remaining issues | TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED flag classification |
+| 8.5 | Cross-participant consistency check | Global consistency audit across participants |
+| 9 | Generate diagnostic figures | 30 figures (14 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt |
+| 10 | Build delivered datasets | finalize_columns() selects/renames to Dataset A/B per column dictionary |
 
 <!-- AUTO:ARCH_ZH_END -->
 

@@ -9,7 +9,8 @@ run_pipeline(
   project_dir = ".",
   skip_visualization = FALSE,
   finalize = TRUE,
-  verbose = TRUE
+  verbose = TRUE,
+  data = NULL
 )
 }
 \arguments{
@@ -27,6 +28,14 @@ this step had to be invoked by hand, which meant a plain
 \code{run_pipeline()} produced no Dataset A or B at all.}
 
 \item{verbose}{Logical. Print progress. Default TRUE.}
+
+\item{data}{Data frame. Optional data-first entry: supply the raw data
+directly instead of reading \code{data.files.main} from the config.
+When NULL (default) the pipeline reads from the config exactly as before
+(\code{data = NULL} is the backward-compatible zero-change path). When
+supplied, the file-reading branch of Step 1 is skipped and the config's
+column_mapping is applied to \code{data}. Used by
+\code{clean_sleep_diary()}.}
 }
 \value{
 Invisibly returns TRUE on successful completion.
