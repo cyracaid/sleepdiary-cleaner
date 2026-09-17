@@ -1,3 +1,42 @@
+# sleepcleanr 1.4.6
+
+Data-first entry, provenance, and figure-hardening release.
+
+## New API: `clean_sleep_diary()`
+
+- One-call entry: `clean_sleep_diary("my.csv")` (also .rds / .xlsx / data.frame)
+  with no config file required; column names are inferred and every schema
+  inference decision is recorded, never silently guessed.
+- `guess_column_mapping()` returns per-column records (user_col, internal_col,
+  match_rule, confidence, status, candidate_set); ambiguous ties are never
+  silently resolved; absent required fields fail loudly.
+- `dry_run = TRUE` previews the mapping and writes only `dry_run_manifest.json`
+  (never a cleaned dataset); raw input is never modified.
+- Provenance manifest (JSON): input md5 hash as identity, git commit (NULL
+  outside a repo), UTC timestamp, environment (R version, platform, package
+  versions), full effective config, per-step ledger, output paths.
+- `run_pipeline()` gains an optional `data = NULL` argument; default NULL is
+  the zero-change backward-compatible path (invariant-tested).
+
+## Validation hardening
+
+- `validation/synthetic/operating_point_sweep.R`: 20-point grid
+  (swap 1-5 h x flip 8-14 h) with a predefined selection rule; result: flat
+  plateau, defaults (3, 12) validated as an operating point.
+- `validation/synthetic/benchmark_table.R`: per-category detection-vs-
+  correction table with precision / FAR / false-correction columns; fixes the
+  control-row miscompute in detection_outcomes_v4_current.csv.
+- Citation metadata: CITATION.cff, inst/CITATION, .zenodo.json (DOI placeholder).
+
+## Figure robustness
+
+- Review PDF built from saved PNGs (print() of patchwork corrupts on
+  non-interactive devices); Fig 13 uses measured table heights so the canvas
+  grows instead of tables overflowing; Fig 15 reads Step-6 classification and
+  degrades to per-type counts on single-date data; Fig 11/14/16 report skip
+  reasons (`.mark_skip()`); missing-figure report (console + CSV + contact
+  sheet footer); A1 ledger Step column width fixed.
+
 # sleepcleanr 1.4.5
 
 CRAN resubmission: fixes the Debian check ERROR by replacing the legacy
