@@ -34,8 +34,18 @@ figure12_step_flag_table <- function(cfg = NULL, output_dir = ".", save_png = NU
 
   fmt <- function(x) ifelse(is.na(x), "\u2014", as.character(x))
 
+  # Step label: id and short label on separate lines so long labels
+  # ("5.75 Second-review consensus") wrap instead of truncating in a
+  # fixed-width grid cell.
+  .short_label <- function(x) {
+    # keep known long labels, compress to first two words when > 18 chars
+    if (nchar(x) <= 18) return(x)
+    words <- strsplit(x, " ")[[1]]
+    paste(words[1:min(2, length(words))], collapse = " ")
+  }
+  steps$label_short <- vapply(steps$label, .short_label, character(1))
   disp <- data.frame(
-    Step        = paste0(steps$step_id, "  ", steps$label),
+    Step        = paste0(steps$step_id, "\n", steps$label_short),
     N           = steps$n_total,
     `DC:error`  = vapply(steps$step_id, cell, integer(1), std = "data_category", cat = "error"),
     `DC:unusual`= vapply(steps$step_id, function(s) {
@@ -85,7 +95,11 @@ figure12_step_flag_table <- function(cfg = NULL, output_dir = ".", save_png = NU
     }
   }
 
-  tab <- gtable::gtable(grid::unit(rep(1, nc), "null"), grid::unit(rep(1, nr + 1L), "null"))
+  tab <- gtable::gtable(
+    # Step column gets 2x weight (long labels), the nc-1 numeric columns share
+    # the remaining width evenly -- fixes the "5.75 Second-review cons" truncation.
+    grid::unit(c(2, rep(1, nc - 1L)), "null"),
+    grid::unit(rep(1, nr + 1L), "null"))
   # zebra + header backgrounds (drawn first, z = 0)
   for (i in seq_len(nr)) {
     tab <- gtable::gtable_add_grob(tab,
