@@ -94,6 +94,12 @@ if (!file.exists(fn_path)) {
 fn_path <- normalizePath(fn_path)          # absolute: we chdir below
 suppressMessages(suppressWarnings(source(fn_path)))
 
+# calculate_sleep_time_end.R calls cfg_get() at run time (output.report.dir).
+# cfg_get/config_get live in R/config.R, not in inst/scripts -- source that
+# dependency so this standalone script runs without the package installed.
+cfg_path <- file.path("R", "config.R")
+if (file.exists(cfg_path)) suppressMessages(suppressWarnings(source(cfg_path)))
+
 # DANGER, and the reason for the sandbox below.
 #
 # calculate_sleep_time_vars_end() is named as though it only computes metrics,

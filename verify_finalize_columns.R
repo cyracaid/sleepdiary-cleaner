@@ -44,6 +44,14 @@ if (!file.exists(dict_path) || !file.exists(fn_path)) {
 }
 
 source(fn_path)
+# finalize_columns() calls audit_dispositions_attach() (R/audit_dispositions.R).
+# Source that dependency too: this standalone script must run with a cleared
+# renv library and never assumes the package is installed.
+audit_path <- file.path("R", "audit_dispositions.R")
+check("R/audit_dispositions.R exists (finalize_columns dependency)",
+      file.exists(audit_path))
+if (!file.exists(audit_path)) quit(status = 1)
+source(audit_path)
 dict <- read.csv(dict_path, stringsAsFactors = FALSE,
                  colClasses = "character", na.strings = NULL)
 
@@ -105,6 +113,14 @@ check("data_category is NOT also in Dataset A (one status column only)",
 
 # ---- Build with synthetic input --------------------------------------------
 cat("\n-- build --\n")
+
+# audit_dispositions_attach() reads ledger paths via getOption() with a
+# getwd()-relative default. A real audit_dispositions.csv / manual correction
+# file in the repo root would carry REAL row_ids that are absent from this
+# synthetic 5-row fixture -> redirect both to non-existent paths so the
+# synthetic build exercises the "no ledger" path (audit_disposition = "none").
+options(sleepcleanr.audit_ledger = file.path(tempdir(), "no_such_audit.csv"),
+        sleepcleanr.audit_manual_corrections = file.path(tempdir(), "no_such_manual.csv"))
 
 impl <- dict[dict$status == "implemented" & (nzchar(dict$name_a) | nzchar(dict$name_b)), ]
 n <- 5
