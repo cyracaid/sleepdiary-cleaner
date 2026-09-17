@@ -20,9 +20,9 @@ generate_figure_index <- function(viz_dir) {
     c("pipeline_cleaning/A1_Step_Flag_Ledger.png",              1, "Per-step flag ledger (merges old Fig 12)"),
     c("pipeline_cleaning/13_Error_Category_Distribution.png",   1, "Error category distribution (absorbs old Fig 19)"),
     c("pipeline_cleaning/14_Sleep_Duration_Pre_Correction.png", 1, "Pre-correction duration (for before/after comparison)"),
-    c("pipeline_cleaning/15_Error_Timeline.png",                1, "Error timeline"),
+    c("pipeline_cleaning/15_Error_Timeline.png",                1, "Timing of flagged temporal patterns (not a defect count -- most were kept unchanged)"),
     c("pipeline_cleaning/16_Common_Error_Patterns.png",         1, "Most frequent specific error patterns"),
-    c("pipeline_cleaning/17_Top_Participants_Flags.png",        1, "Top participants by flag count"),
+    c("pipeline_cleaning/17_Top_Participants_Flags.png",        1, "Top participants by flag rate"),
     c("pipeline_cleaning/18_Auto_Detected_Dashboard.png",       1, "Auto-detected issues dashboard"),
     c("research_ready/02_Correction_Impact.png",                3, "Correction impact (delta lollipops + scatter)"),
     c("research_ready/02B_Distribution_Sleep_Variables.png",    3, "Key sleep-variable distributions"),
@@ -118,7 +118,34 @@ generate_figure_index <- function(viz_dir) {
     cat("[ERROR] No valid figures found in", viz_dir, "\n")
     return(invisible(FALSE))
   }
-  
+
+  # Figures not generated this run (2026-09-17): if sleep_visualization.R
+  # wrote a figures_not_generated.csv (its end-of-script catalog check),
+  # render it as a red-header/orange-strip footer block on the contact sheet
+  # itself, so a missing figure's reason is visible right in the summary
+  # index, not just in console output.
+  missing_csv <- file.path(viz_dir, "figures_not_generated.csv")
+  if (file.exists(missing_csv)) {
+    missing_df <- tryCatch(utils::read.csv(missing_csv, stringsAsFactors = FALSE),
+                            error = function(e) NULL)
+    if (!is.null(missing_df) && nrow(missing_df) > 0) {
+      full_w_guess <- thumb_w * cols
+      hdr_missing <- magick::image_blank(full_w_guess, hdr_h, "#D32F2F")
+      hdr_missing <- magick::image_annotate(
+        hdr_missing, sprintf("%d FIGURE(S) NOT GENERATED THIS RUN", nrow(missing_df)),
+        gravity = "west", location = "+14+0", size = 26, color = "white", weight = 700)
+      strip_rows <- lapply(seq_len(nrow(missing_df)), function(i) {
+        label <- sprintf("%s  —  %s", basename(missing_df$file[i]), missing_df$reason[i])
+        s <- magick::image_blank(full_w_guess, cap_h, "#FFF3E0")
+        magick::image_annotate(s, label, gravity = "west", location = "+8+0",
+                                size = 16, color = "#5D4037", weight = 400)
+      })
+      missing_body <- magick::image_append(do.call(c, strip_rows), stack = TRUE)
+      blocks[[length(blocks) + 1]] <- magick::image_append(c(hdr_missing, missing_body), stack = TRUE)
+      cat(sprintf("  (%d figure(s) not generated this run -- listed on the contact sheet)\n", nrow(missing_df)))
+    }
+  }
+
   full_w <- max(vapply(blocks, function(b) magick::image_info(b)$width, integer(1)))
   blocks <- lapply(blocks, function(b) magick::image_extent(b, paste0(full_w, "x", magick::image_info(b)$height),
                                                     gravity = "northwest", color = bg))

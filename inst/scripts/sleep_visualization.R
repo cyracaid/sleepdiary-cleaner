@@ -161,6 +161,57 @@ if (exists("corrected_ema_data", envir = .GlobalEnv)) {
 }
 cat(sprintf("\nFigures auto-saving to: %s/\n", output_dir))
 
+# ----------------------------------------------------------------------------
+# Explicit default graphics device (2026-09-17 fix)
+# ----------------------------------------------------------------------------
+# WHY: every print(pN) call below draws to R's CURRENT graphics device. When
+# this script runs non-interactively (Rscript / run.sh), nothing opens a
+# device first, so R silently opens its own default device -- a PDF at its
+# built-in 7x7in size -- completely independent of each figure's real
+# save_png()/ggsave() dimensions (14x9in by default). The result was an
+# unrequested Rplots.pdf: a ~27-page, 7x7in collation where wide legends,
+# long subtitles, and dense tables get clipped or crowded (e.g. Figure 10's
+# two-legend layout: subtitle and the "Duration Type" legend both run off
+# the edge of the tiny page). The actual named PNG deliverables
+# (pipeline_cleaning/*.png, research_ready/*.png, saved via ggsave() at
+# their own correct size) were never affected by this -- confirmed by
+# comparing 10_Extreme_Sleep_Duration.png (clean) against the same figure's
+# page in Rplots.pdf (subtitle and legend clipped).
+#
+# Fix: open the default device ourselves, sized to match save_png()'s own
+# default, and write it into output_dir under a real name instead of
+# wherever Rscript happened to be invoked from. This also makes the
+# collation useful for once -- a same-size, non-clipped, flip-through PDF
+# of every figure in generation order.
+# ----------------------------------------------------------------------------
+.default_device_opened <- FALSE
+if (!interactive()) {
+  .pdf_w <- cfg_get("output.figure.width_inches", 14, cfg = pipeline_config)
+  .pdf_h <- cfg_get("output.figure.height_inches", 9, cfg = pipeline_config)
+  grDevices::pdf(file.path(output_dir, "all_figures_review.pdf"), width = .pdf_w, height = .pdf_h)
+  .default_device_opened <- TRUE
+  cat(sprintf("✓ Review PDF collation: %s/all_figures_review.pdf (%.0fx%.0fin per page, matches saved figures)\n",
+              output_dir, .pdf_w, .pdf_h))
+}
+
+# ----------------------------------------------------------------------------
+# Per-figure skip-reason registry (2026-09-17)
+# ----------------------------------------------------------------------------
+# WHY: some figures don't generate a PNG when their guard condition fails
+# this run (e.g. no data of the relevant type) -- several of these had NO
+# else branch at all, so a missing figure gave no indication whether that's
+# expected (e.g. "review queue empty, nothing to plot" -- a GOOD outcome)
+# or a real problem. This registry is filled in as figures skip; at the end
+# of the script (see FIGURES NOT GENERATED THIS RUN) every actually-missing
+# PNG is checked against output_dir and listed with whatever reason was
+# recorded here, so a missing figure always comes with an explanation
+# instead of a silent gap in the contact sheet.
+# ----------------------------------------------------------------------------
+.fig_skip_reason <- list()
+.mark_skip <- function(file_key, reason) {
+  .fig_skip_reason[[file_key]] <<- reason
+}
+
 # Write each figure ONCE, into its classified subfolder.
 # Previously every figure was written twice (flat copy + subfolder copy) and the
 # whole run directory was then copied into latest_visualization/, so ~30 figures
@@ -1463,7 +1514,20 @@ if(length(flag_columns) >= 2) {
       print(p11_heatmap)
   save_png(p11_heatmap, "11_Flag_Cooccurrence_Heatmap", subdir = "pipeline_cleaning")
       cat("✓ FIGURE 11 (Heatmap) completed\n\n")
-}
+    } else {
+      cat("⚠ Figure 11: no flag pairs co-occur in this run's data -- nothing to plot.\n\n")
+      .mark_skip("pipeline_cleaning/11_Flag_Cooccurrence_Heatmap.png",
+                 "No flag pairs co-occurred in this run's data (all flags mutually exclusive or absent).")
+    }
+  } else {
+    cat("⚠ Figure 11: fewer than 2 flag columns had complete (non-NA) data -- skipping.\n\n")
+    .mark_skip("pipeline_cleaning/11_Flag_Cooccurrence_Heatmap.png",
+               "Fewer than 2 flag columns had complete (non-NA) data to compare this run.")
+  }
+} else {
+  cat("⚠ Figure 11: fewer than 2 of the expected flag columns (flag_severity, flag_duration_extreme) exist -- skipping.\n\n")
+  .mark_skip("pipeline_cleaning/11_Flag_Cooccurrence_Heatmap.png",
+             "Fewer than 2 of the expected flag columns (flag_severity, flag_duration_extreme) exist this run.")
 }
 
 
@@ -1484,7 +1548,6 @@ if(length(flag_columns) >= 2) {
 # available in output/correction_status.csv (checkpoints A-E) and
 # output/appendix_step_ledger.csv (full per-step ledger).
 # ============================================================================
-}
 
 cat("\n")
 cat(paste(rep("=", 80), collapse = ""))
@@ -1866,10 +1929,16 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
   save_png(p14, "14_Sleep_Duration_Pre_Correction", subdir = "pipeline_cleaning")
       cat("✓ Figure 14 completed (using _checkforerrors auto-detection)\n\n")
     } else {
-      cat("⚠ No flagged data for Figure 14\n\n")
+      cat("⚠ No flagged data for Figure 14 -- review queue is empty (see below).\n\n")
+      .mark_skip("pipeline_cleaning/14_Sleep_Duration_Pre_Correction.png",
+                 "No records remain in the pre-correction review queue with usable sleep_duration_h.")
+      .explain_no_review_figures()
     }
   } else {
-    cat("⚠ No valid sleep duration data for Figure 14\n\n")
+    cat("⚠ No valid sleep duration data for Figure 14 -- review queue is empty (see below).\n\n")
+    .mark_skip("pipeline_cleaning/14_Sleep_Duration_Pre_Correction.png",
+               "No usable sleep_duration_h values in the pre-correction review queue.")
+    .explain_no_review_figures()
   }
   
   # --------------------------------------------------------------------------
@@ -1975,6 +2044,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
       cat("✓ Figure 15 completed\n\n")
     } else {
       cat("ℹ Figure 15: no timestamped error_type/unusual_type records found -- nothing to plot.\n")
+      .mark_skip("pipeline_cleaning/15_Error_Timeline.png", "No timestamped error_type/unusual_type records found.")
       .explain_no_review_figures()
     }
   } else {
@@ -2052,8 +2122,15 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
   save_png(p16, "16_Common_Error_Patterns", subdir = "pipeline_cleaning")
       cat("✓ Figure 16 completed\n\n")
     } else {
-      cat("⚠ No specific patterns identified (all 'Other')\n")
+      cat("⚠ No specific patterns identified (all 'Other') -- review queue is empty (see below).\n\n")
+      .mark_skip("pipeline_cleaning/16_Common_Error_Patterns.png",
+                 "All records remaining in the review queue fell into 'Other' -- no named pattern matched, or the queue is empty.")
+      .explain_no_review_figures()
     }
+  } else {
+    cat("⚠ Figure 16: auto_error_desc column not available -- skipping.\n\n")
+    .mark_skip("pipeline_cleaning/16_Common_Error_Patterns.png",
+               "auto_error_desc column not present in checkforerrors_processed this run.")
   }
   
   # --------------------------------------------------------------------------
@@ -3185,12 +3262,91 @@ generate_appendix_ledger <- function() {
   invisible(TRUE)
 }
 
-# Run appendix and figure index
+# ============================================================================
+# Figures not generated this run (2026-09-17)
+# ----------------------------------------------------------------------------
+# A passive, catalog-based check that runs regardless of whether an individual
+# figure block was instrumented with .mark_skip() above. Any expected figure
+# whose PNG is missing from output_dir is reported here with its reason where
+# one was recorded (from .fig_skip_reason), so a run never silently drops a
+# figure without leaving a trace -- console output, a CSV, and (via
+# make_figure_index.R) a footer block on the contact sheet itself.
+# ============================================================================
+.expected_figures <- c(
+  "pipeline_cleaning/01_Pipeline_Flow_Diagram.png",
+  "pipeline_cleaning/06_Sleep_Duration_Post_Correction.png",
+  "pipeline_cleaning/07_Flag_Composition_Stacked.png",
+  "pipeline_cleaning/10_Extreme_Sleep_Duration.png",
+  "pipeline_cleaning/11_Flag_Cooccurrence_Heatmap.png",
+  "pipeline_cleaning/13_Error_Category_Distribution.png",
+  "pipeline_cleaning/13B_Adjacent_Timestamp_Gaps.png",
+  "pipeline_cleaning/13C_Detection_Outcomes_Heatmap.png",
+  "pipeline_cleaning/13D_Threshold_vs_Noise_Ratio.png",
+  "pipeline_cleaning/14_Sleep_Duration_Pre_Correction.png",
+  "pipeline_cleaning/15_Error_Timeline.png",
+  "pipeline_cleaning/16_Common_Error_Patterns.png",
+  "pipeline_cleaning/17_Top_Participants_Flags.png",
+  "pipeline_cleaning/18_Auto_Detected_Dashboard.png",
+  "pipeline_cleaning/A1_Step_Flag_Ledger.png",
+  "pipeline_cleaning/P26_PerParticipant_Flag_Rate.png",
+  "research_ready/02_Correction_Impact.png",
+  "research_ready/02B_Distribution_Sleep_Variables.png",
+  "research_ready/03_Sleep_Duration_Distribution.png",
+  "research_ready/04_Sleep_Duration_vs_Time_in_Bed.png",
+  "research_ready/04B_SOL_vs_Sleep_Duration.png",
+  "research_ready/05_Variability_Sleep_Variables.png",
+  "research_ready/09_Bedtime_vs_Getup_Distribution.png",
+  "research_ready/20_SOL_Perception_Bias.png",
+  "research_ready/20B_WASO_Perception_Bias.png",
+  "research_ready/21_Substance_Use_Availability.png",
+  "research_ready/22_Substance_Use_Distribution.png",
+  "research_ready/23_Caffeine_Consumption.png",
+  "research_ready/24_Alcohol_Consumption.png",
+  "research_ready/R25_Sleep_Regularity_Weekday_Weekend.png",
+  "research_ready/R26_Sleep_Composition_TIB_Breakdown.png",
+  "research_ready/R27_Sleep_Metrics_Correlation_Matrix.png"
+)
+# Run appendix ledger BEFORE the missing-figure check: A1_Step_Flag_Ledger.png
+# is written by generate_appendix_ledger(), so a check that runs before it
+# would falsely report the appendix as missing on every run.
 generate_appendix_ledger()
+
+.missing_figures <- .expected_figures[!file.exists(file.path(output_dir, .expected_figures))]
+
+cat("\n")
+cat(paste(rep("=", 80), collapse = ""))
+cat("\nFIGURES NOT GENERATED THIS RUN\n")
+cat(paste(rep("=", 80), collapse = ""))
+cat("\n")
+if (length(.missing_figures) == 0) {
+  cat("  None -- all expected figures were generated.\n")
+} else {
+  for (.f in .missing_figures) {
+    .reason <- .fig_skip_reason[[.f]]
+    cat(sprintf("  ✗ %s\n      %s\n", .f,
+                if (!is.null(.reason)) .reason else "Reason not recorded -- check this figure's console output above."))
+  }
+}
+write.csv(
+  data.frame(
+    file = .missing_figures,
+    reason = vapply(.missing_figures, function(.f) {
+      .r <- .fig_skip_reason[[.f]]
+      if (is.null(.r)) "Reason not recorded -- check console output for this figure's block." else .r
+    }, character(1)),
+    stringsAsFactors = FALSE
+  ),
+  file.path(output_dir, "figures_not_generated.csv"), row.names = FALSE
+)
 
 if (exists("generate_figure_index")) {
   generate_figure_index(output_dir)
 } else if (file.exists("make_figure_index.R")) {
   source("make_figure_index.R", local = TRUE)
   generate_figure_index(output_dir)
+}
+
+if (isTRUE(.default_device_opened)) {
+  grDevices::dev.off()
+  cat(sprintf("✓ Review PDF collation closed: %s/all_figures_review.pdf\n", output_dir))
 }

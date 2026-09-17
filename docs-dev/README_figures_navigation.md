@@ -25,7 +25,7 @@ dominating the flags), the dataset is ready. Otherwise, use Tier 2 below to diag
 | `07_Flag_Composition_Stacked.png` | How data quality varies across sleep-duration ranges. |
 | `11_Flag_Cooccurrence_Heatmap.png` | Which quality issues tend to co-occur (root-cause clustering). |
 | `16_Common_Error_Patterns.png` | The most frequent specific error patterns to prioritize fixing. |
-| `15_Error_Timeline.png` | *When* errors cluster over the study period (device/protocol signal). |
+| `15_Error_Timeline.png` | *When* flagged temporal patterns (timestamp-order, awake/getup/bed-sleep) occur over the study period (device/protocol signal). Most flagged records were reviewed and kept unchanged, not corrected. |
 | `17_Top_Participants_Flags.png` | Top 15 participants by auto-detected flag *rate* (flags / that participant's own observed days). |
 | `18_Auto_Detected_Dashboard.png` | Split of auto-flagged records: still-to-review vs. already-corrected. |
 | `06_Sleep_Duration_Post_Correction.png` | Sleep-duration distribution before vs. after manual correction. |
