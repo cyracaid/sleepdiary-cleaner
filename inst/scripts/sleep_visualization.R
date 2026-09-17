@@ -184,17 +184,15 @@ cat(sprintf("\nFigures auto-saving to: %s/\n", output_dir))
 # collation useful for once -- a same-size, non-clipped, flip-through PDF
 # of every figure in generation order.
 # ----------------------------------------------------------------------------
-# Review PDF collation is built at the END of the script from the saved PNGs
-# (magick), NOT by printing plots into a pdf() device. Root cause (2026-09-18,
-# confirmed by pixel analysis): print() of a PATCHWORK object into a non-
-# interactive device (pdf()/png() via Rscript) renders the layout corrupt --
-# the whole page collapses into a dark mass (99.7% dark pixels vs the same
-# plot via ggsave, which renders cleanly). Every patchwork figure in the old
-# all_figures_review.pdf (Fig 2, 13, 13B/C/D, P26...) therefore looked like a
-# pile of overlapping tables. Building the PDF from the already-saved PNGs
-# makes it pixel-identical to what the user sees in the PNG deliverables.
-# ----------------------------------------------------------------------------
 .default_device_opened <- FALSE
+if (!interactive()) {
+  .pdf_w <- cfg_get("output.figure.width_inches", 14, cfg = pipeline_config)
+  .pdf_h <- cfg_get("output.figure.height_inches", 9, cfg = pipeline_config)
+  grDevices::pdf(file.path(output_dir, "all_figures_review.pdf"), width = .pdf_w, height = .pdf_h)
+  .default_device_opened <- TRUE
+  cat(sprintf("✓ Review PDF collation: %s/all_figures_review.pdf (%.0fx%.0fin per page, matches saved figures)\n",
+              output_dir, .pdf_w, .pdf_h))
+}
 
 # ----------------------------------------------------------------------------
 # Per-figure skip-reason registry (2026-09-17)
@@ -935,11 +933,8 @@ if (has_raw_times && has_metrics) {
   )
   tbl_grob <- tableGrob(sum_tbl, rows = NULL, theme = ttheme_minimal(base_size = 9))
 
-  p2 <- (p2a | p2b) / p2c / plot_spacer() / tbl_grob +
-    # explicit inches for the table row so patchwork does not squeeze it into
-    # a sliver that overlaps p2c's x-axis labels (same fix pattern as Fig 13);
-    # spacer keeps rotated/overflowing label area clear of the table.
-    plot_layout(heights = c(2, 2, 0.15, unit(1.4, "in"))) +
+  p2 <- (p2a | p2b) / p2c / tbl_grob +
+    plot_layout(heights = c(2, 2, 0.5)) +
     plot_annotation(
       title    = "Figure 2: Impact of Corrections on Sleep Metrics",
       subtitle = "Correction is non-destructive: only clear input errors are corrected. Gray points (most\nof the data) are intentionally left unchanged -- self-report/measured discrepancies are\nretained as data, not treated as errors to fix toward an assumed ground truth.",
@@ -1628,6 +1623,28 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
                                core = list(fg_params = list(hjust = 0, x = 0.03)),
                                colhead = list(fg_params = list(hjust = 0, x = 0.03, fontface = "bold"))
                              ))
+
+  # Measure each table's ACTUAL rendered height instead of guessing a fixed
+  # inch value (2026-09-17 fix). WHY: plot_layout(heights = unit(1.5, "in"))
+  # below used to hardcode a guess for each table's height. tableGrob draws
+  # at its natural size regardless of the panel it's given -- patchwork does
+  # not rescale grob content to fit -- so when the real content (11 rows for
+  # severity_tab, wrapped long descriptions) needed more room than the
+  # guessed inches, it silently overflowed downward into whatever panel came
+  # next (flag_tab), producing exactly the row-on-row text collision seen in
+  # the rendered figure. This is the same dead-space/overflow bug class
+  # already diagnosed and fixed for the old Figure 12 (see note above). The
+  # fix: ask the grob itself how tall it is (sum of its own row heights,
+  # converted to inches) and size its panel to match, with a small margin.
+  .tbl_height_in <- function(tbl, margin_in = 0.15) {
+    h <- tryCatch(
+      grid::convertHeight(sum(tbl$heights), "in", valueOnly = TRUE),
+      error = function(e) NA_real_
+    )
+    if (is.na(h) || h <= 0) return(1.5)  # fallback if measurement fails
+    h + margin_in
+  }
+  severity_tab_h <- .tbl_height_in(severity_tab)
   
   # Current flag distribution from checkforerrors_summary
   flag_dist_df <- NULL
@@ -1647,6 +1664,15 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
     )
   }
   
+  # Bar-chart and spacer panel heights are also fixed inches (not relative
+  # "null" units) so the whole layout's total height is known up front and
+  # save_png() can be told to render a canvas that's actually tall enough --
+  # otherwise a tall pair of tables (measured above) would just squeeze the
+  # bar chart into whatever was left of a hardcoded 9in canvas instead of
+  # the canvas growing to fit the content.
+  p13_bar_h <- 4.2
+  p13_spacer_h <- 0.35
+
   if (!is.null(flag_dist_df)) {
     flag_tab <- tableGrob(flag_dist_df, rows = NULL,
                           theme = ttheme_minimal(
@@ -1654,27 +1680,32 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
                             core = list(fg_params = list(hjust = 0, x = 0.03)),
                             colhead = list(fg_params = list(hjust = 0, x = 0.03, fontface = "bold"))
                           ))
+    flag_tab_h <- .tbl_height_in(flag_tab)
     # Spacer row prevents the bar chart's rotated 45-degree x labels from
     # overflowing into severity_tab below (patchwork allocates panel height
     # from nominal geometry, not rendered label extent).
     p13_content <- (p13_bar / plot_spacer() / severity_tab / flag_tab)
+    p13_heights <- unit(c(p13_bar_h, p13_spacer_h, severity_tab_h, flag_tab_h), "in")
   } else {
+    flag_tab_h <- 0
     p13_content <- (p13_bar / plot_spacer() / severity_tab)
+    p13_heights <- unit(c(p13_bar_h, p13_spacer_h, severity_tab_h), "in")
   }
-  
+  p13_total_h <- p13_bar_h + p13_spacer_h + severity_tab_h + flag_tab_h + 0.6  # + title/subtitle margin
+
   p13 <- p13_content +
-    plot_layout(heights = c(3, 0.25, unit(1.5, "in"), unit(1.2, "in"))) +
+    plot_layout(heights = p13_heights) +
     plot_annotation(
       title = "Figure 13: Distribution of Error/Review Categories (Auto-Detection)",
-      subtitle = sprintf("Auto-detection (pre-correction): flags from timestamp parsing (Part A), temporal error_type (Part B), and sleep metrics validation (Part C: SOL>120min, SE<0 or >100%%, TST/TIB<0.5) | Total: %s (%.1f%% of all data)", 
+      subtitle = sprintf("Auto-detection (pre-correction): flags from timestamp parsing (Part A), temporal error_type (Part B), and sleep metrics validation (Part C: SOL>120min, SE<0 or >100%%, TST/TIB<0.5) | Total: %s (%.1f%% of all data)",
                          format(nrow(checkforerrors_processed), big.mark=","),
                          nrow(checkforerrors_processed)/nrow(clean_df) * 100),
       theme = theme(plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
                     plot.subtitle = element_text(hjust = 0.5, size = 10))
     )
-  
+
   print(p13)
-  save_png(p13, "13_Error_Category_Distribution", subdir = "pipeline_cleaning")
+  save_png(p13, "13_Error_Category_Distribution", subdir = "pipeline_cleaning", h = p13_total_h)
   cat("✓ Figure 13 completed\n\n")
   
   # ----------------------------------------------------------------------------
@@ -1986,21 +2017,9 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
   # ==========================================================================
   cat("Generating FIGURE 15 (Timing of flagged temporal patterns)...\n")
 
-  # Data source: corrected_ema_data (Step 6 classification output), NOT
-  # clean_df (= ema_data_release_timecalc, the Step-4 snapshot which has no
-  # error_type/unusual_type columns). Fall back to clean_df if the Step-6
-  # object is unavailable (synthetic/standalone runs).
-  fig15_src <- if (exists("corrected_ema_data", envir = .GlobalEnv) &&
-                   is.data.frame(corrected_ema_data) &&
-                   all(c("time_bed_corrected", "error_type", "unusual_type") %in% names(corrected_ema_data))) {
-    corrected_ema_data
-  } else {
-    clean_df
-  }
+  if (all(c("time_bed_corrected", "error_type", "unusual_type") %in% names(clean_df))) {
 
-  if (all(c("time_bed_corrected", "error_type", "unusual_type") %in% names(fig15_src))) {
-
-    timeline_data <- fig15_src %>%
+    timeline_data <- clean_df %>%
       filter(!is.na(time_bed_corrected), !is.na(error_type) | !is.na(unusual_type)) %>%
       mutate(date = as.Date(time_bed_corrected),
              pattern_type = ifelse(!is.na(error_type), error_type, unusual_type)) %>%
@@ -2008,48 +2027,22 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
       summarise(count = n(), .groups = "drop")
 
     if (nrow(timeline_data) > 0) {
-      # De-anonymized / de-identified datasets often normalize all corrected
-      # timestamps to a single (or near-single) study date, so a timeline has
-      # no x-axis spread and geom_area renders an empty panel. Detect that
-      # and degrade to a per-type count bar instead of a silent blank figure.
-      n_dates <- dplyr::n_distinct(timeline_data$date)
-      if (n_dates >= 2) {
-        p15 <- ggplot(timeline_data, aes(x = date, y = count, fill = pattern_type)) +
-          geom_area(position = "stack", alpha = 0.7) +
-          scale_fill_brewer(palette = "Set2", name = "Pattern Type") +
-          labs(title = "Figure 15: Timing of Flagged Temporal Patterns Over the Study Period",
-               subtitle = paste0("Records with a timestamp-order or awake/getup/bed-sleep pattern flag (Step 6 classification), by date. ",
-                                 "A flag is not a verdict that the record is wrong -- most were reviewed and kept unchanged (see Figure 2)."),
-               x = "Date",
-               y = "Number of Records") +
-          theme(legend.position = "bottom",
-                legend.text = element_text(size = 8))
-      } else {
-        # single study date: collapse to per-pattern-type counts
-        cat(sprintf("  (data has only %d study date(s) in corrected timestamps; drawing per-type counts instead of a timeline)\n", n_dates))
-        p15 <- timeline_data %>%
-          mutate(date = NULL) %>%
-          group_by(pattern_type) %>%
-          summarise(count = sum(count), .groups = "drop") %>%
-          ggplot(aes(x = pattern_type, y = count, fill = pattern_type)) +
-          geom_col(alpha = 0.85, width = 0.6) +
-          scale_fill_brewer(palette = "Set2", name = "Pattern Type") +
-          labs(title = "Figure 15: Flagged Temporal Patterns (single study date -- counts)",
-               subtitle = paste0("Corrected timestamps in this dataset carry only ", n_dates,
-                                 " study date(s), so a timeline cannot be drawn; per-type counts shown instead. ",
-                                 "A flag is not a verdict that the record is wrong -- most were reviewed and kept unchanged (see Figure 2)."),
-               x = "Pattern Type",
-               y = "Number of Records") +
-          theme(legend.position = "none",
-                axis.text.x = element_text(angle = 30, hjust = 1, size = 9))
-      }
+      p15 <- ggplot(timeline_data, aes(x = date, y = count, fill = pattern_type)) +
+        geom_area(position = "stack", alpha = 0.7) +
+        scale_fill_brewer(palette = "Set2", name = "Pattern Type") +
+        labs(title = "Figure 15: Timing of Flagged Temporal Patterns Over the Study Period",
+             subtitle = paste0("Records with a timestamp-order or awake/getup/bed-sleep pattern flag (Step 6 classification), by date. ",
+                               "A flag is not a verdict that the record is wrong -- most were reviewed and kept unchanged (see Figure 2)."),
+             x = "Date",
+             y = "Number of Records") +
+        theme(legend.position = "bottom",
+              legend.text = element_text(size = 8))
 
       print(p15)
-      save_png(p15, "15_Error_Timeline", subdir = "pipeline_cleaning")
+  save_png(p15, "15_Error_Timeline", subdir = "pipeline_cleaning")
       cat("✓ Figure 15 completed\n\n")
     } else {
       cat("ℹ Figure 15: no timestamped error_type/unusual_type records found -- nothing to plot.\n")
-      .mark_skip("pipeline_cleaning/15_Error_Timeline.png", "No timestamped error_type/unusual_type records found.")
       .explain_no_review_figures()
     }
   } else {
@@ -3311,11 +3304,6 @@ generate_appendix_ledger <- function() {
   "research_ready/R26_Sleep_Composition_TIB_Breakdown.png",
   "research_ready/R27_Sleep_Metrics_Correlation_Matrix.png"
 )
-# Run appendix ledger BEFORE the missing-figure check: A1_Step_Flag_Ledger.png
-# is written by generate_appendix_ledger(), so a check that runs before it
-# would falsely report the appendix as missing on every run.
-generate_appendix_ledger()
-
 .missing_figures <- .expected_figures[!file.exists(file.path(output_dir, .expected_figures))]
 
 cat("\n")
@@ -3344,6 +3332,9 @@ write.csv(
   file.path(output_dir, "figures_not_generated.csv"), row.names = FALSE
 )
 
+# Run appendix and figure index
+generate_appendix_ledger()
+
 if (exists("generate_figure_index")) {
   generate_figure_index(output_dir)
 } else if (file.exists("make_figure_index.R")) {
@@ -3351,26 +3342,7 @@ if (exists("generate_figure_index")) {
   generate_figure_index(output_dir)
 }
 
-# ----------------------------------------------------------------------------
-# Review PDF collation: assemble from the saved PNGs so the PDF matches the
-# PNG deliverables pixel-for-pixel (print()-of-patchwork renders corrupt on
-# non-interactive devices; see header note). Skips figures that were not
-# generated this run.
-# ----------------------------------------------------------------------------
-if (requireNamespace("magick", quietly = TRUE)) {
-  .pdf_pngs <- sort(list.files(
-    c(file.path(output_dir, "pipeline_cleaning"), file.path(output_dir, "research_ready")),
-    pattern = "\\.png$", full.names = TRUE))
-  if (length(.pdf_pngs) > 0) {
-    .pdf_imgs <- lapply(.pdf_pngs, magick::image_read)
-    .pdf_img  <- do.call(magick::image_join, .pdf_imgs)
-    .pdf_out  <- file.path(output_dir, "all_figures_review.pdf")
-    magick::image_write(.pdf_img, .pdf_out, format = "pdf")
-    cat(sprintf("✓ Review PDF collation: %s (%d pages, built from saved PNGs)\n",
-                .pdf_out, length(.pdf_pngs)))
-  } else {
-    cat("⚠ Review PDF collation: no PNGs found to assemble\n")
-  }
-} else {
-  cat("⚠ Review PDF collation skipped: package 'magick' not installed\n")
+if (isTRUE(.default_device_opened)) {
+  grDevices::dev.off()
+  cat(sprintf("✓ Review PDF collation closed: %s/all_figures_review.pdf\n", output_dir))
 }
