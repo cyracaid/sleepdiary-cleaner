@@ -25,6 +25,7 @@ jobs:
             any::covr
             any::testthat
             any::yaml
+            any::xml2
           needs: coverage
 
       - name: Test coverage
