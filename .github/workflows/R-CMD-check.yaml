@@ -35,13 +35,25 @@ jobs:
 
       - uses: r-lib/actions/check-r-package@v2
         with:
-          error_on: 'error'
+          # error-on (hyphenated, not error_on): fail only on ERRORs, matching
+          # the 2d698b9 intent. The pre-fix 'error_on' was an invalid input so
+          # r-lib defaulted to error-on: warning, turning every WARNING red
+          # (vignette weave-output WARNINGs were red on all 3 platforms since
+          # 2d698b9 -- the --no-vignettes arg makes R CMD check expect weave
+          # outputs in inst/doc that were never built).
+          error-on: 'error'
           # Drop --as-cran: it runs tests in a build-tree copy where the
           # smoke-legacy-entry subprocess (pkgload::load_all + visualization)
           # hangs after Step 4. Plain R CMD check is the acceptance gate
           # here (0 ERROR / 0 WARNING locally); this is not a CRAN
           # submission. See .github/workflows/R-CMD-check.yaml history.
-          args: 'c("--no-manual", "--no-vignettes")'
+          # Do NOT pass --no-vignettes: with it, R CMD check still walks the
+          # vignettes/ dir but skips building, so inst/doc lacks the weave
+          # outputs it expects -> "Failed to locate weave output" WARNING per
+          # vignette. Build the vignettes during check instead (knitr/rmarkdown
+          # are in Suggests; --no-build-vignettes below prevents the build step
+          # from rebuilding them twice).
+          args: 'c("--no-manual")'
           upload-snapshots: true
           build_args: 'c("--no-build-vignettes", "--no-manual")'
 
