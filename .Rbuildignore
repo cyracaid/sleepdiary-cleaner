@@ -129,3 +129,12 @@ Rplots\.pdf$
 ^VALIDATION_REPORT\.md$
 ^CITATION\.cff$
 ^\.zenodo\.json$
+^fasttrack_review\.csv$
+^disambiguation_fullreview_.*\.csv$
+^disambiguation_.*\.csv$
+^timegap_candidates_.*\.csv$
+^fasttrack_review\.csv$
+^fasttrack_review\.xlsx$
+^_tmp_pkg_snapshot\.tar\.gz$
+^manual_.*\.xlsx$
+^real_data_config_.*\.yaml$
