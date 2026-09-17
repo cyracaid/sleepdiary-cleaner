@@ -13,6 +13,7 @@ articles:
       - pipeline-architecture-zh
   - title: "Usage / 使用"
     contents:
+      - data-first
       - column-mapping
       - column-mapping-zh
       - interpreting-output
