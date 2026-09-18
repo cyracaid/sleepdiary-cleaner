@@ -89,35 +89,30 @@ for (varname in c("time_bed_am", "time_sleep_am", "time_awake_am", "time_getup_a
 
 # ===== EXTRACT CORRECTED TIMES =====
 # Format: YYYY-MM-DD HH:MM (drop seconds)
-# NOTE on semantics: process_timestamp() decodes the RECORDED AM/PM faithfully
-# (a sleep row stored as "01:15 l/PM" decodes to 13:15). But these 23
-# gap_sleep_awake candidates are exactly the rows where the morning-diary
-# AM/PM label is WRONG -- manual_error_corrections.csv confirms the human
-# fix is "Minus 12 hours" / "Same day 02:00 AM": the sleep clock-time belongs
-# to the AM side of the night, so the corrected value must be the AM reading
-# (01:15, anchored to the previous evening), NOT the PM decoding (13:15).
-# Displaying the PM decode as "corrected" keeps the contradiction visible
-# (13:15 sleep -> 08:30 awake = -3.3h). The AM reading is the actual fix.
+#
+# SEMANTICS: "Corrected" here = process_timestamp()'s faithful decode of the
+# recorded AM/PM (sleep "01:15 l/PM" -> 13:15). This is deliberately NOT an
+# AM/PM correction guess: the disambiguation pass flagged these rows because
+# the DECODED night is implausible (sleep 13:15 -> awake 09:55 = -3.3h), and
+# from_time/to_time/gap_hours all use this same decode. What the human fix
+# should be (flip to AM? swap fields? suppress?) is exactly what the Accept
+# column asks the reviewer to decide -- the tool must not pre-answer it by
+# silently rewriting the clock-time. Earlier revisions tried to auto-flip the
+# AM/PM side; that over-inferred and contradicted from_time. Reverted to the
+# faithful decode so Corrected agrees with from_time/gap_hours.
 extract_time <- function(posix_col) {
   format(posix_col, "%Y-%m-%d %H:%M")
 }
+
+merged$Time_Bed_Corrected <- extract_time(merged$time_bed_am_hhmm_ampm)
+merged$Time_Sleep_Corrected <- extract_time(merged$time_sleep_am_hhmm_ampm)
+merged$Time_Awake_Corrected <- extract_time(merged$time_awake_am_hhmm_ampm)
+merged$Time_Getup_Corrected <- extract_time(merged$time_getup_am_hhmm_ampm)
 
 # AM reading of a bed/sleep event: clock-time stays, period forced to AM,
 # anchored to the PREVIOUS calendar day (bed/sleep happen the night before
 # the morning awake/getup). Mirrors manual_error_corrections.csv's
 # "Minus 12 hours" decision for these rows.
-am_reading <- function(hhmm, date_str) {
-  out <- rep(NA_character_, length(hhmm))
-  for (k in seq_along(hhmm)) {
-    if (is.na(hhmm[k]) || !nzchar(hhmm[k])) { out[k] <- NA_character_; next }
-    hm <- strsplit(as.character(hhmm[k]), ":")[[1]]
-    if (length(hm) != 2) { out[k] <- hhmm[k]; next }
-    h <- as.integer(hm[1]); m <- as.integer(hm[2])
-    out[k] <- sprintf("%s %02d:%02d", date_str[k], h, m)
-  }
-  out
-}
-
 # Choose the correct 12h side of a bed/sleep event so the night becomes
 # plausible. Two error dialects exist in the 23 fasttrack rows:
 #   (a) sleep stored as "01:15 l/PM" (morning clock-time, PM label) -> the
@@ -126,72 +121,6 @@ am_reading <- function(hhmm, date_str) {
 #       PM side is right: hh:mm + 12h (23:00 previous night).
 # Rule: pick the side whose sleep->awake gap lands in [5,12]h; if both or
 # neither do, prefer the AM reading (a) as the default interpretation.
-bed_sleep_corrected <- function(bed_hhmm, sleep_hhmm, awake_posix, date_str) {
-  hm_split <- function(x) {
-    parts <- strsplit(x, ":")[[1]]
-    if (length(parts) == 2) c(as.integer(parts[1]), as.integer(parts[2])) else c(NA_integer_, NA_integer_)
-  }
-  gap_h <- function(h, m, dstr) {
-    t <- as.POSIXct(sprintf("%s %02d:%02d", dstr, h, m),
-                    tz = attr(awake_posix[k], "tzone"))
-    g <- as.numeric(difftime(awake_posix[k], t, units = "hours"))
-    if (g < 0) g <- g + 24
-    g
-  }
-  out_sleep <- out_bed <- rep(NA_character_, length(sleep_hhmm))
-  for (k in seq_along(sleep_hhmm)) {
-    if (is.na(sleep_hhmm[k]) || !nzchar(sleep_hhmm[k])) next
-    s <- hm_split(sleep_hhmm[k])
-    if (is.na(s[1])) { out_sleep[k] <- sleep_hhmm[k]; next }
-    dstr <- date_str[k]
-    g_am <- gap_h(s[1], s[2], dstr)
-    # PM side = hh:mm + 12h, anchored the PREVIOUS day (23:00 the night
-    # before the awake morning). Same-side-with-previous-date keeps the
-    # night span correct: sleep 23:00 (prev day) -> awake 07:30 = 8.5h.
-    prev_dstr <- as.character(as.Date(dstr) - 1)
-    g_pm <- gap_h(if (s[1] == 12) s[1] else s[1] + 12, s[2], prev_dstr)
-    use_pm <- is.finite(g_am) && is.finite(g_pm) &&
-      !(g_am >= 5 && g_am <= 12) && (g_pm >= 5 && g_pm <= 12)
-    if (use_pm) {
-      hh <- if (s[1] == 12) "12" else sprintf("%02d", s[1] + 12)
-      out_sleep[k] <- sprintf("%s %s:%02d", prev_dstr, hh, s[2])
-    } else {
-      out_sleep[k] <- sprintf("%s %02d:%02d", dstr, s[1], s[2])
-    }
-    # bed keeps its clock-time on the same side as sleep (same night)
-    if (!is.na(bed_hhmm[k]) && nzchar(bed_hhmm[k])) {
-      b <- hm_split(bed_hhmm[k])
-      if (!is.na(b[1])) {
-        if (use_pm && b[1] < 12) {
-          # PM-side night: bed clock-time + 12h, previous day
-          out_bed[k] <- sprintf("%s %02d:%02d", prev_dstr, b[1] + 12, b[2])
-        } else if (use_pm) {
-          out_bed[k] <- sprintf("%s %02d:%02d", prev_dstr, b[1], b[2])
-        } else if (b[1] >= 12) {
-          # AM-side night but bed clock-time stored on the PM side of the
-          # dial (e.g. bed "12:59 l/PM" with sleep "01:15" AM): read the bed
-          # clock-time as the SAME night's early AM (00:59), on the same
-          # calendar date as sleep -- never shift the bed to a different day.
-          out_bed[k] <- sprintf("%s %02d:%02d", dstr, b[1] - 12, b[2])
-        } else if (b[1] >= 11) {
-          # bed "11:30 l/PM" with an early-morning sleep (00:10): the PM
-          # label makes this 23:30 the previous night. Clock 11-12 + AM-side
-          # sleep -> previous-day 23:xx (bed + 12h).
-          out_bed[k] <- sprintf("%s %02d:%02d", prev_dstr, b[1] + 12, b[2])
-        } else {
-          out_bed[k] <- sprintf("%s %02d:%02d", dstr, b[1], b[2])
-        }
-      }
-    }
-  }
-  list(bed = out_bed, sleep = out_sleep)
-}
-
-ft_from_date <- substr(merged$from_time, 1, 10)
-bs <- bed_sleep_corrected(merged$time_bed_am_hhmm_orig, merged$time_sleep_am_hhmm_orig,
-                          merged$time_awake_am_hhmm_ampm, ft_from_date)
-merged$Time_Bed_Corrected <- bs$bed
-merged$Time_Sleep_Corrected <- bs$sleep
 # awake/getup are already AM on the same morning: keep the faithful decode
 merged$Time_Awake_Corrected <- extract_time(merged$time_awake_am_hhmm_ampm)
 merged$Time_Getup_Corrected <- extract_time(merged$time_getup_am_hhmm_ampm)
