@@ -59,6 +59,10 @@ raw$time_bed_am_hhmm_orig <- raw$time_bed_am_hhmm
 raw$time_sleep_am_hhmm_orig <- raw$time_sleep_am_hhmm
 raw$time_awake_am_hhmm_orig <- raw$time_awake_am_hhmm
 raw$time_getup_am_hhmm_orig <- raw$time_getup_am_hhmm
+raw$time_bed_am_ampm_orig <- raw$time_bed_am_ampm
+raw$time_sleep_am_ampm_orig <- raw$time_sleep_am_ampm
+raw$time_awake_am_ampm_orig <- raw$time_awake_am_ampm
+raw$time_getup_am_ampm_orig <- raw$time_getup_am_ampm
 
 # Merge fasttrack + raw by raw_row_id
 merged <- merge(fasttrack, raw, by = "raw_row_id", all.x = TRUE)
@@ -196,14 +200,59 @@ cat("Extracted corrected times\n")
 
 # ===== MAP ORIGINAL TIMES =====
 # Extract all 4 Original times from raw data (show all, not just gap-involved ones)
-# Use the SAVED original _hhmm columns (before process_timestamp overwrote them)
+# Use the SAVED original _hhmm columns (before process_timestamp overwrote them).
+#
+# IMPORTANT: the raw _hhmm strings carry the study's AM/PM dialect SEPARATELY
+# ("12:30" + "C" = 00:30 AM, "1:00" + "l" = 01:00 AM or 13:00 PM). A bare
+# "12:30" reads as noon and is semantically wrong. Decode the dialect into a
+# displayable clock-time so Original shows what the participant MEANT:
+#   C -> AM, l -> PM (verified against the archived export; see
+#   timestamp_parse.R).
+#   * C/AM with hour 12 -> 00:xx (12:30 AM = half past midnight)
+#   * C/AM with hour 1-9 -> 0x:xx unchanged (1:00 AM = 01:00)
+#   * l/PM with hour 1-9 -> h+12 (1:00 PM = 13:00) UNLESS it is a bed/sleep
+#     event whose early clock-time + PM label is the flagged error pattern
+#     (morning-diary context: should be AM; see manual_error_corrections.csv
+#     "Minus 12 hours"). Those are shown as the AM reading to match the
+#     corrected night.
+decode_orig <- function(hhmm, ampm, is_night = TRUE) {
+  out <- rep(NA_character_, length(hhmm))
+  for (k in seq_along(hhmm)) {
+    if (is.na(hhmm[k]) || !nzchar(hhmm[k])) { out[k] <- NA_character_; next }
+    hm <- strsplit(as.character(hhmm[k]), ":")[[1]]
+    if (length(hm) != 2) { out[k] <- as.character(hhmm[k]); next }
+    h <- as.integer(hm[1]); m <- as.integer(hm[2])
+    ap <- tolower(trimws(as.character(ampm[k])))
+    is_pm <- ap %in% c("l", "pm")
+    if (is_pm && !is_night) {
+      # awake/getup: PM label is genuine -> 12h-dial PM (13:00, 17:00...)
+      hh <- if (h == 12) 12 else h + 12
+      out[k] <- sprintf("%02d:%02d", hh, m)
+    } else if (is_pm && is_night && h >= 10) {
+      # night event with late clock + PM label:
+      #   PM 11:xx -> 23:xx previous night; PM 12:xx -> 00:xx (midnight).
+      out[k] <- sprintf("%02d:%02d", if (h == 12) 0 else h + 12, m)
+    } else if (h == 12) {
+      # AM 12:xx -> 00:xx
+      out[k] <- sprintf("%02d:%02d", 0, m)
+    } else {
+      # AM early clock (or flagged PM-on-early-clock night event): keep AM
+      out[k] <- sprintf("%02d:%02d", h, m)
+    }
+  }
+  out
+}
 
 date_str <- substr(merged$from_time, 1, 10)
 
-merged$Time_Bed_Original <- paste0(date_str, " ", merged$time_bed_am_hhmm_orig)
-merged$Time_Sleep_Original <- paste0(date_str, " ", merged$time_sleep_am_hhmm_orig)
-merged$Time_Awake_Original <- paste0(date_str, " ", merged$time_awake_am_hhmm_orig)
-merged$Time_Getup_Original <- paste0(date_str, " ", merged$time_getup_am_hhmm_orig)
+merged$Time_Bed_Original <- paste0(date_str, " ",
+  decode_orig(merged$time_bed_am_hhmm_orig, merged$time_bed_am_ampm_orig, TRUE))
+merged$Time_Sleep_Original <- paste0(date_str, " ",
+  decode_orig(merged$time_sleep_am_hhmm_orig, merged$time_sleep_am_ampm_orig, TRUE))
+merged$Time_Awake_Original <- paste0(date_str, " ",
+  decode_orig(merged$time_awake_am_hhmm_orig, merged$time_awake_am_ampm_orig, FALSE))
+merged$Time_Getup_Original <- paste0(date_str, " ",
+  decode_orig(merged$time_getup_am_hhmm_orig, merged$time_getup_am_ampm_orig, FALSE))
 
 cat("Mapped original times\n")
 
