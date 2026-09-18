@@ -50,13 +50,39 @@ source("validation/provenance_helpers.R")
 # ===== INPUT =====
 args          <- commandArgs(trailingOnly = TRUE)
 input_path    <- if (length(args) >= 1) args[[1]] else "disambiguation_worksheet_tiered_fasttrack.csv"
+raw_path      <- if (length(args) >= 2) args[[2]] else "sber_ema_anon_20260227.csv"
 output_internal <- "manual_disambiguation_fasttrack.csv"
 output_user   <- "fasttrack_review.csv"
 
 stopifnot(file.exists(input_path))
+stopifnot(file.exists(raw_path))
 
 fasttrack <- read.csv(input_path, stringsAsFactors = FALSE, check.names = FALSE)
+raw       <- read.csv(raw_path, stringsAsFactors = FALSE, check.names = FALSE)
+raw$raw_row_id <- seq_len(nrow(raw))
 cat("Loaded:", nrow(fasttrack), "rows from", input_path, "\n")
+
+# ===== PULL THE RAW ORIGINAL ENTRIES (match-index, not join) ================
+# The reviewer wants to SEE what the participant actually typed, in the raw
+# study dialect (hh:mm + C/l/AM/PM), not just the decoded POSIX. Index the
+# sber rows by position with match() -- this never reorders (unlike merge)
+# and never adds .x/.y suffixes. Rows without a raw match stay NA.
+idx <- match(fasttrack$raw_row_id, raw$raw_row_id)
+
+raw_orig <- function(hhmm_col, ampm_col) {
+  h <- raw[[hhmm_col]][idx]
+  a <- raw[[ampm_col]][idx]
+  out <- rep(NA_character_, length(h))
+  ok <- !is.na(h) & nzchar(as.character(h))
+  out[ok] <- paste0(h[ok], " ", a[ok])
+  out
+}
+
+fasttrack$Raw_Bed    <- raw_orig("time_bed_am_hhmm",    "time_bed_am_ampm")
+fasttrack$Raw_Sleep  <- raw_orig("time_sleep_am_hhmm",  "time_sleep_am_ampm")
+fasttrack$Raw_Awake  <- raw_orig("time_awake_am_hhmm",  "time_awake_am_ampm")
+fasttrack$Raw_Getup  <- raw_orig("time_getup_am_hhmm",  "time_getup_am_ampm")
+cat("Pulled raw original entries (e.g. '01:15 l') for all rows.\n")
 
 # ===== EXTRACT THE 4 DECODED TIMES (zero join) ==============================
 # All four are already decoded POSIX-ish strings in the worksheet. Normalise
@@ -75,17 +101,19 @@ extract_time <- function(x) {
   out
 }
 
-fasttrack$Time_Bed_Original   <- extract_time(fasttrack$time_bed_am_hhmm_ampm)
-fasttrack$Time_Bed_Corrected  <- extract_time(fasttrack$time_bed_am_hhmm_ampm)
-fasttrack$Time_Sleep_Original <- extract_time(fasttrack$from_time)
+# Original = the RAW entry the participant typed (dialect preserved).
+# Corrected = the faithful decode used by the disambiguation pass (from_time
+#             = sleep, to_time = awake; bed/getup from their own columns).
+fasttrack$Time_Bed_Original   <- fasttrack$Raw_Bed
+fasttrack$Time_Sleep_Original <- fasttrack$Raw_Sleep
+fasttrack$Time_Awake_Original <- fasttrack$Raw_Awake
+fasttrack$Time_Getup_Original <- fasttrack$Raw_Getup
+fasttrack$Time_Bed_Corrected   <- extract_time(fasttrack$time_bed_am_hhmm_ampm)
 fasttrack$Time_Sleep_Corrected <- extract_time(fasttrack$from_time)
-fasttrack$Time_Awake_Original <- extract_time(fasttrack$to_time)
 fasttrack$Time_Awake_Corrected <- extract_time(fasttrack$to_time)
-fasttrack$Time_Getup_Original <- extract_time(fasttrack$time_getup_am_hhmm_ampm)
 fasttrack$Time_Getup_Corrected <- extract_time(fasttrack$time_getup_am_hhmm_ampm)
 
-cat("Extracted 4 decoded times (Original == Corrected: both are the faithful\n")
-cat("decode; the AM/PM correction is the reviewer's Accept decision).\n")
+cat("Extracted: Original = raw participant entries, Corrected = decoded times.\n")
 
 # ===== BUILD OUTPUT (INTERNAL) =====
 # Drop any stale Time_*_Original / Time_*_Corrected columns the input may have
@@ -111,6 +139,10 @@ user_output <- data.frame(
   Day            = fasttrack$day_num,
   Gap_Type       = fasttrack$field_pair,
   Row_ID         = fasttrack$raw_row_id,
+  Raw_Bed        = fasttrack$Raw_Bed,
+  Raw_Sleep      = fasttrack$Raw_Sleep,
+  Raw_Awake      = fasttrack$Raw_Awake,
+  Raw_Getup      = fasttrack$Raw_Getup,
   Time_Bed_Original   = fasttrack$Time_Bed_Original,
   Time_Sleep_Original = fasttrack$Time_Sleep_Original,
   Time_Awake_Original = fasttrack$Time_Awake_Original,
