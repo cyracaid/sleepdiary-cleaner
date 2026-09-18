@@ -74,6 +74,7 @@ out_dir  <- if (length(args) >= 2) args[[2]] else "."
 
 script_dir <- if (length(args) >= 3) args[[3]] else "R"
 source(file.path(script_dir, "timestamp_parse.R"))  # brings in process_timestamp()
+source("validation/provenance_helpers.R")
 
 stopifnot(file.exists(raw_path))
 raw <- read.csv(raw_path, stringsAsFactors = FALSE, check.names = FALSE)
@@ -142,6 +143,11 @@ cat("TOTAL candidate rows (union across pairs, a row can appear more than once i
 cat("DISTINCT pid+day_num affected:", nrow(unique(candidates[, c("pid","day_num")])), "\n")
 
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
-write.csv(candidates, file.path(out_dir, "timegap_candidates_3to6h.csv"), row.names = FALSE)
+write_csv_with_provenance(
+  candidates, file.path(out_dir, "timegap_candidates_3to6h.csv"),
+  script_path = "validation/derive_timegap_candidates.R",
+  inputs = raw_path,
+  notes = "3-6h negative-gap candidates, PRE-correction. See LOCKED DECISIONS in this script's header."
+)
 write.csv(summary_counts, file.path(out_dir, "timegap_candidates_summary.csv"), row.names = FALSE)
 cat("Written to:", out_dir, "\n")

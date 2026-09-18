@@ -491,6 +491,7 @@ manual_unusual_path <- if (length(args) >= 6) args[[6]] else "manual_unusual_cor
 stopifnot(file.exists(raw_path))
 stopifnot(file.exists(cand_path))
 source(file.path(script_dir, "timestamp_parse.R"))  # process_timestamp()
+source("validation/provenance_helpers.R")
 
 candidates <- read.csv(cand_path, stringsAsFactors = FALSE)
 candidates$pid <- as.character(candidates$pid)
@@ -875,7 +876,12 @@ if (nrow(worksheet) > 0) {
   fasttrack_rows  <- worksheet
   fullreview_rows <- worksheet
 }
-write.csv(fasttrack_rows, file.path(out_dir, "disambiguation_worksheet_tiered_fasttrack.csv"), row.names = FALSE)
+write_csv_with_provenance(
+  fasttrack_rows, file.path(out_dir, "disambiguation_worksheet_tiered_fasttrack.csv"),
+  script_path = "validation/disambiguate_timegap_candidates.R",
+  inputs = c(cand_path, raw_path, manual_error_path, manual_unusual_path),
+  notes = "needs-review rows with sol_crosscheck_fit == 'good' (single-reviewer fast-track tier, v7->v8)."
+)
 write.csv(fullreview_rows, file.path(out_dir, "disambiguation_worksheet_tiered_fullreview_cyra.csv"), row.names = FALSE)
 write.csv(fullreview_rows, file.path(out_dir, "disambiguation_worksheet_tiered_fullreview_maia.csv"), row.names = FALSE)
 
