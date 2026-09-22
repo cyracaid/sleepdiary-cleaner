@@ -72,9 +72,10 @@ idx <- match(fasttrack$raw_row_id, raw$raw_row_id)
 raw_orig <- function(hhmm_col, ampm_col) {
   h <- raw[[hhmm_col]][idx]
   a <- raw[[ampm_col]][idx]
+  d <- substr(raw$date_of_obs[idx], 1, 10)   # observation date = the day the participant recorded this
   out <- rep(NA_character_, length(h))
   ok <- !is.na(h) & nzchar(as.character(h))
-  out[ok] <- paste0(h[ok], " ", a[ok])
+  out[ok] <- paste0(d[ok], " ", h[ok], " ", a[ok])
   out
 }
 
@@ -82,7 +83,7 @@ fasttrack$Raw_Bed    <- raw_orig("time_bed_am_hhmm",    "time_bed_am_ampm")
 fasttrack$Raw_Sleep  <- raw_orig("time_sleep_am_hhmm",  "time_sleep_am_ampm")
 fasttrack$Raw_Awake  <- raw_orig("time_awake_am_hhmm",  "time_awake_am_ampm")
 fasttrack$Raw_Getup  <- raw_orig("time_getup_am_hhmm",  "time_getup_am_ampm")
-cat("Pulled raw original entries (e.g. '01:15 l') for all rows.\n")
+cat("Pulled raw original entries (e.g. '2022-01-13 01:15 l') for all rows.\n")
 
 # ===== EXTRACT THE 4 DECODED TIMES (zero join) ==============================
 # All four are already decoded POSIX-ish strings in the worksheet. Normalise
