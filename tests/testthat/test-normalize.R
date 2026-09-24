@@ -113,3 +113,28 @@ test_that("out-of-order with large gap (> 3h) -- not auto-corrected", {
   # Just check no crash
   expect_true(is.data.frame(result))
 })
+
+test_that("getup 12h loop reduces getup recorded 12h late", {
+  # awake 06:00, getup 22:00 -> 16h gap >= 12 -> getup - 12h -> 10:00 (4h gap, OK)
+  df <- make_row("22:00", "22:30", "06:00", "22:00")
+  result <- normalize_sleep_time_sequence(df)
+  expect_true(result$corrected[1])
+  expect_true(grepl("getup_reduce_12h", result$correction_type[1]))
+  expect_equal(format(result$time_getup_corrected[1], "%H:%M"), "10:00")
+})
+
+test_that("sleep 12h loop reduces sleep recorded 12h ahead", {
+  # bed 00:00, sleep 13:00 (13h gap >= 12) -> sleep - 12h -> 01:00
+  df <- make_row("00:00", "13:00", "06:00", "06:30")
+  result <- normalize_sleep_time_sequence(df)
+  expect_true(grepl("sleep_reduce_12h", result$correction_type[1]))
+  expect_equal(format(result$time_sleep_corrected[1], "%H:%M"), "01:00")
+})
+
+test_that("bed-sleep >3h order violation NOT auto-corrected", {
+  # bed 22:00, sleep 02:00 (4h gap, bed before sleep) -> >3h minor threshold? 
+  # sleep after bed with 4h gap: not a flip (gap < 12), not a minor swap (>3h) -> untouched
+  df <- make_row("22:00", "02:00", "06:00", "06:30")
+  result <- normalize_sleep_time_sequence(df)
+  expect_false(result$corrected[1])
+})
