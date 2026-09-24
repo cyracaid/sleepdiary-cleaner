@@ -68,3 +68,40 @@ test_that("apply_manual_corrections_and_recalculate stops on missing required co
   corr <- data.frame()
   expect_error(apply_manual_corrections_and_recalculate(ema, corr), "missing required columns")
 })
+
+test_that("apply_manual_corrections_and_recalculate handles manual_unusual_df", {
+  ema <- .mk_ema()
+  # manual_unusual_df with a reasonable-unusual record + an adjust correction
+  munu <- data.frame(
+    pid = 1, day_num = 1, row_id = 10,
+    column_to_adjust = "time_awake_corrected",
+    correction_value = "Same Day 06:00:00 AM",
+    column_to_adjust_2 = NA, correction_value_2 = NA,
+    problem_humanidentified = "manual unusual",
+    solution_humanidentified = NA,
+    stringsAsFactors = FALSE)
+  corr <- data.frame(
+    pid = 1, day_num = 1,
+    column_to_correct = "time_sleep_corrected",
+    correct_value = "Minus 12 hours",
+    column_to_correct_2 = NA, correct_value_2 = NA,
+    solution_humanidentified = NA,
+    stringsAsFactors = FALSE)
+  out <- apply_manual_corrections_and_recalculate(ema, corr, manual_unusual_df = munu)
+  # unusual sets awake_manual to 06:00; regular corr minus 12h on sleep
+  expect_equal(format(out$corrected_ema_data$time_awake_manual[out$corrected_ema_data$row_id == 10], "%H:%M"), "06:00")
+  expect_equal(format(out$corrected_ema_data$time_sleep_manual[out$corrected_ema_data$row_id == 10], "%H:%M"), "11:30")
+})
+
+test_that("apply_manual_corrections_and_recalculate undo via solution_humanidentified", {
+  ema <- .mk_ema()
+  corr <- data.frame(
+    pid = 1, day_num = 1,
+    column_to_correct = NA, correct_value = NA,
+    column_to_correct_2 = NA, correct_value_2 = NA,
+    solution_humanidentified = "undo correction",
+    stringsAsFactors = FALSE)
+  out <- apply_manual_corrections_and_recalculate(ema, corr)
+  # undo restores sleep_manual from original corrected (23:30)
+  expect_equal(format(out$corrected_ema_data$time_sleep_manual[out$corrected_ema_data$row_id == 10], "%H:%M"), "23:30")
+})
