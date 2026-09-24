@@ -107,3 +107,35 @@ test_that("check_swap_corrections marks swap rows as manually corrected", {
   expect_true(res$manually_corrected[res$pid == 1 & res$day_num == 1])
   expect_false(res$manually_corrected[res$pid == 1 & res$day_num == 2])
 })
+
+test_that("process_swap_operations handles case2 pattern set", {
+  df <- data.frame(
+    time_awake_manual = as.POSIXct("2020-01-01 07:00:00", tz = "UTC"),
+    time_getup_manual = as.POSIXct("2020-01-01 08:00:00", tz = "UTC"))
+  res <- process_swap_operations(df, 1, "perform awake-getup swap", pattern_set = "case2")
+  expect_true(res$applied)
+  expect_equal(format(res$data$time_awake_manual[1], "%H:%M"), "08:00")
+})
+
+test_that("process_ampm_conversion handles time_type not matching a known field", {
+  df <- data.frame(time_bed_manual = as.POSIXct("2020-01-01 12:00:00", tz = "UTC"))
+  # "unknown time AM/PM conversion" -> time_type NA -> no-op
+  res <- process_ampm_conversion(df, 1, "unknown time am/pm conversion")
+  expect_false(res$applied)
+})
+
+test_that("ensure_marking_columns adds missing classification columns", {
+  df <- data.frame(pid = 1)
+  out <- ensure_marking_columns(df)
+  expect_true("data_category" %in% names(out))
+  expect_true("error_type" %in% names(out))
+  expect_true("unusual_type" %in% names(out))
+  expect_true(is.na(out$data_category[1]))
+})
+
+test_that("parse_columns splits on commas, plus, and whitespace", {
+  expect_equal(parse_columns("time_bed_corrected, time_sleep_corrected"), c("time_bed_corrected", "time_sleep_corrected"))
+  expect_equal(parse_columns("a+b"), c("a", "b"))
+  expect_equal(parse_columns(""), character(0))
+  expect_equal(parse_columns(NA), character(0))
+})
