@@ -156,3 +156,10 @@ fasttrack_review.csv
 # rebuild_fasttrack_complete.R before it overwrites manual_disambiguation_
 # fasttrack.csv in place -- same real-data content as that file.
 validation/_snapshots/
+# Fasttrack manual review ledger (this round's Cyra+Claude review, real pid/day/timestamps) --
+# same real-data privacy rule as the other validation/ worksheets above. Never commit.
+validation/fasttrack_manual_review_ledger.csv
+validation/existing_ground_truth_crossref.csv
+fasttrack_review_cyra.csv
+fasttrack_review_maia.csv
+fasttrack_review_typeA.csv
