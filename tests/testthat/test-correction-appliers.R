@@ -90,3 +90,39 @@ test_that("apply_metric_review_acceptances returns data unchanged on missing fil
   out <- apply_metric_review_acceptances(df, cfg = list(data = list(files = list(manual_metric_accept = "/nonexistent.csv"))))
   expect_identical(out, df)
 })
+test_that("apply_nap_exercise_corrections skips when variable column missing", {
+  df <- data.frame(pid = 1, day_num = 1, row_id = 10, stringsAsFactors = FALSE)
+  tmp <- tempfile(fileext = ".csv")
+  write.csv(data.frame(
+    pid = 1, day_num = 1, row_id = 10,
+    variable = "nap", corrected_mincalc = 15,
+    manually_corrected = "verified_recode",
+    stringsAsFactors = FALSE), tmp, row.names = FALSE)
+  out <- apply_nap_exercise_corrections(df, cfg = list(data = list(files = list(manual_nap_exercise = tmp))))
+  expect_identical(names(out), names(df))  # unchanged
+})
+
+test_that("apply_nap_exercise_corrections skips when no row matches", {
+  df <- data.frame(pid = 1, day_num = 1, row_id = 10, nap_mincalc = 30, stringsAsFactors = FALSE)
+  tmp <- tempfile(fileext = ".csv")
+  write.csv(data.frame(
+    pid = 999, day_num = 99, row_id = 1,
+    variable = "nap", corrected_mincalc = 15,
+    manually_corrected = "verified_recode",
+    stringsAsFactors = FALSE), tmp, row.names = FALSE)
+  out <- apply_nap_exercise_corrections(df, cfg = list(data = list(files = list(manual_nap_exercise = tmp))))
+  expect_equal(out$nap_mincalc, 30)
+})
+
+test_that("apply_nap_exercise_corrections skips on duplicate match", {
+  df <- data.frame(pid = c(1, 1), day_num = c(1, 1), row_id = c(10, 10),
+                   nap_mincalc = c(30, 40), stringsAsFactors = FALSE)
+  tmp <- tempfile(fileext = ".csv")
+  write.csv(data.frame(
+    pid = 1, day_num = 1, row_id = 10,
+    variable = "nap", corrected_mincalc = 15,
+    manually_corrected = "verified_recode",
+    stringsAsFactors = FALSE), tmp, row.names = FALSE)
+  out <- apply_nap_exercise_corrections(df, cfg = list(data = list(files = list(manual_nap_exercise = tmp))))
+  expect_equal(out$nap_mincalc, c(30, 40))  # untouched
+})

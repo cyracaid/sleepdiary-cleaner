@@ -109,3 +109,29 @@ test_that("plain number below 240 treated as minutes", {
   out <- process_interval(.interval_df(v, c("90")), v, format = "interval_hhmm")
   expect_equal(out[[paste0(v, "_mincalc")]][1], 90)
 })
+
+test_that("3-digit values: 000 -> 00:00, others flagged", {
+  v <- "duration_totalmin_sol_estimate_am"
+  out <- process_interval(.interval_df(v, c("000", "120")), v, format = "interval_hhmm")
+  expect_equal(out[[paste0(v, "_mincalc")]][1], 0)
+  expect_true(grepl("3 digits", out[[paste0(v, "_correctionsmade")]][2]))
+})
+
+test_that("2-digit values assumed minutes", {
+  v <- "duration_totalmin_sol_estimate_am"
+  out <- process_interval(.interval_df(v, c("00", "30", "90")), v, format = "interval_hhmm")
+  expect_equal(out[[paste0(v, "_mincalc")]], c(0, 30, 90))
+})
+
+test_that("1-digit values assumed minutes", {
+  v <- "duration_totalmin_sol_estimate_am"
+  out <- process_interval(.interval_df(v, c("0", "5")), v, format = "interval_hhmm")
+  expect_equal(out[[paste0(v, "_mincalc")]], c(0, 5))
+})
+
+test_that("4-digit value gets colon inserted (1234 -> 12:34)", {
+  v <- "duration_totalmin_sol_estimate_am"
+  out <- process_interval(.interval_df(v, c("1234")), v, format = "interval_hhmm")
+  # 1234 -> 12:34 -> 754 min (>= 240) with mm<60 -> MM:SS recode: 12m34s
+  expect_equal(round(out[[paste0(v, "_mincalc")]][1], 1), 12.6)
+})
