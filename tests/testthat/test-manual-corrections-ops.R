@@ -139,3 +139,60 @@ test_that("parse_columns splits on commas, plus, and whitespace", {
   expect_equal(parse_columns(""), character(0))
   expect_equal(parse_columns(NA), character(0))
 })
+
+test_that("process_case2_correction drives ops from solution_humanidentified", {
+  df <- data.frame(
+    pid = 1, day_num = 1,
+    time_bed_am_hhmm_ampm = as.POSIXct("2020-01-01 23:00:00", tz = "UTC"),
+    time_sleep_am_hhmm_ampm = as.POSIXct("2020-01-01 23:30:00", tz = "UTC"),
+    time_awake_am_hhmm_ampm = as.POSIXct("2020-01-02 07:00:00", tz = "UTC"),
+    time_getup_am_hhmm_ampm = as.POSIXct("2020-01-02 07:30:00", tz = "UTC"),
+    time_bed_manual = as.POSIXct("2020-01-01 23:00:00", tz = "UTC"),
+    time_sleep_manual = as.POSIXct("2020-01-01 13:30:00", tz = "UTC"),
+    time_awake_manual = as.POSIXct("2020-01-02 07:00:00", tz = "UTC"),
+    time_getup_manual = as.POSIXct("2020-01-02 07:30:00", tz = "UTC"),
+    stringsAsFactors = FALSE)
+  corr <- data.frame(pid = 1, day_num = 1,
+    column_to_correct = NA, correct_value = NA,
+    solution_humanidentified = "Sleep time Minus 12 hours",
+    stringsAsFactors = FALSE)
+  out <- process_case2_correction(df, corr,
+    "time_bed_am_hhmm_ampm", "time_sleep_am_hhmm_ampm",
+    "time_awake_am_hhmm_ampm", "time_getup_am_hhmm_ampm")
+  # sleep 13:30 minus 12h -> 01:30
+  expect_equal(format(out$time_sleep_manual[1], "%H:%M"), "01:30")
+  expect_true(out$manually_corrected[1])
+})
+
+test_that("process_case2_correction undo restores original", {
+  df <- data.frame(
+    pid = 1, day_num = 1,
+    time_bed_am_hhmm_ampm = as.POSIXct("2020-01-01 23:00:00", tz = "UTC"),
+    time_sleep_am_hhmm_ampm = as.POSIXct("2020-01-01 23:30:00", tz = "UTC"),
+    time_awake_am_hhmm_ampm = as.POSIXct("2020-01-02 07:00:00", tz = "UTC"),
+    time_getup_am_hhmm_ampm = as.POSIXct("2020-01-02 07:30:00", tz = "UTC"),
+    time_bed_manual = as.POSIXct("2020-01-01 12:00:00", tz = "UTC"),
+    time_sleep_manual = as.POSIXct("2020-01-01 12:30:00", tz = "UTC"),
+    time_awake_manual = as.POSIXct("2020-01-02 07:00:00", tz = "UTC"),
+    time_getup_manual = as.POSIXct("2020-01-02 07:30:00", tz = "UTC"),
+    stringsAsFactors = FALSE)
+  corr <- data.frame(pid = 1, day_num = 1,
+    column_to_correct = NA, correct_value = NA,
+    solution_humanidentified = "undo correction",
+    stringsAsFactors = FALSE)
+  out <- process_case2_correction(df, corr,
+    "time_bed_am_hhmm_ampm", "time_sleep_am_hhmm_ampm",
+    "time_awake_am_hhmm_ampm", "time_getup_am_hhmm_ampm")
+  # undo restores sleep_manual from sleep_am_hhmm_ampm (23:30)
+  expect_equal(format(out$time_sleep_manual[1], "%H:%M"), "23:30")
+})
+
+test_that("process_case2_correction unmatched pid returns data", {
+  df <- data.frame(pid = 1, day_num = 1,
+    time_sleep_manual = as.POSIXct("2020-01-01 13:00:00", tz = "UTC"))
+  corr <- data.frame(pid = 999, day_num = 99,
+    solution_humanidentified = "Sleep time Minus 12 hours",
+    stringsAsFactors = FALSE)
+  out <- process_case2_correction(df, corr, "x", "y", "z", "w")
+  expect_equal(nrow(out), 1)
+})
