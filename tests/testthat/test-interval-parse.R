@@ -84,3 +84,28 @@ test_that("format_total_minutes_hhmm round-trips", {
   expect_equal(format_total_minutes_hhmm(90), "01:30")
   expect_equal(format_total_minutes_hhmm(10.5), "00:10.5")  # preserves fractional minutes
 })
+
+test_that("single-digit h/m padded to two digits", {
+  v <- "duration_totalmin_sol_estimate_am"
+  out <- process_interval(.interval_df(v, c("1:5")), v, format = "interval_hhmm")
+  expect_equal(out[[paste0(v, "_mincalc")]][1], 65)  # 01:05
+})
+
+test_that("dd:00 hour/minute swap flips to 00:dd", {
+  v <- "duration_totalmin_sol_estimate_am"
+  out <- process_interval(.interval_df(v, c("30:00")), v, format = "interval_hhmm")
+  expect_equal(out[[paste0(v, "_mincalc")]][1], 30)  # 00:30
+  expect_true(grepl("dd:00", out[[paste0(v, "_correctionsmade")]][1]))
+})
+
+test_that("five-plus digits flagged for manual check", {
+  v <- "duration_totalmin_sol_estimate_am"
+  out <- process_interval(.interval_df(v, c("12345")), v, format = "interval_hhmm")
+  expect_true(grepl("5\\+ digits", out[[paste0(v, "_correctionsmade")]][1]))
+})
+
+test_that("plain number below 240 treated as minutes", {
+  v <- "duration_totalmin_sol_estimate_am"
+  out <- process_interval(.interval_df(v, c("90")), v, format = "interval_hhmm")
+  expect_equal(out[[paste0(v, "_mincalc")]][1], 90)
+})
