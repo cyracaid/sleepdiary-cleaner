@@ -1,21 +1,11 @@
-<div id="main" class="col-md-9" role="main">
-
 # Figure 12 (new) — Step x Flag ledger table
-
-<div class="ref-description section level2">
 
 Replaces the coarse A-E bar chart. Renders one row per pipeline step
 and, against the shared final standards, shows how each flag family is
 generated and reduced across steps. "not computable at this step" shows
 as "—".
 
-</div>
-
-<div class="section level2">
-
 ## Usage
-
-<div class="sourceCode">
 
 ``` r
 figure12_step_flag_table(
@@ -26,40 +16,26 @@ figure12_step_flag_table(
 )
 ```
 
-</div>
-
-</div>
-
-<div class="section level2">
-
 ## Arguments
 
--   cfg:
+- cfg:
 
-    Pipeline configuration list.
+  Pipeline configuration list.
 
--   output\_dir:
+- output_dir:
 
-    Directory for saving output PNG.
+  Directory for saving output PNG.
 
--   save\_png:
+- save_png:
 
-    Optional save function for PNG output.
+  Optional save function for PNG output.
 
--   filename:
+- filename:
 
-    Output PNG filename without extension.
-
-</div>
-
-<div class="section level2">
+  Output PNG filename without extension.
 
 ## Details
 
-Drop-in: replace the current Figure 12 block in sleep\_visualization.R
-with a call to \`figure12\_step\_flag\_table(cfg = cfg, output\_dir =
-output\_dir, save\_png = save\_png)\`.
-
-</div>
-
-</div>
+Drop-in: replace the current Figure 12 block in sleep_visualization.R
+with a call to \`figure12_step_flag_table(cfg = cfg, output_dir =
+output_dir, save_png = save_png)\`.

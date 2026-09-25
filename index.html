@@ -51,7 +51,9 @@
 <div class="page-header"><h1 id="sleepcleanr--reproducible-cleaning-pipeline-for-sleep-ema-diary-data">sleepcleanr — Reproducible cleaning pipeline for sleep EMA diary data<a class="anchor" aria-label="anchor" href="#sleepcleanr--reproducible-cleaning-pipeline-for-sleep-ema-diary-data"></a>
 </h1></div>
 <p><a href="https://cran.r-project.org/package=sleepcleanr" class="external-link"><img src="https://img.shields.io/cran/v/sleepcleanr?style=flat-square&amp;color=blue" alt="CRAN"></a> <a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link"><img src="https://img.shields.io/github/stars/cyracaid/sleepdiary-cleaner?style=flat-square" alt="GitHub stars"></a> <a href="https://opensource.org/licenses/MIT" class="external-link"><img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License: MIT"></a> <a href="https://github.com/cyracaid/sleepdiary-cleaner/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://img.shields.io/github/actions/workflow/status/cyracaid/sleepdiary-cleaner/R-CMD-check.yaml?style=flat-square&amp;label=R--CMD--check" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/cyracaid/sleepdiary-cleaner" class="external-link"><img src="https://img.shields.io/codecov/c/github/cyracaid/sleepdiary-cleaner?style=flat-square&amp;color=orange" alt="Codecov"></a> <a href="https://cyracaid.github.io/sleepdiary-cleaner/"><img src="https://img.shields.io/badge/docs-pkgdown-blue?style=flat-square" alt="Docs"></a> <a href="https://www.awesomeskills.dev/zh-CN/skill/cyracaid-sleepdiary-cleaner" class="external-link"><img src="https://img.shields.io/badge/awesomeskills.dev-listed-brightgreen?style=flat-square" alt="awesomeskills"></a> <a href="https://github.com/qinwf/awesome-R/pull/276" class="external-link"><img src="https://img.shields.io/badge/awesome--R-PR_276-open?style=flat-square" alt="awesome-R PR"></a></p>
-<blockquote><p><strong><a href="#english">English</a> · <a href="#%E4%B8%AD%E6%96%87">中文</a></strong></p></blockquote>
+<blockquote>
+<p><strong><a href="#english">English</a> · <a href="#%E4%B8%AD%E6%96%87">中文</a></strong></p>
+</blockquote>
 <hr>
 <p><a name="english"></a></p>
 </div>
@@ -96,7 +98,9 @@
 <strong>Not all-flag:</strong> a 1,048-row FLAG queue is unmanageable by hand. High-confidence rules chew the deterministic cases; FLAG keeps only the ambiguous ones for human review.</li>
 </ul>
 <p>The outcome is not “the pipeline makes a mess clean” — it makes the mess <strong>explicit</strong>: every candidate error is surfaced or logged, never silently hidden.</p>
-<blockquote><p><strong>Thresholds are references, not gospel.</strong> The swap/flip thresholds shipped here (e.g. 3-hour adjacent swap, 12-hour AM/PM flip) were validated on our dataset(s) — see VALIDATION_REPORT. Your study’s diaries may fall inside or outside these cut-offs; they are YAML-configurable and should be re-checked against your own data, not copied blindly.</p></blockquote>
+<blockquote>
+<p><strong>Thresholds are references, not gospel.</strong> The swap/flip thresholds shipped here (e.g. 3-hour adjacent swap, 12-hour AM/PM flip) were validated on our dataset(s) — see VALIDATION_REPORT. Your study’s diaries may fall inside or outside these cut-offs; they are YAML-configurable and should be re-checked against your own data, not copied blindly.</p>
+</blockquote>
 </div>
 <div class="section level3">
 <h3 id="flag-system--human-review-workflow">Flag System &amp; Human Review Workflow<a class="anchor" aria-label="anchor" href="#flag-system--human-review-workflow"></a>
@@ -242,8 +246,12 @@ Step 7  Human co-review ── 64–89% agreement
 ROBUSTNESS TIER
 ──────────────────────────────
 Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
-<blockquote><p><strong>Naming note:</strong> The R package is called <strong>sleepcleanr</strong> (CRAN convention: no hyphens). The GitHub repository is <strong>sleepdiary-cleaner</strong>. They are the same project — install via <code>renv::install("cyracaid/sleepdiary-cleaner")</code> and then <code><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">library(sleepcleanr)</a></code>.</p></blockquote>
-<blockquote><p><strong>Validation statistics source:</strong> All validation statistics above (recall 0.995, 92% improvement, 0% silent misrepair for SOL/WASO, etc.) are derived from benchmarks run against the current <code>sleepcleanr</code> v1.4.5+ codebase (commit fd6bbd0). The synthetic benchmark (<code>validation/synthetic/results/detection_outcomes_v4_current.csv</code>, 4,736 injected rows) and real-data audit (n=13,990) were executed against the current codebase (commit fd6bbd0). These statistics reflect the current pipeline behavior and supersede any earlier pre-patch numbers cited in earlier documentation. See <code>VALIDATION_REPORT.md</code> and <code>validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md</code> for the full evidence package.</p></blockquote>
+<blockquote>
+<p><strong>Naming note:</strong> The R package is called <strong>sleepcleanr</strong> (CRAN convention: no hyphens). The GitHub repository is <strong>sleepdiary-cleaner</strong>. They are the same project — install via <code>renv::install("cyracaid/sleepdiary-cleaner")</code> and then <code><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">library(sleepcleanr)</a></code>.</p>
+</blockquote>
+<blockquote>
+<p><strong>Validation statistics source:</strong> All validation statistics above (recall 0.995, 92% improvement, 0% silent misrepair for SOL/WASO, etc.) are derived from benchmarks run against the current <code>sleepcleanr</code> v1.4.5+ codebase (commit fd6bbd0). The synthetic benchmark (<code>validation/synthetic/results/detection_outcomes_v4_current.csv</code>, 4,736 injected rows) and real-data audit (n=13,990) were executed against the current codebase (commit fd6bbd0). These statistics reflect the current pipeline behavior and supersede any earlier pre-patch numbers cited in earlier documentation. See <code>VALIDATION_REPORT.md</code> and <code>validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md</code> for the full evidence package.</p>
+</blockquote>
 </div>
 </div>
 <div class="section level2">
@@ -304,7 +312,8 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <div class="section level3">
 <h3 id="pipeline-steps">Pipeline steps<a class="anchor" aria-label="anchor" href="#pipeline-steps"></a>
 </h3>
-<!-- AUTO:ARCH_START --><p><strong>10 steps</strong> (source: <code>inst/steps.yaml</code>):</p>
+<!-- AUTO:ARCH_START -->
+<p><strong>10 steps</strong> (source: <code>inst/steps.yaml</code>):</p>
 <table class="table">
 <colgroup>
 <col width="23%">
@@ -376,7 +385,9 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <h2 id="sync-human-review-status">Sync Human Review Status<a class="anchor" aria-label="anchor" href="#sync-human-review-status"></a>
 </h2>
 <p>sleepcleanr provides a utility to synchronize human review status fields in the metric review acceptance CSV file.</p>
-<blockquote><p><strong>Resolved (v1.4.5, commit 4812fcc):</strong> The earlier known issue where <code><a href="reference/sync_human_review_status.html">sync_human_review_status()</a></code> crashed on bootstrap runs and did not reproduce from clean state has been fixed. The function now correctly handles first-time runs and produces reproducible results.</p></blockquote>
+<blockquote>
+<p><strong>Resolved (v1.4.5, commit 4812fcc):</strong> The earlier known issue where <code><a href="reference/sync_human_review_status.html">sync_human_review_status()</a></code> crashed on bootstrap runs and did not reproduce from clean state has been fixed. The function now correctly handles first-time runs and produces reproducible results.</p>
+</blockquote>
 <div class="section level3">
 <h3 id="sync_human_review_status">
 <code>sync_human_review_status()</code><a class="anchor" aria-label="anchor" href="#sync_human_review_status"></a>
@@ -388,7 +399,8 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <p><strong>What it does:</strong></p>
 <ol style="list-style-type: decimal">
 <li>
-<strong>Detects human review traces</strong> by checking:<ul>
+<strong>Detects human review traces</strong> by checking:
+<ul>
 <li>
 <code>human_metric_review_note</code> (non-empty reviewer notes)</li>
 <li>
@@ -398,7 +410,8 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 </ul>
 </li>
 <li>
-<strong>Updates three columns</strong> based on detected traces:<ul>
+<strong>Updates three columns</strong> based on detected traces:
+<ul>
 <li>
 <code>review_resolution</code>: <code>"corrected"</code> / <code>"flagged_unresolved"</code> / <code>"legacy"</code>
 </li>
@@ -434,18 +447,22 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 </h1>
 <p><strong>sleepcleanr</strong> 是一个可复现、可审计的睡眠 EMA 日记数据清洗 R 管线：解析原始 就寝/入睡/醒来/起床时间戳，通过透明的人工审核工作流（每次修正都存为可重读的 CSV）检测并修正时序与时长错误，计算标准睡眠指标（TST、SOL、WASO、SE），并生成 诊断与科研图表。经 schema 校验的 YAML 配置可将管线映射到你的数据集，无需改代码。 为斯坦福心理生理学实验室的高强度纵向睡眠研究开发。</p>
 <div class="section level3">
-<h3 id="为什么是自动--人工混合设计">为什么是“自动 + 人工”混合设计？<a class="anchor" aria-label="anchor" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF%E8%87%AA%E5%8A%A8--%E4%BA%BA%E5%B7%A5%E6%B7%B7%E5%90%88%E8%AE%BE%E8%AE%A1"></a>
+<h3 id="为什么是自动--人工混合设计">为什么是”自动 + 人工”混合设计？<a class="anchor" aria-label="anchor" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF%E8%87%AA%E5%8A%A8--%E4%BA%BA%E5%B7%A5%E6%B7%B7%E5%90%88%E8%AE%BE%E8%AE%A1"></a>
 </h3>
 <p>sleepcleanr 刻意<strong>既非全自动、也非全部人工 flag</strong>：</p>
 <ul>
 <li>
-<strong>不全自动：</strong> 高置信、仅涉时序/AM-PM 的规则才安全自动修正；但值级错误（如 SOL 与就寝→入睡窗口的矛盾）绝不覆盖 — 一个看似偏大的 SOL 是真实的心理信号，静默“修正”会破坏管线所服务的睡眠–情绪关联。</li>
+<strong>不全自动：</strong> 高置信、仅涉时序/AM-PM 的规则才安全自动修正；但值级错误（如 SOL 与就寝→入睡窗口的矛盾）绝不覆盖 — 一个看似偏大的 SOL 是真实的心理信号，静默”修正”会破坏管线所服务的睡眠–情绪关联。</li>
 <li>
 <strong>不全 flag</strong>：1048 行 FLAG 队列手动看不过来。高置信规则吃掉确定性个案；FLAG 只把歧义个案留给人审。</li>
 </ul>
-<p>结果不是“管线把 mess 洗干净”，而是把 mess <strong>显式化</strong>：每个候选错误要么被呈现，要么被记录，永不被静默隐藏。</p>
-<blockquote><p><strong>阈值只是参考，不是教条。</strong> 这里的 swap/flip 阈值（如 3 小时相邻对调、12 小时 AM/PM 翻转）在我们的数据集上验证过 — 见 VALIDATION_REPORT。你的研究日记可能落在这区间内或外；它们都是 YAML 可配置的，应按你自己的数据重新审视，而非盲抄。</p></blockquote>
-<blockquote><p><strong>命名说明：</strong> R 包名为 <strong>sleepcleanr</strong>（CRAN 规范不允许连字符）， GitHub 仓库名为 <strong>sleepdiary-cleaner</strong>。两者是同一项目 — 安装用 <code>renv::install("cyracaid/sleepdiary-cleaner")</code>，加载用 <code><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">library(sleepcleanr)</a></code>。</p></blockquote>
+<p>结果不是”管线把 mess 洗干净”，而是把 mess <strong>显式化</strong>：每个候选错误要么被呈现，要么被记录，永不被静默隐藏。</p>
+<blockquote>
+<p><strong>阈值只是参考，不是教条。</strong> 这里的 swap/flip 阈值（如 3 小时相邻对调、12 小时 AM/PM 翻转）在我们的数据集上验证过 — 见 VALIDATION_REPORT。你的研究日记可能落在这区间内或外；它们都是 YAML 可配置的，应按你自己的数据重新审视，而非盲抄。</p>
+</blockquote>
+<blockquote>
+<p><strong>命名说明：</strong> R 包名为 <strong>sleepcleanr</strong>（CRAN 规范不允许连字符）， GitHub 仓库名为 <strong>sleepdiary-cleaner</strong>。两者是同一项目 — 安装用 <code>renv::install("cyracaid/sleepdiary-cleaner")</code>，加载用 <code><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">library(sleepcleanr)</a></code>。</p>
+</blockquote>
 </div>
 <div class="section level2">
 <h2 id="安装">安装<a class="anchor" aria-label="anchor" href="#%E5%AE%89%E8%A3%85"></a>
@@ -495,7 +512,8 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <div class="section level3">
 <h3 id="管线步骤">管线步骤<a class="anchor" aria-label="anchor" href="#%E7%AE%A1%E7%BA%BF%E6%AD%A5%E9%AA%A4"></a>
 </h3>
-<!-- AUTO:ARCH_ZH_START --><p><strong>10 个步骤</strong>（来源：<code>inst/steps.yaml</code>）：</p>
+<!-- AUTO:ARCH_ZH_START -->
+<p><strong>10 个步骤</strong>（来源：<code>inst/steps.yaml</code>）：</p>
 <table class="table">
 <colgroup>
 <col width="33%">

@@ -1,48 +1,25 @@
-<div id="main" class="col-md-9" role="main">
-
 # Print a Bland-Altman summary
-
-<div class="ref-description section level2">
 
 Print a Bland-Altman summary
 
-</div>
-
-<div class="section level2">
-
 ## Usage
-
-<div class="sourceCode">
 
 ``` r
 # S3 method for class 'bland_altman'
 print(x, ...)
 ```
 
-</div>
-
-</div>
-
-<div class="section level2">
-
 ## Arguments
 
--   x:
+- x:
 
-    A list returned by `bland_altman()`.
+  A list returned by
+  [`bland_altman()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/bland_altman.md).
 
--   ...:
+- ...:
 
-    Unused.
-
-</div>
-
-<div class="section level2">
+  Unused.
 
 ## Value
 
 `x`, invisibly.
-
-</div>
-
-</div>

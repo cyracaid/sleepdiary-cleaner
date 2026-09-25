@@ -30,7 +30,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
     <div class="section level2">
@@ -58,7 +58,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="figure-robustness-1-4-6">Figure robustness<a class="anchor" aria-label="anchor" href="#figure-robustness-1-4-6"></a></h3>
-<ul><li>Review PDF built from saved PNGs (print() of patchwork corrupts on non-interactive devices); Fig 13 uses measured table heights so the canvas grows instead of tables overflowing; Fig 15 reads Step-6 classification and degrades to per-type counts on single-date data; Fig 11/14/16 report skip reasons (<code>.mark_skip()</code>); missing-figure report (console + CSV + contact sheet footer); A1 ledger Step column width fixed.</li></ul></div>
+<ul><li>Review PDF built from saved PNGs (print() of patchwork corrupts on non-interactive devices); Fig 13 uses measured table heights so the canvas grows instead of tables overflowing; Fig 15 reads Step-6 classification and degrades to per-type counts on single-date data; Fig 11/14/16 report skip reasons (<code>.mark_skip()</code>); missing-figure report (console + CSV + contact sheet footer); A1 ledger Step column width fixed.</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.4.5" id="sleepcleanr-145">sleepcleanr 1.4.5<a class="anchor" aria-label="anchor" href="#sleepcleanr-145"></a></h2>
@@ -74,7 +75,8 @@
 <div class="section level3">
 <h3 id="fixed-1-4-3">Fixed<a class="anchor" aria-label="anchor" href="#fixed-1-4-3"></a></h3>
 <ul><li>
-<strong><code>sleep_awake_swap_3h</code> guard</strong>: the swap now only fires when <code>bed &lt;= awake</code>. Previously, swapping when the old awake time preceded bed put the new sleep time before bed, worsening the (bed→sleep) SOL gap; validation measured this as a real negative effect (7/10 corrected rows moved farther from self-reported SOL). Real-data rerun after the guard: 10 → 4 swap rows, all order-valid, 3/4 closer to self-report. Guarded rows are left uncorrected and picked up by the downstream temporal-order check for human review.</li></ul></div>
+<strong><code>sleep_awake_swap_3h</code> guard</strong>: the swap now only fires when <code>bed &lt;= awake</code>. Previously, swapping when the old awake time preceded bed put the new sleep time before bed, worsening the (bed→sleep) SOL gap; validation measured this as a real negative effect (7/10 corrected rows moved farther from self-reported SOL). Real-data rerun after the guard: 10 → 4 swap rows, all order-valid, 3/4 closer to self-report. Guarded rows are left uncorrected and picked up by the downstream temporal-order check for human review.</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.4.2" id="sleepcleanr-142">sleepcleanr 1.4.2<a class="anchor" aria-label="anchor" href="#sleepcleanr-142"></a></h2>
@@ -200,7 +202,8 @@
 <div class="section level3">
 <h3 id="tests-1-3-0">Tests<a class="anchor" aria-label="anchor" href="#tests-1-3-0"></a></h3>
 <ul><li>
-<code>test-sleep-diary.R</code> adds 11 tests covering construction, validation, coercion, the generic methods, the Step 7 contract assertion, and step provenance recording. All use synthetic data, so they run on CI with no dataset and no Suggests package present.</li></ul><hr></div>
+<code>test-sleep-diary.R</code> adds 11 tests covering construction, validation, coercion, the generic methods, the Step 7 contract assertion, and step provenance recording. All use synthetic data, so they run on CI with no dataset and no Suggests package present.</li>
+</ul><hr></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.2.0" id="sleepcleanr-120">sleepcleanr 1.2.0<a class="anchor" aria-label="anchor" href="#sleepcleanr-120"></a></h2>

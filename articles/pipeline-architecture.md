@@ -1,20 +1,12 @@
-<div id="main" class="col-md-9" role="main">
-
 # Pipeline Architecture
 
 This vignette documents how the sleepcleanr pipeline is structured: the
 steps, the rule families that do the actual cleaning, and the
 classification systems that label every record.
 
-<div id="cb1" class="sourceCode">
-
 ``` r
 library(sleepcleanr)
 ```
-
-</div>
-
-<div class="section level2">
 
 ## Terminology
 
@@ -22,10 +14,6 @@ Sleep-diary metric abbreviations used throughout this vignette: **SOL**
 (Sleep Onset Latency), **WASO** (Wake After Sleep Onset), **TST** (Total
 Sleep Time), **SE** (Sleep Efficiency). **QC** below refers to quality
 control.
-
-</div>
-
-<div class="section level2">
 
 ## Pipeline steps
 
@@ -55,22 +43,18 @@ control.
 
 **10 steps** (source: `inst/steps.yaml`):
 
-| Step | Label                                | Description                                                                        |
-|------|--------------------------------------|------------------------------------------------------------------------------------|
-| 1    | Load data                            | .rds/.csv auto-detected; schema validated; optional supplementary file merged      |
-| 1.5  | Field-misentry check                 | SOL/WASO clock-time vs duration-field misentry detection on raw data               |
-| 2-4  | Parse & normalize (S3 chain)         | Parse timestamps → parse intervals → normalize sequence                            |
-| 5    | Classify records                     | Generate manual review CSVs for human approval                                     |
-| 5.75 | Second-review consensus              | Apply second-review checklist consensus                                            |
-| 6-7  | Correct & compute metrics (S3 chain) | Manual + duration corrections; TST/SOL/WASO/SE metrics; has\_correction enum       |
-| 8    | Auto-detect remaining issues         | TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED flag classification                        |
-| 8.5  | Cross-participant consistency check  | Global consistency audit across participants                                       |
-| 9    | Generate diagnostic figures          | 30 figures (14 QC + 16 research) + figure\_index.png contact sheet + RUN\_INFO.txt |
-| 10   | Build delivered datasets             | finalize\_columns() selects/renames to Dataset A/B per column dictionary           |
-
-</div>
-
-<div class="section level2">
+| Step | Label                                | Description                                                                      |
+|------|--------------------------------------|----------------------------------------------------------------------------------|
+| 1    | Load data                            | .rds/.csv auto-detected; schema validated; optional supplementary file merged    |
+| 1.5  | Field-misentry check                 | SOL/WASO clock-time vs duration-field misentry detection on raw data             |
+| 2-4  | Parse & normalize (S3 chain)         | Parse timestamps → parse intervals → normalize sequence                          |
+| 5    | Classify records                     | Generate manual review CSVs for human approval                                   |
+| 5.75 | Second-review consensus              | Apply second-review checklist consensus                                          |
+| 6-7  | Correct & compute metrics (S3 chain) | Manual + duration corrections; TST/SOL/WASO/SE metrics; has_correction enum      |
+| 8    | Auto-detect remaining issues         | TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED flag classification                      |
+| 8.5  | Cross-participant consistency check  | Global consistency audit across participants                                     |
+| 9    | Generate diagnostic figures          | 30 figures (14 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt |
+| 10   | Build delivered datasets             | finalize_columns() selects/renames to Dataset A/B per column dictionary          |
 
 ## Detection rule families
 
@@ -84,10 +68,10 @@ the steps above are the scaffolding around it.
 | Family                            | Failure mode targeted                                                                                                               | Decision on hit                        |
 |-----------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------|
 | **Timestamp standardization**     | Non-uniform raw strings (`10.30`, `7:30`, bare hours, hms/difftime types) that can silently misparse (e.g. minutes read as seconds) | FLAG (format risk only)                |
-| **Temporal order validation**     | Bedtime entered after sleep onset; AM/PM flips near midnight; cross-day confusion                                                   | AUTO\_FIX (needs corroboration) / FLAG |
+| **Temporal order validation**     | Bedtime entered after sleep onset; AM/PM flips near midnight; cross-day confusion                                                   | AUTO_FIX (needs corroboration) / FLAG  |
 | **Free-text duration parsing**    | SOL/WASO typed as text (`90:00` meaning 90 min, `0130`, `p` for 0)                                                                  | FLAG (clock-form never auto-corrected) |
-| **Internal consistency check**    | Derived SOL contradicts self-reported SOL; derived duration exceeds the bed→sleep window                                            | AUTO\_FIX component / AUDIT            |
-| **Redundancy-confirmation check** | A “correction” that moves values *away* from self-report (silent worsening)                                                         | **Veto authority over AUTO\_FIX**      |
+| **Internal consistency check**    | Derived SOL contradicts self-reported SOL; derived duration exceeds the bed→sleep window                                            | AUTO_FIX component / AUDIT             |
+| **Redundancy-confirmation check** | A “correction” that moves values *away* from self-report (silent worsening)                                                         | **Veto authority over AUTO_FIX**       |
 | **Cross-day stability screening** | Implausible day-to-day SOL/WASO jumps within a participant                                                                          | AUDIT-only (may be real signal)        |
 | **Correction provenance audit**   | Human correction notes no code path understands (blind spots)                                                                       | AUDIT-only                             |
 | **Post-correction verification**  | Corrected timestamps still disagree with reported durations                                                                         | FLAG / PASS (release gate)             |
@@ -96,7 +80,7 @@ the steps above are the scaffolding around it.
 
 | Decision       | Meaning                                                                                                                                                                          |
 |----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **AUTO\_FIX**  | Deterministic, reversible correction applied without human review. For temporal order, requires corroboration: order violation ∧ internal consistency ∧ redundancy confirmation. |
+| **AUTO_FIX**   | Deterministic, reversible correction applied without human review. For temporal order, requires corroboration: order violation ∧ internal consistency ∧ redundancy confirmation. |
 | **FLAG**       | Sent to the human review queue (CSV workflow); no automatic action.                                                                                                              |
 | **AUDIT-only** | Counted and reported; never modifies data.                                                                                                                                       |
 
@@ -105,22 +89,14 @@ snapshot-verified), which is why inter-rater reliability statistics do
 not apply — there is no rater variance. Human co-review agreement is
 reported instead (see the validation-methodology vignette, Step 7).
 
-</div>
-
-<div class="section level2">
-
 ## Classification systems
 
-| System                   | Source                | Categories                                                                   |
-|--------------------------|-----------------------|------------------------------------------------------------------------------|
-| `data_category`          | Step 6 (temporal)     | clean, error, unusual, equal\_time\_ok, skipped\_na                          |
-| `has_correction`         | Step 7 (traceability) | none, algorithmic, manual, both                                              |
-| `flag_severity`          | Step 7 (metrics)      | Clean, Minor (1 flag), Major (2+ flags)                                      |
-| `checkforerrors_summary` | Step 8 (auto-detect)  | TIMESTAMP\_ISSUE, DURATION\_ISSUE, AMOUNT\_FLAG, SELF\_REPORTED\_FLAG, CLEAN |
-
-</div>
-
-<div class="section level2">
+| System                   | Source                | Categories                                                              |
+|--------------------------|-----------------------|-------------------------------------------------------------------------|
+| `data_category`          | Step 6 (temporal)     | clean, error, unusual, equal_time_ok, skipped_na                        |
+| `has_correction`         | Step 7 (traceability) | none, algorithmic, manual, both                                         |
+| `flag_severity`          | Step 7 (metrics)      | Clean, Minor (1 flag), Major (2+ flags)                                 |
+| `checkforerrors_summary` | Step 8 (auto-detect)  | TIMESTAMP_ISSUE, DURATION_ISSUE, AMOUNT_FLAG, SELF_REPORTED_FLAG, CLEAN |
 
 ## Figures
 
@@ -133,10 +109,6 @@ relevant variables) do not get confused.
 | `pipeline_cleaning/` | Pipeline flow diagram, data quality dashboard, flag composition, per-participant flag rate, step flag ledger                               |
 | `research_ready/`    | Correction impact (before/after delta), sleep variable distributions, perception bias, substance use, sleep regularity, correlation matrix |
 
-</div>
-
-<div class="section level2">
-
 ## Non-destructive model
 
 **The pipeline never deletes a record.** Cleaning means *adding labels
@@ -148,25 +120,21 @@ and corrected columns*, not removing rows. The number of records in
             (data_category, flag_severity) and corrected-value columns
             (time_*_corrected). Raw columns are preserved untouched.
 
--   **Nothing is lost.** Raw timestamps (`time_bed_am_hhmm_ampm`, etc.)
-    stay in the data. Corrected versions are added as new columns
-    (`time_bed_corrected`), so every correction is auditable against the
-    original value.
--   **Every record is labelled, not removed.** Records that fail
-    validation are tagged (`data_category = "error"` or `"unusual"`) but
-    remain in the dataset. You decide later whether to include or
-    exclude them in analysis.
--   **“Final Clean Dataset” is a recommended analysis subset, not a
-    physically separate file.** It is the records where `data_category`
-    is `clean` or `equal_time_ok`:
-
-<div id="cb4" class="sourceCode">
+- **Nothing is lost.** Raw timestamps (`time_bed_am_hhmm_ampm`, etc.)
+  stay in the data. Corrected versions are added as new columns
+  (`time_bed_corrected`), so every correction is auditable against the
+  original value.
+- **Every record is labelled, not removed.** Records that fail
+  validation are tagged (`data_category = "error"` or `"unusual"`) but
+  remain in the dataset. You decide later whether to include or exclude
+  them in analysis.
+- **“Final Clean Dataset” is a recommended analysis subset, not a
+  physically separate file.** It is the records where `data_category` is
+  `clean` or `equal_time_ok`:
 
 ``` r
 clean_data <- corrected_ema_data[corrected_ema_data$data_category %in% c("clean", "equal_time_ok"), ]
 ```
-
-</div>
 
 **One exception:** records with all four sleep timestamps missing
 (`data_category = "skipped_na"`) stay in the file, but their
@@ -175,12 +143,8 @@ timestamps. They are available for compliance/attrition analyses
 (e.g. “how many days did each participant complete”) but not for
 sleep-metric analyses.
 
-| Record type                 | Still in the data? | Has sleep metrics? |     Suitable for sleep analysis?     |
-|-----------------------------|:------------------:|:------------------:|:------------------------------------:|
-| clean / equal\_time\_ok     |        Yes         |        Yes         |        **Yes** (recommended)         |
-| error / unusual (flagged)   |        Yes         |        Yes         | With caution — researcher’s decision |
-| skipped\_na (no timestamps) |        Yes         |      No (NA)       |    No — compliance analysis only     |
-
-</div>
-
-</div>
+| Record type                | Still in the data? | Has sleep metrics? |     Suitable for sleep analysis?     |
+|----------------------------|:------------------:|:------------------:|:------------------------------------:|
+| clean / equal_time_ok      |        Yes         |        Yes         |        **Yes** (recommended)         |
+| error / unusual (flagged)  |        Yes         |        Yes         | With caution — researcher’s decision |
+| skipped_na (no timestamps) |        Yes         |      No (NA)       |    No — compliance analysis only     |

@@ -34,7 +34,7 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
+<li class="active nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -58,19 +58,23 @@
       <h1>Column Mapping, Config &amp; Data Format</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/HEAD/vignettes/column-mapping.Rmd" class="external-link"><code>vignettes/column-mapping.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/vignettes/column-mapping.Rmd" class="external-link"><code>vignettes/column-mapping.Rmd</code></a></small>
       <div class="d-none name"><code>column-mapping.Rmd</code></div>
     </div>
 
     
     
-<p>sleepcleanr is fully configurable via a YAML configuration file: map your dataset’s column names to pipeline internals and adjust thresholds without modifying any R code.</p>
+<p>sleepcleanr is fully configurable via a YAML configuration file: map
+your dataset’s column names to pipeline internals and adjust thresholds
+without modifying any R code.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="terminology">Terminology<a class="anchor" aria-label="anchor" href="#terminology"></a>
 </h2>
-<p>Two sleep-diary metric abbreviations appear in the column mapping and threshold tables below: <strong>SOL</strong> (Sleep Onset Latency) and <strong>WASO</strong> (Wake After Sleep Onset).</p>
+<p>Two sleep-diary metric abbreviations appear in the column mapping and
+threshold tables below: <strong>SOL</strong> (Sleep Onset Latency) and
+<strong>WASO</strong> (Wake After Sleep Onset).</p>
 </div>
 <div class="section level2">
 <h2 id="install-and-run">Install and run<a class="anchor" aria-label="anchor" href="#install-and-run"></a>
@@ -86,7 +90,9 @@
 <div class="section level2">
 <h2 id="using-with-your-own-dataset">Using with your own dataset<a class="anchor" aria-label="anchor" href="#using-with-your-own-dataset"></a>
 </h2>
-<p>The pipeline is fully configurable via a YAML configuration file. This lets you map your dataset’s column names to pipeline variables and adjust thresholds without modifying any R code.</p>
+<p>The pipeline is fully configurable via a YAML configuration file.
+This lets you map your dataset’s column names to pipeline variables and
+adjust thresholds without modifying any R code.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Step 1: Copy the configuration template</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
@@ -94,69 +100,81 @@
 <span>          <span class="st">"my_study.yaml"</span><span class="op">)</span></span></code></pre></div>
 <p><strong>Step 2: Edit <code>my_study.yaml</code></strong></p>
 <p>The file starts with the only two things you must change:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span><span class="kw">:</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">files</span><span class="kw">:</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">main</span><span class="kw">:</span><span class="at"> </span><span class="st">"your_data.rds"</span><span class="co">        # Your sleep diary file (.rds or .csv)</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">extra</span><span class="kw">:</span><span class="at"> </span><span class="st">""</span><span class="co">                    # Leave empty unless StartDate lives in a separate file</span></span></code></pre></div>
-<p>Three common scenarios: - <strong>Everything in one file</strong> (most datasets): <code>main: "my_data.rds"</code>, <code>extra: ""</code> - <strong>Data split across two files</strong>: <code>main: "ema_vars.rds"</code>, <code>extra: "dates.csv"</code> - <strong>Your data is a CSV</strong>: <code>main: "my_data.csv"</code>, <code>extra: ""</code> — the <code>.csv</code> extension is auto-detected</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">data</span><span class="kw">:</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="at">  </span><span class="fu">files</span><span class="kw">:</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="at">    </span><span class="fu">main</span><span class="kw">:</span><span class="at"> </span><span class="st">"your_data.rds"</span><span class="co">        # Your sleep diary file (.rds or .csv)</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="at">    </span><span class="fu">extra</span><span class="kw">:</span><span class="at"> </span><span class="st">""</span><span class="co">                    # Leave empty unless StartDate lives in a separate file</span></span></code></pre></div>
+<p>Three common scenarios: - <strong>Everything in one file</strong>
+(most datasets): <code>main: "my_data.rds"</code>,
+<code>extra: ""</code> - <strong>Data split across two files</strong>:
+<code>main: "ema_vars.rds"</code>, <code>extra: "dates.csv"</code> -
+<strong>Your data is a CSV</strong>: <code>main: "my_data.csv"</code>,
+<code>extra: ""</code> — the <code>.csv</code> extension is
+auto-detected</p>
 <div class="section level3">
 <h3 id="column-mapping">Column Mapping<a class="anchor" aria-label="anchor" href="#column-mapping"></a>
 </h3>
-<p>Map your dataset’s column names to the pipeline’s internal variables:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">column_mapping</span><span class="kw">:</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">identifiers</span><span class="kw">:</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">pid</span><span class="kw">:</span><span class="at"> </span><span class="st">"subject_id"</span><span class="co">          # your participant ID column</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">day_num</span><span class="kw">:</span><span class="at"> </span><span class="st">"study_day"</span><span class="co">       # your day number column</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">timestamp</span><span class="kw">:</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">time_bed_hhmm</span><span class="kw">:</span><span class="at"> </span><span class="st">"bedtime"</span><span class="co">   # your bedtime HH:MM column</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">time_bed_ampm</span><span class="kw">:</span><span class="at"> </span><span class="st">"bed_ampm"</span><span class="co">  # your bedtime AM/PM column</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">time_sleep_hhmm</span><span class="kw">:</span><span class="at"> </span><span class="st">"sleeptime"</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">time_sleep_ampm</span><span class="kw">:</span><span class="at"> </span><span class="st">"sleep_ampm"</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">duration</span><span class="kw">:</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">sol</span><span class="kw">:</span><span class="at"> </span><span class="st">"sleep_onset_latency"</span><span class="co"> # your SOL column (minutes)</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">waso</span><span class="kw">:</span><span class="at"> </span><span class="st">"wake_after_onset"</span><span class="co">   # your WASO column (minutes)</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">substance</span><span class="kw">:</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">caffeine</span><span class="kw">:</span><span class="at"> </span><span class="st">"caffeine_cups"</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">alcohol</span><span class="kw">:</span><span class="at"> </span><span class="st">"alcohol_drinks"</span></span></code></pre></div>
+<p>Map your dataset’s column names to the pipeline’s internal
+variables:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">column_mapping</span><span class="kw">:</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="at">  </span><span class="fu">identifiers</span><span class="kw">:</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="at">    </span><span class="fu">pid</span><span class="kw">:</span><span class="at"> </span><span class="st">"subject_id"</span><span class="co">          # your participant ID column</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="at">    </span><span class="fu">day_num</span><span class="kw">:</span><span class="at"> </span><span class="st">"study_day"</span><span class="co">       # your day number column</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="at">  </span><span class="fu">timestamp</span><span class="kw">:</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="at">    </span><span class="fu">time_bed_hhmm</span><span class="kw">:</span><span class="at"> </span><span class="st">"bedtime"</span><span class="co">   # your bedtime HH:MM column</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="at">    </span><span class="fu">time_bed_ampm</span><span class="kw">:</span><span class="at"> </span><span class="st">"bed_ampm"</span><span class="co">  # your bedtime AM/PM column</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="at">    </span><span class="fu">time_sleep_hhmm</span><span class="kw">:</span><span class="at"> </span><span class="st">"sleeptime"</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="at">    </span><span class="fu">time_sleep_ampm</span><span class="kw">:</span><span class="at"> </span><span class="st">"sleep_ampm"</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="at">  </span><span class="fu">duration</span><span class="kw">:</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="at">    </span><span class="fu">sol</span><span class="kw">:</span><span class="at"> </span><span class="st">"sleep_onset_latency"</span><span class="co"> # your SOL column (minutes)</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="at">    </span><span class="fu">waso</span><span class="kw">:</span><span class="at"> </span><span class="st">"wake_after_onset"</span><span class="co">   # your WASO column (minutes)</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="at">  </span><span class="fu">substance</span><span class="kw">:</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="at">    </span><span class="fu">caffeine</span><span class="kw">:</span><span class="at"> </span><span class="st">"caffeine_cups"</span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="at">    </span><span class="fu">alcohol</span><span class="kw">:</span><span class="at"> </span><span class="st">"alcohol_drinks"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="thresholds">Thresholds<a class="anchor" aria-label="anchor" href="#thresholds"></a>
 </h3>
 <p>Adjust detection sensitivity for your study population:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">classification</span><span class="kw">:</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">metric_validation</span><span class="kw">:</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">sol</span><span class="kw">:</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">excessive_minutes</span><span class="kw">:</span><span class="at"> </span><span class="dv">120</span><span class="co">   # SOL &gt; 2h → flagged</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">se</span><span class="kw">:</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">min_valid_percent</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">max_valid_percent</span><span class="kw">:</span><span class="at"> </span><span class="dv">100</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">tst_tib_ratio</span><span class="kw">:</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">min_ratio</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.5</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">max_ratio</span><span class="kw">:</span><span class="at"> </span><span class="fl">1.0</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">flag_severity</span><span class="kw">:</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">poor_efficiency_threshold_pct</span><span class="kw">:</span><span class="at"> </span><span class="dv">70</span><span class="co">   # SE &lt; 70% → flag</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">high_sol_threshold_hours</span><span class="kw">:</span><span class="at"> </span><span class="dv">1</span><span class="co">         # SOL &gt; 1h → flag</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">high_waso_threshold_hours</span><span class="kw">:</span><span class="at"> </span><span class="fl">1.5</span><span class="co">      # WASO &gt; 1.5h → flag</span></span></code></pre></div>
-<p>Threshold rationale lives in <code>THRESHOLDS.md</code> — defaults are deliberately lenient for healthy-adult samples; revisit for clinical populations.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">classification</span><span class="kw">:</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="at">  </span><span class="fu">metric_validation</span><span class="kw">:</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="at">    </span><span class="fu">sol</span><span class="kw">:</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="at">      </span><span class="fu">excessive_minutes</span><span class="kw">:</span><span class="at"> </span><span class="dv">120</span><span class="co">   # SOL &gt; 2h → flagged</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="at">    </span><span class="fu">se</span><span class="kw">:</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="at">      </span><span class="fu">min_valid_percent</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="at">      </span><span class="fu">max_valid_percent</span><span class="kw">:</span><span class="at"> </span><span class="dv">100</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="at">    </span><span class="fu">tst_tib_ratio</span><span class="kw">:</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="at">      </span><span class="fu">min_ratio</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.5</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="at">      </span><span class="fu">max_ratio</span><span class="kw">:</span><span class="at"> </span><span class="fl">1.0</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="at">  </span><span class="fu">flag_severity</span><span class="kw">:</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="at">    </span><span class="fu">poor_efficiency_threshold_pct</span><span class="kw">:</span><span class="at"> </span><span class="dv">70</span><span class="co">   # SE &lt; 70% → flag</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="at">    </span><span class="fu">high_sol_threshold_hours</span><span class="kw">:</span><span class="at"> </span><span class="dv">1</span><span class="co">         # SOL &gt; 1h → flag</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="at">    </span><span class="fu">high_waso_threshold_hours</span><span class="kw">:</span><span class="at"> </span><span class="fl">1.5</span><span class="co">      # WASO &gt; 1.5h → flag</span></span></code></pre></div>
+<p>Threshold rationale lives in <code>THRESHOLDS.md</code> — defaults
+are deliberately lenient for healthy-adult samples; revisit for clinical
+populations.</p>
 </div>
 <div class="section level3">
 <h3 id="timestamp-format">Timestamp Format<a class="anchor" aria-label="anchor" href="#timestamp-format"></a>
 </h3>
-<div class="sourceCode" id="cb7"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">timestamp</span><span class="kw">:</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">input_format</span><span class="kw">:</span><span class="at"> </span><span class="st">"hh:mm AM/PM"</span><span class="co">   # or "HH:MM", "HH:MM:SS"</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">ampm</span><span class="kw">:</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">enabled</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">pm_keywords</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="st">"PM"</span><span class="kw">,</span><span class="at"> </span><span class="st">"pm"</span><span class="kw">]</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">timestamp</span><span class="kw">:</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="at">  </span><span class="fu">input_format</span><span class="kw">:</span><span class="at"> </span><span class="st">"hh:mm AM/PM"</span><span class="co">   # or "HH:MM", "HH:MM:SS"</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="at">  </span><span class="fu">ampm</span><span class="kw">:</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="at">    </span><span class="fu">enabled</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="at">    </span><span class="fu">pm_keywords</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="st">"PM"</span><span class="kw">,</span><span class="at"> </span><span class="st">"pm"</span><span class="kw">]</span></span></code></pre></div>
 <p><strong>Step 3: Run with your configuration</strong></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/run_pipeline.html">run_pipeline</a></span><span class="op">(</span>config <span class="op">=</span> <span class="st">"my_study_config.yaml"</span><span class="op">)</span></span></code></pre></div>
-<p>All pipeline scripts automatically read the config; no R code changes needed.</p>
+<p>All pipeline scripts automatically read the config; no R code changes
+needed.</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="input-data-structure">Input data structure<a class="anchor" aria-label="anchor" href="#input-data-structure"></a>
 </h2>
-<p><strong>This repository contains no raw participant data.</strong> All CSV files with participant data are gitignored. Templates with synthetic data live in <code>templates/</code>.</p>
+<p><strong>This repository contains no raw participant data.</strong>
+All CSV files with participant data are gitignored. Templates with
+synthetic data live in <code>templates/</code>.</p>
 <table class="table">
 <colgroup>
 <col width="33%">
@@ -181,27 +199,33 @@
 </tr>
 <tr class="odd">
 <td>Raw timestamps (HH:MM)</td>
-<td>time_bed_am_hhmm, time_sleep_am_hhmm, time_awake_am_hhmm, time_getup_am_hhmm</td>
+<td>time_bed_am_hhmm, time_sleep_am_hhmm, time_awake_am_hhmm,
+time_getup_am_hhmm</td>
 <td>Self-reported bed/sleep/awake/getup clock times</td>
 </tr>
 <tr class="even">
 <td>Raw timestamps (AM/PM)</td>
-<td>time_bed_am_ampm, time_sleep_am_ampm, time_awake_am_ampm, time_getup_am_ampm</td>
+<td>time_bed_am_ampm, time_sleep_am_ampm, time_awake_am_ampm,
+time_getup_am_ampm</td>
 <td>AM/PM indicator for each timestamp</td>
 </tr>
 <tr class="odd">
 <td>Raw durations</td>
-<td>duration_totalmin_sol_estimate_am, duration_totalmin_waso_estimate_am</td>
+<td>duration_totalmin_sol_estimate_am,
+duration_totalmin_waso_estimate_am</td>
 <td>Self-reported SOL and WASO in minutes</td>
 </tr>
 <tr class="even">
 <td>Nap/Exercise</td>
-<td>duration_totalmin_napstoday_PM, exercise_PM_totalmin_[Light|Moderate|Vigorous|Strength]</td>
+<td>duration_totalmin_napstoday_PM,
+exercise_PM_totalmin_[Light|Moderate|Vigorous|Strength]</td>
 <td>Self-reported nap and exercise durations</td>
 </tr>
 <tr class="odd">
 <td>Substance use</td>
-<td>caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1, alcoholtoday_PM_NumAlcoholicDrinks_1, nicotine_amount_pm_doses, cannabis_amount_pm_doses</td>
+<td>caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1,
+alcoholtoday_PM_NumAlcoholicDrinks_1, nicotine_amount_pm_doses,
+cannabis_amount_pm_doses</td>
 <td>Self-reported substance use</td>
 </tr>
 <tr class="even">
@@ -291,13 +315,20 @@
 </tr>
 <tr class="odd">
 <td>
-<code>output/verification/real_n13990/</code>, <code>verification/synth_n280/</code>
+<code>output/verification/real_n13990/</code>,
+<code>verification/synth_n280/</code>
 </td>
 <td>Stable, never-overwritten verification artifacts</td>
 </tr>
 </tbody>
 </table>
-<p>Key rules the output structure encodes: - <code>latest_visualization_&lt;tag&gt;_n&lt;rows&gt;/</code> is “latest”, not “history” — wiped on every visualization run. - <code>verification/&lt;tag&gt;_n&lt;rows&gt;/</code> is a sibling that is never touched by the wipe. - Real-tagged output only ever lands under <code>output/</code> (gitignored); synthetic output routes outside <code>output/</code>.</p>
+<p>Key rules the output structure encodes: -
+<code>latest_visualization_&lt;tag&gt;_n&lt;rows&gt;/</code> is
+“latest”, not “history” — wiped on every visualization run. -
+<code>verification/&lt;tag&gt;_n&lt;rows&gt;/</code> is a sibling that
+is never touched by the wipe. - Real-tagged output only ever lands under
+<code>output/</code> (gitignored); synthetic output routes outside
+<code>output/</code>.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
