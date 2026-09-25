@@ -34,7 +34,7 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="active nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -58,26 +58,19 @@
       <h1>Testing Coverage</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/vignettes/testing-coverage.Rmd" class="external-link"><code>vignettes/testing-coverage.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/HEAD/vignettes/testing-coverage.Rmd" class="external-link"><code>vignettes/testing-coverage.Rmd</code></a></small>
       <div class="d-none name"><code>testing-coverage.Rmd</code></div>
     </div>
 
     
     
-<p>The pipeline includes 200+ testthat expectations across 16 test
-files, all exercising software correctness — does the code do what it
-was designed to do — as distinct from methodological validity, which is
-covered in the validation-methodology vignette.</p>
+<p>The pipeline includes 200+ testthat expectations across 16 test files, all exercising software correctness — does the code do what it was designed to do — as distinct from methodological validity, which is covered in the validation-methodology vignette.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="terminology">Terminology<a class="anchor" aria-label="anchor" href="#terminology"></a>
 </h2>
-<p>Sleep-diary metric abbreviations referenced in the coverage table
-below: <strong>SOL</strong> (Sleep Onset Latency), <strong>SE</strong>
-(Sleep Efficiency), <strong>TST</strong> (Total Sleep Time),
-<strong>TIB</strong> (Time in Bed). <strong>CI</strong> below means
-continuous integration (automated testing on every commit).</p>
+<p>Sleep-diary metric abbreviations referenced in the coverage table below: <strong>SOL</strong> (Sleep Onset Latency), <strong>SE</strong> (Sleep Efficiency), <strong>TST</strong> (Total Sleep Time), <strong>TIB</strong> (Time in Bed). <strong>CI</strong> below means continuous integration (automated testing on every commit).</p>
 </div>
 <div class="section level2">
 <h2 id="test-files-and-coverage">Test files and coverage<a class="anchor" aria-label="anchor" href="#test-files-and-coverage"></a>
@@ -94,8 +87,7 @@ continuous integration (automated testing on every commit).</p>
 <tbody>
 <tr class="odd">
 <td><code>test-normalize.R</code></td>
-<td>AM/PM correction, minor order errors, midnight crossing, edge
-cases</td>
+<td>AM/PM correction, minor order errors, midnight crossing, edge cases</td>
 </tr>
 <tr class="even">
 <td><code>test-interval.R</code></td>
@@ -103,77 +95,60 @@ cases</td>
 </tr>
 <tr class="odd">
 <td><code>test-pipeline.R</code></td>
-<td>End-to-end run on synthetic data, config loading, column
-adaptation</td>
+<td>End-to-end run on synthetic data, config loading, column adaptation</td>
 </tr>
 <tr class="even">
 <td><code>test-sleep-diary.R</code></td>
-<td>S3 construction, validation, coercion, generics, step-contract
-assertion, provenance</td>
+<td>S3 construction, validation, coercion, generics, step-contract assertion, provenance</td>
 </tr>
 <tr class="odd">
 <td><code>test-flag-standards.R</code></td>
-<td>Flag evaluators for field misentry, data category, duration extreme,
-flag severity, checkforerrors; step-ledger logging</td>
+<td>Flag evaluators for field misentry, data category, duration extreme, flag severity, checkforerrors; step-ledger logging</td>
 </tr>
 <tr class="even">
 <td><code>test-correction-engine.R</code></td>
-<td>Every classification outcome (order/bed-sleep/awake-getup/24h
-errors, equal-time, unusual, skipped-NA, multiple errors,
-suspicious-latency flags)</td>
+<td>Every classification outcome (order/bed-sleep/awake-getup/24h errors, equal-time, unusual, skipped-NA, multiple errors, suspicious-latency flags)</td>
 </tr>
 <tr class="odd">
 <td><code>test-classification-thresholds.R</code></td>
-<td>Boundary behavior at every classification threshold (7h error,
-3h/15h unusual, suspicious-latency)</td>
+<td>Boundary behavior at every classification threshold (7h error, 3h/15h unusual, suspicious-latency)</td>
 </tr>
 <tr class="even">
 <td><code>test-auto-detection-thresholds.R</code></td>
-<td>SOL/SE/TST-TIB boundary behavior for the Step 8 auto-detection
-flags</td>
+<td>SOL/SE/TST-TIB boundary behavior for the Step 8 auto-detection flags</td>
 </tr>
 <tr class="odd">
 <td><code>test-finalize-columns.R</code></td>
-<td>Dictionary ↔︎ delivered-column consistency, A/B join key uniqueness,
-unit transforms, reserved-column pass-through, export guard,
-missing/optional-column handling</td>
+<td>Dictionary ↔︎ delivered-column consistency, A/B join key uniqueness, unit transforms, reserved-column pass-through, export guard, missing/optional-column handling</td>
 </tr>
 <tr class="even">
 <td><code>test-nonfinite-guards.R</code></td>
-<td>NA/Inf handling in duration and flag-severity evaluators (regression
-tests for two real bugs)</td>
+<td>NA/Inf handling in duration and flag-severity evaluators (regression tests for two real bugs)</td>
 </tr>
 <tr class="odd">
 <td><code>test-config-data.R</code></td>
-<td>Config file loading (RDS/CSV, legacy keys, column mapping, friendly
-error messages)</td>
+<td>Config file loading (RDS/CSV, legacy keys, column mapping, friendly error messages)</td>
 </tr>
 <tr class="even">
 <td><code>test-script-copies-in-sync.R</code></td>
-<td>Root and <code>inst/scripts/</code> copies of every dual-maintained
-script stay byte-identical</td>
+<td>Root and <code>inst/scripts/</code> copies of every dual-maintained script stay byte-identical</td>
 </tr>
 <tr class="odd">
 <td><code>test-generated-docs-in-sync.R</code></td>
-<td>AUTO-generated docs under <code>docs-dev/</code> stay byte-identical
-to their committed versions</td>
+<td>AUTO-generated docs under <code>docs-dev/</code> stay byte-identical to their committed versions</td>
 </tr>
 <tr class="even">
 <td><code>test-global-leakage.R</code></td>
-<td>Pipeline internals never leak into the global environment between
-runs (regression guard for the step-script handoff)</td>
+<td>Pipeline internals never leak into the global environment between runs (regression guard for the step-script handoff)</td>
 </tr>
 <tr class="odd">
 <td><code>test-internalised-in-sync.R</code></td>
 <td>
-<code>R/</code> package wrappers and the <code>inst/scripts/</code>
-step scripts stay in sync (dual-maintenance regression gate)</td>
+<code>R/</code> package wrappers and the <code>inst/scripts/</code> step scripts stay in sync (dual-maintenance regression gate)</td>
 </tr>
 <tr class="even">
 <td><code>test-smoke-legacy-entry.R</code></td>
-<td>Legacy <code>00_MAIN_entry.R</code> auto-run path (different code
-path from <code><a href="../reference/run_pipeline.html">run_pipeline()</a></code>) executes end-to-end in a sandbox
-subprocess</td>
+<td>Legacy <code>00_MAIN_entry.R</code> auto-run path (different code path from <code><a href="../reference/run_pipeline.html">run_pipeline()</a></code>) executes end-to-end in a sandbox subprocess</td>
 </tr>
 </tbody>
 </table>
@@ -192,25 +167,16 @@ subprocess</td>
 <span></span>
 <span><span class="co"># Preferred dev workflow (loads source + runs tests in one call, needs</span></span>
 <span><span class="co"># devtools installed):</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>Full package check (documentation, examples, tests, and the
-<code>verify_reference_fidelity</code> / dual-copy checks):</p>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/test.html" class="external-link">test</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>Full package check (documentation, examples, tests, and the <code>verify_reference_fidelity</code> / dual-copy checks):</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">check</span><span class="op">(</span><span class="op">)</span>   <span class="co"># needs devtools; equivalently: R CMD check sleepcleanr_*.tar.gz</span></span></code></pre></div>
-<p><code>devtools</code> is a development-only tool — it is
-intentionally <strong>not</strong> a dependency of the package (not in
-<code>DESCRIPTION</code>), so it is never required to install or run
-sleepcleanr itself.</p>
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/check.html" class="external-link">check</a></span><span class="op">(</span><span class="op">)</span>   <span class="co"># needs devtools; equivalently: R CMD check sleepcleanr_*.tar.gz</span></span></code></pre></div>
+<p><code>devtools</code> is a development-only tool — it is intentionally <strong>not</strong> a dependency of the package (not in <code>DESCRIPTION</code>), so it is never required to install or run sleepcleanr itself.</p>
 </div>
 <div class="section level2">
 <h2 id="snapshot-verification">Snapshot verification<a class="anchor" aria-label="anchor" href="#snapshot-verification"></a>
 </h2>
-<p>Snapshot verification (<code>inst/verification/</code>,
-<code>verify_v1_3_snapshot.R</code>) confirms the current S3 pipeline
-chain produces byte-identical output to the legacy pipeline path on real
-data. <code>verify_reference_fidelity.R</code> separately pins each of
-the 8 core metric formulas against a documented baseline
-(<code>--strict</code> mode is CI-wired).</p>
+<p>Snapshot verification (<code>inst/verification/</code>, <code>verify_v1_3_snapshot.R</code>) confirms the current S3 pipeline chain produces byte-identical output to the legacy pipeline path on real data. <code>verify_reference_fidelity.R</code> separately pins each of the 8 core metric formulas against a documented baseline (<code>--strict</code> mode is CI-wired).</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

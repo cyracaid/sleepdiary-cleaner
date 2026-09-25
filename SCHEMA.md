@@ -1,9 +1,14 @@
+<div id="main" class="col-md-9" role="main">
+
 # Input Schema — Canonical Column Contract
 
+<div id="input-schema--canonical-column-contract"
+class="section level1">
+
 Single source of truth for the raw input columns the pipeline consumes.
-[`validate_schema()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/validate_schema.md)
-checks this contract right after
-[`adapt_columns()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/adapt_columns.md).
+`validate_schema()` checks this contract right after `adapt_columns()`.
+
+<div class="section level2">
 
 ## Required columns (pipeline stops if missing)
 
@@ -18,6 +23,10 @@ checks this contract right after
 | `sol`             | `duration_totalmin_sol_estimate_am`  | numeric   | Self-reported SOL (min) — bed → sleep-onset latency                                              |
 | `waso`            | `duration_totalmin_waso_estimate_am` | numeric   | Self-reported WASO (min) — *total* minutes awake after sleep onset (all middle-of-night wakings) |
 
+</div>
+
+<div class="section level2">
+
 ## Required only when `timestamp.ampm.enabled: true`
 
 | Logical field     | Default raw name     | Type      |
@@ -26,6 +35,10 @@ checks this contract right after
 | `time_sleep_ampm` | `time_sleep_am_ampm` | character |
 | `time_awake_ampm` | `time_awake_am_ampm` | character |
 | `time_getup_ampm` | `time_getup_am_ampm` | character |
+
+</div>
+
+<div class="section level2">
 
 ## Optional columns (feature degrades gracefully)
 
@@ -36,6 +49,10 @@ checks this contract right after
 | `nap`         | `duration_totalmin_napstoday_PM`                | numeric   | Nap corrections       |
 | `caffeine`    | `caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1` | numeric   | Substance figures     |
 | `alcohol`     | `alcoholtoday_PM_NumAlcoholicDrinks_1`          | numeric   | Substance figures     |
+
+</div>
+
+<div class="section level2">
 
 ## Operational definitions (canonical)
 
@@ -62,3 +79,9 @@ never interchangeable.** Cleaning found repeated cases where
 participants entered their number/timing of middle wakings (WASO
 material) into the `time_awake` field; such entries must be flagged, not
 silently accepted as final-awakening times.
+
+</div>
+
+</div>
+
+</div>
