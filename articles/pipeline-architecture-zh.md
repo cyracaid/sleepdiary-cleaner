@@ -1,20 +1,12 @@
-<div id="main" class="col-md-9" role="main">
-
 # 管线架构（中文）
 
 本文档说明 sleepcleanr
 管线的结构：清洗步骤、真正干活的规则族、以及给每条记录
 打标签的分类体系。
 
-<div id="cb1" class="sourceCode">
-
 ``` r
 library(sleepcleanr)
 ```
-
-</div>
-
-<div class="section level2">
 
 ## 管线步骤
 
@@ -44,22 +36,18 @@ library(sleepcleanr)
 
 **10 步**（来源：`inst/steps.yaml`）：
 
-| 步骤 | 标签                    | 说明                                                        |
-|------|-------------------------|-------------------------------------------------------------|
-| 1    | 加载数据                | .rds/.csv 自动检测；模式校验；可选合并补充文件              |
-| 1.5  | 字段错填检查            | 原始数据上 SOL/WASO 时钟时间 vs 时长字段错填检测            |
-| 2-4  | 解析与标准化（S3 链）   | 解析时间戳 → 解析区间 → 序列标准化                          |
-| 5    | 分类记录                | 生成人工审阅 CSV                                            |
-| 5.75 | 二次审阅共识            | 应用二次审阅清单共识                                        |
-| 6-7  | 修正与计算指标（S3 链） | 人工 + 时长修正；TST/SOL/WASO/SE 指标；has\_correction 枚举 |
-| 8    | 自动检测剩余问题        | TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED flag 分类           |
-| 8.5  | 跨被试一致性检查        | 全局一致性审计                                              |
-| 9    | 生成诊断图表            | 24 张图 + figure\_index.png 总览 + RUN\_INFO.txt            |
-| 10   | 构建交付数据集          | finalize\_columns() 按列字典选择/重命名到 Dataset A/B       |
-
-</div>
-
-<div class="section level2">
+| 步骤 | 标签                    | 说明                                                       |
+|------|-------------------------|------------------------------------------------------------|
+| 1    | 加载数据                | .rds/.csv 自动检测；模式校验；可选合并补充文件             |
+| 1.5  | 字段错填检查            | 原始数据上 SOL/WASO 时钟时间 vs 时长字段错填检测           |
+| 2-4  | 解析与标准化（S3 链）   | 解析时间戳 → 解析区间 → 序列标准化                         |
+| 5    | 分类记录                | 生成人工审阅 CSV                                           |
+| 5.75 | 二次审阅共识            | 应用二次审阅清单共识                                       |
+| 6-7  | 修正与计算指标（S3 链） | 人工 + 时长修正；TST/SOL/WASO/SE 指标；has_correction 枚举 |
+| 8    | 自动检测剩余问题        | TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED flag 分类          |
+| 8.5  | 跨被试一致性检查        | 全局一致性审计                                             |
+| 9    | 生成诊断图表            | 24 张图 + figure_index.png 总览 + RUN_INFO.txt             |
+| 10   | 构建交付数据集          | finalize_columns() 按列字典选择/重命名到 Dataset A/B       |
 
 ## 检测规则族
 
@@ -70,10 +58,10 @@ vignette）。这是管线 真正干活的部分——上面的步骤是围绕�
 | 规则族               | 针对的失效模式                                                                                   | 命中时决策                   |
 |----------------------|--------------------------------------------------------------------------------------------------|------------------------------|
 | **时间戳标准化**     | 不统一的原始字符串（`10.30`、`7:30`、裸小时、hms/difftime 类型）可能静默误解析（如分钟被读成秒） | FLAG（仅格式风险）           |
-| **时间顺序验证**     | 就寝晚于入睡；午夜附近 AM/PM 翻转；跨日混淆                                                      | AUTO\_FIX（需佐证）/ FLAG    |
+| **时间顺序验证**     | 就寝晚于入睡；午夜附近 AM/PM 翻转；跨日混淆                                                      | AUTO_FIX（需佐证）/ FLAG     |
 | **自由文本时长解析** | SOL/WASO 以文本输入（`90:00` 意为 90 分钟、`0130`、`p` 表 0）                                    | FLAG（时钟形态永不自动修）   |
-| **内部一致性检查**   | 派生 SOL 与自报 SOL 矛盾；派生时长超过 bed→sleep 窗口                                            | AUTO\_FIX 组成元 / AUDIT     |
-| **冗余确认检查**     | “校正”让值*远离*自报（静默恶化）                                                                 | **对 AUTO\_FIX 有否决权**    |
+| **内部一致性检查**   | 派生 SOL 与自报 SOL 矛盾；派生时长超过 bed→sleep 窗口                                            | AUTO_FIX 组成元 / AUDIT      |
+| **冗余确认检查**     | “校正”让值*远离*自报（静默恶化）                                                                 | **对 AUTO_FIX 有否决权**     |
 | **跨日稳定性筛查**   | 参与者内部 SOL/WASO 逐日不可信的跳变                                                             | AUDIT-only（可能是真实信号） |
 | **校正溯源审计**     | 无代码路径理解的人工校正备注（盲点）                                                             | AUDIT-only                   |
 | **校正后验证**       | 校正后时间戳仍与自报时长不一致                                                                   | FLAG / PASS（发布闸门）      |
@@ -82,7 +70,7 @@ vignette）。这是管线 真正干活的部分——上面的步骤是围绕�
 
 | 决策           | 含义                                                                                 |
 |----------------|--------------------------------------------------------------------------------------|
-| **AUTO\_FIX**  | 确定性、可逆、无需人工审查即应用。时间顺序需佐证：顺序违反 ∧ 内部一致性 ∧ 冗余确认。 |
+| **AUTO_FIX**   | 确定性、可逆、无需人工审查即应用。时间顺序需佐证：顺序违反 ∧ 内部一致性 ∧ 冗余确认。 |
 | **FLAG**       | 送人工审查队列（CSV 工作流）；不自动动作。                                           |
 | **AUDIT-only** | 计数并报告；从不修改数据。                                                           |
 
@@ -91,22 +79,14 @@ vignette）。这是管线 真正干活的部分——上面的步骤是围绕�
 统计不适用——没有评分者变异。改为报告人工共同审查一致性（见验证方法学
 vignette 第 7 步）。
 
-</div>
-
-<div class="section level2">
-
 ## 分类体系
 
-| 系统                     | 来源           | 类别                                                                         |
-|--------------------------|----------------|------------------------------------------------------------------------------|
-| `data_category`          | Step 6（时序） | clean, error, unusual, equal\_time\_ok, skipped\_na                          |
-| `has_correction`         | Step 7（追溯） | none, algorithmic, manual, both                                              |
-| `flag_severity`          | Step 7（指标） | Clean, Minor（1 标记）, Major（2+ 标记）                                     |
-| `checkforerrors_summary` | Step 8（自动） | TIMESTAMP\_ISSUE, DURATION\_ISSUE, AMOUNT\_FLAG, SELF\_REPORTED\_FLAG, CLEAN |
-
-</div>
-
-<div class="section level2">
+| 系统                     | 来源           | 类别                                                                    |
+|--------------------------|----------------|-------------------------------------------------------------------------|
+| `data_category`          | Step 6（时序） | clean, error, unusual, equal_time_ok, skipped_na                        |
+| `has_correction`         | Step 7（追溯） | none, algorithmic, manual, both                                         |
+| `flag_severity`          | Step 7（指标） | Clean, Minor（1 标记）, Major（2+ 标记）                                |
+| `checkforerrors_summary` | Step 8（自动） | TIMESTAMP_ISSUE, DURATION_ISSUE, AMOUNT_FLAG, SELF_REPORTED_FLAG, CLEAN |
 
 ## 图表
 
@@ -117,10 +97,6 @@ vignette 第 7 步）。
 | `pipeline_cleaning/` | 管线流程图、数据质量仪表板、标记构成、逐被试标记率、步骤标记账本             |
 | `research_ready/`    | 修正影响（前后对比）、睡眠变量分布、知觉偏差、物质使用、睡眠规律性、相关矩阵 |
 
-</div>
-
-<div class="section level2">
-
 ## 非破坏性模型
 
 **管线从不删除任何记录。** 清洗的意思是*打标记 +
@@ -130,34 +106,26 @@ vignette 第 7 步）。
     输出：N 条记录，每条多了分类列（data_category, flag_severity）
          和修正列（time_*_corrected）。原始列原样保留。
 
--   **什么都不丢。** 原始时间戳（`time_bed_am_hhmm_ampm`
-    等）留在数据里，修正版新增为 `time_bed_corrected`
-    列——每条修正都能和原值对照。
--   **每条记录被打标记，不是被删除。** 验证失败的记录标上
-    `data_category = "error"` 或
-    `"unusual"`，但仍然在数据集里。你之后自己决定分析时是否包含它们。
--   **“最终干净数据集”是推荐的分析子集，不是一个物理上独立的文件。** 它
-    = `data_category` 为 `clean` 或 `equal_time_ok` 的记录：
-
-<div id="cb4" class="sourceCode">
+- **什么都不丢。** 原始时间戳（`time_bed_am_hhmm_ampm`
+  等）留在数据里，修正版新增为 `time_bed_corrected`
+  列——每条修正都能和原值对照。
+- **每条记录被打标记，不是被删除。** 验证失败的记录标上
+  `data_category = "error"` 或
+  `"unusual"`，但仍然在数据集里。你之后自己决定分析时是否包含它们。
+- **“最终干净数据集”是推荐的分析子集，不是一个物理上独立的文件。** 它 =
+  `data_category` 为 `clean` 或 `equal_time_ok` 的记录：
 
 ``` r
 clean_data <- corrected_ema_data[corrected_ema_data$data_category %in% c("clean", "equal_time_ok"), ]
 ```
 
-</div>
-
 **一个例外：**
 四个睡眠时间戳全部缺失的记录（`data_category = "skipped_na"`）保留在文件里，但
 TST/SOL/WASO 指标是
-`NA`——时间戳缺失无法计算睡眠指标。它们可用于依从性/流失分析（如“每个被试完成了多少天”），但不能用于睡眠指标分析。
+`NA`——时间戳缺失无法计算睡眠指标。它们可用于依从性/流失分析（如”每个被试完成了多少天”），但不能用于睡眠指标分析。
 
 | 记录类型                  | 还在数据里？ | 有睡眠指标？ |  适合睡眠分析？  |
 |---------------------------|:------------:|:------------:|:----------------:|
-| clean / equal\_time\_ok   |      是      |      是      |  **是**（推荐）  |
+| clean / equal_time_ok     |      是      |      是      |  **是**（推荐）  |
 | error / unusual（被标记） |      是      |      是      | 谨慎——研究者决定 |
-| skipped\_na（时间戳缺失） |      是      |   否（NA）   | 否——仅依从性分析 |
-
-</div>
-
-</div>
+| skipped_na（时间戳缺失）  |      是      |   否（NA）   | 否——仅依从性分析 |

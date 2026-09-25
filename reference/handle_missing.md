@@ -1,21 +1,11 @@
-<div id="main" class="col-md-9" role="main">
-
 # Tag missing-data reason codes and optionally carry forward single-day gaps
-
-<div class="ref-description section level2">
 
 Adds a `missing_reason` column that distinguishes why a row has
 incomplete data, rather than lumping everything into `skipped_na`.
 Optionally applies last-observation-carried-forward (LOCF) to metric
 columns for single-day gaps.
 
-</div>
-
-<div class="section level2">
-
 ## Usage
-
-<div class="sourceCode">
 
 ``` r
 handle_missing(
@@ -28,62 +18,48 @@ handle_missing(
 )
 ```
 
-</div>
-
-</div>
-
-<div class="section level2">
-
 ## Arguments
 
--   data:
+- data:
 
-    A data frame from the pipeline.
+  A data frame from the pipeline.
 
--   timestamp\_cols:
+- timestamp_cols:
 
-    Character. Columns that carry the four sleep-event POSIXct
-    timestamps. If `NULL`, auto-detects from common patterns.
+  Character. Columns that carry the four sleep-event POSIXct timestamps.
+  If `NULL`, auto-detects from common patterns.
 
--   metric\_cols:
+- metric_cols:
 
-    Character. Columns eligible for LOCF. If `NULL`, auto-detects the
-    standard derived-metric columns.
+  Character. Columns eligible for LOCF. If `NULL`, auto-detects the
+  standard derived-metric columns.
 
--   group\_col:
+- group_col:
 
-    Character. Participant identifier. Default `"pid"`.
+  Character. Participant identifier. Default `"pid"`.
 
--   order\_col:
+- order_col:
 
-    Character. Within-participant ordering column. Default `"day_num"`.
+  Character. Within-participant ordering column. Default `"day_num"`.
 
--   max\_gap:
+- max_gap:
 
-    Integer. Maximum consecutive missing days to fill via LOCF.
-    Default 1. Set to 0 to disable LOCF entirely.
-
-</div>
-
-<div class="section level2">
+  Integer. Maximum consecutive missing days to fill via LOCF. Default 1.
+  Set to 0 to disable LOCF entirely.
 
 ## Value
 
 A copy of `data` with:
 
--   `missing_reason`:
+- `missing_reason`:
 
-    Character. One of `"all_timestamps_na"`, `"partial_timestamps_na"`,
-    `"derived_na"`, or `NA` (complete row).
+  Character. One of `"all_timestamps_na"`, `"partial_timestamps_na"`,
+  `"derived_na"`, or `NA` (complete row).
 
--   For each metric column when `max_gap > 0`::
+- For each metric column when `max_gap > 0`::
 
-    a companion `<col>_imputed` logical column, and the original column
-    may contain LOCF-filled values.
-
-</div>
-
-<div class="section level2">
+  a companion `<col>_imputed` logical column, and the original column
+  may contain LOCF-filled values.
 
 ## Design boundaries
 
@@ -94,13 +70,7 @@ columns (SOL, WASO, TST, SE) are eligible for LOCF. \* LOCF is capped at
 with stale data. \* All imputed values carry an `_imputed` companion
 column (`TRUE` / `FALSE`) for audit trail.
 
-</div>
-
-<div class="section level2">
-
 ## Examples
-
-<div class="sourceCode">
 
 ``` r
 if (FALSE) { # \dontrun{
@@ -111,9 +81,3 @@ table(handled$missing_reason)
 handled <- handle_missing(corrected_ema_data, max_gap = 0)
 } # }
 ```
-
-</div>
-
-</div>
-
-</div>
