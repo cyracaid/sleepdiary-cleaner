@@ -1,8 +1,18 @@
+<div id="main" class="col-md-9" role="main">
+
 # Step 3 – parse interval durations
+
+<div class="ref-description section level2">
 
 Step 3 – parse interval durations
 
+</div>
+
+<div class="section level2">
+
 ## Usage
+
+<div class="sourceCode">
 
 ``` r
 step_process_intervals(
@@ -14,16 +24,30 @@ step_process_intervals(
 )
 ```
 
+</div>
+
+</div>
+
+<div class="section level2">
+
 ## Arguments
 
-- x:
+-   x:
 
-  A `sleep_diary` object.
+    A `sleep_diary` object.
 
-- vars:
+-   vars:
 
-  Character vector of interval variables to process.
+    Character vector of interval variables to process.
+
+</div>
+
+<div class="section level2">
 
 ## Value
 
 A `sleep_diary` object.
+
+</div>
+
+</div>

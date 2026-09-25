@@ -32,7 +32,7 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="active nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -56,30 +56,22 @@
       <h1>如何读懂管线输出（中文）</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/vignettes/interpreting-output-zh.Rmd" class="external-link"><code>vignettes/interpreting-output-zh.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/HEAD/vignettes/interpreting-output-zh.Rmd" class="external-link"><code>vignettes/interpreting-output-zh.Rmd</code></a></small>
       <div class="d-none name"><code>interpreting-output-zh.Rmd</code></div>
     </div>
 
     
     
-<p><code><a href="../reference/run_pipeline.html">run_pipeline()</a></code> 跑完后，两个 CSV
-文件告诉你一切。本文说明怎么读它们、怎么
-对比上一次运行做回归检查、以及怎么看图。</p>
+<p><code><a href="../reference/run_pipeline.html">run_pipeline()</a></code> 跑完后，两个 CSV 文件告诉你一切。本文说明怎么读它们、怎么 对比上一次运行做回归检查、以及怎么看图。</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
-<h2 id="outputcorrection_status_final-csv-运行摘要先看这个">1. <code>output/correction_status_final.csv</code> —
-运行摘要（先看这个）<a class="anchor" aria-label="anchor" href="#outputcorrection_status_final-csv-%E8%BF%90%E8%A1%8C%E6%91%98%E8%A6%81%E5%85%88%E7%9C%8B%E8%BF%99%E4%B8%AA"></a>
+<h2 id="outputcorrection_status_final-csv-运行摘要先看这个">1. <code>output/correction_status_final.csv</code> — 运行摘要（先看这个）<a class="anchor" aria-label="anchor" href="#outputcorrection_status_final-csv-%E8%BF%90%E8%A1%8C%E6%91%98%E8%A6%81%E5%85%88%E7%9C%8B%E8%BF%99%E4%B8%AA"></a>
 </h2>
-<p>每次运行一行。回答”清洗是否按预期工作？”</p>
+<p>每次运行一行。回答“清洗是否按预期工作？”</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"output/correction_status_final.csv"</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
-<colgroup>
-<col width="22%">
-<col width="44%">
-<col width="33%">
-</colgroup>
 <thead><tr class="header">
 <th>列</th>
 <th>它告诉你…</th>
@@ -94,14 +86,12 @@
 <tr class="even">
 <td><code>tst_mean_h</code></td>
 <td>平均总睡眠时间（小时）</td>
-<td>大多数成人研究 6.0–8.5 h 正常。若 &lt; 5 或 &gt;
-10，时间戳解析或研究人群异常。</td>
+<td>大多数成人研究 6.0–8.5 h 正常。若 &lt; 5 或 &gt; 10，时间戳解析或研究人群异常。</td>
 </tr>
 <tr class="odd">
 <td><code>sol_mean_min</code></td>
 <td>平均入睡潜伏期（分钟）</td>
-<td>10–45 min 正常。若 &gt; 60，人群失眠率高或 AM/PM
-混淆未完全修正。</td>
+<td>10–45 min 正常。若 &gt; 60，人群失眠率高或 AM/PM 混淆未完全修正。</td>
 </tr>
 <tr class="even">
 <td><code>n_clean</code></td>
@@ -140,14 +130,12 @@
 </tr>
 </tbody>
 </table>
-<p><strong>稳定性规则</strong>：同一数据跑两次 →
-每个数字必须相同。否则非确定性。</p>
+<p><strong>稳定性规则</strong>：同一数据跑两次 → 每个数字必须相同。否则非确定性。</p>
 </div>
 <div class="section level2">
-<h2 id="outputstep_flag_ledger-csv-每步标记追踪第二个看">2. <code>output/step_flag_ledger.csv</code> —
-每步标记追踪（第二个看）<a class="anchor" aria-label="anchor" href="#outputstep_flag_ledger-csv-%E6%AF%8F%E6%AD%A5%E6%A0%87%E8%AE%B0%E8%BF%BD%E8%B8%AA%E7%AC%AC%E4%BA%8C%E4%B8%AA%E7%9C%8B"></a>
+<h2 id="outputstep_flag_ledger-csv-每步标记追踪第二个看">2. <code>output/step_flag_ledger.csv</code> — 每步标记追踪（第二个看）<a class="anchor" aria-label="anchor" href="#outputstep_flag_ledger-csv-%E6%AF%8F%E6%AD%A5%E6%A0%87%E8%AE%B0%E8%BF%BD%E8%B8%AA%E7%AC%AC%E4%BA%8C%E4%B8%AA%E7%9C%8B"></a>
 </h2>
-<p>每行 = 步骤 × 标准 × 类别。回答”哪个步骤出现哪种标记，是否持续？”</p>
+<p>每行 = 步骤 × 标准 × 类别。回答“哪个步骤出现哪种标记，是否持续？”</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ledger</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"output/step_flag_ledger.csv"</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
@@ -210,11 +198,9 @@
 <tr class="odd">
 <td><code>field_misentry</code></td>
 <td align="center">1.5</td>
-<td>时长估计（SOL、WASO）是否恰好匹配时间戳——可能”填错框”</td>
+<td>时长估计（SOL、WASO）是否恰好匹配时间戳——可能“填错框”</td>
 <td>
-<code>none</code>, <code>SOL=time_sleep</code>,
-<code>SOL=time_bed</code>, <code>WASO=time_awake</code>,
-<code>WASO=time_getup</code>
+<code>none</code>, <code>SOL=time_sleep</code>, <code>SOL=time_bed</code>, <code>WASO=time_awake</code>, <code>WASO=time_getup</code>
 </td>
 </tr>
 <tr class="even">
@@ -222,8 +208,7 @@
 <td align="center">4</td>
 <td>bed → sleep → awake → getup 序列的时序与合理性</td>
 <td>
-<code>clean</code>, <code>error</code>, <code>unusual</code>,
-<code>equal_time_ok</code>, <code>skipped_na</code>
+<code>clean</code>, <code>error</code>, <code>unusual</code>, <code>equal_time_ok</code>, <code>skipped_na</code>
 </td>
 </tr>
 <tr class="odd">
@@ -231,8 +216,7 @@
 <td align="center">7</td>
 <td>每条记录触发多少派生指标标记</td>
 <td>
-<code>Clean</code>, <code>Minor (1 flag)</code>,
-<code>Major (2+ flags)</code>
+<code>Clean</code>, <code>Minor (1 flag)</code>, <code>Major (2+ flags)</code>
 </td>
 </tr>
 <tr class="even">
@@ -240,8 +224,7 @@
 <td align="center">7</td>
 <td>生理合理界外的总睡眠时间</td>
 <td>
-<code>OK</code>, <code>Too short (&lt; 3 h)</code>,
-<code>Too long (&gt; 12 h)</code>
+<code>OK</code>, <code>Too short (&lt; 3 h)</code>, <code>Too long (&gt; 12 h)</code>
 </td>
 </tr>
 <tr class="odd">
@@ -249,29 +232,22 @@
 <td align="center">8</td>
 <td>Step 8 汇总的自动检测标记</td>
 <td>
-<code>TIMESTAMP_ISSUE</code>, <code>DURATION_ISSUE</code>,
-<code>AMOUNT_FLAG</code>, <code>SELF_REPORTED_FLAG</code>
+<code>TIMESTAMP_ISSUE</code>, <code>DURATION_ISSUE</code>, <code>AMOUNT_FLAG</code>, <code>SELF_REPORTED_FLAG</code>
 </td>
 </tr>
 </tbody>
 </table>
-<p><strong>概念规则</strong>：标准只计算一次、从不重算。若某标准计数在其首次计算步骤后改变，
-就有问题。</p>
+<p><strong>概念规则</strong>：标准只计算一次、从不重算。若某标准计数在其首次计算步骤后改变， 就有问题。</p>
 <p><strong>验证规则</strong>：</p>
 <ol style="list-style-type: decimal">
 <li>
-<code>field_misentry</code> — Step 1.5 起有数。任何
-<code>SOL=time_bed</code> 或 <code>WASO=time_getup</code>
-<code>count &gt; 0</code> = 潜在跨字段污染。</li>
+<code>field_misentry</code> — Step 1.5 起有数。任何 <code>SOL=time_bed</code> 或 <code>WASO=time_getup</code> <code>count &gt; 0</code> = 潜在跨字段污染。</li>
 <li>
-<code>data_category</code> — Step 6
-起数字必须<strong>稳定</strong>：<code>equal_time_ok + skipped_na = n_total</code>。</li>
+<code>data_category</code> — Step 6 起数字必须<strong>稳定</strong>：<code>equal_time_ok + skipped_na = n_total</code>。</li>
 <li>
-<code>flag_severity</code> — Step 7 起 Steps 7/8/8.5 完全相同：
-<code>Clean + Minor + Major = n_total - skipped_na</code>。</li>
+<code>flag_severity</code> — Step 7 起 Steps 7/8/8.5 完全相同： <code>Clean + Minor + Major = n_total - skipped_na</code>。</li>
 <li>
-<code>duration_extreme</code> — <code>Too short + Too long</code> 应
-&lt; 总记录 5%。</li>
+<code>duration_extreme</code> — <code>Too short + Too long</code> 应 &lt; 总记录 5%。</li>
 <li>
 <code>checkforerrors</code> — 仅 Step 8 有数据。</li>
 </ol>
@@ -285,8 +261,7 @@
 <div class="section level2">
 <h2 id="回归检查对比上次运行">3. 回归检查（对比上次运行）<a class="anchor" aria-label="anchor" href="#%E5%9B%9E%E5%BD%92%E6%A3%80%E6%9F%A5%E5%AF%B9%E6%AF%94%E4%B8%8A%E6%AC%A1%E8%BF%90%E8%A1%8C"></a>
 </h2>
-<p><code>output/correction_status_old.csv</code>
-不是任何管线脚本写的——重跑前你自己另存一份 基线：</p>
+<p><code>output/correction_status_old.csv</code> 不是任何管线脚本写的——重跑前你自己另存一份 基线：</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 重跑之前：把当前结果存成基线</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span><span class="st">"output/correction_status_final.csv"</span>, <span class="st">"output/correction_status_old.csv"</span>,</span>
@@ -304,11 +279,6 @@
 <h2 id="快速检查卡">4. 快速检查卡<a class="anchor" aria-label="anchor" href="#%E5%BF%AB%E9%80%9F%E6%A3%80%E6%9F%A5%E5%8D%A1"></a>
 </h2>
 <table class="table">
-<colgroup>
-<col width="24%">
-<col width="44%">
-<col width="31%">
-</colgroup>
 <thead><tr class="header">
 <th>检查项</th>
 <th>如何验证</th>
@@ -363,11 +333,7 @@
 <div class="section level2">
 <h2 id="如何看图">5. 如何看图<a class="anchor" aria-label="anchor" href="#%E5%A6%82%E4%BD%95%E7%9C%8B%E5%9B%BE"></a>
 </h2>
-<p>图保存在
-<code>latest_visualization_&lt;tag&gt;_n&lt;rows&gt;/</code>（每次运行覆盖——无历史）。
-<code>figure_index.png</code>
-总览所有图。稳定验证产物（snapshot、Bland-Altman 图、阈值 验证）单独在
-<code>output/verification/&lt;tag&gt;/</code>。</p>
+<p>图保存在 <code>latest_visualization_&lt;tag&gt;_n&lt;rows&gt;/</code>（每次运行覆盖——无历史）。 <code>figure_index.png</code> 总览所有图。稳定验证产物（snapshot、Bland-Altman 图、阈值 验证）单独在 <code>output/verification/&lt;tag&gt;/</code>。</p>
 <p><strong>出版用图（Methods 部分）：</strong></p>
 <table class="table">
 <colgroup>
@@ -384,25 +350,17 @@
 <tr class="odd">
 <td><strong>图 1 — 管线流程</strong></td>
 <td><code>pipeline_cleaning/01_Pipeline_Flow_Diagram.png</code></td>
-<td>垂直流程图：raw → 解析 → 算法修正 → 人工修正 →
-最终有效，各阶段计数与 %</td>
+<td>垂直流程图：raw → 解析 → 算法修正 → 人工修正 → 最终有效，各阶段计数与 %</td>
 </tr>
 <tr class="even">
 <td><strong>图 2 — 修正影响</strong></td>
 <td><code>research_ready/02_Correction_Impact.png</code></td>
-<td>A/B delta lollipop（仅修正记录，TST &amp; SOL）+ 一致性散点 +
-前后汇总表</td>
+<td>A/B delta lollipop（仅修正记录，TST &amp; SOL）+ 一致性散点 + 前后汇总表</td>
 </tr>
 </tbody>
 </table>
 <p><strong>5 张必看检查图：</strong></p>
 <table class="table">
-<colgroup>
-<col width="14%">
-<col width="19%">
-<col width="43%">
-<col width="21%">
-</colgroup>
 <thead><tr class="header">
 <th align="center">步骤</th>
 <th>图</th>
