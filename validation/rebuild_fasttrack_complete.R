@@ -103,18 +103,45 @@ extract_time <- function(x) {
 }
 
 # Original = the RAW entry the participant typed (dialect preserved).
-# Corrected = the faithful decode used by the disambiguation pass (from_time
-#             = sleep, to_time = awake; bed/getup from their own columns).
+# Corrected = the PIPELINE's actual corrected value from the final data
+#             (cleaned_data_full.rds), matched by raw_row_id. This is what
+#             normalize_sleep_time_sequence actually produced (AM/PM flip),
+#             NOT the literal PM decode of from_time. (Previous versions
+#             showed the literal decode here, which contradicted the actual
+#             fix and confused review: e.g. sleep "01:20 l" showed as 13:20
+#             "corrected" while the pipeline had already fixed it to 01:20.)
 fasttrack$Time_Bed_Original   <- fasttrack$Raw_Bed
 fasttrack$Time_Sleep_Original <- fasttrack$Raw_Sleep
 fasttrack$Time_Awake_Original <- fasttrack$Raw_Awake
 fasttrack$Time_Getup_Original <- fasttrack$Raw_Getup
-fasttrack$Time_Bed_Corrected   <- extract_time(fasttrack$time_bed_am_hhmm_ampm)
-fasttrack$Time_Sleep_Corrected <- extract_time(fasttrack$from_time)
-fasttrack$Time_Awake_Corrected <- extract_time(fasttrack$to_time)
-fasttrack$Time_Getup_Corrected <- extract_time(fasttrack$time_getup_am_hhmm_ampm)
 
-cat("Extracted: Original = raw participant entries, Corrected = decoded times.\n")
+# Pull pipeline-corrected times from the final dataset when available.
+pipeline_corr_path <- "output/cleaned_data_full.rds"
+if (file.exists(pipeline_corr_path)) {
+  full <- readRDS(pipeline_corr_path)
+  full$key <- paste(full$pid, full$day_num)
+  ft_key <- paste(fasttrack$pid, fasttrack$day_num)
+  match_idx <- match(ft_key, full$key)
+  get_corr <- function(col) {
+    vals <- full[[col]][match_idx]
+    out <- rep(NA_character_, length(vals))
+    ok <- !is.na(vals)
+    out[ok] <- format(as.POSIXct(vals[ok], tz = "America/Los_Angeles"), "%Y-%m-%d %H:%M")
+    out
+  }
+  fasttrack$Time_Bed_Corrected   <- get_corr("time_bed_corrected")
+  fasttrack$Time_Sleep_Corrected <- get_corr("time_sleep_corrected")
+  fasttrack$Time_Awake_Corrected <- get_corr("time_awake_corrected")
+  fasttrack$Time_Getup_Corrected <- get_corr("time_getup_corrected")
+  cat("Corrected times pulled from pipeline final data (cleaned_data_full.rds).\n")
+} else {
+  # Fallback: literal decode (best available without pipeline output)
+  fasttrack$Time_Bed_Corrected   <- extract_time(fasttrack$time_bed_am_hhmm_ampm)
+  fasttrack$Time_Sleep_Corrected <- extract_time(fasttrack$from_time)
+  fasttrack$Time_Awake_Corrected <- extract_time(fasttrack$to_time)
+  fasttrack$Time_Getup_Corrected <- extract_time(fasttrack$time_getup_am_hhmm_ampm)
+  cat("WARNING: cleaned_data_full.rds not found; Corrected = literal decode.\n")
+}
 
 # ===== BUILD OUTPUT (INTERNAL) =====
 # Drop any stale Time_*_Original / Time_*_Corrected columns the input may have
