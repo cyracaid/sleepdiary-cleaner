@@ -125,9 +125,29 @@ fasttrack$Time_Getup_Original <- fasttrack$Raw_Getup
 # the provenance sidecar so a reviewer can see EXACTLY which pipeline run (and
 # which normalize code version) produced the Corrected columns -- otherwise a
 # stale file would silently feed wrong corrections into the review sheet.
+#
+# DATE FIX (2026-09-25): the pipeline's main input is the de-identified rds,
+# which drops StartDate, so process_timestamp falls back to the 2000-01-01
+# placeholder date. The sber csv (same 237 pids / 13990 rows, verified
+# same-source) retains the real observation date. We substitute the real
+# date_of_obs for the placeholder so the review sheet shows the actual diary
+# date, not 2000-01-01.
 pipeline_corr_path <- "output/cleaned_data_full.rds"
 pipeline_corr_meta <- list(used = FALSE, path = NA_character_, md5 = NA_character_,
                            mtime = NA_character_, normalize_code_md5 = NA_character_)
+real_date <- NULL
+if (file.exists(raw_path) && file.exists(pipeline_corr_path)) {
+  raw_date <- read.csv(raw_path, stringsAsFactors = FALSE, check.names = FALSE)
+  if ("date_of_obs" %in% names(raw_date)) {
+    real_date <- data.frame(
+      pid = raw_date$pid, day_num = raw_date$day_num,
+      date = substr(raw_date$date_of_obs, 1, 10),
+      stringsAsFactors = FALSE)
+    # collapse to one date per pid+day (duplicate survey rows share the date)
+    real_date <- real_date[!is.na(real_date$pid) & !is.na(real_date$date), ]
+    real_date <- real_date[!duplicated(paste(real_date$pid, real_date$day_num)), ]
+  }
+}
 if (file.exists(pipeline_corr_path)) {
   full <- readRDS(pipeline_corr_path)
   full$key <- paste(full$pid, full$day_num)
@@ -144,12 +164,47 @@ if (file.exists(pipeline_corr_path)) {
   fasttrack$Time_Sleep_Corrected <- get_corr("time_sleep_corrected")
   fasttrack$Time_Awake_Corrected <- get_corr("time_awake_corrected")
   fasttrack$Time_Getup_Corrected <- get_corr("time_getup_corrected")
+
+  # Substitute real dates for the 2000-01-01 placeholder.
+  if (!is.null(real_date)) {
+    rd_key <- paste(real_date$pid, real_date$day_num)
+    real_dates <- real_date$date[match(ft_key, rd_key)]
+    fix_date <- function(col) {
+      out <- fasttrack[[col]]
+      is_today   <- grepl("^2000-01-01", out)
+      is_prevday <- grepl("^1999-12-31", out)
+      has_real <- !is.na(real_dates)
+
+      # 2000-01-01 placeholder == the anchor day itself -> date_of_obs as-is.
+      swap_today <- is_today & has_real
+      out[swap_today] <- paste0(real_dates[swap_today], " ", sub(".* ", "", out[swap_today]))
+
+      # 1999-12-31 placeholder == the anchor day (2000-01-01) shifted back one
+      # day by process_timestamp()'s bed/sleep >15:00 rule (evening times roll
+      # to "the night before"). The real date must get the same one-day
+      # shift from date_of_obs, or the record silently lands on the wrong
+      # calendar day (e.g. pid 2720 day 1: date_of_obs=2020-10-23, sleep
+      # 23:45 belongs to the night of 2020-10-22, not 2020-10-23).
+      swap_prev <- is_prevday & has_real
+      out[swap_prev] <- paste0(
+        as.character(as.Date(real_dates[swap_prev]) - 1), " ",
+        sub(".* ", "", out[swap_prev])
+      )
+
+      out
+    }
+    fasttrack$Time_Bed_Corrected   <- fix_date("Time_Bed_Corrected")
+    fasttrack$Time_Sleep_Corrected <- fix_date("Time_Sleep_Corrected")
+    fasttrack$Time_Awake_Corrected <- fix_date("Time_Awake_Corrected")
+    fasttrack$Time_Getup_Corrected <- fix_date("Time_Getup_Corrected")
+    cat("Substituted real observation dates for 2000-01-01 placeholders.\n")
+  }
+
   pipeline_corr_meta$used <- TRUE
   pipeline_corr_meta$path <- pipeline_corr_path
   pipeline_corr_meta$md5 <- unname(tools::md5sum(pipeline_corr_path))
   pipeline_corr_meta$mtime <- as.character(file.mtime(pipeline_corr_path))
   # fingerprint of the normalize rule code (the thing that PRODUCES these values)
-  norm_code <- if (file.exists("R/normalize_sequence.R")) paste(readLines("R/normalize_sequence.R"), collapse = "\n") else ""
   pipeline_corr_meta$normalize_code_md5 <- unname(tools::md5sum("R/normalize_sequence.R"))
   cat("Corrected times pulled from pipeline final data (cleaned_data_full.rds).\n")
   cat(sprintf("  [track] %s md5=%s mtime=%s\n", pipeline_corr_path,

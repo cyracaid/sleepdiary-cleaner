@@ -67,7 +67,14 @@ process_timestamp <- function(df, varname, format) {
     if (is.logical(df[[tstamp.varname]])) {
       df[[tstamp.varname]] <- NA_character_
     } else if (inherits(df[[tstamp.varname]], "hms") || inherits(df[[tstamp.varname]], "difftime")) {
-      df[[tstamp.varname]] <- format(df[[tstamp.varname]], "%H:%M")
+      # R >= 4.x: format(<difftime>, "%H:%M") raises "invalid 'trim' argument"
+      # (format.difftime does not accept the "%H:%M" format string). Convert
+      # to seconds and build the HH:MM string ourselves. Both hms and difftime
+      # support the units = "secs" argument.
+      secs <- as.numeric(df[[tstamp.varname]], units = "secs")
+      out <- sprintf("%02d:%02d", floor(secs / 3600) %% 24, floor((secs %% 3600) / 60))
+      out[is.na(secs)] <- NA
+      df[[tstamp.varname]] <- out
     } else {
       df[[tstamp.varname]] <- as.character(df[[tstamp.varname]])
     }
