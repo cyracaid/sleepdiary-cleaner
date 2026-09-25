@@ -116,7 +116,18 @@ fasttrack$Time_Awake_Original <- fasttrack$Raw_Awake
 fasttrack$Time_Getup_Original <- fasttrack$Raw_Getup
 
 # Pull pipeline-corrected times from the final dataset when available.
+# TRACKABILITY (2026-09-25): cleaned_data_full.rds is a PIPELINE RUN ARTIFACT,
+# not source data. Its corrected values are produced by
+# R/normalize_sequence.R's normalize_sleep_time_sequence() (12h AM/PM flip,
+# flip_gap_hours=12, swap_threshold=3h). If the pipeline is re-run, this file
+# is regenerated; if the normalize RULES change, the corrected values change
+# with them. We record the artifact's md5 + mtime + the R-code fingerprint in
+# the provenance sidecar so a reviewer can see EXACTLY which pipeline run (and
+# which normalize code version) produced the Corrected columns -- otherwise a
+# stale file would silently feed wrong corrections into the review sheet.
 pipeline_corr_path <- "output/cleaned_data_full.rds"
+pipeline_corr_meta <- list(used = FALSE, path = NA_character_, md5 = NA_character_,
+                           mtime = NA_character_, normalize_code_md5 = NA_character_)
 if (file.exists(pipeline_corr_path)) {
   full <- readRDS(pipeline_corr_path)
   full$key <- paste(full$pid, full$day_num)
@@ -133,7 +144,16 @@ if (file.exists(pipeline_corr_path)) {
   fasttrack$Time_Sleep_Corrected <- get_corr("time_sleep_corrected")
   fasttrack$Time_Awake_Corrected <- get_corr("time_awake_corrected")
   fasttrack$Time_Getup_Corrected <- get_corr("time_getup_corrected")
+  pipeline_corr_meta$used <- TRUE
+  pipeline_corr_meta$path <- pipeline_corr_path
+  pipeline_corr_meta$md5 <- unname(tools::md5sum(pipeline_corr_path))
+  pipeline_corr_meta$mtime <- as.character(file.mtime(pipeline_corr_path))
+  # fingerprint of the normalize rule code (the thing that PRODUCES these values)
+  norm_code <- if (file.exists("R/normalize_sequence.R")) paste(readLines("R/normalize_sequence.R"), collapse = "\n") else ""
+  pipeline_corr_meta$normalize_code_md5 <- unname(tools::md5sum("R/normalize_sequence.R"))
   cat("Corrected times pulled from pipeline final data (cleaned_data_full.rds).\n")
+  cat(sprintf("  [track] %s md5=%s mtime=%s\n", pipeline_corr_path,
+              substr(pipeline_corr_meta$md5, 1, 8), pipeline_corr_meta$mtime))
 } else {
   # Fallback: literal decode (best available without pipeline output)
   fasttrack$Time_Bed_Corrected   <- extract_time(fasttrack$time_bed_am_hhmm_ampm)
@@ -213,16 +233,22 @@ if (file.exists(output_internal)) {
   cat("Snapshotted pre-overwrite version to:", snapshot_path, "\n")
 }
 
+track_note <- if (isTRUE(pipeline_corr_meta$used)) {
+  sprintf("Corrected columns sourced from PIPELINE RUN ARTIFACT %s (md5=%s, mtime=%s); normalize rule code md5=%s. Re-run pipeline if normalize rules change -- stale artifact would feed wrong corrections.",
+          pipeline_corr_meta$path, pipeline_corr_meta$md5,
+          pipeline_corr_meta$mtime, pipeline_corr_meta$normalize_code_md5)
+} else {
+  "WARNING: cleaned_data_full.rds not found; Corrected = literal decode (not pipeline output)."
+}
+
 write_csv_with_provenance(
   internal_output, output_internal,
   script_path = "validation/rebuild_fasttrack_complete.R",
   inputs = input_path,
   notes = paste0(
-    "Zero-join rebuild: all 4 decoded times extracted from the disambiguate ",
-    "worksheet columns (from_time/to_time/time_bed_am_hhmm_ampm/",
-    "time_getup_am_hhmm_ampm). Original == Corrected (faithful decode); the ",
-    "AM/PM correction is the reviewer's Accept decision. No sber join, no ",
-    "row reordering, no column-suffix pollution."
+    "Zero-join rebuild: Original = raw entries, Corrected = ",
+    if (isTRUE(pipeline_corr_meta$used)) "pipeline actual values." else "literal decode (pipeline missing). ",
+    track_note
   ),
   quote = TRUE
 )
@@ -232,7 +258,10 @@ write_csv_with_provenance(
   user_output, output_user,
   script_path = "validation/rebuild_fasttrack_complete.R",
   inputs = input_path,
-  notes = "User-facing review sheet derived from the same run as manual_disambiguation_fasttrack.csv.",
+  notes = paste0(
+    "User-facing review sheet derived from the same run as manual_disambiguation_fasttrack.csv. ",
+    track_note
+  ),
   quote = TRUE
 )
 cat("\u2713 Wrote:", output_user, "\n")
