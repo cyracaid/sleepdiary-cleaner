@@ -30,7 +30,7 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
+<li class="active nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -54,7 +54,7 @@
       <h1>Data-first entry: clean_sleep_diary()</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/HEAD/vignettes/data-first.Rmd" class="external-link"><code>vignettes/data-first.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/vignettes/data-first.Rmd" class="external-link"><code>vignettes/data-first.Rmd</code></a></small>
       <div class="d-none name"><code>data-first.Rmd</code></div>
     </div>
 
@@ -63,7 +63,10 @@
 <div class="section level2">
 <h2 id="data-first-entry-clean_sleep_diary">Data-first entry: <code>clean_sleep_diary()</code><a class="anchor" aria-label="anchor" href="#data-first-entry-clean_sleep_diary"></a>
 </h2>
-<p>The pipeline can run entirely from a data file or data.frame — no config file required. Column names are inferred, every schema inference decision is recorded, and a provenance manifest is written alongside the cleaned output.</p>
+<p>The pipeline can run entirely from a data file or data.frame — no
+config file required. Column names are inferred, every schema inference
+decision is recorded, and a provenance manifest is written alongside the
+cleaned output.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
 <span></span>
@@ -79,6 +82,10 @@
 <h3 id="return-value-6-field-contract">Return value (6-field contract)<a class="anchor" aria-label="anchor" href="#return-value-6-field-contract"></a>
 </h3>
 <table class="table">
+<colgroup>
+<col width="14%">
+<col width="85%">
+</colgroup>
 <thead><tr class="header">
 <th>Field</th>
 <th>Contents</th>
@@ -86,7 +93,8 @@
 <tbody>
 <tr class="odd">
 <td><code>cleaned</code></td>
-<td>Cleaned Dataset A as a data.frame (<code>NULL</code> in dry-run)</td>
+<td>Cleaned Dataset A as a data.frame (<code>NULL</code> in
+dry-run)</td>
 </tr>
 <tr class="even">
 <td><code>config</code></td>
@@ -102,11 +110,13 @@
 </tr>
 <tr class="odd">
 <td><code>outputs</code></td>
-<td>Named output paths (<code>cleaned_csv</code>, <code>ledger_csv</code>, <code>manifest_json</code>)</td>
+<td>Named output paths (<code>cleaned_csv</code>,
+<code>ledger_csv</code>, <code>manifest_json</code>)</td>
 </tr>
 <tr class="even">
 <td><code>manifest</code></td>
-<td>Provenance manifest (also written to <code>outputs$manifest_json</code>)</td>
+<td>Provenance manifest (also written to
+<code>outputs$manifest_json</code>)</td>
 </tr>
 </tbody>
 </table>
@@ -114,23 +124,34 @@
 <div class="section level3">
 <h3 id="column-auto-guessing">Column auto-guessing<a class="anchor" aria-label="anchor" href="#column-auto-guessing"></a>
 </h3>
-<p><code><a href="../reference/guess_column_mapping.html">guess_column_mapping()</a></code> matches raw column names against known aliases:</p>
+<p><code><a href="../reference/guess_column_mapping.html">guess_column_mapping()</a></code> matches raw column names against
+known aliases:</p>
 <ul>
-<li>exact alias match (e.g. <code>bedtime</code> -&gt; <code>time_bed_hhmm</code>, confidence 1.0)</li>
+<li>exact alias match (e.g. <code>bedtime</code> -&gt;
+<code>time_bed_hhmm</code>, confidence 1.0)</li>
 <li>semantic substring match (confidence 0.6)</li>
-<li>ambiguous ties are <strong>never silently resolved</strong> — they are recorded with their candidate set and left unmapped</li>
-<li>required schema fields with no matching column are marked <code>absent</code> and <code><a href="../reference/validate_schema.html">validate_schema()</a></code> fails loudly with the missing list</li>
+<li>ambiguous ties are <strong>never silently resolved</strong> — they
+are recorded with their candidate set and left unmapped</li>
+<li>required schema fields with no matching column are marked
+<code>absent</code> and <code><a href="../reference/validate_schema.html">validate_schema()</a></code> fails loudly with
+the missing list</li>
 </ul>
-<p>Every decision row carries: <code>user_col, internal_col, match_rule, confidence, status, candidate_set</code>. The package does not silently infer schema; it records every schema inference decision.</p>
+<p>Every decision row carries:
+<code>user_col, internal_col, match_rule, confidence, status, candidate_set</code>.
+The package does not silently infer schema; it records every schema
+inference decision.</p>
 </div>
 <div class="section level3">
 <h3 id="provenance-manifest">Provenance manifest<a class="anchor" aria-label="anchor" href="#provenance-manifest"></a>
 </h3>
-<p>Each full run writes <code>run_manifest_&lt;timestamp&gt;.json</code>:</p>
+<p>Each full run writes
+<code>run_manifest_&lt;timestamp&gt;.json</code>:</p>
 <ul>
-<li>input identity: <strong>md5 hash</strong> (the hash is the identity; path is auxiliary), size, basename</li>
+<li>input identity: <strong>md5 hash</strong> (the hash is the identity;
+path is auxiliary), size, basename</li>
 <li>
-<code>commit</code> (or <code>null</code> outside a git repo — “not available” is a distinct state)</li>
+<code>commit</code> (or <code>null</code> outside a git repo — “not
+available” is a distinct state)</li>
 <li>
 <code>timestamp_utc</code> (UTC only)</li>
 <li>environment: R version, platform, package versions</li>
@@ -143,12 +164,18 @@
 <div class="section level3">
 <h3 id="dry-run">dry-run<a class="anchor" aria-label="anchor" href="#dry-run"></a>
 </h3>
-<p><code>dry_run = TRUE</code> stops after input hashing + schema detection + column mapping + config resolution. It prints the mapping preview, writes <code>dry_run_manifest.json</code>, and <strong>never writes a cleaned dataset</strong>. The raw input is never modified in any mode.</p>
+<p><code>dry_run = TRUE</code> stops after input hashing + schema
+detection + column mapping + config resolution. It prints the mapping
+preview, writes <code>dry_run_manifest.json</code>, and <strong>never
+writes a cleaned dataset</strong>. The raw input is never modified in
+any mode.</p>
 </div>
 <div class="section level3">
 <h3 id="raw-input-is-never-modified">Raw input is never modified<a class="anchor" aria-label="anchor" href="#raw-input-is-never-modified"></a>
 </h3>
-<p>The adapted input is written to an internal copy inside the project directory; the user’s original file or data.frame is untouched (verified by test).</p>
+<p>The adapted input is written to an internal copy inside the project
+directory; the user’s original file or data.frame is untouched (verified
+by test).</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
