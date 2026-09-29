@@ -1,4 +1,8 @@
+<div id="main" class="col-md-9" role="main">
+
 # The S3 cleaning chain
+
+<div class="ref-description section level2">
 
 Runs the pure data-in / data-out portion of the pipeline as a single
 composable chain. These are the six steps that take a data frame and
@@ -6,7 +10,13 @@ return a data frame with no file I/O and no reliance on the global
 environment: timestamps, intervals, sequence normalisation, manual
 corrections, duration corrections and metric computation.
 
+</div>
+
+<div class="section level2">
+
 ## Usage
+
+<div class="sourceCode">
 
 ``` r
 run_cleaning_chain(
@@ -18,55 +28,67 @@ run_cleaning_chain(
 )
 ```
 
+</div>
+
+</div>
+
+<div class="section level2">
+
 ## Arguments
 
-- data:
+-   data:
 
-  A raw data frame, or an existing `sleep_diary` object.
+    A raw data frame, or an existing `sleep_diary` object.
 
-- corrections_df:
+-   corrections\_df:
 
-  Data frame of manual error corrections (Step 6). Pass an empty
-  [`data.frame()`](https://rdrr.io/r/base/data.frame.html) to run
-  without corrections.
+    Data frame of manual error corrections (Step 6). Pass an empty
+    `data.frame()` to run without corrections.
 
-- manual_unusual_df:
+-   manual\_unusual\_df:
 
-  Data frame of manual unusual-pattern decisions.
+    Data frame of manual unusual-pattern decisions.
 
-- cfg:
+-   cfg:
 
-  List or NULL. Pipeline configuration. Defaults to the
-  `pipeline_config` published by
-  [`run_pipeline()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_pipeline.md),
-  if present.
+    List or NULL. Pipeline configuration. Defaults to the
+    `pipeline_config` published by `run_pipeline()`, if present.
 
-- verbose:
+-   verbose:
 
-  Logical. Print per-step progress.
+    Logical. Print per-step progress.
+
+</div>
+
+<div class="section level2">
 
 ## Value
 
 A `sleep_diary` object carrying the cleaned data and the full step
-history. Call
-[`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) on it to
-recover a plain data frame identical in shape to the v1.2.0
-`corrected_ema_data`.
+history. Call `as.data.frame()` on it to recover a plain data frame
+identical in shape to the v1.2.0 `corrected_ema_data`.
+
+</div>
+
+<div class="section level2">
 
 ## Details
 
-The remaining steps of
-[`run_pipeline()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_pipeline.md)
-– data loading (1), the field-misentry check (1.5), review-file
-generation (5), second-review consensus (5.75), auto-detection (8), the
-cross-participant check (8.5) and visualisation (9) – are deliberately
-NOT part of the chain in v1.3.0. They write files or publish objects
-into the global environment, so folding them in would change behaviour
-rather than just re-shape it. They stay in
-[`run_pipeline()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_pipeline.md)
-until snapshot tests cover them.
+The remaining steps of `run_pipeline()` – data loading (1), the
+field-misentry check (1.5), review-file generation (5), second-review
+consensus (5.75), auto-detection (8), the cross-participant check (8.5)
+and visualisation (9) – are deliberately NOT part of the chain in
+v1.3.0. They write files or publish objects into the global environment,
+so folding them in would change behaviour rather than just re-shape it.
+They stay in `run_pipeline()` until snapshot tests cover them.
+
+</div>
+
+<div class="section level2">
 
 ## Examples
+
+<div class="sourceCode">
 
 ``` r
 if (FALSE) { # \dontrun{
@@ -76,3 +98,9 @@ plot(cleaned)
 corrected_ema_data <- as.data.frame(cleaned)
 } # }
 ```
+
+</div>
+
+</div>
+
+</div>

@@ -1,14 +1,24 @@
+<div id="main" class="col-md-9" role="main">
+
 # 列映射、配置与数据格式（中文）
 
 sleepcleanr 通过 YAML
 配置文件完全可配置：把数据集的列名映射到管线内部变量、
 调整阈值，无需修改任何 R 代码。
 
+<div id="cb1" class="sourceCode">
+
 ``` r
 library(sleepcleanr)
 ```
 
+</div>
+
+<div class="section level2">
+
 ## 安装与运行
+
+<div id="cb2" class="sourceCode">
 
 ``` r
 # 从 GitHub 安装
@@ -19,7 +29,15 @@ library(sleepcleanr)
 run_pipeline()
 ```
 
+</div>
+
+</div>
+
+<div class="section level2">
+
 ## 适配自己的数据集
+
+<div id="cb3" class="sourceCode">
 
 ``` r
 # 第 1 步：复制配置模板
@@ -28,9 +46,13 @@ file.copy(system.file("config_template.yaml", package = "sleepcleanr"),
           "my_study.yaml")
 ```
 
+</div>
+
 **第 2 步：编辑 `my_study.yaml`**
 
 文件开头只有两项必须改：
+
+<div id="cb4" class="sourceCode">
 
 ``` yaml
 data:
@@ -39,15 +61,21 @@ data:
     extra: ""                    # 除非 StartDate 在单独文件里，否则留空
 ```
 
+</div>
+
 三种常见场景： -
 **全部在一个文件**（大多数数据集）：`main: "my_data.rds"`，`extra: ""` -
 **数据分两个文件**：`main: "ema_vars.rds"`，`extra: "dates.csv"` -
 **你的数据是 CSV**：`main: "my_data.csv"`，`extra: ""` — `.csv`
 扩展名自动检测
 
+<div class="section level3">
+
 ### 列映射
 
 把数据集的列名映射到管线的内部变量：
+
+<div id="cb5" class="sourceCode">
 
 ``` yaml
 column_mapping:
@@ -67,9 +95,17 @@ column_mapping:
     alcohol: "alcohol_drinks"
 ```
 
+</div>
+
+</div>
+
+<div class="section level3">
+
 ### 阈值
 
 按你的研究人群调整检测灵敏度：
+
+<div id="cb6" class="sourceCode">
 
 ``` yaml
 classification:
@@ -88,10 +124,18 @@ classification:
     high_waso_threshold_hours: 1.5      # WASO > 1.5h → 标记
 ```
 
+</div>
+
 阈值依据见
 `THRESHOLDS.md`——默认值对健康成人样本故意宽松；临床人群需重审。
 
+</div>
+
+<div class="section level3">
+
 ### 时间戳格式
+
+<div id="cb7" class="sourceCode">
 
 ``` yaml
 timestamp:
@@ -101,29 +145,45 @@ timestamp:
     pm_keywords: ["PM", "pm"]
 ```
 
+</div>
+
 **第 3 步：用你的配置运行**
+
+<div id="cb8" class="sourceCode">
 
 ``` r
 run_pipeline(config = "my_study_config.yaml")
 ```
 
+</div>
+
 所有管线脚本自动读取配置；无需改 R 代码。
+
+</div>
+
+</div>
+
+<div class="section level2">
 
 ## 输入数据结构
 
 **本仓库不含原始参与者数据。** 所有含参与者数据的 CSV 都被 gitignore。
 含合成数据的模板在 `templates/`。
 
-| 列组                | 变量                                                                                                                                    | 说明                            |
-|---------------------|-----------------------------------------------------------------------------------------------------------------------------------------|---------------------------------|
-| 标识符              | pid, day_num, row_id, participant                                                                                                       | 参与者和记录 ID                 |
-| 日期                | StartDate                                                                                                                               | EMA 会话的日历日期              |
-| 原始时间戳（HH:MM） | time_bed_am_hhmm, time_sleep_am_hhmm, time_awake_am_hhmm, time_getup_am_hhmm                                                            | 自报就寝/入睡/醒来/起床时钟时间 |
-| 原始时间戳（AM/PM） | time_bed_am_ampm, time_sleep_am_ampm, time_awake_am_ampm, time_getup_am_ampm                                                            | 每个时间戳的 AM/PM 指示         |
-| 原始时长            | duration_totalmin_sol_estimate_am, duration_totalmin_waso_estimate_am                                                                   | 自报 SOL 和 WASO（分钟）        |
-| 小睡/运动           | duration_totalmin_napstoday_PM, exercise_PM_totalmin\_\[Light\|Moderate\|Vigorous\|Strength\]                                           | 自报小睡和运动时长              |
-| 物质使用            | caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1, alcoholtoday_PM_NumAlcoholicDrinks_1, nicotine_amount_pm_doses, cannabis_amount_pm_doses | 自报物质使用                    |
-| WASO 次数           | num_waso_estimate_am, num_waso_am                                                                                                       | 醒来次数                        |
+| 列组                | 变量                                                                                                                                                | 说明                            |
+|---------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------|
+| 标识符              | pid, day\_num, row\_id, participant                                                                                                                 | 参与者和记录 ID                 |
+| 日期                | StartDate                                                                                                                                           | EMA 会话的日历日期              |
+| 原始时间戳（HH:MM） | time\_bed\_am\_hhmm, time\_sleep\_am\_hhmm, time\_awake\_am\_hhmm, time\_getup\_am\_hhmm                                                            | 自报就寝/入睡/醒来/起床时钟时间 |
+| 原始时间戳（AM/PM） | time\_bed\_am\_ampm, time\_sleep\_am\_ampm, time\_awake\_am\_ampm, time\_getup\_am\_ampm                                                            | 每个时间戳的 AM/PM 指示         |
+| 原始时长            | duration\_totalmin\_sol\_estimate\_am, duration\_totalmin\_waso\_estimate\_am                                                                       | 自报 SOL 和 WASO（分钟）        |
+| 小睡/运动           | duration\_totalmin\_napstoday\_PM, exercise\_PM\_totalmin\_\[Light\|Moderate\|Vigorous\|Strength\]                                                  | 自报小睡和运动时长              |
+| 物质使用            | caffeinetoday\_PM\_NumCaffeinatedDrinksSnacks\_1, alcoholtoday\_PM\_NumAlcoholicDrinks\_1, nicotine\_amount\_pm\_doses, cannabis\_amount\_pm\_doses | 自报物质使用                    |
+| WASO 次数           | num\_waso\_estimate\_am, num\_waso\_am                                                                                                              | 醒来次数                        |
+
+</div>
+
+<div class="section level2">
 
 ## 人工修正 CSV 模板
 
@@ -136,18 +196,26 @@ run_pipeline(config = "my_study_config.yaml")
 | `templates/template_manual_metric_review_acceptances.csv`         | `manual_metric_review_acceptances.csv`         | 人工接受的指标标记        |
 | `templates/template_second_review_checklist.csv`                  | `second_review_checklist.csv`                  | 第二人验证决定            |
 
+</div>
+
+<div class="section level2">
+
 ## 输出
 
-| 文件                                                           | 内容                                                       |
-|----------------------------------------------------------------|------------------------------------------------------------|
-| `output/correction_status_final.csv`                           | 每次运行摘要：n_total, tst, sol, error/corrected/flag 计数 |
-| `output/appendix_step_ledger.csv`                              | 逐步标记追踪账本                                           |
-| `output/flagged_records_self_reported.csv`                     | 标为 SELF_REPORTED_FLAG 的记录                             |
-| `latest_visualization_*/figure_index.png`                      | 所有生成图的总览                                           |
-| `output/verification/real_n13990/`, `verification/synth_n280/` | 稳定、永不被覆盖的验证产物                                 |
+| 文件                                                           | 内容                                                        |
+|----------------------------------------------------------------|-------------------------------------------------------------|
+| `output/correction_status_final.csv`                           | 每次运行摘要：n\_total, tst, sol, error/corrected/flag 计数 |
+| `output/appendix_step_ledger.csv`                              | 逐步标记追踪账本                                            |
+| `output/flagged_records_self_reported.csv`                     | 标为 SELF\_REPORTED\_FLAG 的记录                            |
+| `latest_visualization_*/figure_index.png`                      | 所有生成图的总览                                            |
+| `output/verification/real_n13990/`, `verification/synth_n280/` | 稳定、永不被覆盖的验证产物                                  |
 
 输出结构的关键规则： - `latest_visualization_<tag>_n<rows>/`
-是”最新”而非”历史”——每次可视化运行清空重建。 -
+是“最新”而非“历史”——每次可视化运行清空重建。 -
 `verification/<tag>_n<rows>/` 是同级目录，永不被清空逻辑触碰。 -
 真实数据输出只落在 `output/`（gitignore）；合成输出路由到 `output/`
 之外。
+
+</div>
+
+</div>

@@ -32,7 +32,7 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="active nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -56,15 +56,13 @@
       <h1>管线架构（中文）</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/vignettes/pipeline-architecture-zh.Rmd" class="external-link"><code>vignettes/pipeline-architecture-zh.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/HEAD/vignettes/pipeline-architecture-zh.Rmd" class="external-link"><code>vignettes/pipeline-architecture-zh.Rmd</code></a></small>
       <div class="d-none name"><code>pipeline-architecture-zh.Rmd</code></div>
     </div>
 
     
     
-<p>本文档说明 sleepcleanr
-管线的结构：清洗步骤、真正干活的规则族、以及给每条记录
-打标签的分类体系。</p>
+<p>本文档说明 sleepcleanr 管线的结构：清洗步骤、真正干活的规则族、以及给每条记录 打标签的分类体系。</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
@@ -95,11 +93,6 @@
                                                                                               Step 9: 生成图表</code></pre>
 <p><strong>10 步</strong>（来源：<code>inst/steps.yaml</code>）：</p>
 <table class="table">
-<colgroup>
-<col width="33%">
-<col width="33%">
-<col width="33%">
-</colgroup>
 <thead><tr class="header">
 <th>步骤</th>
 <th>标签</th>
@@ -162,9 +155,7 @@
 <div class="section level2">
 <h2 id="检测规则族">检测规则族<a class="anchor" aria-label="anchor" href="#%E6%A3%80%E6%B5%8B%E8%A7%84%E5%88%99%E6%97%8F"></a>
 </h2>
-<p>清洗逻辑组织为八个规则族。每族针对自由文本自报的一种失效模式，有明确的决策
-行为（见下方三态），并由一个合成错误类验证（见验证方法学
-vignette）。这是管线 真正干活的部分——上面的步骤是围绕它的脚手架。</p>
+<p>清洗逻辑组织为八个规则族。每族针对自由文本自报的一种失效模式，有明确的决策 行为（见下方三态），并由一个合成错误类验证（见验证方法学 vignette）。这是管线 真正干活的部分——上面的步骤是围绕它的脚手架。</p>
 <table class="table">
 <colgroup>
 <col width="33%">
@@ -179,8 +170,7 @@ vignette）。这是管线 真正干活的部分——上面的步骤是围绕�
 <tbody>
 <tr class="odd">
 <td><strong>时间戳标准化</strong></td>
-<td>不统一的原始字符串（<code>10.30</code>、<code>7:30</code>、裸小时、hms/difftime
-类型）可能静默误解析（如分钟被读成秒）</td>
+<td>不统一的原始字符串（<code>10.30</code>、<code>7:30</code>、裸小时、hms/difftime 类型）可能静默误解析（如分钟被读成秒）</td>
 <td>FLAG（仅格式风险）</td>
 </tr>
 <tr class="even">
@@ -190,8 +180,7 @@ vignette）。这是管线 真正干活的部分——上面的步骤是围绕�
 </tr>
 <tr class="odd">
 <td><strong>自由文本时长解析</strong></td>
-<td>SOL/WASO 以文本输入（<code>90:00</code> 意为 90
-分钟、<code>0130</code>、<code>p</code> 表 0）</td>
+<td>SOL/WASO 以文本输入（<code>90:00</code> 意为 90 分钟、<code>0130</code>、<code>p</code> 表 0）</td>
 <td>FLAG（时钟形态永不自动修）</td>
 </tr>
 <tr class="even">
@@ -223,10 +212,6 @@ vignette）。这是管线 真正干活的部分——上面的步骤是围绕�
 </table>
 <p><strong>决策三态：</strong></p>
 <table class="table">
-<colgroup>
-<col width="50%">
-<col width="50%">
-</colgroup>
 <thead><tr class="header">
 <th>决策</th>
 <th>含义</th>
@@ -234,8 +219,7 @@ vignette）。这是管线 真正干活的部分——上面的步骤是围绕�
 <tbody>
 <tr class="odd">
 <td><strong>AUTO_FIX</strong></td>
-<td>确定性、可逆、无需人工审查即应用。时间顺序需佐证：顺序违反 ∧
-内部一致性 ∧ 冗余确认。</td>
+<td>确定性、可逆、无需人工审查即应用。时间顺序需佐证：顺序违反 ∧ 内部一致性 ∧ 冗余确认。</td>
 </tr>
 <tr class="even">
 <td><strong>FLAG</strong></td>
@@ -247,10 +231,7 @@ vignette）。这是管线 真正干活的部分——上面的步骤是围绕�
 </tr>
 </tbody>
 </table>
-<p>每个规则族都是确定性的（同输入 → 同输出，snapshot
-验证），因此评分者间信度
-统计不适用——没有评分者变异。改为报告人工共同审查一致性（见验证方法学
-vignette 第 7 步）。</p>
+<p>每个规则族都是确定性的（同输入 → 同输出，snapshot 验证），因此评分者间信度 统计不适用——没有评分者变异。改为报告人工共同审查一致性（见验证方法学 vignette 第 7 步）。</p>
 </div>
 <div class="section level2">
 <h2 id="分类体系">分类体系<a class="anchor" aria-label="anchor" href="#%E5%88%86%E7%B1%BB%E4%BD%93%E7%B3%BB"></a>
@@ -285,8 +266,7 @@ vignette 第 7 步）。</p>
 <tr class="even">
 <td><code>checkforerrors_summary</code></td>
 <td>Step 8（自动）</td>
-<td>TIMESTAMP_ISSUE, DURATION_ISSUE, AMOUNT_FLAG, SELF_REPORTED_FLAG,
-CLEAN</td>
+<td>TIMESTAMP_ISSUE, DURATION_ISSUE, AMOUNT_FLAG, SELF_REPORTED_FLAG, CLEAN</td>
 </tr>
 </tbody>
 </table>
@@ -296,10 +276,6 @@ CLEAN</td>
 </h2>
 <p>生成的图表分两个文件夹，让管线质检视图（每次运行都有）和分析视图（仅当研究包含相关变量时）不混淆。</p>
 <table class="table">
-<colgroup>
-<col width="57%">
-<col width="42%">
-</colgroup>
 <thead><tr class="header">
 <th>文件夹</th>
 <th>内容</th>
@@ -319,33 +295,21 @@ CLEAN</td>
 <div class="section level2">
 <h2 id="非破坏性模型">非破坏性模型<a class="anchor" aria-label="anchor" href="#%E9%9D%9E%E7%A0%B4%E5%9D%8F%E6%80%A7%E6%A8%A1%E5%9E%8B"></a>
 </h2>
-<p><strong>管线从不删除任何记录。</strong> 清洗的意思是<em>打标记 +
-增加修正列</em>，不是删行。<code>corrected_ema_data</code>
-的行数永远等于你输入的行数。</p>
+<p><strong>管线从不删除任何记录。</strong> 清洗的意思是<em>打标记 + 增加修正列</em>，不是删行。<code>corrected_ema_data</code> 的行数永远等于你输入的行数。</p>
 <pre><code>输入：N 条原始记录
 输出：N 条记录，每条多了分类列（data_category, flag_severity）
      和修正列（time_*_corrected）。原始列原样保留。</code></pre>
 <ul>
 <li>
-<strong>什么都不丢。</strong>
-原始时间戳（<code>time_bed_am_hhmm_ampm</code>
-等）留在数据里，修正版新增为 <code>time_bed_corrected</code>
-列——每条修正都能和原值对照。</li>
+<strong>什么都不丢。</strong> 原始时间戳（<code>time_bed_am_hhmm_ampm</code> 等）留在数据里，修正版新增为 <code>time_bed_corrected</code> 列——每条修正都能和原值对照。</li>
 <li>
-<strong>每条记录被打标记，不是被删除。</strong> 验证失败的记录标上
-<code>data_category = "error"</code> 或
-<code>"unusual"</code>，但仍然在数据集里。你之后自己决定分析时是否包含它们。</li>
+<strong>每条记录被打标记，不是被删除。</strong> 验证失败的记录标上 <code>data_category = "error"</code> 或 <code>"unusual"</code>，但仍然在数据集里。你之后自己决定分析时是否包含它们。</li>
 <li>
-<strong>“最终干净数据集”是推荐的分析子集，不是一个物理上独立的文件。</strong>
-它 = <code>data_category</code> 为 <code>clean</code> 或
-<code>equal_time_ok</code> 的记录：</li>
+<strong>“最终干净数据集”是推荐的分析子集，不是一个物理上独立的文件。</strong> 它 = <code>data_category</code> 为 <code>clean</code> 或 <code>equal_time_ok</code> 的记录：</li>
 </ul>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">clean_data</span> <span class="op">&lt;-</span> <span class="va">corrected_ema_data</span><span class="op">[</span><span class="va">corrected_ema_data</span><span class="op">$</span><span class="va">data_category</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"clean"</span>, <span class="st">"equal_time_ok"</span><span class="op">)</span>, <span class="op">]</span></span></code></pre></div>
-<p><strong>一个例外：</strong>
-四个睡眠时间戳全部缺失的记录（<code>data_category = "skipped_na"</code>）保留在文件里，但
-TST/SOL/WASO 指标是
-<code>NA</code>——时间戳缺失无法计算睡眠指标。它们可用于依从性/流失分析（如”每个被试完成了多少天”），但不能用于睡眠指标分析。</p>
+<p><strong>一个例外：</strong> 四个睡眠时间戳全部缺失的记录（<code>data_category = "skipped_na"</code>）保留在文件里，但 TST/SOL/WASO 指标是 <code>NA</code>——时间戳缺失无法计算睡眠指标。它们可用于依从性/流失分析（如“每个被试完成了多少天”），但不能用于睡眠指标分析。</p>
 <table class="table">
 <thead><tr class="header">
 <th>记录类型</th>

@@ -1,13 +1,22 @@
+<div id="main" class="col-md-9" role="main">
+
 # Run the full SPL Sleep pipeline
+
+<div class="ref-description section level2">
 
 Executes the complete sleep EMA data cleaning pipeline. Steps 2–7 now
 flow through the S3 chain (v1.3.1), giving every step automatic
 provenance tracking, contract assertions, and a 2.6x speed-up. Steps
-that write files or read human-reviewed CSVs remain as direct
-[`source()`](https://rdrr.io/r/base/source.html) calls for backward
-compatibility.
+that write files or read human-reviewed CSVs remain as direct `source()`
+calls for backward compatibility.
+
+</div>
+
+<div class="section level2">
 
 ## Usage
+
+<div class="sourceCode">
 
 ``` r
 run_pipeline(
@@ -20,45 +29,57 @@ run_pipeline(
 )
 ```
 
+</div>
+
+</div>
+
+<div class="section level2">
+
 ## Arguments
 
-- config:
+-   config:
 
-  Character or list. Path to a YAML config file, or a config list (from
-  [`load_config()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/load_config.md)).
-  If NULL, uses the bundled default.
+    Character or list. Path to a YAML config file, or a config list
+    (from `load_config()`). If NULL, uses the bundled default.
 
-- project_dir:
+-   project\_dir:
 
-  Character. Path to the project root. Default ".".
+    Character. Path to the project root. Default ".".
 
-- skip_visualization:
+-   skip\_visualization:
 
-  Logical. If TRUE, skip visualization.
+    Logical. If TRUE, skip visualization.
 
-- finalize:
+-   finalize:
 
-  Logical. If TRUE (default) run
-  [`finalize_columns()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/finalize_columns.md)
-  as Step 10 and write the delivered datasets. Set FALSE to stop after
-  the cleaning run and inspect `corrected_ema_data` yourself. Before
-  v1.4 this step had to be invoked by hand, which meant a plain
-  `run_pipeline()` produced no Dataset A or B at all.
+    Logical. If TRUE (default) run `finalize_columns()` as Step 10 and
+    write the delivered datasets. Set FALSE to stop after the cleaning
+    run and inspect `corrected_ema_data` yourself. Before v1.4 this step
+    had to be invoked by hand, which meant a plain `run_pipeline()`
+    produced no Dataset A or B at all.
 
-- verbose:
+-   verbose:
 
-  Logical. Print progress. Default TRUE.
+    Logical. Print progress. Default TRUE.
 
-- data:
+-   data:
 
-  Data frame. Optional data-first entry: supply the raw data directly
-  instead of reading `data.files.main` from the config. When NULL
-  (default) the pipeline reads from the config exactly as before
-  (`data = NULL` is the backward-compatible zero-change path). When
-  supplied, the file-reading branch of Step 1 is skipped and the
-  config's column_mapping is applied to `data`. Used by
-  [`clean_sleep_diary()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/clean_sleep_diary.md).
+    Data frame. Optional data-first entry: supply the raw data directly
+    instead of reading `data.files.main` from the config. When NULL
+    (default) the pipeline reads from the config exactly as before
+    (`data = NULL` is the backward-compatible zero-change path). When
+    supplied, the file-reading branch of Step 1 is skipped and the
+    config's column\_mapping is applied to `data`. Used by
+    `clean_sleep_diary()`.
+
+</div>
+
+<div class="section level2">
 
 ## Value
 
 Invisibly returns TRUE on successful completion.
+
+</div>
+
+</div>
