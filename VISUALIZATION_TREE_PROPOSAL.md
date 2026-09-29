@@ -1,10 +1,4 @@
-<div id="main" class="col-md-9" role="main">
-
 # Visualization Section Redesign — Proposal v2 (revised per your critique, still not implemented)
-
-<div
-id="visualization-section-redesign--proposal-v2-revised-per-your-critique-still-not-implemented"
-class="section level1">
 
 \*Drafted 2026-09-11, revised same day after your critique. Grounded in:
 `inst/scripts/sleep_visualization.R`’s actual figure-generation code
@@ -14,7 +8,7 @@ blocks specifically to verify the two layout bugs before proposing fixes
 direct visual inspection of `figure_index.png` and 10+ individual figure
 PNGs (synthetic n=280 demo run), and a direct count of unique
 participants in the real dataset (`output/cleaned_data_final.csv`: **237
-unique pid, 3–75 diary-days each, median 61 — &gt;20x spread**). Nothing
+unique pid, 3–75 diary-days each, median 61 — \>20x spread**). Nothing
 in this document has been implemented yet — still the “text sketch to
 react to” scope.
 
@@ -35,8 +29,6 @@ Plus the two code-verified bug diagnoses you asked for before any fix
 approach gets asserted (§0), and the numbering-scheme coexistence answer
 (§2, cross-cutting fixes).\*
 
-<div class="section level2">
-
 ## 0. What’s actually causing the “scattered, unintuitive” feeling — found two things worse than a missing hierarchy
 
 Before designing a new tree, it’s worth naming two concrete bugs that
@@ -50,19 +42,20 @@ organizing signal a reader currently has — the figure number:
     `02_Distribution_Sleep_Variables.png`. Resolution, decided via
     git-blame recency (both vignette mentions of “Figure 2 — Correction
     Impact” postdate the script’s internal `COMPLETE FIGURE SUMMARY`
-    hardcoded list by \~1 month, and were authored by you): **Correction
+    hardcoded list by ~1 month, and were authored by you): **Correction
     Impact keeps “Figure 2”** (untouched — it already matched the
     vignettes/docs, which turned out to be the only place this figure is
     documented at all), **Distribution is renamed to “Figure 2B”** —
     filename `02B_Distribution_Sleep_Variables.png`, ggplot title,
-    `cat()` log line, the `COMPLETE FIGURE SUMMARY` block (which was
-    also missing a Correction Impact entry entirely — now added), and
-    `make_figure_index.R`’s registry path, all updated together. Also
-    updated: `docs-dev/README_figures_navigation.md`’s filename
-    reference. Left untouched, deliberately: two dated `work_logs/*.md`
-    entries — editing a historical dated report to retroactively use a
-    name that didn’t exist at the time would misrepresent it, not fix
-    it. `proj_splclean` had no reference to this filename to begin with.
+    [`cat()`](https://rdrr.io/r/base/cat.html) log line, the
+    `COMPLETE FIGURE SUMMARY` block (which was also missing a Correction
+    Impact entry entirely — now added), and `make_figure_index.R`’s
+    registry path, all updated together. Also updated:
+    `docs-dev/README_figures_navigation.md`’s filename reference. Left
+    untouched, deliberately: two dated `work_logs/*.md` entries —
+    editing a historical dated report to retroactively use a name that
+    didn’t exist at the time would misrepresent it, not fix it.
+    `proj_splclean` had no reference to this filename to begin with.
     **Not yet render-tested — see status note below.**
 2.  **“Figure 12” is used for two different figures — NOT independent,
     folds into Step 3.** Two different titles baked into the images
@@ -97,50 +90,47 @@ script produces, not maintained a second time by hand — see §4.
 Two more rendering-level problems, found while inspecting individual
 PNGs. You asked me to verify both against the actual code before
 asserting a fix approach — not infer from the rendered PNG alone — so I
-read the exact `sleep_visualization.R` blocks (lines \~1600–1715 for Fig
-13, \~1496–1590 for Fig 12) rather than guessing. **They turn out to be
+read the exact `sleep_visualization.R` blocks (lines ~1600–1715 for Fig
+13, ~1496–1590 for Fig 12) rather than guessing. **They turn out to be
 two different bugs with two different mechanisms, not the same
 “patchwork heights” issue twice:**
 
--   **`13_Error_Category_Distribution.png` — confirmed `patchwork`
-    mixed-unit layout bug, needs restructuring, not just a ratio
-    tweak.** The figure is `p13_bar / severity_tab / flag_tab` composed
-    with `plot_layout(heights = c(3, unit(1.5, "in"), unit(1.2, "in")))`
-    — one *relative* unit (`3`) for the bar chart, two *absolute* inch
-    units for the two tables. `p13_bar`‘s x-axis labels are rotated 45°
-    (`element_text(angle = 45, hjust = 1)`). Patchwork allocates each
-    panel’s cell height from its nominal panel geometry, not the
-    rendered extent of rotated tick text — so the rotated labels’ visual
-    descent overflows past the bar chart’s allocated cell straight into
-    `severity_tab`’s fixed cell directly below it. Because this is
-    content overflowing its cell (not a wrong ratio), retuning the
-    `heights` numbers won’t reliably fix it. Real fix: give `p13_bar`
-    explicit bottom margin (e.g. `plot.margin = margin(b = 20)`) and/or
-    add a small explicit spacer row between panels — a genuine
-    restructuring of the composition, confirmed needed, not assumed.
--   **`12_Pipeline_Correction_Progress.png` — confirmed `grid.arrange()`
-    fixed-canvas mismatch, a different mechanism from Fig 13.** This
-    figure does NOT use patchwork at all — it’s
-    `gridExtra::grid.arrange()` with three tables sized via
-    `unit(nrow(df) * 0.28 + 0.4, "in")`. `save_png()`‘s signature
-    (`h = cfg_get("output.figure.height_inches", 9, cfg = pipeline_config)`)
-    confirms the default 9-inch canvas height, and Fig 12’s `save_png()`
-    call passes no explicit `h=` override, so it renders into that
-    default 9in canvas. The three tables’ specified heights sum to
-    roughly \~5.1in of actual content; `grid.arrange`’s gtable sizes
-    rows to exactly their specified absolute units and does not stretch
-    to fill the surrounding device viewport, so the remaining \~3.9in of
-    the 9in canvas renders as blank space below the content. Confirmed
-    root cause: `ggsave`’s fixed height parameter vs. `grid.arrange`’s
-    fixed absolute row heights, exactly as you suspected — not a
-    heights-ratio problem like Fig 13. **Practically moot either way**:
-    §2 1.1 already folds this table into the Step Flag Ledger, which
-    removes the standalone figure entirely; noting the confirmed
-    mechanism here only in case that merge doesn’t happen this cycle.
-
-</div>
-
-<div class="section level2">
+- **`13_Error_Category_Distribution.png` — confirmed `patchwork`
+  mixed-unit layout bug, needs restructuring, not just a ratio tweak.**
+  The figure is `p13_bar / severity_tab / flag_tab` composed with
+  `plot_layout(heights = c(3, unit(1.5, "in"), unit(1.2, "in")))` — one
+  *relative* unit (`3`) for the bar chart, two *absolute* inch units for
+  the two tables. `p13_bar`‘s x-axis labels are rotated 45°
+  (`element_text(angle = 45, hjust = 1)`). Patchwork allocates each
+  panel’s cell height from its nominal panel geometry, not the rendered
+  extent of rotated tick text — so the rotated labels’ visual descent
+  overflows past the bar chart’s allocated cell straight into
+  `severity_tab`’s fixed cell directly below it. Because this is content
+  overflowing its cell (not a wrong ratio), retuning the `heights`
+  numbers won’t reliably fix it. Real fix: give `p13_bar` explicit
+  bottom margin (e.g. `plot.margin = margin(b = 20)`) and/or add a small
+  explicit spacer row between panels — a genuine restructuring of the
+  composition, confirmed needed, not assumed.
+- **`12_Pipeline_Correction_Progress.png` — confirmed `grid.arrange()`
+  fixed-canvas mismatch, a different mechanism from Fig 13.** This
+  figure does NOT use patchwork at all — it’s
+  [`gridExtra::grid.arrange()`](https://rdrr.io/pkg/gridExtra/man/arrangeGrob.html)
+  with three tables sized via `unit(nrow(df) * 0.28 + 0.4, "in")`.
+  `save_png()`‘s signature
+  (`h = cfg_get("output.figure.height_inches", 9, cfg = pipeline_config)`)
+  confirms the default 9-inch canvas height, and Fig 12’s `save_png()`
+  call passes no explicit `h=` override, so it renders into that default
+  9in canvas. The three tables’ specified heights sum to roughly ~5.1in
+  of actual content; `grid.arrange`’s gtable sizes rows to exactly their
+  specified absolute units and does not stretch to fill the surrounding
+  device viewport, so the remaining ~3.9in of the 9in canvas renders as
+  blank space below the content. Confirmed root cause: `ggsave`’s fixed
+  height parameter vs. `grid.arrange`’s fixed absolute row heights,
+  exactly as you suspected — not a heights-ratio problem like Fig 13.
+  **Practically moot either way**: §2 1.1 already folds this table into
+  the Step Flag Ledger, which removes the standalone figure entirely;
+  noting the confirmed mechanism here only in case that merge doesn’t
+  happen this cycle.
 
 ## 1. Your four example dimensions, checked against what’s actually in the figure catalog
 
@@ -156,10 +146,6 @@ examples:
 | “Bed” (timing/circadian)          | `04`, `04B`, `09` (bedtime vs getup), `R25` (weekday/weekend regularity)                                                                                                                                                         | These four are currently scattered across two different top-level folders (`pipeline_cleaning` has none of them; they’re split across `research_ready` with no shared visual grouping) |
 | Substance                         | `21`, `22`, `23`, `24`                                                                                                                                                                                                           | Reasonably self-contained already, easiest branch                                                                                                                                      |
 | *(not in your list, but present)* | `20`/`20B` self-report-vs-measured perception bias; `10` extreme-duration outliers; `07` quality-vs-duration                                                                                                                     | These need a home in the tree too — proposed below                                                                                                                                     |
-
-</div>
-
-<div class="section level2">
 
 ## 2. Proposed tree
 
@@ -332,10 +318,6 @@ examples:
             a future contributor isn't confused by why A1/R25-27/P26 don't
             follow the numeric sequence
 
-</div>
-
-<div class="section level2">
-
 ## 3. What to do about the three figures you flagged, concretely
 
 | Figure                             | Your read                     | What I found                                                                                                                                                       | Recommendation                                                                                                                                                                                           |
@@ -344,44 +326,35 @@ examples:
 | Fig 18 (Auto-Detected Dashboard)   | maybe not helpful             | Confirmed — single-category pie filling 90% of the canvas for what’s a 2-number summary; content is a subset of Fig 13                                             | **Drop.** Nothing here Fig 13 doesn’t already show better                                                                                                                                                |
 | Fig P26 (Per-Participant)          | not helpful, labels illegible | Confirmed and quantified — real data has 237 participants; the one-bar-per-participant design cannot produce legible labels at that N, this isn’t a tuning issue   | **Replace the chart type**, don’t just drop — the underlying question (“how uneven is data quality across participants”) is worth keeping, a distribution/beeswarm view scales where the bar chart can’t |
 
-</div>
-
-<div class="section level2">
-
 ## 4. Layout & mechanics suggestions
 
--   **Keep the existing tier-based contact sheet mechanism**
-    (`make_figure_index.R`’s `image_append`/`magick` approach already
-    works and already has a tier concept) rather than introducing a new
-    rendering system — extend it to 2 levels of header (tier header,
-    existing dark bar; sub-branch header, e.g. a lighter gray bar for
-    “1.2 Error taxonomy”) so the nesting is visible directly in the
-    contact sheet, not just in this document.
--   **Don’t try to force the whole 30-figure catalog into one
-    Sankey/flowchart.** A literal flow/graph layout is the right tool
-    for Figure 1 specifically (it already is a flow diagram of the
-    pipeline’s actual steps) — using it as the *meta-organizer* for 30
-    unrelated figures would just be a differently-shaped version of the
-    same “too much in one picture” problem Fig 18 has now. Hierarchical
-    grouping + a numbering scheme that reflects the hierarchy
-    (e.g. `1.2-13` instead of a bare `13`) gets you the “tree” feeling
-    without cramming everything into one diagram.
--   **Generate the contact-sheet registry from the actual figure
-    catalog, not by hand a second time.** Concretely: have each
-    `save_png()` call in `sleep_visualization.R` also append
-    `(path, tier, subtier, caption)` to a running list in-memory, and
-    write that list out as the registry at the end of the script,
-    instead of `make_figure_index.R` hard-coding a parallel list that
-    can silently drift (as it already has, twice, per §0).
--   **P26 replacement**: a histogram of per-participant %-clean-days
-    (one bar per *bin*, not per *participant*) is the most direct fix
-    and reuses the exact same underlying per-participant summary table
-    P26 already computes — no new data pipeline needed, just a different
-    geom.
-
-</div>
-
-<div class="section level2">
+- **Keep the existing tier-based contact sheet mechanism**
+  (`make_figure_index.R`’s `image_append`/`magick` approach already
+  works and already has a tier concept) rather than introducing a new
+  rendering system — extend it to 2 levels of header (tier header,
+  existing dark bar; sub-branch header, e.g. a lighter gray bar for “1.2
+  Error taxonomy”) so the nesting is visible directly in the contact
+  sheet, not just in this document.
+- **Don’t try to force the whole 30-figure catalog into one
+  Sankey/flowchart.** A literal flow/graph layout is the right tool for
+  Figure 1 specifically (it already is a flow diagram of the pipeline’s
+  actual steps) — using it as the *meta-organizer* for 30 unrelated
+  figures would just be a differently-shaped version of the same “too
+  much in one picture” problem Fig 18 has now. Hierarchical grouping + a
+  numbering scheme that reflects the hierarchy (e.g. `1.2-13` instead of
+  a bare `13`) gets you the “tree” feeling without cramming everything
+  into one diagram.
+- **Generate the contact-sheet registry from the actual figure catalog,
+  not by hand a second time.** Concretely: have each `save_png()` call
+  in `sleep_visualization.R` also append
+  `(path, tier, subtier, caption)` to a running list in-memory, and
+  write that list out as the registry at the end of the script, instead
+  of `make_figure_index.R` hard-coding a parallel list that can silently
+  drift (as it already has, twice, per §0).
+- **P26 replacement**: a histogram of per-participant %-clean-days (one
+  bar per *bin*, not per *participant*) is the most direct fix and
+  reuses the exact same underlying per-participant summary table P26
+  already computes — no new data pipeline needed, just a different geom.
 
 ## 5. Redundancy and gaps, summarized
 
@@ -406,10 +379,6 @@ figure set — it shouldn’t have shipped this deep in a redundancy list,
 and it doesn’t anymore. - The four “bed”/timing figures (§2.2) have no
 shared visual identity today — confirming/fixing that is really a
 labeling-and-grouping fix, not a new figure.
-
-</div>
-
-<div class="section level2">
 
 ## Status — what’s decided vs. still open
 
@@ -474,13 +443,7 @@ turned out to rest on a wrong premise — see §6), and Figure 1 was
 investigated and deliberately *not* turned into a new dashboard figure.
 Fig 18’s drop (§3/§5) was never executed and is still open.
 
-</div>
-
-<div class="section level2">
-
 ## 6. Addendum — 2026-09-17 session: non-destructive framing goal, and what actually shipped
-
-<div class="section level3">
 
 ### 6.0 New governing goal, applies to all design decisions from here on (from Cyra)
 
@@ -505,67 +468,58 @@ document stay consistent with them:
     someone who already knows the pipeline’s internal vocabulary
     (e.g. “Checkpoint A–E”, raw column names).
 
-</div>
-
-<div class="section level3">
-
 ### 6.1 What actually shipped this session (code, pushed via device bridge, not git-committed)
 
--   **Fig 8 dropped — fully executed**, not just recommended. The
-    violin/boxplot block in `sleep_visualization.R` was replaced with a
-    removal notice (same rationale as §3/§5: degenerates to one violin
-    under unbalanced clean/unusual/error group sizes, which is the
-    common case, not an edge case). `make_figure_index.R`’s registry and
-    `docs-dev/README_figures_navigation.md` both updated to drop it; the
-    figure count corrected to 29 (13 QC + 16 research).
--   **Fig 12 + Fig 19 fold, and the Fig 13 layout bug — fixed, but by
-    Cyra, not by me.** I only diagnosed the two mechanisms in §0; her
-    commit (`3ecf952`) implemented the actual fix: Fig 12 merged into
-    the Step Flag Ledger (now titled “1.1 — Step Flag Ledger”), Fig 19
-    folded into Fig 13, and a `plot_spacer()` row added to Fig 13 to
-    stop the rotated x-axis labels overflowing into the table below.
--   **Non-destructive captions added** to Figures 2, 20, and 20B, per
-    goal 6.0.1 — each now states explicitly that the
-    self-report/measured gap is preserved, not corrected, and that a
-    flag is not a verdict that the record is wrong.
--   **Fig 17 — redesigned, per §2 1.4’s original plan, confirmed
-    correct.** Switched from raw flag count to a rate: flags ÷ that
-    participant’s own total observed days, still capped at the top 15.
-    The denominator source (unresolved in v2) is `clean_df`’s per-pid
-    row count — `clean_df` is the full corrected dataset (one row per
-    diary-day per participant), confirmed by an existing line elsewhere
-    in the script that already uses `nrow(clean_df)` as the “all
-    records” denominator.
--   **P26 — redesigned, but *not* as §3/§4 described
-    (histogram/beeswarm), and *not* merged with Fig 17** (see §6.2 for
-    why). Implemented as a ranked **table**: top 20 participants by
-    flagged-record rate, reusing the exact per-participant
-    `pid_flags`/`pid_order` calculation that was already correct in the
-    old bar-chart version — only the render form changed. Wording
-    follows goal 6.0.1: “Participants Worth a Second Look,” not “bad
-    data”; rows are lightly tinted using the existing green/orange/red
-    severity colors, not a new palette.
--   **Figure 1 — investigated, deliberately left as the flow diagram it
-    already is.** Found a real internal inconsistency: the data-source
-    header (L15), Figure 1’s own section comment (L661), and the
-    `COMPLETE FIGURE SUMMARY` log line (L2885) all called it “Final Data
-    Quality Dashboard,” while the code that actually runs there has
-    always produced the “Pipeline Record Flow Diagram” — a two-panel
-    dashboard (metrics tile + pie chart) was apparently planned at some
-    point but never built, and the comments/log were never updated to
-    match what shipped. Given a choice between building that dashboard
-    for real (a bigger change touching \~9 other files that reference
-    `01_Pipeline_Flow_Diagram.png` or “Figure 1,” none of it
-    render-testable from here) or just fixing the stale text, Cyra chose
-    the latter. The three mismatched comments/log lines are now
-    corrected to describe the flow diagram; the figure itself is
-    unchanged. `docs-dev/README_figures_navigation.md`’s row 1 was
-    updated to reference the real filename and describe what the flow
-    diagram actually shows.
-
-</div>
-
-<div class="section level3">
+- **Fig 8 dropped — fully executed**, not just recommended. The
+  violin/boxplot block in `sleep_visualization.R` was replaced with a
+  removal notice (same rationale as §3/§5: degenerates to one violin
+  under unbalanced clean/unusual/error group sizes, which is the common
+  case, not an edge case). `make_figure_index.R`’s registry and
+  `docs-dev/README_figures_navigation.md` both updated to drop it; the
+  figure count corrected to 29 (13 QC + 16 research).
+- **Fig 12 + Fig 19 fold, and the Fig 13 layout bug — fixed, but by
+  Cyra, not by me.** I only diagnosed the two mechanisms in §0; her
+  commit (`3ecf952`) implemented the actual fix: Fig 12 merged into the
+  Step Flag Ledger (now titled “1.1 — Step Flag Ledger”), Fig 19 folded
+  into Fig 13, and a `plot_spacer()` row added to Fig 13 to stop the
+  rotated x-axis labels overflowing into the table below.
+- **Non-destructive captions added** to Figures 2, 20, and 20B, per goal
+  6.0.1 — each now states explicitly that the self-report/measured gap
+  is preserved, not corrected, and that a flag is not a verdict that the
+  record is wrong.
+- **Fig 17 — redesigned, per §2 1.4’s original plan, confirmed
+  correct.** Switched from raw flag count to a rate: flags ÷ that
+  participant’s own total observed days, still capped at the top 15. The
+  denominator source (unresolved in v2) is `clean_df`’s per-pid row
+  count — `clean_df` is the full corrected dataset (one row per
+  diary-day per participant), confirmed by an existing line elsewhere in
+  the script that already uses `nrow(clean_df)` as the “all records”
+  denominator.
+- **P26 — redesigned, but *not* as §3/§4 described (histogram/beeswarm),
+  and *not* merged with Fig 17** (see §6.2 for why). Implemented as a
+  ranked **table**: top 20 participants by flagged-record rate, reusing
+  the exact per-participant `pid_flags`/`pid_order` calculation that was
+  already correct in the old bar-chart version — only the render form
+  changed. Wording follows goal 6.0.1: “Participants Worth a Second
+  Look,” not “bad data”; rows are lightly tinted using the existing
+  green/orange/red severity colors, not a new palette.
+- **Figure 1 — investigated, deliberately left as the flow diagram it
+  already is.** Found a real internal inconsistency: the data-source
+  header (L15), Figure 1’s own section comment (L661), and the
+  `COMPLETE FIGURE SUMMARY` log line (L2885) all called it “Final Data
+  Quality Dashboard,” while the code that actually runs there has always
+  produced the “Pipeline Record Flow Diagram” — a two-panel dashboard
+  (metrics tile + pie chart) was apparently planned at some point but
+  never built, and the comments/log were never updated to match what
+  shipped. Given a choice between building that dashboard for real (a
+  bigger change touching ~9 other files that reference
+  `01_Pipeline_Flow_Diagram.png` or “Figure 1,” none of it
+  render-testable from here) or just fixing the stale text, Cyra chose
+  the latter. The three mismatched comments/log lines are now corrected
+  to describe the flow diagram; the figure itself is unchanged.
+  `docs-dev/README_figures_navigation.md`’s row 1 was updated to
+  reference the real filename and describe what the flow diagram
+  actually shows.
 
 ### 6.2 §2 1.4’s merge plan — premise was wrong, corrected
 
@@ -587,38 +541,25 @@ diagnostic). A merge would have papered over that difference, not
 simplified anything — so both stayed as two figures, each fixed on its
 own terms (§6.1).
 
-</div>
-
-<div class="section level3">
-
 ### 6.3 Still open after this session
 
--   **Fig 18 drop (§3/§5)** — recommended, never executed. Still present
-    in `make_figure_index.R`’s registry and the nav doc’s Tier 2 list.
-    Needs a decision, not assumed.
--   **Level 0 contact-sheet header** (§2: stat-tile row + Fig 1
-    thumbnail + misrepair-vs-flagged footer citation) — not implemented.
--   **Level 2 grouping** (§2.1–2.4 visual regrouping of the 16
-    research-ready figures in the contact sheet) — not implemented.
--   **Fig 14 + Fig 06 merge** into one paired before/after panel — not
-    implemented.
--   **Outsider-friendly labeling audit (goal 6.0.3)** — applied so far
-    only to the figures touched this session (1, 2, 8, 17, 20, 20B,
-    P26). Not yet a systematic pass over the other \~22 figures —
-    e.g. whether “Checkpoint A–E” and similar internal vocabulary in the
-    Step Flag Ledger has adequate plain-language translation hasn’t been
-    checked.
--   **`make_figure_index.R`’s tier scheme vs. the nav doc’s tier
-    scheme** — the registry still defines 3 tiers (1/2/3) with tier 2
-    unused (everything is 1 = pipeline\_cleaning or 3 =
-    research\_ready), while the nav doc uses “60-second check” + “Tier
-    2” + “Tier 3” as three genuinely distinct levels. Not reconciled;
-    flagged here so it isn’t lost again.
-
-</div>
-
-</div>
-
-</div>
-
-</div>
+- **Fig 18 drop (§3/§5)** — recommended, never executed. Still present
+  in `make_figure_index.R`’s registry and the nav doc’s Tier 2 list.
+  Needs a decision, not assumed.
+- **Level 0 contact-sheet header** (§2: stat-tile row + Fig 1
+  thumbnail + misrepair-vs-flagged footer citation) — not implemented.
+- **Level 2 grouping** (§2.1–2.4 visual regrouping of the 16
+  research-ready figures in the contact sheet) — not implemented.
+- **Fig 14 + Fig 06 merge** into one paired before/after panel — not
+  implemented.
+- **Outsider-friendly labeling audit (goal 6.0.3)** — applied so far
+  only to the figures touched this session (1, 2, 8, 17, 20, 20B, P26).
+  Not yet a systematic pass over the other ~22 figures — e.g. whether
+  “Checkpoint A–E” and similar internal vocabulary in the Step Flag
+  Ledger has adequate plain-language translation hasn’t been checked.
+- **`make_figure_index.R`’s tier scheme vs. the nav doc’s tier scheme**
+  — the registry still defines 3 tiers (1/2/3) with tier 2 unused
+  (everything is 1 = pipeline_cleaning or 3 = research_ready), while the
+  nav doc uses “60-second check” + “Tier 2” + “Tier 3” as three
+  genuinely distinct levels. Not reconciled; flagged here so it isn’t
+  lost again.

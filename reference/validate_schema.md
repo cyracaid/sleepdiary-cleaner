@@ -1,47 +1,28 @@
-<div id="main" class="col-md-9" role="main">
-
 # Canonical input schema validator
 
-<div class="ref-description section level2">
-
 Single source of truth for raw input columns. Call right after
-`adapt_columns()` so missing or misnamed columns fail loudly.
-
-</div>
-
-<div class="section level2">
+[`adapt_columns()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/adapt_columns.md)
+so missing or misnamed columns fail loudly.
 
 ## Usage
-
-<div class="sourceCode">
 
 ``` r
 validate_schema(data, config, label = "raw EMA input (post-adaptation)")
 ```
 
-</div>
-
-</div>
-
-<div class="section level2">
-
 ## Arguments
 
--   data:
+- data:
 
-    A data frame to validate.
+  A data frame to validate.
 
--   config:
+- config:
 
-    Pipeline configuration list.
+  Pipeline configuration list.
 
--   label:
+- label:
 
-    Character label for error messages.
-
-</div>
-
-<div class="section level2">
+  Character label for error messages.
 
 ## Details
 
@@ -49,7 +30,3 @@ Design: each schema entry is a logical field resolved through the config
 column mapping. The validator accepts either the mapped internal key or
 the raw default name, tolerating the current config-key vs
 hardcoded-name mismatch.
-
-</div>
-
-</div>

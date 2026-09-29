@@ -1,35 +1,19 @@
-<div id="main" class="col-md-9" role="main">
-
 # Sync Human Review Status
 
-<div class="ref-description section level2">
-
-Read manual\_metric\_review\_acceptances.csv and auto-sync
-review\_resolution / resolved\_at / resolved\_by based on human review
+Read manual_metric_review_acceptances.csv and auto-sync
+review_resolution / resolved_at / resolved_by based on human review
 traces
-
-</div>
-
-<div class="section level2">
 
 ## Arguments
 
--   csv\_path:
+- csv_path:
 
-    Path to CSV file
+  Path to CSV file
 
--   overwrite:
+- overwrite:
 
-    Whether to overwrite existing fields (default TRUE)
-
-</div>
-
-<div class="section level2">
+  Whether to overwrite existing fields (default TRUE)
 
 ## Value
 
 Updated data.frame (returned invisibly)
-
-</div>
-
-</div>

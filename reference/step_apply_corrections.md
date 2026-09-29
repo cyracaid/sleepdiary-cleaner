@@ -1,51 +1,27 @@
-<div id="main" class="col-md-9" role="main">
-
 # Step 6 – apply manual corrections
-
-<div class="ref-description section level2">
 
 Step 6 – apply manual corrections
 
-</div>
-
-<div class="section level2">
-
 ## Usage
-
-<div class="sourceCode">
 
 ``` r
 step_apply_corrections(x, corrections_df, manual_unusual_df)
 ```
 
-</div>
-
-</div>
-
-<div class="section level2">
-
 ## Arguments
 
--   x:
+- x:
 
-    A `sleep_diary` object.
+  A `sleep_diary` object.
 
--   corrections\_df:
+- corrections_df:
 
-    Data frame of manual error corrections.
+  Data frame of manual error corrections.
 
--   manual\_unusual\_df:
+- manual_unusual_df:
 
-    Data frame of manual unusual-pattern decisions.
-
-</div>
-
-<div class="section level2">
+  Data frame of manual unusual-pattern decisions.
 
 ## Value
 
 A `sleep_diary` object.
-
-</div>
-
-</div>
