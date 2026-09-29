@@ -32,7 +32,7 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="active nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -56,15 +56,13 @@
       <h1>列映射、配置与数据格式（中文）</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/vignettes/column-mapping-zh.Rmd" class="external-link"><code>vignettes/column-mapping-zh.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/HEAD/vignettes/column-mapping-zh.Rmd" class="external-link"><code>vignettes/column-mapping-zh.Rmd</code></a></small>
       <div class="d-none name"><code>column-mapping-zh.Rmd</code></div>
     </div>
 
     
     
-<p>sleepcleanr 通过 YAML
-配置文件完全可配置：把数据集的列名映射到管线内部变量、
-调整阈值，无需修改任何 R 代码。</p>
+<p>sleepcleanr 通过 YAML 配置文件完全可配置：把数据集的列名映射到管线内部变量、 调整阈值，无需修改任何 R 代码。</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
@@ -88,66 +86,59 @@
 <span>          <span class="st">"my_study.yaml"</span><span class="op">)</span></span></code></pre></div>
 <p><strong>第 2 步：编辑 <code>my_study.yaml</code></strong></p>
 <p>文件开头只有两项必须改：</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">data</span><span class="kw">:</span></span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="at">  </span><span class="fu">files</span><span class="kw">:</span></span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="at">    </span><span class="fu">main</span><span class="kw">:</span><span class="at"> </span><span class="st">"your_data.rds"</span><span class="co">        # 你的睡眠日记文件（.rds 或 .csv）</span></span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="at">    </span><span class="fu">extra</span><span class="kw">:</span><span class="at"> </span><span class="st">""</span><span class="co">                    # 除非 StartDate 在单独文件里，否则留空</span></span></code></pre></div>
-<p>三种常见场景： -
-<strong>全部在一个文件</strong>（大多数数据集）：<code>main: "my_data.rds"</code>，<code>extra: ""</code>
--
-<strong>数据分两个文件</strong>：<code>main: "ema_vars.rds"</code>，<code>extra: "dates.csv"</code>
-- <strong>你的数据是
-CSV</strong>：<code>main: "my_data.csv"</code>，<code>extra: ""</code> —
-<code>.csv</code> 扩展名自动检测</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span><span class="kw">:</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">files</span><span class="kw">:</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">main</span><span class="kw">:</span><span class="at"> </span><span class="st">"your_data.rds"</span><span class="co">        # 你的睡眠日记文件（.rds 或 .csv）</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">extra</span><span class="kw">:</span><span class="at"> </span><span class="st">""</span><span class="co">                    # 除非 StartDate 在单独文件里，否则留空</span></span></code></pre></div>
+<p>三种常见场景： - <strong>全部在一个文件</strong>（大多数数据集）：<code>main: "my_data.rds"</code>，<code>extra: ""</code> - <strong>数据分两个文件</strong>：<code>main: "ema_vars.rds"</code>，<code>extra: "dates.csv"</code> - <strong>你的数据是 CSV</strong>：<code>main: "my_data.csv"</code>，<code>extra: ""</code> — <code>.csv</code> 扩展名自动检测</p>
 <div class="section level3">
 <h3 id="列映射">列映射<a class="anchor" aria-label="anchor" href="#%E5%88%97%E6%98%A0%E5%B0%84"></a>
 </h3>
 <p>把数据集的列名映射到管线的内部变量：</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">column_mapping</span><span class="kw">:</span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="at">  </span><span class="fu">identifiers</span><span class="kw">:</span></span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="at">    </span><span class="fu">pid</span><span class="kw">:</span><span class="at"> </span><span class="st">"subject_id"</span><span class="co">          # 你的参与者 ID 列</span></span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="at">    </span><span class="fu">day_num</span><span class="kw">:</span><span class="at"> </span><span class="st">"study_day"</span><span class="co">       # 你的研究日数列</span></span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="at">  </span><span class="fu">timestamp</span><span class="kw">:</span></span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="at">    </span><span class="fu">time_bed_hhmm</span><span class="kw">:</span><span class="at"> </span><span class="st">"bedtime"</span><span class="co">   # 你的就寝时间 HH:MM 列</span></span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="at">    </span><span class="fu">time_bed_ampm</span><span class="kw">:</span><span class="at"> </span><span class="st">"bed_ampm"</span><span class="co">  # 你的就寝 AM/PM 列</span></span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="at">    </span><span class="fu">time_sleep_hhmm</span><span class="kw">:</span><span class="at"> </span><span class="st">"sleeptime"</span></span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="at">    </span><span class="fu">time_sleep_ampm</span><span class="kw">:</span><span class="at"> </span><span class="st">"sleep_ampm"</span></span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="at">  </span><span class="fu">duration</span><span class="kw">:</span></span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="at">    </span><span class="fu">sol</span><span class="kw">:</span><span class="at"> </span><span class="st">"sleep_onset_latency"</span><span class="co"> # 你的 SOL 列（分钟）</span></span>
-<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="at">    </span><span class="fu">waso</span><span class="kw">:</span><span class="at"> </span><span class="st">"wake_after_onset"</span><span class="co">   # 你的 WASO 列（分钟）</span></span>
-<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="at">  </span><span class="fu">substance</span><span class="kw">:</span></span>
-<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="at">    </span><span class="fu">caffeine</span><span class="kw">:</span><span class="at"> </span><span class="st">"caffeine_cups"</span></span>
-<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="at">    </span><span class="fu">alcohol</span><span class="kw">:</span><span class="at"> </span><span class="st">"alcohol_drinks"</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">column_mapping</span><span class="kw">:</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">identifiers</span><span class="kw">:</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">pid</span><span class="kw">:</span><span class="at"> </span><span class="st">"subject_id"</span><span class="co">          # 你的参与者 ID 列</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">day_num</span><span class="kw">:</span><span class="at"> </span><span class="st">"study_day"</span><span class="co">       # 你的研究日数列</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">timestamp</span><span class="kw">:</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">time_bed_hhmm</span><span class="kw">:</span><span class="at"> </span><span class="st">"bedtime"</span><span class="co">   # 你的就寝时间 HH:MM 列</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">time_bed_ampm</span><span class="kw">:</span><span class="at"> </span><span class="st">"bed_ampm"</span><span class="co">  # 你的就寝 AM/PM 列</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">time_sleep_hhmm</span><span class="kw">:</span><span class="at"> </span><span class="st">"sleeptime"</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">time_sleep_ampm</span><span class="kw">:</span><span class="at"> </span><span class="st">"sleep_ampm"</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">duration</span><span class="kw">:</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">sol</span><span class="kw">:</span><span class="at"> </span><span class="st">"sleep_onset_latency"</span><span class="co"> # 你的 SOL 列（分钟）</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">waso</span><span class="kw">:</span><span class="at"> </span><span class="st">"wake_after_onset"</span><span class="co">   # 你的 WASO 列（分钟）</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">substance</span><span class="kw">:</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">caffeine</span><span class="kw">:</span><span class="at"> </span><span class="st">"caffeine_cups"</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">alcohol</span><span class="kw">:</span><span class="at"> </span><span class="st">"alcohol_drinks"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="阈值">阈值<a class="anchor" aria-label="anchor" href="#%E9%98%88%E5%80%BC"></a>
 </h3>
 <p>按你的研究人群调整检测灵敏度：</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">classification</span><span class="kw">:</span></span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="at">  </span><span class="fu">metric_validation</span><span class="kw">:</span></span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="at">    </span><span class="fu">sol</span><span class="kw">:</span></span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="at">      </span><span class="fu">excessive_minutes</span><span class="kw">:</span><span class="at"> </span><span class="dv">120</span><span class="co">   # SOL &gt; 2h → 标记</span></span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="at">    </span><span class="fu">se</span><span class="kw">:</span></span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="at">      </span><span class="fu">min_valid_percent</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
-<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="at">      </span><span class="fu">max_valid_percent</span><span class="kw">:</span><span class="at"> </span><span class="dv">100</span></span>
-<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="at">    </span><span class="fu">tst_tib_ratio</span><span class="kw">:</span></span>
-<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="at">      </span><span class="fu">min_ratio</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.5</span></span>
-<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="at">      </span><span class="fu">max_ratio</span><span class="kw">:</span><span class="at"> </span><span class="fl">1.0</span></span>
-<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="at">  </span><span class="fu">flag_severity</span><span class="kw">:</span></span>
-<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="at">    </span><span class="fu">poor_efficiency_threshold_pct</span><span class="kw">:</span><span class="at"> </span><span class="dv">70</span><span class="co">   # SE &lt; 70% → 标记</span></span>
-<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="at">    </span><span class="fu">high_sol_threshold_hours</span><span class="kw">:</span><span class="at"> </span><span class="dv">1</span><span class="co">         # SOL &gt; 1h → 标记</span></span>
-<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="at">    </span><span class="fu">high_waso_threshold_hours</span><span class="kw">:</span><span class="at"> </span><span class="fl">1.5</span><span class="co">      # WASO &gt; 1.5h → 标记</span></span></code></pre></div>
-<p>阈值依据见
-<code>THRESHOLDS.md</code>——默认值对健康成人样本故意宽松；临床人群需重审。</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">classification</span><span class="kw">:</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">metric_validation</span><span class="kw">:</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">sol</span><span class="kw">:</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">excessive_minutes</span><span class="kw">:</span><span class="at"> </span><span class="dv">120</span><span class="co">   # SOL &gt; 2h → 标记</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">se</span><span class="kw">:</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">min_valid_percent</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">max_valid_percent</span><span class="kw">:</span><span class="at"> </span><span class="dv">100</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">tst_tib_ratio</span><span class="kw">:</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">min_ratio</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.5</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">max_ratio</span><span class="kw">:</span><span class="at"> </span><span class="fl">1.0</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">flag_severity</span><span class="kw">:</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">poor_efficiency_threshold_pct</span><span class="kw">:</span><span class="at"> </span><span class="dv">70</span><span class="co">   # SE &lt; 70% → 标记</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">high_sol_threshold_hours</span><span class="kw">:</span><span class="at"> </span><span class="dv">1</span><span class="co">         # SOL &gt; 1h → 标记</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">high_waso_threshold_hours</span><span class="kw">:</span><span class="at"> </span><span class="fl">1.5</span><span class="co">      # WASO &gt; 1.5h → 标记</span></span></code></pre></div>
+<p>阈值依据见 <code>THRESHOLDS.md</code>——默认值对健康成人样本故意宽松；临床人群需重审。</p>
 </div>
 <div class="section level3">
 <h3 id="时间戳格式">时间戳格式<a class="anchor" aria-label="anchor" href="#%E6%97%B6%E9%97%B4%E6%88%B3%E6%A0%BC%E5%BC%8F"></a>
 </h3>
-<div class="sourceCode" id="cb7"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">timestamp</span><span class="kw">:</span></span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="at">  </span><span class="fu">input_format</span><span class="kw">:</span><span class="at"> </span><span class="st">"hh:mm AM/PM"</span><span class="co">   # 或 "HH:MM", "HH:MM:SS"</span></span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="at">  </span><span class="fu">ampm</span><span class="kw">:</span></span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="at">    </span><span class="fu">enabled</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="at">    </span><span class="fu">pm_keywords</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="st">"PM"</span><span class="kw">,</span><span class="at"> </span><span class="st">"pm"</span><span class="kw">]</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">timestamp</span><span class="kw">:</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">input_format</span><span class="kw">:</span><span class="at"> </span><span class="st">"hh:mm AM/PM"</span><span class="co">   # 或 "HH:MM", "HH:MM:SS"</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">ampm</span><span class="kw">:</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">enabled</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">pm_keywords</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="st">"PM"</span><span class="kw">,</span><span class="at"> </span><span class="st">"pm"</span><span class="kw">]</span></span></code></pre></div>
 <p><strong>第 3 步：用你的配置运行</strong></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/run_pipeline.html">run_pipeline</a></span><span class="op">(</span>config <span class="op">=</span> <span class="st">"my_study_config.yaml"</span><span class="op">)</span></span></code></pre></div>
@@ -157,8 +148,7 @@ CSV</strong>：<code>main: "my_data.csv"</code>，<code>extra: ""</code> —
 <div class="section level2">
 <h2 id="输入数据结构">输入数据结构<a class="anchor" aria-label="anchor" href="#%E8%BE%93%E5%85%A5%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"></a>
 </h2>
-<p><strong>本仓库不含原始参与者数据。</strong> 所有含参与者数据的 CSV
-都被 gitignore。 含合成数据的模板在 <code>templates/</code>。</p>
+<p><strong>本仓库不含原始参与者数据。</strong> 所有含参与者数据的 CSV 都被 gitignore。 含合成数据的模板在 <code>templates/</code>。</p>
 <table class="table">
 <colgroup>
 <col width="33%">
@@ -183,33 +173,27 @@ CSV</strong>：<code>main: "my_data.csv"</code>，<code>extra: ""</code> —
 </tr>
 <tr class="odd">
 <td>原始时间戳（HH:MM）</td>
-<td>time_bed_am_hhmm, time_sleep_am_hhmm, time_awake_am_hhmm,
-time_getup_am_hhmm</td>
+<td>time_bed_am_hhmm, time_sleep_am_hhmm, time_awake_am_hhmm, time_getup_am_hhmm</td>
 <td>自报就寝/入睡/醒来/起床时钟时间</td>
 </tr>
 <tr class="even">
 <td>原始时间戳（AM/PM）</td>
-<td>time_bed_am_ampm, time_sleep_am_ampm, time_awake_am_ampm,
-time_getup_am_ampm</td>
+<td>time_bed_am_ampm, time_sleep_am_ampm, time_awake_am_ampm, time_getup_am_ampm</td>
 <td>每个时间戳的 AM/PM 指示</td>
 </tr>
 <tr class="odd">
 <td>原始时长</td>
-<td>duration_totalmin_sol_estimate_am,
-duration_totalmin_waso_estimate_am</td>
+<td>duration_totalmin_sol_estimate_am, duration_totalmin_waso_estimate_am</td>
 <td>自报 SOL 和 WASO（分钟）</td>
 </tr>
 <tr class="even">
 <td>小睡/运动</td>
-<td>duration_totalmin_napstoday_PM,
-exercise_PM_totalmin_[Light|Moderate|Vigorous|Strength]</td>
+<td>duration_totalmin_napstoday_PM, exercise_PM_totalmin_[Light|Moderate|Vigorous|Strength]</td>
 <td>自报小睡和运动时长</td>
 </tr>
 <tr class="odd">
 <td>物质使用</td>
-<td>caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1,
-alcoholtoday_PM_NumAlcoholicDrinks_1, nicotine_amount_pm_doses,
-cannabis_amount_pm_doses</td>
+<td>caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1, alcoholtoday_PM_NumAlcoholicDrinks_1, nicotine_amount_pm_doses, cannabis_amount_pm_doses</td>
 <td>自报物质使用</td>
 </tr>
 <tr class="even">
@@ -299,20 +283,13 @@ cannabis_amount_pm_doses</td>
 </tr>
 <tr class="odd">
 <td>
-<code>output/verification/real_n13990/</code>,
-<code>verification/synth_n280/</code>
+<code>output/verification/real_n13990/</code>, <code>verification/synth_n280/</code>
 </td>
 <td>稳定、永不被覆盖的验证产物</td>
 </tr>
 </tbody>
 </table>
-<p>输出结构的关键规则： -
-<code>latest_visualization_&lt;tag&gt;_n&lt;rows&gt;/</code>
-是”最新”而非”历史”——每次可视化运行清空重建。 -
-<code>verification/&lt;tag&gt;_n&lt;rows&gt;/</code>
-是同级目录，永不被清空逻辑触碰。 - 真实数据输出只落在
-<code>output/</code>（gitignore）；合成输出路由到 <code>output/</code>
-之外。</p>
+<p>输出结构的关键规则： - <code>latest_visualization_&lt;tag&gt;_n&lt;rows&gt;/</code> 是“最新”而非“历史”——每次可视化运行清空重建。 - <code>verification/&lt;tag&gt;_n&lt;rows&gt;/</code> 是同级目录，永不被清空逻辑触碰。 - 真实数据输出只落在 <code>output/</code>（gitignore）；合成输出路由到 <code>output/</code> 之外。</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

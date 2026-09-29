@@ -30,11 +30,10 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>sleepcleanr — Validation Report</h1>
-      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/VALIDATION_REPORT.md" class="external-link"><code>VALIDATION_REPORT.md</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/HEAD/VALIDATION_REPORT.md" class="external-link"><code>VALIDATION_REPORT.md</code></a></small>
     </div>
 
 <div id="sleepcleanr--validation-report" class="section level1">
-
 <p><em>Rendered 2026-09-17 by <code>validation/render_validation_report.R</code>. All synthetic numbers are read directly from the result CSVs — nothing below is hand-typed.</em></p>
 <div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a></h2>
@@ -285,7 +284,7 @@
 </div>
 <div class="section level2">
 <h2 id="bland-altman-measurement-characterization">Bland-Altman measurement characterization<a class="anchor" aria-label="anchor" href="#bland-altman-measurement-characterization"></a></h2>
-<table class="table"><colgroup><col width="25%"><col width="25%"><col width="25%"><col width="25%"></colgroup><thead><tr class="header"><th>Metric</th>
+<table class="table"><thead><tr class="header"><th>Metric</th>
 <th>LoA half-width</th>
 <th>Threshold ratio</th>
 <th>Verdict</th>
@@ -465,11 +464,11 @@ B1 TST shift / B2 n shift | 29.6 min / 1131 records | | |</p>
 <li><p><strong>SOL thresholds sit inside the ±75-min Bland-Altman noise band</strong> — SOL flags are descriptive, routed to human review; never cited as accuracy.</p></li>
 <li><p><strong>Ablation recall uses a flag-based definition</strong> (AUTO_FIXed records never enter the flag queue) — reported as supplementary; primary evidence is the multiverse variance decomposition.</p></li>
 <li><p><strong>Operating-point analysis is synthetic-only</strong> — real data has no ground truth, so recall is undefined there (the real-data spec curve measures downstream means only, which cannot move: n_flagged = 0 under every spec). The plateau verdict holds on the synthetic benchmark; real-world threshold choice should be re-checked on external data. ## Reproducibility</p></li>
-</ol><div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co"># from the repo root, after renv::restore() and installing splsleep</span></span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>Rscript validation<span class="sc">/</span>synthetic<span class="sc">/</span>ppv_cluster_ci.R   <span class="co"># synthetic benchmark (recall/spec/FAR)</span></span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>Rscript validation<span class="sc">/</span>synthetic<span class="sc">/</span>operating_point_sweep.R  <span class="co"># threshold operating-point analysis</span></span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>Rscript validation<span class="sc">/</span>audit_review_queue_m1_m7.R   <span class="co"># real-data audit (requires local data)</span></span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>Rscript validation<span class="sc">/</span>render_validation_report.R   <span class="co"># re-render this report from the CSVs</span></span></code></pre></div>
+</ol><div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># from the repo root, after renv::restore() and installing splsleep</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>Rscript validation<span class="sc">/</span>synthetic<span class="sc">/</span>ppv_cluster_ci.R   <span class="co"># synthetic benchmark (recall/spec/FAR)</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>Rscript validation<span class="sc">/</span>synthetic<span class="sc">/</span>operating_point_sweep.R  <span class="co"># threshold operating-point analysis</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>Rscript validation<span class="sc">/</span>audit_review_queue_m1_m7.R   <span class="co"># real-data audit (requires local data)</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>Rscript validation<span class="sc">/</span>render_validation_report.R   <span class="co"># re-render this report from the CSVs</span></span></code></pre></div>
 <p>The synthetic layer is fully reproducible from committed CSVs. The real-data audit requires the gitignored local dataset.</p>
 </div>
 </div>
