@@ -135,6 +135,12 @@ Rplots\.pdf$
 ^timegap_candidates_.*\.csv$
 ^fasttrack_review\.csv$
 ^fasttrack_review\.xlsx$
+^fasttrack_review_.*\.csv$
+^fasttrack_review_.*\.xlsx$
+^manual_disambiguation_.*\.csv$
+^manual_disambiguation_fasttrack\.csv$
+^manual_error_corrections\.csv\..*$
+^.*\.provenance\.json$
 ^_tmp_pkg_snapshot\.tar\.gz$
 ^manual_.*\.xlsx$
 ^real_data_config_.*\.yaml$
