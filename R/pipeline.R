@@ -84,11 +84,26 @@ utils::globalVariables(c(
 #'   supplied, the file-reading branch of Step 1 is skipped and the config's
 #'   column_mapping is applied to \code{data}. Used by
 #'   \code{clean_sleep_diary()}.
+#' @param include_manual_corrections Logical or character. Controls whether
+#'   HUMAN-REVIEW corrections are applied to the data. \strong{Default FALSE}:
+#'   the pipeline runs algorithmic-only -- every human-review file
+#'   (manual_error/unusual/nap_exercise/sleep_metric_duration/
+#'   metric_review_acceptances/second_review) is treated as absent, Step 5
+#'   still generates the [NEW] review worksheets for inspection, and a
+#'   prominent banner states that no human corrections were applied. TRUE:
+#'   apply the manual-correction files configured in the config YAML
+#'   (the pre-2026-09-29 behaviour). The strings "ask" / "y" / "n" / "yes" /
+#'   "no" are also accepted: "ask" prompts interactively (in an interactive
+#'   session only; in a non-interactive session it degrades to FALSE with a
+#'   notice). The point of the default-off switch: a package user must
+#'   OPT IN to human corrections so that a dataset can never be silently
+#'   modified by review files left over in the working directory.
 #'
 #' @return Invisibly returns TRUE on successful completion.
 #' @export
 run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = FALSE,
-                         finalize = TRUE, verbose = TRUE, data = NULL) {
+                         finalize = TRUE, verbose = TRUE, data = NULL,
+                         include_manual_corrections = FALSE) {
   env <- .pipeline_init(config, project_dir, verbose)
   on.exit(.pipeline_cleanup(env$old_wd), add = TRUE)
   cfg  <- env$cfg
@@ -195,8 +210,123 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   suppressMessages(generated_files <- generate_correction_files(ema_data_release_timecalc))
   log_step(ema_data_release_timecalc, "5", "Classify records", cfg)
 
+  # STRICT PATH MATCHING: manual_error_path / manual_unusual_path are used
+  # exactly as configured, with a plain file.exists() check below -- no
+  # fuzzy/near-miss filename lookup of any kind. (An earlier version of this
+  # code auto-substituted a similarly-named file when the exact one was
+  # missing; that was removed on request -- searching for "close enough"
+  # filenames is a guess, and a wrong guess here means the pipeline silently
+  # runs on the wrong -- or un-reviewed -- corrections file. If the exact
+  # path isn't found, fix the path or the filename; nothing here will do
+  # that automatically.)
   manual_error_path   <- cfg_get("data.files.manual_error",   "manual_error_corrections.csv", cfg = cfg)
   manual_unusual_path <- cfg_get("data.files.manual_unusual", "manual_unusual_corrections.csv", cfg = cfg)
+
+  # REQUIRE MANUAL CORRECTIONS (2026-09-25): for a study that has completed
+  # human review, silently continuing with 0 manual corrections is not a
+  # degraded-but-usable result -- it is a wrong result that looks identical
+  # to a correct one (right columns, right row count, "[OK] Pipeline
+  # complete!", no error). That is exactly the failure mode that let a run
+  # without manual_error_corrections.csv / manual_unusual_corrections.csv
+  # complete and be mistaken for the fully-corrected dataset. This flag lets
+  # a study's own config (e.g. real_data_config.yaml) turn the soft
+  # [WARN]-and-continue into a hard stop, WITHOUT changing the default
+  # behaviour for every other user of this package -- many legitimately have
+  # no manual review yet (first exploratory run, algorithmic-only workflow,
+  # the bundled synthetic demo) and must not be broken by this. Default FALSE
+  # preserves the original soft-fallback behaviour everywhere this key is
+  # absent or explicitly false.
+  # ---------------------------------------------------------------------
+  # MANUAL-CORRECTIONS GATE (2026-09-29): human-review files are applied
+  # ONLY when the caller explicitly opts in. Default FALSE = algorithmic-
+  # only run; the [NEW] review worksheets from Step 5 are still generated
+  # for inspection, but nothing human-reviewed touches the data. This makes
+  # silent correction impossible: the data can only be changed by a
+  # human-review file if the caller asked for it by name.
+  .include_val <- if (is.character(include_manual_corrections))
+    tolower(trimws(include_manual_corrections)) else include_manual_corrections
+  if (.include_val %in% c("y", "yes")) {
+    .include_manual <- TRUE
+  } else if (.include_val %in% c("n", "no")) {
+    .include_manual <- FALSE
+  } else if (identical(.include_val, "ask")) {
+    .n_err_new <- if (file.exists("[NEW]manual_error_correction_review.csv"))
+      max(0, length(readLines("[NEW]manual_error_correction_review.csv")) - 1) else 0
+    .n_unu_new <- if (file.exists("[NEW]manual_unusual_review.csv"))
+      max(0, length(readLines("[NEW]manual_unusual_review.csv")) - 1) else 0
+    if (interactive()) {
+      cat(sprintf(paste0(
+        "\n*** Step 5 flagged %d error-classified and %d unusual-classified ",
+        "record(s) for human review. ***\nInclude the manual correction files ",
+        "configured in your YAML? (y/n): "), .n_err_new, .n_unu_new))
+      .ans <- tolower(trimws(readline()))
+      .include_manual <- .ans %in% c("y", "yes")
+      if (!.include_manual)
+        cat("  -> proceeding WITHOUT manual corrections (your 'n' answer).\n")
+    } else {
+      .include_manual <- FALSE
+      cat("  [include_manual_corrections = \"ask\"] non-interactive session -> ",
+          "defaulting to FALSE (no manual corrections applied).\n")
+    }
+  } else {
+    .include_manual <- isTRUE(.include_val)
+  }
+  if (!.include_manual) {
+    # Algorithmic-only run: blank out every human-review path for this run.
+    # Step 5 has already written the [NEW] worksheets; they are untouched.
+    cfg$data$files$manual_error           <- ""
+    cfg$data$files$manual_unusual         <- ""
+    cfg$data$files$manual_nap_exercise    <- ""
+    cfg$data$files$manual_metric_duration <- ""
+    cfg$data$files$manual_metric_accept   <- ""
+    cfg$data$files$second_review          <- ""
+    # The path variables above were already resolved from the pre-gate cfg;
+    # blank them too so the Step-6 readers see "no file" rather than the
+    # configured path.
+    manual_error_path   <- ""
+    manual_unusual_path <- ""
+    assign("pipeline_config", cfg, envir = .GlobalEnv)
+    if (verbose) cat(sprintf(
+      paste0("\n%s\n*   MANUAL CORRECTIONS NOT INCLUDED%s",
+             "*   This run is ALGORITHMIC-ONLY: no human-review file touched the data.%s",
+             "*   The [NEW] review worksheets from Step 5 were still generated for%s",
+             "*   your inspection. To apply human corrections, rerun with:%s",
+             "*       run_pipeline(..., include_manual_corrections = TRUE)%s%s\n"),
+      strrep("*", 74), "\n", "\n", "\n", "\n", "\n", strrep("*", 74)))
+  } else if (verbose) {
+    cat("\nManual corrections INCLUDED (include_manual_corrections = TRUE):",
+        "applying the human-review files configured in the YAML.\n")
+  }
+
+  # The require-manual guard is only meaningful when human corrections ARE
+  # intended: in an explicitly algorithmic-only run an absent manual file is
+  # the caller's informed choice, not a silent accident.
+  .require_manual <- .include_manual &&
+    isTRUE(cfg_get("data.require_manual_corrections", FALSE, cfg = cfg))
+  if (.require_manual) {
+    .missing <- c(
+      if (!file.exists(manual_error_path))   manual_error_path,
+      if (!file.exists(manual_unusual_path)) manual_unusual_path
+    )
+    if (length(.missing) > 0) {
+      stop(sprintf(
+        paste0(
+          "data.require_manual_corrections is TRUE in this config, but the ",
+          "following required manual-review file(s) were not found at their ",
+          "exact configured path:\n    %s\n",
+          "Refusing to run with silently-empty manual corrections -- this ",
+          "would complete without error and produce a dataset that LOOKS ",
+          "fully corrected but is missing every human-reviewed fix. Place ",
+          "the real file(s) at the exact path(s) above (this pipeline does ",
+          "not search for similarly-named files), or set ",
+          "data.require_manual_corrections: false in this config if an ",
+          "algorithmic-only run is actually intended."
+        ),
+        paste(.missing, collapse = "\n    ")
+      ))
+    }
+  }
+
   manual_corrections <- if (file.exists(manual_error_path)) {
     # Kept as readr::read_csv rather than utils::read.csv: this file feeds the
     # Step 6 manual corrections, and readr's column-type inference differs from
