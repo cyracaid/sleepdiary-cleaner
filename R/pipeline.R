@@ -243,33 +243,49 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   # for inspection, but nothing human-reviewed touches the data. This makes
   # silent correction impossible: the data can only be changed by a
   # human-review file if the caller asked for it by name.
+  #
+  # Ask-when-missing (2026-09-29, user design): when corrections ARE opted
+  # into but a configured review file is absent, the pipeline asks once --
+  # "skip the missing files and continue algorithmic-only?" -- instead of
+  # either silently continuing or dying without dialogue. In a
+  # non-interactive session nobody can answer, so the run stops hard rather
+  # than skip silently; data.require_manual_corrections keeps controlling
+  # that non-interactive stop.
   .include_val <- if (is.character(include_manual_corrections))
     tolower(trimws(include_manual_corrections)) else include_manual_corrections
-  if (.include_val %in% c("y", "yes")) {
+  if (.include_val %in% c("y", "yes", "ask")) {
     .include_manual <- TRUE
   } else if (.include_val %in% c("n", "no")) {
     .include_manual <- FALSE
-  } else if (identical(.include_val, "ask")) {
-    .n_err_new <- if (file.exists("[NEW]manual_error_correction_review.csv"))
-      max(0, length(readLines("[NEW]manual_error_correction_review.csv")) - 1) else 0
-    .n_unu_new <- if (file.exists("[NEW]manual_unusual_review.csv"))
-      max(0, length(readLines("[NEW]manual_unusual_review.csv")) - 1) else 0
-    if (interactive()) {
-      cat(sprintf(paste0(
-        "\n*** Step 5 flagged %d error-classified and %d unusual-classified ",
-        "record(s) for human review. ***\nInclude the manual correction files ",
-        "configured in your YAML? (y/n): "), .n_err_new, .n_unu_new))
-      .ans <- tolower(trimws(readline()))
-      .include_manual <- .ans %in% c("y", "yes")
-      if (!.include_manual)
-        cat("  -> proceeding WITHOUT manual corrections (your 'n' answer).\n")
-    } else {
-      .include_manual <- FALSE
-      cat("  [include_manual_corrections = \"ask\"] non-interactive session -> ",
-          "defaulting to FALSE (no manual corrections applied).\n")
-    }
   } else {
     .include_manual <- isTRUE(.include_val)
+  }
+  if (.include_manual) {
+    .missing_manual <- c(
+      if (!file.exists(manual_error_path))   manual_error_path,
+      if (!file.exists(manual_unusual_path)) manual_unusual_path
+    )
+    if (length(.missing_manual) > 0 && interactive()) {
+      cat(sprintf(paste0(
+        "\n*** Manual-correction file(s) configured in your YAML were NOT found:%s",
+        "\n    %s%s",
+        "\nSkip manual corrections and continue as an ALGORITHMIC-ONLY run?%s",
+        "(y = skip and continue / n = stop) : "), "\n",
+        paste(.missing_manual, collapse = "\n    "), "\n", "\n"))
+      .ans <- tolower(trimws(readline()))
+      if (.ans %in% c("y", "yes")) {
+        .include_manual <- FALSE
+        cat("  -> skipping manual corrections (your 'y' answer).\n")
+      } else {
+        stop(sprintf(paste0(
+          "Manual-correction file(s) not found at their exact configured ",
+          "paths:\n    %s\nRun stopped at your request (the 'n' answer). ",
+          "Place the file(s) at the paths above or set ",
+          "include_manual_corrections = FALSE for an explicitly ",
+          "algorithmic-only run."),
+          paste(.missing_manual, collapse = "\n    ")))
+      }
+    }
   }
   if (!.include_manual) {
     # Algorithmic-only run: blank out every human-review path for this run.
