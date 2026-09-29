@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,6 +33,29 @@
       <small>Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.4.7" id="sleepcleanr-147">sleepcleanr 1.4.7<a class="anchor" aria-label="anchor" href="#sleepcleanr-147"></a></h2>
+<p>Robustness and consent release. Fixes found by external-dataset validation and controlled re-runs; no changes to cleaning logic or thresholds.</p>
+<div class="section level3">
+<h3 id="new-explicit-manual-corrections-gate-1-4-7">New: explicit manual-corrections gate<a class="anchor" aria-label="anchor" href="#new-explicit-manual-corrections-gate-1-4-7"></a></h3>
+<ul><li>
+<code><a href="../reference/run_pipeline.html">run_pipeline()</a></code> gains <code>include_manual_corrections = FALSE</code> (new default): an algorithmic-only run — no human-review file touches the data, a prominent banner says so, and Step 5 still writes the <code>[NEW]</code> review worksheets for inspection. <code>TRUE</code> restores the legacy behaviour; <code>"ask"</code> prompts interactively (reporting flagged-record counts) and degrades to FALSE non-interactively; <code>y/yes/n/no</code> accepted. A dataset can now only be modified by a human-review file when the caller asked for it by name.</li>
+<li>
+<code>data.require_manual_corrections</code> guard fixed: the key was documented and configured one YAML level too deep (<code>data.files.</code>), so the missing-file hard stop had been silently inert since 1.4.5. It now lives under <code>data:</code> and verified to stop correctly.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="fixed-1-4-7">Fixed<a class="anchor" aria-label="anchor" href="#fixed-1-4-7"></a></h3>
+<ul><li>
+<code>format(&lt;difftime&gt;, "%H:%M")</code> raised “invalid ‘trim’ argument” on R &gt;= 4.x for hms/difftime timestamp columns; conversion is now manual and version-stable (the pipeline runs on R 4.6.0).</li>
+<li>CSV main inputs crashed at Step 1.5 with the cryptic “unknown input format” (the field-misentry preprocessor hard-coded <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS()</a></code>); CSV is now loaded by extension, matching the Step-1 loader.</li>
+<li>All-NA interval columns no longer skip contract-placeholder generation (<code>*_mincalc</code>, <code>*_checkforerrors</code>, <code>*_correctionsmade</code>), so datasets that legitimately lack a field (no naps, no substance data) pass the Step-10 column-dictionary check.</li>
+<li>Corrected-time review sheets now show the pipeline’s actual corrected values with real observation dates instead of the 2000-01-01 placeholder date (de-identified inputs have no dates; the sber export supplies them).</li>
+</ul></div>
+<div class="section level3">
+<h3 id="external-validation-1-4-7">External validation<a class="anchor" aria-label="anchor" href="#external-validation-1-4-7"></a></h3>
+<ul><li>End-to-end run on an independent real dataset (Baigutanova et al. 2025, <em>Scientific Data</em>: 49 healthy adults x 4 weeks, 1,372 diary entries, 24-hour clock times, no separate get-up field): 1,094 valid (79.7%), mean TST 7.55 h (healthy-adult literature range), zero errors, zero automated corrections — consistent with the source study’s pre-release AM/PM correction.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.4.6" id="sleepcleanr-146">sleepcleanr 1.4.6<a class="anchor" aria-label="anchor" href="#sleepcleanr-146"></a></h2>
 <p>Data-first entry, provenance, and figure-hardening release.</p>

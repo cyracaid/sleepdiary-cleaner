@@ -1,5 +1,54 @@
 # Changelog
 
+## sleepcleanr 1.4.7
+
+Robustness and consent release. Fixes found by external-dataset
+validation and controlled re-runs; no changes to cleaning logic or
+thresholds.
+
+### New: explicit manual-corrections gate
+
+- [`run_pipeline()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_pipeline.md)
+  gains `include_manual_corrections = FALSE` (new default): an
+  algorithmic-only run — no human-review file touches the data, a
+  prominent banner says so, and Step 5 still writes the `[NEW]` review
+  worksheets for inspection. `TRUE` restores the legacy behaviour;
+  `"ask"` prompts interactively (reporting flagged-record counts) and
+  degrades to FALSE non-interactively; `y/yes/n/no` accepted. A dataset
+  can now only be modified by a human-review file when the caller asked
+  for it by name.
+- `data.require_manual_corrections` guard fixed: the key was documented
+  and configured one YAML level too deep (`data.files.`), so the
+  missing-file hard stop had been silently inert since 1.4.5. It now
+  lives under `data:` and verified to stop correctly.
+
+### Fixed
+
+- `format(<difftime>, "%H:%M")` raised “invalid ‘trim’ argument” on R
+  \>= 4.x for hms/difftime timestamp columns; conversion is now manual
+  and version-stable (the pipeline runs on R 4.6.0).
+- CSV main inputs crashed at Step 1.5 with the cryptic “unknown input
+  format” (the field-misentry preprocessor hard-coded
+  [`readRDS()`](https://rdrr.io/r/base/readRDS.html)); CSV is now loaded
+  by extension, matching the Step-1 loader.
+- All-NA interval columns no longer skip contract-placeholder generation
+  (`*_mincalc`, `*_checkforerrors`, `*_correctionsmade`), so datasets
+  that legitimately lack a field (no naps, no substance data) pass the
+  Step-10 column-dictionary check.
+- Corrected-time review sheets now show the pipeline’s actual corrected
+  values with real observation dates instead of the 2000-01-01
+  placeholder date (de-identified inputs have no dates; the sber export
+  supplies them).
+
+### External validation
+
+- End-to-end run on an independent real dataset (Baigutanova et
+  al. 2025, *Scientific Data*: 49 healthy adults x 4 weeks, 1,372 diary
+  entries, 24-hour clock times, no separate get-up field): 1,094 valid
+  (79.7%), mean TST 7.55 h (healthy-adult literature range), zero
+  errors, zero automated corrections — consistent with the source
+  study’s pre-release AM/PM correction.
+
 ## sleepcleanr 1.4.6
 
 Data-first entry, provenance, and figure-hardening release.

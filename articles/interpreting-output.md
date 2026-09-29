@@ -208,6 +208,35 @@ The retired figures `08_Sleep_Duration_by_Category` and
 questions are answered by Figure 07 and A1); `11`, `14`, `15` and `16`
 are intentionally skipped on real data (empty/blank by design).
 
+**Choosing figures for the paper — a recommendation.** The “Paper use”
+column above is a default suggestion, not a verdict. For a
+Methods/Results structure the pipeline supports, this split works well:
+
+- **Methods, main text (2 figures).** 01 (Pipeline Record Flow) — shows
+  what the pipeline IS: stages, counts, and the final classification
+  breakdown. 02 (Correction Impact) — shows what cleaning DID:
+  non-destructive, only confirmed input errors modified. These two
+  answer the reviewer’s first two questions (“what did you do?” and “how
+  invasive was it?”) with no clutter.
+- **Results, main text (pick 3–5).** 03 (TST distribution) as the
+  data-quality anchor; 20/20B (perception bias) if
+  subjective-vs-computed agreement is part of your story; R25 (weekday
+  vs weekend) or R26 (TIB composition) if timing regularity /
+  composition matters; R27 (correlation matrix) if you reference metric
+  interrelationships. Resist putting more than five in the main text —
+  the rest reads better as supplement.
+- **Supplement (everything else).** All `pipeline_cleaning/` figures
+  (13, 13B, 13C, 13D, 17, 18, A1, P26, 06, 07, 10) form the audit trail:
+  put them in a supplement titled “Data quality and cleaning audit” and
+  cite the set collectively from Methods with one sentence (“see
+  Supplement S1 for the full audit trail”). The substance figures
+  (21–24) belong with whatever substance-use analysis the paper reports,
+  or supplement if none.
+
+A minimal working set if page limits are tight: **01 + 02 in Methods,
+03 + 20 + R27 in Results, the supplement section for the audit trail.**
+Captions for every one of these are ready in §7.
+
 ### 6.2 Figure Cards
 
 #### 01 · Pipeline Record Flow

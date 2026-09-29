@@ -24,7 +24,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -775,6 +775,38 @@ Correlation Matrix</a></td>
 (their questions are answered by Figure 07 and A1); <code>11</code>,
 <code>14</code>, <code>15</code> and <code>16</code> are intentionally
 skipped on real data (empty/blank by design).</p>
+<p><strong>Choosing figures for the paper — a recommendation.</strong>
+The “Paper use” column above is a default suggestion, not a verdict. For
+a Methods/Results structure the pipeline supports, this split works
+well:</p>
+<ul>
+<li>
+<strong>Methods, main text (2 figures).</strong> 01 (Pipeline Record
+Flow) — shows what the pipeline IS: stages, counts, and the final
+classification breakdown. 02 (Correction Impact) — shows what cleaning
+DID: non-destructive, only confirmed input errors modified. These two
+answer the reviewer’s first two questions (“what did you do?” and “how
+invasive was it?”) with no clutter.</li>
+<li>
+<strong>Results, main text (pick 3–5).</strong> 03 (TST
+distribution) as the data-quality anchor; 20/20B (perception bias) if
+subjective-vs-computed agreement is part of your story; R25 (weekday vs
+weekend) or R26 (TIB composition) if timing regularity / composition
+matters; R27 (correlation matrix) if you reference metric
+interrelationships. Resist putting more than five in the main text — the
+rest reads better as supplement.</li>
+<li>
+<strong>Supplement (everything else).</strong> All
+<code>pipeline_cleaning/</code> figures (13, 13B, 13C, 13D, 17, 18, A1,
+P26, 06, 07, 10) form the audit trail: put them in a supplement titled
+“Data quality and cleaning audit” and cite the set collectively from
+Methods with one sentence (“see Supplement S1 for the full audit
+trail”). The substance figures (21–24) belong with whatever
+substance-use analysis the paper reports, or supplement if none.</li>
+</ul>
+<p>A minimal working set if page limits are tight: <strong>01 + 02 in
+Methods, 03 + 20 + R27 in Results, the supplement section for the audit
+trail.</strong> Captions for every one of these are ready in §7.</p>
 </div>
 <div class="section level3">
 <h3 id="figure-cards">6.2 Figure Cards<a class="anchor" aria-label="anchor" href="#figure-cards"></a>
