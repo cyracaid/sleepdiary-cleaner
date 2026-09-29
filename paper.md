@@ -11,11 +11,11 @@ authors:
   - given-names: Cai
     family-names: Dong
     affiliation: "Insert affiliation"
-    orcid: "Insert ORCID"
+    orcid: "https://orcid.org/0009-0001-0706-0335"
   - given-names: Maia
     family-names: ten Brink
     affiliation: "Insert affiliation"
-    orcid: "Insert ORCID"
+    orcid: "https://orcid.org/0000-0001-6987-1339"
 date: 29 September 2026
 repository: https://github.com/cyracaid/sleepdiary-cleaner
 version: 1.4.7
