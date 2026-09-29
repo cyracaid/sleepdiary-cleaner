@@ -1000,11 +1000,13 @@ Distribution</li>
 <code>research_ready/03_Sleep_Duration_Distribution.png</code> —
 generated at <code>sleep_visualization.R:1056</code> <strong>Paper
 use</strong> Results <strong>What each part means</strong> Histogram +
-density of total sleep time (h) with mean/median reference lines
-(“Enhanced”: sleep period minus WASO). <strong>Healthy look</strong>
-Unimodal, 6–8 h center, mean ≈ median. <strong>Anomaly →</strong> Mean ≫
-median → right tail of long sleepers; spike at 0 → zero-duration
-records. <strong>Precise rules</strong></p>
+density of total sleep time (h) with a bottom legend naming all three
+overlays: red smooth curve = density estimate; blue solid line = mean;
+orange dashed line = median (each with its hour value). TST = time
+actually asleep (“Enhanced”: sleep period minus WASO). <strong>Healthy
+look</strong> Unimodal, 6–8 h center, mean ≈ median. <strong>Anomaly
+→</strong> Mean ≫ median → right tail of long sleepers; spike at 0 →
+zero-duration records. <strong>Precise rules</strong></p>
 <ul>
 <li>
 <strong>03 (TST distribution)</strong> uses
@@ -1029,13 +1031,16 @@ Bed</li>
 <p><strong>File</strong>
 <code>research_ready/04_Sleep_Duration_vs_Time_in_Bed.png</code> —
 generated at <code>sleep_visualization.R:1111</code> <strong>Paper
-use</strong> Results <strong>What each part means</strong> Scatter TST
-(h) vs time-in-bed (h) with smooth trend + identity reference.
-<strong>Healthy look</strong> Points hug the identity line; spread grows
-at longer TIB (people lounge in bed); no points with TST &gt; TIB.
-<strong>Anomaly →</strong> TST &gt; TIB region populated → duration
-arithmetic error (WASO subtraction missing); flat cloud → TIB and TST
-decoupled (parsing problem). <strong>Precise rules</strong></p>
+use</strong> Results <strong>What each part means</strong> Scatter of
+TIME IN BED (from getting into bed to getting out) vs SLEEP DURATION
+(time actually asleep = TIB − SOL − WASO). Black line = linear trend;
+the gray band around it = that trend’s uncertainty range. Dashed
+diagonal = the impossible line TST == TIB. <strong>Healthy look</strong>
+Points hug the identity line; spread grows at longer TIB (people lounge
+in bed); no points with TST &gt; TIB. <strong>Anomaly →</strong> TST
+&gt; TIB region populated → duration arithmetic error (WASO subtraction
+missing); flat cloud → TIB and TST decoupled (parsing problem).
+<strong>Precise rules</strong></p>
 <ul>
 <li>
 <strong>04</strong> plots TST (h) vs time-in-bed (h). Because TST =
@@ -1061,13 +1066,16 @@ points above the identity line are physically impossible.</em> #### 04B
 <p><strong>File</strong>
 <code>research_ready/04B_SOL_vs_Sleep_Duration.png</code> — generated at
 <code>sleep_visualization.R:1161</code> <strong>Paper use</strong>
-Results <strong>What each part means</strong> Scatter SOL (h) vs TST
-(h), <strong>color = data quality</strong>, SOL &gt; 3 h filtered out
-for clarity. <strong>Healthy look</strong> Negative correlation (long
-SOL → short TST); most points SOL &lt; 1 h; quality colors mixed
-uniformly. <strong>Anomaly →</strong> Cluster of error/unusual colors at
-high SOL → sleep-onset mis-entry pattern; vertical stripe at SOL = 0 →
-zero-latency reporting (equal-time). <strong>Precise rules</strong></p>
+Results <strong>What each part means</strong> Scatter of SOL (how long
+it took to fall asleep after getting into bed) vs TST. Each dot = one
+diary night. Black line = linear trend; gray band = trend’s uncertainty
+range. Red dotted vertical at SOL = 1 h (reference, labeled). SOL &gt; 3
+h filtered out for clarity. <strong>Healthy look</strong> Negative
+correlation (long SOL → short TST); most points SOL &lt; 1 h; quality
+colors mixed uniformly. <strong>Anomaly →</strong> Cluster of
+error/unusual colors at high SOL → sleep-onset mis-entry pattern;
+vertical stripe at SOL = 0 → zero-latency reporting (equal-time).
+<strong>Precise rules</strong></p>
 <ul>
 <li>
 <strong>04</strong> plots TST (h) vs time-in-bed (h). Because TST =
@@ -1113,11 +1121,14 @@ not absolute values.</em> #### 06 · Sleep Duration Post-Correction</li>
 <code>pipeline_cleaning/06_Sleep_Duration_Post_Correction.png</code> —
 generated at <code>sleep_visualization.R:1285</code> <strong>Paper
 use</strong> Supplement <strong>What each part means</strong> Density
-curve of final TST (hours) after manual corrections; one curve over the
-whole dataset. <strong>Healthy look</strong> Unimodal, peak 6–8 h, no
-spikes at 0 or &gt; 12. <strong>Anomaly →</strong> Flat/bimodal → mixed
-12h/24h formats survived parsing; spike at 0 → missing/zero-duration
-records. <strong>Precise rules</strong></p>
+curves of final sleep duration by record class (Clean / Unusual /
+Manually Corrected / Error) after Steps 5–6.5. WHAT THIS ANSWERS: did
+the human corrections distort the overall sleep-duration distribution?
+(The corrected class’s curve should overlap the clean curve.)
+<strong>Healthy look</strong> Unimodal, peak 6–8 h, no spikes at 0 or
+&gt; 12. <strong>Anomaly →</strong> Flat/bimodal → mixed 12h/24h formats
+survived parsing; spike at 0 → missing/zero-duration records.
+<strong>Precise rules</strong></p>
 <ul>
 <li>Density of final <code>sleep_duration_h</code> after manual
 corrections are applied. Compare against the (auto-detection-only) view
@@ -1132,10 +1143,12 @@ residual parsing artifacts.</em> #### 07 · Flag Composition Stacked</li>
 <code>pipeline_cleaning/07_Flag_Composition_Stacked.png</code> —
 generated at <code>sleep_visualization.R:1350</code> <strong>Paper
 use</strong> Supplement <strong>What each part means</strong> Stacked
-histogram: x = sleep duration (h), y = count, <strong>fill =
-<code>flag_severity</code></strong> (Clean / Minor (1 flag) / Major (2+
-flags), not <code>data_category</code> — see §6.4). Shows how flag
-severity varies with sleep duration. <strong>Healthy look</strong> Clean
+histogram: x = sleep duration (h), <strong>y = number of
+records</strong> in that range, <strong>fill =
+<code>flag_severity</code></strong> under a legend titled “Data Quality”
+(Clean / Minor (1 flag) / Major (2+ flags) — not
+<code>data_category</code>, see §6.4). Shows whether quality problems
+cluster at extreme durations. <strong>Healthy look</strong> Clean
 dominates every duration bin; colored slivers only at extremes (&lt; 3
 h, &gt; 12 h) and at 0. <strong>Anomaly →</strong> Error band wide
 across mid durations → systematic parsing problem, not extreme-value
@@ -1425,12 +1438,19 @@ Counts must match <code>correction_status_final.csv</code>.</em> #### 20
 <p><strong>File</strong>
 <code>research_ready/20_SOL_Perception_Bias.png</code> — generated at
 <code>sleep_visualization.R:2547</code> <strong>Paper use</strong>
-Results <strong>What each part means</strong> Histogram of |subjective
-SOL − computed SOL| (minutes) with reference line; shows perception bias
-magnitude. <strong>Healthy look</strong> Mass near 0; small tail; mean
-bias &lt; 30 min. <strong>Anomaly →</strong> Large systematic shift
-(mean ≫ 0) → participants misjudge onset latency; bimodal → subset
-misusing the field. <strong>Precise rules</strong></p>
+Results <strong>What each part means</strong> Histogram of the absolute
+bias, printed on-figure as
+<code>bias = |computed SOL − self-reported SOL|</code> (minutes). Two
+reference lines, each now labeled with its basis: <strong>orange dashed
+at 15 min</strong> = small mismatch (close to the pipeline’s 15-min
+window tolerance,
+<code>classification.metric_validation.sol.window_tolerance_minutes</code>);
+<strong>red dashed at 60 min</strong> = large mismatch — a DISPLAY
+reference, not a pipeline rule; cases beyond it are worth a manual look.
+<strong>Healthy look</strong> Mass near 0; small tail; mean bias &lt; 30
+min. <strong>Anomaly →</strong> Large systematic shift (mean ≫ 0) →
+participants misjudge onset latency; bimodal → subset misusing the
+field. <strong>Precise rules</strong></p>
 <ul>
 <li>
 <strong>20 (SOL):</strong> objective SOL =
@@ -1452,12 +1472,13 @@ Perception Bias</li>
 <p><strong>File</strong>
 <code>research_ready/20B_WASO_Perception_Bias.png</code> — generated at
 <code>sleep_visualization.R:2602</code> <strong>Paper use</strong>
-Results <strong>What each part means</strong> Histogram of
-|self-reported nighttime wakefulness − computed| (minutes); same
-interpretation as Figure 20 but for WASO. <strong>Healthy look</strong>
-Mass near 0, small tail. <strong>Anomaly →</strong> Large tail →
-participants under/over-report wake bouts; check WASO duration
-corrections. <strong>Precise rules</strong></p>
+Results <strong>What each part means</strong> Histogram of the absolute
+bias, <code>bias = |computed WASO − self-reported wakefulness|</code>
+(minutes), printed on-figure, with the same 15 min / 60 min labeled
+reference lines as Figure 20. <strong>Healthy look</strong> Mass near 0,
+small tail. <strong>Anomaly →</strong> Large tail → participants
+under/over-report wake bouts; check WASO duration corrections.
+<strong>Precise rules</strong></p>
 <ul>
 <li>
 <strong>20 (SOL):</strong> objective SOL =
@@ -1504,12 +1525,14 @@ Substance Use Value Distribution</li>
 <p><strong>File</strong>
 <code>research_ready/22_Substance_Use_Distribution.png</code> —
 generated at <code>sleep_visualization.R:2777</code> <strong>Paper
-use</strong> Supplement <strong>What each part means</strong> Boxplots +
-jitter of reported values per substance. <strong>Healthy look</strong>
-Compact boxes at plausible doses (caffeine 0–4 cups; alcohol 0–3
-drinks); few outliers. <strong>Anomaly →</strong> Extreme outliers →
-amount flags (coding units wrong, e.g. drinks vs servings); wide box →
-non-standard dosing. <strong>Precise rules</strong></p>
+use</strong> Supplement <strong>What each part means</strong> Boxplots
+(box = middle 50% of reports; line inside = median) with <strong>gray
+dots</strong> — each dot = one participant’s report, jittered sideways
+so identical values don’t stack into one point. <strong>Healthy
+look</strong> Compact boxes at plausible doses (caffeine 0–4 cups;
+alcohol 0–3 drinks); few outliers. <strong>Anomaly →</strong> Extreme
+outliers → amount flags (coding units wrong, e.g. drinks vs servings);
+wide box → non-standard dosing. <strong>Precise rules</strong></p>
 <ul>
 <li>
 <strong>Units</strong> (from the plotting config): caffeine =
@@ -1529,11 +1552,12 @@ Consumption</li>
 <p><strong>File</strong>
 <code>research_ready/23_Caffeine_Consumption.png</code> — generated at
 <code>sleep_visualization.R:2839</code> <strong>Paper use</strong>
-Supplement <strong>What each part means</strong> Bar chart of caffeine
-distribution (cups/day) with counts. <strong>Healthy look</strong>
-Right-skewed, mode 0–1 cups. <strong>Anomaly →</strong> Spike at
-implausible values (≥ 10) → unit confusion (cans vs cups) feeding
-<code>AMOUNT_FLAG</code>. <strong>Precise rules</strong></p>
+Supplement <strong>What each part means</strong> Bar chart, <strong>one
+bar per distinct reported value</strong> (0, 0.5, 1, 1.5, … cups/day —
+discrete x axis, bars never overlap), counts + % on top. <strong>Healthy
+look</strong> Right-skewed, mode 0–1 cups. <strong>Anomaly →</strong>
+Spike at implausible values (≥ 10) → unit confusion (cans vs cups)
+feeding <code>AMOUNT_FLAG</code>. <strong>Precise rules</strong></p>
 <ul>
 <li>
 <strong>Units</strong> (from the plotting config): caffeine =
@@ -1553,11 +1577,12 @@ expected; spikes at implausible values indicate unit confusion.</em>
 <p><strong>File</strong>
 <code>research_ready/24_Alcohol_Consumption.png</code> — generated at
 <code>sleep_visualization.R:2874</code> <strong>Paper use</strong>
-Supplement <strong>What each part means</strong> Bar chart of alcohol
-distribution (drinks/day) with counts. <strong>Healthy look</strong>
-Right-skewed, mode 0. <strong>Anomaly →</strong> Spike at high values →
-same unit concern as caffeine; verify <code>alcoholtoday_PM</code>
-coding. <strong>Precise rules</strong></p>
+Supplement <strong>What each part means</strong> Bar chart, one bar per
+distinct reported value (drinks/day), same discrete construction as
+Figure 23. <strong>Healthy look</strong> Right-skewed, mode 0.
+<strong>Anomaly →</strong> Spike at high values → same unit concern as
+caffeine; verify <code>alcoholtoday_PM</code> coding. <strong>Precise
+rules</strong></p>
 <ul>
 <li>
 <strong>Units</strong> (from the plotting config): caffeine =
@@ -1642,13 +1667,15 @@ a verdict that the data are wrong.</li>
 <p><strong>File</strong>
 <code>research_ready/R25_Sleep_Regularity_Weekday_Weekend.png</code> —
 generated at <code>sleep_visualization.R:2937</code> <strong>Paper
-use</strong> Results <strong>What each part means</strong> Violin +
-boxplot of clock hours (bedtime and get-up) split by day type
-(weekday/weekend). <strong>Healthy look</strong> Weekend bedtimes ~0.5–1
-h later; get-up ~1 h later; distributions otherwise similar.
-<strong>Anomaly →</strong> Weekday = weekend exactly → day_type
-mis-assigned or dates stripped; huge weekend shift → strong social
-jetlag (report it). <strong>Precise rules</strong></p>
+use</strong> Results <strong>What each part means</strong> Two
+side-by-side panels — <strong>left = Bedtime, right = Get-up
+Time</strong> (bold labels on top) — each a violin + boxplot of the
+clock hour split by day type (weekday/weekend, colors). <strong>Healthy
+look</strong> Weekend bedtimes ~0.5–1 h later; get-up ~1 h later;
+distributions otherwise similar. <strong>Anomaly →</strong> Weekday =
+weekend exactly → day_type mis-assigned or dates stripped; huge weekend
+shift → strong social jetlag (report it). <strong>Precise
+rules</strong></p>
 <ul>
 <li>
 <code>day_type</code> is derived from the corrected bedtime:
@@ -1673,12 +1700,14 @@ jetlag.</em> #### R26 · Sleep Composition — TIB Breakdown</li>
 <code>research_ready/R26_Sleep_Composition_TIB_Breakdown.png</code> —
 generated at <code>sleep_visualization.R:2987</code> <strong>Paper
 use</strong> Results <strong>What each part means</strong> Stacked bar
-of time-in-bed composition: TST + SOL + WASO (+ residual) as
-proportions. <strong>Healthy look</strong> TST the dominant block
-(~80–90% of TIB); SOL and WASO small slices. <strong>Anomaly →</strong>
-SOL or WASO consuming &gt; 30% of TIB → high sleep fragmentation or
-onset latency; negative residual → duration arithmetic bug.
-<strong>Precise rules</strong></p>
+of Time in Bed composition; the figure subtitle defines every
+abbreviation: TIB = TST (Total Sleep Time — actually asleep) + SOL
+(Sleep Onset Latency — falling asleep) + WASO (Wake After Sleep Onset —
+awake in the night), as proportions. <strong>Healthy look</strong> TST
+the dominant block (~80–90% of TIB); SOL and WASO small slices.
+<strong>Anomaly →</strong> SOL or WASO consuming &gt; 30% of TIB → high
+sleep fragmentation or onset latency; negative residual → duration
+arithmetic bug. <strong>Precise rules</strong></p>
 <ul>
 <li>
 <strong>Identity:</strong> <code>TIB = TST + SOL + WASO</code> — the
