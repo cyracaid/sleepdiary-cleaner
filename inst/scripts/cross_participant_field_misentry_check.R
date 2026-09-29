@@ -18,7 +18,15 @@ if (!file.exists(rds_path)) {
   stop(sprintf("Raw data not found: %s. Run from sleepcleanr/ directory.", rds_path))
 }
 
-raw <- readRDS(rds_path)
+# FORMAT FIX (2026-09-29): this step hard-coded readRDS(), so any user whose
+# data.files.main is a .csv (an accepted Step-1 format!) crashed here with the
+# cryptic "unknown input format" (readRDS failing on CSV magic bytes). Load
+# by extension, matching the Step-1 loader.
+raw <- if (grepl("\\.csv$", rds_path, ignore.case = TRUE)) {
+  utils::read.csv(rds_path, stringsAsFactors = FALSE)
+} else {
+  readRDS(rds_path)
+}
 
 # SOL column name is mapping-driven (MM:SS-era exports store SOL under the
 # *_hhmm column; the old totalmin name does not exist in them).

@@ -85,10 +85,17 @@ format_total_minutes_hhmm <- function(total_minutes) {
 process_interval<- function(df, varname, format) {
 
   # -------------------------------------------------------------------------
-  # If the entire column is already NA, there is nothing to do — return
-  # the data frame as-is.
+  # If the entire column is already NA, there is nothing to compute — but
+  # still emit the same contract placeholder columns the normal path would
+  # have produced (2026-09-29 fix). Datasets that legitimately lack a field
+  # (no naps, no exercise, no substance data -- e.g. external sleep-diary
+  # exports) would otherwise die at Step 10 with "Dictionary promises
+  # column(s) that are not available" for the missing *_mincalc columns.
   # -------------------------------------------------------------------------
   if (all(is.na(df[[varname]]))) {
+    df[[paste0(varname, "_mincalc")]]         <- NA_real_
+    df[[paste0(varname, "_checkforerrors")]]  <- NA
+    df[[paste0(varname, "_correctionsmade")]] <- NA_character_
     return(df)
   }
 
