@@ -15,7 +15,7 @@ Source:
 [`inst/CITATION`](https://github.com/cyracaid/sleepdiary-cleaner/blob/main/inst/CITATION)
 
 Dong, C., & ten Brink, M. (2026). sleepcleanr: Reproducible Sleep EMA
-Diary Data Cleaning Pipeline (Version 1.4.5) \[R package\].
+Diary Data Cleaning Pipeline \[R package\].
 https://github.com/cyracaid/sleepdiary-cleaner
 doi:10.5281/zenodo.0000000
 
