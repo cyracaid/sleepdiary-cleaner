@@ -1,5 +1,7 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/404.html</loc></url>
+<url><loc>https://cyracaid.github.io/sleepdiary-cleaner/CODE_OF_CONDUCT.html</loc></url>
+<url><loc>https://cyracaid.github.io/sleepdiary-cleaner/CONTRIBUTING.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/LICENSE-text.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/SCHEMA.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/THRESHOLDS.html</loc></url>
@@ -20,6 +22,7 @@
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/authors.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/index.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/news/index.html</loc></url>
+<url><loc>https://cyracaid.github.io/sleepdiary-cleaner/paper.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/STANDARD_LEVELS.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/adapt_columns.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/as.data.frame.sleep_diary.html</loc></url>
