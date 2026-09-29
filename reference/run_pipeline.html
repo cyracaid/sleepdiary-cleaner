@@ -58,7 +58,8 @@ Steps that write files or read human-reviewed CSVs remain as direct
 <span>  skip_visualization <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  finalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  data <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  include_manual_corrections <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -99,6 +100,23 @@ When NULL (default) the pipeline reads from the config exactly as before
 supplied, the file-reading branch of Step 1 is skipped and the config's
 column_mapping is applied to <code>data</code>. Used by
 <code><a href="clean_sleep_diary.html">clean_sleep_diary()</a></code>.</p></dd>
+
+
+<dt id="arg-include-manual-corrections">include_manual_corrections<a class="anchor" aria-label="anchor" href="#arg-include-manual-corrections"></a></dt>
+<dd><p>Logical or character. Controls whether
+HUMAN-REVIEW corrections are applied to the data. <strong>Default FALSE</strong>:
+the pipeline runs algorithmic-only – every human-review file
+(manual_error/unusual/nap_exercise/sleep_metric_duration/
+metric_review_acceptances/second_review) is treated as absent, Step 5
+still generates the [NEW] review worksheets for inspection, and a
+prominent banner states that no human corrections were applied. TRUE:
+apply the manual-correction files configured in the config YAML
+(the pre-2026-09-29 behaviour). The strings "ask" / "y" / "n" / "yes" /
+"no" are also accepted: "ask" prompts interactively (in an interactive
+session only; in a non-interactive session it degrades to FALSE with a
+notice). The point of the default-off switch: a package user must
+OPT IN to human corrections so that a dataset can never be silently
+modified by review files left over in the working directory.</p></dd>
 
 </dl></div>
     <div class="section level2">
