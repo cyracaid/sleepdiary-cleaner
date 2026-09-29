@@ -10,11 +10,11 @@ tags:
 authors:
   - given-names: Cai
     family-names: Dong
-    affiliation: "Insert affiliation"
+    affiliation: "Yonsei University"
     orcid: "https://orcid.org/0009-0001-0706-0335"
   - given-names: Maia
     family-names: ten Brink
-    affiliation: "Insert affiliation"
+    affiliation: "Center for Behavioral Cardiovascular Health, Department of Medicine, Columbia University Irving Medical Center"
     orcid: "https://orcid.org/0000-0001-6987-1339"
 date: 29 September 2026
 repository: https://github.com/cyracaid/sleepdiary-cleaner
