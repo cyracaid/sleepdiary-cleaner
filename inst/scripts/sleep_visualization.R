@@ -774,8 +774,11 @@ if(all(c("data_category", "manually_corrected", "corrected") %in% names(correcte
                                              corrected_ema_data$manually_corrected == TRUE)]))
 
   flow <- data.frame(
-    stage  = c("Raw Load", "Parsed (non-NA)", "Algo-Corrected", "Manual-Corrected",
-               "Final Valid"),
+    stage  = c("Raw Load (all diary entries)",
+               "Parsed (entries with timestamps)",
+               "Auto-Corrected (AM/PM + order fixes)",
+               "Manual-Corrected (human review fixes)",
+               "Final Valid (usable for analysis)"),
     count  = c(n_total, n_parsed, n_algo, n_manual, n_valid),
     pid_n  = c(NA, NA, n_pid_algo, n_pid_manual, NA),
     color  = c("#2E7D32", "#4CAF50", "#FF8C00", "#2196F3", "#2E7D32"),
@@ -806,7 +809,7 @@ if(all(c("data_category", "manually_corrected", "corrected") %in% names(correcte
                  color = "#616161", linewidth = 0.6) +
     annotate("text", x = 1.6, y = max(flow$y) - 1, hjust = 0, size = 3.2,
              label = sprintf(
-               "Not Reported: %s (%s%%)\nClean: %s (%s%%)\nUnusual (Accepted): %s\nError (Reviewed): %s\nEqual Time: %s\nParticipants w/ \u22651 correction: %s / %s (%s%%)",
+               "FINAL RECORD CLASSES (each record gets exactly one):\nNot Reported: %s (%s%%) = one or more timestamps missing\nClean: %s (%s%%) = order intact, nothing odd\nUnusual (Accepted): %s = odd but possible (e.g. >3h gap), reviewed and kept as-is\nError (Reviewed): %s = impossible order (e.g. getup before bed), reviewed and fixed\nEqual Time: %s = bed==sleep and/or awake==getup reported as the same clock time (benign diary habit, zero latency/lingering; sleep==awake would be an ERROR, not this)\nParticipants w/ \u22651 correction: %s / %s (%s%%)",
                format(n_not_rpt, big.mark = ","), round(n_not_rpt / n_total * 100, 1),
                format(n_clean, big.mark = ","), round(n_clean / n_total * 100, 1),
                n_unusual, n_error, n_equal,
@@ -1039,18 +1042,31 @@ if(length(vars_to_plot) > 0) {
 cat("Generating Figure 3...\n")
 
 if("sleep_duration_h" %in% names(clean_df)) {
+  .mean_h   <- round(mean(clean_df$sleep_duration_h, na.rm = TRUE), 2)
+  .median_h <- round(median(clean_df$sleep_duration_h, na.rm = TRUE), 2)
+  .reflines <- data.frame(
+    x  = c(mean(clean_df$sleep_duration_h, na.rm = TRUE),
+           median(clean_df$sleep_duration_h, na.rm = TRUE)),
+    lab = c(paste0("Mean (blue solid) = ", .mean_h, " h"),
+            paste0("Median (orange dashed) = ", .median_h, " h")),
+    stringsAsFactors = FALSE
+  )
   p3 <- ggplot(clean_df, aes(x = sleep_duration_h)) +
     geom_histogram(aes(y = after_stat(density)), bins = 40, fill = "#2E7D32", alpha = 0.5) +
-    geom_density(color = "#D32F2F", size = 1) +
-    geom_vline(aes(xintercept = mean(sleep_duration_h, na.rm = TRUE)), color = "#1976D2", size = 1) +
-    geom_vline(aes(xintercept = median(sleep_duration_h, na.rm = TRUE)), color = "#FF8C00", linetype = "dashed", size = 1) +
+    geom_density(aes(color = "Density curve (red, smoothed)"), size = 1, show.legend = TRUE) +
+    geom_vline(data = .reflines, aes(xintercept = x, color = lab,
+                                     linetype = ifelse(grepl("Median", lab), "dashed", "solid")),
+               size = 1, show.legend = TRUE) +
+    scale_color_manual(values = setNames(
+      c("#D32F2F", "#1976D2", "#FF8C00"),
+      c("Density curve (red, smoothed)", .reflines$lab[1], .reflines$lab[2])), name = NULL) +
+    scale_linetype_identity() +
     labs(title = "Figure 3: Distribution of Total Sleep Time (TST)",
-         subtitle = "Enhanced calculation: Sleep period minus WASO (based on final corrected data)",
+         subtitle = "TST = Total Sleep Time, i.e. how long participants were actually asleep (final corrected data). Histogram = each bar counts records falling in that duration range.",
          x = "Sleep Duration (hours)", y = "Density") +
-    annotate("text", x = Inf, y = Inf, 
-             label = paste("Mean:", round(mean(clean_df$sleep_duration_h, na.rm = TRUE), 2),
-                           "hours\nMedian:", round(median(clean_df$sleep_duration_h, na.rm = TRUE), 2),
-                           "hours\nn =", sum(!is.na(clean_df$sleep_duration_h))),
+    theme(legend.position = "bottom") +
+    annotate("text", x = Inf, y = Inf,
+             label = paste("n =", sum(!is.na(clean_df$sleep_duration_h))),
              hjust = 1.1, vjust = 1.5, size = 3.5)
   print(p3)
   save_png(p3, "03_Sleep_Duration_Distribution", subdir = "research_ready")
@@ -1091,18 +1107,18 @@ if(all(c("time_in_bed_h", "sleep_duration_h", "flag_severity") %in% names(clean_
                      plot_df_4$sleep_duration_h[plot_df_4$flag_severity == "Clean"],
                      use = "complete.obs")
     
-    p4 <- ggplot(plot_df_4, aes(x = time_in_bed_h, y = sleep_duration_h, 
+    p4 <- ggplot(plot_df_4, aes(x = time_in_bed_h, y = sleep_duration_h,
                                 color = flag_severity)) +
-      geom_point(alpha = 0.6, size = 2) +
+      geom_point(alpha = 0.25, size = 2) +
       geom_smooth(aes(group = 1), method = "lm", se = TRUE, color = "black", size = 0.8) +
       geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "gray50", alpha = 0.5) +
-      scale_color_manual(values = c("Clean" = "#2E7D32", 
+      scale_color_manual(values = c("Clean" = "#2E7D32",
                                     "Minor issues (1 flag)" = "#FF8C00",
                                     "Major issues (2+ flags)" = "#D32F2F"),
                          name = "Data Quality") +
       labs(title = "Figure 4: Sleep Duration vs Time in Bed",
-           subtitle = sprintf("COLOR-CODED by data quality | Overall r = %.3f | Clean records r = %.3f (based on final corrected data)", overall_cor, clean_cor),
-           x = "Time in Bed (hours)", 
+           subtitle = sprintf("TIME IN BED = from getting into bed to getting out. SLEEP DURATION = time actually asleep (TIB minus SOL minus WASO). | COLOR-CODED by data quality | r = %.3f | Black line = linear trend; gray band around it = uncertainty range of the trend | Dashed diagonal = TIB == TST (impossible to sleep all of TIB) (based on final corrected data)", overall_cor, clean_cor),
+           x = "Time in Bed (hours)",
            y = "Total Sleep Time (hours)") +
       theme(legend.position = "bottom") +
       coord_cartesian(xlim = c(0, 16), ylim = c(0, 16))
@@ -1144,18 +1160,20 @@ if(all(c("sol_h", "sleep_duration_h", "flag_severity") %in% names(clean_df))) {
   if(nrow(plot_df_4b) > 0) {
     p4b <- ggplot(plot_df_4b, aes(x = sol_h, y = sleep_duration_h, 
                                   color = flag_severity)) +
-      geom_point(alpha = 0.6, size = 2) +
+      geom_point(alpha = 0.25, size = 2) +
       geom_smooth(aes(group = 1), method = "lm", se = TRUE, color = "black", size = 0.8) +
       scale_color_manual(values = c("Clean" = "#2E7D32", 
                                     "Minor issues (1 flag)" = "#FF8C00",
                                     "Major issues (2+ flags)" = "#D32F2F"),
                          name = "Data Quality") +
       labs(title = "Figure 4B: Sleep Onset Latency vs Sleep Duration",
-           subtitle = "COLOR-CODED by data quality | SOL > 3h filtered for clarity (based on final corrected data)",
+           subtitle = "SOL = how long it took to fall asleep after getting into bed. Each dot = one diary night. | Black line = linear trend; gray band around it = uncertainty range of the trend. | SOL > 3h filtered for clarity (based on final corrected data)",
            x = "Sleep Onset Latency (hours)", 
            y = "Total Sleep Time (hours)") +
       theme(legend.position = "bottom") +
-      geom_vline(xintercept = 1, linetype = "dotted", color = "red", alpha = 0.5)
+      geom_vline(xintercept = 1, linetype = "dotted", color = "red", alpha = 0.5) +
+      annotate("text", x = 1, y = -Inf, label = "1 h", vjust = -0.5, size = 3,
+               color = "red", alpha = 0.7)
     
     print(p4b)
   save_png(p4b, "04B_SOL_vs_Sleep_Duration", subdir = "research_ready")
@@ -1271,7 +1289,7 @@ if (exists("clean_df") && exists("corrected_ema_data") &&
       scale_fill_manual(values = color_map, name = "Final Classification") +
       scale_color_manual(values = color_map, name = "Final Classification") +
       labs(title = "Figure 6: Sleep Duration Distribution (Post-Manual-Correction)",
-      subtitle = paste0("Before-vs-after: sleep duration distributions by data_category after Steps 5-6.5 corrections. ",
+      subtitle = paste0("WHAT THIS ANSWERS: did the human corrections distort the overall sleep-duration distribution? Each curve = the distribution of sleep durations for one record class after corrections (Steps 5-6.5). ",
                         "Clean: ", sum(p6_data$status == "Clean"),
                         " | Unusual: ", sum(p6_data$status == "Unusual"),
                         " | Manually Corrected: ", sum(p6_data$status == "Manually Corrected"),
@@ -1337,8 +1355,8 @@ if(all(c("sleep_duration_h", "flag_severity") %in% names(clean_df))) {
                                    "Major issues (2+ flags)" = "#D32F2F"),
                         name = "Data Quality") +
       labs(title = "Figure 7: Data Quality Composition Across Sleep Durations",
-           subtitle = "Stacked histogram showing how data quality varies by sleep duration (based on final corrected data)",
-           x = "Sleep Duration (hours)", y = "Count") +
+           subtitle = "Each bar = number of records in that sleep-duration range. Colors = per-record quality class. Shows whether quality problems cluster at extreme durations (based on final corrected data)",
+           x = "Sleep Duration (hours)", y = "Number of records") +
       scale_x_continuous(limits = c(0, 16), expand = c(0.02, 0)) +
       scale_y_continuous(expand = expansion(mult = c(0, 0.35))) +
       annotate("label", x = 15, y = Inf, label = flag_text,
@@ -2533,8 +2551,12 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
     p20 <- ggplot(bias_counts, aes(x = bias, y = count)) +
       geom_col(fill = "#1976D2", alpha = 0.8, width = 1) +
       geom_vline(xintercept = c(15, 60), linetype = "dashed", color = c("orange", "red"), linewidth = 1) +
-      annotate("text", x = 15, y = Inf, label = "Minor (15min)", vjust = 2, color = "orange") +
-      annotate("text", x = 60, y = Inf, label = "Red Line (60min)", vjust = 2, color = "red") +
+      annotate("text", x = c(15, 60), y = Inf, vjust = 2, hjust = 0.02,
+               color = c("orange", "red"), size = 3.1,
+               label = c("15 min: small mismatch (minor)",
+                         "60 min: large mismatch (notable)")) +
+      annotate("text", x = -Inf, y = Inf, hjust = -0.05, vjust = 2.5, size = 3.2,
+               label = "bias = |computed \u2212 self-reported|  (minutes)") +
       labs(title = "Figure 20: SOL Perception Bias (Subjective vs Objective)",
       subtitle = paste0("Absolute difference: subjective SOL (self-reported) vs objective SOL (time_sleep - time_bed). N=", length(valid_rows), ".\n",
                         "This gap is preserved, not corrected -- perception/measurement mismatch is signal, not error. ",
@@ -2587,8 +2609,12 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
         p20b <- ggplot(waso_df, aes(x = bias)) +
           geom_histogram(binwidth = 5, fill = "#FF8C00", alpha = 0.7, boundary = 0) +
           geom_vline(xintercept = c(15, 60), linetype = "dashed", color = c("orange", "red"), linewidth = 1) +
-          annotate("text", x = 15, y = Inf, label = "Minor (15min)", vjust = 2, color = "orange") +
-          annotate("text", x = 60, y = Inf, label = "Red Line (60min)", vjust = 2, color = "red") +
+          annotate("text", x = c(15, 60), y = Inf, vjust = 2, hjust = 0.02,
+                   color = c("orange", "red"), size = 3.1,
+                   label = c("15 min: small mismatch (minor)",
+                             "60 min: large mismatch (notable)")) +
+          annotate("text", x = -Inf, y = Inf, hjust = -0.05, vjust = 2.5, size = 3.2,
+                   label = "bias = |computed \u2212 self-reported|  (minutes)") +
            labs(title = "Figure 20B: Self-Reported Nighttime Wakefulness vs Post-Awakening Time in Bed",
             subtitle = paste0("Note: self-reported WASO (within sleep period) and post-awakening interval (getup − awake) are different time windows. ",
                               "The latter captures time spent in bed after final awakening, not wakefulness during sleep. N=", length(valid_waso_rows), ".\n",
@@ -2765,7 +2791,7 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
       geom_jitter(width = 0.2, alpha = 0.3, size = 0.8, color = "gray30") +
       labs(
         title = "Figure 22: Substance Use Value Distribution",
-        subtitle = "Boxplots show distribution of reported self-report values",
+        subtitle = "Box = middle 50% of reports with the median line inside; each gray dot = one participant's report (jittered sideways to avoid overlap)",
         y = "Reported Value", 
         x = ""
       ) +
@@ -2824,11 +2850,10 @@ if (exists("corrected_ema_data") && caf_col %in% names(corrected_ema_data)) {
       summarise(n = n(), .groups = "drop") %>%
       mutate(pct = n / sum(n) * 100)
 
-    p23 <- ggplot(caf_summary, aes(x = caffeine_cups, y = n)) +
+    p23 <- ggplot(caf_summary, aes(x = factor(caffeine_cups), y = n)) +
       geom_col(alpha = 0.85, width = 0.7, fill = "#1976D2") +
       geom_text(aes(label = paste0(n, " (", round(pct, 1), "%)")),
                 vjust = -0.3, size = 3) +
-      scale_x_continuous(breaks = seq(0, max(caf_summary$caffeine_cups), by = 1)) +
       labs(title = "Figure 23: Caffeine Consumption Distribution",
            subtitle = sprintf("Based on %d non-NA records | Median: %d cups | Range: %d - %d",
                               length(caf_non_na), median(caf_non_na), min(caf_non_na), max(caf_non_na)),
@@ -2859,7 +2884,7 @@ if (exists("corrected_ema_data") && alc_col %in% names(corrected_ema_data)) {
       summarise(n = n(), .groups = "drop") %>%
       mutate(pct = n / sum(n) * 100)
 
-    p24 <- ggplot(alc_summary, aes(x = alcohol_drinks, y = n)) +
+    p24 <- ggplot(alc_summary, aes(x = factor(alcohol_drinks), y = n)) +
       geom_col(alpha = 0.85, width = 0.7, fill = "#FF8C00") +
       geom_text(aes(label = paste0(n, " (", round(pct, 1), "%)")),
                 vjust = -0.3, size = 3) +
@@ -2932,7 +2957,8 @@ if (all(c("time_bed_corrected", "time_getup_corrected") %in% names(corrected_ema
                              "Bedtime hours >12 indicate AM. N=", nrow(sr), " records."),
            x = "", y = "Clock Hour") +
       theme_minimal(base_size = 11) +
-      theme(legend.position = "bottom")
+      theme(legend.position = "bottom",
+            strip.text = element_text(face = "bold", size = 13))
     print(p_r25)
     save_png(p_r25, "R25_Sleep_Regularity_Weekday_Weekend", subdir = "research_ready")
     cat("✓ Figure R25 completed\n\n")
@@ -2978,8 +3004,8 @@ if (all(c("self_diffcalc_totalsleeptime_minutes", "self_diffcalc_sol_minutes",
                                  "Sleep Onset Latency (SOL)" = "#FF8C00",
                                  "Wake After Sleep Onset (WASO)" = "#D32F2F")) +
     labs(title = "Figure R26: Sleep Composition — TIB Breakdown",
-         subtitle = paste0("Average proportion of Time in Bed spent in each stage (N=", nrow(sc),
-                           " valid records after pipeline correction). TIB = TST + SOL + WASO."),
+         subtitle = paste0("Average proportion of Time in Bed (TIB) spent in each stage (N=", nrow(sc),
+                           " valid records after pipeline correction). TIB = TST (Total Sleep Time, asleep) + SOL (Sleep Onset Latency, falling asleep) + WASO (Wake After Sleep Onset, awake in the night)."),
          x = "", y = "") +
     theme_void(base_size = 12) +
     theme(legend.position = "bottom")
@@ -3020,8 +3046,8 @@ if (requireNamespace("corrplot", quietly = TRUE) &&
                        addCoef.col = "black", number.cex = 0.7,
                        col = colorRampPalette(c("#D32F2F", "white", "#2E7D32"))(200),
                        title = "Figure R27: Sleep Metrics Correlation Matrix",
-                       mar = c(2, 2, 3, 2))
-    mtext(side = 3, line = 0.5, cex = 0.8,
+                       mar = c(2, 2, 5, 2))
+    mtext(side = 3, line = 0.3, cex = 0.8,
           sprintf("Pairwise Pearson correlations (N=%d valid records after pipeline correction). Red = negative, Green = positive.", nrow(cor_data)))
     dev.off()
     # No flat top-level copy: subfolders are the single location for figures

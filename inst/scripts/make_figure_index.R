@@ -49,7 +49,10 @@ generate_figure_index <- function(viz_dir) {
                    "TIER 2 — Diagnose What / Where / Who",
                    "TIER 3 — Research Outputs")
   
-  thumb_w   <- 1000L
+  # RESOLUTION FIX (2026-09-29): 1000px thumbnails halved each source figure
+  # (2100px wide) and made the contact sheet unreadable ("糊"). Full width
+  # keeps nearly all source resolution; the sheet simply grows.
+  thumb_w   <- 1900L
   cols      <- 2L
   pad       <- 18L
   cap_h     <- 58L
