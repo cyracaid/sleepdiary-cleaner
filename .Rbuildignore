@@ -144,3 +144,7 @@ Rplots\.pdf$
 ^_tmp_pkg_snapshot\.tar\.gz$
 ^manual_.*\.xlsx$
 ^real_data_config_.*\.yaml$
+^paper\.md$
+^paper\.bib$
+^CONTRIBUTING\.md$
+^CODE_OF_CONDUCT\.md$

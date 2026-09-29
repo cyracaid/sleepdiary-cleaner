@@ -127,7 +127,7 @@ audit_dispositions.csv
 audit_dispositions.csv.*
 
 # local-only, real-study config — never commit/ship
-real_data_config.yaml
+real_data_config*.yaml
 AGENTS.md
 # Disambiguation worksheets/reports (validation/disambiguate_timegap_candidates.R,
 # validation/compute_disambiguation_agreement.R) -- real pid/day_num/timestamps,
