@@ -41,12 +41,20 @@ test_that("WASO MM:SS tail follows the same rule (the 3200/6374 shape)", {
   expect_equal(out[[paste0(v, "_mincalc")]], c(5, 90))
 })
 
-test_that("all-NA column returns the data frame untouched", {
+test_that("all-NA column emits contract placeholders (2026-09-29 fix)", {
   v <- "duration_totalmin_sol_estimate_am"
   df <- .interval_df(v, c(NA, NA))
   out <- process_interval(df, v, format = "interval_hhmm")
-  expect_identical(out, df)
-  expect_false(paste0(v, "_mincalc") %in% names(out))
+  # The 2026-09-29 fix: all-NA columns now emit the same contract placeholder
+  # columns the normal path produces, so datasets legitimately lacking a
+  # field (no naps, no substance data -- e.g. external diary exports) pass
+  # finalize()'s column-dictionary check instead of dying at Step 10.
+  expect_true(paste0(v, "_mincalc") %in% names(out))
+  expect_true(paste0(v, "_checkforerrors") %in% names(out))
+  expect_true(paste0(v, "_correctionsmade") %in% names(out))
+  expect_true(all(is.na(out[[paste0(v, "_mincalc")]])))
+  # Input values themselves stay untouched (still NA)
+  expect_true(all(is.na(out[[v]])))
 })
 test_that("decimal-hour values convert to minutes (0.5 -> 30 min)", {
   v <- "duration_totalmin_sol_estimate_am"
