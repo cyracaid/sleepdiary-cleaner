@@ -1,5 +1,3 @@
-<div id="main" class="col-md-9" role="main">
-
 # Validation Methodology
 
 This vignette is the full validation walkthrough that appears in
@@ -9,15 +7,9 @@ pipeline harm good data? can it catch known errors? does it fix them
 noisy is the self-report itself? what does it find in real data? do the
 humans agree? do our choices matter?
 
-<div id="cb1" class="sourceCode">
-
 ``` r
 library(sleepcleanr)
 ```
-
-</div>
-
-<div class="section level2">
 
 ## Terminology
 
@@ -25,22 +17,18 @@ This vignette uses several standard sleep-diary metric abbreviations
 throughout, defined once here rather than spelled out at every
 occurrence:
 
--   **SOL** — Sleep Onset Latency (minutes from getting into bed to
-    falling asleep)
--   **WASO** — Wake After Sleep Onset (total minutes awake during the
-    night after first falling asleep)
--   **TST** — Total Sleep Time
--   **TIB** — Time in Bed
--   **SE** — Sleep Efficiency (TST / TIB, as a percentage)
--   **PSG** — Polysomnography (the sleep-lab gold-standard measurement
-    this dataset does not have; see below)
--   **EMA** — Ecological Momentary Assessment (the self-report diary
-    method this dataset uses instead of PSG)
--   **MAD** — Median Absolute Deviation
-
-</div>
-
-<div class="section level2">
+- **SOL** — Sleep Onset Latency (minutes from getting into bed to
+  falling asleep)
+- **WASO** — Wake After Sleep Onset (total minutes awake during the
+  night after first falling asleep)
+- **TST** — Total Sleep Time
+- **TIB** — Time in Bed
+- **SE** — Sleep Efficiency (TST / TIB, as a percentage)
+- **PSG** — Polysomnography (the sleep-lab gold-standard measurement
+  this dataset does not have; see below)
+- **EMA** — Ecological Momentary Assessment (the self-report diary
+  method this dataset uses instead of PSG)
+- **MAD** — Median Absolute Deviation
 
 ## Why validation at all
 
@@ -95,10 +83,6 @@ a different way, and is deliberately independent of the others.
                appendix); TST robust, SOL sensitive (22.7–58.1 min);
                recall stable 0.993–0.995 across seeds
 
-</div>
-
-<div class="section level2">
-
 ## Step 1 — Does the pipeline touch clean data? (clean-input specificity)
 
 **What we do.** Generate synthetic data with *no errors at all* (10,000
@@ -109,10 +93,6 @@ both. Any change is pure iatrogenic damage; any flag is a false alarm.
 **Result.** **Records altered: 0 / 9,996**; **false alarm flags: 0 /
 1,609**; **false alarm alterations: 0 / 1,609** (rule-of-three 95% upper
 bound ≈ 0.03%). **Meaning.** The pipeline does no harm to good data.
-
-</div>
-
-<div class="section level2">
 
 ## Step 2 — Does the pipeline catch known errors? (injected-error benchmark)
 
@@ -159,10 +139,6 @@ matches reality. Three mechanisms keep this from being circular:
     0.43 → 1.0 and `format_no_colon` recall 0.11 → 1.0 (both blind-spot
     categories, injected and closed by this loop).
 
-</div>
-
-<div class="section level2">
-
 ## Step 3 — When we fix, do we fix *right*? (detection vs. value-correctness)
 
 **What we do.** Split “caught” into two numbers: **flagged or
@@ -185,10 +161,10 @@ wrong but plausible values; now 0% are — they go to human review.
 **The silent-misrepair bug and its fix.** An initial synthetic benchmark
 (2026-08-12, pre-patch) injected 400 field-misentry errors into each of
 the SOL and WASO fields and ran the then-current pipeline. The results
-showed pervasive silent misrepair: **field\_misentry\_sol** was silently
-misrepaired in 383/400 cases (95.8%); **field\_misentry\_waso** in
-384/400 (96.0%). Only 4.2% (SOL) and 3.0% (WASO) were caught or
-corrected at all — the worst failure mode for a data-cleaning pipeline.
+showed pervasive silent misrepair: **field_misentry_sol** was silently
+misrepaired in 383/400 cases (95.8%); **field_misentry_waso** in 384/400
+(96.0%). Only 4.2% (SOL) and 3.0% (WASO) were caught or corrected at all
+— the worst failure mode for a data-cleaning pipeline.
 
 The fix (commit `5dd0e27`, 2026-08-12, Part A4 in
 `checkforerrors_processing.R`) added a targeted check that flags
@@ -209,11 +185,11 @@ participant-clustered injection), evaluated with `evaluate_detection.R`
 (v4) against the current `ground_truth_enrichment.csv`. This produced
 the first real post-patch numbers for this finding:
 
-|                                                          | field\_misentry\_sol | field\_misentry\_waso |
-|----------------------------------------------------------|----------------------|-----------------------|
-| **CORRECT** (auto-fixed to the true value)               | 7/400 (1.8%)         | 13/400 (3.2%)         |
-| **FLAGGED\_UNRESOLVED** (caught, routed to human review) | 393/400 (98.2%)      | 387/400 (96.8%)       |
-| **MISREPAIRED** (silently wrong)                         | **0/400 (0%)**       | **0/400 (0%)**        |
+|                                                         | field_misentry_sol | field_misentry_waso |
+|---------------------------------------------------------|--------------------|---------------------|
+| **CORRECT** (auto-fixed to the true value)              | 7/400 (1.8%)       | 13/400 (3.2%)       |
+| **FLAGGED_UNRESOLVED** (caught, routed to human review) | 393/400 (98.2%)    | 387/400 (96.8%)     |
+| **MISREPAIRED** (silently wrong)                        | **0/400 (0%)**     | **0/400 (0%)**      |
 
 The silent-misrepair bug is **fully closed** for both fields — 0%
 misrepaired, actually stronger than the earlier hand-derived claim of a
@@ -222,7 +198,7 @@ code; not further investigated, but noted as an open thread rather than
 claiming certainty about why).
 
 **Important nuance:** the pipeline now routes virtually all
-field-misentry cases to human review (FLAGGED\_UNRESOLVED: 98.2% SOL,
+field-misentry cases to human review (FLAGGED_UNRESOLVED: 98.2% SOL,
 96.8% WASO). Only 1.8% (SOL) and 3.2% (WASO) are auto-corrected to the
 correct value (CORRECT). The previously cited “96.5% caught” figure
 conflated auto-correction with human-review routing; the pipeline’s real
@@ -230,10 +206,6 @@ effect is converting a silent wrong answer into a **human-review flag**,
 not an automatic fix. Both are legitimate, safe outcomes — neither
 delivers a wrong value silently — but they are different claims and
 should be reported separately.
-
-</div>
-
-<div class="section level2">
 
 ## Step 4 — Is the pipeline better than doing nothing? (controls)
 
@@ -245,14 +217,10 @@ script” baseline; the pipeline is the full design. The gap between naive
 and pipeline is the *incremental* value of the rule families — the
 number that justifies the design’s complexity.
 
-**Result.** no\_cleaning **0** / naive\_rule **0.623** / pipeline
+**Result.** no_cleaning **0** / naive_rule **0.623** / pipeline
 **0.995**. **Meaning.** Raw strings give zero detection; a naive rule
 catches 62%; the full pipeline 99.5%. The +37 points over naive is the
 value the rule families add.
-
-</div>
-
-<div class="section level2">
 
 ## Step 5 — Do corrections make real data *better*? (redundant-channel, no synthetic standard)
 
@@ -273,10 +241,6 @@ on real production data (n = 13,990) — no injection needed.
 on real data, with a redundant-channel yardstick that needs no synthetic
 standard. The one bad rule was found *by this step* and guarded.
 
-</div>
-
-<div class="section level2">
-
 ## Step 5.5 — How noisy is the self-report itself? (Bland-Altman, three analyses)
 
 **What we do.** Ask a different question from Step 5: not “do
@@ -284,7 +248,8 @@ corrections improve values?” but “how much do the two self-report
 measures of the same construct disagree in the first place?” This is
 *measurement characterization* — it quantifies the noise floor that any
 threshold must be judged against. Three analyses, all from
-`bland_altman()` on real data (n = 13,990):
+[`bland_altman()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/bland_altman.md)
+on real data (n = 13,990):
 
 | \#  | Analysis                     | Inputs (reported vs computed)                                         | Output                                                                        |
 |-----|------------------------------|-----------------------------------------------------------------------|-------------------------------------------------------------------------------|
@@ -298,7 +263,7 @@ threshold must be judged against. Three analyses, all from
 |---------|----------|------------------------------------|----------------------|-------|---------------------------|
 | A1 SOL  | +1.6 min | **75.4 min**                       | excessive 120 min    | 1.59  | ⚠️ INSIDE NOISE           |
 | A1 SOL  | —        | 75.4 min                           | high severity 60 min | 0.80  | ⚠️⚠️ INSIDE NOISE         |
-| A2 WASO | small    | **27.3 min**                       | high severity 90 min | 3.29  | ✅ SAFE                    |
+| A2 WASO | small    | **27.3 min**                       | high severity 90 min | 3.29  | ✅ SAFE                   |
 | A3      | —        | —                                  | SE poor (70%)        | —     | N/A (no self-report pair) |
 | A3      | —        | —                                  | TST/TIB ratio        | —     | N/A (no self-report pair) |
 
@@ -320,16 +285,12 @@ threshold must be judged against. Three analyses, all from
     **polysomnography (PSG, sleep-lab gold standard)**, which this
     **ecological momentary assessment (EMA)-only** dataset lacks).
 
-</div>
-
-<div class="section level2">
-
 ## Step 6 — What does the pipeline find in real data? (audit, n = 13,990)
 
 **What we do.** Run the pipeline in report-only mode over all 13,990
 real records; count what each rule family flags. No data is changed.
 
-**Result.** 0 AUTO\_FIX, 1048 FLAG — of which **922 logical-window
+**Result.** 0 AUTO_FIX, 1048 FLAG — of which **922 logical-window
 violations** (derived SOL longer than the bed→sleep window, max 225
 min), 140 temporal order violations, 1 redundancy-confirmed worsening
 (the known boundary case, independently reproduced from the work log), 1
@@ -341,10 +302,6 @@ data (922!) without changing a single value. This is the layer the
 synthetic benchmark cannot provide: synthetic proves *detection
 ability*, this proves *real-world prevalence*. Script:
 `audit_review_queue_m1_m7.R`; output `audit_m1_m7_decision.csv`.
-
-</div>
-
-<div class="section level2">
 
 ## Step 7 — Do the humans agree? (co-review agreement)
 
@@ -364,10 +321,6 @@ worksheet), so the independent label sets κ requires never existed.
 Higher agreement on atypical cases than on corrections is consistent
 with task difficulty: judging whether a record is unusual is easier than
 deciding exactly how to fix it.
-
-</div>
-
-<div class="section level2">
 
 ## Step 8 — Do our choices matter? (multiverse, downstream sensitivity, seeds)
 
@@ -451,10 +404,6 @@ reproducible?* — yes across seeds (recall 0.993–0.995, **false alarm
 rate 0**), with the single known-weak family disclosed rather than
 hidden.
 
-</div>
-
-<div class="section level2">
-
 ## Honest caveats (read before using any number)
 
 1.  **`cross_participant_spike` is the weakest family** — flagged
@@ -471,7 +420,3 @@ hidden.
     inflates the flag count) — the ablation table is reported as
     supplementary with a footnote; the primary evidence is the
     multiverse variance decomposition.
-
-</div>
-
-</div>
