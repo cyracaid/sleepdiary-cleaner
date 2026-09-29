@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,6 +48,37 @@
 <h2 id="对抗-huntrelease-前">对抗 hunt（release 前）<a class="anchor" aria-label="anchor" href="#%E5%AF%B9%E6%8A%97-huntrelease-%E5%89%8D"></a></h2>
 <p>每个 release 前派独立 reviewer 扫全 <code>R/</code> + <code>tests/</code>，聚焦：off-by-one、 S3 class 一致性、silent-error guard 链、缺测试的导出 API、config 驱动列漂移。 报告落 <code>work_logs/</code>。🔴 必修，🟡 判断后定，🔵 记下不修。 ⚠️ reviewer 抓的 shape 需业务语义验证——不是每个“off-by-one”都是 bug （例：interval_parse.R WASO <code>&gt; 240</code> 是结构标记阈值，恰好 240 不算异常）。</p>
 <p>=== SCOPE LIMITS (these bound what you PROPOSE, never what you look for) === Report anything that is actually wrong here — including a rare-looking case, if this project actually produces it. Then keep the fix in scope: 1. This is not a security paper. Verification is welcome; over-defense is not. Unless this project states otherwise, assume a cooperating operator on their own machine; if it has a real adversary, it will say so and that scope wins. 2. Do not add hashes, checksums or fingerprints unless the hash replaces a materially more expensive operation AND its result changes what happens next. 3. No defensive scaffolding: no feature flags, migration frameworks, compat layers or wrappers for cases that do not occur here. 4. No corner-case obsession: exotic encodings, symlink races, RTL text and millisecond races are out of scope unless the case is reachable through this project’s supported use — its documented inputs, its published interface, its real data. Reachable is enough; you do not need a reproduction. Constructible in principle is not enough. 5. Where judgement is needed, judge. Do not replace it with a scoring table, a checklist, or a re-verification loop over something already settled. 6. None of this overrides security, migration, verification or review that the user, this project’s own conventions, or a higher-priority rule asked for. Those were requested; they are the work, not scope creep. Shapes already seen, for calibration. Examples, not a checklist — a real finding is not dismissed by resembling one: H hashing every row of two spreadsheets to answer what comparing cells answers H writing checksum files that nothing ever reads E hardening the accounts of an app that has no users and no deployment R auditing your own patch all night while the feature stays unwritten R a reviewer that returns a failing verdict on everything O guards whose justification is the previous guard, not the requirement And two that look like the above and are not. Report these: ✓ a digest that lets you skip re-reading a large file you already have ✓ a rare-looking input this project’s own documentation example produces Before running any check, answer: what specific failure would this detect, and what would I do differently if it occurred? No answer means do not run it. Say plainly when something is correct. Do not manufacture findings.</p>
+</div>
+<div class="section level2">
+<h2 id="冻结约定-2026-09-29ai--研究助理执行权在人">冻结约定 (2026-09-29)：AI = 研究助理，执行权在人<a class="anchor" aria-label="anchor" href="#%E5%86%BB%E7%BB%93%E7%BA%A6%E5%AE%9A-2026-09-29ai--%E7%A0%94%E7%A9%B6%E5%8A%A9%E7%90%86%E6%89%A7%E8%A1%8C%E6%9D%83%E5%9C%A8%E4%BA%BA"></a></h2>
+<p>背景：2026-09-29 session 中，agent 的测试运行覆盖了 output/ 真实产物、 tarball 打包险些带上真实数据（pre-release 抓住）。执行权必须收归人。</p>
+<blockquote><p>本文件自身在 <code>.gitignore</code>（第131行）和 <code>.Rbuildignore</code> 里——它是本地 工作约定，不会被提交、不会被发布。看到它别疑惑。</p></blockquote>
+<div class="section level3">
+<h3 id="agent-未经明确许可不得执行的动作">Agent 未经明确许可不得执行的动作<a class="anchor" aria-label="anchor" href="#agent-%E6%9C%AA%E7%BB%8F%E6%98%8E%E7%A1%AE%E8%AE%B8%E5%8F%AF%E4%B8%8D%E5%BE%97%E6%89%A7%E8%A1%8C%E7%9A%84%E5%8A%A8%E4%BD%9C"></a></h3>
+<ul><li>
+<strong><code>git add</code>（一切 git 暂存动作）</strong>、git commit / push / tag / release / deploy（gh-pages）——commit 许可不含 add 许可，暂存是泄漏的第一入口</li>
+<li>跑 pipeline（run_pipeline / run.sh / 任何真实数据 config 的运行）</li>
+<li>跑全量 testthat（test_local / test_dir）——单文件单测试允许（查证目的）</li>
+<li>修改 R/、inst/scripts/ 下的文件——先给 diff 草稿，批准后落</li>
+<li>R CMD build / devtools::build（产物可能与真实数据同目录）</li>
+<li>覆盖或删除 output/、latest_visualization<em>/、任何 </em>.csv / *.rds 数据文件</li>
+</ul></div>
+<div class="section level3">
+<h3 id="形状触发规则泄漏模式专条">形状触发规则（泄漏模式专条）<a class="anchor" aria-label="anchor" href="#%E5%BD%A2%E7%8A%B6%E8%A7%A6%E5%8F%91%E8%A7%84%E5%88%99%E6%B3%84%E6%BC%8F%E6%A8%A1%E5%BC%8F%E4%B8%93%E6%9D%A1"></a></h3>
+<p>本仓库反复出事的同一个形状：<strong>出现一个名字长得像真实数据的新文件，两个 ignore 文件当时都只覆盖了精确名，变体趁没人注意溜进去</strong>。案例：.bak 后缀 （2026-08-09）、<code>..Rcheck</code> 目录、<code>fasttrack_review.csv</code> 漏收 <code>_cyra/_maia/ _typeA</code> 变体（3d61e9a）、<code>real_data_config.yaml</code> 漏收 <code>_fixed/_test</code> 变体。</p>
+<p>规则：任何要被 add 的、文件名匹配真实数据形状（<code>manual_*</code>、<code>fasttrack_*</code>、 <code>disambiguation_*</code>、<code>tiered_*</code>、<code>timegap_*</code>、<code>real_data_config*</code>、 <code>audit_*</code>、<code>second_review*</code>、<code>sber_*</code>、<code>deidentified_*</code>、<code>cleaned_*</code>、 <code>*.provenance.json</code>）但<strong>尚未被 .gitignore/.Rbuildignore 覆盖</strong>的文件， 一律按潜在泄漏处理：<strong>停手 → 报告 → 等指示</strong>。不许先 add 再说，不许 “顺手”补 ignore 规则一起 commit。</p>
+</div>
+<div class="section level3">
+<h3 id="允许研究助理本职">允许（研究助理本职）<a class="anchor" aria-label="anchor" href="#%E5%85%81%E8%AE%B8%E7%A0%94%E7%A9%B6%E5%8A%A9%E7%90%86%E6%9C%AC%E8%81%8C"></a></h3>
+<ul><li>读任何文件；grep/查证；解释代码、报错、数据</li>
+<li>起草文档（vignette/NEWS/method 草稿）、起草 diff——<strong>起草 ≠ 落盘</strong>， R/ 与 inst/scripts 的 diff 落盘前要批准</li>
+<li>work_logs/ 与本地笔记写入（gitignored 区）</li>
+<li>临时目录（/tmp）内跑验证实验——<strong>禁止指向 repo 的 project_dir</strong>； 会写 output/ 的运行必须在 /tmp sandbox 里跑</li>
+</ul></div>
+<div class="section level3">
+<h3 id="出事协议">出事协议<a class="anchor" aria-label="anchor" href="#%E5%87%BA%E4%BA%8B%E5%8D%8F%E8%AE%AE"></a></h3>
+<p>任何意外覆盖/泄漏/异常：<strong>立即停手 → 报告 → 等指示</strong>。不自己“顺便修”。</p>
+</div>
 </div>
 </div>
 

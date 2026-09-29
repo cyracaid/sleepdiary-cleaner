@@ -73,6 +73,76 @@ findings.
 
 </div>
 
+<div class="section level2">
+
+## 冻结约定 (2026-09-29)：AI = 研究助理，执行权在人
+
+背景：2026-09-29 session 中，agent 的测试运行覆盖了 output/ 真实产物、
+tarball 打包险些带上真实数据（pre-release 抓住）。执行权必须收归人。
+
+> 本文件自身在 `.gitignore`（第131行）和 `.Rbuildignore` 里——它是本地
+> 工作约定，不会被提交、不会被发布。看到它别疑惑。
+
+<div class="section level3">
+
+### Agent 未经明确许可不得执行的动作
+
+-   **`git add`（一切 git 暂存动作）**、git commit / push / tag /
+    release / deploy（gh-pages）——commit 许可不含 add
+    许可，暂存是泄漏的第一入口
+-   跑 pipeline（run\_pipeline / run.sh / 任何真实数据 config 的运行）
+-   跑全量 testthat（test\_local /
+    test\_dir）——单文件单测试允许（查证目的）
+-   修改 R/、inst/scripts/ 下的文件——先给 diff 草稿，批准后落
+-   R CMD build / devtools::build（产物可能与真实数据同目录）
+-   覆盖或删除 output/、latest\_visualization*/、任何* .csv / \*.rds
+    数据文件
+
+</div>
+
+<div class="section level3">
+
+### 形状触发规则（泄漏模式专条）
+
+本仓库反复出事的同一个形状：**出现一个名字长得像真实数据的新文件，两个
+ignore 文件当时都只覆盖了精确名，变体趁没人注意溜进去**。案例：.bak 后缀
+（2026-08-09）、`..Rcheck` 目录、`fasttrack_review.csv` 漏收
+`_cyra/_maia/ _typeA` 变体（3d61e9a）、`real_data_config.yaml` 漏收
+`_fixed/_test` 变体。
+
+规则：任何要被 add
+的、文件名匹配真实数据形状（`manual_*`、`fasttrack_*`、
+`disambiguation_*`、`tiered_*`、`timegap_*`、`real_data_config*`、
+`audit_*`、`second_review*`、`sber_*`、`deidentified_*`、`cleaned_*`、
+`*.provenance.json`）但**尚未被 .gitignore/.Rbuildignore 覆盖**的文件，
+一律按潜在泄漏处理：**停手 → 报告 → 等指示**。不许先 add 再说，不许
+“顺手”补 ignore 规则一起 commit。
+
+</div>
+
+<div class="section level3">
+
+### 允许（研究助理本职）
+
+-   读任何文件；grep/查证；解释代码、报错、数据
+-   起草文档（vignette/NEWS/method 草稿）、起草 diff——**起草 ≠ 落盘**，
+    R/ 与 inst/scripts 的 diff 落盘前要批准
+-   work\_logs/ 与本地笔记写入（gitignored 区）
+-   临时目录（/tmp）内跑验证实验——**禁止指向 repo 的 project\_dir**；
+    会写 output/ 的运行必须在 /tmp sandbox 里跑
+
+</div>
+
+<div class="section level3">
+
+### 出事协议
+
+任何意外覆盖/泄漏/异常：**立即停手 → 报告 → 等指示**。不自己“顺便修”。
+
+</div>
+
+</div>
+
 </div>
 
 </div>
