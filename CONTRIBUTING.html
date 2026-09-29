@@ -30,10 +30,11 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Contributing to sleepcleanr</h1>
-      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/HEAD/CONTRIBUTING.md" class="external-link"><code>CONTRIBUTING.md</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/CONTRIBUTING.md" class="external-link"><code>CONTRIBUTING.md</code></a></small>
     </div>
 
 <div id="contributing-to-sleepcleanr" class="section level1">
+
 <p>Thank you for considering contributing! This package cleans and validates self-reported sleep-diary data (ECMA morning diaries: bed / sleep / awake / get-up timestamps, SOL/WASO durations, and derived metrics TST, SOL, WASO, SE).</p>
 <div class="section level2">
 <h2 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a></h2>
@@ -42,8 +43,8 @@
 <li>
 <p>Build and check the package before you start editing, so you have a green baseline:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/test.html" class="external-link">test</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </li>
 </ol></div>
 <div class="section level2">
@@ -53,7 +54,7 @@
 <li>
 <strong>Tests.</strong> New behaviour needs tests. Bug fixes need a test that fails before the fix and passes after it. Place tests in <code>tests/testthat/</code> following the existing file-per-function naming (<code>test-&lt;function&gt;.R</code>).</li>
 <li>
-<strong>Documentation.</strong> Every exported function needs a roxygen2 docblock; run <code><a href="https://devtools.r-lib.org/reference/document.html" class="external-link">devtools::document()</a></code> so <code>man/</code> stays in sync with the code. A Codoc mismatch (documented arguments differing from code) fails <code>R CMD check</code>.</li>
+<strong>Documentation.</strong> Every exported function needs a roxygen2 docblock; run <code>devtools::document()</code> so <code>man/</code> stays in sync with the code. A Codoc mismatch (documented arguments differing from code) fails <code>R CMD check</code>.</li>
 <li>
 <strong>NEWS.md.</strong> User-visible changes get an entry under the relevant version heading.</li>
 <li>

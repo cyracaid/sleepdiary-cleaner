@@ -30,12 +30,15 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Detection Thresholds — Defaults, Rationale, and When to Change</h1>
-      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/HEAD/THRESHOLDS.md" class="external-link"><code>THRESHOLDS.md</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/THRESHOLDS.md" class="external-link"><code>THRESHOLDS.md</code></a></small>
     </div>
 
 <div id="detection-thresholds--defaults-rationale-and-when-to-change" class="section level1">
+
 <p>Flag thresholds are <strong>scientific judgments, not just config values.</strong> Defaults are <strong>deliberately lenient</strong> — appropriate for a <strong>general healthy-adult sample</strong> where the goal is to catch data-entry errors and gross outliers, not to diagnose insomnia. For clinical samples (insomnia, elderly, shift-work), revisit every row.</p>
-<blockquote><p><strong>Provenance:</strong> defaults tuned on healthy young-adult university EMA sample. Document your own study population here so downstream users know the reference.</p></blockquote>
+<blockquote>
+<p><strong>Provenance:</strong> defaults tuned on healthy young-adult university EMA sample. Document your own study population here so downstream users know the reference.</p>
+</blockquote>
 <div class="section level2">
 <h2 id="threshold-table">Threshold table<a class="anchor" aria-label="anchor" href="#threshold-table"></a></h2>
 <table class="table"><colgroup><col width="25%"><col width="25%"><col width="25%"><col width="25%"></colgroup><thead><tr class="header"><th>Config key</th>
@@ -90,13 +93,13 @@
 <div class="section level2">
 <h2 id="suggested-config-comments">Suggested config comments<a class="anchor" aria-label="anchor" href="#suggested-config-comments"></a></h2>
 <p>Add rationale inline next to each threshold:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">flag_severity</span><span class="kw">:</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">poor_efficiency_threshold_pct</span><span class="kw">:</span><span class="at"> </span><span class="dv">70</span><span class="co">   # lenient (healthy sample). Clinical cutoff ~85%</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">high_sol_threshold_hours</span><span class="kw">:</span><span class="at"> </span><span class="dv">1</span><span class="co">         # lenient. Clinical marker ~30 min</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">high_waso_threshold_hours</span><span class="kw">:</span><span class="at"> </span><span class="fl">1.5</span><span class="co">      # lenient. Clinical marker ~30 min</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">metric_validation</span><span class="kw">:</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">sol</span><span class="kw">:</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">excessive_minutes</span><span class="kw">:</span><span class="at"> </span><span class="dv">120</span><span class="co">            # gross-outlier catch, not clinical</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="at">  </span><span class="fu">flag_severity</span><span class="kw">:</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="at">    </span><span class="fu">poor_efficiency_threshold_pct</span><span class="kw">:</span><span class="at"> </span><span class="dv">70</span><span class="co">   # lenient (healthy sample). Clinical cutoff ~85%</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="at">    </span><span class="fu">high_sol_threshold_hours</span><span class="kw">:</span><span class="at"> </span><span class="dv">1</span><span class="co">         # lenient. Clinical marker ~30 min</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="at">    </span><span class="fu">high_waso_threshold_hours</span><span class="kw">:</span><span class="at"> </span><span class="fl">1.5</span><span class="co">      # lenient. Clinical marker ~30 min</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="at">  </span><span class="fu">metric_validation</span><span class="kw">:</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="at">    </span><span class="fu">sol</span><span class="kw">:</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="at">      </span><span class="fu">excessive_minutes</span><span class="kw">:</span><span class="at"> </span><span class="dv">120</span><span class="co">            # gross-outlier catch, not clinical</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>

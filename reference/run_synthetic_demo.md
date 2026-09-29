@@ -1,53 +1,29 @@
-<div id="main" class="col-md-9" role="main">
-
 # Run the complete pipeline on bundled synthetic demo data
-
-<div class="ref-description section level2">
 
 Convenience function that runs the full pipeline using the synthetic EMA
 diary dataset bundled with sleepcleanr. Useful for testing, demos, and
 validation without needing real data.
 
-</div>
-
-<div class="section level2">
-
 ## Usage
-
-<div class="sourceCode">
 
 ``` r
 run_synthetic_demo(project_dir = ".", verbose = TRUE)
 ```
 
-</div>
-
-</div>
-
-<div class="section level2">
-
 ## Arguments
 
--   project\_dir:
+- project_dir:
 
-    Character. Path to the project root (where output/ will be created).
-    Default ".".
+  Character. Path to the project root (where output/ will be created).
+  Default ".".
 
--   verbose:
+- verbose:
 
-    Logical. Print progress. Default TRUE.
-
-</div>
-
-<div class="section level2">
+  Logical. Print progress. Default TRUE.
 
 ## Value
 
 Invisibly TRUE on successful completion.
-
-</div>
-
-<div class="section level2">
 
 ## Details
 
@@ -56,13 +32,7 @@ categories to benchmark detection and correction performance. Results
 are written to `output/latest_visualization_synth_nXXX/` in the current
 working directory.
 
-</div>
-
-<div class="section level2">
-
 ## Examples
-
-<div class="sourceCode">
 
 ``` r
 if (FALSE) { # \dontrun{
@@ -73,9 +43,3 @@ if (FALSE) { # \dontrun{
   run_synthetic_demo(project_dir = "~/my_sleepcleanr_run")
 } # }
 ```
-
-</div>
-
-</div>
-
-</div>

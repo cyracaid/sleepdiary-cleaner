@@ -34,7 +34,7 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
+<li class="active nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -58,34 +58,46 @@
       <h1>Validation Methodology</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/HEAD/vignettes/validation-methodology.Rmd" class="external-link"><code>vignettes/validation-methodology.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/vignettes/validation-methodology.Rmd" class="external-link"><code>vignettes/validation-methodology.Rmd</code></a></small>
       <div class="d-none name"><code>validation-methodology.Rmd</code></div>
     </div>
 
     
     
-<p>This vignette is the full validation walkthrough that appears in condensed form in the README. It answers, step by step: does the pipeline harm good data? can it catch known errors? does it fix them <em>right</em>? is it better than doing nothing? does it improve real data? how noisy is the self-report itself? what does it find in real data? do the humans agree? do our choices matter?</p>
+<p>This vignette is the full validation walkthrough that appears in
+condensed form in the README. It answers, step by step: does the
+pipeline harm good data? can it catch known errors? does it fix them
+<em>right</em>? is it better than doing nothing? does it improve real
+data? how noisy is the self-report itself? what does it find in real
+data? do the humans agree? do our choices matter?</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="terminology">Terminology<a class="anchor" aria-label="anchor" href="#terminology"></a>
 </h2>
-<p>This vignette uses several standard sleep-diary metric abbreviations throughout, defined once here rather than spelled out at every occurrence:</p>
+<p>This vignette uses several standard sleep-diary metric abbreviations
+throughout, defined once here rather than spelled out at every
+occurrence:</p>
 <ul>
 <li>
-<strong>SOL</strong> — Sleep Onset Latency (minutes from getting into bed to falling asleep)</li>
+<strong>SOL</strong> — Sleep Onset Latency (minutes from getting
+into bed to falling asleep)</li>
 <li>
-<strong>WASO</strong> — Wake After Sleep Onset (total minutes awake during the night after first falling asleep)</li>
+<strong>WASO</strong> — Wake After Sleep Onset (total minutes awake
+during the night after first falling asleep)</li>
 <li>
 <strong>TST</strong> — Total Sleep Time</li>
 <li>
 <strong>TIB</strong> — Time in Bed</li>
 <li>
-<strong>SE</strong> — Sleep Efficiency (TST / TIB, as a percentage)</li>
+<strong>SE</strong> — Sleep Efficiency (TST / TIB, as a
+percentage)</li>
 <li>
-<strong>PSG</strong> — Polysomnography (the sleep-lab gold-standard measurement this dataset does not have; see below)</li>
+<strong>PSG</strong> — Polysomnography (the sleep-lab gold-standard
+measurement this dataset does not have; see below)</li>
 <li>
-<strong>EMA</strong> — Ecological Momentary Assessment (the self-report diary method this dataset uses instead of PSG)</li>
+<strong>EMA</strong> — Ecological Momentary Assessment (the
+self-report diary method this dataset uses instead of PSG)</li>
 <li>
 <strong>MAD</strong> — Median Absolute Deviation</li>
 </ul>
@@ -93,7 +105,12 @@
 <div class="section level2">
 <h2 id="why-validation-at-all">Why validation at all<a class="anchor" aria-label="anchor" href="#why-validation-at-all"></a>
 </h2>
-<p>Sleep-diary cleaning has no ground truth: nobody can know for certain what a participant meant when they typed “10:30” into a duration field. Testing coverage proves the code does what it was designed to do, but not that the design is methodologically valid. Our answer is a multi-step validation chain where each step asks one question, fails in a different way, and is deliberately independent of the others.</p>
+<p>Sleep-diary cleaning has no ground truth: nobody can know for certain
+what a participant meant when they typed “10:30” into a duration field.
+Testing coverage proves the code does what it was designed to do, but
+not that the design is methodologically valid. Our answer is a
+multi-step validation chain where each step asks one question, fails in
+a different way, and is deliberately independent of the others.</p>
 <pre><code>                    VALIDATION CHAIN (9 steps, three tiers)
                     ──────────────────────────────────────────
 
@@ -139,15 +156,28 @@
            recall stable 0.993–0.995 across seeds</code></pre>
 </div>
 <div class="section level2">
-<h2 id="step-1-does-the-pipeline-touch-clean-data-clean-input-specificity">Step 1 — Does the pipeline touch clean data? (clean-input specificity)<a class="anchor" aria-label="anchor" href="#step-1-does-the-pipeline-touch-clean-data-clean-input-specificity"></a>
+<h2 id="step-1-does-the-pipeline-touch-clean-data-clean-input-specificity">Step 1 — Does the pipeline touch clean data? (clean-input
+specificity)<a class="anchor" aria-label="anchor" href="#step-1-does-the-pipeline-touch-clean-data-clean-input-specificity"></a>
 </h2>
-<p><strong>What we do.</strong> Generate synthetic data with <em>no errors at all</em> (10,000 records), run the pipeline, and count how many records it changed or flagged. <strong>The rule.</strong> On clean input the correct answer is zero of both. Any change is pure iatrogenic damage; any flag is a false alarm.</p>
-<p><strong>Result.</strong> <strong>Records altered: 0 / 9,996</strong>; <strong>false alarm flags: 0 / 1,609</strong>; <strong>false alarm alterations: 0 / 1,609</strong> (rule-of-three 95% upper bound ≈ 0.03%). <strong>Meaning.</strong> The pipeline does no harm to good data.</p>
+<p><strong>What we do.</strong> Generate synthetic data with <em>no
+errors at all</em> (10,000 records), run the pipeline, and count how
+many records it changed or flagged. <strong>The rule.</strong> On clean
+input the correct answer is zero of both. Any change is pure iatrogenic
+damage; any flag is a false alarm.</p>
+<p><strong>Result.</strong> <strong>Records altered: 0 / 9,996</strong>;
+<strong>false alarm flags: 0 / 1,609</strong>; <strong>false alarm
+alterations: 0 / 1,609</strong> (rule-of-three 95% upper bound ≈ 0.03%).
+<strong>Meaning.</strong> The pipeline does no harm to good data.</p>
 </div>
 <div class="section level2">
-<h2 id="step-2-does-the-pipeline-catch-known-errors-injected-error-benchmark">Step 2 — Does the pipeline catch known errors? (injected-error benchmark)<a class="anchor" aria-label="anchor" href="#step-2-does-the-pipeline-catch-known-errors-injected-error-benchmark"></a>
+<h2 id="step-2-does-the-pipeline-catch-known-errors-injected-error-benchmark">Step 2 — Does the pipeline catch known errors? (injected-error
+benchmark)<a class="anchor" aria-label="anchor" href="#step-2-does-the-pipeline-catch-known-errors-injected-error-benchmark"></a>
 </h2>
-<p><strong>What we do.</strong> Take clean synthetic data, deliberately corrupt it with known errors — 400 injections per error category — and record the true value of each injection <em>at injection time</em> (a ground-truth table). Run the pipeline on the corrupted data. Compare its output against the ground truth.</p>
+<p><strong>What we do.</strong> Take clean synthetic data, deliberately
+corrupt it with known errors — 400 injections per error category — and
+record the true value of each injection <em>at injection time</em> (a
+ground-truth table). Run the pipeline on the corrupted data. Compare its
+output against the ground truth.</p>
 <p><strong>Result.</strong></p>
 <table class="table">
 <thead><tr class="header">
@@ -166,27 +196,86 @@
 </tr>
 </tbody>
 </table>
-<p>Cluster-bootstrap CIs at participant level (1,000 iterations), because records from the same participant are correlated.</p>
-<p><strong>Meaning.</strong> 99.5% of injected errors are caught — either flagged for a human or auto-corrected. This benchmark is also how we found and fixed two real bugs that were invisible in logs and by eye (v1.4.1, see Step 3).</p>
-<p><strong>What this ground truth is — and is not (important).</strong> The ground truth here is <strong>not</strong> an external gold standard (there is none for free-text diary entry — nobody can know what a participant meant by “10:30”). It is a <em>self-consistent</em> standard: the error definitions are ours, the corruption is ours, and we record the true value <em>at the moment we corrupt it</em> — before the pipeline ever runs. The benchmark proves the pipeline does what <em>we defined</em> as cleaning, not that our definition matches reality. Three mechanisms keep this from being circular:</p>
+<p>Cluster-bootstrap CIs at participant level (1,000 iterations),
+because records from the same participant are correlated.</p>
+<p><strong>Meaning.</strong> 99.5% of injected errors are caught —
+either flagged for a human or auto-corrected. This benchmark is also how
+we found and fixed two real bugs that were invisible in logs and by eye
+(v1.4.1, see Step 3).</p>
+<p><strong>What this ground truth is — and is not (important).</strong>
+The ground truth here is <strong>not</strong> an external gold standard
+(there is none for free-text diary entry — nobody can know what a
+participant meant by “10:30”). It is a <em>self-consistent</em>
+standard: the error definitions are ours, the corruption is ours, and we
+record the true value <em>at the moment we corrupt it</em> — before the
+pipeline ever runs. The benchmark proves the pipeline does what <em>we
+defined</em> as cleaning, not that our definition matches reality. Three
+mechanisms keep this from being circular:</p>
 <ol style="list-style-type: decimal">
 <li>
-<strong>The error taxonomy is a three-source union</strong> — errors we have observed in real data, errors reported in the literature (e.g. SHUTi, RESTING), and errors that are theoretically possible but we have never caught. It is deliberately <em>not</em> “the errors the pipeline already detects”.</li>
+<strong>The error taxonomy is a three-source union</strong> — errors
+we have observed in real data, errors reported in the literature
+(e.g. SHUTi, RESTING), and errors that are theoretically possible but we
+have never caught. It is deliberately <em>not</em> “the errors the
+pipeline already detects”.</li>
 <li>
-<strong>A real-data layer that needs no synthetic standard at all</strong> (Steps 5–7).</li>
+<strong>A real-data layer that needs no synthetic standard at
+all</strong> (Steps 5–7).</li>
 <li>
-<strong>Closed-loop blind-spot closure</strong>: when a new error type is discovered in real data, it is added to the catalog, injected, and the benchmark re-run. Two concrete closures: <code>sol_window</code> recall 0.43 → 1.0 and <code>format_no_colon</code> recall 0.11 → 1.0 (both blind-spot categories, injected and closed by this loop).</li>
+<strong>Closed-loop blind-spot closure</strong>: when a new error
+type is discovered in real data, it is added to the catalog, injected,
+and the benchmark re-run. Two concrete closures: <code>sol_window</code>
+recall 0.43 → 1.0 and <code>format_no_colon</code> recall 0.11 → 1.0
+(both blind-spot categories, injected and closed by this loop).</li>
 </ol>
 </div>
 <div class="section level2">
-<h2 id="step-3-when-we-fix-do-we-fix-right-detection-vs--value-correctness">Step 3 — When we fix, do we fix <em>right</em>? (detection vs. value-correctness)<a class="anchor" aria-label="anchor" href="#step-3-when-we-fix-do-we-fix-right-detection-vs--value-correctness"></a>
+<h2 id="step-3-when-we-fix-do-we-fix-right-detection-vs--value-correctness">Step 3 — When we fix, do we fix <em>right</em>? (detection
+vs. value-correctness)<a class="anchor" aria-label="anchor" href="#step-3-when-we-fix-do-we-fix-right-detection-vs--value-correctness"></a>
 </h2>
-<p><strong>What we do.</strong> Split “caught” into two numbers: <strong>flagged or corrected</strong> (detection level) and <strong>value-correct</strong> (final value actually equals the ground truth). The gap between them is where human review lives.</p>
-<p><strong>Result.</strong> <code>ampm_swap</code>: flagged 1.0, value-correct 0.565. <code>field_misentry</code>: flagged 1.0, value-correct 0.018. <strong>Mis-repair rate</strong> in the current run: <strong>0 across all categories</strong>.</p>
-<p><strong>Meaning.</strong> Detection is not the same as guessing a correct value. When the correct restoration is uncertain (AM/PM flips, clock-time-in-duration fields), the pipeline flags for a human instead of guessing — that is the design working. The <code>field_misentry</code> <strong>value-correct gap</strong> is the <em>fixed</em> state of a bug the benchmark caught: pre-v1.4.1, 95.8% of these entries were silently “repaired” to wrong but plausible values; now 0% are — they go to human review.</p>
-<p><strong>The silent-misrepair bug and its fix.</strong> An initial synthetic benchmark (2026-08-12, pre-patch) injected 400 field-misentry errors into each of the SOL and WASO fields and ran the then-current pipeline. The results showed pervasive silent misrepair: <strong>field_misentry_sol</strong> was silently misrepaired in 383/400 cases (95.8%); <strong>field_misentry_waso</strong> in 384/400 (96.0%). Only 4.2% (SOL) and 3.0% (WASO) were caught or corrected at all — the worst failure mode for a data-cleaning pipeline.</p>
-<p>The fix (commit <code>5dd0e27</code>, 2026-08-12, Part A4 in <code>checkforerrors_processing.R</code>) added a targeted check that flags suspicious clock-time-shaped duration entries for human review instead of silently accepting a reinterpreted value. However, the synthetic benchmark result files committed to the repository one hour after the patch (commit <code>18c3ed1</code>) were the <em>pre-patch</em> run that originally discovered the bug — not a post-patch re-run. A “Patch verification” table in the project documentation cited post-patch numbers (SOL 95.8% → 3.5% misrepaired; WASO 95.8% → 0%) but those figures were hand-derived from an ad-hoc check, not from a regenerated benchmark CSV; no post-patch CSV existed in the repository.</p>
-<p>We re-ran the full benchmark end-to-end on 2026-09-02 against the currently installed <code>sleepcleanr</code> 1.4.5 (Part A4 patch included) — full <code>corrupted_enrichment.rds</code> (n=7,000, all 15 error categories together, participant-clustered injection), evaluated with <code>evaluate_detection.R</code> (v4) against the current <code>ground_truth_enrichment.csv</code>. This produced the first real post-patch numbers for this finding:</p>
+<p><strong>What we do.</strong> Split “caught” into two numbers:
+<strong>flagged or corrected</strong> (detection level) and
+<strong>value-correct</strong> (final value actually equals the ground
+truth). The gap between them is where human review lives.</p>
+<p><strong>Result.</strong> <code>ampm_swap</code>: flagged 1.0,
+value-correct 0.565. <code>field_misentry</code>: flagged 1.0,
+value-correct 0.018. <strong>Mis-repair rate</strong> in the current
+run: <strong>0 across all categories</strong>.</p>
+<p><strong>Meaning.</strong> Detection is not the same as guessing a
+correct value. When the correct restoration is uncertain (AM/PM flips,
+clock-time-in-duration fields), the pipeline flags for a human instead
+of guessing — that is the design working. The
+<code>field_misentry</code> <strong>value-correct gap</strong> is the
+<em>fixed</em> state of a bug the benchmark caught: pre-v1.4.1, 95.8% of
+these entries were silently “repaired” to wrong but plausible values;
+now 0% are — they go to human review.</p>
+<p><strong>The silent-misrepair bug and its fix.</strong> An initial
+synthetic benchmark (2026-08-12, pre-patch) injected 400 field-misentry
+errors into each of the SOL and WASO fields and ran the then-current
+pipeline. The results showed pervasive silent misrepair:
+<strong>field_misentry_sol</strong> was silently misrepaired in 383/400
+cases (95.8%); <strong>field_misentry_waso</strong> in 384/400 (96.0%).
+Only 4.2% (SOL) and 3.0% (WASO) were caught or corrected at all — the
+worst failure mode for a data-cleaning pipeline.</p>
+<p>The fix (commit <code>5dd0e27</code>, 2026-08-12, Part A4 in
+<code>checkforerrors_processing.R</code>) added a targeted check that
+flags suspicious clock-time-shaped duration entries for human review
+instead of silently accepting a reinterpreted value. However, the
+synthetic benchmark result files committed to the repository one hour
+after the patch (commit <code>18c3ed1</code>) were the
+<em>pre-patch</em> run that originally discovered the bug — not a
+post-patch re-run. A “Patch verification” table in the project
+documentation cited post-patch numbers (SOL 95.8% → 3.5% misrepaired;
+WASO 95.8% → 0%) but those figures were hand-derived from an ad-hoc
+check, not from a regenerated benchmark CSV; no post-patch CSV existed
+in the repository.</p>
+<p>We re-ran the full benchmark end-to-end on 2026-09-02 against the
+currently installed <code>sleepcleanr</code> 1.4.5 (Part A4 patch
+included) — full <code>corrupted_enrichment.rds</code> (n=7,000, all 15
+error categories together, participant-clustered injection), evaluated
+with <code>evaluate_detection.R</code> (v4) against the current
+<code>ground_truth_enrichment.csv</code>. This produced the first real
+post-patch numbers for this finding:</p>
 <table class="table">
 <colgroup>
 <col width="33%">
@@ -207,7 +296,8 @@
 </tr>
 <tr class="even">
 <td>
-<strong>FLAGGED_UNRESOLVED</strong> (caught, routed to human review)</td>
+<strong>FLAGGED_UNRESOLVED</strong> (caught, routed to human
+review)</td>
 <td>393/400 (98.2%)</td>
 <td>387/400 (96.8%)</td>
 </tr>
@@ -219,26 +309,70 @@
 </tr>
 </tbody>
 </table>
-<p>The silent-misrepair bug is <strong>fully closed</strong> for both fields — 0% misrepaired, actually stronger than the earlier hand-derived claim of a 3.5% residual for SOL (that residual does not reproduce on the current code; not further investigated, but noted as an open thread rather than claiming certainty about why).</p>
-<p><strong>Important nuance:</strong> the pipeline now routes virtually all field-misentry cases to human review (FLAGGED_UNRESOLVED: 98.2% SOL, 96.8% WASO). Only 1.8% (SOL) and 3.2% (WASO) are auto-corrected to the correct value (CORRECT). The previously cited “96.5% caught” figure conflated auto-correction with human-review routing; the pipeline’s real effect is converting a silent wrong answer into a <strong>human-review flag</strong>, not an automatic fix. Both are legitimate, safe outcomes — neither delivers a wrong value silently — but they are different claims and should be reported separately.</p>
+<p>The silent-misrepair bug is <strong>fully closed</strong> for both
+fields — 0% misrepaired, actually stronger than the earlier hand-derived
+claim of a 3.5% residual for SOL (that residual does not reproduce on
+the current code; not further investigated, but noted as an open thread
+rather than claiming certainty about why).</p>
+<p><strong>Important nuance:</strong> the pipeline now routes virtually
+all field-misentry cases to human review (FLAGGED_UNRESOLVED: 98.2% SOL,
+96.8% WASO). Only 1.8% (SOL) and 3.2% (WASO) are auto-corrected to the
+correct value (CORRECT). The previously cited “96.5% caught” figure
+conflated auto-correction with human-review routing; the pipeline’s real
+effect is converting a silent wrong answer into a <strong>human-review
+flag</strong>, not an automatic fix. Both are legitimate, safe outcomes
+— neither delivers a wrong value silently — but they are different
+claims and should be reported separately.</p>
 </div>
 <div class="section level2">
 <h2 id="step-4-is-the-pipeline-better-than-doing-nothing-controls">Step 4 — Is the pipeline better than doing nothing? (controls)<a class="anchor" aria-label="anchor" href="#step-4-is-the-pipeline-better-than-doing-nothing-controls"></a>
 </h2>
-<p><strong>What we do.</strong> Compare three conditions on the same corrupted data: no cleaning at all, a naive regex-only rule, and the full pipeline. The no-cleaning condition is the floor (what the study team gets if they skip cleaning entirely); the naive rule is the “someone wrote a quick script” baseline; the pipeline is the full design. The gap between naive and pipeline is the <em>incremental</em> value of the rule families — the number that justifies the design’s complexity.</p>
-<p><strong>Result.</strong> no_cleaning <strong>0</strong> / naive_rule <strong>0.623</strong> / pipeline <strong>0.995</strong>. <strong>Meaning.</strong> Raw strings give zero detection; a naive rule catches 62%; the full pipeline 99.5%. The +37 points over naive is the value the rule families add.</p>
+<p><strong>What we do.</strong> Compare three conditions on the same
+corrupted data: no cleaning at all, a naive regex-only rule, and the
+full pipeline. The no-cleaning condition is the floor (what the study
+team gets if they skip cleaning entirely); the naive rule is the
+“someone wrote a quick script” baseline; the pipeline is the full
+design. The gap between naive and pipeline is the <em>incremental</em>
+value of the rule families — the number that justifies the design’s
+complexity.</p>
+<p><strong>Result.</strong> no_cleaning <strong>0</strong> / naive_rule
+<strong>0.623</strong> / pipeline <strong>0.995</strong>.
+<strong>Meaning.</strong> Raw strings give zero detection; a naive rule
+catches 62%; the full pipeline 99.5%. The +37 points over naive is the
+value the rule families add.</p>
 </div>
 <div class="section level2">
-<h2 id="step-5-do-corrections-make-real-data-better-redundant-channel-no-synthetic-standard">Step 5 — Do corrections make real data <em>better</em>? (redundant-channel, no synthetic standard)<a class="anchor" aria-label="anchor" href="#step-5-do-corrections-make-real-data-better-redundant-channel-no-synthetic-standard"></a>
+<h2 id="step-5-do-corrections-make-real-data-better-redundant-channel-no-synthetic-standard">Step 5 — Do corrections make real data <em>better</em>?
+(redundant-channel, no synthetic standard)<a class="anchor" aria-label="anchor" href="#step-5-do-corrections-make-real-data-better-redundant-channel-no-synthetic-standard"></a>
 </h2>
-<p><strong>What we do.</strong> Real diaries measure sleep-onset latency two independent ways: self-reported duration, and derived from timestamps. Step 4’s correction logic never reads the duration columns (verified by source inspection), so comparing the two after correction is non-circular. Run on real production data (n = 13,990) — no injection needed.</p>
-<p><strong>Result.</strong> <code>bed_sleep_swap_3h</code> 39/39 improved (100% [91–100%]); <code>sleep_reduce_12h_loop</code> 38/38; all bed/sleep-relevant corrections 81/88 (92%). This step also surfaced a <em>negative</em> rule, <code>sleep_awake_swap_3h</code> (7/10 worsened, p = 0.036): <strong>diagnosed and fixed in v1.4.3</strong> with a <code>bed &lt;= awake</code> guard. Post-guard rerun: swap rows 10 → 4, 3/4 improved; 7 worsened → 1 disclosed boundary case.</p>
-<p><strong>Meaning.</strong> Corrections move values toward self-report 92% of the time, on real data, with a redundant-channel yardstick that needs no synthetic standard. The one bad rule was found <em>by this step</em> and guarded.</p>
+<p><strong>What we do.</strong> Real diaries measure sleep-onset latency
+two independent ways: self-reported duration, and derived from
+timestamps. Step 4’s correction logic never reads the duration columns
+(verified by source inspection), so comparing the two after correction
+is non-circular. Run on real production data (n = 13,990) — no injection
+needed.</p>
+<p><strong>Result.</strong> <code>bed_sleep_swap_3h</code> 39/39
+improved (100% [91–100%]); <code>sleep_reduce_12h_loop</code> 38/38; all
+bed/sleep-relevant corrections 81/88 (92%). This step also surfaced a
+<em>negative</em> rule, <code>sleep_awake_swap_3h</code> (7/10 worsened,
+p = 0.036): <strong>diagnosed and fixed in v1.4.3</strong> with a
+<code>bed &lt;= awake</code> guard. Post-guard rerun: swap rows 10 → 4,
+3/4 improved; 7 worsened → 1 disclosed boundary case.</p>
+<p><strong>Meaning.</strong> Corrections move values toward self-report
+92% of the time, on real data, with a redundant-channel yardstick that
+needs no synthetic standard. The one bad rule was found <em>by this
+step</em> and guarded.</p>
 </div>
 <div class="section level2">
-<h2 id="step-5-5-how-noisy-is-the-self-report-itself-bland-altman-three-analyses">Step 5.5 — How noisy is the self-report itself? (Bland-Altman, three analyses)<a class="anchor" aria-label="anchor" href="#step-5-5-how-noisy-is-the-self-report-itself-bland-altman-three-analyses"></a>
+<h2 id="step-5-5-how-noisy-is-the-self-report-itself-bland-altman-three-analyses">Step 5.5 — How noisy is the self-report itself? (Bland-Altman, three
+analyses)<a class="anchor" aria-label="anchor" href="#step-5-5-how-noisy-is-the-self-report-itself-bland-altman-three-analyses"></a>
 </h2>
-<p><strong>What we do.</strong> Ask a different question from Step 5: not “do corrections improve values?” but “how much do the two self-report measures of the same construct disagree in the first place?” This is <em>measurement characterization</em> — it quantifies the noise floor that any threshold must be judged against. Three analyses, all from <code><a href="../reference/bland_altman.html">bland_altman()</a></code> on real data (n = 13,990):</p>
+<p><strong>What we do.</strong> Ask a different question from Step 5:
+not “do corrections improve values?” but “how much do the two
+self-report measures of the same construct disagree in the first place?”
+This is <em>measurement characterization</em> — it quantifies the noise
+floor that any threshold must be judged against. Three analyses, all
+from <code><a href="../reference/bland_altman.html">bland_altman()</a></code> on real data (n = 13,990):</p>
 <table class="table">
 <colgroup>
 <col width="25%">
@@ -257,7 +391,8 @@
 <td>A1</td>
 <td><strong>SOL Bland-Altman</strong></td>
 <td>self-reported SOL vs computed SOL</td>
-<td>bias, <strong>95% limits of agreement</strong>, half-width, % outside, proportional-bias p</td>
+<td>bias, <strong>95% limits of agreement</strong>, half-width, %
+outside, proportional-bias p</td>
 </tr>
 <tr class="even">
 <td>A2</td>
@@ -268,14 +403,24 @@
 <tr class="odd">
 <td>A3</td>
 <td><strong>Threshold vs noise ratio</strong></td>
-<td>each flag threshold ÷ its metric’s <strong>limits of agreement half-width</strong>
+<td>each flag threshold ÷ its metric’s <strong>limits of agreement
+half-width</strong>
 </td>
-<td>per-threshold verdict: CONSERVATIVE / SAFE / BORDERLINE / INSIDE NOISE</td>
+<td>per-threshold verdict: CONSERVATIVE / SAFE / BORDERLINE / INSIDE
+NOISE</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Result.</strong></p>
-<table class="table">
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+</colgroup>
 <thead><tr class="header">
 <th></th>
 <th>Bias</th>
@@ -327,42 +472,110 @@
 </tr>
 </tbody>
 </table>
-<p><strong>What this means (read carefully — this is a finding, not a bug).</strong></p>
+<p><strong>What this means (read carefully — this is a finding, not a
+bug).</strong></p>
 <ol style="list-style-type: decimal">
-<li>Computed and reported SOL differ by up to <strong>±75 min</strong> — a quantified perception-bias estimate, and a publishable finding on its own.</li>
-<li>SOL flag thresholds (60/120 min) sit <strong>inside</strong> that noise band, so a “high SOL” flag cannot distinguish a real long SOL from ordinary reporting disagreement. This does <strong>not</strong> corrupt data: <code>flag_severity</code> is a descriptive column that feeds no correction path (verified in code). SOL flags are therefore <strong>descriptive indicators routed to human review</strong>, not automated error signals.</li>
-<li>WASO thresholds clear the noise floor by <strong>3.3×</strong> — safe.</li>
-<li>SE and TST/TIB have no self-report counterpart, so they cannot be Bland-Altman validated; stated explicitly rather than implied.</li>
+<li>Computed and reported SOL differ by up to <strong>±75 min</strong> —
+a quantified perception-bias estimate, and a publishable finding on its
+own.</li>
+<li>SOL flag thresholds (60/120 min) sit <strong>inside</strong> that
+noise band, so a “high SOL” flag cannot distinguish a real long SOL from
+ordinary reporting disagreement. This does <strong>not</strong> corrupt
+data: <code>flag_severity</code> is a descriptive column that feeds no
+correction path (verified in code). SOL flags are therefore
+<strong>descriptive indicators routed to human review</strong>, not
+automated error signals.</li>
+<li>WASO thresholds clear the noise floor by <strong>3.3×</strong> —
+safe.</li>
+<li>SE and TST/TIB have no self-report counterpart, so they cannot be
+Bland-Altman validated; stated explicitly rather than implied.</li>
 <li>
-<strong>Limits of agreement bound <em>consistency</em>, never <em>accuracy</em></strong> — do not cite them as criterion validity (that would require actigraphy / <strong>polysomnography (PSG, sleep-lab gold standard)</strong>, which this <strong>ecological momentary assessment (EMA)-only</strong> dataset lacks).</li>
+<strong>Limits of agreement bound <em>consistency</em>, never
+<em>accuracy</em></strong> — do not cite them as criterion validity
+(that would require actigraphy / <strong>polysomnography (PSG, sleep-lab
+gold standard)</strong>, which this <strong>ecological momentary
+assessment (EMA)-only</strong> dataset lacks).</li>
 </ol>
 </div>
 <div class="section level2">
-<h2 id="step-6-what-does-the-pipeline-find-in-real-data-audit-n-13990">Step 6 — What does the pipeline find in real data? (audit, n = 13,990)<a class="anchor" aria-label="anchor" href="#step-6-what-does-the-pipeline-find-in-real-data-audit-n-13990"></a>
+<h2 id="step-6-what-does-the-pipeline-find-in-real-data-audit-n-13990">Step 6 — What does the pipeline find in real data? (audit, n =
+13,990)<a class="anchor" aria-label="anchor" href="#step-6-what-does-the-pipeline-find-in-real-data-audit-n-13990"></a>
 </h2>
-<p><strong>What we do.</strong> Run the pipeline in report-only mode over all 13,990 real records; count what each rule family flags. No data is changed.</p>
-<p><strong>Result.</strong> 0 AUTO_FIX, 1048 FLAG — of which <strong>922 logical-window violations</strong> (derived SOL longer than the bed→sleep window, max 225 min), 140 temporal order violations, 1 redundancy-confirmed worsening (the known boundary case, independently reproduced from the work log), 1 cross-day spike, 0 unmapped correction notes (all 14,338 notes map to known mechanisms).</p>
-<p><strong>Meaning.</strong> The pipeline finds real, previously unknown problems in our data (922!) without changing a single value. This is the layer the synthetic benchmark cannot provide: synthetic proves <em>detection ability</em>, this proves <em>real-world prevalence</em>. Script: <code>audit_review_queue_m1_m7.R</code>; output <code>audit_m1_m7_decision.csv</code>.</p>
+<p><strong>What we do.</strong> Run the pipeline in report-only mode
+over all 13,990 real records; count what each rule family flags. No data
+is changed.</p>
+<p><strong>Result.</strong> 0 AUTO_FIX, 1048 FLAG — of which <strong>922
+logical-window violations</strong> (derived SOL longer than the
+bed→sleep window, max 225 min), 140 temporal order violations, 1
+redundancy-confirmed worsening (the known boundary case, independently
+reproduced from the work log), 1 cross-day spike, 0 unmapped correction
+notes (all 14,338 notes map to known mechanisms).</p>
+<p><strong>Meaning.</strong> The pipeline finds real, previously unknown
+problems in our data (922!) without changing a single value. This is the
+layer the synthetic benchmark cannot provide: synthetic proves
+<em>detection ability</em>, this proves <em>real-world prevalence</em>.
+Script: <code>audit_review_queue_m1_m7.R</code>; output
+<code>audit_m1_m7_decision.csv</code>.</p>
 </div>
 <div class="section level2">
 <h2 id="step-7-do-the-humans-agree-co-review-agreement">Step 7 — Do the humans agree? (co-review agreement)<a class="anchor" aria-label="anchor" href="#step-7-do-the-humans-agree-co-review-agreement"></a>
 </h2>
-<p><strong>What we do.</strong> Two researchers jointly reviewed every record the pipeline flagged. Report the proportion agreed on the spot vs. requiring discussion.</p>
-<p><strong>Result.</strong> Flagged temporal errors: <strong>64.0%</strong> immediate agreement (n = 75), 36.0% required discussion. Statistically atypical records: <strong>89.2%</strong> (n = 37), 10.8% required discussion. The two tracks are independent and not additive; the flagged set grew 47 → 75 as detection rules strengthened.</p>
-<p><strong>Meaning.</strong> Reported as <strong>co-review agreement</strong>, not inter-rater reliability / Cohen’s κ — the review was collaborative (one shared worksheet), so the independent label sets κ requires never existed. Higher agreement on atypical cases than on corrections is consistent with task difficulty: judging whether a record is unusual is easier than deciding exactly how to fix it.</p>
+<p><strong>What we do.</strong> Two researchers jointly reviewed every
+record the pipeline flagged. Report the proportion agreed on the spot
+vs. requiring discussion.</p>
+<p><strong>Result.</strong> Flagged temporal errors:
+<strong>64.0%</strong> immediate agreement (n = 75), 36.0% required
+discussion. Statistically atypical records: <strong>89.2%</strong> (n =
+37), 10.8% required discussion. The two tracks are independent and not
+additive; the flagged set grew 47 → 75 as detection rules
+strengthened.</p>
+<p><strong>Meaning.</strong> Reported as <strong>co-review
+agreement</strong>, not inter-rater reliability / Cohen’s κ — the review
+was collaborative (one shared worksheet), so the independent label sets
+κ requires never existed. Higher agreement on atypical cases than on
+corrections is consistent with task difficulty: judging whether a record
+is unusual is easier than deciding exactly how to fix it.</p>
 </div>
 <div class="section level2">
-<h2 id="step-8-do-our-choices-matter-multiverse-downstream-sensitivity-seeds">Step 8 — Do our choices matter? (multiverse, downstream sensitivity, seeds)<a class="anchor" aria-label="anchor" href="#step-8-do-our-choices-matter-multiverse-downstream-sensitivity-seeds"></a>
+<h2 id="step-8-do-our-choices-matter-multiverse-downstream-sensitivity-seeds">Step 8 — Do our choices matter? (multiverse, downstream sensitivity,
+seeds)<a class="anchor" aria-label="anchor" href="#step-8-do-our-choices-matter-multiverse-downstream-sensitivity-seeds"></a>
 </h2>
-<p><strong>Why we ask this.</strong> Every threshold and rule choice in the pipeline is a judgment call: the 12-hour AM/PM flip trigger, the 3-hour adjacent-swap window, the 4× MAD spike cutoff, the SOL/SE/WASO flag thresholds, the 6-minute verification tolerance. A cleaning pipeline whose <em>answers</em> depend heavily on which of these reasonable values we picked is not trustworthy — the cleaning would be manufacturing its own conclusions. This step measures how much the results and the downstream metrics move when we vary those choices across a specification grid.</p>
-<p><strong>What we do.</strong> Three analyses, in increasing order of scope:</p>
+<p><strong>Why we ask this.</strong> Every threshold and rule choice in
+the pipeline is a judgment call: the 12-hour AM/PM flip trigger, the
+3-hour adjacent-swap window, the 4× MAD spike cutoff, the SOL/SE/WASO
+flag thresholds, the 6-minute verification tolerance. A cleaning
+pipeline whose <em>answers</em> depend heavily on which of these
+reasonable values we picked is not trustworthy — the cleaning would be
+manufacturing its own conclusions. This step measures how much the
+results and the downstream metrics move when we vary those choices
+across a specification grid.</p>
+<p><strong>What we do.</strong> Three analyses, in increasing order of
+scope:</p>
 <ol style="list-style-type: decimal">
 <li>
-<strong>Multiverse analysis (specification curve).</strong> Define the cleaning choices that are genuinely open (continuous thresholds — 12 h, 3 h, midnight 6, mmss 60, SOL 120/180, SE 70, WASO 1.5, TST/TIB 0.5, cross-participant spike cutoff 4× <strong>median absolute deviation (MAD)</strong> — plus discrete branches: which rows to trust, cross-participant layer on/off, manual-review layer on/off). Hard constraints are excluded (those are logic, not choice). Screen with <strong>one-at-a-time</strong> runs, then a full factorial grid; each spec runs the real pipeline and records the same outputs. Two output contracts: a <strong>specification curve</strong> (Simonsohn-style plot of the metric across all specs) and a <strong>variance decomposition</strong> (how much of the variation each dimension explains). Script: <code>validation/synthetic/multiverse.R</code>; results in <code>results/multiverse/</code>.</li>
+<strong>Multiverse analysis (specification curve).</strong> Define
+the cleaning choices that are genuinely open (continuous thresholds — 12
+h, 3 h, midnight 6, mmss 60, SOL 120/180, SE 70, WASO 1.5, TST/TIB 0.5,
+cross-participant spike cutoff 4× <strong>median absolute deviation
+(MAD)</strong> — plus discrete branches: which rows to trust,
+cross-participant layer on/off, manual-review layer on/off). Hard
+constraints are excluded (those are logic, not choice). Screen with
+<strong>one-at-a-time</strong> runs, then a full factorial grid; each
+spec runs the real pipeline and records the same outputs. Two output
+contracts: a <strong>specification curve</strong> (Simonsohn-style plot
+of the metric across all specs) and a <strong>variance
+decomposition</strong> (how much of the variation each dimension
+explains). Script: <code>validation/synthetic/multiverse.R</code>;
+results in <code>results/multiverse/</code>.</li>
 <li>
-<strong>Downstream sensitivity.</strong> The same grid, but measuring the <em>deliverable</em> quantities the study team actually uses: mean TST, mean SOL, and analyzable n (records that survive the cleaning decisions).</li>
+<strong>Downstream sensitivity.</strong> The same grid, but
+measuring the <em>deliverable</em> quantities the study team actually
+uses: mean TST, mean SOL, and analyzable n (records that survive the
+cleaning decisions).</li>
 <li>
-<strong>Seed sensitivity.</strong> Regenerate the whole benchmark under different random seeds and confirm the headline numbers do not move.</li>
+<strong>Seed sensitivity.</strong> Regenerate the whole benchmark
+under different random seeds and confirm the headline numbers do not
+move.</li>
 </ol>
 <p><strong>Result.</strong></p>
 <p><em>Multiverse — which choice dominates?</em></p>
@@ -387,7 +600,14 @@
 </tr>
 </tbody>
 </table>
-<p>The adjacent-swap threshold’s 44% holds only inside the full factorial grid and is <strong>seed-fragile</strong>: one-at-a-time screening keeps AM/PM flip + adjacent-swap under seed 20260817 but reduces the surviving set to AM/PM flip only under seed 20260915. The <em>main</em> specification curve is therefore reported <strong>AM/PM-flip only</strong> (3 specs — the cross-seed intersection), and the full factorial lives in the appendix as <code>spec_curve_full.csv</code>.</p>
+<p>The adjacent-swap threshold’s 44% holds only inside the full
+factorial grid and is <strong>seed-fragile</strong>: one-at-a-time
+screening keeps AM/PM flip + adjacent-swap under seed 20260817 but
+reduces the surviving set to AM/PM flip only under seed 20260915. The
+<em>main</em> specification curve is therefore reported
+<strong>AM/PM-flip only</strong> (3 specs — the cross-seed
+intersection), and the full factorial lives in the appendix as
+<code>spec_curve_full.csv</code>.</p>
 <p><em>Downstream — do the delivered metrics move?</em></p>
 <table class="table">
 <thead><tr class="header">
@@ -414,20 +634,49 @@
 </tr>
 </tbody>
 </table>
-<p><em>Decision-relevant deltas (branch 1 / branch 2):</em> branch 1 (which rows to trust) moves mean TST by <strong>29.6 min</strong>; branch 2 (WASO trust gate variant) moves analyzable n by <strong>1,131 records</strong>. These are not errors — they are the honest range of what a <em>different reasonable</em> decision produces.</p>
-<p><em>Seeds:</em> pooled recall stable at 0.993–0.995 across 4 seeds, control <strong>false alarm rate 0</strong> in all; the one family that wobbles (0.886–0.907) is the known-weak <code>cross_participant_spike</code> — already disclosed as audit-only below.</p>
-<p><strong>Meaning.</strong> Three separate questions, three clear answers: (1) <em>which decision matters most?</em> — the adjacent-swap threshold dominates the full grid at 44% of variation, but that share is seed-fragile, so the main curve is AM/PM-flip only and the adjacent-swap threshold is a documented sensitivity warning; (2) <em>which conclusions are robust?</em> — TST yes (±0.01 h on the AM/PM-flip main curve), SOL no (23–58 min), and we now know why (perception bias, Step 5.5); (3) <em>are the numbers reproducible?</em> — yes across seeds (recall 0.993–0.995, <strong>false alarm rate 0</strong>), with the single known-weak family disclosed rather than hidden.</p>
+<p><em>Decision-relevant deltas (branch 1 / branch 2):</em> branch 1
+(which rows to trust) moves mean TST by <strong>29.6 min</strong>;
+branch 2 (WASO trust gate variant) moves analyzable n by <strong>1,131
+records</strong>. These are not errors — they are the honest range of
+what a <em>different reasonable</em> decision produces.</p>
+<p><em>Seeds:</em> pooled recall stable at 0.993–0.995 across 4 seeds,
+control <strong>false alarm rate 0</strong> in all; the one family that
+wobbles (0.886–0.907) is the known-weak
+<code>cross_participant_spike</code> — already disclosed as audit-only
+below.</p>
+<p><strong>Meaning.</strong> Three separate questions, three clear
+answers: (1) <em>which decision matters most?</em> — the adjacent-swap
+threshold dominates the full grid at 44% of variation, but that share is
+seed-fragile, so the main curve is AM/PM-flip only and the adjacent-swap
+threshold is a documented sensitivity warning; (2) <em>which conclusions
+are robust?</em> — TST yes (±0.01 h on the AM/PM-flip main curve), SOL
+no (23–58 min), and we now know why (perception bias, Step 5.5); (3)
+<em>are the numbers reproducible?</em> — yes across seeds (recall
+0.993–0.995, <strong>false alarm rate 0</strong>), with the single
+known-weak family disclosed rather than hidden.</p>
 </div>
 <div class="section level2">
 <h2 id="honest-caveats-read-before-using-any-number">Honest caveats (read before using any number)<a class="anchor" aria-label="anchor" href="#honest-caveats-read-before-using-any-number"></a>
 </h2>
 <ol style="list-style-type: decimal">
 <li>
-<strong><code>cross_participant_spike</code> is the weakest family</strong> — flagged 0.886–0.907 across seeds, value-correct 0 <em>by design</em> (it is audit-only: a single-day spike may be a real event — illness, shift work — so it flags for a human and never auto-fixes).</li>
+<strong><code>cross_participant_spike</code> is the weakest
+family</strong> — flagged 0.886–0.907 across seeds, value-correct 0
+<em>by design</em> (it is audit-only: a single-day spike may be a real
+event — illness, shift work — so it flags for a human and never
+auto-fixes).</li>
 <li>
-<strong>SOL flag thresholds sit inside the ±75-min Bland-Altman noise band</strong> of self-reported SOL — SOL flags are descriptive indicators routed to human review, not automated error signals (verified in code: <code>flag_severity</code> feeds no correction path). WASO thresholds clear the noise floor by 3.3×.</li>
+<strong>SOL flag thresholds sit inside the ±75-min Bland-Altman
+noise band</strong> of self-reported SOL — SOL flags are descriptive
+indicators routed to human review, not automated error signals (verified
+in code: <code>flag_severity</code> feeds no correction path). WASO
+thresholds clear the noise floor by 3.3×.</li>
 <li>
-<strong>Ablation recall uses a flag-based definition</strong> (auto-corrected records never enter the flag queue, so disabling a fixing rule inflates the flag count) — the ablation table is reported as supplementary with a footnote; the primary evidence is the multiverse variance decomposition.</li>
+<strong>Ablation recall uses a flag-based definition</strong>
+(auto-corrected records never enter the flag queue, so disabling a
+fixing rule inflates the flag count) — the ablation table is reported as
+supplementary with a footnote; the primary evidence is the multiverse
+variance decomposition.</li>
 </ol>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
