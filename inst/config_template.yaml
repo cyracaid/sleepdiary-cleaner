@@ -65,7 +65,11 @@ data:
     #     with an error. Turn this on once your study's human review is
     #     actually done -- it stops a run that's silently missing your real
     #     corrections from completing and looking valid.
-    require_manual_corrections: false
+    # LEVEL NOTE (2026-09-29): this key lives under data: (one level up from
+    # files:), because pipeline.R reads data.require_manual_corrections.
+    # Placing it under data.files makes the guard silently inert.
+
+  require_manual_corrections: false
 
 # =============================================================================
 # OUTPUT SETTINGS (optional -- defaults are correct for most studies)
