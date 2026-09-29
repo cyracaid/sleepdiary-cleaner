@@ -1,61 +1,37 @@
-<div id="main" class="col-md-9" role="main">
-
 # Resolve the stable, never-wiped verification directory for a run
-
-<div class="ref-description section level2">
 
 Verification artifacts (S3-vs-legacy snapshot `.rds` pairs, the Markdown
 verification report, advisory analyses such as Bland-Altman plots) must
 survive the \*next\* pipeline run. The figure run directory returned by
-`figure_run_dir` does not survive it – every run of
-`sleep_visualization.R` deletes and rebuilds that directory from
-scratch.
-
-</div>
-
-<div class="section level2">
+[`figure_run_dir`](https://cyracaid.github.io/sleepdiary-cleaner/reference/figure_run_dir.md)
+does not survive it – every run of `sleep_visualization.R` deletes and
+rebuilds that directory from scratch.
 
 ## Usage
-
-<div class="sourceCode">
 
 ``` r
 verification_run_dir(cfg = NULL, data_tag, n_records = NULL)
 ```
 
-</div>
-
-</div>
-
-<div class="section level2">
-
 ## Arguments
 
--   cfg:
+- cfg:
 
-    Optional. Pipeline configuration list (preferred; falls back to the
-    global environment when omitted).
+  Optional. Pipeline configuration list (preferred; falls back to the
+  global environment when omitted).
 
--   data\_tag:
+- data_tag:
 
-    Character. "real", "synth", or "unknown".
+  Character. "real", "synth", or "unknown".
 
--   n\_records:
+- n_records:
 
-    Numeric or NULL. Row count appended to the directory name.
-
-</div>
-
-<div class="section level2">
+  Numeric or NULL. Row count appended to the directory name.
 
 ## Value
 
 Character. Relative path to the stable verification directory, e.g.
 `"output/verification/real_n13990"` or `"verification/synth_n280"`.
-
-</div>
-
-<div class="section level2">
 
 ## Details
 
@@ -72,7 +48,3 @@ returns a path that is a \*sibling\* of the run directory, not a child
 of it, so no wipe – current or future, in this script or any other – can
 reach it. No preserve logic is required anywhere, and none can be
 forgotten.
-
-</div>
-
-</div>

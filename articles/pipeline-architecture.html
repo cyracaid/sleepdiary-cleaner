@@ -34,7 +34,7 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
+<li class="active nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -58,19 +58,25 @@
       <h1>Pipeline Architecture</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/HEAD/vignettes/pipeline-architecture.Rmd" class="external-link"><code>vignettes/pipeline-architecture.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/vignettes/pipeline-architecture.Rmd" class="external-link"><code>vignettes/pipeline-architecture.Rmd</code></a></small>
       <div class="d-none name"><code>pipeline-architecture.Rmd</code></div>
     </div>
 
     
     
-<p>This vignette documents how the sleepcleanr pipeline is structured: the steps, the rule families that do the actual cleaning, and the classification systems that label every record.</p>
+<p>This vignette documents how the sleepcleanr pipeline is structured:
+the steps, the rule families that do the actual cleaning, and the
+classification systems that label every record.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="terminology">Terminology<a class="anchor" aria-label="anchor" href="#terminology"></a>
 </h2>
-<p>Sleep-diary metric abbreviations used throughout this vignette: <strong>SOL</strong> (Sleep Onset Latency), <strong>WASO</strong> (Wake After Sleep Onset), <strong>TST</strong> (Total Sleep Time), <strong>SE</strong> (Sleep Efficiency). <strong>QC</strong> below refers to quality control.</p>
+<p>Sleep-diary metric abbreviations used throughout this vignette:
+<strong>SOL</strong> (Sleep Onset Latency), <strong>WASO</strong> (Wake
+After Sleep Onset), <strong>TST</strong> (Total Sleep Time),
+<strong>SE</strong> (Sleep Efficiency). <strong>QC</strong> below refers
+to quality control.</p>
 </div>
 <div class="section level2">
 <h2 id="pipeline-steps">Pipeline steps<a class="anchor" aria-label="anchor" href="#pipeline-steps"></a>
@@ -114,12 +120,14 @@
 <tr class="odd">
 <td>1</td>
 <td>Load data</td>
-<td>.rds/.csv auto-detected; schema validated; optional supplementary file merged</td>
+<td>.rds/.csv auto-detected; schema validated; optional supplementary
+file merged</td>
 </tr>
 <tr class="even">
 <td>1.5</td>
 <td>Field-misentry check</td>
-<td>SOL/WASO clock-time vs duration-field misentry detection on raw data</td>
+<td>SOL/WASO clock-time vs duration-field misentry detection on raw
+data</td>
 </tr>
 <tr class="odd">
 <td>2-4</td>
@@ -139,7 +147,8 @@
 <tr class="even">
 <td>6-7</td>
 <td>Correct &amp; compute metrics (S3 chain)</td>
-<td>Manual + duration corrections; TST/SOL/WASO/SE metrics; has_correction enum</td>
+<td>Manual + duration corrections; TST/SOL/WASO/SE metrics;
+has_correction enum</td>
 </tr>
 <tr class="odd">
 <td>8</td>
@@ -154,12 +163,14 @@
 <tr class="odd">
 <td>9</td>
 <td>Generate diagnostic figures</td>
-<td>30 figures (14 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt</td>
+<td>30 figures (14 QC + 16 research) + figure_index.png contact sheet +
+RUN_INFO.txt</td>
 </tr>
 <tr class="even">
 <td>10</td>
 <td>Build delivered datasets</td>
-<td>finalize_columns() selects/renames to Dataset A/B per column dictionary</td>
+<td>finalize_columns() selects/renames to Dataset A/B per column
+dictionary</td>
 </tr>
 </tbody>
 </table>
@@ -167,7 +178,12 @@
 <div class="section level2">
 <h2 id="detection-rule-families">Detection rule families<a class="anchor" aria-label="anchor" href="#detection-rule-families"></a>
 </h2>
-<p>The cleaning logic is organized into eight rule families. Each family targets one failure mode of free-text self-report, has a defined decision behavior (see tri-state below), and is validated against a synthetic error class that exercises it (see the validation-methodology vignette). This is the part of the pipeline that does the actual work — the steps above are the scaffolding around it.</p>
+<p>The cleaning logic is organized into eight rule families. Each family
+targets one failure mode of free-text self-report, has a defined
+decision behavior (see tri-state below), and is validated against a
+synthetic error class that exercises it (see the validation-methodology
+vignette). This is the part of the pipeline that does the actual work —
+the steps above are the scaffolding around it.</p>
 <table class="table">
 <colgroup>
 <col width="33%">
@@ -182,27 +198,33 @@
 <tbody>
 <tr class="odd">
 <td><strong>Timestamp standardization</strong></td>
-<td>Non-uniform raw strings (<code>10.30</code>, <code>7:30</code>, bare hours, hms/difftime types) that can silently misparse (e.g. minutes read as seconds)</td>
+<td>Non-uniform raw strings (<code>10.30</code>, <code>7:30</code>, bare
+hours, hms/difftime types) that can silently misparse (e.g. minutes read
+as seconds)</td>
 <td>FLAG (format risk only)</td>
 </tr>
 <tr class="even">
 <td><strong>Temporal order validation</strong></td>
-<td>Bedtime entered after sleep onset; AM/PM flips near midnight; cross-day confusion</td>
+<td>Bedtime entered after sleep onset; AM/PM flips near midnight;
+cross-day confusion</td>
 <td>AUTO_FIX (needs corroboration) / FLAG</td>
 </tr>
 <tr class="odd">
 <td><strong>Free-text duration parsing</strong></td>
-<td>SOL/WASO typed as text (<code>90:00</code> meaning 90 min, <code>0130</code>, <code>p</code> for 0)</td>
+<td>SOL/WASO typed as text (<code>90:00</code> meaning 90 min,
+<code>0130</code>, <code>p</code> for 0)</td>
 <td>FLAG (clock-form never auto-corrected)</td>
 </tr>
 <tr class="even">
 <td><strong>Internal consistency check</strong></td>
-<td>Derived SOL contradicts self-reported SOL; derived duration exceeds the bed→sleep window</td>
+<td>Derived SOL contradicts self-reported SOL; derived duration exceeds
+the bed→sleep window</td>
 <td>AUTO_FIX component / AUDIT</td>
 </tr>
 <tr class="odd">
 <td><strong>Redundancy-confirmation check</strong></td>
-<td>A “correction” that moves values <em>away</em> from self-report (silent worsening)</td>
+<td>A “correction” that moves values <em>away</em> from self-report
+(silent worsening)</td>
 <td><strong>Veto authority over AUTO_FIX</strong></td>
 </tr>
 <tr class="even">
@@ -235,11 +257,14 @@
 <tbody>
 <tr class="odd">
 <td><strong>AUTO_FIX</strong></td>
-<td>Deterministic, reversible correction applied without human review. For temporal order, requires corroboration: order violation ∧ internal consistency ∧ redundancy confirmation.</td>
+<td>Deterministic, reversible correction applied without human review.
+For temporal order, requires corroboration: order violation ∧ internal
+consistency ∧ redundancy confirmation.</td>
 </tr>
 <tr class="even">
 <td><strong>FLAG</strong></td>
-<td>Sent to the human review queue (CSV workflow); no automatic action.</td>
+<td>Sent to the human review queue (CSV workflow); no automatic
+action.</td>
 </tr>
 <tr class="odd">
 <td><strong>AUDIT-only</strong></td>
@@ -247,7 +272,10 @@
 </tr>
 </tbody>
 </table>
-<p>Every rule family is deterministic (same input → same output, snapshot-verified), which is why inter-rater reliability statistics do not apply — there is no rater variance. Human co-review agreement is reported instead (see the validation-methodology vignette, Step 7).</p>
+<p>Every rule family is deterministic (same input → same output,
+snapshot-verified), which is why inter-rater reliability statistics do
+not apply — there is no rater variance. Human co-review agreement is
+reported instead (see the validation-methodology vignette, Step 7).</p>
 </div>
 <div class="section level2">
 <h2 id="classification-systems">Classification systems<a class="anchor" aria-label="anchor" href="#classification-systems"></a>
@@ -282,7 +310,8 @@
 <tr class="even">
 <td><code>checkforerrors_summary</code></td>
 <td>Step 8 (auto-detect)</td>
-<td>TIMESTAMP_ISSUE, DURATION_ISSUE, AMOUNT_FLAG, SELF_REPORTED_FLAG, CLEAN</td>
+<td>TIMESTAMP_ISSUE, DURATION_ISSUE, AMOUNT_FLAG, SELF_REPORTED_FLAG,
+CLEAN</td>
 </tr>
 </tbody>
 </table>
@@ -290,7 +319,9 @@
 <div class="section level2">
 <h2 id="figures">Figures<a class="anchor" aria-label="anchor" href="#figures"></a>
 </h2>
-<p>Generated figures are split into two folders so pipeline-quality views (every run) and analysis views (only when the study contains the relevant variables) do not get confused.</p>
+<p>Generated figures are split into two folders so pipeline-quality
+views (every run) and analysis views (only when the study contains the
+relevant variables) do not get confused.</p>
 <table class="table">
 <colgroup>
 <col width="47%">
@@ -303,11 +334,14 @@
 <tbody>
 <tr class="odd">
 <td><code>pipeline_cleaning/</code></td>
-<td>Pipeline flow diagram, data quality dashboard, flag composition, per-participant flag rate, step flag ledger</td>
+<td>Pipeline flow diagram, data quality dashboard, flag composition,
+per-participant flag rate, step flag ledger</td>
 </tr>
 <tr class="even">
 <td><code>research_ready/</code></td>
-<td>Correction impact (before/after delta), sleep variable distributions, perception bias, substance use, sleep regularity, correlation matrix</td>
+<td>Correction impact (before/after delta), sleep variable
+distributions, perception bias, substance use, sleep regularity,
+correlation matrix</td>
 </tr>
 </tbody>
 </table>
@@ -315,22 +349,39 @@
 <div class="section level2">
 <h2 id="non-destructive-model">Non-destructive model<a class="anchor" aria-label="anchor" href="#non-destructive-model"></a>
 </h2>
-<p><strong>The pipeline never deletes a record.</strong> Cleaning means <em>adding labels and corrected columns</em>, not removing rows. The number of records in <code>corrected_ema_data</code> always equals the number of records you put in.</p>
+<p><strong>The pipeline never deletes a record.</strong> Cleaning means
+<em>adding labels and corrected columns</em>, not removing rows. The
+number of records in <code>corrected_ema_data</code> always equals the
+number of records you put in.</p>
 <pre><code>Input:  N raw records
 Output: N records, each with additional classification columns
         (data_category, flag_severity) and corrected-value columns
         (time_*_corrected). Raw columns are preserved untouched.</code></pre>
 <ul>
 <li>
-<strong>Nothing is lost.</strong> Raw timestamps (<code>time_bed_am_hhmm_ampm</code>, etc.) stay in the data. Corrected versions are added as new columns (<code>time_bed_corrected</code>), so every correction is auditable against the original value.</li>
+<strong>Nothing is lost.</strong> Raw timestamps
+(<code>time_bed_am_hhmm_ampm</code>, etc.) stay in the data. Corrected
+versions are added as new columns (<code>time_bed_corrected</code>), so
+every correction is auditable against the original value.</li>
 <li>
-<strong>Every record is labelled, not removed.</strong> Records that fail validation are tagged (<code>data_category = "error"</code> or <code>"unusual"</code>) but remain in the dataset. You decide later whether to include or exclude them in analysis.</li>
+<strong>Every record is labelled, not removed.</strong> Records that
+fail validation are tagged (<code>data_category = "error"</code> or
+<code>"unusual"</code>) but remain in the dataset. You decide later
+whether to include or exclude them in analysis.</li>
 <li>
-<strong>“Final Clean Dataset” is a recommended analysis subset, not a physically separate file.</strong> It is the records where <code>data_category</code> is <code>clean</code> or <code>equal_time_ok</code>:</li>
+<strong>“Final Clean Dataset” is a recommended analysis subset, not
+a physically separate file.</strong> It is the records where
+<code>data_category</code> is <code>clean</code> or
+<code>equal_time_ok</code>:</li>
 </ul>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">clean_data</span> <span class="op">&lt;-</span> <span class="va">corrected_ema_data</span><span class="op">[</span><span class="va">corrected_ema_data</span><span class="op">$</span><span class="va">data_category</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"clean"</span>, <span class="st">"equal_time_ok"</span><span class="op">)</span>, <span class="op">]</span></span></code></pre></div>
-<p><strong>One exception:</strong> records with all four sleep timestamps missing (<code>data_category = "skipped_na"</code>) stay in the file, but their TST/SOL/WASO metrics are <code>NA</code> — sleep metrics cannot be computed without timestamps. They are available for compliance/attrition analyses (e.g. “how many days did each participant complete”) but not for sleep-metric analyses.</p>
+<p><strong>One exception:</strong> records with all four sleep
+timestamps missing (<code>data_category = "skipped_na"</code>) stay in
+the file, but their TST/SOL/WASO metrics are <code>NA</code> — sleep
+metrics cannot be computed without timestamps. They are available for
+compliance/attrition analyses (e.g. “how many days did each participant
+complete”) but not for sleep-metric analyses.</p>
 <table style="width:100%;" class="table">
 <colgroup>
 <col width="44%">

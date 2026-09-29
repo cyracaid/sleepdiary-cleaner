@@ -1,8 +1,4 @@
-<div id="main" class="col-md-9" role="main">
-
 # Summary
-
-<div id="summary" class="section level1">
 
 Self-reported sleep diaries collected through ecological momentary
 assessment (EMA) are noisy at exactly the points that matter most. Clock
@@ -11,7 +7,7 @@ times are entered as free text, and that text carries AM/PM reversals,
 values typed into timestamp fields (and vice versa). Existing cleaning
 options sit at two unhelpful extremes. Fully automated scripts silently
 “repair” plausible-looking entries. Fully manual review of every record
-is intractable at diary scale: a two-week study with \~250 participants
+is intractable at diary scale: a two-week study with ~250 participants
 already produces thousands of entries.
 
 `sleepcleanr` is an R package implementing a hybrid cleaning pipeline
@@ -43,10 +39,6 @@ thresholds are YAML-configurable references validated on our data — not
 gospel. The package ships an operating-point sweep and a Bland–Altman
 measurement-noise analysis showing how detection thresholds relate to
 measurement noise.
-
-</div>
-
-<div class="section level1">
 
 # Statement of need
 
@@ -82,12 +74,4 @@ pipeline directly usable. Column mapping is configurable via YAML, or
 inferred by a recorded, fail-loud guessing function. A data-first entry
 point accepts an in-memory data frame without any config file.
 
-</div>
-
-<div class="section level1">
-
 # References
-
-</div>
-
-</div>
