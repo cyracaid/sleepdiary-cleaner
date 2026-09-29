@@ -8,6 +8,9 @@ tags:
   - reproducibility
   - human-in-the-loop
 authors:
+  # NOTE (2026-09-29): additional authors may be added pending agreement.
+  # The list below reflects confirmed contributions only; update before
+  # final submission.
   - given-names: Cai
     family-names: Dong
     affiliation: "Yonsei University"
