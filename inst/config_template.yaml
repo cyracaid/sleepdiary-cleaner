@@ -56,6 +56,17 @@ data:
     manual_metric_accept: ""
     second_review: ""
 
+    # -- Require manual review files to exist (default false) --
+    #   false (default): if manual_error/manual_unusual are configured but
+    #     the file isn't found, the pipeline warns and continues with an
+    #     empty (algorithmic-only) correction set. Fine for a first
+    #     exploratory run or an algorithmic-only workflow.
+    #   true: the SAME missing-file situation instead stops the pipeline
+    #     with an error. Turn this on once your study's human review is
+    #     actually done -- it stops a run that's silently missing your real
+    #     corrections from completing and looking valid.
+    require_manual_corrections: false
+
 # =============================================================================
 # OUTPUT SETTINGS (optional -- defaults are correct for most studies)
 # =============================================================================

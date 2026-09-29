@@ -20,15 +20,88 @@
 # Classification priority chain (first match wins):
 #   EQUAL_TIME > ERROR > UNUSUAL > CLEAN (normal)
 
+# ============================================
+# Helper: verify_file_written()
+# ============================================
+# WHAT: After a write.csv() call, confirms the target file genuinely landed
+#   on disk, is non-empty, was modified during this run (not a stale
+#   leftover from a previous run), and holds the expected number of data
+#   rows when read back.
+# WHY (regression guard): on 2026-08-12 the two write.csv() calls in
+#   Section 13 below were found commented out while the "Files saved"
+#   summary further down still unconditionally printed success -- so the
+#   console log claimed the review CSVs existed when they had never reached
+#   disk, and a human reviewer had nothing to open. This helper makes that
+#   class of bug impossible to reintroduce silently: if a future edit
+#   disables, guards, or breaks a write (comments it out, wraps it in a
+#   condition that doesn't fire, the write fails partway through, the
+#   filesystem is read-only or full, something else overwrites the path
+#   afterward, etc.), the pipeline now stops immediately with a specific
+#   error instead of letting a stale or missing file pass as "saved."
+# WHAT HAPPENS NEXT: called once per write.csv() call in Section 13, right
+#   after each write. On success it returns invisibly (the surrounding
+#   cat() calls already print the checkmark); on failure it stop()s, which
+#   halts the whole pipeline run rather than letting it finish with a
+#   misleading "success" log.
+verify_file_written <- function(path, expected_rows, run_start_time) {
+  if (!file.exists(path)) {
+    stop("FILE WRITE VERIFICATION FAILED: '", path, "' does not exist on disk ",
+         "after write.csv() was called. The write step may have been skipped, ",
+         "commented out, or failed silently -- do not trust any 'saved' message ",
+         "printed after this point until this is fixed.")
+  }
+
+  info <- file.info(path)
+
+  if (is.na(info$size) || info$size <= 0) {
+    stop("FILE WRITE VERIFICATION FAILED: '", path, "' exists but is empty (0 bytes). ",
+         "Expected a CSV with a header row and ", expected_rows, " data row(s).")
+  }
+
+  if (is.na(info$mtime) || info$mtime < run_start_time) {
+    stop("FILE WRITE VERIFICATION FAILED: '", path, "' was not modified during this run ",
+         "(file mtime = ", format(info$mtime), "; run started = ", format(run_start_time), "). ",
+         "This looks like a stale file left over from a previous run rather than a fresh ",
+         "write -- the write.csv() call for this file may not have executed.")
+  }
+
+  # Re-read the file and confirm its row count matches what we intended to
+  # write. read.csv() (not a raw line count) so embedded newlines inside
+  # quoted fields don't produce a false mismatch.
+  written_rows <- tryCatch(
+    nrow(read.csv(path, stringsAsFactors = FALSE, check.names = FALSE)),
+    error = function(e) {
+      stop("FILE WRITE VERIFICATION FAILED: '", path, "' exists but could not be read back ",
+           "as a valid CSV (", conditionMessage(e), "). The file on disk may be truncated ",
+           "or corrupted.")
+    }
+  )
+
+  if (written_rows != expected_rows) {
+    stop("FILE WRITE VERIFICATION FAILED: '", path, "' has ", written_rows, " data row(s) ",
+         "on disk but ", expected_rows, " were expected. The write may be incomplete, or ",
+         "the file may have been overwritten or truncated by something else after write.csv() ran.")
+  }
+
+  invisible(TRUE)
+}
+
 generate_correction_files <- function(ema_data_release_timecalc) {
-  
+
   # Load required libraries
   require(dplyr)
   require(lubridate)
   require(stringr)
   require(tidyr)
   require(readr)
-  
+
+  # Captured before any writes happen below, with a small buffer to absorb
+  # filesystem mtime rounding (some filesystems truncate mtime to whole
+  # seconds). Used by verify_file_written() in Section 13 to confirm the
+  # review CSVs were actually (re)written during this run, not left over
+  # from an earlier one.
+  run_start_time <- Sys.time() - 1
+
   cat("\n========================================\n")
   cat("Starting correction file generation\n")
   cat("========================================\n")
@@ -721,16 +794,24 @@ generate_correction_files <- function(ema_data_release_timecalc) {
   #   cross_participant_global_check.R) -- run_pipeline() has already
   #   setwd()'d into project_dir by the time this runs, so these land at
   #   project_dir root alongside cross_participant_*.csv, not under output/.
+  # REGRESSION GUARD (added after the 2026-08-12 fix, so this can't silently
+  #   regress again): each write.csv() below is immediately followed by
+  #   verify_file_written(), which re-checks the file on disk (exists,
+  #   non-empty, freshly modified, correct row count) and stop()s the whole
+  #   run with a specific error if any of that doesn't hold -- instead of
+  #   letting a skipped/failed write pass through as a printed "✓ saved".
 
   cat("\n14. Saving review CSV files with [NEW] prefix...\n")
 
   # Save manual error correction review file with [NEW] prefix
   write.csv(manual_corrections_pre, "[NEW]manual_error_correction_review.csv", row.names = FALSE)
-  cat(sprintf("  ✓ [NEW]manual_error_correction_review.csv (%d rows)\n", nrow(manual_corrections_pre)))
+  verify_file_written("[NEW]manual_error_correction_review.csv", nrow(manual_corrections_pre), run_start_time)
+  cat(sprintf("  ✓ [NEW]manual_error_correction_review.csv (%d rows, verified on disk)\n", nrow(manual_corrections_pre)))
 
   # Save manual unusual review file with [NEW] prefix
   write.csv(manual_unusual_pre, "[NEW]manual_unusual_review.csv", row.names = FALSE)
-  cat(sprintf("  ✓ [NEW]manual_unusual_review.csv (%d rows)\n", nrow(manual_unusual_pre)))
+  verify_file_written("[NEW]manual_unusual_review.csv", nrow(manual_unusual_pre), run_start_time)
+  cat(sprintf("  ✓ [NEW]manual_unusual_review.csv (%d rows, verified on disk)\n", nrow(manual_unusual_pre)))
   
   # Note about other dataframes (not saved)
   cat("\n  Note: The following dataframes are available in environment but NOT saved to CSV:\n")

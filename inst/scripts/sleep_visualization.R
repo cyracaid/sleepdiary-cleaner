@@ -717,9 +717,13 @@ cat("\n\n")
 # WHAT THIS FIGURE SHOWS:
 # A vertical flow diagram tracing every record through the pipeline: Raw
 # Load -> Parsed (non-NA) -> Algo-Corrected -> Manual-Corrected -> Final
-# Valid, each stage with count and % of total raw input. A side annotation
-# gives the final breakdown (Not Reported / Clean / Unusual / Error /
-# Equal Time).
+# Valid, each stage with count and % of total raw input. The two correction
+# stages also show how many DISTINCT PARTICIPANTS (unique pid) contributed
+# those corrected records, not just the row count -- added 2026-09-25 because
+# row counts alone can't distinguish "10 corrections on 1 participant" from
+# "10 corrections spread across 10 participants." A side annotation gives the
+# final breakdown (Not Reported / Clean / Unusual / Error / Equal Time) plus
+# the total participant count with >=1 correction.
 #
 # INTERPRETATION:
 # Most records should reach "Final Valid" and land in Clean. A high share
@@ -757,16 +761,37 @@ if(all(c("data_category", "manually_corrected", "corrected") %in% names(correcte
   n_equal     <- sum(corrected_ema_data$data_category == "equal_time_ok", na.rm = TRUE)
   n_valid     <- sum(!is.na(corrected_ema_data$self_diffcalc_totalsleeptime_minutes))
 
+  # PARTICIPANT-LEVEL COUNTS (2026-09-25): row counts alone hide whether a
+  # correction is concentrated in a handful of participants or spread across
+  # the sample -- for judging data quality, "how many DIFFERENT people needed
+  # a fix" is usually more informative than "how many diary entries." Added
+  # alongside (not instead of) the record counts already above.
+  .pid          <- corrected_ema_data$pid
+  n_pid_total   <- length(unique(.pid))
+  n_pid_algo    <- length(unique(.pid[which(corrected_ema_data$corrected == TRUE)]))
+  n_pid_manual  <- length(unique(.pid[which(corrected_ema_data$manually_corrected == TRUE)]))
+  n_pid_any_corr <- length(unique(.pid[which(corrected_ema_data$corrected == TRUE |
+                                             corrected_ema_data$manually_corrected == TRUE)]))
+
   flow <- data.frame(
     stage  = c("Raw Load", "Parsed (non-NA)", "Algo-Corrected", "Manual-Corrected",
                "Final Valid"),
     count  = c(n_total, n_parsed, n_algo, n_manual, n_valid),
+    pid_n  = c(NA, NA, n_pid_algo, n_pid_manual, NA),
     color  = c("#2E7D32", "#4CAF50", "#FF8C00", "#2196F3", "#2E7D32"),
     stringsAsFactors = FALSE
   )
   flow$pct  <- round(flow$count / n_total * 100, 1)
   flow$label <- sprintf("%s\nn = %s (%s%%)", flow$stage,
                         format(flow$count, big.mark = ","), flow$pct)
+  # Append a participant count under the two correction stages only -- it is
+  # not meaningful for Raw Load / Parsed / Final Valid (those are just "all
+  # participants").
+  flow$label <- ifelse(
+    !is.na(flow$pid_n),
+    paste0(flow$label, sprintf("\n(%s participants)", flow$pid_n)),
+    flow$label
+  )
   flow$y <- seq(length(flow$stage), 1, by = -1)
 
   p1 <- ggplot(flow, aes(x = 0.5, y = y)) +
@@ -781,10 +806,11 @@ if(all(c("data_category", "manually_corrected", "corrected") %in% names(correcte
                  color = "#616161", linewidth = 0.6) +
     annotate("text", x = 1.6, y = max(flow$y) - 1, hjust = 0, size = 3.2,
              label = sprintf(
-               "Not Reported: %s (%s%%)\nClean: %s (%s%%)\nUnusual (Accepted): %s\nError (Reviewed): %s\nEqual Time: %s",
+               "Not Reported: %s (%s%%)\nClean: %s (%s%%)\nUnusual (Accepted): %s\nError (Reviewed): %s\nEqual Time: %s\nParticipants w/ \u22651 correction: %s / %s (%s%%)",
                format(n_not_rpt, big.mark = ","), round(n_not_rpt / n_total * 100, 1),
                format(n_clean, big.mark = ","), round(n_clean / n_total * 100, 1),
-               n_unusual, n_error, n_equal)) +
+               n_unusual, n_error, n_equal,
+               n_pid_any_corr, n_pid_total, round(n_pid_any_corr / n_pid_total * 100, 1))) +
     annotate("text", x = 1.6, y = min(flow$y), hjust = 0, size = 3,
              color = "#757575",
              label = sprintf("%s%% of raw records enter analysis",
