@@ -585,6 +585,17 @@ if (exists("review_output") && is.list(review_output) &&
     cat(sprintf("  What to report: 'auto-detection proposed %d candidates, all\n",
                 aud$n_flagged))
     cat("  human-reviewed, zero outstanding' -- a stronger statement than the figures.\n")
+  } else if (is.data.frame(get0("checkforerrors_df", ifnotfound = NULL)) &&
+             nrow(get0("checkforerrors_df")) > 0) {
+    # The queue exists; what is missing is a sleep duration to plot. Rows that
+    # are still pending have timestamps the pipeline could not reconcile (for
+    # example an order error), so no total sleep time can be computed for them
+    # until a correction is applied.
+    cat(sprintf("  Why: %d record(s) are still pending review, but none of them has a\n",
+                aud$n_pending))
+    cat("       computable sleep duration (their timestamps are not yet reconciled),\n")
+    cat("       so the duration figures have nothing to plot. This is expected in a\n")
+    cat("       run without manual corrections.\n")
   } else {
     cat(sprintf("  Why: %d record(s) are still pending review, but checkforerrors_df\n",
                 aud$n_pending))
@@ -1939,6 +1950,8 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
     } else {
       cat(sprintf("⚠ Cannot generate Figure 13C: %s not found (run the validation/synthetic/ benchmark harness first)\n\n",
                     det_path))
+      .mark_skip("pipeline_cleaning/13C_Detection_Outcomes_Heatmap.png",
+                 sprintf("%s not found (run the validation/synthetic/ benchmark harness first).", det_path))
     }
   } else {
     cat("⊘ Figure 13C skipped (visualization.detection_outcomes.enabled = false)\n\n")

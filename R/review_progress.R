@@ -45,6 +45,16 @@ annotate_review_worksheet <- function(ws, manual, label) {
   manual <- .rp_clean_names(manual)
   ws <- ws[, setdiff(names(ws), .rp_added_cols), drop = FALSE]
   i <- match(.rp_key(ws), .rp_key(manual))
+  # A manual row written without a row_id (older files) still identifies its
+  # record by participant and day; use that only for rows the full key missed.
+  if (any(is.na(i)) && all(c("pid", "day_num", "row_id") %in% names(manual))) {
+    no_id <- which(is.na(manual$row_id))
+    if (length(no_id) > 0) {
+      pd <- function(d) paste(as.character(d$pid), as.character(d$day_num), sep = "|")
+      j <- match(pd(ws), pd(manual[no_id, , drop = FALSE]))
+      i[is.na(i) & !is.na(j)] <- no_id[j[is.na(i) & !is.na(j)]]
+    }
+  }
   ws$in_manual_file <- ifelse(is.na(i), "", label)
   for (col in c("review_resolution", "resolved_at", "resolved_by")) {
     v <- if (col %in% names(manual)) as.character(manual[[col]])[i] else rep(NA_character_, nrow(ws))

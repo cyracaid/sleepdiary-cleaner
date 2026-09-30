@@ -89,3 +89,14 @@ test_that("an unusual row that stays unusual after review is not a problem, an e
   cnt2 <- review_state_counts(list(error = annotate_review_worksheet(wu, mu, "m")), fin, NULL)
   expect_equal(cnt2$still_problem_after_check, 1)
 })
+
+test_that("a manual row with no row_id still marks its pid/day record as handled", {
+  m <- data.frame(pid = c(1, 2), day_num = c(1, 1), row_id = c(NA, 12),
+                  review_resolution = c("resolution_unknown_legacy", "corrected"),
+                  stringsAsFactors = FALSE)
+  out <- annotate_review_worksheet(ws_error, m, "f.csv")
+  expect_equal(out$in_manual_file, c("f.csv", "", "f.csv", ""))
+  expect_equal(out$review_resolution[1], "resolution_unknown_legacy")
+  # a different day of the same participant is not matched by the fallback
+  expect_equal(out$in_manual_file[2], "")
+})

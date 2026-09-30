@@ -111,6 +111,15 @@ generate_figure_index <- function(viz_dir) {
     rows <- list()
     for (start in seq(1, length(thumbs), by = cols)) {
       chunk <- thumbs[start:min(start + cols - 1, length(thumbs))]
+      # An odd number of figures leaves the last row's second cell empty, which
+      # reads as a figure that failed to draw; say so in the cell instead.
+      if (length(chunk) < cols) {
+        w <- magick::image_info(chunk[[1]])$width
+        filler <- magick::image_blank(w, 300L, "gray97")
+        filler <- magick::image_annotate(filler, "(no more figures in this tier)",
+                                         gravity = "center", size = 44, color = "gray55")
+        chunk <- c(chunk, list(filler))
+      }
       row <- row_strip(chunk)
       if (!is.null(row)) rows[[length(rows) + 1]] <- row
     }
