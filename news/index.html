@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.8</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,6 +51,38 @@
       <small>Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.4.8" id="sleepcleanr-148">sleepcleanr 1.4.8<a class="anchor" aria-label="anchor" href="#sleepcleanr-148"></a></h2>
+<p>Review-loop and figure-clarity release. No change to cleaning logic, thresholds or any computed number; the real-data run gives the same 85 corrections as 1.4.7.</p>
+<div class="section level3">
+<h3 id="review-worksheets-show-where-each-row-was-already-handled-1-4-8">Review worksheets show where each row was already handled<a class="anchor" aria-label="anchor" href="#review-worksheets-show-where-each-row-was-already-handled-1-4-8"></a></h3>
+<ul><li>The <code>[NEW]manual_error_correction_review.csv</code> and <code>[NEW]manual_unusual_review.csv</code> worksheets still list every row the rules flag, and now carry four extra columns taken from the manual files: <code>in_manual_file</code>, <code>review_resolution</code>, <code>resolved_at</code>, <code>resolved_by</code>. A row that is in no manual file yet has all four empty.</li>
+<li>At the end of a run (after the re-check of the corrected data) the console prints, per worksheet: rows not yet in a manual file, pending, legacy (no record of who or when), corrected, and handled-but-still-flagged. The summary is skipped when manual corrections were not applied.</li>
+<li>A manual row written without a <code>row_id</code> is matched to its worksheet row by participant and day.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="fixed-1-4-8">Fixed<a class="anchor" aria-label="anchor" href="#fixed-1-4-8"></a></h3>
+<ul><li>Manual correction files are read the same way in every R session. In a non-UTF-8 locale <code>read.csv(fileEncoding = "UTF-8")</code> silently dropped rows; the files are now read as raw bytes and decoded as UTF-8 (BOM stripped), and invalid input stops with an error instead of truncating.</li>
+<li>The step ledger (Fig 12 / A1) recorded <code>NA</code> for the checkforerrors standard at every step; it now shows the flag counts.</li>
+<li>Fig 24 crashed on a leftover continuous x scale; Fig 13 no longer clips its top; Fig 2 and R25 subtitles no longer overlap or run off the figure.</li>
+<li>Step 11 built the figure index from the wrong folder for tagged runs.</li>
+<li>A1 was listed as “not generated” when it had been.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="figures-explain-themselves-1-4-8">Figures explain themselves<a class="anchor" aria-label="anchor" href="#figures-explain-themselves-1-4-8"></a></h3>
+<ul><li>Figures carry their own definitions or standards where a reader needs them, and fractional-cup substance values are shown as fractions.</li>
+<li>Every figure missing from a run is listed, with a reason, on the contact sheet; Fig 13C (no synthetic benchmark files) and Fig 14 (pending rows have no computable sleep duration) now say so instead of “Reason not recorded” or “UNEXPECTED”.</li>
+<li>An odd number of figures in a tier no longer leaves an unexplained empty cell on the contact sheet.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-1-4-8">Documentation<a class="anchor" aria-label="anchor" href="#documentation-1-4-8"></a></h3>
+<ul><li>
+<code>interpreting-output</code> (English and Chinese) restructured: plain-language rules, terminology, run and inputs first, collapsible FAQ and exact rules.</li>
+<li>The pkgdown Articles menu separates English and Chinese; every article links to its counterpart.</li>
+<li>
+<code>validation/external/</code> documents two external-dataset checks (KAIST, Manchester) with their adaptation scripts. Both are feasibility checks, not accuracy evaluations: neither dataset has known diary errors.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.4.7" id="sleepcleanr-147">sleepcleanr 1.4.7<a class="anchor" aria-label="anchor" href="#sleepcleanr-147"></a></h2>
 <p>Robustness and consent release. Fixes found by external-dataset validation and controlled re-runs; no changes to cleaning logic or thresholds.</p>

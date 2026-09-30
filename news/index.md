@@ -1,5 +1,64 @@
 # Changelog
 
+## sleepcleanr 1.4.8
+
+Review-loop and figure-clarity release. No change to cleaning logic,
+thresholds or any computed number; the real-data run gives the same 85
+corrections as 1.4.7.
+
+### Review worksheets show where each row was already handled
+
+- The `[NEW]manual_error_correction_review.csv` and
+  `[NEW]manual_unusual_review.csv` worksheets still list every row the
+  rules flag, and now carry four extra columns taken from the manual
+  files: `in_manual_file`, `review_resolution`, `resolved_at`,
+  `resolved_by`. A row that is in no manual file yet has all four empty.
+- At the end of a run (after the re-check of the corrected data) the
+  console prints, per worksheet: rows not yet in a manual file, pending,
+  legacy (no record of who or when), corrected, and
+  handled-but-still-flagged. The summary is skipped when manual
+  corrections were not applied.
+- A manual row written without a `row_id` is matched to its worksheet
+  row by participant and day.
+
+### Fixed
+
+- Manual correction files are read the same way in every R session. In a
+  non-UTF-8 locale `read.csv(fileEncoding = "UTF-8")` silently dropped
+  rows; the files are now read as raw bytes and decoded as UTF-8 (BOM
+  stripped), and invalid input stops with an error instead of
+  truncating.
+- The step ledger (Fig 12 / A1) recorded `NA` for the checkforerrors
+  standard at every step; it now shows the flag counts.
+- Fig 24 crashed on a leftover continuous x scale; Fig 13 no longer
+  clips its top; Fig 2 and R25 subtitles no longer overlap or run off
+  the figure.
+- Step 11 built the figure index from the wrong folder for tagged runs.
+- A1 was listed as “not generated” when it had been.
+
+### Figures explain themselves
+
+- Figures carry their own definitions or standards where a reader needs
+  them, and fractional-cup substance values are shown as fractions.
+- Every figure missing from a run is listed, with a reason, on the
+  contact sheet; Fig 13C (no synthetic benchmark files) and Fig 14
+  (pending rows have no computable sleep duration) now say so instead of
+  “Reason not recorded” or “UNEXPECTED”.
+- An odd number of figures in a tier no longer leaves an unexplained
+  empty cell on the contact sheet.
+
+### Documentation
+
+- `interpreting-output` (English and Chinese) restructured:
+  plain-language rules, terminology, run and inputs first, collapsible
+  FAQ and exact rules.
+- The pkgdown Articles menu separates English and Chinese; every article
+  links to its counterpart.
+- `validation/external/` documents two external-dataset checks (KAIST,
+  Manchester) with their adaptation scripts. Both are feasibility
+  checks, not accuracy evaluations: neither dataset has known diary
+  errors.
+
 ## sleepcleanr 1.4.7
 
 Robustness and consent release. Fixes found by external-dataset

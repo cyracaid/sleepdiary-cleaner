@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.8</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,7 +70,7 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="sleepcleanr--reproducible-cleaning-pipeline-for-sleep-ema-diary-data">sleepcleanr — Reproducible cleaning pipeline for sleep EMA diary data<a class="anchor" aria-label="anchor" href="#sleepcleanr--reproducible-cleaning-pipeline-for-sleep-ema-diary-data"></a>
 </h1></div>
-<p><a href="https://cran.r-project.org/package=sleepcleanr" class="external-link"><img src="https://img.shields.io/cran/v/sleepcleanr?style=flat-square&amp;color=blue" alt="CRAN"></a> <a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link"><img src="https://img.shields.io/github/stars/cyracaid/sleepdiary-cleaner?style=flat-square" alt="GitHub stars"></a> <a href="https://opensource.org/licenses/MIT" class="external-link"><img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License: MIT"></a> <a href="https://github.com/cyracaid/sleepdiary-cleaner/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://img.shields.io/github/actions/workflow/status/cyracaid/sleepdiary-cleaner/R-CMD-check.yaml?style=flat-square&amp;label=R--CMD--check" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/cyracaid/sleepdiary-cleaner" class="external-link"><img src="https://img.shields.io/codecov/c/github/cyracaid/sleepdiary-cleaner?style=flat-square&amp;color=orange" alt="Codecov"></a> <a href="https://cyracaid.github.io/sleepdiary-cleaner/"><img src="https://img.shields.io/badge/docs-pkgdown-blue?style=flat-square" alt="Docs"></a> <a href="https://www.awesomeskills.dev/zh-CN/skill/cyracaid-sleepdiary-cleaner" class="external-link"><img src="https://img.shields.io/badge/awesomeskills.dev-listed-brightgreen?style=flat-square" alt="awesomeskills"></a> <a href="https://github.com/qinwf/awesome-R/pull/276" class="external-link"><img src="https://img.shields.io/badge/awesome--R-PR_276-open?style=flat-square" alt="awesome-R PR"></a></p>
+<p><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link"><img src="https://img.shields.io/github/stars/cyracaid/sleepdiary-cleaner?style=flat-square" alt="GitHub stars"></a> <a href="https://opensource.org/licenses/MIT" class="external-link"><img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License: MIT"></a> <a href="https://github.com/cyracaid/sleepdiary-cleaner/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://img.shields.io/github/actions/workflow/status/cyracaid/sleepdiary-cleaner/R-CMD-check.yaml?style=flat-square&amp;label=R--CMD--check" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/cyracaid/sleepdiary-cleaner" class="external-link"><img src="https://img.shields.io/codecov/c/github/cyracaid/sleepdiary-cleaner?style=flat-square&amp;color=orange" alt="Codecov"></a> <a href="https://cyracaid.github.io/sleepdiary-cleaner/"><img src="https://img.shields.io/badge/docs-pkgdown-blue?style=flat-square" alt="Docs"></a></p>
 <blockquote>
 <p><strong><a href="#english">English</a> · <a href="#%E4%B8%AD%E6%96%87">中文</a></strong></p>
 </blockquote>
@@ -101,10 +101,10 @@
    Dataset A (final clean) + Dataset B (audit ledger)</code></pre>
 <p><strong>Why sleepcleanr?</strong></p>
 <ul>
-<li>🔍 <strong>Detects</strong> not auto-fixes — 1,048 records flagged for manual review, 0 silent misrepairs (field-misentry silent-misrepair bug, 96% in v1.4.0, fixed in v1.4.4+; current benchmark: 0% silent misrepair for SOL/WASO)</li>
+<li>🔍 <strong>Detects</strong> not auto-fixes — 1,048 records flagged for manual review in the v1.4.5 audit, 0 silent misrepairs (field-misentry silent-misrepair bug, 96% in v1.4.0, fixed in v1.4.4+; current benchmark: 0% silent misrepair for SOL/WASO)</li>
 <li>📊 <strong>Auditable</strong> — every change logged and reversible; non-destructive architecture</li>
 <li>✅ <strong>Validated</strong> — 9-step validation chain: synthetic (0.995 recall) + real data (92% improved) + robustness proof</li>
-<li>🚀 <strong>Reproducible</strong> — YAML config, full pipeline documentation, 308 unit tests passing</li>
+<li>🚀 <strong>Reproducible</strong> — YAML config, full pipeline documentation, automated test suite run in CI (R-CMD-check, Codecov)</li>
 <li>🎯 <strong>Research-ready</strong> — generates publication-quality figures + correlation matrices</li>
 </ul>
 <div class="section level3">
@@ -244,7 +244,7 @@
 </tr>
 </tbody>
 </table>
-<p><strong>Flag statistics (v1.4.5, n=13,990):</strong> 1,048 records flagged (7.5%); 0 AUTO_FIX; 0 silent corrections. Breakdown: 922 TIMESTAMP (window violations), 140 DURATION (order violations), 1 SELF_REPORTED (extreme), 1 redundancy-confirmed worsening. See <code>VALIDATION_REPORT.md</code> for full breakdown.</p>
+<p><strong>Flag statistics (snapshot at v1.4.5, n=13,990; each run prints the current review queue):</strong> 1,048 records flagged (7.5%); 0 AUTO_FIX; 0 silent corrections. Breakdown: 922 TIMESTAMP (window violations), 140 DURATION (order violations), 1 SELF_REPORTED (extreme), 1 redundancy-confirmed worsening. See <code>VALIDATION_REPORT.md</code> for full breakdown.</p>
 </div>
 <div class="section level3">
 <h3 id="validation-map">Validation Map<a class="anchor" aria-label="anchor" href="#validation-map"></a>
@@ -278,9 +278,8 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <h2 id="install">Install<a class="anchor" aria-label="anchor" href="#install"></a>
 </h2>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># From GitHub (available on CRAN as sleepcleanr)</span></span>
-<span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner"</span><span class="op">)</span></span>
-<span><span class="co"># or: install.packages("sleepcleanr")</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># From GitHub (not yet on CRAN)</span></span>
+<span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
@@ -304,6 +303,13 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <span><span class="va">res</span><span class="op">$</span><span class="va">manifest</span>                                      <span class="co"># provenance: input hash, config, step ledger</span></span>
 <span><span class="co"># Preview the inferred mapping without running anything:</span></span>
 <span><span class="fu"><a href="reference/clean_sleep_diary.html">clean_sleep_diary</a></span><span class="op">(</span><span class="st">"my_diary.csv"</span>, dry_run <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># writes dry_run_manifest.json, no data written</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="run-the-tests-report-a-problem-contribute">Run the tests, report a problem, contribute<a class="anchor" aria-label="anchor" href="#run-the-tests-report-a-problem-contribute"></a>
+</h2>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span>   <span class="co"># from a clone of the repository; the same suite runs in CI</span></span></code></pre></div>
+<p>Bugs, questions and feature requests: open an <a href="https://github.com/cyracaid/sleepdiary-cleaner/issues" class="external-link">issue</a>. Contribution guidelines are in <a href="CONTRIBUTING.html"><code>CONTRIBUTING.md</code></a>.</p>
 </div>
 <div class="section level2">
 <h2 id="learn-more">Learn more<a class="anchor" aria-label="anchor" href="#learn-more"></a>
@@ -413,7 +419,7 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <code>sync_human_review_status()</code><a class="anchor" aria-label="anchor" href="#sync_human_review_status"></a>
 </h3>
 <p>Automatically synchronizes review status fields in <code>manual_metric_review_acceptances.csv</code> based on human review traces.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/sync_human_review_status.html">sync_human_review_status</a></span><span class="op">(</span><span class="st">"manual_metric_review_acceptances.csv"</span><span class="op">)</span></span></code></pre></div>
 <p><strong>What it does:</strong></p>
@@ -445,16 +451,16 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 </ol>
 <p><strong>Resolution Logic:</strong> | Condition | <code>review_resolution</code> | <code>resolved_at</code> | <code>resolved_by</code> | |———–|———————|—————|—————| | Explicit <code>corrected</code> flag | <code>"corrected"</code> | Today | <code>"system"</code> | | Human traces + legacy/NA | <code>"flagged_unresolved"</code> | NA | <code>"pending"</code> | | Human traces + legacy/NA | <code>"flagged_unresolved"</code> | NA | <code>"pending"</code> | | No traces + legacy | <code>"legacy"</code> | NA | <code>"legacy"</code> |</p>
 <p><strong>Usage:</strong></p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/sync_human_review_status.html">sync_human_review_status</a></span><span class="op">(</span><span class="st">"manual_metric_review_acceptances.csv"</span><span class="op">)</span></span></code></pre></div>
 <p><strong>Output:</strong></p>
 <pre><code>✓ Synced 161 rows: 1 corrected, 43 flagged, 117 legacy</code></pre>
 <p><strong>Integration in Pipeline:</strong> Automatically runs at pipeline Step 11 (after all corrections, before visualization):</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/run_pipeline.html">run_pipeline</a></span><span class="op">(</span>config <span class="op">=</span> <span class="st">"my_study.yaml"</span><span class="op">)</span>  <span class="co"># Automatically runs sync_human_review_status() at Step 11</span></span></code></pre></div>
 <p><strong>Manual invocation:</strong></p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/sync_human_review_status.html">sync_human_review_status</a></span><span class="op">(</span><span class="st">"manual_metric_review_acceptances.csv"</span><span class="op">)</span></span></code></pre></div>
 <hr>
@@ -487,15 +493,14 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <div class="section level2">
 <h2 id="安装">安装<a class="anchor" aria-label="anchor" href="#%E5%AE%89%E8%A3%85"></a>
 </h2>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># 从 GitHub 安装（已上线 CRAN，包名 sleepcleanr）</span></span>
-<span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner"</span><span class="op">)</span></span>
-<span><span class="co"># 或: install.packages("sleepcleanr")</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># 从 GitHub 安装（尚未上线 CRAN，包名 sleepcleanr）</span></span>
+<span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="快速开始">快速开始<a class="anchor" aria-label="anchor" href="#%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B"></a>
 </h2>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 用内置合成数据跑演示</span></span>
@@ -505,6 +510,13 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"config_template.yaml"</span>, package <span class="op">=</span> <span class="st">"sleepcleanr"</span><span class="op">)</span>,</span>
 <span>          <span class="st">"my_study.yaml"</span><span class="op">)</span></span>
 <span><span class="co"># 编辑 my_study.yaml → run_pipeline(config = "my_study.yaml")</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="运行测试反馈问题参与贡献">运行测试、反馈问题、参与贡献<a class="anchor" aria-label="anchor" href="#%E8%BF%90%E8%A1%8C%E6%B5%8B%E8%AF%95%E5%8F%8D%E9%A6%88%E9%97%AE%E9%A2%98%E5%8F%82%E4%B8%8E%E8%B4%A1%E7%8C%AE"></a>
+</h2>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span>   <span class="co"># 在仓库克隆目录中运行；CI 里跑的是同一套测试</span></span></code></pre></div>
+<p>Bug、问题和功能建议：请开 <a href="https://github.com/cyracaid/sleepdiary-cleaner/issues" class="external-link">issue</a>。 贡献指南见 <a href="CONTRIBUTING.html"><code>CONTRIBUTING.md</code></a>。</p>
 </div>
 <div class="section level2">
 <h2 id="了解更多">了解更多<a class="anchor" aria-label="anchor" href="#%E4%BA%86%E8%A7%A3%E6%9B%B4%E5%A4%9A"></a>
