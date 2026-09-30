@@ -291,6 +291,8 @@ card.
 
 ### 6.2 Figure Cards
 
+<a id="01-pipeline-record-flow"></a>
+
 #### 01 · Pipeline Record Flow
 
 **File** `pipeline_cleaning/01_Pipeline_Flow_Diagram.png` — generated at `sleep_visualization.R:862`
@@ -354,6 +356,9 @@ The figure prints these standards next to each class (first match wins, in the o
 
 **Paper caption**
 > **Figure 01.** Flow diagram tracing all raw diary entries through the five pipeline stages (raw load, timestamp parsing, algorithmic correction, manual correction, final valid output), with record counts and percentages at each stage. The side annotation reports the final record classification (clean, unusual accepted, error reviewed, equal-time benign, not-reported) and the proportion of participants who received at least one correction. TST = total sleep time; SOL = sleep onset latency.
+
+<a id="02-correction-impact"></a>
+
 #### 02 · Correction Impact
 
 **File** `research_ready/02_Correction_Impact.png` — generated at `sleep_visualization.R:1013`
@@ -406,6 +411,9 @@ The figure prints these standards next to each class (first match wins, in the o
 
 **Paper caption**
 > **Figure 02.** (A) Lollipop plot of the change in total sleep time (ΔTST, minutes) for each modified record, colored by correction type (orange = algorithmic, blue = manual). (B) Same for sleep onset latency (ΔSOL). (C) Identity scatter of TST before vs after correction; unchanged records are shown at 3% opacity as a gray backdrop. (D) Summary table of TST and SOL means (± SD) before and after correction. Corrections are non-destructive: only confirmed input errors were modified.
+
+<a id="02b-distribution-of-sleep-variables"></a>
+
 #### 02B · Distribution of Sleep Variables
 
 **File** `research_ready/02B_Distribution_Sleep_Variables.png` — generated at `sleep_visualization.R:1057`
@@ -435,6 +443,9 @@ The figure prints these standards next to each class (first match wins, in the o
 
 **Paper caption**
 > **Figure 02B.** Histograms with density curves for total sleep time (TST), sleep onset latency (SOL), wake after sleep onset (WASO), and sleep efficiency (SE) on the final corrected data.
+
+<a id="03-tst-distribution"></a>
+
 #### 03 · TST Distribution
 
 **File** `research_ready/03_Sleep_Duration_Distribution.png` — generated at `sleep_visualization.R:1108`
@@ -474,6 +485,9 @@ TST here is the *enhanced* definition: `TST = TIB − SOL − WASO` — not the 
 
 **Paper caption**
 > **Figure 03.** Histogram and density of TST (hours) with the mean (blue) and median (orange) marked. TST is computed as the sleep period minus WASO (TST = TIB − SOL − WASO).
+
+<a id="04-sleep-duration-vs-time-in-bed"></a>
+
 #### 04 · Sleep Duration vs Time in Bed
 
 **File** `research_ready/04_Sleep_Duration_vs_Time_in_Bed.png` — generated at `sleep_visualization.R:1163`
@@ -502,6 +516,9 @@ TST here is the *enhanced* definition: `TST = TIB − SOL − WASO` — not the 
 
 **Paper caption**
 > **Figure 04.** Scatter of TST (hours) by time in bed (TIB, hours) with a smoothed trend and identity reference line. Because TST ≤ TIB by construction, points above the identity line are physically impossible.
+
+<a id="04b-sol-vs-sleep-duration"></a>
+
 #### 04B · SOL vs Sleep Duration
 
 **File** `research_ready/04B_SOL_vs_Sleep_Duration.png` — generated at `sleep_visualization.R:1215`
@@ -530,6 +547,9 @@ TST here is the *enhanced* definition: `TST = TIB − SOL − WASO` — not the 
 
 **Paper caption**
 > **Figure 04B.** Scatter of SOL (hours, restricted to ≤ 3 h for readability) by TST (hours), colored by flag severity. The negative association (long onset latency, shorter sleep) is the expected clinical pattern.
+
+<a id="05-variability-of-sleep-variables"></a>
+
 #### 05 · Variability of Sleep Variables
 
 **File** `research_ready/05_Variability_Sleep_Variables.png` — generated at `sleep_visualization.R:1265`
@@ -550,6 +570,9 @@ TST here is the *enhanced* definition: `TST = TIB − SOL − WASO` — not the 
 
 **Paper caption**
 > **Figure 05.** Violin plots with overlaid boxplots for each sleep variable; each panel uses its own y-axis scale, so panels are compared by distribution shape, not absolute values.
+
+<a id="06-sleep-duration-post-correction"></a>
+
 #### 06 · Sleep Duration Post-Correction
 
 **File** `pipeline_cleaning/06_Sleep_Duration_Post_Correction.png` — generated at `sleep_visualization.R:1339`
@@ -570,6 +593,9 @@ TST here is the *enhanced* definition: `TST = TIB − SOL − WASO` — not the 
 
 **Paper caption**
 > **Figure 06.** Density of final total sleep time (TST, hours) after all manual corrections were applied. Unimodal distributions centered on 6–8 h indicate healthy sleep durations; spikes at zero or > 12 h indicate residual parsing artifacts.
+
+<a id="07-flag-composition-stacked"></a>
+
 #### 07 · Flag Composition Stacked
 
 **File** `pipeline_cleaning/07_Flag_Composition_Stacked.png` — generated at `sleep_visualization.R:1404`
@@ -606,6 +632,9 @@ Not to be confused with `data_category` — a different classification system (s
 
 **Paper caption**
 > **Figure 07.** Stacked histogram of final sleep duration (hours), with bars colored by flag severity: Clean (no metric flags), Minor (one flag), Major (two or more flags from {SE < 70%, SOL > 1 h, WASO > 1.5 h}). Shows whether quality problems concentrate at extreme durations.
+
+<a id="09-bedtime-vs-get-up-distribution"></a>
+
 #### 09 · Bedtime vs Get-up Distribution
 
 **File** `research_ready/09_Bedtime_vs_Getup_Distribution.png` — generated at `sleep_visualization.R:1458`
@@ -627,6 +656,9 @@ Not to be confused with `data_category` — a different classification system (s
 
 **Paper caption**
 > **Figure 09.** Density of bedtime and get-up clock hours (corrected times) across the day. Peak separation (evening bedtimes, morning get-ups) is the healthy circadian signature.
+
+<a id="10-extreme-sleep-durations"></a>
+
 #### 10 · Extreme Sleep Durations
 
 **File** `pipeline_cleaning/10_Extreme_Sleep_Duration.png` — generated at `sleep_visualization.R:1514`
@@ -661,6 +693,9 @@ Not to be confused with `data_category` — a different classification system (s
 
 **Paper caption**
 > **Figure 10.** Scatter of total sleep time (TST, hours) versus sleep efficiency (SE, %) restricted to extreme durations (< 4 h short, > 10 h long). Point shape encodes short vs long sleep; point color encodes record quality. The horizontal line marks the SE = 85% poor-efficiency threshold.
+
+<a id="13-error-category-distribution"></a>
+
 #### 13 · Error Category Distribution
 
 **File** `pipeline_cleaning/13_Error_Category_Distribution.png` — generated at `sleep_visualization.R:1794`
@@ -691,6 +726,9 @@ Not to be confused with `data_category` — a different classification system (s
 
 **Paper caption**
 > **Figure 13.** Bar chart of records flagged by the post-correction auto-detection pass, grouped into six review classes derived from the flag description: temporal issues, metric issues, amount/input flags, interval format errors, timestamp format errors, and other. Counts are pre-correction — they show the burden the pipeline had to absorb.
+
+<a id="13b-adjacent-timestamp-gaps"></a>
+
 #### 13B · Adjacent Timestamp Gaps
 
 **File** `pipeline_cleaning/13B_Adjacent_Timestamp_Gaps.png` — generated at `sleep_visualization.R:1877`
@@ -716,6 +754,9 @@ Not to be confused with `data_category` — a different classification system (s
 
 **Paper caption**
 > **Figure 13B.** Histogram of the time gap (hours) between adjacent diary events (bed→sleep, sleep→awake, awake→getup) computed from raw, pre-correction timestamps. Negative gaps indicate the later event's clock time precedes the earlier one, the signature of order errors and 12 h AM/PM dial habits.
+
+<a id="13c-detection-outcomes-heatmap"></a>
+
 #### 13C · Detection Outcomes Heatmap
 
 **File** `pipeline_cleaning/13C_Detection_Outcomes_Heatmap.png` — generated at `sleep_visualization.R:1936`
@@ -744,6 +785,9 @@ Not to be confused with `data_category` — a different classification system (s
 
 **Paper caption**
 > **Figure 13C.** Heatmap from the synthetic benchmark in which known errors were injected into clean records; each cell reports the modal detection outcome (correctly auto-fixed, flagged for review, or misrepaired) for one injected error class. A strong diagonal indicates the detector fires on the error it was injected with.
+
+<a id="13d-threshold-vs-measurement-noise"></a>
+
 #### 13D · Threshold vs Measurement Noise
 
 **File** `pipeline_cleaning/13D_Threshold_vs_Noise_Ratio.png` — generated at `sleep_visualization.R:1980`
@@ -772,6 +816,9 @@ Not to be confused with `data_category` — a different classification system (s
 
 **Paper caption**
 > **Figure 13D.** Detection rate as a function of the threshold-to-measurement-noise ratio, where noise is quantified from Bland-Altman analysis. The vertical line marks the configured operating point (3 h gap threshold, 12 h flip threshold); thresholds left of the line sit within measurement noise.
+
+<a id="14-sleep-duration-pre-correction"></a>
+
 #### 14 · Sleep Duration Pre-Correction
 
 **File** `pipeline_cleaning/14_Sleep_Duration_Pre_Correction.png` — generated at `sleep_visualization.R:2051`
@@ -788,6 +835,8 @@ Not to be confused with `data_category` — a different classification system (s
 
 **Paper caption**
 > **Figure 14.** Density of sleep duration (hours) for records without auto-detection flags (green, random sample of up to 5,000) and records flagged for review (red), before any manual correction.
+
+<a id="15-error-timeline"></a>
 
 #### 15 · Error Timeline
 
@@ -809,6 +858,8 @@ Not to be confused with `data_category` — a different classification system (s
 **Paper caption**
 > **Figure 15.** Number of records per month with a temporal-order error or a suspicious-gap pattern (Step 6 classification), by pattern type.
 
+<a id="16-common-error-patterns"></a>
+
 #### 16 · Common Error Patterns
 
 **File** `pipeline_cleaning/16_Common_Error_Patterns.png` — generated at `sleep_visualization.R:2228`
@@ -825,6 +876,8 @@ Not to be confused with `data_category` — a different classification system (s
 
 **Paper caption**
 > **Figure 16.** Most common automatically detected patterns among records in the review queue; the last bar collects records that match no named pattern.
+
+<a id="17-top-participants-by-flag-rate"></a>
 
 #### 17 · Top Participants by Flag Rate
 
@@ -850,6 +903,9 @@ Not to be confused with `data_category` — a different classification system (s
 
 **Paper caption**
 > **Figure 17.** The 15 participants with the highest auto-detected flag rate (flags per observed diary day), not raw flag counts, so participants with few diary days are not overrepresented.
+
+<a id="18-auto-detected-dashboard"></a>
+
 #### 18 · Auto-Detected Dashboard
 
 **File** `pipeline_cleaning/18_Auto_Detected_Dashboard.png` — generated at `sleep_visualization.R:2409`
@@ -874,6 +930,9 @@ Not to be confused with `data_category` — a different classification system (s
 
 **Paper caption**
 > **Figure 18.** Key metrics panel (total records, flagged records, manually corrected records) alongside a stacked bar of the six review-source classes. Counts must match `correction_status_final.csv`.
+
+<a id="20-sol-perception-bias"></a>
+
 #### 20 · SOL Perception Bias
 
 **File** `research_ready/20_SOL_Perception_Bias.png` — generated at `sleep_visualization.R:2637`
@@ -896,6 +955,9 @@ Not to be confused with `data_category` — a different classification system (s
 
 **Paper caption**
 > **Figure 20.** Histogram of the absolute difference between objective SOL (derived from corrected bed and sleep timestamps) and subjective SOL (participant's reported onset latency), in minutes.
+
+<a id="20b-waso-perception-bias"></a>
+
 #### 20B · WASO Perception Bias
 
 **File** `research_ready/20B_WASO_Perception_Bias.png` — generated at `sleep_visualization.R:2695`
@@ -918,6 +980,9 @@ Not to be confused with `data_category` — a different classification system (s
 
 **Paper caption**
 > **Figure 20B.** Histogram of the absolute difference between computed wake-after-sleep-onset and the participant's self-reported nighttime wakefulness, in minutes.
+
+<a id="21-substance-use-availability"></a>
+
 #### 21 · Substance Use Availability
 
 **File** `research_ready/21_Substance_Use_Availability.png` — generated at `sleep_visualization.R:2767`
@@ -940,6 +1005,9 @@ Not to be confused with `data_category` — a different classification system (s
 
 **Paper caption**
 > **Figure 21.** Percentage of records containing data for each substance (caffeine, alcohol, nicotine, cannabis), indicating how completely each substance domain was reported.
+
+<a id="22-substance-use-value-distribution"></a>
+
 #### 22 · Substance Use Value Distribution
 
 **File** `research_ready/22_Substance_Use_Distribution.png` — generated at `sleep_visualization.R:2870`
@@ -962,6 +1030,9 @@ Not to be confused with `data_category` — a different classification system (s
 
 **Paper caption**
 > **Figure 22.** Boxplots with jittered points of reported values per substance. Units: caffeine = cups, alcohol = standard drinks, nicotine and cannabis = doses.
+
+<a id="23-caffeine-consumption"></a>
+
 #### 23 · Caffeine Consumption
 
 **File** `research_ready/23_Caffeine_Consumption.png` — generated at `sleep_visualization.R:2944`
@@ -985,6 +1056,9 @@ Not to be confused with `data_category` — a different classification system (s
 
 **Paper caption**
 > **Figure 23.** Count of records by reported caffeine consumption (cups/day). Right-skewed with a mode of 0–1 cups is expected; spikes at implausible values indicate unit confusion.
+
+<a id="24-alcohol-consumption"></a>
+
 #### 24 · Alcohol Consumption
 
 **File** `research_ready/24_Alcohol_Consumption.png` — generated at `sleep_visualization.R:2979`
@@ -1007,6 +1081,9 @@ Not to be confused with `data_category` — a different classification system (s
 
 **Paper caption**
 > **Figure 24.** Count of records by reported alcohol consumption (standard drinks/day).
+
+<a id="a1-step-flag-ledger"></a>
+
 #### A1 · Step Flag Ledger
 
 **File** `pipeline_cleaning/A1_Step_Flag_Ledger.png` — generated at `figure12_step_flag_table.R:15`
@@ -1032,6 +1109,9 @@ Not to be confused with `data_category` — a different classification system (s
 
 **Paper caption**
 > **Figure A1.** Per-step × per-standard × per-category record counts for the five evaluation systems (field mis-entry, data category, flag severity, duration extreme, check-for-errors). Each standard is computed once at a fixed pipeline step; counts must remain constant thereafter.
+
+<a id="p26-participants-worth-a-second-look"></a>
+
 #### P26 · Participants Worth a Second Look
 
 **File** `pipeline_cleaning/P26_PerParticipant_Flag_Rate.png` — generated at `sleep_visualization.R:2579`
@@ -1055,6 +1135,8 @@ Not to be confused with `data_category` — a different classification system (s
 
 **Paper caption**
 > **Figure P26.** Ranked table of participants by flagged-record rate, for manual review prioritization. A high rate flags records worth hand-checking; it is not a verdict that the data are wrong.
+
+<a id="r25-sleep-regularity--weekday-vs-weekend"></a>
 
 #### R25 · Sleep Regularity — Weekday vs Weekend
 
@@ -1086,6 +1168,9 @@ Not to be confused with `data_category` — a different classification system (s
 
 **Paper caption**
 > **Figure R25.** Violin plots with boxplots of bedtime and get-up clock hours, split by day type (weekday, Monday–Friday; weekend, Saturday–Sunday, derived from the corrected bedtime date). A modest (≤ 1 h) weekend delay is expected; a large shift indicates social jetlag.
+
+<a id="r26-sleep-composition--tib-breakdown"></a>
+
 #### R26 · Sleep Composition — TIB Breakdown
 
 **File** `research_ready/R26_Sleep_Composition_TIB_Breakdown.png` — generated at `sleep_visualization.R:3096`
@@ -1108,6 +1193,9 @@ Not to be confused with `data_category` — a different classification system (s
 
 **Paper caption**
 > **Figure R26.** Stacked bars decomposing time in bed (TIB) into its components: total sleep time (TST), sleep onset latency (SOL), and wake after sleep onset (WASO), with TIB = TST + SOL + WASO by construction. Healthy composition places TST at 80–90% of TIB.
+
+<a id="r27-sleep-metrics-correlation-matrix"></a>
+
 #### R27 · Sleep Metrics Correlation Matrix
 
 **File** `research_ready/R27_Sleep_Metrics_Correlation_Matrix.png` — generated at `sleep_visualization.R:3125`
