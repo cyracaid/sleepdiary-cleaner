@@ -996,13 +996,13 @@ if (has_raw_times && has_metrics) {
   p2_body <- if (nrow(mod) > 0) (p2a | p2b) / p2c / tbl_grob else p2a / tbl_grob
   p2_heights <- if (nrow(mod) > 0) c(2, 2, 0.9) else c(1, 1)
   p2_subtitle <- if (nrow(mod) > 0) NULL else
-    "PURPOSE: an audit of how much, and in which direction, corrections changed the data.\nNo record was changed in this run, so there is nothing to plot; the table shows the data are identical before and after."
+    "Purpose: an audit of how much, and in which direction, corrections changed the data.\nNo record was changed in this run, so there is nothing to plot; the table shows the data are identical before and after."
 
   p2 <- p2_body +
     plot_layout(heights = p2_heights) +
     plot_annotation(
       title    = "Figure 2: Impact of Corrections on Sleep Metrics",
-      subtitle = if (!is.null(p2_subtitle)) p2_subtitle else "PURPOSE: an audit of how much, and in which direction, corrections changed the data.\nTop panels: one row per corrected record; line length = change in TST / SOL (minutes, after minus before); orange = algorithmic, blue = manual.\nBottom panel: TST before (x) vs after (y); a dot on the dotted diagonal did not change. Unchanged records are drawn almost transparent.\nCorrection is non-destructive: only clear input errors are corrected; self-report/measured discrepancies are retained as data.",
+      subtitle = if (!is.null(p2_subtitle)) p2_subtitle else "Purpose: an audit of how much, and in which direction, corrections changed the data.\nTop panels: one row per corrected record; line length = change in TST or SOL (min, after minus before).\nBottom panel: TST before (x) vs after (y); orange = algorithmic, blue = manual; a dot on the dotted diagonal did not change.\nCorrection is non-destructive: only clear input errors are corrected; self-report/measured discrepancies stay as data.",
       caption  = .anno,
       theme    = theme(plot.title    = element_text(hjust = 0.5, size = 14, face = "bold"),
                        plot.subtitle = element_text(hjust = 0.5, size = 9, color = "#424242"),
@@ -3033,8 +3033,8 @@ if (all(c("time_bed_corrected", "time_getup_corrected") %in% names(corrected_ema
       facet_wrap(~event, scales = "free_y") +
       scale_fill_manual(values = c("Weekday" = "#1976D2", "Weekend" = "#FF8C00")) +
       labs(title = "Figure R25: Sleep Regularity — Weekday vs Weekend",
-           subtitle = paste0("Violin + boxplot of bedtime and get-up time by day type (Weekend = Sat/Sun). ",
-                             "Bedtime = time_bed_corrected, get-up = time_getup_corrected; bedtime hours >24 are after midnight. N=", nrow(sr), " records."),
+           subtitle = paste0("Violin + boxplot of bedtime and get-up time by day type (weekend = Sat/Sun); N = ", nrow(sr), " records.\n",
+                             "Bedtime = time_bed_corrected, get-up = time_getup_corrected. Bedtime hours above 24 are after midnight (26 = 02:00)."),
            x = "", y = "Clock Hour") +
       theme_minimal(base_size = 11) +
       theme(legend.position = "bottom",
