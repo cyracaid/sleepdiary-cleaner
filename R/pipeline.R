@@ -411,13 +411,28 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
                      row.names = FALSE)
     if (verbose) cat(sprintf("  Exported %d SELF-REPORTED FLAG records\n", nrow(ndf)))
   }
-  log_step(corrected_ema_data, "8", "Auto-detect", cfg)
+  # The auto-detection labels (raw_category) live in checkforerrors_summary,
+  # not in corrected_ema_data, so the ledger used to see no labels for the
+  # checkforerrors standard and recorded NA at every step. Hand the ledger a
+  # copy with the labels attached (matched on pid/day_num/row_id); the pipeline
+  # data itself is not modified.
+  .with_cfe_labels <- function(df) {
+    rs <- checkforerrors_summary$review_summary
+    need <- c("pid", "day_num", "row_id")
+    if (is.data.frame(rs) && all(need %in% names(rs)) && all(need %in% names(df))) {
+      idx <- match(do.call(paste, c(df[need], sep = "|")),
+                   do.call(paste, c(rs[need], sep = "|")))
+      df$raw_category <- as.character(rs$raw_category)[idx]
+    }
+    df
+  }
+  log_step(.with_cfe_labels(corrected_ema_data), "8", "Auto-detect", cfg)
 
   # -- Step 8.5: Cross-participant check -------------------------------
   if (verbose) cat("\n=== Step 8.5: Cross-participant global consistency check ===\n")
   source(file.path(sdir, "cross_participant_global_check.R"), local = TRUE)
   assign("review_output", review_output, envir = .GlobalEnv)
-  log_step(corrected_ema_data, "8.5", "Cross-participant check", cfg)
+  log_step(.with_cfe_labels(corrected_ema_data), "8.5", "Cross-participant check", cfg)
 
   # -- Step 9: Visualization -------------------------------------------
   if (!skip_visualization) {
