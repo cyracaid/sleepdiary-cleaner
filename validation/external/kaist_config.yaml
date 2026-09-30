@@ -1,0 +1,32 @@
+# Config used for the KAIST run (see README.md). Paths are relative to the
+# project directory; put kaist_adapted.csv under external/ there.
+pipeline:
+  name: "KAIST HRV Sleep Diary external validation"
+  version: "1.4.6"
+  data_tag: "unknown"
+data:
+  files:
+    main: external/kaist_adapted.csv
+    extra: ''
+column_mapping:
+  identifiers:
+    pid: pid
+    day_num: day_num
+  timestamp:
+    time_bed_hhmm: time_bed_am_hhmm
+    time_bed_ampm: time_bed_am_ampm
+    time_sleep_hhmm: time_sleep_am_hhmm
+    time_sleep_ampm: time_sleep_am_ampm
+    time_awake_hhmm: time_awake_am_hhmm
+    time_awake_ampm: time_awake_am_ampm
+    time_getup_hhmm: time_getup_am_hhmm
+    time_getup_ampm: time_getup_am_ampm
+  duration:
+    sol: duration_totalmin_sol_estimate_am
+    waso: duration_totalmin_waso_estimate_am
+    nap: duration_totalmin_napstoday_PM
+timestamp:
+  input_format: hh:mm AM/PM
+  midnight_handling: next_day
+normalize:
+  swap_threshold_hours: 3
