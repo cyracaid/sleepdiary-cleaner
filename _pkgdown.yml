@@ -5,6 +5,41 @@ template:
 # Articles are grouped by language (English first, then Chinese) instead of
 # mixing both languages under each topic. The first group's description links
 # to the second, and every article links to its counterpart at the top.
+navbar:
+  components:
+    # The Articles entry opens a menu with the two languages kept apart
+    # (headers "English" / "中文"), instead of one mixed list.
+    articles:
+      text: Articles
+      menu:
+        - text: "English"
+        - text: "Validation Methodology"
+          href: articles/validation-methodology.html
+        - text: "Pipeline Architecture"
+          href: articles/pipeline-architecture.html
+        - text: "Data-first entry: clean_sleep_diary()"
+          href: articles/data-first.html
+        - text: "Column Mapping, Config & Data Format"
+          href: articles/column-mapping.html
+        - text: "Interpreting the Pipeline Output"
+          href: articles/interpreting-output.html
+        - text: "Testing Coverage"
+          href: articles/testing-coverage.html
+        - text: "-------"
+        - text: "中文"
+        - text: "验证方法学"
+          href: articles/validation-methodology-zh.html
+        - text: "管线架构"
+          href: articles/pipeline-architecture-zh.html
+        - text: "列映射、配置与数据格式"
+          href: articles/column-mapping-zh.html
+        - text: "如何读懂管线输出"
+          href: articles/interpreting-output-zh.html
+        - text: "测试覆盖率"
+          href: articles/testing-coverage-zh.html
+        - text: "-------"
+        - text: "All articles / 全部文章"
+          href: articles/index.html
 articles:
   - title: "English"
     desc: >
