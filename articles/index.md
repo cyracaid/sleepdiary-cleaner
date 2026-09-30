@@ -56,7 +56,7 @@
 - [如何读懂管线输出（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output-zh.md):
 
   怎么读 correction_status_final.csv、step flag
-  ledger、回归检查与诊断图表——每个输出的含义和检查要点。
+  ledger、回归检查与诊断图表——每个输出的含义、检查要点，以及每张图的详细参考。
 
 ### Quality / 质量
 
