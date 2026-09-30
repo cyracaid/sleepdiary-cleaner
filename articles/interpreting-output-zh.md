@@ -1,5 +1,8 @@
 # 如何读懂管线输出（中文）
 
+[English
+→](https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output.md)
+
 [`run_pipeline()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_pipeline.md)
 跑完后，两个 CSV
 文件告诉你一切。本文说明怎么读它们、怎么对比上一次运行做回归检查、以及怎么看图。

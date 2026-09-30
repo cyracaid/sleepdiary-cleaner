@@ -1,5 +1,8 @@
 # Testing Coverage
 
+[中文版
+→](https://cyracaid.github.io/sleepdiary-cleaner/articles/testing-coverage-zh.md)
+
 The pipeline includes 200+ testthat expectations across 16 test files,
 all exercising software correctness — does the code do what it was
 designed to do — as distinct from methodological validity, which is

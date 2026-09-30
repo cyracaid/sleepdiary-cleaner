@@ -1,5 +1,8 @@
 # Pipeline Architecture
 
+[中文版
+→](https://cyracaid.github.io/sleepdiary-cleaner/articles/pipeline-architecture-zh.md)
+
 This vignette documents how the sleepcleanr pipeline is structured: the
 steps, the rule families that do the actual cleaning, and the
 classification systems that label every record.

@@ -1,5 +1,8 @@
 # Validation Methodology
 
+[中文版
+→](https://cyracaid.github.io/sleepdiary-cleaner/articles/validation-methodology-zh.md)
+
 This vignette is the full validation walkthrough that appears in
 condensed form in the README. It answers, step by step: does the
 pipeline harm good data? can it catch known errors? does it fix them

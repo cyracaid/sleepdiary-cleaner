@@ -1,5 +1,8 @@
 # Column Mapping, Config & Data Format
 
+[中文版
+→](https://cyracaid.github.io/sleepdiary-cleaner/articles/column-mapping-zh.md)
+
 sleepcleanr is fully configurable via a YAML configuration file: map
 your dataset’s column names to pipeline internals and adjust thresholds
 without modifying any R code.

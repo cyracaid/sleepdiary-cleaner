@@ -1,5 +1,8 @@
 # 管线架构（中文）
 
+[English
+→](https://cyracaid.github.io/sleepdiary-cleaner/articles/pipeline-architecture.md)
+
 本文档说明 sleepcleanr
 管线的结构：清洗步骤、真正干活的规则族、以及给每条记录
 打标签的分类体系。

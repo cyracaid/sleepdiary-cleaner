@@ -1,5 +1,8 @@
 # 列映射、配置与数据格式（中文）
 
+[English
+→](https://cyracaid.github.io/sleepdiary-cleaner/articles/column-mapping.md)
+
 sleepcleanr 通过 YAML
 配置文件完全可配置：把数据集的列名映射到管线内部变量、
 调整阈值，无需修改任何 R 代码。

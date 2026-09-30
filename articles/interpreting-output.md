@@ -1,5 +1,8 @@
 # Interpreting the Pipeline Output
 
+[中文版
+→](https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output-zh.md)
+
 After
 [`run_pipeline()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_pipeline.md)
 finishes, two CSV files tell you everything. This vignette explains how

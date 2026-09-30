@@ -1,5 +1,8 @@
 # 测试覆盖率（中文）
 
+[English
+→](https://cyracaid.github.io/sleepdiary-cleaner/articles/testing-coverage.md)
+
 管线包含 16 个测试文件、200+ 条 testthat
 断言，全部检验软件正确性——代码是否
 按设计跑——区别于方法学效度（后者见验证方法学 vignette）。

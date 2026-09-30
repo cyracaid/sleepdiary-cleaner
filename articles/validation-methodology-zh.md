@@ -1,5 +1,8 @@
 # 验证方法学
 
+[English
+→](https://cyracaid.github.io/sleepdiary-cleaner/articles/validation-methodology.md)
+
 本 vignette 是 README
 中验证部分的中文完整版。它逐步回答：管线会伤害好数据吗？
 能抓住已知错误吗？修得对吗？比什么都不做强吗？让真实数据更好吗？自报本身有多
