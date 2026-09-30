@@ -2,23 +2,28 @@ url: https://cyracaid.github.io/sleepdiary-cleaner/
 destination: docs/
 template:
   bootstrap: 5
+# Articles are grouped by language (English first, then Chinese) instead of
+# mixing both languages under each topic. The first group's description links
+# to the second, and every article links to its counterpart at the top.
 articles:
-  - title: "Validation / 验证"
+  - title: "English"
+    desc: >
+      <span id="english"></span>Choose your language: English articles are
+      listed here; [中文版请看下面 / Chinese articles below ↓](#chinese).
     contents:
       - validation-methodology
-      - validation-methodology-zh
-  - title: "Pipeline / 管线"
-    contents:
       - pipeline-architecture
-      - pipeline-architecture-zh
-  - title: "Usage / 使用"
-    contents:
       - data-first
       - column-mapping
-      - column-mapping-zh
       - interpreting-output
-      - interpreting-output-zh
-  - title: "Quality / 质量"
-    contents:
       - testing-coverage
+  - title: "Chinese (中文)"
+    desc: >
+      <span id="chinese"></span>中文文章。[Back to English ↑](#english)
+      （`data-first` 暂无中文版。）
+    contents:
+      - validation-methodology-zh
+      - pipeline-architecture-zh
+      - column-mapping-zh
+      - interpreting-output-zh
       - testing-coverage-zh

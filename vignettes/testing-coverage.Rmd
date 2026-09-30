@@ -10,6 +10,8 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+<p class="lang-switch" style="text-align:right;margin:0.2em 0 0.8em"><a href="testing-coverage-zh.html">中文版 →</a></p>
+
 ```{r, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```

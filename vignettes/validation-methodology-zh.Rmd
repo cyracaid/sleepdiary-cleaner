@@ -10,6 +10,8 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+<p class="lang-switch" style="text-align:right;margin:0.2em 0 0.8em"><a href="validation-methodology.html">English →</a></p>
+
 ```{r, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
