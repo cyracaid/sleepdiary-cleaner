@@ -2857,7 +2857,7 @@ if (exists("corrected_ema_data") && caf_col %in% names(corrected_ema_data)) {
       labs(title = "Figure 23: Caffeine Consumption Distribution",
            subtitle = sprintf("Based on %d non-NA records | Median: %d cups | Range: %d - %d",
                               length(caf_non_na), median(caf_non_na), min(caf_non_na), max(caf_non_na)),
-           x = "Caffeine (cups/day)", y = "Count") +
+           x = "Caffeine (cups/day)", y = "Number of records") +
       theme_minimal(base_size = 12)
 
     print(p23)
@@ -2888,11 +2888,10 @@ if (exists("corrected_ema_data") && alc_col %in% names(corrected_ema_data)) {
       geom_col(alpha = 0.85, width = 0.7, fill = "#FF8C00") +
       geom_text(aes(label = paste0(n, " (", round(pct, 1), "%)")),
                 vjust = -0.3, size = 3) +
-      scale_x_continuous(breaks = seq(0, max(alc_summary$alcohol_drinks), by = 1)) +
       labs(title = "Figure 24: Alcohol Consumption Distribution",
            subtitle = sprintf("Based on %d non-NA records | Median: %d drinks | Range: %d - %d",
                               length(alc_non_na), median(alc_non_na), min(alc_non_na), max(alc_non_na)),
-           x = "Alcohol (drinks/day)", y = "Count") +
+           x = "Alcohol (drinks/day)", y = "Number of records") +
       theme_minimal(base_size = 12)
 
     print(p24)
