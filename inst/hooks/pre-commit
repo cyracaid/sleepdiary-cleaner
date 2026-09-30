@@ -47,6 +47,16 @@ SENSITIVE_PATTERNS=(
   'ground_truth_enrichment\.csv$'
   'cluster_bootstrap_per_row\.csv$'
   'mrr_per_row\.csv$'
+  # Shapes that leaked before (.bak, ..Rcheck, fasttrack/real_data_config
+  # variants). Anchored on the file name so templates/stub_* and the R scripts
+  # that merely share a word (R/manual_corrections.R) are not caught.
+  '^[^/]+\.(csv|rds|xlsx)$'
+  '(^|/)real_data_config'
+  '(^|/)sber_'
+  '(^|/)manual_[^/]*\.(csv|xlsx|rds)'
+  '(^|/)(fasttrack|disambiguation|tiered|timegap|second_review|cleaned|audit)_[^/]*\.(csv|xlsx|rds)'
+  '\.provenance\.json$'
+  '(^|/)\[NEW\]'
 )
 while IFS= read -r staged_path; do
   [ -z "$staged_path" ] && continue
