@@ -148,3 +148,5 @@ Rplots\.pdf$
 ^paper\.bib$
 ^CONTRIBUTING\.md$
 ^CODE_OF_CONDUCT\.md$
+^LICENSE\.md$
+^VISUALIZATION_TREE_PROPOSAL\.md$

@@ -11,8 +11,6 @@ Authors@R: c(
            comment = c(ORCID = "0000-0001-6987-1339",
                        "Mentor"))
   )
-Author: Cai Dong [aut, cre], Maia ten Brink [aut]
-Maintainer: Cai Dong <cyracaid@gmail.com>
 Description: Reproducible R pipeline for cleaning sleep EMA diary data:
     parses raw timestamps, detects and corrects temporal and duration errors
     through a documented human-in-the-loop workflow, computes standard sleep
