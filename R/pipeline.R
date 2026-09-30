@@ -423,6 +423,10 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   if (!skip_visualization) {
     if (verbose) cat("\n=== Step 9: Generating visualizations ===\n")
     source(file.path(sdir, "sleep_visualization.R"), local = TRUE)
+    # The script resolves its own output directory from the data tag
+    # (real / synth / unknown). Remember it so Step 11 indexes the directory
+    # the figures were actually written to, instead of re-guessing the tag.
+    viz_dir <- output_dir
   }
 
   write_step_ledger(file.path(cfg_get("output.report.dir", "output", cfg = cfg),
@@ -457,11 +461,7 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   # -- Step 11: Generate figure_index contact sheet ---------------------------
   if (!skip_visualization) {
     if (verbose) cat("\n=== Step 11: Generating figure index ===\n")
-    # Compute viz_dir using same logic as sleep_visualization.R
-    viz_dir <- figure_run_dir(cfg = cfg, 
-                              data_tag = if (!is.null(cfg$pipeline$data_tag)) 
-                                          cfg$pipeline$data_tag else "real",
-                              n_records = nrow(corrected_ema_data))
+    # viz_dir was set in Step 9 (the directory sleep_visualization.R wrote to).
     tryCatch(
       run_figure_index(viz_dir),
       error = function(e) {

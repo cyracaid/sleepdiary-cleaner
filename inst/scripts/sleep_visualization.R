@@ -225,6 +225,25 @@ save_png <- function(plot, name, w = NULL, h = NULL, subdir = NULL) {
   rel  <- if (is.null(subdir)) paste0(name, ".png") else file.path(subdir, paste0(name, ".png"))
   path <- file.path(output_dir, rel)
   dir.create(dirname(path), showWarnings = FALSE, recursive = TRUE)
+  # Long subtitles/captions ran off the right edge of the canvas (Figs 3, 4,
+  # 4B, 6, 7, 13C, 13D, 20, 20B, R26). Wrap them to the figure width here so
+  # every figure is covered without editing each labs() call. ~9.5 chars/inch
+  # is conservative for 8-10pt text.
+  .wrap_txt <- function(x) {
+    if (!is.character(x) || length(x) != 1 || is.na(x)) return(x)
+    paste(vapply(strsplit(x, "\n", fixed = TRUE)[[1]],
+                 function(l) paste(strwrap(l, width = floor(w * 9.5)), collapse = "\n"),
+                 character(1)), collapse = "\n")
+  }
+  if (inherits(plot, "patchwork")) {
+    ann <- plot$patches$annotation
+    if (is.character(ann$subtitle)) plot <- plot + patchwork::plot_annotation(subtitle = .wrap_txt(ann$subtitle))
+    if (is.character(ann$caption))  plot <- plot + patchwork::plot_annotation(caption  = .wrap_txt(ann$caption))
+  } else if (inherits(plot, "ggplot")) {
+    lb <- plot$labels
+    if (is.character(lb$subtitle)) plot <- plot + ggplot2::labs(subtitle = .wrap_txt(lb$subtitle))
+    if (is.character(lb$caption))  plot <- plot + ggplot2::labs(caption  = .wrap_txt(lb$caption))
+  }
   ggsave(path, plot, width = w, height = h, dpi = dpi, limitsize = FALSE)
 }
 
@@ -807,18 +826,26 @@ if(all(c("data_category", "manually_corrected", "corrected") %in% names(correcte
                      y = y - 0.38, yend = y - 0.62),
                  arrow = arrow(length = unit(0.10, "inches"), type = "closed"),
                  color = "#616161", linewidth = 0.6) +
-    annotate("text", x = 1.6, y = max(flow$y) - 1, hjust = 0, size = 3.2,
-             label = sprintf(
-               "FINAL RECORD CLASSES (each record gets exactly one):\nNot Reported: %s (%s%%) = one or more timestamps missing\nClean: %s (%s%%) = order intact, nothing odd\nUnusual (Accepted): %s = odd but possible (e.g. >3h gap), reviewed and kept as-is\nError (Reviewed): %s = impossible order (e.g. getup before bed), reviewed and fixed\nEqual Time: %s = bed==sleep and/or awake==getup reported as the same clock time (benign diary habit, zero latency/lingering; sleep==awake would be an ERROR, not this)\nParticipants w/ \u22651 correction: %s / %s (%s%%)",
-               format(n_not_rpt, big.mark = ","), round(n_not_rpt / n_total * 100, 1),
-               format(n_clean, big.mark = ","), round(n_clean / n_total * 100, 1),
-               n_unusual, n_error, n_equal,
-               n_pid_any_corr, n_pid_total, round(n_pid_any_corr / n_pid_total * 100, 1))) +
-    annotate("text", x = 1.6, y = min(flow$y), hjust = 0, size = 3,
+    annotate("text", x = 1.05, y = max(flow$y) - 0.6, hjust = 0, size = 3.2, lineheight = 1.15,
+             label = paste(
+               vapply(c(
+                 "FINAL RECORD CLASSES (each record gets exactly one; first match wins):",
+                 sprintf("Not Reported: %s (%s%%) = any of bed / sleep / awake / getup time is missing",
+                         format(n_not_rpt, big.mark = ","), round(n_not_rpt / n_total * 100, 1)),
+                 sprintf("Error (Reviewed): %s = order broken (not bed \u2264 sleep \u2264 awake \u2264 getup), sleep = awake, a gap > 7 h, or sleep span > 24 h; reviewed and fixed", n_error),
+                 sprintf("Equal Time: %s = bed = sleep and/or awake = getup (difference < 0.01 h, about 36 s), order intact; benign diary habit, not an error", n_equal),
+                 sprintf("Unusual (Accepted): %s = order intact but a gap > 3 h (bed\u2192sleep or awake\u2192getup); odd but possible, reviewed and kept as-is", n_unusual),
+                 sprintf("Clean: %s (%s%%) = order intact, no gap > 3 h",
+                         format(n_clean, big.mark = ","), round(n_clean / n_total * 100, 1)),
+                 sprintf("Participants w/ \u22651 correction: %s / %s (%s%%)",
+                         n_pid_any_corr, n_pid_total, round(n_pid_any_corr / n_pid_total * 100, 1))
+               ), function(l) paste(strwrap(l, width = 68, exdent = 3), collapse = "\n"), character(1)),
+               collapse = "\n")) +
+    annotate("text", x = 1.05, y = min(flow$y), hjust = 0, size = 3,
              color = "#757575",
              label = sprintf("%s%% of raw records enter analysis",
                              round(n_valid / n_total * 100, 1))) +
-    xlim(0, 2.5) + ylim(0.5, length(flow$stage) + 0.5) +
+    xlim(0, 2.3) + ylim(0.5, length(flow$stage) + 0.5) +
     labs(
       title = "Figure 1: Pipeline Record Flow Diagram",
       subtitle = sprintf("N = %s raw diary entries | %s records with computed sleep metrics",
@@ -931,8 +958,9 @@ if (has_raw_times && has_metrics) {
            subtitle = sprintf("SOL corrections (n = %d)", nrow(mod))) +
       theme(legend.position = "none")
   } else {
-    p2a <- ggplot() + annotate("text", x = 0, y = 0, label = "No records modified") + theme_void()
-    p2b <- ggplot() + annotate("text", x = 0, y = 0, label = "No records modified") + theme_void()
+    .none_msg <- "No record was changed by a correction in this run\n(none needed, or the manual-correction files were not applied)"
+    p2a <- ggplot() + annotate("text", x = 0, y = 0, label = .none_msg, size = 3.6) + theme_void()
+    p2b <- ggplot() + annotate("text", x = 0, y = 0, label = .none_msg, size = 3.6) + theme_void()
   }
 
   # --- Panel C: Identity scatter (unchanged as faint backdrop) ---
@@ -962,15 +990,23 @@ if (has_raw_times && has_metrics) {
   )
   tbl_grob <- tableGrob(sum_tbl, rows = NULL, theme = ttheme_minimal(base_size = 9))
 
-  p2 <- (p2a | p2b) / p2c / tbl_grob +
-    plot_layout(heights = c(2, 2, 0.5)) +
+  # When nothing was corrected (e.g. a clean dataset, or the manual-correction
+  # files were not applied) the lollipop panels and the all-on-the-diagonal
+  # scatter are empty -- show one plain message plus the before/after table.
+  p2_body <- if (nrow(mod) > 0) (p2a | p2b) / p2c / tbl_grob else p2a / tbl_grob
+  p2_heights <- if (nrow(mod) > 0) c(2, 2, 0.9) else c(1, 1)
+  p2_subtitle <- if (nrow(mod) > 0) NULL else
+    "PURPOSE: an audit of how much, and in which direction, corrections changed the data.\nNo record was changed in this run, so there is nothing to plot; the table shows the data are identical before and after."
+
+  p2 <- p2_body +
+    plot_layout(heights = p2_heights) +
     plot_annotation(
       title    = "Figure 2: Impact of Corrections on Sleep Metrics",
-      subtitle = "Correction is non-destructive: only clear input errors are corrected. Gray points (most\nof the data) are intentionally left unchanged -- self-report/measured discrepancies are\nretained as data, not treated as errors to fix toward an assumed ground truth.",
+      subtitle = if (!is.null(p2_subtitle)) p2_subtitle else "PURPOSE: an audit of how much, and in which direction, corrections changed the data.\nTop panels: one row per corrected record; line length = change in TST / SOL (minutes, after minus before); orange = algorithmic, blue = manual.\nBottom panel: TST before (x) vs after (y); a dot on the dotted diagonal did not change. Unchanged records are drawn almost transparent.\nCorrection is non-destructive: only clear input errors are corrected; self-report/measured discrepancies are retained as data.",
       caption  = .anno,
       theme    = theme(plot.title    = element_text(hjust = 0.5, size = 14, face = "bold"),
                        plot.subtitle = element_text(hjust = 0.5, size = 9, color = "#424242"),
-                       plot.caption  = element_text(hjust = 0.5, size = 9, color = "#616161"))
+                       plot.caption  = element_text(hjust = 0.5, size = 9, color = "#616161", margin = margin(t = 10)))
     )
 
   print(p2)
@@ -1059,7 +1095,7 @@ if("sleep_duration_h" %in% names(clean_df)) {
                size = 1, show.legend = TRUE) +
     scale_color_manual(values = setNames(
       c("#D32F2F", "#1976D2", "#FF8C00"),
-      c("Density curve (red, smoothed)", .reflines$lab[1], .reflines$lab[2])), name = NULL) +
+      c("Density curve (red, smoothed)", .reflines$lab[1], .reflines$lab[2])), name = "Line shown") +
     scale_linetype_identity() +
     labs(title = "Figure 3: Distribution of Total Sleep Time (TST)",
          subtitle = "TST = Total Sleep Time, i.e. how long participants were actually asleep (final corrected data). Histogram = each bar counts records falling in that duration range.",
@@ -1633,6 +1669,9 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
     geom_text(aes(label = paste0(format(count, big.mark=","), "\n(", round(percentage, 1), "%)")), 
               vjust = -0.3, size = 3) +
     scale_fill_brewer(palette = "Set2") +
+    # Headroom above the tallest bar: without it the count line of its label
+    # sat outside the panel and was clipped (only "(82.7%)" showed).
+    scale_y_continuous(expand = expansion(mult = c(0.02, 0.18))) +
     labs(x = "", y = "Count") +
     theme(axis.text.x = element_text(angle = 45, hjust = 1),
           legend.position = "none")
@@ -1735,7 +1774,10 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
     p13_content <- (p13_bar / plot_spacer() / severity_tab)
     p13_heights <- unit(c(p13_bar_h, p13_spacer_h, severity_tab_h), "in")
   }
-  p13_total_h <- p13_bar_h + p13_spacer_h + severity_tab_h + flag_tab_h + 0.6  # + title/subtitle margin
+  p13_total_h <- p13_bar_h + p13_spacer_h + severity_tab_h + flag_tab_h + 3.4
+  # 3.4in = title/subtitle (~1.0) + rotated x labels and axis title of the bar
+  # panel (~1.9) + margins. Absolute-height panels size the PANEL only, so
+  # omitting the axis/label space clipped the top of the bar chart (2026-09-30).
 
   p13 <- p13_content +
     plot_layout(heights = p13_heights) +
@@ -2061,23 +2103,32 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
   # ==========================================================================
   cat("Generating FIGURE 15 (Timing of flagged temporal patterns)...\n")
 
-  if (all(c("time_bed_corrected", "error_type", "unusual_type") %in% names(clean_df))) {
+  # clean_df is the Step-4 frame (before classification), so it has no
+  # error_type/unusual_type; those are attached at Steps 5-6 and live in
+  # corrected_ema_data (2026-09-30).
+  fig15_src <- get0("corrected_ema_data", envir = .GlobalEnv, ifnotfound = NULL)
 
-    timeline_data <- clean_df %>%
+  if (is.data.frame(fig15_src) &&
+      all(c("time_bed_corrected", "error_type", "unusual_type") %in% names(fig15_src))) {
+
+    timeline_data <- fig15_src %>%
       filter(!is.na(time_bed_corrected), !is.na(error_type) | !is.na(unusual_type)) %>%
-      mutate(date = as.Date(time_bed_corrected),
+      # Monthly bins: with a few dozen flagged records, a per-day stacked area
+      # drew misleading slanted blocks between isolated dates.
+      mutate(date = as.Date(format(as.Date(time_bed_corrected), "%Y-%m-01")),
              pattern_type = ifelse(!is.na(error_type), error_type, unusual_type)) %>%
       group_by(date, pattern_type) %>%
       summarise(count = n(), .groups = "drop")
 
     if (nrow(timeline_data) > 0) {
       p15 <- ggplot(timeline_data, aes(x = date, y = count, fill = pattern_type)) +
-        geom_area(position = "stack", alpha = 0.7) +
+        geom_col(position = "stack", alpha = 0.85, width = 25) +
+        scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
         scale_fill_brewer(palette = "Set2", name = "Pattern Type") +
         labs(title = "Figure 15: Timing of Flagged Temporal Patterns Over the Study Period",
-             subtitle = paste0("Records with a timestamp-order or awake/getup/bed-sleep pattern flag (Step 6 classification), by date. ",
+             subtitle = paste0("Records with a timestamp-order or awake/getup/bed-sleep pattern flag (Step 6 classification), counted per month. ",
                                "A flag is not a verdict that the record is wrong -- most were reviewed and kept unchanged (see Figure 2)."),
-             x = "Date",
+             x = "Month",
              y = "Number of Records") +
         theme(legend.position = "bottom",
               legend.text = element_text(size = 8))
@@ -2087,10 +2138,14 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
       cat("✓ Figure 15 completed\n\n")
     } else {
       cat("ℹ Figure 15: no timestamped error_type/unusual_type records found -- nothing to plot.\n")
+      .mark_skip("pipeline_cleaning/15_Error_Timeline.png",
+                 "No record has both a bed timestamp and an error_type/unusual_type classification.")
       .explain_no_review_figures()
     }
   } else {
-    cat("⚠ Missing time_bed_corrected/error_type/unusual_type in clean_df -- skipping Figure 15\n")
+    cat("⚠ Missing time_bed_corrected/error_type/unusual_type in corrected_ema_data -- skipping Figure 15\n")
+    .mark_skip("pipeline_cleaning/15_Error_Timeline.png",
+               "time_bed_corrected / error_type / unusual_type not present in corrected_ema_data.")
     .explain_no_review_figures()
   }
   
@@ -2125,6 +2180,11 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
           grepl("\\[Metrics\\].*SOL:", auto_error_desc) ~ "SOL metric abnormal",
           grepl("\\[Metrics\\].*SE:", auto_error_desc) ~ "Sleep efficiency abnormal",
           grepl("\\[Metrics\\].*TST/TIB:", auto_error_desc) ~ "TST/TIB ratio abnormal",
+          # SOL window check (window_tolerance_minutes): notes read
+          # "SOL_estimate:exceeds_bed_to_sleep_window", not "SOL:" -- without
+          # this every metric flag fell into "Other" and the figure was skipped.
+          grepl("\\[Metrics\\].*SOL_estimate:", auto_error_desc) ~ "SOL exceeds bed-to-sleep window",
+          grepl("\\[Metrics\\].*WASO_estimate:", auto_error_desc) ~ "WASO estimate inconsistent",
           grepl("duration_totalmin_sol_estimate_am", auto_error_desc) ~ "SOL interval format",
           grepl("duration_totalmin_waso_estimate_am", auto_error_desc) ~ "WASO interval format",
           grepl("\\[Amount\\]", auto_error_desc) ~ "Amount input anomaly",
@@ -2138,14 +2198,18 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
     pattern_dist <- table(pattern_data$specific_pattern)
     print(pattern_dist)
     
+    # "Other" (no named pattern matched) is shown, labelled, and placed last so
+    # a reader sees what share of the queue the named patterns do NOT explain.
+    # The figure is still skipped when nothing at all was named.
     pattern_summary <- pattern_data %>%
-      filter(specific_pattern != "Other") %>%
+      mutate(specific_pattern = ifelse(specific_pattern == "Other",
+                                       "Other / unclassified", specific_pattern)) %>%
       group_by(specific_pattern) %>%
       summarise(count = n(), .groups = "drop") %>%
-      arrange(desc(count)) %>%
+      arrange(specific_pattern == "Other / unclassified", desc(count)) %>%
       mutate(specific_pattern = factor(specific_pattern, levels = rev(unique(specific_pattern))))
     
-    if(nrow(pattern_summary) > 0) {
+    if(any(pattern_summary$specific_pattern != "Other / unclassified")) {
       p16 <- ggplot(pattern_summary, aes(x = specific_pattern, y = count, fill = count)) +
         geom_bar(stat = "identity", alpha = 0.8) +
         geom_text(aes(label = format(count, big.mark=",")), hjust = -0.1, size = 3.5) +
@@ -2228,11 +2292,14 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
         geom_bar(stat = "identity", alpha = 0.7) +
         geom_text(aes(label = sprintf("%.0f%% (%d/%d)", flag_rate_pct, error_count, total_days)),
                   vjust = -0.3, size = 2.8) +
+        scale_y_continuous(expand = expansion(mult = c(0, 0.10))) +
         scale_fill_gradient(low = "#FF8C00", high = "#D32F2F", name = "Flag Rate (%)") +
         labs(title = "Figure 17: Top 15 Participants by Flag Rate (Auto-Detection)",
              subtitle = sprintf("Flags as %% of each participant's own total observed days. Total participants with algorithm-detected issues: %d", length(unique(checkforerrors_processed$pid))),
              x = "Participant ID",
              y = "% of Observed Days Flagged") +
+        guides(fill = guide_colorbar(barwidth = grid::unit(8, "cm"), barheight = grid::unit(0.4, "cm"),
+                                     title.position = "top", title.hjust = 0.5)) +
         theme(axis.text.x = element_text(angle = 45, hjust = 1),
               legend.position = "bottom")
 
@@ -2295,8 +2362,10 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
                   sprintf("%d (%.1f%%)", flagged_records, flagged_records/total_records*100))
       )
       
-      p18_left <- ggplot(summary_stats, aes(x = metric, y = 1, label = value)) +
-        geom_text(size = 5, fontface = "bold") +
+      p18_left <- ggplot(summary_stats, aes(x = metric)) +
+        geom_text(aes(y = 1.06, label = value), size = 6, fontface = "bold") +
+        geom_text(aes(y = 0.92, label = metric), size = 3.4, color = "gray30", lineheight = 1.05) +
+        ylim(0.7, 1.3) +
         labs(title = "Key Metrics", 
              subtitle = "Manually corrected = fixed by human review\nAuto-detected = algorithm-identified potential issues") +
         theme_void() +
@@ -2477,10 +2546,10 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
 
     p26_tab <- tableGrob(display_tbl, rows = NULL,
                           theme = ttheme_minimal(
-                            base_size = 9,
-                            core = list(fg_params = list(hjust = 0, x = 0.03),
+                            base_size = 12,
+                            core = list(fg_params = list(hjust = 0.5, x = 0.5),
                                         bg_params = list(fill = core_bg)),
-                            colhead = list(fg_params = list(hjust = 0, x = 0.03, fontface = "bold"))
+                            colhead = list(fg_params = list(hjust = 0.5, x = 0.5, fontface = "bold"))
                           ))
 
     overall_clean_pct <- clean_df %>%
@@ -2496,15 +2565,15 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
                     "(Minor + Major). Overall %.0f%% of all records are Clean; %d participant(s) are at or ",
                     "above 20%% flagged.\nA high rate marks records worth a manual look -- not data that is ",
                     "wrong. Self-report/measured discrepancies are preserved by design, not corrected ",
-                    "(see Figure 2). Minor = 1 flag, Major = 2+ flags from {SE<%s%%, SOL>%sh, WASO>%sh}."),
+                    "(see Figure 2).\nMinor = 1 flag, Major = 2+ flags from {SE<%s%%, SOL>%sh, WASO>%sh}."),
              n_show, n_participants, overall_clean_pct, n_high_flag,
              cfg_get("classification.flag_severity.poor_efficiency_threshold_pct", 70),
              cfg_get("classification.flag_severity.high_sol_threshold_hours", 1),
              cfg_get("classification.flag_severity.high_waso_threshold_hours", 1.5))) +
-      theme(plot.title = element_text(hjust = 0.5, size = 13, face = "bold"),
-            plot.subtitle = element_text(hjust = 0.5, size = 8, color = "#424242"))
+      theme(plot.title = element_text(hjust = 0.5, size = 15, face = "bold"),
+            plot.subtitle = element_text(hjust = 0.5, size = 10, color = "#424242"))
 
-    p_p26 <- (p26_title / p26_tab) + plot_layout(heights = c(0.35, 1))
+    p_p26 <- (p26_title / p26_tab) + plot_layout(heights = c(0.14, 1))
 
     print(p_p26)
     save_png(p_p26, "P26_PerParticipant_Flag_Rate", subdir = "pipeline_cleaning")
@@ -2551,12 +2620,11 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
     p20 <- ggplot(bias_counts, aes(x = bias, y = count)) +
       geom_col(fill = "#1976D2", alpha = 0.8, width = 1) +
       geom_vline(xintercept = c(15, 60), linetype = "dashed", color = c("orange", "red"), linewidth = 1) +
-      annotate("text", x = c(15, 60), y = Inf, vjust = 2, hjust = 0.02,
+      annotate("text", x = c(15, 60), y = Inf, vjust = 2, hjust = -0.05,
                color = c("orange", "red"), size = 3.1,
                label = c("15 min: small mismatch (minor)",
                          "60 min: large mismatch (notable)")) +
-      annotate("text", x = -Inf, y = Inf, hjust = -0.05, vjust = 2.5, size = 3.2,
-               label = "bias = |computed \u2212 self-reported|  (minutes)") +
+      labs(caption = "bias = |computed \u2212 self-reported|  (minutes)") +
       labs(title = "Figure 20: SOL Perception Bias (Subjective vs Objective)",
       subtitle = paste0("Absolute difference: subjective SOL (self-reported) vs objective SOL (time_sleep - time_bed). N=", length(valid_rows), ".\n",
                         "This gap is preserved, not corrected -- perception/measurement mismatch is signal, not error. ",
@@ -2609,12 +2677,11 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
         p20b <- ggplot(waso_df, aes(x = bias)) +
           geom_histogram(binwidth = 5, fill = "#FF8C00", alpha = 0.7, boundary = 0) +
           geom_vline(xintercept = c(15, 60), linetype = "dashed", color = c("orange", "red"), linewidth = 1) +
-          annotate("text", x = c(15, 60), y = Inf, vjust = 2, hjust = 0.02,
+          annotate("text", x = c(15, 60), y = Inf, vjust = 2, hjust = -0.05,
                    color = c("orange", "red"), size = 3.1,
                    label = c("15 min: small mismatch (minor)",
                              "60 min: large mismatch (notable)")) +
-          annotate("text", x = -Inf, y = Inf, hjust = -0.05, vjust = 2.5, size = 3.2,
-                   label = "bias = |computed \u2212 self-reported|  (minutes)") +
+          labs(caption = "bias = |computed \u2212 self-reported|  (minutes)") +
            labs(title = "Figure 20B: Self-Reported Nighttime Wakefulness vs Post-Awakening Time in Bed",
             subtitle = paste0("Note: self-reported WASO (within sleep period) and post-awakening interval (getup − awake) are different time windows. ",
                               "The latter captures time spent in bed after final awakening, not wakefulness during sleep. N=", length(valid_waso_rows), ".\n",
@@ -2835,6 +2902,18 @@ cat("\n\n")
   xv <- suppressWarnings(as.numeric(x))
   xv[is.finite(xv)]
 }
+# Axis labels for substance amounts: the x axis is categorical (one bar per
+# distinct reported value, in numeric order) so every fractional answer stays
+# visible; common fractions print as plain-text fractions (1/2, 1 1/2, ...).
+.frac_label <- function(v) {
+  x <- suppressWarnings(as.numeric(as.character(v)))
+  out <- as.character(v)
+  out[!is.na(x) & abs(x - 0.5)  < 1e-9] <- "1/2"
+  out[!is.na(x) & abs(x - 1.5)  < 1e-9] <- "1 1/2"
+  out[!is.na(x) & abs(x - 1.25) < 1e-9] <- "1 1/4"
+  out[!is.na(x) & abs(x - 0.25) < 1e-9] <- "1/4"
+  out
+}
 cat("Generating Figure 23 (Caffeine consumption)...\n")
 
 caf_col <- "caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1"
@@ -2851,12 +2930,13 @@ if (exists("corrected_ema_data") && caf_col %in% names(corrected_ema_data)) {
       mutate(pct = n / sum(n) * 100)
 
     p23 <- ggplot(caf_summary, aes(x = factor(caffeine_cups), y = n)) +
+      scale_x_discrete(labels = .frac_label) +
       geom_col(alpha = 0.85, width = 0.7, fill = "#1976D2") +
       geom_text(aes(label = paste0(n, " (", round(pct, 1), "%)")),
                 vjust = -0.3, size = 3) +
       labs(title = "Figure 23: Caffeine Consumption Distribution",
-           subtitle = sprintf("Based on %d non-NA records | Median: %d cups | Range: %d - %d",
-                              length(caf_non_na), median(caf_non_na), min(caf_non_na), max(caf_non_na)),
+           subtitle = sprintf("Based on %d non-NA records | Median: %s cups | Range: %s - %s | Fractional answers (e.g. half a cup) are kept as reported",
+                              length(caf_non_na), format(median(caf_non_na)), format(min(caf_non_na)), format(max(caf_non_na))),
            x = "Caffeine (cups/day)", y = "Number of records") +
       theme_minimal(base_size = 12)
 
@@ -2885,12 +2965,13 @@ if (exists("corrected_ema_data") && alc_col %in% names(corrected_ema_data)) {
       mutate(pct = n / sum(n) * 100)
 
     p24 <- ggplot(alc_summary, aes(x = factor(alcohol_drinks), y = n)) +
+      scale_x_discrete(labels = .frac_label) +
       geom_col(alpha = 0.85, width = 0.7, fill = "#FF8C00") +
       geom_text(aes(label = paste0(n, " (", round(pct, 1), "%)")),
                 vjust = -0.3, size = 3) +
       labs(title = "Figure 24: Alcohol Consumption Distribution",
-           subtitle = sprintf("Based on %d non-NA records | Median: %d drinks | Range: %d - %d",
-                              length(alc_non_na), median(alc_non_na), min(alc_non_na), max(alc_non_na)),
+           subtitle = sprintf("Based on %d non-NA records | Median: %s drinks | Range: %s - %s | Fractional answers are kept as reported",
+                              length(alc_non_na), format(median(alc_non_na)), format(min(alc_non_na)), format(max(alc_non_na))),
            x = "Alcohol (drinks/day)", y = "Number of records") +
       theme_minimal(base_size = 12)
 
@@ -2953,7 +3034,7 @@ if (all(c("time_bed_corrected", "time_getup_corrected") %in% names(corrected_ema
       scale_fill_manual(values = c("Weekday" = "#1976D2", "Weekend" = "#FF8C00")) +
       labs(title = "Figure R25: Sleep Regularity — Weekday vs Weekend",
            subtitle = paste0("Violin + boxplot of bedtime and get-up time by day type (Weekend = Sat/Sun). ",
-                             "Bedtime hours >12 indicate AM. N=", nrow(sr), " records."),
+                             "Bedtime = time_bed_corrected, get-up = time_getup_corrected; bedtime hours >24 are after midnight. N=", nrow(sr), " records."),
            x = "", y = "Clock Hour") +
       theme_minimal(base_size = 11) +
       theme(legend.position = "bottom",
@@ -2995,11 +3076,14 @@ if (all(c("self_diffcalc_totalsleeptime_minutes", "self_diffcalc_sol_minutes",
     stringsAsFactors = FALSE
   )
 
-  p_r26 <- ggplot(avg_comp, aes(x = "", y = pct, fill = component)) +
-    geom_bar(stat = "identity", width = 1, alpha = 0.85) +
-    coord_polar("y", start = 0) +
-    geom_text(aes(label = sprintf("%.1f%%", pct)), position = position_stack(vjust = 0.5), size = 4) +
-    scale_fill_manual(values = c("Total Sleep Time (TST)" = "#2E7D32",
+  # Pie -> single stacked bar: the 5.6% / 3.0% slices' labels collided in the pie.
+  avg_comp$component <- factor(avg_comp$component, levels = avg_comp$component)
+  p_r26 <- ggplot(avg_comp, aes(x = pct, y = "TIB", fill = component)) +
+    geom_col(width = 0.35, alpha = 0.85, position = position_stack(reverse = TRUE)) +
+    geom_text(aes(label = sprintf("%.1f%%", pct)), position = position_stack(vjust = 0.5, reverse = TRUE),
+              size = 4.5, color = "white", fontface = "bold") +
+    scale_x_continuous(limits = c(0, 100), expand = c(0, 0)) +
+    scale_fill_manual(name = NULL, values = c("Total Sleep Time (TST)" = "#2E7D32",
                                  "Sleep Onset Latency (SOL)" = "#FF8C00",
                                  "Wake After Sleep Onset (WASO)" = "#D32F2F")) +
     labs(title = "Figure R26: Sleep Composition — TIB Breakdown",
@@ -3007,7 +3091,7 @@ if (all(c("self_diffcalc_totalsleeptime_minutes", "self_diffcalc_sol_minutes",
                            " valid records after pipeline correction). TIB = TST (Total Sleep Time, asleep) + SOL (Sleep Onset Latency, falling asleep) + WASO (Wake After Sleep Onset, awake in the night)."),
          x = "", y = "") +
     theme_void(base_size = 12) +
-    theme(legend.position = "bottom")
+    theme(legend.position = "bottom", plot.margin = margin(10, 30, 10, 30))
   print(p_r26)
   save_png(p_r26, "R26_Sleep_Composition_TIB_Breakdown", subdir = "research_ready")
   cat("✓ Figure R26 completed\n\n")
@@ -3040,13 +3124,14 @@ if (requireNamespace("corrplot", quietly = TRUE) &&
 
     png(file.path(output_dir, "research_ready", "R27_Sleep_Metrics_Correlation_Matrix.png"),
         width = 8, height = 7, units = "in", res = 150)
+    par(oma = c(0, 0, 4.5, 0))  # outer top margin holds the title/subtitle clear of the rotated labels
     corrplot::corrplot(M, method = "color", type = "upper",
                        tl.col = "black", tl.cex = 0.8,
                        addCoef.col = "black", number.cex = 0.7,
                        col = colorRampPalette(c("#D32F2F", "white", "#2E7D32"))(200),
-                       title = "Figure R27: Sleep Metrics Correlation Matrix",
-                       mar = c(2, 2, 5, 2))
-    mtext(side = 3, line = 0.3, cex = 0.8,
+                       title = "", mar = c(2, 2, 1, 2))
+    mtext("Figure R27: Sleep Metrics Correlation Matrix", side = 3, outer = TRUE, line = 2.4, cex = 1.3, font = 2)
+    mtext(side = 3, outer = TRUE, line = 0.9, cex = 0.8,
           sprintf("Pairwise Pearson correlations (N=%d valid records after pipeline correction). Red = negative, Green = positive.", nrow(cor_data)))
     dev.off()
     # No flat top-level copy: subfolders are the single location for figures
@@ -3311,6 +3396,11 @@ generate_appendix_ledger <- function() {
   invisible(TRUE)
 }
 
+# Run the appendix ledger BEFORE the catalog check below: A1_Step_Flag_Ledger.png
+# is written by it, so checking first reported A1 as "not generated" on every
+# run (2026-09-30).
+generate_appendix_ledger()
+
 # ============================================================================
 # Figures not generated this run (2026-09-17)
 # ----------------------------------------------------------------------------
@@ -3383,9 +3473,7 @@ write.csv(
   file.path(output_dir, "figures_not_generated.csv"), row.names = FALSE
 )
 
-# Run appendix and figure index
-generate_appendix_ledger()
-
+# Figure index (the appendix ledger already ran above, before the catalog check)
 if (exists("generate_figure_index")) {
   generate_figure_index(output_dir)
 } else if (file.exists("make_figure_index.R")) {

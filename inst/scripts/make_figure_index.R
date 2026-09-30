@@ -19,6 +19,10 @@ generate_figure_index <- function(viz_dir) {
     c("pipeline_cleaning/11_Flag_Cooccurrence_Heatmap.png",     1, "Which quality issues co-occur"),
     c("pipeline_cleaning/A1_Step_Flag_Ledger.png",              1, "Per-step flag ledger (merges old Fig 12)"),
     c("pipeline_cleaning/13_Error_Category_Distribution.png",   1, "Error category distribution (absorbs old Fig 19)"),
+    c("pipeline_cleaning/13B_Adjacent_Timestamp_Gaps.png",      2, "Adjacent timestamp gap distribution (raw)"),
+    c("pipeline_cleaning/13C_Detection_Outcomes_Heatmap.png",   2, "Detection outcomes heatmap"),
+    c("pipeline_cleaning/13D_Threshold_vs_Noise_Ratio.png",     2, "Threshold vs noise ratio"),
+    c("pipeline_cleaning/P26_PerParticipant_Flag_Rate.png",     2, "Participants worth a second look"),
     c("pipeline_cleaning/14_Sleep_Duration_Pre_Correction.png", 1, "Pre-correction duration (for before/after comparison)"),
     c("pipeline_cleaning/15_Error_Timeline.png",                1, "Timing of flagged temporal patterns (not a defect count -- most were kept unchanged)"),
     c("pipeline_cleaning/16_Common_Error_Patterns.png",         1, "Most frequent specific error patterns"),
@@ -55,8 +59,8 @@ generate_figure_index <- function(viz_dir) {
   thumb_w   <- 1900L
   cols      <- 2L
   pad       <- 18L
-  cap_h     <- 58L
-  hdr_h     <- 60L
+  cap_h     <- 90L
+  hdr_h     <- 100L
   bg        <- "white"
   
   make_thumb <- function(path, caption) {
@@ -69,7 +73,7 @@ generate_figure_index <- function(viz_dir) {
       label <- paste0(sub("\\.png$", "", basename(path)), "  — ", caption)
       th <- magick::image_blank(magick::image_info(img)$width, cap_h, "gray95")
       th <- magick::image_annotate(th, label, gravity = "west", location = "+8+0",
-                           size = 18, color = "gray20", weight = 400)
+                           size = 40, color = "gray20", weight = 400)
       magick::image_append(c(img, th), stack = TRUE)
     }, error = function(e) {
       cat("[WARNING] Failed to process", path, ":", conditionMessage(e), "\n")
@@ -81,8 +85,10 @@ generate_figure_index <- function(viz_dir) {
     if (length(imgs) == 0) return(NULL)
     tryCatch({
       h <- max(vapply(imgs, function(i) magick::image_info(i)$height, integer(1)))
+      # Centre shorter tiles on a light matte so a short figure (e.g. A1) next
+      # to a tall one does not look like a blank half-figure.
       imgs <- lapply(imgs, function(i) magick::image_extent(i, paste0(magick::image_info(i)$width, "x", h),
-                                                    gravity = "north", color = bg))
+                                                    gravity = "center", color = "gray97"))
       magick::image_append(do.call(c, imgs), stack = FALSE)
     }, error = function(e) {
       cat("[WARNING] row_strip failed:", conditionMessage(e), "\n")
@@ -93,7 +99,7 @@ generate_figure_index <- function(viz_dir) {
   header_bar <- function(text, width) {
     h <- magick::image_blank(width, hdr_h, "gray20")
     h <- magick::image_annotate(h, text, gravity = "west", location = "+14+0",
-                    size = 26, color = "white", weight = 700)
+                    size = 52, color = "white", weight = 700)
   }
   
   blocks <- list()
@@ -136,15 +142,16 @@ generate_figure_index <- function(viz_dir) {
       hdr_missing <- magick::image_blank(full_w_guess, hdr_h, "#D32F2F")
       hdr_missing <- magick::image_annotate(
         hdr_missing, sprintf("%d FIGURE(S) NOT GENERATED THIS RUN", nrow(missing_df)),
-        gravity = "west", location = "+14+0", size = 26, color = "white", weight = 700)
+        gravity = "west", location = "+14+0", size = 52, color = "white", weight = 700)
       strip_rows <- lapply(seq_len(nrow(missing_df)), function(i) {
         label <- sprintf("%s  —  %s", basename(missing_df$file[i]), missing_df$reason[i])
         s <- magick::image_blank(full_w_guess, cap_h, "#FFF3E0")
         magick::image_annotate(s, label, gravity = "west", location = "+8+0",
-                                size = 16, color = "#5D4037", weight = 400)
+                                size = 34, color = "#5D4037", weight = 400)
       })
       missing_body <- magick::image_append(do.call(c, strip_rows), stack = TRUE)
-      blocks[[length(blocks) + 1]] <- magick::image_append(c(hdr_missing, missing_body), stack = TRUE)
+      # Put this block FIRST: at the bottom of a 20,000+ px sheet nobody saw it.
+      blocks <- c(list(magick::image_append(c(hdr_missing, missing_body), stack = TRUE)), blocks)
       cat(sprintf("  (%d figure(s) not generated this run -- listed on the contact sheet)\n", nrow(missing_df)))
     }
   }

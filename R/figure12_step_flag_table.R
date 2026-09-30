@@ -70,7 +70,7 @@ figure12_step_flag_table <- function(cfg = NULL, output_dir = ".", save_png = NU
   # -- Table via grid/gtable only (gridExtra dropped from Imports) -------------
   # Visual contract matches the old gridExtra::tableGrob(ttheme_minimal):
   #   - column header: bold, centred in cell
-  #   - body cells:    right-aligned (hjust = 1, x = 0.95), zebra-striped rows
+  #   - body cells:    centred under their header, zebra-striped rows
   #   - first column (Step): left-aligned, plain weight
   nc <- ncol(disp_chr)
   nr <- nrow(disp_chr)
@@ -89,8 +89,12 @@ figure12_step_flag_table <- function(cfg = NULL, output_dir = ".", save_png = NU
           grid::textGrob(disp_chr[[j]][i], x = 0.05, hjust = 0,
                          gp = grid::gpar(fontsize = 7.2))
         } else {
-          grid::textGrob(disp_chr[[j]][i], x = 0.95, hjust = 1,
-                         gp = grid::gpar(fontsize = 7.2))
+          # Centred under the (centred) header; "not computable" dashes greyed
+          # so the real numbers stand out.
+          is_dash <- identical(disp_chr[[j]][i], "\u2014")
+          grid::textGrob(disp_chr[[j]][i], x = 0.5, hjust = 0.5,
+                         gp = grid::gpar(fontsize = 7.2,
+                                         col = if (is_dash) "grey65" else "black"))
         }
     }
   }
@@ -117,16 +121,20 @@ figure12_step_flag_table <- function(cfg = NULL, output_dir = ".", save_png = NU
   title <- grid::textGrob("1.1 \u2014 Step Flag Ledger",
                     gp = grid::gpar(fontsize = 14, fontface = "bold"))
   sub <- grid::textGrob(paste0("Records in each final-standard flag category at every pipeline step. ",
-                         "\u2014 = not yet computable at that step (first number = generation point). ",
-                         "Corrected = data fixed; Suppressed = human-accepted."),
+                         "\u2014 = not yet computable at that step (first number = generation point)."),
                   gp = grid::gpar(fontsize = 9, col = "grey30"))
-  legend <- grid::textGrob(paste0("DC = data_category (temporal, Step 5)   SEV = flag_severity (metrics, Step 7)   ",
-                            "CFE = checkforerrors (auto-detect, Step 8)   MISentry = field misentry (Step 1.5)"),
-                     gp = grid::gpar(fontsize = 8, col = "grey45"))
+  legend <- grid::textGrob(paste0(
+    "N = records in run.   DC:error = records whose timestamp order is impossible (Step 5).   ",
+    "DC:unusual = odd-but-possible records, kept (Step 5).\n",
+    "SEV:Minor / SEV:Major = records with 1 / 2+ metric flags -- low efficiency, long SOL, long WASO (Step 7).\n",
+    "CFE:flag = records the automatic error check marked for review (Step 8).   ",
+    "MISentry = values entered in the wrong field, e.g. SOL typed as a clock time (Step 1.5).\n",
+    "Corrected = records whose data were fixed.   Suppressed = flags a human reviewed and accepted."),
+    gp = grid::gpar(fontsize = 9, col = "grey30"), just = "centre")
 
   plot_obj <- gtable::gtable(grid::unit(1, "null"),
     grid::unit.c(grid::unit(1.4, "lines"), grid::unit(2.2, "lines"),
-                 grid::unit(1, "null"), grid::unit(1.4, "lines")),
+                 grid::unit(1, "null"), grid::unit(5.5, "lines")),
     name = "fig12")
   plot_obj <- gtable::gtable_add_grob(plot_obj,
     list(title, sub, tab, legend),
