@@ -17,12 +17,10 @@ Source:
 Dong, C., & ten Brink, M. (2026). sleepcleanr: Reproducible Sleep EMA
 Diary Data Cleaning Pipeline \[R package\].
 https://github.com/cyracaid/sleepdiary-cleaner
-doi:10.5281/zenodo.0000000
 
     @Manual{,
       title = {sleepcleanr: Reproducible Sleep EMA Diary Data Cleaning Pipeline},
       author = {Cai Dong and Maia {ten Brink}},
       year = {2026},
       url = {https://github.com/cyracaid/sleepdiary-cleaner},
-      doi = {10.5281/zenodo.0000000},
     }

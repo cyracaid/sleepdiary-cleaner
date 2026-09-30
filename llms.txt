@@ -1,6 +1,5 @@
 # sleepcleanr — Reproducible cleaning pipeline for sleep EMA diary data
 
-[![CRAN](https://img.shields.io/cran/v/sleepcleanr?style=flat-square&color=blue)](https://cran.r-project.org/package=sleepcleanr)
 [![GitHub
 stars](https://img.shields.io/github/stars/cyracaid/sleepdiary-cleaner?style=flat-square)](https://github.com/cyracaid/sleepdiary-cleaner)
 [![License:
@@ -8,9 +7,6 @@ MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)](https://
 [![R-CMD-check](https://img.shields.io/github/actions/workflow/status/cyracaid/sleepdiary-cleaner/R-CMD-check.yaml?style=flat-square&label=R--CMD--check)](https://github.com/cyracaid/sleepdiary-cleaner/actions/workflows/R-CMD-check.yaml)
 [![Codecov](https://img.shields.io/codecov/c/github/cyracaid/sleepdiary-cleaner?style=flat-square&color=orange)](https://app.codecov.io/gh/cyracaid/sleepdiary-cleaner)
 [![Docs](https://img.shields.io/badge/docs-pkgdown-blue?style=flat-square)](https://cyracaid.github.io/sleepdiary-cleaner/)
-[![awesomeskills](https://img.shields.io/badge/awesomeskills.dev-listed-brightgreen?style=flat-square)](https://www.awesomeskills.dev/zh-CN/skill/cyracaid-sleepdiary-cleaner)
-[![awesome-R
-PR](https://img.shields.io/badge/awesome--R-PR_276-open?style=flat-square)](https://github.com/qinwf/awesome-R/pull/276)
 
 > **[English](#english) · [中文](#%E4%B8%AD%E6%96%87)**
 
@@ -49,15 +45,15 @@ Psychophysiology Laboratory’s intensive-longitudinal sleep study.
 **Why sleepcleanr?**
 
 - 🔍 **Detects** not auto-fixes — 1,048 records flagged for manual
-  review, 0 silent misrepairs (field-misentry silent-misrepair bug, 96%
-  in v1.4.0, fixed in v1.4.4+; current benchmark: 0% silent misrepair
-  for SOL/WASO)
+  review in the v1.4.5 audit, 0 silent misrepairs (field-misentry
+  silent-misrepair bug, 96% in v1.4.0, fixed in v1.4.4+; current
+  benchmark: 0% silent misrepair for SOL/WASO)
 - 📊 **Auditable** — every change logged and reversible; non-destructive
   architecture
 - ✅ **Validated** — 9-step validation chain: synthetic (0.995 recall) +
   real data (92% improved) + robustness proof
-- 🚀 **Reproducible** — YAML config, full pipeline documentation, 308
-  unit tests passing
+- 🚀 **Reproducible** — YAML config, full pipeline documentation,
+  automated test suite run in CI (R-CMD-check, Codecov)
 - 🎯 **Research-ready** — generates publication-quality figures +
   correlation matrices
 
@@ -137,10 +133,11 @@ METHODS Stage 7):
 | **AMOUNT**        | Substance input anomalies                               | negative, excessive digits, filler codes (888/999)      |
 | **SELF_REPORTED** | SOL/WASO vs timestamp-window mismatch                   | SOL \> bed→sleep window, SE\>100%, etc.                 |
 
-**Flag statistics (v1.4.5, n=13,990):** 1,048 records flagged (7.5%); 0
-AUTO_FIX; 0 silent corrections. Breakdown: 922 TIMESTAMP (window
-violations), 140 DURATION (order violations), 1 SELF_REPORTED (extreme),
-1 redundancy-confirmed worsening. See `VALIDATION_REPORT.md` for full
+**Flag statistics (snapshot at v1.4.5, n=13,990; each run prints the
+current review queue):** 1,048 records flagged (7.5%); 0 AUTO_FIX; 0
+silent corrections. Breakdown: 922 TIMESTAMP (window violations), 140
+DURATION (order violations), 1 SELF_REPORTED (extreme), 1
+redundancy-confirmed worsening. See `VALIDATION_REPORT.md` for full
 breakdown.
 
 ### Validation Map
@@ -186,9 +183,8 @@ breakdown.
 ## Install
 
 ``` r
-# From GitHub (available on CRAN as sleepcleanr)
+# From GitHub (not yet on CRAN)
 renv::install("cyracaid/sleepdiary-cleaner")
-# or: install.packages("sleepcleanr")
 ```
 
 ## Quick start
@@ -213,6 +209,17 @@ res$manifest                                      # provenance: input hash, conf
 # Preview the inferred mapping without running anything:
 clean_sleep_diary("my_diary.csv", dry_run = TRUE) # writes dry_run_manifest.json, no data written
 ```
+
+## Run the tests, report a problem, contribute
+
+``` r
+devtools::test()   # from a clone of the repository; the same suite runs in CI
+```
+
+Bugs, questions and feature requests: open an
+[issue](https://github.com/cyracaid/sleepdiary-cleaner/issues).
+Contribution guidelines are in
+[`CONTRIBUTING.md`](https://cyracaid.github.io/sleepdiary-cleaner/CONTRIBUTING.md).
 
 ## Learn more
 
@@ -364,9 +371,8 @@ sleepcleanr 刻意**既非全自动、也非全部人工 flag**：
 ## 安装
 
 ``` r
-# 从 GitHub 安装（已上线 CRAN，包名 sleepcleanr）
+# 从 GitHub 安装（尚未上线 CRAN，包名 sleepcleanr）
 renv::install("cyracaid/sleepdiary-cleaner")
-# 或: install.packages("sleepcleanr")
 ```
 
 ## 快速开始
@@ -382,6 +388,17 @@ file.copy(system.file("config_template.yaml", package = "sleepcleanr"),
           "my_study.yaml")
 # 编辑 my_study.yaml → run_pipeline(config = "my_study.yaml")
 ```
+
+## 运行测试、反馈问题、参与贡献
+
+``` r
+devtools::test()   # 在仓库克隆目录中运行；CI 里跑的是同一套测试
+```
+
+Bug、问题和功能建议：请开
+[issue](https://github.com/cyracaid/sleepdiary-cleaner/issues)。
+贡献指南见
+[`CONTRIBUTING.md`](https://cyracaid.github.io/sleepdiary-cleaner/CONTRIBUTING.md)。
 
 ## 了解更多
 
