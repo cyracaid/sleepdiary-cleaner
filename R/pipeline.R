@@ -353,7 +353,7 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
     data.frame()
   }
   manual_unusual <- if (file.exists(manual_unusual_path)) {
-    utils::read.csv(manual_unusual_path, fileEncoding = "UTF-8-BOM")
+    .read_manual_csv(manual_unusual_path)
   } else {
     if (verbose) cat(sprintf("  [WARN] %s not found -- using empty unusual\n", manual_unusual_path))
     data.frame()
