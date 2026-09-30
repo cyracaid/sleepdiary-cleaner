@@ -359,6 +359,14 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
     data.frame()
   }
   names(manual_unusual) <- gsub("^X\\.\\.\\.|^X\\.|^\\.", "", names(manual_unusual))
+  # Show, on every row of the [NEW] worksheets, where (if anywhere) it has
+  # already been handled in the manual files. Non-fatal.
+  .review_ws <- tryCatch(
+    annotate_review_worksheets(manual_corrections, manual_unusual, verbose),
+    error = function(e) {
+      if (verbose) cat("  [review worksheets] not annotated:", conditionMessage(e), "\n")
+      list()
+    })
   rm(generated_files, generate_correction_files); if (verbose) gc()
 
   # -- Step 5.75: Second-review consensus ------------------------------
@@ -433,6 +441,14 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   source(file.path(sdir, "cross_participant_global_check.R"), local = TRUE)
   assign("review_output", review_output, envir = .GlobalEnv)
   log_step(.with_cfe_labels(corrected_ema_data), "8.5", "Cross-participant check", cfg)
+
+  # After the re-check of the corrected data: how many handled rows are still a
+  # problem? Print only; nothing is written and the data are not touched.
+  tryCatch(
+    print_review_summary(.review_ws, corrected_ema_data, review_output$data_with_flags,
+                         applied = .include_manual, verbose = verbose),
+    error = function(e) if (verbose) cat("  [review progress] skipped:", conditionMessage(e), "\n")
+  )
 
   # -- Step 9: Visualization -------------------------------------------
   if (!skip_visualization) {

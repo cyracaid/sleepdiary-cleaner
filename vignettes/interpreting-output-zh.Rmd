@@ -245,8 +245,10 @@ Step 5：给全部记录分类 → 写出 [NEW]manual_error_correction_review.cs
    ↓
 下一次管线运行：Step 6 应用你的修正，重新推导一切
    ↓
-Step 5 重新分类：已修正的记录不再是错误 → 它们从新的 [NEW]
-   文件里消失。循环，直到 [NEW] 文件变空。
+Step 5 会列出规则在修正之前的数据上标记的所有记录，所以你已经处理过的
+   行也会再列一遍。新增的四列告诉你每一行（如果有）在哪里处理过；运行结束
+   时还会打印一段汇总。循环，直到没有未处理的行、也没有仍然有问题的行
+   （见"怎么知道做完了"）。
 ```
 
 **什么会让一条记录进入审查堆（精确规则，按优先级）：**
@@ -277,10 +279,19 @@ Equal-time 记录会得到一个标签，但**永远不会进入审查文件**�
 | 解析后时间 | `time_bed/sleep/awake/getup_corrected` | 管线目前最好的猜测 |
 | 差值 | `bed_sleep_diff_h`, `sleep_awake_diff_h`, `awake_getup_diff_h`, `reasonable_temporal_order` | 上面那些规则据以触发的数字 |
 | 机器判定 | `error_type`, `corrected`, `correction_type` | 哪条规则触发了；算法是否已经修正 |
-| **人工填写** | `problem_humanidentified`, `solution_humanidentified`, `column_to_correct`, `correct_value`, `manually_corrected` | 末尾的空白列——写清楚哪一列错了、正确值是什么、你是否已经修正 |
+| **人工填写** | `problem_humanidentified`, `solution_humanidentified`, `column_to_correct`, `correct_value`, `manually_corrected` | 空白列——写清楚哪一列错了、正确值是什么、你是否已经修正 |
+| **在哪里处理过**（管线添加） | `in_manual_file`, `review_resolution`, `resolved_at`, `resolved_by` | 从你的人工文件里对应的那一行带过来。四列全空表示这条记录还没人处理过 |
 
-**为什么这个循环会收敛：** 一条被修正的记录不再违反最初标记它的那条规则，于是它就不会再出现在下一份 `[NEW]` 文件里。每一轮审查堆都会变小；直到 `[NEW]` 文件变空为止。在真实研究数据上，这花了几轮循环，最终产出 75 条 error + 37 条 unusual 的人工确认修正（见
-Methods 部分 Stage 5）。
+**怎么知道做完了。** `[NEW]` 文件总是列出规则在*修正之前*的数据上标记的所有记录，所以它不会缩到空。要看新增的四列：
+
+| 看到的情况 | 含义 |
+|---|---|
+| 四列全空 | 从没处理过——要做的 |
+| `corrected` 加 `resolved_by` | 已处理并有记录 |
+| `resolution_unknown_legacy` / `legacy` | 处理过，但没人记录是谁、什么时候（可以补上） |
+| `flagged_unresolved`，或 `resolved_by` 为 `pending` | 等待确认 |
+
+每次运行结束时，管线会打印每张待审表里各状态的行数，以及有多少条**已处理的行在自动复查之后仍然有问题**（仍是 error，或仍被标记）。改过的记录仍可能通不过复查，所以最后这个数很重要。当没有未处理或待确认的行、也没有仍有问题的行时，就做完了。在真实研究数据上，最终产出了 75 条 error + 37 条 unusual 的人工确认修正（见 Methods 部分 Stage 5）。
 
 **已验证数字的来源：** 一次受控重跑（2026-09-29）精确量化了人工修正对最终数据集的影响：不含人工修正时，1,719 条记录有可计算的总睡眠时间，61 条仍留在 `error` 类；含人工修正时，1,729 条记录有效（净增 10），85 条记录带有人工修正，只有 3 条仍是 error。11 条被
 "解锁"的记录原本是 `error` 类，修正后的时间戳让 TST 首次可以计算（293–590 分钟）；一条极端记录（TST = 10 分钟）在修正后被正确地退出了有效集合。

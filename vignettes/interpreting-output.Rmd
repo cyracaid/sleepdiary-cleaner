@@ -256,8 +256,10 @@ Remove the [NEW] prefix → save as manual_error_corrections.csv /
    ↓
 NEXT pipeline run: Step 6 applies your corrections, re-derives everything
    ↓
-Step 5 re-classifies: fixed records are no longer errors → they vanish
-   from the new [NEW] files. Loop until the [NEW] files come back empty.
+Step 5 lists every record the rules flag on the data BEFORE corrections, so
+   rows you already handled are listed again. Four columns tell you where
+   (if anywhere) each row was handled; the run ends with a summary. Loop until
+   no row is unhandled and none is still a problem (see "How to know you are done").
 ```
 
 **What puts a record on the review pile (the exact rules, in priority order):**
@@ -291,13 +293,19 @@ benign (see the Terminology section).
 | Parsed times | `time_bed/sleep/awake/getup_corrected` | Pipeline's current best guess |
 | Diffs | `bed_sleep_diff_h`, `sleep_awake_diff_h`, `awake_getup_diff_h`, `reasonable_temporal_order` | The numbers the rules above fired on |
 | Machine verdict | `error_type`, `corrected`, `correction_type` | Which rule fired; whether the algorithm already fixed it |
-| **Human fills in** | `problem_humanidentified`, `solution_humanidentified`, `column_to_correct`, `correct_value`, `manually_corrected` | Blank columns at the end — write which column is wrong, what the right value is, and whether you fixed it |
+| **Human fills in** | `problem_humanidentified`, `solution_humanidentified`, `column_to_correct`, `correct_value`, `manually_corrected` | Blank columns — write which column is wrong, what the right value is, and whether you fixed it |
+| **Where it was handled** (added by the pipeline) | `in_manual_file`, `review_resolution`, `resolved_at`, `resolved_by` | Copied from the matching row of your manual file. All four empty means nobody has handled this record yet |
 
-**Why the loop converges:** a corrected record no longer violates the rule
-that flagged it, so it stops appearing in the next `[NEW]` file. Each cycle
-the pile shrinks; you stop when the `[NEW]` files come back empty. On the real
-study data this took a handful of cycles and ended with 75 error + 37 unusual
-human-verified corrections (see the Methods section, Stage 5).
+**How to know you are done.** The `[NEW]` files always list every record the rules flag on the data as it stands *before* corrections, so they do not shrink to empty. Read the four added columns instead:
+
+| What you see | Meaning |
+|---|---|
+| all four empty | never handled — to do |
+| `corrected` with `resolved_by` | handled and recorded |
+| `resolution_unknown_legacy` / `legacy` | handled, but nobody recorded who or when (you can fill that in) |
+| `flagged_unresolved`, or `resolved_by` = `pending` | waiting for confirmation |
+
+At the end of each run the pipeline prints how many rows of each worksheet are in each state, and how many handled rows are **still a problem after the automatic re-check** (still an error, or still flagged). Corrected records can still fail that re-check, so that last number matters. You are done when no row is unhandled or pending and none is still a problem. On the real study data this ended with 75 error + 37 unusual human-verified corrections (see the Methods section, Stage 5).
 
 **Where the validated numbers come from:** a controlled re-run (2026-09-29)
 showed exactly what the manual corrections do to the final dataset: without
