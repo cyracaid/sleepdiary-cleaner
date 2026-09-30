@@ -34,7 +34,27 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="active nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
+<li class="active nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><h6 class="dropdown-header" data-toc-skip>English</h6></li>
+    <li><a class="dropdown-item" href="../articles/validation-methodology.html">Validation Methodology</a></li>
+    <li><a class="dropdown-item" href="../articles/pipeline-architecture.html">Pipeline Architecture</a></li>
+    <li><a class="dropdown-item" href="../articles/data-first.html">Data-first entry: clean_sleep_diary()</a></li>
+    <li><a class="dropdown-item" href="../articles/column-mapping.html">Column Mapping, Config &amp; Data Format</a></li>
+    <li><a class="dropdown-item" href="../articles/interpreting-output.html">Interpreting the Pipeline Output</a></li>
+    <li><a class="dropdown-item" href="../articles/testing-coverage.html">Testing Coverage</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>中文</h6></li>
+    <li><a class="dropdown-item" href="../articles/validation-methodology-zh.html">验证方法学</a></li>
+    <li><a class="dropdown-item" href="../articles/pipeline-architecture-zh.html">管线架构</a></li>
+    <li><a class="dropdown-item" href="../articles/column-mapping-zh.html">列映射、配置与数据格式</a></li>
+    <li><a class="dropdown-item" href="../articles/interpreting-output-zh.html">如何读懂管线输出</a></li>
+    <li><a class="dropdown-item" href="../articles/testing-coverage-zh.html">测试覆盖率</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../articles/index.html">All articles / 全部文章</a></li>
+  </ul>
+</li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -722,8 +742,10 @@ Remove the [NEW] prefix → save as manual_error_corrections.csv /
    ↓
 NEXT pipeline run: Step 6 applies your corrections, re-derives everything
    ↓
-Step 5 re-classifies: fixed records are no longer errors → they vanish
-   from the new [NEW] files. Loop until the [NEW] files come back empty.</code></pre>
+Step 5 lists every record the rules flag on the data BEFORE corrections, so
+   rows you already handled are listed again. Four columns tell you where
+   (if anywhere) each row was handled; the run ends with a summary. Loop until
+   no row is unhandled and none is still a problem (see "How to know you are done").</code></pre>
 <p><strong>What puts a record on the review pile (the exact rules, in
 priority order):</strong></p>
 <p><em>ERROR — physically impossible, must be fixed
@@ -802,17 +824,68 @@ section).</p>
 <code>solution_humanidentified</code>, <code>column_to_correct</code>,
 <code>correct_value</code>, <code>manually_corrected</code>
 </td>
-<td>Blank columns at the end — write which column is wrong, what the
-right value is, and whether you fixed it</td>
+<td>Blank columns — write which column is wrong, what the right value
+is, and whether you fixed it</td>
+</tr>
+<tr class="odd">
+<td>
+<strong>Where it was handled</strong> (added by the pipeline)</td>
+<td>
+<code>in_manual_file</code>, <code>review_resolution</code>,
+<code>resolved_at</code>, <code>resolved_by</code>
+</td>
+<td>Copied from the matching row of your manual file. All four empty
+means nobody has handled this record yet</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Why the loop converges:</strong> a corrected record no longer
-violates the rule that flagged it, so it stops appearing in the next
-<code>[NEW]</code> file. Each cycle the pile shrinks; you stop when the
-<code>[NEW]</code> files come back empty. On the real study data this
-took a handful of cycles and ended with 75 error + 37 unusual
-human-verified corrections (see the Methods section, Stage 5).</p>
+<p><strong>How to know you are done.</strong> The <code>[NEW]</code>
+files always list every record the rules flag on the data as it stands
+<em>before</em> corrections, so they do not shrink to empty. Read the
+four added columns instead:</p>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th>What you see</th>
+<th>Meaning</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>all four empty</td>
+<td>never handled — to do</td>
+</tr>
+<tr class="even">
+<td>
+<code>corrected</code> with <code>resolved_by</code>
+</td>
+<td>handled and recorded</td>
+</tr>
+<tr class="odd">
+<td>
+<code>resolution_unknown_legacy</code> / <code>legacy</code>
+</td>
+<td>handled, but nobody recorded who or when (you can fill that in)</td>
+</tr>
+<tr class="even">
+<td>
+<code>flagged_unresolved</code>, or <code>resolved_by</code> =
+<code>pending</code>
+</td>
+<td>waiting for confirmation</td>
+</tr>
+</tbody>
+</table>
+<p>At the end of each run the pipeline prints how many rows of each
+worksheet are in each state, and how many handled rows are <strong>still
+a problem after the automatic re-check</strong> (still an error, or
+still flagged). Corrected records can still fail that re-check, so that
+last number matters. You are done when no row is unhandled or pending
+and none is still a problem. On the real study data this ended with 75
+error + 37 unusual human-verified corrections (see the Methods section,
+Stage 5).</p>
 <p><strong>Where the validated numbers come from:</strong> a controlled
 re-run (2026-09-29) showed exactly what the manual corrections do to the
 final dataset: without them, 1,719 records have computable total sleep

@@ -66,12 +66,15 @@ dataset \[@baigutanova2025hrv\] — 49 healthy adults’ four-week sleep
 diaries (1,372 entries, 24-hour clock format, a different schema with no
 separate get-up field) — the pipeline ran end-to-end without
 intervention and recovered the source study’s sleep metrics (mean total
-sleep time 7.55 h). That external run also exposed two input-handling
-defects, which are fixed in the current version. Researchers collecting
-longitudinal diary data with free-text time entries — in sleep, affect,
-or any protocol where participants type clock times — should find the
-pipeline directly usable. Column mapping is configurable via YAML, or
-inferred by a recorded, fail-loud guessing function. A data-first entry
-point accepts an in-memory data frame without any config file.
+sleep time 7.55 h). This is a feasibility check on data without ground
+truth: it shows that the pipeline runs unmodified and reproduces a
+published metric, not how accurately it detects errors. That external
+run also exposed two input-handling defects, which are fixed in the
+current version. Researchers collecting longitudinal diary data with
+free-text time entries — in sleep, affect, or any protocol where
+participants type clock times — should find the pipeline directly
+usable. Column mapping is configurable via YAML, or inferred by a
+recorded, fail-loud guessing function. A data-first entry point accepts
+an in-memory data frame without any config file.
 
 # References

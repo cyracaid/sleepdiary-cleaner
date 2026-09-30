@@ -32,7 +32,27 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="active nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
+<li class="active nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><h6 class="dropdown-header" data-toc-skip>English</h6></li>
+    <li><a class="dropdown-item" href="../articles/validation-methodology.html">Validation Methodology</a></li>
+    <li><a class="dropdown-item" href="../articles/pipeline-architecture.html">Pipeline Architecture</a></li>
+    <li><a class="dropdown-item" href="../articles/data-first.html">Data-first entry: clean_sleep_diary()</a></li>
+    <li><a class="dropdown-item" href="../articles/column-mapping.html">Column Mapping, Config &amp; Data Format</a></li>
+    <li><a class="dropdown-item" href="../articles/interpreting-output.html">Interpreting the Pipeline Output</a></li>
+    <li><a class="dropdown-item" href="../articles/testing-coverage.html">Testing Coverage</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>中文</h6></li>
+    <li><a class="dropdown-item" href="../articles/validation-methodology-zh.html">验证方法学</a></li>
+    <li><a class="dropdown-item" href="../articles/pipeline-architecture-zh.html">管线架构</a></li>
+    <li><a class="dropdown-item" href="../articles/column-mapping-zh.html">列映射、配置与数据格式</a></li>
+    <li><a class="dropdown-item" href="../articles/interpreting-output-zh.html">如何读懂管线输出</a></li>
+    <li><a class="dropdown-item" href="../articles/testing-coverage-zh.html">测试覆盖率</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../articles/index.html">All articles / 全部文章</a></li>
+  </ul>
+</li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -654,8 +674,10 @@ AI）只需要填写<em>正确的值应该是什么</em>。循环是这样运作
    ↓
 下一次管线运行：Step 6 应用你的修正，重新推导一切
    ↓
-Step 5 重新分类：已修正的记录不再是错误 → 它们从新的 [NEW]
-   文件里消失。循环，直到 [NEW] 文件变空。</code></pre>
+Step 5 会列出规则在修正之前的数据上标记的所有记录，所以你已经处理过的
+   行也会再列一遍。新增的四列告诉你每一行（如果有）在哪里处理过；运行结束
+   时还会打印一段汇总。循环，直到没有未处理的行、也没有仍然有问题的行
+   （见"怎么知道做完了"）。</code></pre>
 <p><strong>什么会让一条记录进入审查堆（精确规则，按优先级）：</strong></p>
 <p><em>ERROR——物理上不可能，必须修正（<code>generate_correction_files.R:315</code>）：</em>
 1. <code>sleep_awake_equal_error</code> — 入睡时间 ==
@@ -730,15 +752,60 @@ bed → sleep → awake → getup 的顺序被违反（比如起床早于就寝�
 <code>solution_humanidentified</code>, <code>column_to_correct</code>,
 <code>correct_value</code>, <code>manually_corrected</code>
 </td>
-<td>末尾的空白列——写清楚哪一列错了、正确值是什么、你是否已经修正</td>
+<td>空白列——写清楚哪一列错了、正确值是什么、你是否已经修正</td>
+</tr>
+<tr class="odd">
+<td>
+<strong>在哪里处理过</strong>（管线添加）</td>
+<td>
+<code>in_manual_file</code>, <code>review_resolution</code>,
+<code>resolved_at</code>, <code>resolved_by</code>
+</td>
+<td>从你的人工文件里对应的那一行带过来。四列全空表示这条记录还没人处理过</td>
 </tr>
 </tbody>
 </table>
-<p><strong>为什么这个循环会收敛：</strong>
-一条被修正的记录不再违反最初标记它的那条规则，于是它就不会再出现在下一份
-<code>[NEW]</code> 文件里。每一轮审查堆都会变小；直到 <code>[NEW]</code>
-文件变空为止。在真实研究数据上，这花了几轮循环，最终产出 75 条 error +
-37 条 unusual 的人工确认修正（见 Methods 部分 Stage 5）。</p>
+<p><strong>怎么知道做完了。</strong> <code>[NEW]</code>
+文件总是列出规则在<em>修正之前</em>的数据上标记的所有记录，所以它不会缩到空。要看新增的四列：</p>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th>看到的情况</th>
+<th>含义</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>四列全空</td>
+<td>从没处理过——要做的</td>
+</tr>
+<tr class="even">
+<td>
+<code>corrected</code> 加 <code>resolved_by</code>
+</td>
+<td>已处理并有记录</td>
+</tr>
+<tr class="odd">
+<td>
+<code>resolution_unknown_legacy</code> / <code>legacy</code>
+</td>
+<td>处理过，但没人记录是谁、什么时候（可以补上）</td>
+</tr>
+<tr class="even">
+<td>
+<code>flagged_unresolved</code>，或 <code>resolved_by</code> 为
+<code>pending</code>
+</td>
+<td>等待确认</td>
+</tr>
+</tbody>
+</table>
+<p>每次运行结束时，管线会打印每张待审表里各状态的行数，以及有多少条<strong>已处理的行在自动复查之后仍然有问题</strong>（仍是
+error，或仍被标记）。改过的记录仍可能通不过复查，所以最后这个数很重要。当没有未处理或待确认的行、也没有仍有问题的行时，就做完了。在真实研究数据上，最终产出了
+75 条 error + 37 条 unusual 的人工确认修正（见 Methods 部分 Stage
+5）。</p>
 <p><strong>已验证数字的来源：</strong>
 一次受控重跑（2026-09-29）精确量化了人工修正对最终数据集的影响：不含人工修正时，1,719
 条记录有可计算的总睡眠时间，61 条仍留在 <code>error</code>
