@@ -34,7 +34,7 @@ This is a deliberate design choice, not incomplete cleaning.
 | Synthetic  | 2\. Injected-error benchmark        | pooled recall 0.995 \[0.993, 0.997\]; specificity 1.0                                |
 | Synthetic  | 3\. Detection vs value-correctness  | L1/L3 gap, e.g. ampm_swap L1 1.0 / L3 0.565 (uncertain restorations → human)         |
 | Synthetic  | 4\. Controls                        | no_cleaning 0.000 / naive_rule 0.623 / pipeline 0.995                                |
-| Real       | 5\. Redundant-channel               | 81/88 corrections improved; 1 bad rule found & guarded (v1.4.3)                      |
+| Real       | 5\. Redundant-channel               | 80/81 corrections improved (98.8%); 1 bad rule found & guarded (v1.4.3)              |
 | Real       | 5.5 Bland-Altman                    | SOL ±75-min noise band → SOL flags INSIDE NOISE (descriptive, human); WASO 3.3× SAFE |
 | Real       | 6\. Report-only audit               | 0 AUTO_FIX, 1048 FLAG (922 window violations, 140 order violations)                  |
 | Real       | 7\. Co-review agreement             | 64.0% (n=75) / 89.2% (n=37), not κ                                                   |

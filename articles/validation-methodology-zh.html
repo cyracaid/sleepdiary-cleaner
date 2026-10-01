@@ -24,7 +24,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.9</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -121,7 +121,7 @@ truth：没有人能确定参与者在时长字段里填「10:30」时
 
   真实数据层（n = 13,990，无需合成标准）
   ────────────────────────────────────────────
-  第 5 步：冗余通道验证 ─── 校正把值移向自报：81/88（92%）改进；
+  第 5 步：冗余通道验证 ─── 校正把值移向自报：80/81（98.8%）改进；
            发现 1 条坏规则并加守卫（v1.4.3）
                     │
                     ▼
@@ -293,14 +293,17 @@ caught”表述混淆了自动修正与人工复核路由；管线真实作用�
 的校正逻辑从不读取自报时长列（源码检查确认），所以校正后比较两者是非循环的。直接在真实生产数据（n
 = 13,990）上跑，无需注入。</p>
 <p><strong>结果。</strong> <code>bed_sleep_swap_3h</code> 39/39
-改进（100% [91–100%]）；<code>sleep_reduce_12h_loop</code> 38/38；全部
-bed/sleep 相关校正 81/88（92%）。这一步还揪出一条<em>负面</em>规则
-<code>sleep_awake_swap_3h</code>（10 例中 7 例变差，p =
-0.036）：<strong>已在 v1.4.3 诊断并修复</strong>——加入
-<code>bed &lt;= awake</code> 守卫。守卫后重跑：swap 行 10 → 4，3/4
-改进；7 变差 → 1 披露边界案例。</p>
-<p><strong>意味着。</strong> 校正 92%
-的情况下把真实数据里的值移向自报，使用无需合成标准的冗余通道标尺。唯一有问题的规则<em>是被这一步发现</em>并加了守卫。</p>
+改进（100% [91–100%]）；<code>sleep_reduce_12h_loop</code> 39/39；全部
+bed/sleep 相关校正 80/81（98.8%）。这一步还揪出一条<em>负面</em>规则
+<code>sleep_awake_swap_3h</code>：第一次分析（2026 年 8 月）里它的 10
+例中 7 例变差（p = 0.036），全部合计为 81/88（92%）。<strong>已在 v1.4.3
+诊断并修复</strong>——加入 <code>bed &lt;= awake</code> 守卫。用
+<code>validation/redundant_channel_check.R</code>
+在当前管线上重算（2026-10-01）：该规则现在只作用于 3 行有自报的记录（2
+改进、1 变差），另外两条规则不变，三类合计
+80/81。数字不同是因为管线变了，不是因为比较方式变了。</p>
+<p><strong>意味着。</strong> 校正 99%
+的情况下（80/81）把真实数据里的值移向自报，使用无需合成标准的冗余通道标尺。唯一有问题的规则<em>是被这一步发现</em>并加了守卫。</p>
 </div>
 <div class="section level2">
 <h2 id="第-5-5-步-自报本身有多吵bland-altman三个分析">第 5.5 步 — 自报本身有多吵？（Bland-Altman，三个分析）<a class="anchor" aria-label="anchor" href="#%E7%AC%AC-5-5-%E6%AD%A5-%E8%87%AA%E6%8A%A5%E6%9C%AC%E8%BA%AB%E6%9C%89%E5%A4%9A%E5%90%B5bland-altman%E4%B8%89%E4%B8%AA%E5%88%86%E6%9E%90"></a>

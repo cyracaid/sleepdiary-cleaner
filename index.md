@@ -51,7 +51,7 @@ Psychophysiology Laboratory’s intensive-longitudinal sleep study.
 - 📊 **Auditable** — every change logged and reversible; non-destructive
   architecture
 - ✅ **Validated** — 9-step validation chain: synthetic (0.995 recall) +
-  real data (92% improved) + robustness proof
+  real data (99% improved) + robustness proof
 - 🚀 **Reproducible** — YAML config, full pipeline documentation,
   automated test suite run in CI (R-CMD-check, Codecov)
 - 🎯 **Research-ready** — generates publication-quality figures +
@@ -151,7 +151,7 @@ breakdown.
 
     REAL-DATA TIER (n = 13,990)
     ──────────────────────────────
-    Step 5  Redundant-channel ── 81/88 corrections improve (92%)
+    Step 5  Redundant-channel ── 80/81 corrections improve (98.8%)
     Step 5.5  Bland-Altman ── SOL ±75-min noise band; WASO 3.3× above noise
     Step 6  Report-only audit ── 0 AUTO_FIX, 1,048 FLAG
     Step 7  Human co-review ── 64–89% agreement
@@ -167,7 +167,7 @@ breakdown.
 > [`library(sleepcleanr)`](https://github.com/cyracaid/sleepdiary-cleaner).
 
 > **Validation statistics source:** All validation statistics above
-> (recall 0.995, 92% improvement, 0% silent misrepair for SOL/WASO,
+> (recall 0.995, 99% improvement, 0% silent misrepair for SOL/WASO,
 > etc.) are derived from benchmarks run against the current
 > `sleepcleanr` v1.4.5+ codebase (commit fd6bbd0). The synthetic
 > benchmark

@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.9</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -103,7 +103,7 @@
 <ul>
 <li>🔍 <strong>Detects</strong> not auto-fixes — 1,048 records flagged for manual review in the v1.4.5 audit, 0 silent misrepairs (field-misentry silent-misrepair bug, 96% in v1.4.0, fixed in v1.4.4+; current benchmark: 0% silent misrepair for SOL/WASO)</li>
 <li>📊 <strong>Auditable</strong> — every change logged and reversible; non-destructive architecture</li>
-<li>✅ <strong>Validated</strong> — 9-step validation chain: synthetic (0.995 recall) + real data (92% improved) + robustness proof</li>
+<li>✅ <strong>Validated</strong> — 9-step validation chain: synthetic (0.995 recall) + real data (99% improved) + robustness proof</li>
 <li>🚀 <strong>Reproducible</strong> — YAML config, full pipeline documentation, automated test suite run in CI (R-CMD-check, Codecov)</li>
 <li>🎯 <strong>Research-ready</strong> — generates publication-quality figures + correlation matrices</li>
 </ul>
@@ -258,7 +258,7 @@ Step 4  Controls ── no_cleaning 0 / naive_rule 0.623 / pipeline 0.995
 
 REAL-DATA TIER (n = 13,990)
 ──────────────────────────────
-Step 5  Redundant-channel ── 81/88 corrections improve (92%)
+Step 5  Redundant-channel ── 80/81 corrections improve (98.8%)
 Step 5.5  Bland-Altman ── SOL ±75-min noise band; WASO 3.3× above noise
 Step 6  Report-only audit ── 0 AUTO_FIX, 1,048 FLAG
 Step 7  Human co-review ── 64–89% agreement
@@ -270,7 +270,7 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <p><strong>Naming note:</strong> The R package is called <strong>sleepcleanr</strong> (CRAN convention: no hyphens). The GitHub repository is <strong>sleepdiary-cleaner</strong>. They are the same project — install via <code>renv::install("cyracaid/sleepdiary-cleaner")</code> and then <code><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">library(sleepcleanr)</a></code>.</p>
 </blockquote>
 <blockquote>
-<p><strong>Validation statistics source:</strong> All validation statistics above (recall 0.995, 92% improvement, 0% silent misrepair for SOL/WASO, etc.) are derived from benchmarks run against the current <code>sleepcleanr</code> v1.4.5+ codebase (commit fd6bbd0). The synthetic benchmark (<code>validation/synthetic/results/detection_outcomes_v4_current.csv</code>, 4,736 injected rows) and real-data audit (n=13,990) were executed against the current codebase (commit fd6bbd0). These statistics reflect the current pipeline behavior and supersede any earlier pre-patch numbers cited in earlier documentation. See <code>VALIDATION_REPORT.md</code> and <code>validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md</code> for the full evidence package.</p>
+<p><strong>Validation statistics source:</strong> All validation statistics above (recall 0.995, 99% improvement, 0% silent misrepair for SOL/WASO, etc.) are derived from benchmarks run against the current <code>sleepcleanr</code> v1.4.5+ codebase (commit fd6bbd0). The synthetic benchmark (<code>validation/synthetic/results/detection_outcomes_v4_current.csv</code>, 4,736 injected rows) and real-data audit (n=13,990) were executed against the current codebase (commit fd6bbd0). These statistics reflect the current pipeline behavior and supersede any earlier pre-patch numbers cited in earlier documentation. See <code>VALIDATION_REPORT.md</code> and <code>validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md</code> for the full evidence package.</p>
 </blockquote>
 </div>
 </div>

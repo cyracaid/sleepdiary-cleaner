@@ -1,5 +1,39 @@
 # Changelog
 
+## sleepcleanr 1.4.9
+
+Documentation and validation release. No change to the package code, the
+cleaning logic, any threshold or any computed number.
+
+### Documentation
+
+- README: new “Status and data availability” section (English and
+  Chinese): the study data are not public; the bundled synthetic
+  fixture, the seeded synthetic benchmark and two public datasets are.
+  The CRAN claim and two directory badges were removed (the package is
+  not on CRAN), and a section on running the tests and reporting
+  problems was added.
+- `validation/README.md` (new): each headline validation number, the
+  table and script it comes from, and whether it needs the (non-public)
+  study data.
+- The redundant-channel result is now reported as 80 of 81 corrections
+  improved (98.8%). The first analysis (August 2026) read 81 of 88 (92%)
+  because one rule, `sleep_awake_swap_3h`, had not yet been guarded
+  (v1.4.3); the validation vignettes (English and Chinese) keep both
+  results and say why they differ.
+
+### Validation
+
+- `validation/redundant_channel_check.R` (new) recomputes that
+  comparison from a run’s `output/corrected_ema_data.rds`: counts,
+  medians, an exact interval and a paired test, in total, by origin
+  (algorithmic or manual) and by correction type.
+
+### Repository
+
+- The pre-commit hook also refuses root-level csv/rds/xlsx files and the
+  manual\_/sber\_/real_data_config/fasttrack-style file-name shapes.
+
 ## sleepcleanr 1.4.8
 
 Review-loop and figure-clarity release. No change to cleaning logic,

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.9</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,6 +51,26 @@
       <small>Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.4.9" id="sleepcleanr-149">sleepcleanr 1.4.9<a class="anchor" aria-label="anchor" href="#sleepcleanr-149"></a></h2>
+<p>Documentation and validation release. No change to the package code, the cleaning logic, any threshold or any computed number.</p>
+<div class="section level3">
+<h3 id="documentation-1-4-9">Documentation<a class="anchor" aria-label="anchor" href="#documentation-1-4-9"></a></h3>
+<ul><li>README: new “Status and data availability” section (English and Chinese): the study data are not public; the bundled synthetic fixture, the seeded synthetic benchmark and two public datasets are. The CRAN claim and two directory badges were removed (the package is not on CRAN), and a section on running the tests and reporting problems was added.</li>
+<li>
+<code>validation/README.md</code> (new): each headline validation number, the table and script it comes from, and whether it needs the (non-public) study data.</li>
+<li>The redundant-channel result is now reported as 80 of 81 corrections improved (98.8%). The first analysis (August 2026) read 81 of 88 (92%) because one rule, <code>sleep_awake_swap_3h</code>, had not yet been guarded (v1.4.3); the validation vignettes (English and Chinese) keep both results and say why they differ.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="validation-1-4-9">Validation<a class="anchor" aria-label="anchor" href="#validation-1-4-9"></a></h3>
+<ul><li>
+<code>validation/redundant_channel_check.R</code> (new) recomputes that comparison from a run’s <code>output/corrected_ema_data.rds</code>: counts, medians, an exact interval and a paired test, in total, by origin (algorithmic or manual) and by correction type.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="repository-1-4-9">Repository<a class="anchor" aria-label="anchor" href="#repository-1-4-9"></a></h3>
+<ul><li>The pre-commit hook also refuses root-level csv/rds/xlsx files and the manual_/sber_/real_data_config/fasttrack-style file-name shapes.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.4.8" id="sleepcleanr-148">sleepcleanr 1.4.8<a class="anchor" aria-label="anchor" href="#sleepcleanr-148"></a></h2>
 <p>Review-loop and figure-clarity release. No change to cleaning logic, thresholds or any computed number; the real-data run gives the same 85 corrections as 1.4.7.</p>

@@ -64,7 +64,7 @@ a different way, and is deliberately independent of the others.
       REAL-DATA TIER (n = 13,990, no synthetic standard needed)
       ────────────────────────────────────────────────────────────
       Step 5: Redundant-channel validation ── corrections move values
-               toward self-report: 81/88 (92%) improved; 1 bad rule
+               toward self-report: 80/81 (98.8%) improved; 1 bad rule
                found & guarded (v1.4.3)
                          │
                          ▼
@@ -234,15 +234,21 @@ inspection), so comparing the two after correction is non-circular. Run
 on real production data (n = 13,990) — no injection needed.
 
 **Result.** `bed_sleep_swap_3h` 39/39 improved (100% \[91–100%\]);
-`sleep_reduce_12h_loop` 38/38; all bed/sleep-relevant corrections 81/88
-(92%). This step also surfaced a *negative* rule, `sleep_awake_swap_3h`
-(7/10 worsened, p = 0.036): **diagnosed and fixed in v1.4.3** with a
-`bed <= awake` guard. Post-guard rerun: swap rows 10 → 4, 3/4 improved;
-7 worsened → 1 disclosed boundary case.
+`sleep_reduce_12h_loop` 39/39; all bed/sleep-relevant corrections 80/81
+(98.8%). This step also surfaced a *negative* rule,
+`sleep_awake_swap_3h`: in the first analysis (August 2026) 7 of its 10
+rows worsened (p = 0.036), and the whole set read 81/88 (92%). It was
+**diagnosed and fixed in v1.4.3** with a `bed <= awake` guard.
+Recomputed on the current pipeline with
+`validation/redundant_channel_check.R` (2026-10-01): that rule now
+applies to 3 rows with a self-report (2 improved, 1 worsened), the other
+two rules are unchanged, and all three together read 80/81. The counts
+differ because the pipeline changed, not because the comparison did.
 
-**Meaning.** Corrections move values toward self-report 92% of the time,
-on real data, with a redundant-channel yardstick that needs no synthetic
-standard. The one bad rule was found *by this step* and guarded.
+**Meaning.** Corrections move values toward self-report 99% of the time
+(80/81), on real data, with a redundant-channel yardstick that needs no
+synthetic standard. The one bad rule was found *by this step* and
+guarded.
 
 ## Step 5.5 — How noisy is the self-report itself? (Bland-Altman, three analyses)
 
