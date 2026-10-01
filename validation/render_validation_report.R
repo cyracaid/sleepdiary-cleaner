@@ -133,7 +133,7 @@ r <- c(r, paste0("| Synthetic | 3. Detection vs value-correctness | L1/L3 gap, e
 r <- c(r, paste0("| Synthetic | 4. Controls | no_cleaning ", fmt(ctrl$recall[ctrl$condition == "no_cleaning"]),
   " / naive_rule ", fmt(ctrl$recall[ctrl$condition == "naive_rule"]),
   " / pipeline ", fmt(ctrl$recall[ctrl$condition == "pipeline"]), " |"))
-r <- c(r, "| Real | 5. Redundant-channel | 81/88 corrections improved; 1 bad rule found & guarded (v1.4.3) |")
+r <- c(r, "| Real | 5. Redundant-channel | 80/81 corrections improved (98.8%); 1 bad rule found & guarded (v1.4.3) |")
 r <- c(r, "| Real | 5.5 Bland-Altman | SOL ±75-min noise band → SOL flags INSIDE NOISE (descriptive, human); WASO 3.3× SAFE |")
 if (audit_avail)
   r <- c(r, paste0("| Real | 6. Report-only audit | 0 AUTO_FIX, ", n_flag, " FLAG (", n_m4,

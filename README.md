@@ -48,7 +48,7 @@ Messy sleep diary data (CSV / RDS)
 
 - 🔍 **Detects** not auto-fixes — 1,048 records flagged for manual review in the v1.4.5 audit, 0 silent misrepairs (field-misentry silent-misrepair bug, 96% in v1.4.0, fixed in v1.4.4+; current benchmark: 0% silent misrepair for SOL/WASO)
 - 📊 **Auditable** — every change logged and reversible; non-destructive architecture
-- ✅ **Validated** — 9-step validation chain: synthetic (0.995 recall) + real data (92% improved) + robustness proof
+- ✅ **Validated** — 9-step validation chain: synthetic (0.995 recall) + real data (99% improved) + robustness proof
 - 🚀 **Reproducible** — YAML config, full pipeline documentation, automated test suite run in CI (R-CMD-check, Codecov)
 - 🎯 **Research-ready** — generates publication-quality figures + correlation matrices
 
@@ -117,7 +117,7 @@ Step 4  Controls ── no_cleaning 0 / naive_rule 0.623 / pipeline 0.995
 
 REAL-DATA TIER (n = 13,990)
 ──────────────────────────────
-Step 5  Redundant-channel ── 81/88 corrections improve (92%)
+Step 5  Redundant-channel ── 80/81 corrections improve (98.8%)
 Step 5.5  Bland-Altman ── SOL ±75-min noise band; WASO 3.3× above noise
 Step 6  Report-only audit ── 0 AUTO_FIX, 1,048 FLAG
 Step 7  Human co-review ── 64–89% agreement
@@ -133,7 +133,7 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995
 > `library(sleepcleanr)`.
 
 
-> **Validation statistics source:** All validation statistics above (recall 0.995, 92% improvement, 0% silent misrepair for SOL/WASO, etc.) are derived from benchmarks run against the current `sleepcleanr` v1.4.5+ codebase (commit fd6bbd0). The synthetic benchmark (`validation/synthetic/results/detection_outcomes_v4_current.csv`, 4,736 injected rows) and real-data audit (n=13,990) were executed against the current codebase (commit fd6bbd0). These statistics reflect the current pipeline behavior and supersede any earlier pre-patch numbers cited in earlier documentation. See `VALIDATION_REPORT.md` and `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md` for the full evidence package.
+> **Validation statistics source:** All validation statistics above (recall 0.995, 99% improvement, 0% silent misrepair for SOL/WASO, etc.) are derived from benchmarks run against the current `sleepcleanr` v1.4.5+ codebase (commit fd6bbd0). The synthetic benchmark (`validation/synthetic/results/detection_outcomes_v4_current.csv`, 4,736 injected rows) and real-data audit (n=13,990) were executed against the current codebase (commit fd6bbd0). These statistics reflect the current pipeline behavior and supersede any earlier pre-patch numbers cited in earlier documentation. See `VALIDATION_REPORT.md` and `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md` for the full evidence package.
 
 ## Status and data availability
 
