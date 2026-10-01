@@ -135,6 +135,28 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995
 
 > **Validation statistics source:** All validation statistics above (recall 0.995, 92% improvement, 0% silent misrepair for SOL/WASO, etc.) are derived from benchmarks run against the current `sleepcleanr` v1.4.5+ codebase (commit fd6bbd0). The synthetic benchmark (`validation/synthetic/results/detection_outcomes_v4_current.csv`, 4,736 injected rows) and real-data audit (n=13,990) were executed against the current codebase (commit fd6bbd0). These statistics reflect the current pipeline behavior and supersede any earlier pre-patch numbers cited in earlier documentation. See `VALIDATION_REPORT.md` and `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md` for the full evidence package.
 
+## Status and data availability
+
+**Status.** sleepcleanr 1.4.8 is research software under active development. It
+was built for one longitudinal sleep study, has not yet been peer reviewed, and
+is not on CRAN. Treat the shipped thresholds as references to check against your
+own data.
+
+**Data availability.** The study data are not public (participant privacy).
+What you can use without them:
+
+- a bundled synthetic fixture (`inst/extdata/`, 280 rows, 20 participants) that
+  `run_pipeline()` runs on by default;
+- the synthetic benchmark, which regenerates its own data from fixed seeds, so
+  every benchmark number can be re-run (see
+  [`validation/README.md`](validation/README.md));
+- two public diary datasets with adaptation scripts
+  (`validation/external/`).
+
+The few numbers that come from the study data (for example the redundant-channel
+check) are reported in `VALIDATION_REPORT.md` and cannot be re-run without
+access to those data.
+
 ## Install
 
 ```r
@@ -302,6 +324,18 @@ sleepcleanr 刻意**既非全自动、也非全部人工 flag**：
 > **命名说明：** R 包名为 **sleepcleanr**（CRAN 规范不允许连字符），
 > GitHub 仓库名为 **sleepdiary-cleaner**。两者是同一项目 — 安装用
 > `renv::install("cyracaid/sleepdiary-cleaner")`，加载用 `library(sleepcleanr)`。
+
+## 状态与数据可用性
+
+**状态。** sleepcleanr 1.4.8 是仍在开发中的研究软件，为一项纵向睡眠研究而写，尚未经同行评审，也未上线 CRAN。随包给出的阈值只是参考，请用你自己的数据核对。
+
+**数据可用性。** 研究数据不公开（参与者隐私）。不需要这些数据也能用到的东西：
+
+- 内置合成数据（`inst/extdata/`，280 行、20 名参与者），`run_pipeline()` 默认就跑它；
+- 合成基准会按固定随机种子自己生成数据，所以基准里的每个数字都可以重跑（见 [`validation/README.md`](validation/README.md)）；
+- 两个公开日记数据集及其转换脚本（`validation/external/`）。
+
+少数来自研究数据的数字（例如冗余通道检查）记录在 `VALIDATION_REPORT.md` 里，没有数据访问权限就无法重跑。
 
 ## 安装
 
