@@ -1,0 +1,15 @@
+category,n,detection_recall_L1,correction_recall_L3,flagged_unresolved,misrepaired
+adjacent_swap_large_gap_left_clean,400,1,0.6075,157,0
+adjacent_swap_time_awake_am_time_getup_am,400,1,1,0,0
+adjacent_swap_time_bed_am_time_sleep_am,400,1,1,0,0
+adjacent_swap_time_sleep_am_time_awake_am,400,1,0,400,0
+ampm_swap,400,1,0.565,174,0
+compound_ampm_and_swap,400,1,0.38,248,0
+cross_participant_spike,236,1,0,214,22
+field_misentry_sol,400,1,0.0175,393,0
+field_misentry_waso,400,1,0.0325,387,0
+format_malformed_colon,400,1,1,0,0
+format_no_colon,400,1,1,0,0
+implausible_duration,400,1,0,400,0
+mmss_confusion,400,1,0.945,18,4
+sol_window_contradiction,355,1,0,355,0

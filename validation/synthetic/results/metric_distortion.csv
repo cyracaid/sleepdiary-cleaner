@@ -1,0 +1,5 @@
+arm,n,mean_tst_h,mean_sol_min,mean_tib_h,mean_se_pct,tst_shift_min_vs_clean,sol_shift_min_vs_clean,se_shift_pct_vs_clean
+clean,6668,7.756,20.3,8.239,94.13,0,0,0
+no_clean,6668,6.323,211.67,9.102,72.16,-85.99,191.38,-21.97
+naive,6668,6.836,138.23,11.67,75.65,-55.2,117.94,-18.482
+pipeline,6668,7.943,67.94,8.235,96.66,11.22,47.64,2.531

@@ -1,0 +1,7 @@
+metric,value
+n_injected,5391
+detection_recall_L1,1
+correction_recall_L3,0.4858
+flag_only_share,0.5094
+misrepair_rate,0.0048
+false_correction_count,26
