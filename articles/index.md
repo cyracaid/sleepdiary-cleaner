@@ -1,99 +1,78 @@
-<div id="main" class="col-md-9" role="main">
-
 # Articles
 
-<div class="section">
-
 ### English
-
-<div class="section-desc">
 
 Choose your language: English articles are listed here; [中文版请看下面
 / Chinese articles below ↓](#chinese).
 
-</div>
+- [Validation
+  Methodology](https://cyracaid.github.io/sleepdiary-cleaner/articles/validation-methodology.md):
 
--   [Validation
-    Methodology](https://cyracaid.github.io/sleepdiary-cleaner/articles/validation-methodology.md):
+  How the sleepcleanr cleaning pipeline is validated: the 9-step chain
+  from clean-input specificity through injected-error benchmarks,
+  Bland-Altman measurement characterization, real-data audit, and
+  multiverse robustness.
 
-    How the sleepcleanr cleaning pipeline is validated: the 9-step chain
-    from clean-input specificity through injected-error benchmarks,
-    Bland-Altman measurement characterization, real-data audit, and
-    multiverse robustness.
+- [Pipeline
+  Architecture](https://cyracaid.github.io/sleepdiary-cleaner/articles/pipeline-architecture.md):
 
--   [Pipeline
-    Architecture](https://cyracaid.github.io/sleepdiary-cleaner/articles/pipeline-architecture.md):
+  The 10-step cleaning pipeline, the 8 detection rule families, the
+  decision tri-state, and the classification systems — how sleepcleanr
+  is structured.
 
-    The 10-step cleaning pipeline, the 8 detection rule families, the
-    decision tri-state, and the classification systems — how sleepcleanr
-    is structured.
+- [Data-first entry:
+  clean_sleep_diary()](https://cyracaid.github.io/sleepdiary-cleaner/articles/data-first.md):
 
--   [Data-first entry:
-    clean\_sleep\_diary()](https://cyracaid.github.io/sleepdiary-cleaner/articles/data-first.md):
+- [Column Mapping, Config & Data
+  Format](https://cyracaid.github.io/sleepdiary-cleaner/articles/column-mapping.md):
 
--   [Column Mapping, Config & Data
-    Format](https://cyracaid.github.io/sleepdiary-cleaner/articles/column-mapping.md):
+  How to adapt sleepcleanr to your own dataset: YAML column mapping,
+  threshold configuration, timestamp format, input data structure, and
+  manual correction CSV templates.
 
-    How to adapt sleepcleanr to your own dataset: YAML column mapping,
-    threshold configuration, timestamp format, input data structure, and
-    manual correction CSV templates.
+- [Interpreting the Pipeline
+  Output](https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output.md):
 
--   [Interpreting the Pipeline
-    Output](https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output.md):
+  How to read correction_status_final.csv, the step flag ledger,
+  regression checks, and the diagnostic figures — what each output means
+  and what to check for.
 
-    How to read correction\_status\_final.csv, the step flag ledger,
-    regression checks, and the diagnostic figures — what each output
-    means and what to check for.
+- [Testing
+  Coverage](https://cyracaid.github.io/sleepdiary-cleaner/articles/testing-coverage.md):
 
--   [Testing
-    Coverage](https://cyracaid.github.io/sleepdiary-cleaner/articles/testing-coverage.md):
-
-    The 200+ testthat expectations across 16 test files: what the tests
-    verify, how to run them, and how snapshot verification works.
-
-</div>
-
-<div class="section">
+  The 200+ testthat expectations across 16 test files: what the tests
+  verify, how to run them, and how snapshot verification works.
 
 ### Chinese (中文)
 
-<div class="section-desc">
-
 中文文章。[Back to English ↑](#english)
 
-</div>
+- [验证方法学](https://cyracaid.github.io/sleepdiary-cleaner/articles/validation-methodology-zh.md):
 
--   [验证方法学](https://cyracaid.github.io/sleepdiary-cleaner/articles/validation-methodology-zh.md):
+  sleepcleanr
+  清洗管线的验证方法：从干净输入特异度、注入错误基准、Bland-Altman
+  测量特性描述、真实数据审计到 multiverse 鲁棒性分析的九步验证链。
 
-    sleepcleanr
-    清洗管线的验证方法：从干净输入特异度、注入错误基准、Bland-Altman
-    测量特性描述、真实数据审计到 multiverse 鲁棒性分析的九步验证链。
+- [管线架构（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/pipeline-architecture-zh.md):
 
--   [管线架构（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/pipeline-architecture-zh.md):
+  sleepcleanr 清洗管线的 10 步结构、8 个检测规则族、决策三态与分类体系。
 
-    sleepcleanr 清洗管线的 10 步结构、8
-    个检测规则族、决策三态与分类体系。
+- [数据优先入口：clean_sleep_diary()（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/data-first-zh.md):
 
--   [数据优先入口：clean\_sleep\_diary()（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/data-first-zh.md):
+  无需配置文件即可运行管线：列名自动推断、每个推断决策都被记录、清洗结果旁边会写出一份来源清单（provenance
+  manifest）。
 
-    无需配置文件即可运行管线：列名自动推断、每个推断决策都被记录、清洗结果旁边会写出一份来源清单（provenance
-    manifest）。
+- [列映射、配置与数据格式（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/column-mapping-zh.md):
 
--   [列映射、配置与数据格式（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/column-mapping-zh.md):
+  如何把 sleepcleanr 适配到自己的数据集：YAML
+  列映射、阈值配置、时间戳格式、输入数据结构与人工修正 CSV 模板。
 
-    如何把 sleepcleanr 适配到自己的数据集：YAML
-    列映射、阈值配置、时间戳格式、输入数据结构与人工修正 CSV 模板。
+- [如何读懂管线输出（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output-zh.md):
 
--   [如何读懂管线输出（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output-zh.md):
+  怎么读 correction_status_final.csv、step flag
+  ledger、回归检查与诊断图表——每个输出的含义、检查要点，以及每张图的详细参考。
 
-    怎么读 correction\_status\_final.csv、step flag
-    ledger、回归检查与诊断图表——每个输出的含义、检查要点，以及每张图的详细参考。
+- [测试覆盖率（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/testing-coverage-zh.md):
 
--   [测试覆盖率（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/testing-coverage-zh.md):
-
-    16 个测试文件、200+ 条 testthat
-    断言：测试验证什么、怎么运行、snapshot 验证如何工作。
-
-</div>
-
-</div>
+  16 个测试文件、200+ 条 testthat 断言：测试验证什么、怎么运行、snapshot
+  验证如何工作。

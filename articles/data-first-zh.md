@@ -1,8 +1,4 @@
-<div id="main" class="col-md-9" role="main">
-
-# 数据优先入口：clean\_sleep\_diary()（中文）
-
-<div class="section level2">
+# 数据优先入口：clean_sleep_diary()（中文）
 
 ## 数据优先入口：`clean_sleep_diary()`
 
@@ -12,8 +8,6 @@
 管线可以完全从数据文件或 data.frame
 跑起来——**不需要配置文件**。列名会自动推断，每一个推断决策都会被记录下来，清洗结果旁边还会写出一份来源清单（provenance
 manifest）。
-
-<div id="cb1" class="sourceCode">
 
 ``` r
 library(sleepcleanr)
@@ -28,10 +22,6 @@ res <- clean_sleep_diary(df)
 clean_sleep_diary("my_diary.csv", dry_run = TRUE)
 ```
 
-</div>
-
-<div class="section level3">
-
 ### 返回值（6 字段契约）
 
 | 字段       | 内容                                                         |
@@ -39,46 +29,36 @@ clean_sleep_diary("my_diary.csv", dry_run = TRUE)
 | `cleaned`  | 清洗后的 Dataset A（data.frame）；dry-run 时为 `NULL`        |
 | `config`   | 本次实际生效的完整配置（默认值 + 覆盖项）                    |
 | `guesses`  | 逐列的映射决策（有记录，绝不静默）                           |
-| `ledger`   | 逐步行数账本（step\_id、label、n\_rows）                     |
+| `ledger`   | 逐步行数账本（step_id、label、n_rows）                       |
 | `outputs`  | 具名输出路径（`cleaned_csv`、`ledger_csv`、`manifest_json`） |
 | `manifest` | 来源清单（同时写到 `outputs$manifest_json`）                 |
 
-</div>
-
-<div class="section level3">
-
 ### 列名自动推断
 
-`guess_column_mapping()` 把原始列名与已知别名做匹配：
+[`guess_column_mapping()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/guess_column_mapping.md)
+把原始列名与已知别名做匹配：
 
--   别名精确匹配（例如 `bedtime` -&gt; `time_bed_hhmm`，置信度 1.0）
--   语义子串匹配（置信度 0.6）
--   有歧义的并列匹配**绝不静默选择**——会连同候选集合一起记录，并保持未映射
--   找不到匹配列的必填字段会被标为 `absent`，随后 `validate_schema()`
-    带着缺失清单**显式报错**
+- 别名精确匹配（例如 `bedtime` -\> `time_bed_hhmm`，置信度 1.0）
+- 语义子串匹配（置信度 0.6）
+- 有歧义的并列匹配**绝不静默选择**——会连同候选集合一起记录，并保持未映射
+- 找不到匹配列的必填字段会被标为 `absent`，随后
+  [`validate_schema()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/validate_schema.md)
+  带着缺失清单**显式报错**
 
 每个决策行都携带：`user_col, internal_col, match_rule, confidence, status, candidate_set`。包不会静默推断
 schema——它记录每一个 schema 推断决策。
-
-</div>
-
-<div class="section level3">
 
 ### 来源清单（provenance manifest）
 
 每次完整运行都会写出 `run_manifest_<timestamp>.json`：
 
--   输入身份：**md5 哈希**（哈希是身份，路径只是辅助）、大小、文件名
--   `commit`（不在 git 仓库时为 `null`——“不可用”是一个独立状态）
--   `timestamp_utc`（仅 UTC）
--   环境：R 版本、平台、各包版本
--   实际生效的完整 `config`
--   逐步 `ledger`（每一步的行数）
--   输出文件路径
-
-</div>
-
-<div class="section level3">
+- 输入身份：**md5 哈希**（哈希是身份，路径只是辅助）、大小、文件名
+- `commit`（不在 git 仓库时为 `null`——“不可用”是一个独立状态）
+- `timestamp_utc`（仅 UTC）
+- 环境：R 版本、平台、各包版本
+- 实际生效的完整 `config`
+- 逐步 `ledger`（每一步的行数）
+- 输出文件路径
 
 ### dry-run
 
@@ -86,17 +66,7 @@ schema——它记录每一个 schema 推断决策。
 配置解析”之后停下。它会打印映射预览、写出
 `dry_run_manifest.json`，并且**绝不写出清洗后的数据集**。任何模式下原始输入都不会被修改。
 
-</div>
-
-<div class="section level3">
-
 ### 原始输入永不被修改
 
 适配后的输入会写到项目目录里的一个内部副本；用户原始的文件或 data.frame
 保持不变（有测试验证）。
-
-</div>
-
-</div>
-
-</div>

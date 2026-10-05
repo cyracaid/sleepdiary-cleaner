@@ -1,13 +1,13 @@
-<div id="main" class="col-md-9" role="main">
-
 # Interpreting the Pipeline Output
 
 [中文版
 →](https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output-zh.md)
 
-After `run_pipeline()` finishes, two CSV files tell you everything. This
-vignette explains how to read them, how to regression-check against a
-previous run, and how to read the figures.
+After
+[`run_pipeline()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_pipeline.md)
+finishes, two CSV files tell you everything. This vignette explains how
+to read them, how to regression-check against a previous run, and how to
+read the figures.
 
 Sections 1–3 cover running the pipeline and the manual input files; 4–7
 cover the two output CSVs, the regression check and the quick reference
@@ -15,86 +15,79 @@ card; 8–9 cover the figures.
 
 Contents
 
--   [Terminology and definitions](#s-terms)
-    -   [Sleep metrics](#s-terms-1)
-    -   [Record classification: `data_category`](#s-terms-2)
-    -   [Metric flags: `flag_severity`](#s-terms-3)
-    -   [“Standard”](#s-terms-4)
--   [1. Running the pipeline](#s-1)
--   [2. Manual input files](#s-2)
-    -   [2.1 Sample and template files](#s-2-1)
--   [3. The manual-review cycle (plain language)](#s-3)
--   [4. `output/correction_status_final.csv` — The Run Summary (Open
-    This First)](#s-4)
--   [5. `output/step_flag_ledger.csv` — The Per-Step Flag Tracker (Open
-    Second)](#s-5)
-    -   [5.1 Column layout](#s-5-1)
--   [6. Regression Check (compare against a previous run)](#s-6)
--   [7. Quick Reference Card](#s-7)
--   [8. How to Read the Figures](#s-8)
--   [9. Figure-by-Figure Reference](#s-9)
-    -   [9.1 Figure Index](#s-9-1)
-    -   [9.2 Pipeline-cleaning figure cards (`pipeline_cleaning/`) (15
-        figures)](#s-9-2)
-        -   [01 · Pipeline Record Flow](#01-pipeline-record-flow)
-        -   [06 · Sleep Duration
-            Post-Correction](#06-sleep-duration-post-correction)
-        -   [07 · Flag Composition
-            Stacked](#07-flag-composition-stacked)
-        -   [10 · Extreme Sleep Durations](#10-extreme-sleep-durations)
-        -   [13 · Error Category
-            Distribution](#13-error-category-distribution)
-        -   [13B · Adjacent Timestamp
-            Gaps](#13b-adjacent-timestamp-gaps)
-        -   [13C · Detection Outcomes
-            Heatmap](#13c-detection-outcomes-heatmap)
-        -   [13D · Threshold vs Measurement
-            Noise](#13d-threshold-vs-measurement-noise)
-        -   [14 · Sleep Duration
-            Pre-Correction](#14-sleep-duration-pre-correction)
-        -   [15 · Error Timeline](#15-error-timeline)
-        -   [16 · Common Error Patterns](#16-common-error-patterns)
-        -   [17 · Top Participants by Flag
-            Rate](#17-top-participants-by-flag-rate)
-        -   [18 · Auto-Detected Dashboard](#18-auto-detected-dashboard)
-        -   [A1 · Step Flag Ledger](#a1-step-flag-ledger)
-        -   [P26 · Participants Worth a Second
-            Look](#p26-participants-worth-a-second-look)
-    -   [9.3 Research-ready figure cards (`research_ready/`) (16
-        figures)](#s-9-3)
-        -   [02 · Correction Impact](#02-correction-impact)
-        -   [02B · Distribution of Sleep
-            Variables](#02b-distribution-of-sleep-variables)
-        -   [03 · TST Distribution](#03-tst-distribution)
-        -   [04 · Sleep Duration vs Time in
-            Bed](#04-sleep-duration-vs-time-in-bed)
-        -   [04B · SOL vs Sleep Duration](#04b-sol-vs-sleep-duration)
-        -   [05 · Variability of Sleep
-            Variables](#05-variability-of-sleep-variables)
-        -   [09 · Bedtime vs Get-up
-            Distribution](#09-bedtime-vs-get-up-distribution)
-        -   [20 · SOL Perception Bias](#20-sol-perception-bias)
-        -   [20B · WASO Perception Bias](#20b-waso-perception-bias)
-        -   [21 · Substance Use
-            Availability](#21-substance-use-availability)
-        -   [22 · Substance Use Value
-            Distribution](#22-substance-use-value-distribution)
-        -   [23 · Caffeine Consumption](#23-caffeine-consumption)
-        -   [24 · Alcohol Consumption](#24-alcohol-consumption)
-        -   [R25 · Sleep Regularity — Weekday vs
-            Weekend](#r25-sleep-regularity--weekday-vs-weekend)
-        -   [R26 · Sleep Composition — TIB
-            Breakdown](#r26-sleep-composition--tib-breakdown)
-        -   [R27 · Sleep Metrics Correlation
-            Matrix](#r27-sleep-metrics-correlation-matrix)
-
-<div class="section level2">
+- [Terminology and definitions](#s-terms)
+  - [Sleep metrics](#s-terms-1)
+  - [Record classification: `data_category`](#s-terms-2)
+  - [Metric flags: `flag_severity`](#s-terms-3)
+  - [“Standard”](#s-terms-4)
+- [1. Running the pipeline](#s-1)
+- [2. Manual input files](#s-2)
+  - [2.1 Sample and template files](#s-2-1)
+- [3. The manual-review cycle (plain language)](#s-3)
+- [4. `output/correction_status_final.csv` — The Run Summary (Open This
+  First)](#s-4)
+- [5. `output/step_flag_ledger.csv` — The Per-Step Flag Tracker (Open
+  Second)](#s-5)
+  - [5.1 Column layout](#s-5-1)
+- [6. Regression Check (compare against a previous run)](#s-6)
+- [7. Quick Reference Card](#s-7)
+- [8. How to Read the Figures](#s-8)
+- [9. Figure-by-Figure Reference](#s-9)
+  - [9.1 Figure Index](#s-9-1)
+  - [9.2 Pipeline-cleaning figure cards (`pipeline_cleaning/`) (15
+    figures)](#s-9-2)
+    - [01 · Pipeline Record Flow](#01-pipeline-record-flow)
+    - [06 · Sleep Duration
+      Post-Correction](#06-sleep-duration-post-correction)
+    - [07 · Flag Composition Stacked](#07-flag-composition-stacked)
+    - [10 · Extreme Sleep Durations](#10-extreme-sleep-durations)
+    - [13 · Error Category
+      Distribution](#13-error-category-distribution)
+    - [13B · Adjacent Timestamp Gaps](#13b-adjacent-timestamp-gaps)
+    - [13C · Detection Outcomes
+      Heatmap](#13c-detection-outcomes-heatmap)
+    - [13D · Threshold vs Measurement
+      Noise](#13d-threshold-vs-measurement-noise)
+    - [14 · Sleep Duration
+      Pre-Correction](#14-sleep-duration-pre-correction)
+    - [15 · Error Timeline](#15-error-timeline)
+    - [16 · Common Error Patterns](#16-common-error-patterns)
+    - [17 · Top Participants by Flag
+      Rate](#17-top-participants-by-flag-rate)
+    - [18 · Auto-Detected Dashboard](#18-auto-detected-dashboard)
+    - [A1 · Step Flag Ledger](#a1-step-flag-ledger)
+    - [P26 · Participants Worth a Second
+      Look](#p26-participants-worth-a-second-look)
+  - [9.3 Research-ready figure cards (`research_ready/`) (16
+    figures)](#s-9-3)
+    - [02 · Correction Impact](#02-correction-impact)
+    - [02B · Distribution of Sleep
+      Variables](#02b-distribution-of-sleep-variables)
+    - [03 · TST Distribution](#03-tst-distribution)
+    - [04 · Sleep Duration vs Time in
+      Bed](#04-sleep-duration-vs-time-in-bed)
+    - [04B · SOL vs Sleep Duration](#04b-sol-vs-sleep-duration)
+    - [05 · Variability of Sleep
+      Variables](#05-variability-of-sleep-variables)
+    - [09 · Bedtime vs Get-up
+      Distribution](#09-bedtime-vs-get-up-distribution)
+    - [20 · SOL Perception Bias](#20-sol-perception-bias)
+    - [20B · WASO Perception Bias](#20b-waso-perception-bias)
+    - [21 · Substance Use Availability](#21-substance-use-availability)
+    - [22 · Substance Use Value
+      Distribution](#22-substance-use-value-distribution)
+    - [23 · Caffeine Consumption](#23-caffeine-consumption)
+    - [24 · Alcohol Consumption](#24-alcohol-consumption)
+    - [R25 · Sleep Regularity — Weekday vs
+      Weekend](#r25-sleep-regularity--weekday-vs-weekend)
+    - [R26 · Sleep Composition — TIB
+      Breakdown](#r26-sleep-composition--tib-breakdown)
+    - [R27 · Sleep Metrics Correlation
+      Matrix](#r27-sleep-metrics-correlation-matrix)
 
 ## Terminology and definitions
 
 Every term the tables and figures use is defined here once.
-
-<div class="section level3">
 
 ### Sleep metrics
 
@@ -108,10 +101,6 @@ Every term the tables and figures use is defined here once.
 
 They are tied together by an identity that holds throughout the figures:
 `TIB = TST + SOL + WASO`, and `SE = TST / TIB`.
-
-</div>
-
-<div class="section level3">
 
 ### Record classification: `data_category`
 
@@ -128,21 +117,17 @@ below — the first match wins.
 |    5     | `clean`              | none of the above                                                                                                                                                                          | nothing to do                                         |
 |    —     | `reasonable_unusual` | an `unusual` record that a human looked at and accepted                                                                                                                                    | counted separately so the human judgement is not lost |
 
--   **Equal Time is not an error.** Reporting “went to bed” and “fell
-    asleep” (or “woke up” and “got up”) as the same clock time is a
-    common, harmless way to fill in a diary. It is tracked as
-    `bed_sleep_equal`, `awake_getup_equal` or `both_equal`
-    (`equal_time_type`).
--   **`sleep = awake` is always an error.** A night with zero sleep is a
-    broken record, not a benign habit, so it can never be Equal Time.
--   **The 0.01 h tolerance** only absorbs floating-point rounding; it
-    does not hide real differences.
--   **Sanity check:** the six classes add up to `n_total` (used by the
-    ledger, §5). The rules live in `R/flag_standards.R`.
-
-</div>
-
-<div class="section level3">
+- **Equal Time is not an error.** Reporting “went to bed” and “fell
+  asleep” (or “woke up” and “got up”) as the same clock time is a
+  common, harmless way to fill in a diary. It is tracked as
+  `bed_sleep_equal`, `awake_getup_equal` or `both_equal`
+  (`equal_time_type`).
+- **`sleep = awake` is always an error.** A night with zero sleep is a
+  broken record, not a benign habit, so it can never be Equal Time.
+- **The 0.01 h tolerance** only absorbs floating-point rounding; it does
+  not hide real differences.
+- **Sanity check:** the six classes add up to `n_total` (used by the
+  ledger, §5). The rules live in `R/flag_standards.R`.
 
 ### Metric flags: `flag_severity`
 
@@ -156,10 +141,6 @@ It is a **different system** from `data_category`: a record can be
 `clean` in `data_category` and `Major` in `flag_severity` (order fine,
 computed metrics extreme). The three classes add up to `n_total`.
 
-</div>
-
-<div class="section level3">
-
 ### “Standard”
 
 In the ledger (§5), a *standard* is one of the five evaluation systems —
@@ -167,25 +148,15 @@ In the ledger (§5), a *standard* is one of the five evaluation systems —
 `checkforerrors`. Each is computed once at a fixed pipeline step and
 never recomputed.
 
-</div>
-
-</div>
-
-<div class="section level2">
-
 ## 1. Running the pipeline
 
 Prepare the inputs first (§2), then run:
-
-<div id="cb1" class="sourceCode">
 
 ``` r
 library(sleepcleanr)
 run_pipeline(config = "my_study.yaml", include_manual_corrections = TRUE)  # full run
 run_pipeline(config = "my_study.yaml", skip_visualization = TRUE)          # cleaning only, no figures
 ```
-
-</div>
 
 | Argument                     | What it does                                                                                                                                                                                                                                                                                                                                          |
 |------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -195,7 +166,9 @@ run_pipeline(config = "my_study.yaml", skip_visualization = TRUE)          # cle
 | `finalize`                   | Default `TRUE`: writes the delivered datasets (Step 10). `FALSE` stops after cleaning.                                                                                                                                                                                                                                                                |
 
 From a shell you can also run `inst/scripts/run.sh` (installs the
-package if missing, then runs `run_pipeline()` with the default config).
+package if missing, then runs
+[`run_pipeline()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_pipeline.md)
+with the default config).
 
 **Before a run:** the input data file (`data.files.main`, `.rds` or
 `.csv`) and the manual CSVs of §2 must exist in the working directory;
@@ -207,19 +180,11 @@ a pipeline run, the candidate-detection → review → rebuild chain is
 scripted end to end with md5 integrity checks (repository checkout
 only):
 
-<div id="cb2" class="sourceCode">
-
 ``` r
 source("validation/reproduce_fasttrack_chain.R")   # derive → disambiguate →
                                                   # promote → rebuild; verifies
                                                   # byte-identical outputs
 ```
-
-</div>
-
-</div>
-
-<div class="section level2">
 
 ## 2. Manual input files
 
@@ -247,8 +212,6 @@ fill the `new_value_*` and `reviewer_notes` columns). Column templates
 live in `templates/template_*.csv`; `inst/extdata/stub_*.csv` are
 shipped in the package as header-only format examples (no real data).
 
-<div class="section level3">
-
 ### 2.1 Sample and template files
 
 You do not have to start from a blank file. Templates and virtual sample
@@ -265,22 +228,12 @@ data are provided:
 
 To find an installed file from R:
 
-<div id="cb3" class="sourceCode">
-
 ``` r
 system.file("extdata", "stub_error_corrections.csv", package = "sleepcleanr")
 ```
 
-</div>
-
 Copy a stub to your working directory under the name your config
 expects, then fill it in.
-
-</div>
-
-</div>
-
-<div class="section level2">
 
 ## 3. The manual-review cycle (plain language)
 
@@ -323,12 +276,12 @@ getting up 5. `sleep_awake_24h_error` — computed sleep period longer
 than 24 h
 
 *UNUSUAL — suspicious but possible, worth a look (`:393`):* 1.
-`sleep_awake_suspicious` — total sleep &lt; 3 h or &gt; 15 h 2.
-`bed_sleep_suspicious` — sleep onset latency &gt; 3 h 3.
-`awake_getup_suspicious` — lying awake in bed &gt; 3 h before rising 4.
+`sleep_awake_suspicious` — total sleep \< 3 h or \> 15 h 2.
+`bed_sleep_suspicious` — sleep onset latency \> 3 h 3.
+`awake_getup_suspicious` — lying awake in bed \> 3 h before rising 4.
 `multiple_suspicious` — several of the above at once
 
-*Final label priority:* `error` &gt; `equal_time` &gt; `unusual` &gt;
+*Final label priority:* `error` \> `equal_time` \> `unusual` \>
 `normal`. Equal-time records get a label but **never enter the review
 files** — they are benign (see the Terminology section).
 
@@ -360,9 +313,9 @@ worksheet are in each state, and how many handled rows are **still a
 problem after the automatic re-check** (still an error, or still
 flagged). Corrected records can still fail that re-check, so that last
 number matters. You are done when no row is unhandled or pending and
-none is still a problem. On the real study data this ended with 75 error
-+ 37 unusual human-verified corrections (see the Methods section, Stage
-5).
+none is still a problem. On the real study data this ended with 75
+error + 37 unusual human-verified corrections (see the Methods section,
+Stage 5).
 
 **Where the validated numbers come from:** a controlled re-run
 (2026-09-29) showed exactly what the manual corrections do to the final
@@ -373,35 +326,27 @@ remain errors. The 11 unlocked records were `error`-class rows whose
 corrected timestamps made TST computable (293–590 min); one extreme
 record (TST = 10 min) was correctly retired by its correction.
 
-</div>
-
-<div class="section level2">
-
 ## 4. `output/correction_status_final.csv` — The Run Summary (Open This First)
 
 One row per pipeline run. It answers: *“did the cleaning work as
 expected?”*
 
-<div id="cb5" class="sourceCode">
-
 ``` r
 read.csv("output/correction_status_final.csv")
 ```
 
-</div>
-
-| Column               | It tells you…                                                          | Check this                                                                                                                                        |
-|----------------------|------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
-| `n_total`            | Total records in your data                                             | Must equal your input row count. If smaller, records were dropped somewhere.                                                                      |
-| `tst_mean_h`         | Mean total sleep time in hours                                         | 6.0–8.5 h is normal for most adult studies. If &lt; 5 or &gt; 10, something is off with the timestamp parsing or the study population is unusual. |
-| `sol_mean_min`       | Mean sleep onset latency in minutes                                    | 10–45 min is normal. If &gt; 60, either the population has high insomnia or AM/PM confusion was not fully corrected.                              |
-| `n_clean`            | Records that passed every check                                        | Should be stable across runs (same data = same count).                                                                                            |
-| `n_error`            | Records with impossible temporal order (e.g., getup before bedtime)    | Should be &lt; 1% of total. If &gt; 5%, review the survey design or data collection.                                                              |
-| `n_corrected`        | Records manually corrected via your CSV files                          | Should match the number of rows in your `manual_error_corrections.csv`.                                                                           |
-| `timestamp_issue`    | Timestamps that could not be parsed into a valid time                  | 0 is normal. &gt; 0 means some participants entered non-standard time formats.                                                                    |
-| `duration_issue`     | Sleep metrics (SOL, SE, TST) outside configured thresholds             | Small numbers are normal. If very large, your thresholds may be too strict or the data has quality problems.                                      |
-| `amount_flag`        | Substance-use entries with unusual values                              | Should be 0 or very low.                                                                                                                          |
-| `self_reported_flag` | Records where self-reported SOL/WASO disagrees with the computed value | Indicates perception bias. Check Figure 20 (SOL Perception Bias).                                                                                 |
+| Column               | It tells you…                                                          | Check this                                                                                                                                    |
+|----------------------|------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
+| `n_total`            | Total records in your data                                             | Must equal your input row count. If smaller, records were dropped somewhere.                                                                  |
+| `tst_mean_h`         | Mean total sleep time in hours                                         | 6.0–8.5 h is normal for most adult studies. If \< 5 or \> 10, something is off with the timestamp parsing or the study population is unusual. |
+| `sol_mean_min`       | Mean sleep onset latency in minutes                                    | 10–45 min is normal. If \> 60, either the population has high insomnia or AM/PM confusion was not fully corrected.                            |
+| `n_clean`            | Records that passed every check                                        | Should be stable across runs (same data = same count).                                                                                        |
+| `n_error`            | Records with impossible temporal order (e.g., getup before bedtime)    | Should be \< 1% of total. If \> 5%, review the survey design or data collection.                                                              |
+| `n_corrected`        | Records manually corrected via your CSV files                          | Should match the number of rows in your `manual_error_corrections.csv`.                                                                       |
+| `timestamp_issue`    | Timestamps that could not be parsed into a valid time                  | 0 is normal. \> 0 means some participants entered non-standard time formats.                                                                  |
+| `duration_issue`     | Sleep metrics (SOL, SE, TST) outside configured thresholds             | Small numbers are normal. If very large, your thresholds may be too strict or the data has quality problems.                                  |
+| `amount_flag`        | Substance-use entries with unusual values                              | Should be 0 or very low.                                                                                                                      |
+| `self_reported_flag` | Records where self-reported SOL/WASO disagrees with the computed value | Indicates perception bias. Check Figure 20 (SOL Perception Bias).                                                                             |
 
 **Stability rule:** Run twice on the same data → every number must be
 identical. If not, something is non-deterministic.
@@ -413,16 +358,10 @@ the two use different reference numbers (10–45 min here vs. 15/60 min
 there) because they measure different things. Don’t read one against the
 other.
 
-</div>
-
-<div class="section level2">
-
 ## 5. `output/step_flag_ledger.csv` — The Per-Step Flag Tracker (Open Second)
 
 One row per step × per standard × per category. It answers: *“at which
 step did which flag appear, and did it persist?”*
-
-<div id="cb6" class="sourceCode">
 
 ``` r
 ledger <- read.csv("output/step_flag_ledger.csv")
@@ -430,12 +369,8 @@ library(dplyr)
 ledger %>% filter(!is.na(count)) %>% arrange(step_id, standard)
 ```
 
-</div>
-
 Each row answers: *“at this step, using this standard, how many records
 fell into this category?”*
-
-<div class="section level3">
 
 ### 5.1 Column layout
 
@@ -472,7 +407,7 @@ something is wrong.
     `clean + unusual + reasonable_unusual + equal_time_ok + error + skipped_na = n_total`.
 3.  `flag_severity` — from Step 7 onward identical across Steps 7, 8,
     8.5: `Clean + Minor + Major = n_total`.
-4.  `duration_extreme` — `Too short + Too long` should be &lt; 5% of
+4.  `duration_extreme` — `Too short + Too long` should be \< 5% of
     `n_total`.
 5.  `checkforerrors` — populated at Step 8 only.
 
@@ -483,18 +418,10 @@ something is wrong.
       flag_severity:    Clean = 251, Minor = 28, Major = 1         251 + 28 + 1 = 280 - 14 ✓
       duration_extreme: OK = 262, Too short = 1, Too long = 0
 
-</div>
-
-</div>
-
-<div class="section level2">
-
 ## 6. Regression Check (compare against a previous run)
 
 `output/correction_status_old.csv` is not written by any pipeline script
 — you create it yourself as a saved baseline before rerunning:
-
-<div id="cb8" class="sourceCode">
 
 ``` r
 # BEFORE rerunning: save the current output as your baseline.
@@ -509,14 +436,8 @@ identical(old$sol_mean_min, new$sol_mean_min)
 identical(old$n_clean, new$n_clean)
 ```
 
-</div>
-
 If they differ and the input data did not change, the pipeline output
 has changed. Investigate.
-
-</div>
-
-<div class="section level2">
 
 ## 7. Quick Reference Card
 
@@ -526,14 +447,10 @@ has changed. Investigate.
 | Reasonable TST                                     | `tst_mean_h` between 6–8.5                                                            | Yes     |
 | Reasonable SOL (raw duration, not perception bias) | `sol_mean_min` between 10–45                                                          | Yes     |
 | Few errors                                         | `n_error < 0.01 * n_total`                                                            | Yes     |
-| data\_category stable                              | Counts identical across Steps 6–8.5                                                   | Yes     |
-| flag\_severity stable                              | Counts identical across Steps 7–8.5                                                   | Yes     |
+| data_category stable                               | Counts identical across Steps 6–8.5                                                   | Yes     |
+| flag_severity stable                               | Counts identical across Steps 7–8.5                                                   | Yes     |
 | All records accounted                              | `clean + unusual + reasonable_unusual + equal_time_ok + error + skipped_na = n_total` | Yes     |
 | Deterministic                                      | Same input → same output every time                                                   | Yes     |
-
-</div>
-
-<div class="section level2">
 
 ## 8. How to Read the Figures
 
@@ -563,17 +480,13 @@ for just checking your data, ignore it and go by figure number.
 
 **Five must-check figures:**
 
-| Step | Figure (card)                                  | Should look like                                                      | If not?                                                                 |
-|:----:|------------------------------------------------|-----------------------------------------------------------------------|-------------------------------------------------------------------------|
-|  1   | **01 Pipeline Record Flow** (§9.2)             | Flow narrows gently; Clean dominates; Error + Unusual small (&lt; 5%) | Spike at 0 or huge Error/Unusual share → parsing/AM-PM failure upstream |
-|  2   | **A1 Step Flag Ledger** (§9.2)                 | Corrected bar appears ONLY at Step 6.5, flat after                    | Change after Step 6.5 = instability                                     |
-|  3   | **18 Auto-Detected Dashboard** (§9.2)          | Flag counts match `correction_status_final.csv`                       | Mismatch = misalignment                                                 |
-|  4   | **02B Distribution of Sleep Variables** (§9.3) | TST peaks 6–8 h, SOL right-skewed, WASO &lt; 60, SE &gt; 85%          | SOL flat/bimodal = AM/PM confusion                                      |
-|  5   | **13 Error Category Distribution** (§9.2)      | Most records Clean/Minor; Error+Unusual &lt; 5%                       | High = review manual CSVs                                               |
-
-</div>
-
-<div class="section level2">
+| Step | Figure (card)                                  | Should look like                                                    | If not?                                                                 |
+|:----:|------------------------------------------------|---------------------------------------------------------------------|-------------------------------------------------------------------------|
+|  1   | **01 Pipeline Record Flow** (§9.2)             | Flow narrows gently; Clean dominates; Error + Unusual small (\< 5%) | Spike at 0 or huge Error/Unusual share → parsing/AM-PM failure upstream |
+|  2   | **A1 Step Flag Ledger** (§9.2)                 | Corrected bar appears ONLY at Step 6.5, flat after                  | Change after Step 6.5 = instability                                     |
+|  3   | **18 Auto-Detected Dashboard** (§9.2)          | Flag counts match `correction_status_final.csv`                     | Mismatch = misalignment                                                 |
+|  4   | **02B Distribution of Sleep Variables** (§9.3) | TST peaks 6–8 h, SOL right-skewed, WASO \< 60, SE \> 85%            | SOL flat/bimodal = AM/PM confusion                                      |
+|  5   | **13 Error Category Distribution** (§9.2)      | Most records Clean/Minor; Error+Unusual \< 5%                       | High = review manual CSVs                                               |
 
 ## 9. Figure-by-Figure Reference
 
@@ -583,38 +496,36 @@ healthy data look like, what anomalies mean, and a paper-ready caption.
 Figures land in `latest_visualization_<tag>_n<rows>/pipeline_cleaning/`
 (diagnostic) and `.../research_ready/` (publication).
 
-<div class="section level3">
-
 ### 9.1 Figure Index
 
 | \#      | File                                                      | Paper use     | Code source                     | Card                                                                                      | Last checked |
 |---------|-----------------------------------------------------------|---------------|---------------------------------|-------------------------------------------------------------------------------------------|--------------|
-| **01**  | `pipeline_cleaning/01_Pipeline_Flow_Diagram.png`          | Methods Fig 1 | `sleep_visualization.R:862`     | [§9.2 · Pipeline Record Flow](#01-pipeline-record-flow)                                   | 2026-09-25   |
-| **02**  | `research_ready/02_Correction_Impact.png`                 | Methods Fig 2 | `sleep_visualization.R:1013`    | [§9.3 · Correction Impact](#02-correction-impact)                                         | 2026-09-25   |
-| **02B** | `research_ready/02B_Distribution_Sleep_Variables.png`     | Results       | `sleep_visualization.R:1057`    | [§9.3 · Distribution of Sleep Variables](#02b-distribution-of-sleep-variables)            | 2026-09-25   |
-| **03**  | `research_ready/03_Sleep_Duration_Distribution.png`       | Results       | `sleep_visualization.R:1108`    | [§9.3 · TST Distribution](#03-tst-distribution)                                           | 2026-09-25   |
-| **04**  | `research_ready/04_Sleep_Duration_vs_Time_in_Bed.png`     | Results       | `sleep_visualization.R:1163`    | [§9.3 · Sleep Duration vs Time in Bed](#04-sleep-duration-vs-time-in-bed)                 | 2026-09-25   |
-| **04B** | `research_ready/04B_SOL_vs_Sleep_Duration.png`            | Results       | `sleep_visualization.R:1215`    | [§9.3 · SOL vs Sleep Duration](#04b-sol-vs-sleep-duration)                                | 2026-09-25   |
-| **05**  | `research_ready/05_Variability_Sleep_Variables.png`       | Results       | `sleep_visualization.R:1265`    | [§9.3 · Variability of Sleep Variables](#05-variability-of-sleep-variables)               | 2026-09-25   |
-| **06**  | `pipeline_cleaning/06_Sleep_Duration_Post_Correction.png` | Supplement    | `sleep_visualization.R:1339`    | [§9.2 · Sleep Duration Post-Correction](#06-sleep-duration-post-correction)               | 2026-09-25   |
-| **07**  | `pipeline_cleaning/07_Flag_Composition_Stacked.png`       | Supplement    | `sleep_visualization.R:1404`    | [§9.2 · Flag Composition Stacked](#07-flag-composition-stacked)                           | 2026-09-25   |
-| **09**  | `research_ready/09_Bedtime_vs_Getup_Distribution.png`     | Results       | `sleep_visualization.R:1458`    | [§9.3 · Bedtime vs Get-up Distribution](#09-bedtime-vs-get-up-distribution)               | 2026-09-25   |
-| **10**  | `pipeline_cleaning/10_Extreme_Sleep_Duration.png`         | Supplement    | `sleep_visualization.R:1514`    | [§9.2 · Extreme Sleep Durations](#10-extreme-sleep-durations)                             | 2026-09-25   |
-| **13**  | `pipeline_cleaning/13_Error_Category_Distribution.png`    | Supplement    | `sleep_visualization.R:1794`    | [§9.2 · Error Category Distribution](#13-error-category-distribution)                     | 2026-09-25   |
-| **13B** | `pipeline_cleaning/13B_Adjacent_Timestamp_Gaps.png`       | Supplement    | `sleep_visualization.R:1877`    | [§9.2 · Adjacent Timestamp Gaps](#13b-adjacent-timestamp-gaps)                            | 2026-09-25   |
-| **13C** | `pipeline_cleaning/13C_Detection_Outcomes_Heatmap.png`    | Supplement    | `sleep_visualization.R:1936`    | [§9.2 · Detection Outcomes Heatmap](#13c-detection-outcomes-heatmap)                      | 2026-09-25   |
-| **13D** | `pipeline_cleaning/13D_Threshold_vs_Noise_Ratio.png`      | Supplement    | `sleep_visualization.R:1980`    | [§9.2 · Threshold vs Measurement Noise](#13d-threshold-vs-measurement-noise)              | 2026-09-25   |
-| **14**  | `pipeline_cleaning/14_Sleep_Duration_Pre_Correction.png`  | Supplement    | `sleep_visualization.R:2051`    | [§9.2 · Sleep Duration Pre-Correction](#14-sleep-duration-pre-correction)                 | 2026-09-30   |
-| **15**  | `pipeline_cleaning/15_Error_Timeline.png`                 | Supplement    | `sleep_visualization.R:2137`    | [§9.2 · Error Timeline](#15-error-timeline)                                               | 2026-09-30   |
-| **16**  | `pipeline_cleaning/16_Common_Error_Patterns.png`          | Supplement    | `sleep_visualization.R:2228`    | [§9.2 · Common Error Patterns](#16-common-error-patterns)                                 | 2026-09-30   |
-| **17**  | `pipeline_cleaning/17_Top_Participants_Flags.png`         | Supplement    | `sleep_visualization.R:2307`    | [§9.2 · Top Participants by Flag Rate](#17-top-participants-by-flag-rate)                 | 2026-09-25   |
-| **18**  | `pipeline_cleaning/18_Auto_Detected_Dashboard.png`        | Supplement    | `sleep_visualization.R:2409`    | [§9.2 · Auto-Detected Dashboard](#18-auto-detected-dashboard)                             | 2026-09-25   |
-| **20**  | `research_ready/20_SOL_Perception_Bias.png`               | Results       | `sleep_visualization.R:2637`    | [§9.3 · SOL Perception Bias](#20-sol-perception-bias)                                     | 2026-09-25   |
-| **20B** | `research_ready/20B_WASO_Perception_Bias.png`             | Results       | `sleep_visualization.R:2695`    | [§9.3 · WASO Perception Bias](#20b-waso-perception-bias)                                  | 2026-09-25   |
-| **21**  | `research_ready/21_Substance_Use_Availability.png`        | Supplement    | `sleep_visualization.R:2767`    | [§9.3 · Substance Use Availability](#21-substance-use-availability)                       | 2026-09-25   |
-| **22**  | `research_ready/22_Substance_Use_Distribution.png`        | Supplement    | `sleep_visualization.R:2870`    | [§9.3 · Substance Use Value Distribution](#22-substance-use-value-distribution)           | 2026-09-25   |
-| **23**  | `research_ready/23_Caffeine_Consumption.png`              | Supplement    | `sleep_visualization.R:2944`    | [§9.3 · Caffeine Consumption](#23-caffeine-consumption)                                   | 2026-09-25   |
-| **24**  | `research_ready/24_Alcohol_Consumption.png`               | Supplement    | `sleep_visualization.R:2979`    | [§9.3 · Alcohol Consumption](#24-alcohol-consumption)                                     | 2026-09-25   |
+| **01**  | `pipeline_cleaning/01_Pipeline_Flow_Diagram.png`          | Methods Fig 1 | `sleep_visualization.R:862`     | [§9.2 · Pipeline Record Flow](#id_01-pipeline-record-flow)                                | 2026-09-25   |
+| **02**  | `research_ready/02_Correction_Impact.png`                 | Methods Fig 2 | `sleep_visualization.R:1013`    | [§9.3 · Correction Impact](#id_02-correction-impact)                                      | 2026-09-25   |
+| **02B** | `research_ready/02B_Distribution_Sleep_Variables.png`     | Results       | `sleep_visualization.R:1057`    | [§9.3 · Distribution of Sleep Variables](#id_02b-distribution-of-sleep-variables)         | 2026-09-25   |
+| **03**  | `research_ready/03_Sleep_Duration_Distribution.png`       | Results       | `sleep_visualization.R:1108`    | [§9.3 · TST Distribution](#id_03-tst-distribution)                                        | 2026-09-25   |
+| **04**  | `research_ready/04_Sleep_Duration_vs_Time_in_Bed.png`     | Results       | `sleep_visualization.R:1163`    | [§9.3 · Sleep Duration vs Time in Bed](#id_04-sleep-duration-vs-time-in-bed)              | 2026-09-25   |
+| **04B** | `research_ready/04B_SOL_vs_Sleep_Duration.png`            | Results       | `sleep_visualization.R:1215`    | [§9.3 · SOL vs Sleep Duration](#id_04b-sol-vs-sleep-duration)                             | 2026-09-25   |
+| **05**  | `research_ready/05_Variability_Sleep_Variables.png`       | Results       | `sleep_visualization.R:1265`    | [§9.3 · Variability of Sleep Variables](#id_05-variability-of-sleep-variables)            | 2026-09-25   |
+| **06**  | `pipeline_cleaning/06_Sleep_Duration_Post_Correction.png` | Supplement    | `sleep_visualization.R:1339`    | [§9.2 · Sleep Duration Post-Correction](#id_06-sleep-duration-post-correction)            | 2026-09-25   |
+| **07**  | `pipeline_cleaning/07_Flag_Composition_Stacked.png`       | Supplement    | `sleep_visualization.R:1404`    | [§9.2 · Flag Composition Stacked](#id_07-flag-composition-stacked)                        | 2026-09-25   |
+| **09**  | `research_ready/09_Bedtime_vs_Getup_Distribution.png`     | Results       | `sleep_visualization.R:1458`    | [§9.3 · Bedtime vs Get-up Distribution](#id_09-bedtime-vs-get-up-distribution)            | 2026-09-25   |
+| **10**  | `pipeline_cleaning/10_Extreme_Sleep_Duration.png`         | Supplement    | `sleep_visualization.R:1514`    | [§9.2 · Extreme Sleep Durations](#id_10-extreme-sleep-durations)                          | 2026-09-25   |
+| **13**  | `pipeline_cleaning/13_Error_Category_Distribution.png`    | Supplement    | `sleep_visualization.R:1794`    | [§9.2 · Error Category Distribution](#id_13-error-category-distribution)                  | 2026-09-25   |
+| **13B** | `pipeline_cleaning/13B_Adjacent_Timestamp_Gaps.png`       | Supplement    | `sleep_visualization.R:1877`    | [§9.2 · Adjacent Timestamp Gaps](#id_13b-adjacent-timestamp-gaps)                         | 2026-09-25   |
+| **13C** | `pipeline_cleaning/13C_Detection_Outcomes_Heatmap.png`    | Supplement    | `sleep_visualization.R:1936`    | [§9.2 · Detection Outcomes Heatmap](#id_13c-detection-outcomes-heatmap)                   | 2026-09-25   |
+| **13D** | `pipeline_cleaning/13D_Threshold_vs_Noise_Ratio.png`      | Supplement    | `sleep_visualization.R:1980`    | [§9.2 · Threshold vs Measurement Noise](#id_13d-threshold-vs-measurement-noise)           | 2026-09-25   |
+| **14**  | `pipeline_cleaning/14_Sleep_Duration_Pre_Correction.png`  | Supplement    | `sleep_visualization.R:2051`    | [§9.2 · Sleep Duration Pre-Correction](#id_14-sleep-duration-pre-correction)              | 2026-09-30   |
+| **15**  | `pipeline_cleaning/15_Error_Timeline.png`                 | Supplement    | `sleep_visualization.R:2137`    | [§9.2 · Error Timeline](#id_15-error-timeline)                                            | 2026-09-30   |
+| **16**  | `pipeline_cleaning/16_Common_Error_Patterns.png`          | Supplement    | `sleep_visualization.R:2228`    | [§9.2 · Common Error Patterns](#id_16-common-error-patterns)                              | 2026-09-30   |
+| **17**  | `pipeline_cleaning/17_Top_Participants_Flags.png`         | Supplement    | `sleep_visualization.R:2307`    | [§9.2 · Top Participants by Flag Rate](#id_17-top-participants-by-flag-rate)              | 2026-09-25   |
+| **18**  | `pipeline_cleaning/18_Auto_Detected_Dashboard.png`        | Supplement    | `sleep_visualization.R:2409`    | [§9.2 · Auto-Detected Dashboard](#id_18-auto-detected-dashboard)                          | 2026-09-25   |
+| **20**  | `research_ready/20_SOL_Perception_Bias.png`               | Results       | `sleep_visualization.R:2637`    | [§9.3 · SOL Perception Bias](#id_20-sol-perception-bias)                                  | 2026-09-25   |
+| **20B** | `research_ready/20B_WASO_Perception_Bias.png`             | Results       | `sleep_visualization.R:2695`    | [§9.3 · WASO Perception Bias](#id_20b-waso-perception-bias)                               | 2026-09-25   |
+| **21**  | `research_ready/21_Substance_Use_Availability.png`        | Supplement    | `sleep_visualization.R:2767`    | [§9.3 · Substance Use Availability](#id_21-substance-use-availability)                    | 2026-09-25   |
+| **22**  | `research_ready/22_Substance_Use_Distribution.png`        | Supplement    | `sleep_visualization.R:2870`    | [§9.3 · Substance Use Value Distribution](#id_22-substance-use-value-distribution)        | 2026-09-25   |
+| **23**  | `research_ready/23_Caffeine_Consumption.png`              | Supplement    | `sleep_visualization.R:2944`    | [§9.3 · Caffeine Consumption](#id_23-caffeine-consumption)                                | 2026-09-25   |
+| **24**  | `research_ready/24_Alcohol_Consumption.png`               | Supplement    | `sleep_visualization.R:2979`    | [§9.3 · Alcohol Consumption](#id_24-alcohol-consumption)                                  | 2026-09-25   |
 | **A1**  | `pipeline_cleaning/A1_Step_Flag_Ledger.png`               | Supplement    | `figure12_step_flag_table.R:15` | [§9.2 · Step Flag Ledger](#a1-step-flag-ledger)                                           | 2026-09-25   |
 | **P26** | `pipeline_cleaning/P26_PerParticipant_Flag_Rate.png`      | Supplement    | `sleep_visualization.R:2579`    | [§9.2 · Participants Worth a Second Look](#p26-participants-worth-a-second-look)          | 2026-09-25   |
 | **R25** | `research_ready/R25_Sleep_Regularity_Weekday_Weekend.png` | Results       | `sleep_visualization.R:3043`    | [§9.3 · Sleep Regularity — Weekday vs Weekend](#r25-sleep-regularity--weekday-vs-weekend) | 2026-09-25   |
@@ -636,39 +547,33 @@ already reviewed), the skip reason says so explicitly.
 column above is a default suggestion, not a verdict. For a
 Methods/Results structure the pipeline supports, this split works well:
 
--   **Methods, main text (2 figures).** 01 (Pipeline Record Flow) —
-    shows what the pipeline IS: stages, counts, and the final
-    classification breakdown. 02 (Correction Impact) — shows what
-    cleaning DID: non-destructive, only confirmed input errors modified.
-    These two answer the reviewer’s first two questions (“what did you
-    do?” and “how invasive was it?”) with no clutter.
--   **Results, main text (pick 3–5).** 03 (TST distribution) as the
-    data-quality anchor; 20/20B (perception bias) if
-    subjective-vs-computed agreement is part of your story; R25 (weekday
-    vs weekend) or R26 (TIB composition) if timing regularity /
-    composition matters; R27 (correlation matrix) if you reference
-    metric interrelationships. Resist putting more than five in the main
-    text — the rest reads better as supplement.
--   **Supplement (everything else).** All `pipeline_cleaning/` figures
-    (13, 13B, 13C, 13D, 17, 18, A1, P26, 06, 07, 10) form the audit
-    trail: put them in a supplement titled “Data quality and cleaning
-    audit” and cite the set collectively from Methods with one sentence
-    (“see Supplement S1 for the full audit trail”). The substance
-    figures (21–24) belong with whatever substance-use analysis the
-    paper reports, or supplement if none.
+- **Methods, main text (2 figures).** 01 (Pipeline Record Flow) — shows
+  what the pipeline IS: stages, counts, and the final classification
+  breakdown. 02 (Correction Impact) — shows what cleaning DID:
+  non-destructive, only confirmed input errors modified. These two
+  answer the reviewer’s first two questions (“what did you do?” and “how
+  invasive was it?”) with no clutter.
+- **Results, main text (pick 3–5).** 03 (TST distribution) as the
+  data-quality anchor; 20/20B (perception bias) if
+  subjective-vs-computed agreement is part of your story; R25 (weekday
+  vs weekend) or R26 (TIB composition) if timing regularity /
+  composition matters; R27 (correlation matrix) if you reference metric
+  interrelationships. Resist putting more than five in the main text —
+  the rest reads better as supplement.
+- **Supplement (everything else).** All `pipeline_cleaning/` figures
+  (13, 13B, 13C, 13D, 17, 18, A1, P26, 06, 07, 10) form the audit trail:
+  put them in a supplement titled “Data quality and cleaning audit” and
+  cite the set collectively from Methods with one sentence (“see
+  Supplement S1 for the full audit trail”). The substance figures
+  (21–24) belong with whatever substance-use analysis the paper reports,
+  or supplement if none.
 
-A minimal working set if page limits are tight: **01 + 02 in Methods, 03
-+ 20 + R27 in Results, the supplement section for the audit trail.**
+A minimal working set if page limits are tight: **01 + 02 in Methods,
+03 + 20 + R27 in Results, the supplement section for the audit trail.**
 Captions for every one of these are ready in §9.2 and §9.3 below, at the
 end of each figure’s card.
 
-</div>
-
-<div class="section level3">
-
 ### 9.2 Pipeline-cleaning figure cards (`pipeline_cleaning/`)
-
-<div class="section level4">
 
 #### 01 · Pipeline Record Flow
 
@@ -687,13 +592,13 @@ counts.
 The right-side annotation classifies every final record into one of five
 classes:
 
-| Class              | Meaning                                                                                                                                                             |
-|--------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Not Reported       | Any of bed / sleep / awake / getup time is missing                                                                                                                  |
-| Error (Reviewed)   | Order broken (not `bed ≤ sleep ≤ awake ≤ getup`), `sleep = awake`, a gap &gt; 7 h, or a sleep span &gt; 24 h — reviewed and fixed                                   |
-| Equal Time         | `bed == sleep` and/or `awake == getup` (difference &lt; 0.01 h, about 36 s) with the order intact — a benign diary habit. (`sleep == awake` is an ERROR, not this.) |
-| Unusual (Accepted) | Order intact but a gap &gt; 3 h (bed→sleep or awake→getup) — odd but possible, reviewed and kept as-is                                                              |
-| Clean              | Order intact, no gap &gt; 3 h                                                                                                                                       |
+| Class              | Meaning                                                                                                                                                           |
+|--------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Not Reported       | Any of bed / sleep / awake / getup time is missing                                                                                                                |
+| Error (Reviewed)   | Order broken (not `bed ≤ sleep ≤ awake ≤ getup`), `sleep = awake`, a gap \> 7 h, or a sleep span \> 24 h — reviewed and fixed                                     |
+| Equal Time         | `bed == sleep` and/or `awake == getup` (difference \< 0.01 h, about 36 s) with the order intact — a benign diary habit. (`sleep == awake` is an ERROR, not this.) |
+| Unusual (Accepted) | Order intact but a gap \> 3 h (bed→sleep or awake→getup) — odd but possible, reviewed and kept as-is                                                              |
+| Clean              | Order intact, no gap \> 3 h                                                                                                                                       |
 
 The figure prints these standards next to each class (first match wins,
 in the order above), so the diagram can be read without this page.
@@ -711,20 +616,20 @@ detector missed rows.
 
 **Precise rules**
 
--   **What is counted.** One row per raw diary entry (13,990 in the real
-    run). The five boxes are successive stages: everything loaded, then
-    entries that have timestamps, then entries fixed by rules (AM/PM and
-    order fixes), then entries fixed by a human, then entries usable for
-    analysis. Every percentage is out of the raw total.
--   **How the side list is made.** Every final record gets exactly one
-    class, checked top to bottom: not reported, error, equal time,
-    unusual, clean. The first match wins. The exact rules are in the
-    Terminology section, and the figure prints them next to each class.
--   **The bottom line** (“x% of raw records enter analysis”) is the
-    share of raw entries that have all four timestamps and therefore
-    computed sleep metrics.
--   **Participants with a correction** counts participants who have at
-    least one corrected record, out of all participants.
+- **What is counted.** One row per raw diary entry (13,990 in the real
+  run). The five boxes are successive stages: everything loaded, then
+  entries that have timestamps, then entries fixed by rules (AM/PM and
+  order fixes), then entries fixed by a human, then entries usable for
+  analysis. Every percentage is out of the raw total.
+- **How the side list is made.** Every final record gets exactly one
+  class, checked top to bottom: not reported, error, equal time,
+  unusual, clean. The first match wins. The exact rules are in the
+  Terminology section, and the figure prints them next to each class.
+- **The bottom line** (“x% of raw records enter analysis”) is the share
+  of raw entries that have all four timestamps and therefore computed
+  sleep metrics.
+- **Participants with a correction** counts participants who have at
+  least one corrected record, out of all participants.
 
 **FAQ**
 
@@ -769,10 +674,6 @@ records that were changed along the way.
 > who received at least one correction. TST = total sleep time; SOL =
 > sleep onset latency.
 
-</div>
-
-<div class="section level4">
-
 #### 06 · Sleep Duration Post-Correction
 
 **File** `pipeline_cleaning/06_Sleep_Duration_Post_Correction.png` —
@@ -796,17 +697,17 @@ records slipped through.
 
 **Precise rules**
 
--   **What is drawn.** A smoothed curve of the final `sleep_duration_h`
-    (TST in hours) for each record class: Clean, Unusual, Manually
-    Corrected and Error. Each curve is scaled to its own area, so
-    compare shapes, not heights; the subtitle lists how many records
-    each curve rests on.
--   **Who is included.** Only records with a computed sleep duration,
-    and only those four classes. A record that was manually corrected is
-    shown as Manually Corrected, whatever its original class.
--   **What it is for.** To check that human corrections did not distort
-    the overall distribution: compare with Figure 14, which shows the
-    same kind of curve before any manual correction.
+- **What is drawn.** A smoothed curve of the final `sleep_duration_h`
+  (TST in hours) for each record class: Clean, Unusual, Manually
+  Corrected and Error. Each curve is scaled to its own area, so compare
+  shapes, not heights; the subtitle lists how many records each curve
+  rests on.
+- **Who is included.** Only records with a computed sleep duration, and
+  only those four classes. A record that was manually corrected is shown
+  as Manually Corrected, whatever its original class.
+- **What it is for.** To check that human corrections did not distort
+  the overall distribution: compare with Figure 14, which shows the same
+  kind of curve before any manual correction.
 
 **FAQ**
 
@@ -835,12 +736,8 @@ corrections are wrong.
 
 > **Figure 06.** Density of final total sleep time (TST, hours) after
 > all manual corrections were applied. Unimodal distributions centered
-> on 6–8 h indicate healthy sleep durations; spikes at zero or &gt; 12 h
+> on 6–8 h indicate healthy sleep durations; spikes at zero or \> 12 h
 > indicate residual parsing artifacts.
-
-</div>
-
-<div class="section level4">
 
 #### 07 · Flag Composition Stacked
 
@@ -874,19 +771,17 @@ systematic parsing problem, not a handful of extreme records.
 
 **Precise rules**
 
--   **What the colours mean.** The fill is `flag_severity`, not
-    `data_category`: Clean (no metric flag), Minor (1 flag), Major (2 or
-    more). A flag is one of: sleep efficiency below 70%, sleep onset
-    latency above 1 h, wake after sleep onset above 1.5 h (set under
-    `classification.flag_severity.*`).
--   **What the bars are.** Each bar counts the records whose sleep
-    duration falls in that range; the colours split each bar by
-    severity.
--   **What is cut off.** The x axis shows 0 to 16 h, and records with a
-    duration of 0 or 20 h and above are left out.
--   **The box in the corner** repeats the thresholds and the counts of
-    Minor and Major records, so the figure can be read without this
-    page.
+- **What the colours mean.** The fill is `flag_severity`, not
+  `data_category`: Clean (no metric flag), Minor (1 flag), Major (2 or
+  more). A flag is one of: sleep efficiency below 70%, sleep onset
+  latency above 1 h, wake after sleep onset above 1.5 h (set under
+  `classification.flag_severity.*`).
+- **What the bars are.** Each bar counts the records whose sleep
+  duration falls in that range; the colours split each bar by severity.
+- **What is cut off.** The x axis shows 0 to 16 h, and records with a
+  duration of 0 or 20 h and above are left out.
+- **The box in the corner** repeats the thresholds and the counts of
+  Minor and Major records, so the figure can be read without this page.
 
 **FAQ**
 
@@ -912,13 +807,9 @@ corner box reads the current values, so it stays correct.
 
 > **Figure 07.** Stacked histogram of final sleep duration (hours), with
 > bars colored by flag severity: Clean (no metric flags), Minor (one
-> flag), Major (two or more flags from {SE &lt; 70%, SOL &gt; 1 h, WASO
-> &gt; 1.5 h}). Shows whether quality problems concentrate at extreme
+> flag), Major (two or more flags from {SE \< 70%, SOL \> 1 h, WASO \>
+> 1.5 h}). Shows whether quality problems concentrate at extreme
 > durations.
-
-</div>
-
-<div class="section level4">
 
 #### 10 · Extreme Sleep Durations
 
@@ -928,7 +819,7 @@ at `sleep_visualization.R:1514`
 **Paper use** Supplement
 
 **What each part means** Scatter: x = TST (h), y = sleep efficiency (%),
-restricted to extreme durations (&lt; 4 h or &gt; 10 h).
+restricted to extreme durations (\< 4 h or \> 10 h).
 
 | Encoding        | Meaning                              |
 |-----------------|--------------------------------------|
@@ -947,16 +838,16 @@ Points sitting exactly at TST = 0 or 24 h point to a parsing failure.
 
 **Precise rules**
 
--   **What is shown.** Only the extremes: records with TST under 4 h
-    (triangles, “short”) or over 10 h (circles, “long”). Everything in
-    between is left out. Colour is the data-quality class.
--   **The dashed line** at sleep efficiency 85% is a reading aid taken
-    from the clinical rule of thumb. The pipeline’s own flag uses 70%
-    (`poor_efficiency_threshold_pct`), so a point can sit below 85%
-    without being flagged.
--   **Two sets of cut-offs.** 4 h and 10 h are this figure’s own display
-    cut-offs. They are looser than the pipeline’s `duration_extreme`
-    limits (under 3 h, over 12 h), which are a separate check.
+- **What is shown.** Only the extremes: records with TST under 4 h
+  (triangles, “short”) or over 10 h (circles, “long”). Everything in
+  between is left out. Colour is the data-quality class.
+- **The dashed line** at sleep efficiency 85% is a reading aid taken
+  from the clinical rule of thumb. The pipeline’s own flag uses 70%
+  (`poor_efficiency_threshold_pct`), so a point can sit below 85%
+  without being flagged.
+- **Two sets of cut-offs.** 4 h and 10 h are this figure’s own display
+  cut-offs. They are looser than the pipeline’s `duration_extreme`
+  limits (under 3 h, over 12 h), which are a separate check.
 
 **FAQ**
 
@@ -980,14 +871,10 @@ inside it. Few points is the expected, healthy picture.
 **Paper caption**
 
 > **Figure 10.** Scatter of total sleep time (TST, hours) versus sleep
-> efficiency (SE, %) restricted to extreme durations (&lt; 4 h short,
-> &gt; 10 h long). Point shape encodes short vs long sleep; point color
+> efficiency (SE, %) restricted to extreme durations (\< 4 h short, \>
+> 10 h long). Point shape encodes short vs long sleep; point color
 > encodes record quality. The horizontal line marks the SE = 85%
 > poor-efficiency threshold.
-
-</div>
-
-<div class="section level4">
 
 #### 13 · Error Category Distribution
 
@@ -1010,19 +897,19 @@ parsing rules before reviewing records one by one.
 
 **Precise rules**
 
--   **What the bars count.** Records flagged by the automatic check in
-    Step 8, before any manual correction, grouped by the kind of
-    problem. The kind comes from the prefix of the check’s message:
-    `[Temporal]` temporal issues, `[Metrics]` metric thresholds,
-    `[Amount]` amount/input flags, `[Interval]` interval format,
-    `[Timestamp]` timestamp format; anything else is “Other”.
--   **The subtitle** lists the metric rules feeding the Metric Threshold
-    group: SOL above 120 min, sleep efficiency below 0 or above 100%,
-    TST/TIB ratio below 0.5.
--   **The two tables** under the bars explain the categories: the first
-    lists each category with a severity and a plain description; the
-    second counts records by their check result (for example
-    SELF\_REPORTED\_FLAG, CLEAN).
+- **What the bars count.** Records flagged by the automatic check in
+  Step 8, before any manual correction, grouped by the kind of problem.
+  The kind comes from the prefix of the check’s message: `[Temporal]`
+  temporal issues, `[Metrics]` metric thresholds, `[Amount]`
+  amount/input flags, `[Interval]` interval format, `[Timestamp]`
+  timestamp format; anything else is “Other”.
+- **The subtitle** lists the metric rules feeding the Metric Threshold
+  group: SOL above 120 min, sleep efficiency below 0 or above 100%,
+  TST/TIB ratio below 0.5.
+- **The two tables** under the bars explain the categories: the first
+  lists each category with a severity and a plain description; the
+  second counts records by their check result (for example
+  SELF_REPORTED_FLAG, CLEAN).
 
 **FAQ**
 
@@ -1061,10 +948,6 @@ hours:minutes).
 > interval format errors, timestamp format errors, and other. Counts are
 > pre-correction — they show the burden the pipeline had to absorb.
 
-</div>
-
-<div class="section level4">
-
 #### 13B · Adjacent Timestamp Gaps
 
 **File** `pipeline_cleaning/13B_Adjacent_Timestamp_Gaps.png` — generated
@@ -1088,20 +971,20 @@ the normalizer will flip; two clusters near ±12 h point to a
 
 **Precise rules**
 
--   **What a gap is.** For each of three neighbouring pairs — bed to
-    sleep, sleep to awake, awake to getup — the gap is the later time
-    minus the earlier time, in hours. It is computed on the raw
-    (decoded) times, before any correction.
--   **A negative gap** means the later event has an earlier clock time
-    than the earlier one (for example awake at 01:00 but asleep at 23:00
-    in the same row). That is the raw signature of an order error or a
-    12-hour AM/PM slip.
--   **The red band** marks gaps of −3 to −6 h, the range that defines
-    the “AM/PM decode or field-swap candidate” definition used in the
-    validation work; the count in the band is printed on it.
--   **How to read the shape.** A negative mass of roughly −1 to −3 h
-    points to order swaps (repaired by the swap step); two clusters near
-    ±12 h point to PM times typed as AM (repaired by the 12-hour flip).
+- **What a gap is.** For each of three neighbouring pairs — bed to
+  sleep, sleep to awake, awake to getup — the gap is the later time
+  minus the earlier time, in hours. It is computed on the raw (decoded)
+  times, before any correction.
+- **A negative gap** means the later event has an earlier clock time
+  than the earlier one (for example awake at 01:00 but asleep at 23:00
+  in the same row). That is the raw signature of an order error or a
+  12-hour AM/PM slip.
+- **The red band** marks gaps of −3 to −6 h, the range that defines the
+  “AM/PM decode or field-swap candidate” definition used in the
+  validation work; the count in the band is printed on it.
+- **How to read the shape.** A negative mass of roughly −1 to −3 h
+  points to order swaps (repaired by the swap step); two clusters near
+  ±12 h point to PM times typed as AM (repaired by the 12-hour flip).
 
 **FAQ**
 
@@ -1130,10 +1013,6 @@ the rules and the review decide which are errors.
 > pre-correction timestamps. Negative gaps indicate the later event’s
 > clock time precedes the earlier one, the signature of order errors and
 > 12 h AM/PM dial habits.
-
-</div>
-
-<div class="section level4">
 
 #### 13C · Detection Outcomes Heatmap
 
@@ -1164,22 +1043,20 @@ error was not detected at all.
 
 **Precise rules**
 
--   **Where the data come from.** The synthetic error-injection
-    benchmark
-    (`validation/synthetic/results/detection_outcomes_v4_current.csv`):
-    known errors were injected into clean data, and the pipeline was run
-    on the result. Because the right answer is known, each outcome can
-    be labelled.
--   **What a cell is.** For an injected error type, `n` is the number of
-    injected rows; a cell is `count / n × 100`. Each row therefore adds
-    up to about 100%.
--   **The five outcomes.** `CORRECT` fixed correctly;
-    `FLAGGED_UNRESOLVED` caught and handed to a human without a fix;
-    `MISREPAIRED` fixed wrongly; `MISSED` not detected; `NO_MATCH` the
-    injected row could not be matched one-to-one to a row in the
-    pipeline output.
--   **If the file is missing** from the working directory, the figure is
-    skipped and the reason appears at the top of the figure index.
+- **Where the data come from.** The synthetic error-injection benchmark
+  (`validation/synthetic/results/detection_outcomes_v4_current.csv`):
+  known errors were injected into clean data, and the pipeline was run
+  on the result. Because the right answer is known, each outcome can be
+  labelled.
+- **What a cell is.** For an injected error type, `n` is the number of
+  injected rows; a cell is `count / n × 100`. Each row therefore adds up
+  to about 100%.
+- **The five outcomes.** `CORRECT` fixed correctly; `FLAGGED_UNRESOLVED`
+  caught and handed to a human without a fix; `MISREPAIRED` fixed
+  wrongly; `MISSED` not detected; `NO_MATCH` the injected row could not
+  be matched one-to-one to a row in the pipeline output.
+- **If the file is missing** from the working directory, the figure is
+  skipped and the reason appears at the top of the figure index.
 
 **FAQ**
 
@@ -1189,7 +1066,7 @@ It is the evidence that the detection numbers mean something: the
 detector is checked against known ground truth, whereas on real data the
 “correct” answer is unknowable.
 
-Is FLAGGED\_UNRESOLVED a failure?
+Is FLAGGED_UNRESOLVED a failure?
 
 No. It means the pipeline noticed the problem but did not want to guess
 a fix, so it left the decision to a person. For some error types (for
@@ -1215,10 +1092,6 @@ data contain.
 > types; columns are pipeline outcomes (correctly fixed, flagged for
 > review, misrepaired, missed); each cell is the percentage of that
 > error type’s rows with that outcome.
-
-</div>
-
-<div class="section level4">
 
 #### 13D · Threshold vs Measurement Noise
 
@@ -1248,20 +1121,20 @@ an error — and consider raising the threshold.
 
 **Precise rules**
 
--   **What each bar is.** A cleaning threshold divided by the
-    measurement noise. Only thresholds that can be checked against a
-    self-report are drawn (the SOL and WASO thresholds); the subtitle
-    says how many others were left out, such as sleep efficiency.
--   **What “noise” means.** The self-reported value and the value the
-    pipeline computes from the timestamps never agree exactly. Their
-    typical disagreement is the half-width of the 95% Bland-Altman
-    limits of agreement; that is the noise.
--   **How it is graded.** At least 5× conservative, at least 3× safe, at
-    least 2× borderline, under 2× inside the noise. The dashed lines are
-    at 2× and 3×.
--   **Live numbers.** It is computed from this run’s data by
-    `validate_thresholds()` (`R/bland_altman.R`), not from the synthetic
-    benchmark.
+- **What each bar is.** A cleaning threshold divided by the measurement
+  noise. Only thresholds that can be checked against a self-report are
+  drawn (the SOL and WASO thresholds); the subtitle says how many others
+  were left out, such as sleep efficiency.
+- **What “noise” means.** The self-reported value and the value the
+  pipeline computes from the timestamps never agree exactly. Their
+  typical disagreement is the half-width of the 95% Bland-Altman limits
+  of agreement; that is the noise.
+- **How it is graded.** At least 5× conservative, at least 3× safe, at
+  least 2× borderline, under 2× inside the noise. The dashed lines are
+  at 2× and 3×.
+- **Live numbers.** It is computed from this run’s data by
+  [`validate_thresholds()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/validate_thresholds.md)
+  (`R/bland_altman.R`), not from the synthetic benchmark.
 
 **FAQ**
 
@@ -1291,10 +1164,6 @@ out.
 > self-reported and computed values). Dashed lines mark 2× (borderline)
 > and 3× (safe).
 
-</div>
-
-<div class="section level4">
-
 #### 14 · Sleep Duration Pre-Correction
 
 **File** `pipeline_cleaning/14_Sleep_Duration_Pre_Correction.png` —
@@ -1318,14 +1187,14 @@ rules.
 
 **Precise rules**
 
--   **Two groups.** Green is a random sample (up to 5,000) of records
-    with no automatic flag. Red is every record the automatic check
-    flagged that has a usable sleep duration.
--   **Before any manual fix.** This uses the algorithm’s flags only;
-    manual corrections are not applied, so the curve shows what the
-    automatic check saw.
--   **Compare with Figure 6,** which shows the same kind of curve after
-    human review.
+- **Two groups.** Green is a random sample (up to 5,000) of records with
+  no automatic flag. Red is every record the automatic check flagged
+  that has a usable sleep duration.
+- **Before any manual fix.** This uses the algorithm’s flags only;
+  manual corrections are not applied, so the curve shows what the
+  automatic check saw.
+- **Compare with Figure 6,** which shows the same kind of curve after
+  human review.
 
 **FAQ**
 
@@ -1350,10 +1219,6 @@ figure index then says so.
 > **Figure 14.** Density of sleep duration (hours) for records without
 > auto-detection flags (green, random sample of up to 5,000) and records
 > flagged for review (red), before any manual correction.
-
-</div>
-
-<div class="section level4">
 
 #### 15 · Error Timeline
 
@@ -1380,18 +1245,18 @@ curve or unclear instructions.
 
 **Precise rules**
 
--   **Which records.** Records that carry a temporal classification: an
-    order error (`order_error`) or one of three “suspicious gap” types
-    (bed→sleep, sleep→awake, awake→getup). Each needs a bed timestamp so
-    it can be placed on the calendar.
--   **Why monthly.** There are only a few dozen such records in total. A
-    daily area chart would draw slanted blocks between isolated days and
-    suggest a trend that is not there, so the figure counts per month.
--   **Data source.** `corrected_ema_data`, where the classification
-    lives. `clean_df` is the earlier frame from before the
-    classification, so it does not have these columns.
--   **A flag is not a verdict.** Most of these records were reviewed and
-    kept as reported (see Figure 2).
+- **Which records.** Records that carry a temporal classification: an
+  order error (`order_error`) or one of three “suspicious gap” types
+  (bed→sleep, sleep→awake, awake→getup). Each needs a bed timestamp so
+  it can be placed on the calendar.
+- **Why monthly.** There are only a few dozen such records in total. A
+  daily area chart would draw slanted blocks between isolated days and
+  suggest a trend that is not there, so the figure counts per month.
+- **Data source.** `corrected_ema_data`, where the classification lives.
+  `clean_df` is the earlier frame from before the classification, so it
+  does not have these columns.
+- **A flag is not a verdict.** Most of these records were reviewed and
+  kept as reported (see Figure 2).
 
 **FAQ**
 
@@ -1416,10 +1281,6 @@ so it is not drawn.
 
 > **Figure 15.** Number of records per month with a temporal-order error
 > or a suspicious-gap pattern (Step 6 classification), by pattern type.
-
-</div>
-
-<div class="section level4">
 
 #### 16 · Common Error Patterns
 
@@ -1446,18 +1307,18 @@ rule has no matching label in this figure.
 
 **Precise rules**
 
--   **What is ranked.** The queue of records the automatic check
-    flagged, sorted by the specific pattern found in its message:
-    temporal order error, unusual sleep pattern, SOL / sleep-efficiency
-    / TST-TIB metric abnormal, SOL exceeds the bed-to-sleep window, WASO
-    estimate inconsistent, interval-format and timestamp-parse issues.
--   **“Other / unclassified”.** Flagged records that match none of the
-    named patterns. The bar is always drawn last, so you can see what
-    share the named patterns do not explain.
--   **When it is skipped.** If every flagged record is “Other /
-    unclassified”, or there is nothing in the queue (for example because
-    everything was already reviewed), the figure is not drawn and the
-    reason is listed at the top of the figure index.
+- **What is ranked.** The queue of records the automatic check flagged,
+  sorted by the specific pattern found in its message: temporal order
+  error, unusual sleep pattern, SOL / sleep-efficiency / TST-TIB metric
+  abnormal, SOL exceeds the bed-to-sleep window, WASO estimate
+  inconsistent, interval-format and timestamp-parse issues.
+- **“Other / unclassified”.** Flagged records that match none of the
+  named patterns. The bar is always drawn last, so you can see what
+  share the named patterns do not explain.
+- **When it is skipped.** If every flagged record is “Other /
+  unclassified”, or there is nothing in the queue (for example because
+  everything was already reviewed), the figure is not drawn and the
+  reason is listed at the top of the figure index.
 
 **FAQ**
 
@@ -1486,10 +1347,6 @@ inside each message.
 > records in the review queue; the last bar collects records that match
 > no named pattern.
 
-</div>
-
-<div class="section level4">
-
 #### 17 · Top Participants by Flag Rate
 
 **File** `pipeline_cleaning/17_Top_Participants_Flags.png` — generated
@@ -1510,15 +1367,15 @@ mistake; open their raw entries and look at the pattern.
 
 **Precise rules**
 
--   **What the rate is.** For each participant, the number of records
-    flagged by the automatic check divided by the number of diary days
-    that participant has. The 15 highest rates are shown, each labelled
-    with `flags / days`.
--   **Why a rate, not a count.** Participants are observed for different
-    lengths of time. Five flags in 75 days (7%) is not the same as five
-    flags in 5 days (100%).
--   **What it is for.** To find people whose diaries are worth a look.
-    The figure does not say the records are wrong.
+- **What the rate is.** For each participant, the number of records
+  flagged by the automatic check divided by the number of diary days
+  that participant has. The 15 highest rates are shown, each labelled
+  with `flags / days`.
+- **Why a rate, not a count.** Participants are observed for different
+  lengths of time. Five flags in 75 days (7%) is not the same as five
+  flags in 5 days (100%).
+- **What it is for.** To find people whose diaries are worth a look. The
+  figure does not say the records are wrong.
 
 **FAQ**
 
@@ -1547,10 +1404,6 @@ the corrected data.
 > rate (flags per observed diary day), not raw flag counts, so
 > participants with few diary days are not overrepresented.
 
-</div>
-
-<div class="section level4">
-
 #### 18 · Auto-Detected Dashboard
 
 **File** `pipeline_cleaning/18_Auto_Detected_Dashboard.png` — generated
@@ -1561,7 +1414,7 @@ at `sleep_visualization.R:2409`
 **What each part means** Left text panel “Key Metrics”: three numbers,
 each with its name under it — auto-detected (needs human review),
 manually corrected (human-reviewed and fixed), and total records. Right:
-pie of review\_source classes (Temporal Issues / Metrics Issues /
+pie of review_source classes (Temporal Issues / Metrics Issues /
 Amount/Input Flags / Interval Format Errors / Timestamp Format Errors /
 Other).
 
@@ -1575,15 +1428,15 @@ substance-use coding problem.
 
 **Precise rules**
 
--   **Left panel.** Three headline numbers, each named under it: records
-    the algorithm flagged (needs human review), records already fixed by
-    a human, and the total number of records.
--   **Right panel.** A pie of the flagged records by review source:
-    Temporal, Metrics, Amount/Input, Interval Format, Timestamp Format,
-    Other. Each slice shows its count and share.
--   **A consistency check.** The numbers should match
-    `correction_status_final.csv`; the console also checks that no
-    corrected record is still flagged.
+- **Left panel.** Three headline numbers, each named under it: records
+  the algorithm flagged (needs human review), records already fixed by a
+  human, and the total number of records.
+- **Right panel.** A pie of the flagged records by review source:
+  Temporal, Metrics, Amount/Input, Interval Format, Timestamp Format,
+  Other. Each slice shows its count and share.
+- **A consistency check.** The numbers should match
+  `correction_status_final.csv`; the console also checks that no
+  corrected record is still flagged.
 
 **FAQ**
 
@@ -1614,10 +1467,6 @@ slices or Figure 13.
 > review-source classes. Counts must match
 > `correction_status_final.csv`.
 
-</div>
-
-<div class="section level4">
-
 #### A1 · Step Flag Ledger
 
 **File** `pipeline_cleaning/A1_Step_Flag_Ledger.png` — generated at
@@ -1645,16 +1494,16 @@ mean the pipeline is unstable (see the validation rules in §5).
 
 **Precise rules**
 
--   **One row per pipeline step.** The columns are the five evaluation
-    systems, each computed once at a fixed step: `DC` (`data_category`,
-    Step 5), `SEV` (`flag_severity`, Step 7), `CFE` (`checkforerrors`,
-    Step 8), `MISentry` (`field_misentry`, Step 1.5), plus Corrected and
-    Suppressed.
--   **A dash means “not computable yet”.** The first number in a column
-    is where it is generated; after that the counts should stay put.
--   **The two identities worth checking.** From Step 6 on, the six
-    `data_category` counts add up to the number of records; from Step 7
-    on, the three `flag_severity` counts do too. The rule list is in §5.
+- **One row per pipeline step.** The columns are the five evaluation
+  systems, each computed once at a fixed step: `DC` (`data_category`,
+  Step 5), `SEV` (`flag_severity`, Step 7), `CFE` (`checkforerrors`,
+  Step 8), `MISentry` (`field_misentry`, Step 1.5), plus Corrected and
+  Suppressed.
+- **A dash means “not computable yet”.** The first number in a column is
+  where it is generated; after that the counts should stay put.
+- **The two identities worth checking.** From Step 6 on, the six
+  `data_category` counts add up to the number of records; from Step 7
+  on, the three `flag_severity` counts do too. The rule list is in §5.
 
 **FAQ**
 
@@ -1674,7 +1523,7 @@ What does the CFE:flag column count, and why is it not the same as
 Figure 13?
 
 From Step 8 on it counts the records in each outcome of the automatic
-check’s summary (for example SELF\_REPORTED\_FLAG), which is the same
+check’s summary (for example SELF_REPORTED_FLAG), which is the same
 table behind `correction_status_final.csv`. That summary is built before
 a person’s accepted rows are withdrawn, so it still counts them (85 in
 the real run), and it classifies the duration-reinterpretation flags as
@@ -1694,10 +1543,6 @@ as a picture.
 > severity, duration extreme, check-for-errors). Each standard is
 > computed once at a fixed pipeline step; counts must remain constant
 > thereafter.
-
-</div>
-
-<div class="section level4">
 
 #### P26 · Participants Worth a Second Look
 
@@ -1720,14 +1565,14 @@ participants, not individual behavior.
 
 **Precise rules**
 
--   **Who is listed.** The 20 participants with the highest share of
-    their own records flagged by `flag_severity` (Minor plus Major). The
-    share is 100% minus the Clean percentage.
--   **The colours.** Rows at 20% flagged or more are tinted orange, 50%
-    or more red. In a healthy dataset no row is tinted.
--   **Not a quality verdict.** A flag marks a record that differs from
-    an automatic expectation, including self-report-versus-computed
-    disagreements that the pipeline keeps on purpose.
+- **Who is listed.** The 20 participants with the highest share of their
+  own records flagged by `flag_severity` (Minor plus Major). The share
+  is 100% minus the Clean percentage.
+- **The colours.** Rows at 20% flagged or more are tinted orange, 50% or
+  more red. In a healthy dataset no row is tinted.
+- **Not a quality verdict.** A flag marks a record that differs from an
+  automatic expectation, including self-report-versus-computed
+  disagreements that the pipeline keeps on purpose.
 
 **FAQ**
 
@@ -1753,15 +1598,7 @@ corrected data.
 > for manual review prioritization. A high rate flags records worth
 > hand-checking; it is not a verdict that the data are wrong.
 
-</div>
-
-</div>
-
-<div class="section level3">
-
 ### 9.3 Research-ready figure cards (`research_ready/`)
-
-<div class="section level4">
 
 #### 02 · Correction Impact
 
@@ -1806,21 +1643,21 @@ clear shift in the before/after means calls for asking why so much was
 
 **Precise rules**
 
--   **Who is counted as “modified”.** Each record has a status: `manual`
-    if a human correction touched it, otherwise `algorithmic` if a rule
-    changed it, otherwise `none`. A record is never both; manual wins.
--   **What the top panels plot.** Only modified records, one row each,
-    sorted by the size of the change. ΔTST = TST after − TST before
-    (minutes), ΔSOL likewise. A negative bar means the correction
-    shortened the value.
--   **What “before” means.** The “before” values are recomputed from the
-    raw parsed timestamps (TST = awake − sleep − WASO, SOL = sleep −
-    bed); the “after” values are the pipeline’s final numbers.
--   **The scatter** plots before (x) against after (y) for all records.
-    Unchanged records are drawn almost transparent, so they form a faint
-    band on the diagonal behind the few coloured modified points.
--   **The table** gives the mean and SD of TST and SOL before and after;
-    the caption says how many of how many records were modified.
+- **Who is counted as “modified”.** Each record has a status: `manual`
+  if a human correction touched it, otherwise `algorithmic` if a rule
+  changed it, otherwise `none`. A record is never both; manual wins.
+- **What the top panels plot.** Only modified records, one row each,
+  sorted by the size of the change. ΔTST = TST after − TST before
+  (minutes), ΔSOL likewise. A negative bar means the correction
+  shortened the value.
+- **What “before” means.** The “before” values are recomputed from the
+  raw parsed timestamps (TST = awake − sleep − WASO, SOL = sleep − bed);
+  the “after” values are the pipeline’s final numbers.
+- **The scatter** plots before (x) against after (y) for all records.
+  Unchanged records are drawn almost transparent, so they form a faint
+  band on the diagonal behind the few coloured modified points.
+- **The table** gives the mean and SD of TST and SOL before and after;
+  the caption says how many of how many records were modified.
 
 **FAQ**
 
@@ -1866,10 +1703,6 @@ whole.
 > after correction. Corrections are non-destructive: only confirmed
 > input errors were modified.
 
-</div>
-
-<div class="section level4">
-
 #### 02B · Distribution of Sleep Variables
 
 **File** `research_ready/02B_Distribution_Sleep_Variables.png` —
@@ -1891,15 +1724,15 @@ uncorrected; sleep efficiency piled up at exactly 100% suggests many
 
 **Precise rules**
 
--   **What is drawn.** Five small panels, one per metric: sleep
-    duration, time in bed, WASO, SOL and sleep efficiency, from the
-    final corrected data. Each panel has its own axis (the panels are
-    not comparable in scale).
--   **Bars and curve.** The green bars are a histogram (40 bins); the
-    red curve is a smoothed version of the same data. Both are on a
-    density scale, so the area is 1 in each panel.
--   **Units.** Durations are in hours and sleep efficiency is in
-    percent, as in the other figures.
+- **What is drawn.** Five small panels, one per metric: sleep duration,
+  time in bed, WASO, SOL and sleep efficiency, from the final corrected
+  data. Each panel has its own axis (the panels are not comparable in
+  scale).
+- **Bars and curve.** The green bars are a histogram (40 bins); the red
+  curve is a smoothed version of the same data. Both are on a density
+  scale, so the area is 1 in each panel.
+- **Units.** Durations are in hours and sleep efficiency is in percent,
+  as in the other figures.
 
 **FAQ**
 
@@ -1935,10 +1768,6 @@ median and the spread easier to compare at a glance.
 > (TST), sleep onset latency (SOL), wake after sleep onset (WASO), and
 > sleep efficiency (SE) on the final corrected data.
 
-</div>
-
-<div class="section level4">
-
 #### 03 · TST Distribution
 
 **File** `research_ready/03_Sleep_Duration_Distribution.png` — generated
@@ -1969,16 +1798,16 @@ long sleepers; a spike at 0 means zero-duration records.
 
 **Precise rules**
 
--   **What TST is here.** The enhanced definition: sleep period minus
-    wake after sleep onset, `TST = TIB − SOL − WASO` (stored as
-    `sleep_duration_h`). It is not the raw difference between two clock
-    times.
--   **The lines.** Blue solid = mean, orange dashed = median, red =
-    smoothed density; the legend “Line shown” names them and the two
-    values are printed in it.
--   **Skew.** For sleep data the mean is usually a little above the
-    median because of the long-sleeper tail.
--   **`n`** in the corner is the number of records with a computed TST.
+- **What TST is here.** The enhanced definition: sleep period minus wake
+  after sleep onset, `TST = TIB − SOL − WASO` (stored as
+  `sleep_duration_h`). It is not the raw difference between two clock
+  times.
+- **The lines.** Blue solid = mean, orange dashed = median, red =
+  smoothed density; the legend “Line shown” names them and the two
+  values are printed in it.
+- **Skew.** For sleep data the mean is usually a little above the median
+  because of the long-sleeper tail.
+- **`n`** in the corner is the number of records with a computed TST.
 
 **FAQ**
 
@@ -2011,10 +1840,6 @@ their corrected values.
 > (blue) and median (orange) marked. TST is computed as the sleep period
 > minus WASO (TST = TIB − SOL − WASO).
 
-</div>
-
-<div class="section level4">
-
 #### 04 · Sleep Duration vs Time in Bed
 
 **File** `research_ready/04_Sleep_Duration_vs_Time_in_Bed.png` —
@@ -2031,22 +1856,22 @@ uncertainty range. Dashed diagonal = the impossible line TST == TIB.
 time in bed (people stay in bed awake); no point has TST above time in
 bed, which would be impossible.
 
-**Anomaly →** Points above the line (TST &gt; TIB) mean a duration
+**Anomaly →** Points above the line (TST \> TIB) mean a duration
 arithmetic error, such as WASO not being subtracted; a shapeless cloud
 means TIB and TST are decoupled, which usually points to a parsing
 problem.
 
 **Precise rules**
 
--   **What is plotted.** Time in bed (x) against total sleep time (y)
-    for records with a time in bed under 24 h and a TST between 0 and
-    20 h. Colour is the data-quality class.
--   **The impossible line.** The dashed diagonal is TST = TIB. Since TST
-    = TIB − SOL − WASO, no valid point can be above it.
--   **The trend line** is an ordinary straight-line fit with its
-    uncertainty band; the subtitle prints the correlation `r`.
--   **The view** is cut to 0–16 h on both axes for readability; the
-    statistics use all points in range.
+- **What is plotted.** Time in bed (x) against total sleep time (y) for
+  records with a time in bed under 24 h and a TST between 0 and 20 h.
+  Colour is the data-quality class.
+- **The impossible line.** The dashed diagonal is TST = TIB. Since TST =
+  TIB − SOL − WASO, no valid point can be above it.
+- **The trend line** is an ordinary straight-line fit with its
+  uncertainty band; the subtitle prints the correlation `r`.
+- **The view** is cut to 0–16 h on both axes for readability; the
+  statistics use all points in range.
 
 **FAQ**
 
@@ -2081,10 +1906,6 @@ are still in the statistics.
 > construction, points above the identity line are physically
 > impossible.
 
-</div>
-
-<div class="section level4">
-
 #### 04B · SOL vs Sleep Duration
 
 **File** `research_ready/04B_SOL_vs_Sleep_Duration.png` — generated at
@@ -2095,8 +1916,7 @@ are still in the statistics.
 **What each part means** Scatter of SOL (how long it took to fall asleep
 after getting into bed) vs TST. Each dot = one diary night. Black line =
 linear trend; gray band = trend’s uncertainty range. Red dotted vertical
-at SOL = 1 h (reference, labeled). SOL &gt; 3 h filtered out for
-clarity.
+at SOL = 1 h (reference, labeled). SOL \> 3 h filtered out for clarity.
 
 **Healthy look** A negative relationship — a longer time to fall asleep
 goes with less sleep; most points have SOL under 1 hour; the quality
@@ -2108,15 +1928,15 @@ zero-latency reporting (equal-time entries).
 
 **Precise rules**
 
--   **What is plotted.** Sleep onset latency (x, in hours) against total
-    sleep time (y) for records with SOL between 0 and 3 h. Colour is the
-    data-quality class.
--   **The red dotted line** marks SOL = 1 h, the pipeline’s “long onset
-    latency” metric flag.
--   **The trend line** is an ordinary straight-line fit with its
-    uncertainty band.
--   **The 3 h cut** only keeps the plot readable; it is a display
-    choice, not a pipeline rule.
+- **What is plotted.** Sleep onset latency (x, in hours) against total
+  sleep time (y) for records with SOL between 0 and 3 h. Colour is the
+  data-quality class.
+- **The red dotted line** marks SOL = 1 h, the pipeline’s “long onset
+  latency” metric flag.
+- **The trend line** is an ordinary straight-line fit with its
+  uncertainty band.
+- **The 3 h cut** only keeps the plot readable; it is a display choice,
+  not a pipeline rule.
 
 **FAQ**
 
@@ -2146,10 +1966,6 @@ uncertain the slope is.
 > association (long onset latency, shorter sleep) is the expected
 > clinical pattern.
 
-</div>
-
-<div class="section level4">
-
 #### 05 · Variability of Sleep Variables
 
 **File** `research_ready/05_Variability_Sleep_Variables.png` — generated
@@ -2171,16 +1987,16 @@ violin means noisy measurement.
 
 **Precise rules**
 
--   **What is drawn.** One violin per metric (sleep duration, time in
-    bed, WASO, SOL, sleep efficiency), with a small box inside showing
-    the median and middle half of the data. Each panel has its own
-    vertical axis.
--   **How to read a violin.** The width at each height is how many
-    records have that value; a wide part means many records, a thin part
-    means few.
--   **The box** shows the median (line) and the middle 50% of values;
-    outliers are not drawn separately, because the violin already shows
-    the tails.
+- **What is drawn.** One violin per metric (sleep duration, time in bed,
+  WASO, SOL, sleep efficiency), with a small box inside showing the
+  median and middle half of the data. Each panel has its own vertical
+  axis.
+- **How to read a violin.** The width at each height is how many records
+  have that value; a wide part means many records, a thin part means
+  few.
+- **The box** shows the median (line) and the middle 50% of values;
+  outliers are not drawn separately, because the violin already shows
+  the tails.
 
 **FAQ**
 
@@ -2207,10 +2023,6 @@ they are worth checking in Figure 10.
 > variable; each panel uses its own y-axis scale, so panels are compared
 > by distribution shape, not absolute values.
 
-</div>
-
-<div class="section level4">
-
 #### 09 · Bedtime vs Get-up Distribution
 
 **File** `research_ready/09_Bedtime_vs_Getup_Distribution.png` —
@@ -2231,14 +2043,14 @@ were parsed as morning.
 
 **Precise rules**
 
--   **What is drawn.** Two smoothed curves of the clock hour (0–24):
-    bedtime (green) and get-up time (orange), from the corrected
-    timestamps.
--   **The wrap-around.** The axis runs from 0 to 24 h, so bedtimes
-    around midnight are split: the part before midnight is at the right
-    end and the part after midnight is at the left end.
--   **Who is included.** Records that have both a bed time and a get-up
-    time.
+- **What is drawn.** Two smoothed curves of the clock hour (0–24):
+  bedtime (green) and get-up time (orange), from the corrected
+  timestamps.
+- **The wrap-around.** The axis runs from 0 to 24 h, so bedtimes around
+  midnight are split: the part before midnight is at the right end and
+  the part after midnight is at the left end.
+- **Who is included.** Records that have both a bed time and a get-up
+  time.
 
 **FAQ**
 
@@ -2263,10 +2075,6 @@ weekend.
 > **Figure 09.** Density of bedtime and get-up clock hours (corrected
 > times) across the day. Peak separation (evening bedtimes, morning
 > get-ups) is the healthy circadian signature.
-
-</div>
-
-<div class="section level4">
 
 #### 20 · SOL Perception Bias
 
@@ -2299,17 +2107,17 @@ a subset of participants is using the field differently.
 
 **Precise rules**
 
--   **The two SOL values.** Objective SOL is computed from the corrected
-    times, `time_sleep_corrected − time_bed_corrected`, in minutes.
-    Subjective SOL is what the participant reported in
-    `duration_totalmin_sol_estimate_am`.
-    `bias = |objective − subjective|`.
--   **Who is included.** Only records where both values exist.
--   **The view.** The x axis shows 0–200 minutes, so larger differences
-    are not drawn (R prints a warning about the removed rows).
--   **The two dashed lines** are reading aids: 15 min is close to the
-    pipeline’s 15-min window tolerance; 60 min is a display reference,
-    not a rule.
+- **The two SOL values.** Objective SOL is computed from the corrected
+  times, `time_sleep_corrected − time_bed_corrected`, in minutes.
+  Subjective SOL is what the participant reported in
+  `duration_totalmin_sol_estimate_am`.
+  `bias = |objective − subjective|`.
+- **Who is included.** Only records where both values exist.
+- **The view.** The x axis shows 0–200 minutes, so larger differences
+  are not drawn (R prints a warning about the removed rows).
+- **The two dashed lines** are reading aids: 15 min is close to the
+  pipeline’s 15-min window tolerance; 60 min is a display reference, not
+  a rule.
 
 **FAQ**
 
@@ -2343,10 +2151,6 @@ signed difference from the two columns.
 > SOL (derived from corrected bed and sleep timestamps) and subjective
 > SOL (participant’s reported onset latency), in minutes.
 
-</div>
-
-<div class="section level4">
-
 #### 20B · WASO Perception Bias
 
 **File** `research_ready/20B_WASO_Perception_Bias.png` — generated at
@@ -2373,18 +2177,18 @@ entry problem.
 
 **Precise rules**
 
--   **The two values are different things.** Objective here is
-    `time_getup_corrected − time_awake_corrected` in minutes — the time
-    spent in bed after the final awakening. Subjective is the
-    participant’s reported nighttime wakefulness
-    (`duration_totalmin_waso_estimate_am`, read when written as
-    hours:minutes).
--   **So the gap is not a pure reporting error.** The two numbers cover
-    different time windows; the figure’s subtitle says so. The mismatch
-    is informative, not something to fix.
--   **Same construction as Figure 20.**
-    `bias = |objective − subjective|`, records with both values, x axis
-    0–200 min, dashed references at 15 and 60 min.
+- **The two values are different things.** Objective here is
+  `time_getup_corrected − time_awake_corrected` in minutes — the time
+  spent in bed after the final awakening. Subjective is the
+  participant’s reported nighttime wakefulness
+  (`duration_totalmin_waso_estimate_am`, read when written as
+  hours:minutes).
+- **So the gap is not a pure reporting error.** The two numbers cover
+  different time windows; the figure’s subtitle says so. The mismatch is
+  informative, not something to fix.
+- **Same construction as Figure 20.** `bias = |objective − subjective|`,
+  records with both values, x axis 0–200 min, dashed references at 15
+  and 60 min.
 
 **FAQ**
 
@@ -2412,10 +2216,6 @@ be read, so some rows drop out.
 > wake-after-sleep-onset and the participant’s self-reported nighttime
 > wakefulness, in minutes.
 
-</div>
-
-<div class="section level4">
-
 #### 21 · Substance Use Availability
 
 **File** `research_ready/21_Substance_Use_Availability.png` — generated
@@ -2435,15 +2235,15 @@ points to a column-mapping or collection problem.
 
 **Precise rules**
 
--   **What each bar is.** The percentage of all diary rows that have a
-    value for that substance (caffeine, alcohol, nicotine, cannabis).
-    The label gives the count, the percentage and the range of reported
-    values.
--   **The denominator is every row,** including days with no substance
-    entry at all, so the percentages are low for items that were only
-    asked on some days or only in the evening survey.
--   **Units.** Caffeine is cups, alcohol is standard drinks, nicotine
-    and cannabis are doses.
+- **What each bar is.** The percentage of all diary rows that have a
+  value for that substance (caffeine, alcohol, nicotine, cannabis). The
+  label gives the count, the percentage and the range of reported
+  values.
+- **The denominator is every row,** including days with no substance
+  entry at all, so the percentages are low for items that were only
+  asked on some days or only in the evening survey.
+- **Units.** Caffeine is cups, alcohol is standard drinks, nicotine and
+  cannabis are doses.
 
 **FAQ**
 
@@ -2472,10 +2272,6 @@ a units mix-up; see Figures 22–24.
 > substance (caffeine, alcohol, nicotine, cannabis), indicating how
 > completely each substance domain was reported.
 
-</div>
-
-<div class="section level4">
-
 #### 22 · Substance Use Value Distribution
 
 **File** `research_ready/22_Substance_Use_Distribution.png` — generated
@@ -2497,15 +2293,15 @@ dosing.
 
 **Precise rules**
 
--   **What is drawn.** One box per substance that has data: the box is
-    the middle half of the reports, the line inside is the median, and
-    the gray dots are individual reports spread sideways so identical
-    values do not stack into one dot.
--   **Which substances.** Only those with at least one value; substances
-    with no data are not drawn.
--   **Units.** Caffeine is cups and alcohol is standard drinks; nicotine
-    and cannabis are doses.
--   **Extreme values** feed the amount flags in Step 8.
+- **What is drawn.** One box per substance that has data: the box is the
+  middle half of the reports, the line inside is the median, and the
+  gray dots are individual reports spread sideways so identical values
+  do not stack into one dot.
+- **Which substances.** Only those with at least one value; substances
+  with no data are not drawn.
+- **Units.** Caffeine is cups and alcohol is standard drinks; nicotine
+  and cannabis are doses.
+- **Extreme values** feed the amount flags in Step 8.
 
 **FAQ**
 
@@ -2532,10 +2328,6 @@ real heavy day. Check the record.
 > substance. Units: caffeine = cups, alcohol = standard drinks, nicotine
 > and cannabis = doses.
 
-</div>
-
-<div class="section level4">
-
 #### 23 · Caffeine Consumption
 
 **File** `research_ready/23_Caffeine_Consumption.png` — generated at
@@ -2558,16 +2350,16 @@ units confusion (cans vs cups) and feeds `AMOUNT_FLAG`.
 
 **Precise rules**
 
--   **One bar per distinct reported value,** with no binning, in numeric
-    order on a discrete axis, so every value has its own bar and bars
-    never overlap. Fractional answers (half a cup, for example) keep
-    their own bar and are labelled as fractions.
--   **Unit and column.** Cups per day, from
-    `caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1`.
--   **Labels.** Each bar shows its count and its share of the
-    non-missing reports.
--   **Extreme values** (for example 10 or more) feed `AMOUNT_FLAG` in
-    Step 8 and often mean a units mix-up (cups, cans or servings).
+- **One bar per distinct reported value,** with no binning, in numeric
+  order on a discrete axis, so every value has its own bar and bars
+  never overlap. Fractional answers (half a cup, for example) keep their
+  own bar and are labelled as fractions.
+- **Unit and column.** Cups per day, from
+  `caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1`.
+- **Labels.** Each bar shows its count and its share of the non-missing
+  reports.
+- **Extreme values** (for example 10 or more) feed `AMOUNT_FLAG` in Step
+  8 and often mean a units mix-up (cups, cans or servings).
 
 **FAQ**
 
@@ -2599,10 +2391,6 @@ servings were entered as cups; such records get an amount flag.
 > (cups/day). Right-skewed with a mode of 0–1 cups is expected; spikes
 > at implausible values indicate unit confusion.
 
-</div>
-
-<div class="section level4">
-
 #### 24 · Alcohol Consumption
 
 **File** `research_ready/24_Alcohol_Consumption.png` — generated at
@@ -2621,15 +2409,15 @@ caffeine; verify how `alcoholtoday_PM` was coded.
 
 **Precise rules**
 
--   **Same construction as Figure 23.** One bar per distinct reported
-    value on a discrete axis, in numeric order; fractional answers are
-    kept and labelled as fractions.
--   **Unit and column.** Standard drinks per day, from
-    `alcoholtoday_PM_NumAlcoholicDrinks_1`.
--   **Labels.** Each bar shows its count and its share of the
-    non-missing reports.
--   **High values** feed `AMOUNT_FLAG` in Step 8; check how the column
-    was coded before treating them as real consumption.
+- **Same construction as Figure 23.** One bar per distinct reported
+  value on a discrete axis, in numeric order; fractional answers are
+  kept and labelled as fractions.
+- **Unit and column.** Standard drinks per day, from
+  `alcoholtoday_PM_NumAlcoholicDrinks_1`.
+- **Labels.** Each bar shows its count and its share of the non-missing
+  reports.
+- **High values** feed `AMOUNT_FLAG` in Step 8; check how the column was
+  coded before treating them as real consumption.
 
 **FAQ**
 
@@ -2654,10 +2442,6 @@ definition, treat large values with care.
 
 > **Figure 24.** Count of records by reported alcohol consumption
 > (standard drinks/day).
-
-</div>
-
-<div class="section level4">
 
 #### R25 · Sleep Regularity — Weekday vs Weekend
 
@@ -2687,16 +2471,16 @@ shift is social jetlag and worth reporting as a finding.
 
 **Precise rules**
 
--   **Which columns.** Bedtime comes from `time_bed_corrected` and
-    get-up time from `time_getup_corrected`. Both are corrected
-    timestamps the pipeline creates, not raw diary columns.
--   **Weekday or weekend.** From the calendar day of the bed timestamp:
-    Saturday and Sunday are “Weekend”, Monday to Friday are “Weekday”. A
-    bedtime after midnight carries the next day’s date.
--   **Hours above 24.** Bedtime hours before noon are shifted by +24, so
-    a y value above 24 means after midnight (26 = 02:00).
--   **What is drawn.** A violin plus a box for each day type, separately
-    for bedtime and get-up time; the black dot is the median.
+- **Which columns.** Bedtime comes from `time_bed_corrected` and get-up
+  time from `time_getup_corrected`. Both are corrected timestamps the
+  pipeline creates, not raw diary columns.
+- **Weekday or weekend.** From the calendar day of the bed timestamp:
+  Saturday and Sunday are “Weekend”, Monday to Friday are “Weekday”. A
+  bedtime after midnight carries the next day’s date.
+- **Hours above 24.** Bedtime hours before noon are shifted by +24, so a
+  y value above 24 means after midnight (26 = 02:00).
+- **What is drawn.** A violin plus a box for each day type, separately
+  for bedtime and get-up time; the black dot is the median.
 
 **FAQ**
 
@@ -2731,10 +2515,6 @@ finding.
 > Saturday–Sunday, derived from the corrected bedtime date). A modest (≤
 > 1 h) weekend delay is expected; a large shift indicates social jetlag.
 
-</div>
-
-<div class="section level4">
-
 #### R26 · Sleep Composition — TIB Breakdown
 
 **File** `research_ready/R26_Sleep_Composition_TIB_Breakdown.png` —
@@ -2756,15 +2536,14 @@ would mean a duration arithmetic bug.
 
 **Precise rules**
 
--   **What the bar is.** The average share of time in bed spent in each
-    of three parts: total sleep time (TST), sleep onset latency (SOL)
-    and wake after sleep onset (WASO). For each record the three parts
-    are divided by their sum, and those shares are then averaged over
-    records.
--   **The identity.** `TIB = TST + SOL + WASO`, so the three segments
-    fill the whole bar with no leftover; any tiny gap is rounding.
--   **Who is included.** Records with all three values and a TST above
-    0; the subtitle gives the number.
+- **What the bar is.** The average share of time in bed spent in each of
+  three parts: total sleep time (TST), sleep onset latency (SOL) and
+  wake after sleep onset (WASO). For each record the three parts are
+  divided by their sum, and those shares are then averaged over records.
+- **The identity.** `TIB = TST + SOL + WASO`, so the three segments fill
+  the whole bar with no leftover; any tiny gap is rounding.
+- **Who is included.** Records with all three values and a TST above 0;
+  the subtitle gives the number.
 
 **FAQ**
 
@@ -2793,10 +2572,6 @@ slices stay readable, which a pie would crowd.
 > wake after sleep onset (WASO), with TIB = TST + SOL + WASO by
 > construction. Healthy composition places TST at 80–90% of TIB.
 
-</div>
-
-<div class="section level4">
-
 #### R27 · Sleep Metrics Correlation Matrix
 
 **File** `research_ready/R27_Sleep_Metrics_Correlation_Matrix.png` —
@@ -2824,15 +2599,15 @@ negative by construction, because SE is computed from WASO.)
 
 **Precise rules**
 
--   **What each cell is.** The Pearson correlation between two of TST,
-    SOL, WASO, SE and TIB, computed on records where all five are
-    present; the subtitle gives the number of records.
--   **The colours.** Red is negative, green is positive, and the colour
-    gets stronger the closer the value is to −1 or +1. Only the upper
-    triangle is shown; the diagonal is always 1.
--   **Definitional links.** Some pairs are tied by definition:
-    `SE = TST / TIB` and `TIB = TST + SOL + WASO`, so their correlations
-    are partly built in.
+- **What each cell is.** The Pearson correlation between two of TST,
+  SOL, WASO, SE and TIB, computed on records where all five are present;
+  the subtitle gives the number of records.
+- **The colours.** Red is negative, green is positive, and the colour
+  gets stronger the closer the value is to −1 or +1. Only the upper
+  triangle is shown; the diagonal is always 1.
+- **Definitional links.** Some pairs are tied by definition:
+  `SE = TST / TIB` and `TIB = TST + SOL + WASO`, so their correlations
+  are partly built in.
 
 **FAQ**
 
@@ -2867,11 +2642,3 @@ values.
 > data (red = negative, green = positive, coefficient per cell).
 > Expected signs: TST–SE positive, SOL–SE negative, TST–TIB positive,
 > WASO–SE negative.
-
-</div>
-
-</div>
-
-</div>
-
-</div>

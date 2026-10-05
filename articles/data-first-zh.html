@@ -32,7 +32,7 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item dropdown">
+<li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><h6 class="dropdown-header" data-toc-skip>English</h6></li>
@@ -77,7 +77,7 @@
       <h1>数据优先入口：clean_sleep_diary()（中文）</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/HEAD/vignettes/data-first-zh.Rmd" class="external-link"><code>vignettes/data-first-zh.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/vignettes/data-first-zh.Rmd" class="external-link"><code>vignettes/data-first-zh.Rmd</code></a></small>
       <div class="d-none name"><code>data-first-zh.Rmd</code></div>
     </div>
 
@@ -89,7 +89,9 @@
 <p class="lang-switch" style="text-align:right;margin:0.2em 0 0.8em">
 <a href="data-first.html">English →</a>
 </p>
-<p>管线可以完全从数据文件或 data.frame 跑起来——<strong>不需要配置文件</strong>。列名会自动推断，每一个推断决策都会被记录下来，清洗结果旁边还会写出一份来源清单（provenance manifest）。</p>
+<p>管线可以完全从数据文件或 data.frame
+跑起来——<strong>不需要配置文件</strong>。列名会自动推断，每一个推断决策都会被记录下来，清洗结果旁边还会写出一份来源清单（provenance
+manifest）。</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
 <span></span>
@@ -105,6 +107,10 @@
 <h3 id="返回值6-字段契约">返回值（6 字段契约）<a class="anchor" aria-label="anchor" href="#%E8%BF%94%E5%9B%9E%E5%80%BC6-%E5%AD%97%E6%AE%B5%E5%A5%91%E7%BA%A6"></a>
 </h3>
 <table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
 <thead><tr class="header">
 <th>字段</th>
 <th>内容</th>
@@ -112,7 +118,8 @@
 <tbody>
 <tr class="odd">
 <td><code>cleaned</code></td>
-<td>清洗后的 Dataset A（data.frame）；dry-run 时为 <code>NULL</code>
+<td>清洗后的 Dataset A（data.frame）；dry-run 时为
+<code>NULL</code>
 </td>
 </tr>
 <tr class="even">
@@ -143,22 +150,29 @@
 </h3>
 <p><code><a href="../reference/guess_column_mapping.html">guess_column_mapping()</a></code> 把原始列名与已知别名做匹配：</p>
 <ul>
-<li>别名精确匹配（例如 <code>bedtime</code> -&gt; <code>time_bed_hhmm</code>，置信度 1.0）</li>
+<li>别名精确匹配（例如 <code>bedtime</code> -&gt;
+<code>time_bed_hhmm</code>，置信度 1.0）</li>
 <li>语义子串匹配（置信度 0.6）</li>
 <li>有歧义的并列匹配<strong>绝不静默选择</strong>——会连同候选集合一起记录，并保持未映射</li>
-<li>找不到匹配列的必填字段会被标为 <code>absent</code>，随后 <code><a href="../reference/validate_schema.html">validate_schema()</a></code> 带着缺失清单<strong>显式报错</strong>
+<li>找不到匹配列的必填字段会被标为 <code>absent</code>，随后
+<code><a href="../reference/validate_schema.html">validate_schema()</a></code>
+带着缺失清单<strong>显式报错</strong>
 </li>
 </ul>
-<p>每个决策行都携带：<code>user_col, internal_col, match_rule, confidence, status, candidate_set</code>。包不会静默推断 schema——它记录每一个 schema 推断决策。</p>
+<p>每个决策行都携带：<code>user_col, internal_col, match_rule, confidence, status, candidate_set</code>。包不会静默推断
+schema——它记录每一个 schema 推断决策。</p>
 </div>
 <div class="section level3">
 <h3 id="来源清单provenance-manifest">来源清单（provenance manifest）<a class="anchor" aria-label="anchor" href="#%E6%9D%A5%E6%BA%90%E6%B8%85%E5%8D%95provenance-manifest"></a>
 </h3>
-<p>每次完整运行都会写出 <code>run_manifest_&lt;timestamp&gt;.json</code>：</p>
+<p>每次完整运行都会写出
+<code>run_manifest_&lt;timestamp&gt;.json</code>：</p>
 <ul>
-<li>输入身份：<strong>md5 哈希</strong>（哈希是身份，路径只是辅助）、大小、文件名</li>
+<li>输入身份：<strong>md5
+哈希</strong>（哈希是身份，路径只是辅助）、大小、文件名</li>
 <li>
-<code>commit</code>（不在 git 仓库时为 <code>null</code>——“不可用”是一个独立状态）</li>
+<code>commit</code>（不在 git 仓库时为
+<code>null</code>——“不可用”是一个独立状态）</li>
 <li>
 <code>timestamp_utc</code>（仅 UTC）</li>
 <li>环境：R 版本、平台、各包版本</li>
@@ -171,12 +185,15 @@
 <div class="section level3">
 <h3 id="dry-run">dry-run<a class="anchor" aria-label="anchor" href="#dry-run"></a>
 </h3>
-<p><code>dry_run = TRUE</code> 在“输入哈希 + schema 检测 + 列映射 + 配置解析”之后停下。它会打印映射预览、写出 <code>dry_run_manifest.json</code>，并且<strong>绝不写出清洗后的数据集</strong>。任何模式下原始输入都不会被修改。</p>
+<p><code>dry_run = TRUE</code> 在“输入哈希 + schema 检测 + 列映射 +
+配置解析”之后停下。它会打印映射预览、写出
+<code>dry_run_manifest.json</code>，并且<strong>绝不写出清洗后的数据集</strong>。任何模式下原始输入都不会被修改。</p>
 </div>
 <div class="section level3">
 <h3 id="原始输入永不被修改">原始输入永不被修改<a class="anchor" aria-label="anchor" href="#%E5%8E%9F%E5%A7%8B%E8%BE%93%E5%85%A5%E6%B0%B8%E4%B8%8D%E8%A2%AB%E4%BF%AE%E6%94%B9"></a>
 </h3>
-<p>适配后的输入会写到项目目录里的一个内部副本；用户原始的文件或 data.frame 保持不变（有测试验证）。</p>
+<p>适配后的输入会写到项目目录里的一个内部副本；用户原始的文件或
+data.frame 保持不变（有测试验证）。</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
