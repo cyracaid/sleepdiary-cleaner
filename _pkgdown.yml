@@ -31,6 +31,8 @@ navbar:
           href: articles/validation-methodology-zh.html
         - text: "管线架构"
           href: articles/pipeline-architecture-zh.html
+        - text: "数据优先入口：clean_sleep_diary()"
+          href: articles/data-first-zh.html
         - text: "列映射、配置与数据格式"
           href: articles/column-mapping-zh.html
         - text: "如何读懂管线输出"
@@ -55,10 +57,10 @@ articles:
   - title: "Chinese (中文)"
     desc: >
       <span id="chinese"></span>中文文章。[Back to English ↑](#english)
-      （`data-first` 暂无中文版。）
     contents:
       - validation-methodology-zh
       - pipeline-architecture-zh
+      - data-first-zh
       - column-mapping-zh
       - interpreting-output-zh
       - testing-coverage-zh

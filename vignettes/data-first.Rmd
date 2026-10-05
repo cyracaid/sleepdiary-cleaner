@@ -9,6 +9,8 @@ vignette: >
 
 # Data-first entry: `clean_sleep_diary()`
 
+<p class="lang-switch" style="text-align:right;margin:0.2em 0 0.8em"><a href="data-first-zh.html">中文版 →</a></p>
+
 The pipeline can run entirely from a data file or data.frame — no config file
 required. Column names are inferred, every schema inference decision is
 recorded, and a provenance manifest is written alongside the cleaned output.
