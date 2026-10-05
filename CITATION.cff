@@ -26,5 +26,8 @@ version: 1.4.9
 date-released: "2026-10-01"
 license: MIT
 url: "https://github.com/cyracaid/sleepdiary-cleaner"
-# DOI: mint a Zenodo DOI from the GitHub release, then add:
-# doi: 10.5281/zenodo.XXXXXXX
+doi: 10.5281/zenodo.23077702
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.23077703
+    description: "Archived version 1.4.9 (the DOI above resolves to the latest version)"

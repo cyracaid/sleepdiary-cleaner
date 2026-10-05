@@ -57,3 +57,19 @@ cleaning accuracy).
   improved, 7 worsened). All three types together: 80 of 81 improved now, 81
   of 88 then. The counts differ because the pipeline changed, not because the
   comparison did.
+- **Two detection-recall tables are not yet reconciled.** The headline recall
+  (0.995, interval 0.993 to 0.997) comes from `recall_specificity_ci.csv`
+  (`ppv_cluster_ci.R`, 4,745 injected rows; weakest category
+  `cross_participant_spike`, about 0.89 to 0.91). `correction_level_recall.csv`
+  and its per-category file (`correction_level_recall.R`) are built from
+  `detection_outcomes_v4_current.csv` (5,391 injected rows) and report a
+  detection recall of 1.0 in every category, because there "detected" counts every
+  row the pipeline acted on, including 26 that it repaired wrongly. The two come
+  from different benchmark runs and different definitions. Quote one table, name
+  it, and state its definition; do not put the two side by side until they are
+  re-derived from one run.
+- `correction_level_recall.csv` and `metric_distortion.csv` report that, among
+  injected errors, 48.6% were corrected to the true value, 50.9% were flagged
+  without correction, and 0.5% were misrepaired; and that after the pipeline the
+  mean sleep-onset latency is still 47.6 minutes above the clean data (it is 191
+  minutes above with no cleaning). Report this residual in the paper.
