@@ -127,6 +127,30 @@ summ <- lapply(names(arms), function(nm) {
              se_shift_pct_vs_clean = round(mean(a$se - A$se[keep], na.rm = TRUE), 3))
 }) %>% bind_rows()
 
+# Extra arm (2026-10-05): the pipeline's output after the rows it flagged for review
+# are set aside (excluded), compared with the clean data on those same rows. Shows
+# whether the residual distortion above sits in the flagged rows. Needs the
+# per-row flag from ppv_cluster_ci.R (cluster_bootstrap_per_row.csv).
+pr_path <- file.path(RES, "cluster_bootstrap_per_row.csv")
+if (file.exists(pr_path)) {
+  pr <- read.csv(pr_path, stringsAsFactors = FALSE)
+  fl <- pr$detected_flag[match(raw$row_id, pr$row_id)]
+  fl[is.na(fl)] <- FALSE
+  sel <- keep & !fl
+  extra <- lapply(c("clean_same_rows", "pipeline_excl_flagged"), function(nm) {
+    a <- if (nm == "clean_same_rows") A[sel, ] else D[sel, ]
+    data.frame(arm = nm, n = sum(sel),
+               mean_tst_h = round(mean(a$tst) / 60, 3),
+               mean_sol_min = round(mean(a$sol), 2),
+               mean_tib_h = round(mean(a$tib) / 60, 3),
+               mean_se_pct = round(mean(a$se, na.rm = TRUE), 2),
+               tst_shift_min_vs_clean = round(mean(a$tst - A$tst[sel]), 2),
+               sol_shift_min_vs_clean = round(mean(a$sol - A$sol[sel]), 2),
+               se_shift_pct_vs_clean = round(mean(a$se - A$se[sel], na.rm = TRUE), 3))
+  }) %>% bind_rows()
+  summ <- bind_rows(summ, extra)
+}
+
 write_csv(summ, file.path(RES, "metric_distortion.csv"))
 print(as.data.frame(summ))
 cat("\nWrote:", file.path(RES, "metric_distortion.csv"), "  (rows compared:", sum(keep), ")\n")

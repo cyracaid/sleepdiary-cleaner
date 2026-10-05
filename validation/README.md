@@ -89,4 +89,12 @@ cleaning accuracy).
   injected errors, 48.6% were corrected to the true value, 50.9% were flagged
   without correction, and 0.5% were misrepaired; and that after the pipeline the
   mean sleep-onset latency is still 47.6 minutes above the clean data (it is 191
-  minutes above with no cleaning). Report this residual in the paper.
+  minutes above with no cleaning). The residual sits entirely in the rows the
+  pipeline flagged and left for review: with the 2,787 flagged rows set aside the
+  remaining 3,881 rows show no shift in total sleep time, onset latency or
+  efficiency (the `pipeline_excl_flagged` arm), while the flagged rows alone are
+  114 minutes too long on latency. Two cautions. The benchmark is enriched with
+  errors (5,391 of 7,000 rows are injected), so setting aside the flagged rows
+  costs 42% of the rows here, whereas the review queue is about 1.6% of rows in
+  the study data. And no shift in the unflagged rows means the injected error
+  types the pipeline handles; it says nothing about error types not injected.
