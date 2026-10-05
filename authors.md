@@ -1,18 +1,26 @@
+<div id="main" class="col-md-9" role="main">
+
 # Authors and Citation
+
+<div class="section level2">
 
 ## Authors
 
-- **Cai Dong**. Author, maintainer.
-  [](https://orcid.org/0009-0001-0706-0335)
+-   **Cai Dong**. Author, maintainer.
+    [](https://orcid.org/0009-0001-0706-0335)
 
-- **Maia ten Brink**. Author.
-  [](https://orcid.org/0000-0001-6987-1339)  
-  Mentor
+-   **Maia ten Brink**. Author.
+    [](https://orcid.org/0000-0001-6987-1339)  
+    Mentor
+
+</div>
+
+<div class="section level2">
 
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/cyracaid/sleepdiary-cleaner/blob/main/inst/CITATION)
+[`inst/CITATION`](https://github.com/cyracaid/sleepdiary-cleaner/blob/HEAD/inst/CITATION)
 
 Dong, C., & ten Brink, M. (2026). sleepcleanr: Reproducible Sleep EMA
 Diary Data Cleaning Pipeline \[R package\].
@@ -24,3 +32,7 @@ https://github.com/cyracaid/sleepdiary-cleaner
       year = {2026},
       url = {https://github.com/cyracaid/sleepdiary-cleaner},
     }
+
+</div>
+
+</div>

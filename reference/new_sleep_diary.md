@@ -1,8 +1,18 @@
-# Construct a sleep_diary object
+<div id="main" class="col-md-9" role="main">
 
-Construct a sleep_diary object
+# Construct a sleep\_diary object
+
+<div class="ref-description section level2">
+
+Construct a sleep\_diary object
+
+</div>
+
+<div class="section level2">
 
 ## Usage
+
+<div class="sourceCode">
 
 ``` r
 new_sleep_diary(
@@ -15,34 +25,48 @@ new_sleep_diary(
 )
 ```
 
+</div>
+
+</div>
+
+<div class="section level2">
+
 ## Arguments
 
-- data:
+-   data:
 
-  A data frame holding the working records.
+    A data frame holding the working records.
 
-- step_id:
+-   step\_id:
 
-  Character. Short ordered step id, e.g. "1", "1.5", "2". Use "0" for a
-  freshly loaded object that no step has processed yet.
+    Character. Short ordered step id, e.g. "1", "1.5", "2". Use "0" for
+    a freshly loaded object that no step has processed yet.
 
-- step_label:
+-   step\_label:
 
-  Character. Human-readable step name.
+    Character. Human-readable step name.
 
-- cfg:
+-   cfg:
 
-  List or NULL. Pipeline configuration in force.
+    List or NULL. Pipeline configuration in force.
 
-- history:
+-   history:
 
-  List of prior step records (oldest first).
+    List of prior step records (oldest first).
 
-- extra:
+-   extra:
 
-  List. Optional extra fields merged into the step record, for example
-  `list(n_corrected = 12)`.
+    List. Optional extra fields merged into the step record, for example
+    `list(n_corrected = 12)`.
+
+</div>
+
+<div class="section level2">
 
 ## Value
 
 An object of class `sleep_diary`.
+
+</div>
+
+</div>
