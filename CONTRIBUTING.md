@@ -82,3 +82,11 @@ data that cannot be shared publicly, describe the *shape* of the data
 
 By participating you agree to abide by the [Contributor Covenant Code of
 Conduct](https://cyracaid.github.io/sleepdiary-cleaner/CODE_OF_CONDUCT.md).
+
+## Scripts at the repository root
+
+`verify_finalize_columns.R`, `verify_reference_fidelity.R` and
+`verify_delivery_wiring.R` are run by CI
+(`.github/workflows/R-CMD-check.yaml`) after the package check. Do not
+move or delete them; they are excluded from the built package by
+`.Rbuildignore`.

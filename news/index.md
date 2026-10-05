@@ -19,12 +19,27 @@
 - `validation/run_all.R` (new): regenerates nine synthetic benchmark
   tables from fixed seeds in a temporary copy and compares them with the
   committed ones (all nine identical with 1.4.9).
+
 - The benchmark size is 5,391 injected rows in 14 categories plus 1,609
   clean controls; the “4,736” in earlier notes described an older
   composition. The headline recall 0.995 (flagged or corrected to the
   true value) and the detection recall 1.0 in
   `correction_level_recall.csv` (any action, including 26 wrong repairs)
   come from the same run and are defined in `validation/README.md`.
+
+- `validation/synthetic/low_prevalence.R` (new): the benchmark at about
+  5% injected rows (flagged or corrected 99.4%, no clean row flagged or
+  altered, 29.7 rows per 1,000 flagged); `validation/run_all.R` now
+  regenerates ten tables, all identical.
+
+- `validation/blind_audit/` (new): protocol and scripts for a blind
+  audit of the pipeline on real data (stratified sample, two independent
+  annotators, kappa, miss rate with intervals, population estimate);
+  tested on synthetic data only.
+
+- `THRESHOLDS.md` says explicitly that the defaults are reference
+  values: the threshold sweep is flat, so the benchmark is insensitive
+  to them.
 
 ### Citation
 

@@ -121,6 +121,10 @@
 <span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="at">      </span><span class="fu">excessive_minutes</span><span class="kw">:</span><span class="at"> </span><span class="dv">120</span><span class="co">            # gross-outlier catch, not clinical</span></span></code></pre></div>
 </div>
 <div class="section level2">
+<h2 id="what-the-validation-shows-about-these-defaults-and-what-it-does-not">What the validation shows about these defaults (and what it does not)<a class="anchor" aria-label="anchor" href="#what-the-validation-shows-about-these-defaults-and-what-it-does-not"></a></h2>
+<p>These values are <strong>reference values, not optimized ones.</strong> The synthetic benchmark swept the adjacent-swap threshold (1 to 5 h) and the AM/PM flip threshold (8 to 14 h) over a 20-point grid: recall stayed between 0.9950 and 0.9957 and false alarms stayed at zero. The benchmark is therefore <em>insensitive</em> to these two thresholds over that range; it cannot tell 3 h from 2 h or 4 h, and it does not show that 3 h and 12 h are optimal. On the study data no threshold changed the mean total sleep time by more than 0.93 minutes or the number of analysable rows by more than 0.70%. The defaults were set on a healthy young-adult sample and should be re-checked on your own data (<code>validation/synthetic/operating_point_sweep.R</code> is the template).</p>
+</div>
+<div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
 <ul><li>Lichstein et al. (2003), <em>Behaviour Research and Therapy</em> — quantitative criteria for insomnia (30-min SOL/WASO, ~85% SE)</li>
 <li>AASM standard actigraphy-diary reporting conventions</li>

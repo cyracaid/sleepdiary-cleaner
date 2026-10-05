@@ -61,9 +61,11 @@
 </ul></div>
 <div class="section level3">
 <h3 id="validation-development-version">Validation<a class="anchor" aria-label="anchor" href="#validation-development-version"></a></h3>
-<ul><li>
-<code>validation/run_all.R</code> (new): regenerates nine synthetic benchmark tables from fixed seeds in a temporary copy and compares them with the committed ones (all nine identical with 1.4.9).</li>
-<li>The benchmark size is 5,391 injected rows in 14 categories plus 1,609 clean controls; the “4,736” in earlier notes described an older composition. The headline recall 0.995 (flagged or corrected to the true value) and the detection recall 1.0 in <code>correction_level_recall.csv</code> (any action, including 26 wrong repairs) come from the same run and are defined in <code>validation/README.md</code>.</li>
+<ul><li><p><code>validation/run_all.R</code> (new): regenerates nine synthetic benchmark tables from fixed seeds in a temporary copy and compares them with the committed ones (all nine identical with 1.4.9).</p></li>
+<li><p>The benchmark size is 5,391 injected rows in 14 categories plus 1,609 clean controls; the “4,736” in earlier notes described an older composition. The headline recall 0.995 (flagged or corrected to the true value) and the detection recall 1.0 in <code>correction_level_recall.csv</code> (any action, including 26 wrong repairs) come from the same run and are defined in <code>validation/README.md</code>.</p></li>
+<li><p><code>validation/synthetic/low_prevalence.R</code> (new): the benchmark at about 5% injected rows (flagged or corrected 99.4%, no clean row flagged or altered, 29.7 rows per 1,000 flagged); <code>validation/run_all.R</code> now regenerates ten tables, all identical.</p></li>
+<li><p><code>validation/blind_audit/</code> (new): protocol and scripts for a blind audit of the pipeline on real data (stratified sample, two independent annotators, kappa, miss rate with intervals, population estimate); tested on synthetic data only.</p></li>
+<li><p><code>THRESHOLDS.md</code> says explicitly that the defaults are reference values: the threshold sweep is flat, so the benchmark is insensitive to them.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="citation-development-version">Citation<a class="anchor" aria-label="anchor" href="#citation-development-version"></a></h3>

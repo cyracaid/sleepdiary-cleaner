@@ -39,7 +39,7 @@ Psychophysiology Laboratory’s intensive-longitudinal sleep study.
              ↓
        Sleep metrics (TST, SOL, WASO, SE)
              ↓
-       30+ diagnostic & research-ready figures
+       Diagnostic and research figures
              ↓
        Dataset A (final clean) + Dataset B (audit ledger)
 
