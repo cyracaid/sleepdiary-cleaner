@@ -71,7 +71,7 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="sleepcleanr--reproducible-cleaning-pipeline-for-sleep-ema-diary-data">sleepcleanr — Reproducible cleaning pipeline for sleep EMA diary data<a class="anchor" aria-label="anchor" href="#sleepcleanr--reproducible-cleaning-pipeline-for-sleep-ema-diary-data"></a>
 </h1></div>
-<p><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link"><img src="https://img.shields.io/github/stars/cyracaid/sleepdiary-cleaner?style=flat-square" alt="GitHub stars"></a> <a href="https://opensource.org/licenses/MIT" class="external-link"><img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License: MIT"></a> <a href="https://github.com/cyracaid/sleepdiary-cleaner/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://img.shields.io/github/actions/workflow/status/cyracaid/sleepdiary-cleaner/R-CMD-check.yaml?style=flat-square&amp;label=R--CMD--check" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/cyracaid/sleepdiary-cleaner" class="external-link"><img src="https://img.shields.io/codecov/c/github/cyracaid/sleepdiary-cleaner?style=flat-square&amp;color=orange" alt="Codecov"></a> <a href="https://cyracaid.github.io/sleepdiary-cleaner/"><img src="https://img.shields.io/badge/docs-pkgdown-blue?style=flat-square" alt="Docs"></a></p>
+<p><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link"><img src="https://img.shields.io/github/stars/cyracaid/sleepdiary-cleaner?style=flat-square" alt="GitHub stars"></a> <a href="https://opensource.org/licenses/MIT" class="external-link"><img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License: MIT"></a> <a href="https://doi.org/10.5281/zenodo.23077702" class="external-link"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.23077702.svg" alt="DOI"></a> <a href="https://github.com/cyracaid/sleepdiary-cleaner/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://img.shields.io/github/actions/workflow/status/cyracaid/sleepdiary-cleaner/R-CMD-check.yaml?style=flat-square&amp;label=R--CMD--check" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/cyracaid/sleepdiary-cleaner" class="external-link"><img src="https://img.shields.io/codecov/c/github/cyracaid/sleepdiary-cleaner?style=flat-square&amp;color=orange" alt="Codecov"></a> <a href="https://cyracaid.github.io/sleepdiary-cleaner/"><img src="https://img.shields.io/badge/docs-pkgdown-blue?style=flat-square" alt="Docs"></a></p>
 <blockquote>
 <p><strong><a href="#english">English</a> · <a href="#%E4%B8%AD%E6%96%87">中文</a></strong></p>
 </blockquote>
@@ -121,9 +121,9 @@
 <p>Full package in <a href="VALIDATION_REPORT.html">VALIDATION_REPORT.md</a>. Summary:</p>
 <ul>
 <li>
-<strong>Synthetic ground truth</strong> (4,736 injected errors): detection recall <strong>0.995</strong> [0.993, 0.997], specificity 1.0. “Detection” means the record was flagged, not that the corrected value was recovered — correction-level recall is lower and is reported per error category in the validation report.</li>
+<strong>Synthetic ground truth</strong> (5,391 injected errors in 14 categories, plus 1,609 clean control rows): detection recall <strong>0.995</strong> [0.993, 0.997], specificity 1.0. “Detection” means the record was flagged, not that the corrected value was recovered — correction-level recall is lower and is reported per error category in the validation report.</li>
 <li>
-<strong>Real study data</strong> (n = 13,990): 0 automatic fixes; 1,048 records flagged for human review.</li>
+<strong>Real study data</strong> (n = 13,990): in the study’s run, the rules applied an automatic order or format correction to 93 rows (10 of them were also corrected by a reviewer) and reviewers corrected 75 further rows. The review queue at the end of a run is 226 rows (1.6%) with the manual files applied and 307 (2.2%) without. The 1,048 rows flagged in the v1.4.5 audit came from a report-only pass that modified no data.</li>
 <li>
 <strong>External public datasets</strong>: the pipeline runs on other schemas after a short conversion script. These datasets contain no known errors, so they are a feasibility check, not accuracy validation.</li>
 </ul>
@@ -389,7 +389,7 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <p><strong>Naming note:</strong> The R package is called <strong>sleepcleanr</strong> (CRAN convention: no hyphens). The GitHub repository is <strong>sleepdiary-cleaner</strong>. They are the same project — install via <code>renv::install("cyracaid/sleepdiary-cleaner")</code> and then <code><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">library(sleepcleanr)</a></code>.</p>
 </blockquote>
 <blockquote>
-<p><strong>Validation statistics source:</strong> All validation statistics above (recall 0.995, 99% improvement, 0% silent misrepair for SOL/WASO, etc.) are derived from benchmarks run against the current <code>sleepcleanr</code> v1.4.5+ codebase (commit fd6bbd0). The synthetic benchmark (<code>validation/synthetic/results/detection_outcomes_v4_current.csv</code>, 4,736 injected rows) and real-data audit (n=13,990) were executed against the current codebase (commit fd6bbd0). These statistics reflect the current pipeline behavior and supersede any earlier pre-patch numbers cited in earlier documentation. See <code>VALIDATION_REPORT.md</code> and <code>validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md</code> for the full evidence package.</p>
+<p><strong>Validation statistics source:</strong> All validation statistics above (recall 0.995, 99% improvement, 0% silent misrepair for SOL/WASO, etc.) are derived from benchmarks run against the current <code>sleepcleanr</code> v1.4.5+ codebase (commit fd6bbd0). The synthetic benchmark (<code>validation/synthetic/results/detection_outcomes_v4_current.csv</code>, 5,391 injected rows) and real-data audit (n=13,990) were executed against the current codebase (commit fd6bbd0). These statistics reflect the current pipeline behavior and supersede any earlier pre-patch numbers cited in earlier documentation. See <code>VALIDATION_REPORT.md</code> and <code>validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md</code> for the full evidence package.</p>
 </blockquote>
 </div>
 </div>
@@ -451,6 +451,15 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <span><span class="va">res</span><span class="op">$</span><span class="va">manifest</span>                                      <span class="co"># provenance: input hash, config, step ledger</span></span>
 <span><span class="co"># Preview the inferred mapping without running anything:</span></span>
 <span><span class="fu"><a href="reference/clean_sleep_diary.html">clean_sleep_diary</a></span><span class="op">(</span><span class="st">"my_diary.csv"</span>, dry_run <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># writes dry_run_manifest.json, no data written</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
+</h2>
+<p>Cite the software with its Zenodo DOI (the concept DOI always resolves to the latest version; each release also has its own version DOI):</p>
+<blockquote>
+<p>Dong, C., &amp; ten Brink, M. (2026). <em>sleepcleanr: Reproducible Sleep EMA Diary Data Cleaning Pipeline</em> [R package]. <a href="https://doi.org/10.5281/zenodo.23077702" class="external-link uri">https://doi.org/10.5281/zenodo.23077702</a></p>
+</blockquote>
+<p>In R: <code>citation("sleepcleanr")</code>. Machine-readable metadata: <code>CITATION.cff</code>.</p>
 </div>
 <div class="section level2">
 <h2 id="run-the-tests-report-a-problem-contribute">Run the tests, report a problem, contribute<a class="anchor" aria-label="anchor" href="#run-the-tests-report-a-problem-contribute"></a>
@@ -687,6 +696,15 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"config_template.yaml"</span>, package <span class="op">=</span> <span class="st">"sleepcleanr"</span><span class="op">)</span>,</span>
 <span>          <span class="st">"my_study.yaml"</span><span class="op">)</span></span>
 <span><span class="co"># 编辑 my_study.yaml → run_pipeline(config = "my_study.yaml")</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="引用">引用<a class="anchor" aria-label="anchor" href="#%E5%BC%95%E7%94%A8"></a>
+</h2>
+<p>请用 Zenodo DOI 引用本软件（总 DOI 永远指向最新版本，每个 release 另有自己的版本 DOI）：</p>
+<blockquote>
+<p>Dong, C., &amp; ten Brink, M. (2026). <em>sleepcleanr: Reproducible Sleep EMA Diary Data Cleaning Pipeline</em> [R package]. <a href="https://doi.org/10.5281/zenodo.23077702" class="external-link uri">https://doi.org/10.5281/zenodo.23077702</a></p>
+</blockquote>
+<p>在 R 里：<code>citation("sleepcleanr")</code>。机器可读元数据：<code>CITATION.cff</code>。</p>
 </div>
 <div class="section level2">
 <h2 id="运行测试反馈问题参与贡献">运行测试、反馈问题、参与贡献<a class="anchor" aria-label="anchor" href="#%E8%BF%90%E8%A1%8C%E6%B5%8B%E8%AF%95%E5%8F%8D%E9%A6%88%E9%97%AE%E9%A2%98%E5%8F%82%E4%B8%8E%E8%B4%A1%E7%8C%AE"></a>

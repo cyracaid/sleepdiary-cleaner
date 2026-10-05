@@ -1,5 +1,36 @@
 # Changelog
 
+## sleepcleanr (development version)
+
+### Corrections to earlier notes
+
+- The 1.4.6 note “defaults (3, 12) validated as an operating point”
+  overstated the sweep: the 20-point grid is flat (recall 0.9949 to
+  0.9957, false alarms 0), so the benchmark shows that results are
+  *insensitive* to the swap and flip thresholds over that range. It
+  cannot tell them apart and does not show that 3 h and 12 h are
+  optimal; they are retained as reference values.
+- README: the real-data bullet no longer says “0 automatic fixes” (that
+  figure described a report-only audit pass) and now gives the
+  corrections the rules and the reviewers actually applied.
+
+### Validation
+
+- `validation/run_all.R` (new): regenerates nine synthetic benchmark
+  tables from fixed seeds in a temporary copy and compares them with the
+  committed ones (all nine identical with 1.4.9).
+- The benchmark size is 5,391 injected rows in 14 categories plus 1,609
+  clean controls; the “4,736” in earlier notes described an older
+  composition. The headline recall 0.995 (flagged or corrected to the
+  true value) and the detection recall 1.0 in
+  `correction_level_recall.csv` (any action, including 26 wrong repairs)
+  come from the same run and are defined in `validation/README.md`.
+
+### Citation
+
+- The package now has a Zenodo DOI (concept DOI 10.5281/zenodo.23077702)
+  in `CITATION.cff`, `inst/CITATION` and the README.
+
 ## sleepcleanr 1.4.9
 
 Documentation and validation release. No change to the package code, the

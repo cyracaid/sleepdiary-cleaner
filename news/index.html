@@ -53,6 +53,24 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="development version" id="sleepcleanr-development-version">sleepcleanr (development version)<a class="anchor" aria-label="anchor" href="#sleepcleanr-development-version"></a></h2>
+<div class="section level3">
+<h3 id="corrections-to-earlier-notes-development-version">Corrections to earlier notes<a class="anchor" aria-label="anchor" href="#corrections-to-earlier-notes-development-version"></a></h3>
+<ul><li>The 1.4.6 note “defaults (3, 12) validated as an operating point” overstated the sweep: the 20-point grid is flat (recall 0.9949 to 0.9957, false alarms 0), so the benchmark shows that results are <em>insensitive</em> to the swap and flip thresholds over that range. It cannot tell them apart and does not show that 3 h and 12 h are optimal; they are retained as reference values.</li>
+<li>README: the real-data bullet no longer says “0 automatic fixes” (that figure described a report-only audit pass) and now gives the corrections the rules and the reviewers actually applied.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="validation-development-version">Validation<a class="anchor" aria-label="anchor" href="#validation-development-version"></a></h3>
+<ul><li>
+<code>validation/run_all.R</code> (new): regenerates nine synthetic benchmark tables from fixed seeds in a temporary copy and compares them with the committed ones (all nine identical with 1.4.9).</li>
+<li>The benchmark size is 5,391 injected rows in 14 categories plus 1,609 clean controls; the “4,736” in earlier notes described an older composition. The headline recall 0.995 (flagged or corrected to the true value) and the detection recall 1.0 in <code>correction_level_recall.csv</code> (any action, including 26 wrong repairs) come from the same run and are defined in <code>validation/README.md</code>.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="citation-development-version">Citation<a class="anchor" aria-label="anchor" href="#citation-development-version"></a></h3>
+<ul><li>The package now has a Zenodo DOI (concept DOI 10.5281/zenodo.23077702) in <code>CITATION.cff</code>, <code>inst/CITATION</code> and the README.</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.4.9" id="sleepcleanr-149">sleepcleanr 1.4.9<a class="anchor" aria-label="anchor" href="#sleepcleanr-149"></a></h2>
 <p>Documentation and validation release. No change to the package code, the cleaning logic, any threshold or any computed number.</p>
 <div class="section level3">

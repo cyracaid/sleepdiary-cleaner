@@ -4,6 +4,7 @@
 stars](https://img.shields.io/github/stars/cyracaid/sleepdiary-cleaner?style=flat-square)](https://github.com/cyracaid/sleepdiary-cleaner)
 [![License:
 MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)](https://opensource.org/licenses/MIT)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23077702.svg)](https://doi.org/10.5281/zenodo.23077702)
 [![R-CMD-check](https://img.shields.io/github/actions/workflow/status/cyracaid/sleepdiary-cleaner/R-CMD-check.yaml?style=flat-square&label=R--CMD--check)](https://github.com/cyracaid/sleepdiary-cleaner/actions/workflows/R-CMD-check.yaml)
 [![Codecov](https://img.shields.io/codecov/c/github/cyracaid/sleepdiary-cleaner?style=flat-square&color=orange)](https://app.codecov.io/gh/cyracaid/sleepdiary-cleaner)
 [![Docs](https://img.shields.io/badge/docs-pkgdown-blue?style=flat-square)](https://cyracaid.github.io/sleepdiary-cleaner/)
@@ -65,13 +66,17 @@ Full package in
 [VALIDATION_REPORT.md](https://cyracaid.github.io/sleepdiary-cleaner/VALIDATION_REPORT.md).
 Summary:
 
-- **Synthetic ground truth** (4,736 injected errors): detection recall
-  **0.995** \[0.993, 0.997\], specificity 1.0. “Detection” means the
-  record was flagged, not that the corrected value was recovered —
-  correction-level recall is lower and is reported per error category in
-  the validation report.
-- **Real study data** (n = 13,990): 0 automatic fixes; 1,048 records
-  flagged for human review.
+- **Synthetic ground truth** (5,391 injected errors in 14 categories,
+  plus 1,609 clean control rows): detection recall **0.995** \[0.993,
+  0.997\], specificity 1.0. “Detection” means the record was flagged,
+  not that the corrected value was recovered — correction-level recall
+  is lower and is reported per error category in the validation report.
+- **Real study data** (n = 13,990): in the study’s run, the rules
+  applied an automatic order or format correction to 93 rows (10 of them
+  were also corrected by a reviewer) and reviewers corrected 75 further
+  rows. The review queue at the end of a run is 226 rows (1.6%) with the
+  manual files applied and 307 (2.2%) without. The 1,048 rows flagged in
+  the v1.4.5 audit came from a report-only pass that modified no data.
 - **External public datasets**: the pipeline runs on other schemas after
   a short conversion script. These datasets contain no known errors, so
   they are a feasibility check, not accuracy validation.
@@ -221,7 +226,7 @@ breakdown.
 > `sleepcleanr` v1.4.5+ codebase (commit fd6bbd0). The synthetic
 > benchmark
 > (`validation/synthetic/results/detection_outcomes_v4_current.csv`,
-> 4,736 injected rows) and real-data audit (n=13,990) were executed
+> 5,391 injected rows) and real-data audit (n=13,990) were executed
 > against the current codebase (commit fd6bbd0). These statistics
 > reflect the current pipeline behavior and supersede any earlier
 > pre-patch numbers cited in earlier documentation. See
@@ -306,6 +311,18 @@ res$manifest                                      # provenance: input hash, conf
 # Preview the inferred mapping without running anything:
 clean_sleep_diary("my_diary.csv", dry_run = TRUE) # writes dry_run_manifest.json, no data written
 ```
+
+## Citation
+
+Cite the software with its Zenodo DOI (the concept DOI always resolves
+to the latest version; each release also has its own version DOI):
+
+> Dong, C., & ten Brink, M. (2026). *sleepcleanr: Reproducible Sleep EMA
+> Diary Data Cleaning Pipeline* \[R package\].
+> <https://doi.org/10.5281/zenodo.23077702>
+
+In R: `citation("sleepcleanr")`. Machine-readable metadata:
+`CITATION.cff`.
 
 ## Run the tests, report a problem, contribute
 
@@ -522,6 +539,17 @@ file.copy(system.file("config_template.yaml", package = "sleepcleanr"),
           "my_study.yaml")
 # 编辑 my_study.yaml → run_pipeline(config = "my_study.yaml")
 ```
+
+## 引用
+
+请用 Zenodo DOI 引用本软件（总 DOI 永远指向最新版本，每个 release
+另有自己的版本 DOI）：
+
+> Dong, C., & ten Brink, M. (2026). *sleepcleanr: Reproducible Sleep EMA
+> Diary Data Cleaning Pipeline* \[R package\].
+> <https://doi.org/10.5281/zenodo.23077702>
+
+在 R 里：`citation("sleepcleanr")`。机器可读元数据：`CITATION.cff`。
 
 ## 运行测试、反馈问题、参与贡献
 
