@@ -125,8 +125,8 @@ corrected_ema_data <- fix_substance_text(corrected_ema_data, raw_csv,
 #        3. Values between 0-1 (not 0.5) suggesting a misplaced decimal (0.3→3)
 # WHY:   We read from the raw CSV (not the processed R data) because the RDS
 #        may have already coerced text entries to NA or applied type conversions.
-# OUTPUT: substance_decimal_anomalies (data.frame, stored in global environment
-#         so it's accessible in R Studio after the pipeline finishes)
+# OUTPUT: substance_decimal_anomalies (data.frame, created in the run's frame; it is
+#         also written to substance_decimal_anomalies.csv)
 # ----------------------------------------------------------------------------
 cat("\n--- 1b. Building substance input anomaly reference table ---\n")
 
@@ -183,12 +183,12 @@ build_input_anomalies <- function(val_col, label, raw_csv_path) {
   out
 }
 
-assign("substance_decimal_anomalies", rbind(
+substance_decimal_anomalies <- rbind(
   build_input_anomalies(caf_col, "caffeine", raw_csv),
   build_input_anomalies(alc_col, "alcohol", raw_csv),
   build_input_anomalies(nic_col, "nicotine", raw_csv),
   build_input_anomalies(can_col, "cannabis", raw_csv)
-), envir = .GlobalEnv)
+)
 
 if (nrow(substance_decimal_anomalies) > 0) {
   cat(sprintf("  Found %d input anomalies:\n", nrow(substance_decimal_anomalies)))

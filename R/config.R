@@ -49,7 +49,7 @@ load_config <- function(config_file = NULL) {
 config_get <- function(config, key, default = NULL) {
   # Fallback: check global env if config not provided
   if (missing(config) || is.null(config)) {
-    config <- get0("pipeline_config", envir = .GlobalEnv, ifnotfound = NULL)
+    config <- .sc_config()
   }
   if (is.null(config)) return(default)
   keys <- strsplit(key, "\\.")[[1]]
@@ -80,9 +80,9 @@ config_get <- function(config, key, default = NULL) {
 #' @export
 cfg_get <- function(key, default = NULL, cfg = NULL) {
   if (is.null(cfg)) {
-    cfg <- get0("pipeline_config", envir = .GlobalEnv, ifnotfound = NULL)
+    cfg <- .sc_config()
     if (!is.null(cfg)) {
-      warning("cfg_get(\"", key, "\") read from .GlobalEnv$pipeline_config. ",
+      warning("cfg_get(\"", key, "\") read an implicit pipeline_config. ",
               "Pass cfg explicitly. Deprecated in v1.4.0.",
               call. = FALSE)
     }

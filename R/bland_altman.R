@@ -209,7 +209,7 @@ plot.bland_altman <- function(x, ...) {
 validate_thresholds <- function(data, cfg = NULL) {
 
   if (is.null(cfg)) {
-    cfg <- get0("pipeline_config", envir = .GlobalEnv, ifnotfound = NULL)
+    cfg <- .sc_config()
   }
 
   # Fallback defaults matching the shipped config

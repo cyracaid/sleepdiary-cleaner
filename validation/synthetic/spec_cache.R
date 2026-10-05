@@ -42,6 +42,16 @@ sha256_file <- function(path) {
 # to checkforerrors_processing.R (new guard) with unchanged input/config must
 # invalidate cached summaries. Without this, the cache would serve stale
 # results computed by the pre-change pipeline.
+# Objects of the run just completed: pipeline_results() in sleepcleanr >= 1.5.0,
+# the global environment in older versions (which wrote them there).
+.run_obj <- function(name) {
+  if ("pipeline_results" %in% getNamespaceExports("sleepcleanr")) {
+    sleepcleanr::pipeline_results()[[name]]
+  } else {
+    get(name, envir = .GlobalEnv)
+  }
+}
+
 code_fingerprint <- function() {
   repo_r <- list.files("R", pattern = "\\.R$", full.names = TRUE)
   inst_s <- list.files("inst/scripts", pattern = "\\.R$", full.names = TRUE)
@@ -153,8 +163,8 @@ run_spec_once <- function(label, overrides, input_rds = INPUT_RD,
   }, finally = setwd(old_wd))
   if (!ok) return(NULL)
 
-  corr <- get("corrected_ema_data", envir = .GlobalEnv)
-  review <- get("review_output", envir = .GlobalEnv)
+  corr <- .run_obj("corrected_ema_data")
+  review <- .run_obj("review_output")
   d <- review$data_with_flags
 
   # flagged mask (needs_review_flag OR any _checkforerrors)

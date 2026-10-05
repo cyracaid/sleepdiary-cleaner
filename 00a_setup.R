@@ -39,7 +39,7 @@ check_environment <- function() {
 
   # ── Required files ──
   # Use pipeline_config if available (via run_pipeline()), else hardcoded defaults
-  cfg <- get0("pipeline_config", envir = .GlobalEnv, ifnotfound = NULL)
+  cfg <- get0("pipeline_config", ifnotfound = NULL)
   if (!is.null(cfg) && !is.null(cfg$data$files)) {
     file_list <- cfg$data$files
     # Filter out empty paths (e.g. manual corrections not used in demo)

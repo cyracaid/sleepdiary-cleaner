@@ -248,7 +248,7 @@ calculate_sleep_time_vars_end <- function(data, cfg = NULL) {
   
   # ---- Block 2: Flag evaluators (single source of truth) ----
   if (is.null(cfg)) {
-    cfg <- get0("pipeline_config", envir = .GlobalEnv, ifnotfound = NULL)
+    cfg <- .sc_config()
   }
   if (!is.null(cfg)) {
     cleaned_data$flag_severity   <- eval_flag_severity(cleaned_data, cfg)

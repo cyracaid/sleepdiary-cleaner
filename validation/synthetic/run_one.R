@@ -66,9 +66,19 @@ ok <- tryCatch({
 t1 <- Sys.time()
 cat(sprintf("Run took %.1f sec, success=%s\n", as.numeric(t1 - t0, units = "secs"), ok))
 
+# Objects of the run just completed: pipeline_results() in sleepcleanr >= 1.5.0,
+# the global environment in older versions (which wrote them there).
+.run_obj <- function(name) {
+  if ("pipeline_results" %in% getNamespaceExports("sleepcleanr")) {
+    sleepcleanr::pipeline_results()[[name]]
+  } else {
+    get(name, envir = .GlobalEnv)
+  }
+}
+
 if (ok) {
-  corrected <- get("corrected_ema_data", envir = .GlobalEnv)
-  review    <- get("review_output", envir = .GlobalEnv)
+  corrected <- .run_obj("corrected_ema_data")
+  review    <- .run_obj("review_output")
   saveRDS(corrected, file.path(project_dir, "corrected_ema_data.rds"))
   saveRDS(review,    file.path(project_dir, "review_output.rds"))
   cat(sprintf("Saved corrected_ema_data (%d rows) and review_output to %s\n",

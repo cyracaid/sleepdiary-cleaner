@@ -83,14 +83,14 @@ if (!exists("pipeline_config")) { pipeline_config <- list() }
 # run_pipeline()), fail fast BEFORE creating the output directory -- otherwise a
 # stranded empty output/latest_visualization_real/ shell is left behind.
 # NOTE: plain exists() (no envir=) checks the source() environment, which is
-# run_pipeline's frame during a real run and .GlobalEnv for a standalone call.
+# run_pipeline's frame during a real run (the run's objects are restored into it).
 if (!exists("ema_data_release_timecalc")) {
   stop("No pipeline data in memory. Run run_pipeline() (or 00_MAIN_entry.R) ",
        "first so it loads the data, then re-run the visualization.")
 }
 
-.n_records <- if (exists("corrected_ema_data", envir = .GlobalEnv))
-  nrow(get("corrected_ema_data", envir = .GlobalEnv)) else NA_integer_
+.n_records <- if (exists("corrected_ema_data"))
+  nrow(get("corrected_ema_data")) else NA_integer_
 
 # Derive the tag from the configured input file. "unknown" when it cannot be
 # determined -- an honest label beats a confidently wrong one.
@@ -137,9 +137,9 @@ dir.create(file.path(output_dir, "research_ready"),    recursive = TRUE, showWar
 # that at the root: whatever is in verification_dir now really did come from
 # this run. Wrapped in tryCatch so a plotting failure here degrades gracefully
 # (skips the plots, logs why) instead of aborting the whole visualization run.
-if (exists("corrected_ema_data", envir = .GlobalEnv)) {
+if (exists("corrected_ema_data")) {
   .ba_result <- tryCatch(
-    validate_thresholds(get("corrected_ema_data", envir = .GlobalEnv), cfg = pipeline_config),
+    validate_thresholds(get("corrected_ema_data"), cfg = pipeline_config),
     error = function(e) {
       cat(sprintf("⚠ Bland-Altman validation skipped: %s\n", conditionMessage(e)))
       NULL
@@ -2119,7 +2119,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
   # clean_df is the Step-4 frame (before classification), so it has no
   # error_type/unusual_type; those are attached at Steps 5-6 and live in
   # corrected_ema_data (2026-09-30).
-  fig15_src <- get0("corrected_ema_data", envir = .GlobalEnv, ifnotfound = NULL)
+  fig15_src <- get0("corrected_ema_data", ifnotfound = NULL)
 
   if (is.data.frame(fig15_src) &&
       all(c("time_bed_corrected", "error_type", "unusual_type") %in% names(fig15_src))) {

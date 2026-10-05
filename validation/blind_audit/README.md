@@ -14,7 +14,8 @@ inside a git work tree).
 1. Run the pipeline on the study data and keep the review queue:
    ```r
    run_pipeline(config = "my_study.yaml")
-   saveRDS(review_output, "review_output.rds")   # left in the global environment by the run
+   saveRDS(pipeline_results()$review_output, "review_output.rds")   # sleepcleanr >= 1.5.0
+   # (older versions leave `review_output` in the global environment: saveRDS(review_output, ...))
    ```
 2. Draw the sample (outside the repo):
    ```bash

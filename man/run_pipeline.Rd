@@ -11,7 +11,8 @@ run_pipeline(
   finalize = TRUE,
   verbose = TRUE,
   data = NULL,
-  include_manual_corrections = FALSE
+  include_manual_corrections = FALSE,
+  export_env = NULL
 )
 }
 \arguments{
@@ -52,6 +53,12 @@ session only; in a non-interactive session it degrades to FALSE with a
 notice). The point of the default-off switch: a package user must
 OPT IN to human corrections so that a dataset can never be silently
 modified by review files left over in the working directory.}
+
+\item{export_env}{An environment, or \code{NULL} (default). The pipeline no
+longer writes into the global environment. Its main results are kept in the
+package and returned by \code{pipeline_results()}. To also copy them into an
+environment of your choice (for example \code{globalenv()}, the behaviour
+before version 1.5.0), pass it here.}
 }
 \value{
 Invisibly returns TRUE on successful completion.
