@@ -39,21 +39,21 @@ mechanism-level behavior, the audit layer catches real-data blind spots.
 | `fcr_pure_n10000_result.csv` | evaluate_fcr.R | 20260812 | 10,000 | FAR_alter per field | rule-of-three 95% upper bound |
 | `enrichment_detection_outcomes_v3.csv` | evaluate_detection.R (v3) | 20260812 | 7,000 | per-category recall (L1 flag) | none (superseded by v4) |
 | `detection_outcomes_v4.csv` | evaluate_detection.R (v4) | 20260812 | 7,000 | per-category CORRECT/MISREPAIRED/FLAGGED/MISSED | none (first-pass, pre-5.1) |
-| `cluster_bootstrap_per_row.csv` | ppv_cluster_ci.R | 20260817 | 7,000 (4,745 inj + 1,609 ctrl) | per-row detected/flag/value_correct | — |
-| `recall_specificity_ci.csv` | ppv_cluster_ci.R | 20260817 | 4,745 inj / 1,609 ctrl | pooled + per-category recall, control specificity | participant-level cluster bootstrap, 2,000 resamples |
+| `cluster_bootstrap_per_row.csv` | ppv_cluster_ci.R | 20260817 | 7,000 (5,391 inj + 1,609 ctrl) | per-row detected/flag/value_correct | — |
+| `recall_specificity_ci.csv` | ppv_cluster_ci.R | 20260817 | 5,391 inj / 1,609 ctrl | pooled + per-category recall, control specificity | participant-level cluster bootstrap, 2,000 resamples |
 | `ppv_curve.csv` | ppv_cluster_ci.R | 20260817 | — | PPV over pi=0.5–10% | Bayes from recall/spec + 500 bootstrap draws |
 | `far_flag_alter.csv` | far_flag_mrr_magnitude.R | 20260817 | 1,609 ctrl | FAR_flag, FAR_alter + rule-of-three 95% upper bound (0.186% @ 0 hits) | point estimate + upper bound |
-| `mrr_magnitude.csv` | far_flag_mrr_magnitude.R | 20260817 | 4,745 inj | per-category MRR + magnitude | point estimate |
-| `mrr_per_row.csv` | far_flag_mrr_magnitude.R | 20260817 | 4,745 | per-row kind + magnitude | — |
-| `control_baselines.csv` | control_baselines.R | 20260817 | 4,745 | no-cleaning / naive-rule / pipeline recall + FAR | point estimate |
+| `mrr_magnitude.csv` | far_flag_mrr_magnitude.R | 20260817 | 5,391 inj | per-category MRR + magnitude | point estimate |
+| `mrr_per_row.csv` | far_flag_mrr_magnitude.R | 20260817 | 5,391 | per-row kind + magnitude | — |
+| `control_baselines.csv` | control_baselines.R | 20260817 | 5,391 | no-cleaning / naive-rule / pipeline recall + FAR | point estimate |
 | `multiverse/oat_screening.csv` | multiverse.R | — | 13 specs | downstream qty per OAT level | none (screening) |
 | `multiverse/spec_curve.csv` | multiverse.R | — | **3 specs (D1-only)** | mean TST/SOL/SE, analyzable n | none (deterministic, robust survivors) |
 | `multiverse/spec_curve_full.csv` | multiverse.R | — | **9 specs (3^2)** | mean TST/SOL/SE, analyzable n | none (deterministic, appendix incl. marginal D2) |
 | `multiverse/instability.csv` | multiverse.R | — | 5 specs | record classification by spec | none |
 | `multiverse/variance_decomposition.csv` | multiverse.R | — | 9 specs | sum_sq + proportion per dim | ANOVA (descriptive) |
 | `downstream_sensitivity.csv` | downstream_sensitivity.R | — | — | multiverse ranges + B1/B2 | none |
-| `l2_tier.csv` | l2_tier_leave_one_out.R | 20260817 | 4,745 | per-category L1/L2/L3 | point estimate |
-| `leave_one_out.csv` | l2_tier_leave_one_out.R | 20260817 | 4,745 | recall/workload per ablation | deterministic via spec_cache (issue #6 closed) |
+| `l2_tier.csv` | l2_tier_leave_one_out.R | 20260817 | 5,391 | per-category L1/L2/L3 | point estimate |
+| `leave_one_out.csv` | l2_tier_leave_one_out.R | 20260817 | 5,391 | recall/workload per ablation | deterministic via spec_cache (issue #6 closed) |
 | `seed_sensitivity.csv` | seed_sensitivity.R | 20260812/17, 20260901/15 | 4×~5,400 | pooled recall, FAR, weak-cat recall, OAT survivors | point estimates, 4 seeds |
 | `real_data_oat_screening.csv` | real_data_spec_curve.R | — | 13,990 | downstream qty per OAT level (real data) | none (screening) |
 | `real_data_spec_curve.csv` | real_data_spec_curve.R | — | 13,990 | mean TST/SOL/SE, analyzable n per spec | none (deterministic, D2 fallback) |

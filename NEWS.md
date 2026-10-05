@@ -10,6 +10,16 @@
   described a report-only audit pass) and now gives the corrections the rules and
   the reviewers actually applied.
 
+## Validation
+* `validation/run_all.R` (new): regenerates nine synthetic benchmark tables from fixed
+  seeds in a temporary copy and compares them with the committed ones (all nine
+  identical with 1.4.9).
+* The benchmark size is 5,391 injected rows in 14 categories plus 1,609 clean
+  controls; the "4,736" in earlier notes described an older composition. The
+  headline recall 0.995 (flagged or corrected to the true value) and the
+  detection recall 1.0 in `correction_level_recall.csv` (any action, including
+  26 wrong repairs) come from the same run and are defined in `validation/README.md`.
+
 ## Citation
 * The package now has a Zenodo DOI (concept DOI 10.5281/zenodo.23077702) in
   `CITATION.cff`, `inst/CITATION` and the README.

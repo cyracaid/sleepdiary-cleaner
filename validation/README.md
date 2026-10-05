@@ -13,6 +13,22 @@ This folder holds the evidence behind the claims in the paper and in
   numbers are recorded in `VALIDATION_REPORT.md`; the scripts that read the
   data are here, but they cannot run without local access.
 
+## Re-run it
+
+```bash
+Rscript validation/run_all.R
+```
+
+This regenerates nine of the synthetic tables (recall and its intervals, the
+PPV curve, false alarms and misrepair, the three control arms, the per-category
+outcomes, the correction-level recall and the metric distortion) in a temporary
+copy, from fixed seeds, with the installed sleepcleanr, and compares each with the
+committed table. Checked on 2026-10-05 with sleepcleanr 1.4.9: all nine
+regenerate identically (largest difference 0). The longer scripts
+(`multiverse.R`, `l2_tier_leave_one_out.R`, `seed_sensitivity.R`,
+`operating_point_sweep.R`, `evaluate_fcr.R`) are not part of `run_all.R` and were
+not re-run for this check.
+
 ## Headline numbers
 
 | Claim | Table | Script (from the repo root) | Needs real data |
@@ -57,17 +73,18 @@ cleaning accuracy).
   improved, 7 worsened). All three types together: 80 of 81 improved now, 81
   of 88 then. The counts differ because the pipeline changed, not because the
   comparison did.
-- **Two detection-recall tables are not yet reconciled.** The headline recall
-  (0.995, interval 0.993 to 0.997) comes from `recall_specificity_ci.csv`
-  (`ppv_cluster_ci.R`, 4,745 injected rows; weakest category
-  `cross_participant_spike`, about 0.89 to 0.91). `correction_level_recall.csv`
-  and its per-category file (`correction_level_recall.R`) are built from
-  `detection_outcomes_v4_current.csv` (5,391 injected rows) and report a
-  detection recall of 1.0 in every category, because there "detected" counts every
-  row the pipeline acted on, including 26 that it repaired wrongly. The two come
-  from different benchmark runs and different definitions. Quote one table, name
-  it, and state its definition; do not put the two side by side until they are
-  re-derived from one run.
+- **Two "recall" figures, one run.** Both come from the same benchmark run (5,391
+  injected rows, 1,609 clean controls). The headline recall 0.995
+  (`recall_specificity_ci.csv`, `ppv_cluster_ci.R`) counts a row as detected when
+  the pipeline flagged it or corrected it to the true value: 5,365 of 5,391
+  (0.9952); the 26 rows it repaired wrongly are the misses (the weakest
+  category, `cross_participant_spike`, is 214 of 236, 0.907). The "detection
+  recall (L1)" of 1.0 in `correction_level_recall.csv` counts every row the
+  pipeline acted on, including those 26 wrong repairs. State which definition a
+  sentence uses.
+- The figure "4,736 injected errors" and the "4,745" in older notes describe an
+  earlier benchmark composition (11 categories). The committed tables and the
+  regenerated run use 5,391 injected rows in 14 categories.
 - `correction_level_recall.csv` and `metric_distortion.csv` report that, among
   injected errors, 48.6% were corrected to the true value, 50.9% were flagged
   without correction, and 0.5% were misrepaired; and that after the pipeline the

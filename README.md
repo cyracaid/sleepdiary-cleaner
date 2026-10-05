@@ -64,7 +64,7 @@ Messy sleep diary data (CSV / RDS)
 
 Full package in [VALIDATION_REPORT.md](VALIDATION_REPORT.md). Summary:
 
-- **Synthetic ground truth** (4,736 injected errors): detection recall **0.995**
+- **Synthetic ground truth** (5,391 injected errors in 14 categories, plus 1,609 clean control rows): detection recall **0.995**
   [0.993, 0.997], specificity 1.0. "Detection" means the record was flagged, not
   that the corrected value was recovered — correction-level recall is lower and is
   reported per error category in the validation report.
@@ -188,7 +188,7 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995
 > `library(sleepcleanr)`.
 
 
-> **Validation statistics source:** All validation statistics above (recall 0.995, 99% improvement, 0% silent misrepair for SOL/WASO, etc.) are derived from benchmarks run against the current `sleepcleanr` v1.4.5+ codebase (commit fd6bbd0). The synthetic benchmark (`validation/synthetic/results/detection_outcomes_v4_current.csv`, 4,736 injected rows) and real-data audit (n=13,990) were executed against the current codebase (commit fd6bbd0). These statistics reflect the current pipeline behavior and supersede any earlier pre-patch numbers cited in earlier documentation. See `VALIDATION_REPORT.md` and `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md` for the full evidence package.
+> **Validation statistics source:** All validation statistics above (recall 0.995, 99% improvement, 0% silent misrepair for SOL/WASO, etc.) are derived from benchmarks run against the current `sleepcleanr` v1.4.5+ codebase (commit fd6bbd0). The synthetic benchmark (`validation/synthetic/results/detection_outcomes_v4_current.csv`, 5,391 injected rows) and real-data audit (n=13,990) were executed against the current codebase (commit fd6bbd0). These statistics reflect the current pipeline behavior and supersede any earlier pre-patch numbers cited in earlier documentation. See `VALIDATION_REPORT.md` and `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md` for the full evidence package.
 
 ## Status and data availability
 
