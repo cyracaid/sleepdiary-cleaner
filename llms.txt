@@ -42,20 +42,43 @@ Psychophysiology Laboratory’s intensive-longitudinal sleep study.
              ↓
        Dataset A (final clean) + Dataset B (audit ledger)
 
-**Why sleepcleanr?**
+## What makes it different
 
-- 🔍 **Detects** not auto-fixes — 1,048 records flagged for manual
-  review in the v1.4.5 audit, 0 silent misrepairs (field-misentry
-  silent-misrepair bug, 96% in v1.4.0, fixed in v1.4.4+; current
-  benchmark: 0% silent misrepair for SOL/WASO)
-- 📊 **Auditable** — every change logged and reversible; non-destructive
-  architecture
-- ✅ **Validated** — 9-step validation chain: synthetic (0.995 recall) +
-  real data (99% improved) + robustness proof
-- 🚀 **Reproducible** — YAML config, full pipeline documentation,
-  automated test suite run in CI (R-CMD-check, Codecov)
-- 🎯 **Research-ready** — generates publication-quality figures +
-  correlation matrices
+1.  **Human-in-the-loop, not automatic repair.** Deterministic rules
+    correct only unambiguous ordering and format errors; value-level
+    disagreements are routed to human review. A plausible large SOL is
+    left exactly as reported — it is signal, not an error.
+2.  **No silent corrections.** Every change carries a recorded
+    correction type, and flags persist until a human resolves them
+    explicitly. The correction ledger is part of the output
+    (`correction_status_final.csv`, `step_flag_ledger.csv`).
+3.  **Configurable, documented thresholds.** Rule thresholds ship as
+    YAML defaults with rationale (see
+    [THRESHOLDS.md](https://cyracaid.github.io/sleepdiary-cleaner/THRESHOLDS.md))
+    and are meant to be re-checked against your own data.
+4.  **Reproducible.** YAML config, `renv.lock`, and a CI-run test suite
+    (R-CMD-check, Codecov).
+
+## Evidence at a glance
+
+Full package in
+[VALIDATION_REPORT.md](https://cyracaid.github.io/sleepdiary-cleaner/VALIDATION_REPORT.md).
+Summary:
+
+- **Synthetic ground truth** (4,736 injected errors): detection recall
+  **0.995** \[0.993, 0.997\], specificity 1.0. “Detection” means the
+  record was flagged, not that the corrected value was recovered —
+  correction-level recall is lower and is reported per error category in
+  the validation report.
+- **Real study data** (n = 13,990): 0 automatic fixes; 1,048 records
+  flagged for human review.
+- **External public datasets**: the pipeline runs on other schemas after
+  a short conversion script. These datasets contain no known errors, so
+  they are a feasibility check, not accuracy validation.
+
+Earlier automated variants silently misrepaired entries; the synthetic
+benchmark found and closed those defects, and the current benchmark
+reports 0% silent misrepair for SOL/WASO.
 
 ### Why the hybrid (automated + human) design?
 
@@ -81,6 +104,32 @@ silently hidden.
 > diaries may fall inside or outside these cut-offs; they are
 > YAML-configurable and should be re-checked against your own data, not
 > copied blindly.
+
+### Terminology
+
+| Term                             | Meaning                                                                                                    |
+|----------------------------------|------------------------------------------------------------------------------------------------------------|
+| **Detection recall (L1)**        | Share of injected errors for which the pipeline *acted* (flagged or corrected)                             |
+| **Correction-level recall (L3)** | Share of injected errors for which the pipeline recovered the *correct value*                              |
+| **FCR**                          | False-correction rate: clean records that were altered                                                     |
+| **FAR**                          | False-alarm rate: clean records that were flagged                                                          |
+| **SPEC**                         | Specificity (clean records left untouched)                                                                 |
+| **M1 / M4 / M5**                 | Real-data audit rules: M1 order violations, M4 bed→sleep window violations, M5 silent-worsening candidates |
+| **AUTO_FIX**                     | A change applied automatically, with no human review                                                       |
+
+### Detection-threshold defaults
+
+| Rule                                                           | Default | Rationale                                              |
+|----------------------------------------------------------------|---------|--------------------------------------------------------|
+| `timestamp.sequence.max_gap_hours` (AM/PM flip)                | 12 h    | Assumes no legitimate interval ≥ 12 h                  |
+| adjacent-swap threshold                                        | 3 h     | Tuned on the development sample; see VALIDATION_REPORT |
+| `metric_validation.sol.excessive_minutes`                      | 120     | Gross-outlier catch, not a clinical marker             |
+| `metric_validation.se.min_valid_percent` / `max_valid_percent` | 0 / 100 | Structural impossibility → always flag                 |
+| `interval.mmss_threshold_minutes`                              | 60      | Heuristic for ambiguous `MM:SS` vs `HH:MM`             |
+| `timestamp.midnight_threshold_hour`                            | 6       | Times \< 6 AM assigned to the next day                 |
+
+Full rationale and change guidance:
+[THRESHOLDS.md](https://cyracaid.github.io/sleepdiary-cleaner/THRESHOLDS.md).
 
 ### Flag System & Human Review Workflow
 
@@ -145,7 +194,7 @@ breakdown.
     SYNTHETIC TIER (ground truth)
     ──────────────────────────────
     Step 1  Clean-input specificity ── 10k clean records → 0 changes/flags
-    Step 2  Injected-error benchmark ── recall 0.995 [0.993, 0.997]
+    Step 2  Injected-error benchmark ── detection recall 0.995 [0.993, 0.997]
     Step 3  Detection vs correctness ── L1 vs L3 gap → routes to human
     Step 4  Controls ── no_cleaning 0 / naive_rule 0.623 / pipeline 0.995
 
@@ -182,7 +231,7 @@ breakdown.
 
 ## Status and data availability
 
-**Status.** sleepcleanr 1.4.8 is research software under active
+**Status.** sleepcleanr 1.4.9 is research software under active
 development. It was built for one longitudinal sleep study, has not yet
 been peer reviewed, and is not on CRAN. Treat the shipped thresholds as
 references to check against your own data.
@@ -203,6 +252,30 @@ privacy). What you can use without them:
 The few numbers that come from the study data (for example the
 redundant-channel check) are reported in `VALIDATION_REPORT.md` and
 cannot be re-run without access to those data.
+
+## Limitations
+
+- **Thresholds are study-specific defaults.** The 3-hour adjacent-swap
+  and 12-hour AM/PM-flip rules, and the plausibility cut-offs, were
+  tuned on one healthy-adult EMA sample. Clinical, shift-work, and
+  elderly samples should revisit every rule. Rationale and defaults are
+  in
+  [THRESHOLDS.md](https://cyracaid.github.io/sleepdiary-cleaner/THRESHOLDS.md).
+- **Detect, do not infer intent.** The pipeline surfaces candidate
+  errors; it cannot recover information that was never entered, and
+  value-level disagreements are routed to a human, not resolved
+  automatically.
+- **Validation is partly self-referential.** Detection was validated
+  against injected synthetic errors and the pipeline’s own real-data
+  audit. No independent human gold standard for free-text diary entry
+  exists, and some reported statistics come from the development data.
+- **No native CSD or `.sav` support.** The Consensus Sleep Diary format
+  is not a native input; map your columns via YAML (or let the inference
+  guess). Output is `.csv` / `.rds`; there is no SPSS `.sav` export.
+- **One protocol.** Developed for an intensive-longitudinal morning
+  sleep diary. Evening diaries, nap-only logs, and actigraphy are out of
+  scope.
+- **Not a substitute for study-specific quality control.**
 
 ## Install
 
@@ -394,7 +467,7 @@ sleepcleanr 刻意**既非全自动、也非全部人工 flag**：
 
 ## 状态与数据可用性
 
-**状态。** sleepcleanr 1.4.8
+**状态。** sleepcleanr 1.4.9
 是仍在开发中的研究软件，为一项纵向睡眠研究而写，尚未经同行评审，也未上线
 CRAN。随包给出的阈值只是参考，请用你自己的数据核对。
 
@@ -410,6 +483,24 @@ CRAN。随包给出的阈值只是参考，请用你自己的数据核对。
 
 少数来自研究数据的数字（例如冗余通道检查）记录在 `VALIDATION_REPORT.md`
 里，没有数据访问权限就无法重跑。
+
+## 局限
+
+- **阈值是研究专属默认值。** 3 小时相邻对调、12 小时 AM/PM
+  翻转及合理性切点，都在单一健康成人 EMA
+  样本上调过。临床、倒班、老年样本应重新审视每条规则。见
+  [THRESHOLDS.md](https://cyracaid.github.io/sleepdiary-cleaner/THRESHOLDS.md)。
+- **只检测，不推断意图。**
+  管线只呈现候选错误，无法恢复从未录入的信息；值级分歧交人工，不自动裁决。
+- **验证部分是自证的。**
+  检出率基于注入的合成错误与本管线自己的真实数据审计。自由文本日记没有独立人工金标准，部分统计来自开发数据。
+- **无原生 CSD / `.sav` 支持。** Consensus Sleep Diary
+  不是原生输入格式，需用 YAML 映射列（或让推断函数猜）。输出为 `.csv` /
+  `.rds`，无 SPSS `.sav` 导出。
+- **单一协议。**
+  为高强度纵向晨间睡眠日记开发；晚间日记、仅小睡日志、actigraphy
+  不在范围。
+- **不能替代研究专属的质量控制。**
 
 ## 安装
 

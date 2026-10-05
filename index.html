@@ -100,14 +100,34 @@
    30+ diagnostic &amp; research-ready figures
          ↓
    Dataset A (final clean) + Dataset B (audit ledger)</code></pre>
-<p><strong>Why sleepcleanr?</strong></p>
+</div>
+<div class="section level2">
+<h2 id="what-makes-it-different">What makes it different<a class="anchor" aria-label="anchor" href="#what-makes-it-different"></a>
+</h2>
+<ol style="list-style-type: decimal">
+<li>
+<strong>Human-in-the-loop, not automatic repair.</strong> Deterministic rules correct only unambiguous ordering and format errors; value-level disagreements are routed to human review. A plausible large SOL is left exactly as reported — it is signal, not an error.</li>
+<li>
+<strong>No silent corrections.</strong> Every change carries a recorded correction type, and flags persist until a human resolves them explicitly. The correction ledger is part of the output (<code>correction_status_final.csv</code>, <code>step_flag_ledger.csv</code>).</li>
+<li>
+<strong>Configurable, documented thresholds.</strong> Rule thresholds ship as YAML defaults with rationale (see <a href="THRESHOLDS.html">THRESHOLDS.md</a>) and are meant to be re-checked against your own data.</li>
+<li>
+<strong>Reproducible.</strong> YAML config, <code>renv.lock</code>, and a CI-run test suite (R-CMD-check, Codecov).</li>
+</ol>
+</div>
+<div class="section level2">
+<h2 id="evidence-at-a-glance">Evidence at a glance<a class="anchor" aria-label="anchor" href="#evidence-at-a-glance"></a>
+</h2>
+<p>Full package in <a href="VALIDATION_REPORT.html">VALIDATION_REPORT.md</a>. Summary:</p>
 <ul>
-<li>🔍 <strong>Detects</strong> not auto-fixes — 1,048 records flagged for manual review in the v1.4.5 audit, 0 silent misrepairs (field-misentry silent-misrepair bug, 96% in v1.4.0, fixed in v1.4.4+; current benchmark: 0% silent misrepair for SOL/WASO)</li>
-<li>📊 <strong>Auditable</strong> — every change logged and reversible; non-destructive architecture</li>
-<li>✅ <strong>Validated</strong> — 9-step validation chain: synthetic (0.995 recall) + real data (99% improved) + robustness proof</li>
-<li>🚀 <strong>Reproducible</strong> — YAML config, full pipeline documentation, automated test suite run in CI (R-CMD-check, Codecov)</li>
-<li>🎯 <strong>Research-ready</strong> — generates publication-quality figures + correlation matrices</li>
+<li>
+<strong>Synthetic ground truth</strong> (4,736 injected errors): detection recall <strong>0.995</strong> [0.993, 0.997], specificity 1.0. “Detection” means the record was flagged, not that the corrected value was recovered — correction-level recall is lower and is reported per error category in the validation report.</li>
+<li>
+<strong>Real study data</strong> (n = 13,990): 0 automatic fixes; 1,048 records flagged for human review.</li>
+<li>
+<strong>External public datasets</strong>: the pipeline runs on other schemas after a short conversion script. These datasets contain no known errors, so they are a feasibility check, not accuracy validation.</li>
 </ul>
+<p>Earlier automated variants silently misrepaired entries; the synthetic benchmark found and closed those defects, and the current benchmark reports 0% silent misrepair for SOL/WASO.</p>
 <div class="section level3">
 <h3 id="why-the-hybrid-automated--human-design">Why the hybrid (automated + human) design?<a class="anchor" aria-label="anchor" href="#why-the-hybrid-automated--human-design"></a>
 </h3>
@@ -122,6 +142,104 @@
 <blockquote>
 <p><strong>Thresholds are references, not gospel.</strong> The swap/flip thresholds shipped here (e.g. 3-hour adjacent swap, 12-hour AM/PM flip) were validated on our dataset(s) — see VALIDATION_REPORT. Your study’s diaries may fall inside or outside these cut-offs; they are YAML-configurable and should be re-checked against your own data, not copied blindly.</p>
 </blockquote>
+</div>
+<div class="section level3">
+<h3 id="terminology">Terminology<a class="anchor" aria-label="anchor" href="#terminology"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th>Term</th>
+<th>Meaning</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><strong>Detection recall (L1)</strong></td>
+<td>Share of injected errors for which the pipeline <em>acted</em> (flagged or corrected)</td>
+</tr>
+<tr class="even">
+<td><strong>Correction-level recall (L3)</strong></td>
+<td>Share of injected errors for which the pipeline recovered the <em>correct value</em>
+</td>
+</tr>
+<tr class="odd">
+<td><strong>FCR</strong></td>
+<td>False-correction rate: clean records that were altered</td>
+</tr>
+<tr class="even">
+<td><strong>FAR</strong></td>
+<td>False-alarm rate: clean records that were flagged</td>
+</tr>
+<tr class="odd">
+<td><strong>SPEC</strong></td>
+<td>Specificity (clean records left untouched)</td>
+</tr>
+<tr class="even">
+<td><strong>M1 / M4 / M5</strong></td>
+<td>Real-data audit rules: M1 order violations, M4 bed→sleep window violations, M5 silent-worsening candidates</td>
+</tr>
+<tr class="odd">
+<td><strong>AUTO_FIX</strong></td>
+<td>A change applied automatically, with no human review</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="detection-threshold-defaults">Detection-threshold defaults<a class="anchor" aria-label="anchor" href="#detection-threshold-defaults"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th>Rule</th>
+<th>Default</th>
+<th>Rationale</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>
+<code>timestamp.sequence.max_gap_hours</code> (AM/PM flip)</td>
+<td>12 h</td>
+<td>Assumes no legitimate interval ≥ 12 h</td>
+</tr>
+<tr class="even">
+<td>adjacent-swap threshold</td>
+<td>3 h</td>
+<td>Tuned on the development sample; see VALIDATION_REPORT</td>
+</tr>
+<tr class="odd">
+<td><code>metric_validation.sol.excessive_minutes</code></td>
+<td>120</td>
+<td>Gross-outlier catch, not a clinical marker</td>
+</tr>
+<tr class="even">
+<td>
+<code>metric_validation.se.min_valid_percent</code> / <code>max_valid_percent</code>
+</td>
+<td>0 / 100</td>
+<td>Structural impossibility → always flag</td>
+</tr>
+<tr class="odd">
+<td><code>interval.mmss_threshold_minutes</code></td>
+<td>60</td>
+<td>Heuristic for ambiguous <code>MM:SS</code> vs <code>HH:MM</code>
+</td>
+</tr>
+<tr class="even">
+<td><code>timestamp.midnight_threshold_hour</code></td>
+<td>6</td>
+<td>Times &lt; 6 AM assigned to the next day</td>
+</tr>
+</tbody>
+</table>
+<p>Full rationale and change guidance: <a href="THRESHOLDS.html">THRESHOLDS.md</a>.</p>
 </div>
 <div class="section level3">
 <h3 id="flag-system--human-review-workflow">Flag System &amp; Human Review Workflow<a class="anchor" aria-label="anchor" href="#flag-system--human-review-workflow"></a>
@@ -253,7 +371,7 @@
 <pre><code>SYNTHETIC TIER (ground truth)
 ──────────────────────────────
 Step 1  Clean-input specificity ── 10k clean records → 0 changes/flags
-Step 2  Injected-error benchmark ── recall 0.995 [0.993, 0.997]
+Step 2  Injected-error benchmark ── detection recall 0.995 [0.993, 0.997]
 Step 3  Detection vs correctness ── L1 vs L3 gap → routes to human
 Step 4  Controls ── no_cleaning 0 / naive_rule 0.623 / pipeline 0.995
 
@@ -278,7 +396,7 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <div class="section level2">
 <h2 id="status-and-data-availability">Status and data availability<a class="anchor" aria-label="anchor" href="#status-and-data-availability"></a>
 </h2>
-<p><strong>Status.</strong> sleepcleanr 1.4.8 is research software under active development. It was built for one longitudinal sleep study, has not yet been peer reviewed, and is not on CRAN. Treat the shipped thresholds as references to check against your own data.</p>
+<p><strong>Status.</strong> sleepcleanr 1.4.9 is research software under active development. It was built for one longitudinal sleep study, has not yet been peer reviewed, and is not on CRAN. Treat the shipped thresholds as references to check against your own data.</p>
 <p><strong>Data availability.</strong> The study data are not public (participant privacy). What you can use without them:</p>
 <ul>
 <li>a bundled synthetic fixture (<code>inst/extdata/</code>, 280 rows, 20 participants) that <code><a href="reference/run_pipeline.html">run_pipeline()</a></code> runs on by default;</li>
@@ -286,6 +404,23 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <li>two public diary datasets with adaptation scripts (<code>validation/external/</code>).</li>
 </ul>
 <p>The few numbers that come from the study data (for example the redundant-channel check) are reported in <code>VALIDATION_REPORT.md</code> and cannot be re-run without access to those data.</p>
+</div>
+<div class="section level2">
+<h2 id="limitations">Limitations<a class="anchor" aria-label="anchor" href="#limitations"></a>
+</h2>
+<ul>
+<li>
+<strong>Thresholds are study-specific defaults.</strong> The 3-hour adjacent-swap and 12-hour AM/PM-flip rules, and the plausibility cut-offs, were tuned on one healthy-adult EMA sample. Clinical, shift-work, and elderly samples should revisit every rule. Rationale and defaults are in <a href="THRESHOLDS.html">THRESHOLDS.md</a>.</li>
+<li>
+<strong>Detect, do not infer intent.</strong> The pipeline surfaces candidate errors; it cannot recover information that was never entered, and value-level disagreements are routed to a human, not resolved automatically.</li>
+<li>
+<strong>Validation is partly self-referential.</strong> Detection was validated against injected synthetic errors and the pipeline’s own real-data audit. No independent human gold standard for free-text diary entry exists, and some reported statistics come from the development data.</li>
+<li>
+<strong>No native CSD or <code>.sav</code> support.</strong> The Consensus Sleep Diary format is not a native input; map your columns via YAML (or let the inference guess). Output is <code>.csv</code> / <code>.rds</code>; there is no SPSS <code>.sav</code> export.</li>
+<li>
+<strong>One protocol.</strong> Developed for an intensive-longitudinal morning sleep diary. Evening diaries, nap-only logs, and actigraphy are out of scope.</li>
+<li><strong>Not a substitute for study-specific quality control.</strong></li>
+</ul>
 </div>
 <div class="section level2">
 <h2 id="install">Install<a class="anchor" aria-label="anchor" href="#install"></a>
@@ -506,7 +641,7 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <div class="section level2">
 <h2 id="状态与数据可用性">状态与数据可用性<a class="anchor" aria-label="anchor" href="#%E7%8A%B6%E6%80%81%E4%B8%8E%E6%95%B0%E6%8D%AE%E5%8F%AF%E7%94%A8%E6%80%A7"></a>
 </h2>
-<p><strong>状态。</strong> sleepcleanr 1.4.8 是仍在开发中的研究软件，为一项纵向睡眠研究而写，尚未经同行评审，也未上线 CRAN。随包给出的阈值只是参考，请用你自己的数据核对。</p>
+<p><strong>状态。</strong> sleepcleanr 1.4.9 是仍在开发中的研究软件，为一项纵向睡眠研究而写，尚未经同行评审，也未上线 CRAN。随包给出的阈值只是参考，请用你自己的数据核对。</p>
 <p><strong>数据可用性。</strong> 研究数据不公开（参与者隐私）。不需要这些数据也能用到的东西：</p>
 <ul>
 <li>内置合成数据（<code>inst/extdata/</code>，280 行、20 名参与者），<code><a href="reference/run_pipeline.html">run_pipeline()</a></code> 默认就跑它；</li>
@@ -514,6 +649,23 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <li>两个公开日记数据集及其转换脚本（<code>validation/external/</code>）。</li>
 </ul>
 <p>少数来自研究数据的数字（例如冗余通道检查）记录在 <code>VALIDATION_REPORT.md</code> 里，没有数据访问权限就无法重跑。</p>
+</div>
+<div class="section level2">
+<h2 id="局限">局限<a class="anchor" aria-label="anchor" href="#%E5%B1%80%E9%99%90"></a>
+</h2>
+<ul>
+<li>
+<strong>阈值是研究专属默认值。</strong> 3 小时相邻对调、12 小时 AM/PM 翻转及合理性切点，都在单一健康成人 EMA 样本上调过。临床、倒班、老年样本应重新审视每条规则。见 <a href="THRESHOLDS.html">THRESHOLDS.md</a>。</li>
+<li>
+<strong>只检测，不推断意图。</strong> 管线只呈现候选错误，无法恢复从未录入的信息；值级分歧交人工，不自动裁决。</li>
+<li>
+<strong>验证部分是自证的。</strong> 检出率基于注入的合成错误与本管线自己的真实数据审计。自由文本日记没有独立人工金标准，部分统计来自开发数据。</li>
+<li>
+<strong>无原生 CSD / <code>.sav</code> 支持。</strong> Consensus Sleep Diary 不是原生输入格式，需用 YAML 映射列（或让推断函数猜）。输出为 <code>.csv</code> / <code>.rds</code>，无 SPSS <code>.sav</code> 导出。</li>
+<li>
+<strong>单一协议。</strong> 为高强度纵向晨间睡眠日记开发；晚间日记、仅小睡日志、actigraphy 不在范围。</li>
+<li><strong>不能替代研究专属的质量控制。</strong></li>
+</ul>
 </div>
 <div class="section level2">
 <h2 id="安装">安装<a class="anchor" aria-label="anchor" href="#%E5%AE%89%E8%A3%85"></a>
