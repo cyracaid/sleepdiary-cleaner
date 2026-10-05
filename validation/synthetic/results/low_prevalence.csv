@@ -1,0 +1,12 @@
+"metric","value"
+"rows",7000
+"injected_rows",348
+"injected_share",0.0497
+"flagged_or_corrected_to_true_value",0.9943
+"corrected_to_true_value",0.4569
+"flagged_only",0.5374
+"repaired_wrongly",0.0057
+"precision_of_flags",1
+"clean_rows_flagged",0
+"clean_rows_altered",0
+"rows_flagged_per_1000",29.7

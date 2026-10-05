@@ -56,7 +56,8 @@ steps <- list(
     file.path(syn, "run_ppv", "corrected_ema_data.rds"),
     file.path(syn, "results", "detection_outcomes_v4_current.csv")),
   c("correction_level_recall.R"),
-  c("metric_distortion.R")
+  c("metric_distortion.R"),
+  c("low_prevalence.R")                        # the benchmark at about 5% injected rows
 )
 
 owd <- setwd(work); on.exit(setwd(owd), add = TRUE)
@@ -76,7 +77,8 @@ for (st in steps) {
 produced <- c("recall_specificity_ci.csv", "ppv_curve.csv", "far_flag_alter.csv",
               "mrr_magnitude.csv", "control_baselines.csv",
               "detection_outcomes_v4_current.csv", "correction_level_recall.csv",
-              "correction_level_recall_per_category.csv", "metric_distortion.csv")
+              "correction_level_recall_per_category.csv", "metric_distortion.csv",
+              "low_prevalence.csv")
 cat("\n== comparison with the committed tables\n")
 n_bad <- 0L
 for (f in produced) {

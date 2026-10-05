@@ -38,6 +38,18 @@ Add rationale inline next to each threshold:
       excessive_minutes: 120            # gross-outlier catch, not clinical
 ```
 
+## What the validation shows about these defaults (and what it does not)
+
+These values are **reference values, not optimized ones.** The synthetic benchmark
+swept the adjacent-swap threshold (1 to 5 h) and the AM/PM flip threshold (8 to 14 h)
+over a 20-point grid: recall stayed between 0.9950 and 0.9957 and false alarms stayed
+at zero. The benchmark is therefore *insensitive* to these two thresholds over that
+range; it cannot tell 3 h from 2 h or 4 h, and it does not show that 3 h and 12 h are
+optimal. On the study data no threshold changed the mean total sleep time by more than
+0.93 minutes or the number of analysable rows by more than 0.70%. The defaults were
+set on a healthy young-adult sample and should be re-checked on your own data
+(`validation/synthetic/operating_point_sweep.R` is the template).
+
 ## References
 
 - Lichstein et al. (2003), *Behaviour Research and Therapy* — quantitative criteria for insomnia (30-min SOL/WASO, ~85% SE)

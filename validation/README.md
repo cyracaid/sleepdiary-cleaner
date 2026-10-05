@@ -19,11 +19,12 @@ This folder holds the evidence behind the claims in the paper and in
 Rscript validation/run_all.R
 ```
 
-This regenerates nine of the synthetic tables (recall and its intervals, the
+This regenerates ten of the synthetic tables (recall and its intervals, the
 PPV curve, false alarms and misrepair, the three control arms, the per-category
-outcomes, the correction-level recall and the metric distortion) in a temporary
+outcomes, the correction-level recall, the metric distortion and the benchmark at
+a realistic error rate) in a temporary
 copy, from fixed seeds, with the installed sleepcleanr, and compares each with the
-committed table. Checked on 2026-10-05 with sleepcleanr 1.4.9: all nine
+committed table. Checked on 2026-10-06 with sleepcleanr 1.4.9: all ten
 regenerate identically (largest difference 0). The longer scripts
 (`multiverse.R`, `l2_tier_leave_one_out.R`, `seed_sensitivity.R`,
 `operating_point_sweep.R`, `evaluate_fcr.R`) are not part of `run_all.R` and were
@@ -53,6 +54,21 @@ interval type in `synthetic/README_results.md`, which also lists the full
 command sequence, the caching that makes reruns identical, and how to read the
 numbers (for example why a pooled "value correct" rate of 0.486 is not the
 cleaning accuracy).
+
+## At a realistic error rate, and the audit on real data
+
+- `synthetic/low_prevalence.R` repeats the benchmark with 25 injected errors per
+  category (348 of 7,000 rows, 5%). Result (`results/low_prevalence.csv`): 99.4% of
+  injected errors flagged or corrected to the true value, 45.7% corrected, 53.7%
+  flagged only, 0.6% repaired wrongly; every flagged row carried an injected error and
+  no clean row was flagged or altered; 29.7 rows per 1,000 are flagged for review (the
+  study's own queue is about 16 per 1,000). Clean rows here are built to pass, so the
+  precision of 1.0 is a property of the benchmark, not a promise for real data.
+- `blind_audit/` is the procedure and the tooling for the check that the benchmark
+  cannot give: two people judge raw study entries without seeing the pipeline's output,
+  and the miss rate in rows the pipeline left alone is estimated. The tooling is
+  tested on the synthetic data; **it has not been run on the study data**. See
+  `blind_audit/README.md`.
 
 ## What these numbers do not show
 
