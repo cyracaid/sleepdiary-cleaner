@@ -38,7 +38,8 @@ jobs:
           covr::to_cobertura(cov)
         shell: Rscript {0}
 
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v5
+        continue-on-error: true
         with:
           file: ./cobertura.xml
           fail_ci_if_error: false
