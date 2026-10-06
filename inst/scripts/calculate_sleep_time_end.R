@@ -68,6 +68,13 @@
 #                                        many brief awakenings.
 # ============================================================================
 
+# Standalone use: verify_*.R and the legacy workflow source this file without the
+# package, where the internal config lookup does not exist; read the user's own
+# global config instead (reading only). Inside the package this is not defined here.
+if (!exists(".sc_config", mode = "function")) {
+  .sc_config <- function() get0("pipeline_config", envir = globalenv(), ifnotfound = NULL)
+}
+
 calculate_sleep_time_vars_end <- function(data, cfg = NULL) {
   # dplyr + lubridate used via NAMESPACE imports
 
