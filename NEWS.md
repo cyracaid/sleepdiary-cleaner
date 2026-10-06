@@ -1,4 +1,10 @@
-# sleepcleanr (development version)
+# sleepcleanr 1.5.0
+
+The package no longer writes to the global environment (a breaking change for code
+that read `corrected_ema_data` or `review_output` from it); cleaning logic,
+thresholds and every computed number are unchanged. Also new in this release: the
+realistic-error-rate benchmark, `validation/run_all.R`, the blind-audit tooling, the
+Zenodo DOI in the citation files, and corrected validation text.
 
 ## Breaking change: the package no longer writes to the global environment
 * `run_pipeline()` used to leave `corrected_ema_data`, `review_output`,

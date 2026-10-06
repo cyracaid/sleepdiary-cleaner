@@ -2,7 +2,7 @@
 
 <!-- AUTO:SKILL_FACTS_START -->
 
-**Version:** 1.4.9
+**Version:** 1.5.0
 **Pipeline steps:** 10
 
 | Step | Label | Description |
