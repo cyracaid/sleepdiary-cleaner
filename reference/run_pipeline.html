@@ -15,7 +15,7 @@ source() calls for backward compatibility."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,7 +78,8 @@ Steps that write files or read human-reviewed CSVs remain as direct
 <span>  finalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  include_manual_corrections <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  include_manual_corrections <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  export_env <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -136,6 +137,14 @@ session only; in a non-interactive session it degrades to FALSE with a
 notice). The point of the default-off switch: a package user must
 OPT IN to human corrections so that a dataset can never be silently
 modified by review files left over in the working directory.</p></dd>
+
+
+<dt id="arg-export-env">export_env<a class="anchor" aria-label="anchor" href="#arg-export-env"></a></dt>
+<dd><p>An environment, or <code>NULL</code> (default). The pipeline no
+longer writes into the global environment. Its main results are kept in the
+package and returned by <code><a href="pipeline_results.html">pipeline_results()</a></code>. To also copy them into an
+environment of your choice (for example <code><a href="https://rdrr.io/r/base/environment.html" class="external-link">globalenv()</a></code>, the behaviour
+before version 1.5.0), pass it here.</p></dd>
 
 </dl></div>
     <div class="section level2">

@@ -1,6 +1,42 @@
 # Changelog
 
-## sleepcleanr (development version)
+## sleepcleanr 1.5.0
+
+The package no longer writes to the global environment (a breaking
+change for code that read `corrected_ema_data` or `review_output` from
+it); cleaning logic, thresholds and every computed number are unchanged.
+Also new in this release: the realistic-error-rate benchmark,
+`validation/run_all.R`, the blind-audit tooling, the Zenodo DOI in the
+citation files, and corrected validation text.
+
+### Breaking change: the package no longer writes to the global environment
+
+- [`run_pipeline()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_pipeline.md)
+  used to leave `corrected_ema_data`, `review_output`,
+  `checkforerrors_summary`, `pipeline_config`,
+  `ema_data_release_timecalc`, `reasonable_unusual_df` (and, through the
+  correction step, `equal_time_df`, `error_df`, `unusual_df`,
+  `clean_df`) in the user’s global environment. CRAN does not allow a
+  package to do that, and it could overwrite a user’s own objects of the
+  same names. These objects are now kept in the package and returned by
+  the new
+  [`pipeline_results()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/pipeline_results.md).
+- To keep the old behaviour, pass an environment:
+  `run_pipeline(..., export_env = globalenv())` copies the same objects
+  there.
+- [`run_visualization()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_visualization.md)
+  still works after a
+  [`run_pipeline()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_pipeline.md)
+  in the same session.
+- Cleaning logic, thresholds and every computed number are unchanged: on
+  the synthetic demo and on the study data (with and without the manual
+  files) the corrected data, the review queue and all output files are
+  identical to those of 1.4.9, and the ten synthetic benchmark tables
+  regenerate identically.
+- Tests: a new test checks that no `R/` file assigns into the global
+  environment and that a pipeline run leaves it untouched; the
+  legacy-entry leakage test now allows only the objects the legacy
+  script itself creates.
 
 ### Corrections to earlier notes
 

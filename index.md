@@ -236,7 +236,7 @@ breakdown.
 
 ## Status and data availability
 
-**Status.** sleepcleanr 1.4.9 is research software under active
+**Status.** sleepcleanr 1.5.0 is research software under active
 development. It was built for one longitudinal sleep study, has not yet
 been peer reviewed, and is not on CRAN. Treat the shipped thresholds as
 references to check against your own data.
@@ -484,7 +484,7 @@ sleepcleanr 刻意**既非全自动、也非全部人工 flag**：
 
 ## 状态与数据可用性
 
-**状态。** sleepcleanr 1.4.9
+**状态。** sleepcleanr 1.5.0
 是仍在开发中的研究软件，为一项纵向睡眠研究而写，尚未经同行评审，也未上线
 CRAN。随包给出的阈值只是参考，请用你自己的数据核对。
 

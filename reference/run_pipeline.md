@@ -17,7 +17,8 @@ run_pipeline(
   finalize = TRUE,
   verbose = TRUE,
   data = NULL,
-  include_manual_corrections = FALSE
+  include_manual_corrections = FALSE,
+  export_env = NULL
 )
 ```
 
@@ -76,6 +77,16 @@ run_pipeline(
   notice). The point of the default-off switch: a package user must OPT
   IN to human corrections so that a dataset can never be silently
   modified by review files left over in the working directory.
+
+- export_env:
+
+  An environment, or `NULL` (default). The pipeline no longer writes
+  into the global environment. Its main results are kept in the package
+  and returned by
+  [`pipeline_results()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/pipeline_results.md).
+  To also copy them into an environment of your choice (for example
+  [`globalenv()`](https://rdrr.io/r/base/environment.html), the
+  behaviour before version 1.5.0), pass it here.
 
 ## Value
 

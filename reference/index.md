@@ -72,6 +72,8 @@
   : Construct a sleep_diary object
 - [`outlier_flags`](https://cyracaid.github.io/sleepdiary-cleaner/reference/outlier_flags.md)
   : Per-participant IQR outlier detection
+- [`pipeline_results()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/pipeline_results.md)
+  : Objects left by the last pipeline run
 - [`pipeline_steps`](https://cyracaid.github.io/sleepdiary-cleaner/reference/pipeline_steps.md)
   : Pipeline step adapters (wrapper layer)
 - [`plot(`*`<bland_altman>`*`)`](https://cyracaid.github.io/sleepdiary-cleaner/reference/plot.bland_altman.md)
