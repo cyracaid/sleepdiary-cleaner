@@ -62,6 +62,16 @@ TS_MAP <- c(
 )
 DUR_FIELDS <- c("duration_totalmin_sol_estimate_am", "duration_totalmin_waso_estimate_am")
 
+# Objects of the run just completed: pipeline_results() in sleepcleanr >= 1.5.0,
+# the global environment in older versions (which wrote them there).
+.run_obj <- function(name) {
+  if ("pipeline_results" %in% getNamespaceExports("sleepcleanr")) {
+    sleepcleanr::pipeline_results()[[name]]
+  } else {
+    get(name, envir = .GlobalEnv)
+  }
+}
+
 value_correct <- function(gt_row, corrected, raw) {
   rid <- gt_row$row_id; field <- gt_row$field
   if (is.na(field) || !nzchar(field)) return(FALSE)
@@ -130,8 +140,8 @@ run_point <- function(swap, flip, run_dir) {
   }, finally = setwd(old_wd))
   if (!ok) return(NULL)
 
-  corrected <- get("corrected_ema_data", envir = .GlobalEnv)
-  review    <- get("review_output", envir = .GlobalEnv)
+  corrected <- .run_obj("corrected_ema_data")
+  review    <- .run_obj("review_output")
   raw       <- readRDS(file.path(run_dir, "main.rds"))
   d <- review$data_with_flags
 

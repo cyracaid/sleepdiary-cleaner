@@ -40,7 +40,7 @@ run_cleaning_chain <- function(data,
                                cfg = NULL,
                                verbose = getOption("sleepcleanr.verbose", TRUE)) {
   if (is.null(cfg)) {
-    cfg <- get0("pipeline_config", envir = .GlobalEnv, ifnotfound = NULL)
+    cfg <- .sc_config()
   }
 
   x <- if (is_sleep_diary(data)) {

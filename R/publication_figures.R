@@ -24,7 +24,7 @@ utils::globalVariables(c(
 # --------------------------------------------------------------
 
 .guard <- function() {
-  if (!exists("corrected_ema_data", envir = .GlobalEnv))
+  if (is.null(.sc_obj("corrected_ema_data")))
     stop("corrected_ema_data not found. Run the pipeline first (run_pipeline()).")
 }
 
@@ -61,7 +61,7 @@ utils::globalVariables(c(
 #' @export
 figure_pipeline_workflow <- function() {
   .guard()
-  df <- get("corrected_ema_data", envir = .GlobalEnv)
+  df <- .sc_obj("corrected_ema_data")
   cc <- .extract_counts(df)
 
   # Derived categories
@@ -226,7 +226,7 @@ figure_pipeline_workflow <- function() {
 #' @export
 figure_cleaning_effect <- function() {
   .guard()
-  df <- get("corrected_ema_data", envir = .GlobalEnv)
+  df <- .sc_obj("corrected_ema_data")
   cc <- .extract_counts(df)
 
   # ---- Panel A: SOL before (self-reported) vs after (computed) ----

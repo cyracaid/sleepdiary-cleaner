@@ -31,7 +31,7 @@ multi_process <- function(df, var_list, func, format = NULL) {
   # let it auto-run" calling convention. The config is taken from the
   # .GlobalEnv$pipeline_config the legacy workflow assigns, falling back to
   # the package default when absent.
-  cfg <- get0("pipeline_config", envir = .GlobalEnv, ifnotfound = NULL)
+  cfg <- get0("pipeline_config", ifnotfound = NULL)
   run_pipeline(config = cfg, project_dir = ".", verbose = TRUE)
 }
 

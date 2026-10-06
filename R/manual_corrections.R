@@ -1337,16 +1337,18 @@ apply_manual_corrections_and_recalculate <- function(ema_data, corrections_df, m
                                           duration_col = duration_col,
                                           manual_unusual_df = manual_unusual_df)
   
-  list2env(results, envir = .GlobalEnv)
+  # Keep the classified data frames for the rest of the run (package-private
+  # state; the user's global environment is not touched)
+  for (.nm in names(results)) .sc_set(.nm, results[[.nm]])
   
-  cat("\n[OK] All dataframes saved to global environment:\n")
+  cat("\n[OK] All dataframes kept for the rest of the run:\n")
   cat("  equal_time_df: Equal time records\n")
   cat("  error_df: Error records (with duration comparison)\n")
   cat("  unusual_df: Unusual records (Reasonable unusual records removed by pid and row_id)\n")
   cat("  clean_df: Clean records\n")
   
+  reasonable_unusual_df <- results$reasonable_unusual_df
   if ("reasonable_unusual_df" %in% names(results)) {
-    assign("reasonable_unusual_df", results$reasonable_unusual_df, envir = .GlobalEnv)
     cat("  reasonable_unusual_df: Reasonable unusual records\n")
   }
   
@@ -1361,7 +1363,7 @@ apply_manual_corrections_and_recalculate <- function(ema_data, corrections_df, m
     cat("  - duration_match: Difference < 6 minutes\n")
   }
   
-  if (exists("reasonable_unusual_df") && nrow(reasonable_unusual_df) > 0) {
+  if (!is.null(reasonable_unusual_df) && nrow(reasonable_unusual_df) > 0) {
     write_csv(reasonable_unusual_df, "reasonable_unusual_records.csv", na = "")
     cat(sprintf("\n[OK] Saved %d Reasonable unusual records to reasonable_unusual_records.csv\n", 
                 nrow(reasonable_unusual_df)))

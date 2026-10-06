@@ -1,4 +1,6 @@
-# Writing to the global environment: assessment (2026-10-06)
+# Writing to the global environment: assessment (2026-10-06) and outcome (2026-10-07)
+
+**Outcome:** done on a branch (`globalenv-refactor`), option 1 below, with the objects returned by the new `pipeline_results()` and an opt-in `export_env` argument. Gates passed: the full test suite, a differential run on the synthetic demo and on the study data (with and without the manual files) against 1.4.9, and `validation/run_all.R`. See NEWS.
 
 `R CMD check --as-cran` reports, as a NOTE, assignments to `.GlobalEnv` in
 `R/pipeline.R` (8 sites) and `R/manual_corrections.R` (1 site), and CRAN policy does

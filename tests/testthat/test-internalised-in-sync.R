@@ -58,6 +58,10 @@ test_that("internalised R/ functions match inst/scripts bodies", {
     common <- intersect(names(r_fns), names(s_fns))
     expect_true(length(common) > 0,
                 info = paste("no shared function names:", pr[[1]], "vs", pr[[2]]))
+    # Intentionally diverged: the R/ copy keeps the classified data frames in the
+    # package's private run state, the legacy script copy still writes them to the
+    # global environment (CRAN does not allow a package to do that).
+    common <- setdiff(common, "apply_manual_corrections_and_recalculate")
     for (nm in common) {
       expect_identical(r_fns[[nm]], s_fns[[nm]],
                        info = paste("body drift:", nm, "in", pr[[1]]))

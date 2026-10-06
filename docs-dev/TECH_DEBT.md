@@ -159,7 +159,7 @@ it already does for other package functions.
 
 ## 7. error_unusual publishes results via list2env() to .GlobalEnv
 
-**Status: OPEN (2026-08-13).** `error_unusual_sleep_time_corrections.R:2046`
+**Status: RESOLVED in the R/ copy (development version after 1.4.9); the legacy script copy still writes the globals.** Originally: `error_unusual_sleep_time_corrections.R:2046`
 does `list2env(results, envir = .GlobalEnv)`, dumping equal_time_df, error_df,
 unusual_df, clean_df, correction_summary (+ reasonable_unusual_df via
 assign) into the global environment. The leakage test (2911d06) whitelists

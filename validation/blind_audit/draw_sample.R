@@ -18,9 +18,9 @@
 # Usage:
 #   Rscript validation/blind_audit/draw_sample.R <corrected_ema_data.rds> <out_dir> \
 #       [<review_output.rds>] [--n_flagged=150] [--n_changed=50] [--n_left_alone=150] [--seed=20261006]
-# review_output.rds holds the review queue. run_pipeline() leaves it in the global
-# environment as `review_output`; save it after the run with
-#   saveRDS(review_output, "review_output.rds")
+# review_output.rds holds the review queue. Save it after the run with
+#   saveRDS(pipeline_results()$review_output, "review_output.rds")   # sleepcleanr >= 1.5.0
+# (older versions leave it in the global environment as `review_output`)
 # Without it the script falls back to rows classed error or unusual, which is a
 # subset of the queue and understates it.
 args <- commandArgs(trailingOnly = TRUE)

@@ -4,12 +4,11 @@ scripts_dir <- function() {
   getwd()
 }
 
-# Declare variables placed in .GlobalEnv by run_pipeline() for backward
-# compatibility with the legacy source()-based steps 8 and 9.
+# Variables the sourced step scripts find by name in run_pipeline()'s frame.
 utils::globalVariables(c(
   "corrected_ema_data", "ema_data_release_timecalc",
   "review_output", "checkforerrors_summary",
-  "pipeline_config", "sleepcleanr_scripts_dir",
+  "pipeline_config", "sleepcleanr_scripts_dir", "output_dir",
   # functions sourced from inst/scripts at runtime (report_correction_status.R)
   "report_status", "final_summary", "generate_correction_files", "generate_figure_index"
 ))
@@ -33,7 +32,7 @@ utils::globalVariables(c(
 .pipeline_init <- function(config, project_dir, verbose) {
   old_wd <- setwd(project_dir)
   sdir   <- scripts_dir()
-  assign("sleepcleanr_scripts_dir", sdir, envir = .GlobalEnv)
+  .sc_set("sleepcleanr_scripts_dir", sdir)
 
   if (is.character(config) || is.null(config)) {
     cfg <- load_config(config)
@@ -43,9 +42,8 @@ utils::globalVariables(c(
     stop("config must be a file path, list, or NULL")
   }
 
-  # Keep .GlobalEnv assignment for backward compatibility with source() steps
-  assign("pipeline_config", cfg, envir = .GlobalEnv)
-  assign("sleepcleanr_loaded", TRUE, envir = .GlobalEnv)
+  # Package-private copy (the user's global environment is not touched)
+  .sc_set("pipeline_config", cfg)
 
   if (verbose) cat(sprintf("\n=== SPL Sleep Pipeline (%s) ===\n",
     if (is.null(cfg$pipeline$name)) "sleepcleanr" else cfg$pipeline$name))
@@ -99,15 +97,24 @@ utils::globalVariables(c(
 #'   OPT IN to human corrections so that a dataset can never be silently
 #'   modified by review files left over in the working directory.
 #'
+#' @param export_env An environment, or \code{NULL} (default). The pipeline no
+#'   longer writes into the global environment. Its main results are kept in the
+#'   package and returned by \code{pipeline_results()}. To also copy them into an
+#'   environment of your choice (for example \code{globalenv()}, the behaviour
+#'   before version 1.5.0), pass it here.
+#'
 #' @return Invisibly returns TRUE on successful completion.
 #' @export
 run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = FALSE,
                          finalize = TRUE, verbose = TRUE, data = NULL,
-                         include_manual_corrections = FALSE) {
+                         include_manual_corrections = FALSE, export_env = NULL) {
+  .sc_clear()   # a new run starts from a clean state
   env <- .pipeline_init(config, project_dir, verbose)
   on.exit(.pipeline_cleanup(env$old_wd), add = TRUE)
   cfg  <- env$cfg
   sdir <- env$sdir
+  # Seen by the sourced step scripts (they run in this frame); not the global environment.
+  sleepcleanr_loaded <- TRUE
 
   init_step_ledger()
   source(file.path(sdir, "report_correction_status.R"), local = TRUE)
@@ -200,7 +207,7 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
 
   # Expose the normalized data for downstream steps (visualization uses this)
   ema_data_release_timecalc <- as.data.frame(ema)
-  assign("ema_data_release_timecalc", ema_data_release_timecalc, envir = .GlobalEnv)
+  .sc_set("ema_data_release_timecalc", ema_data_release_timecalc)
 
   checkpoint_A <- report_status(ema_data_release_timecalc, "After Step 4 (auto-normalize)", "A")
 
@@ -301,7 +308,7 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
     # configured path.
     manual_error_path   <- ""
     manual_unusual_path <- ""
-    assign("pipeline_config", cfg, envir = .GlobalEnv)
+    .sc_set("pipeline_config", cfg)
     if (verbose) cat(sprintf(
       paste0("\n%s\n*   MANUAL CORRECTIONS NOT INCLUDED%s",
              "*   This run is ALGORITHMIC-ONLY: no human-review file touched the data.%s",
@@ -384,7 +391,7 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   ema <- step_compute_metrics(ema)
 
   corrected_ema_data <- as.data.frame(ema)
-  assign("corrected_ema_data", corrected_ema_data, envir = .GlobalEnv)
+  .sc_set("corrected_ema_data", corrected_ema_data)
 
   checkpoint_B <- report_status(corrected_ema_data, "After Step 6 (timestamp corrections)", "B", previous = checkpoint_A)
   checkpoint_C <- report_status(corrected_ema_data, "After Step 6.5 (duration corrections)", "C", previous = checkpoint_B)
@@ -393,8 +400,8 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   # -- Step 8: Auto-detection ------------------------------------------
   if (verbose) cat("\n=== Step 8: Running auto error detection ===\n")
   source(file.path(sdir, "checkforerrors_processing.R"), local = TRUE)
-  assign("review_output", review_output, envir = .GlobalEnv)
-  assign("checkforerrors_summary", checkforerrors_summary, envir = .GlobalEnv)
+  .sc_set("review_output", review_output)
+  .sc_set("checkforerrors_summary", checkforerrors_summary)
 
   rs <- checkforerrors_summary$review_summary
   flag_extra <- list(
@@ -439,7 +446,7 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   # -- Step 8.5: Cross-participant check -------------------------------
   if (verbose) cat("\n=== Step 8.5: Cross-participant global consistency check ===\n")
   source(file.path(sdir, "cross_participant_global_check.R"), local = TRUE)
-  assign("review_output", review_output, envir = .GlobalEnv)
+  .sc_set("review_output", review_output)
   log_step(.with_cfe_labels(corrected_ema_data), "8.5", "Cross-participant check", cfg)
 
   # After the re-check of the corrected data: how many handled rows are still a
@@ -453,6 +460,7 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   # -- Step 9: Visualization -------------------------------------------
   if (!skip_visualization) {
     if (verbose) cat("\n=== Step 9: Generating visualizations ===\n")
+    .sc_restore(environment())
     source(file.path(sdir, "sleep_visualization.R"), local = TRUE)
     # The script resolves its own output directory from the data tag
     # (real / synth / unknown). Remember it so Step 11 indexes the directory
@@ -502,6 +510,10 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
     )
   }
 
+  if (!is.null(export_env)) {
+    res <- Filter(Negate(is.null), pipeline_results())
+    list2env(res, envir = export_env)
+  }
   if (verbose) cat("\n[OK] Pipeline complete!\n")
   invisible(TRUE)
 }
@@ -521,6 +533,8 @@ run_setup <- function(config = NULL, project_dir = ".") {
   env  <- .pipeline_init(config, project_dir, verbose = TRUE)
   on.exit(.pipeline_cleanup(env$old_wd), add = TRUE)
   # NOTE: 00a_setup.R only checks R packages / input files -- no data loaded.
+  pipeline_config <- env$cfg
+  sleepcleanr_loaded <- TRUE
   source(file.path(env$sdir, "00a_setup.R"), local = TRUE)
   cat("Setup complete. Data loaded successfully.\n")
   invisible(TRUE)
@@ -539,6 +553,7 @@ run_visualization <- function(config = NULL, project_dir = ".") {
   env  <- .pipeline_init(config, project_dir, verbose = TRUE)
   on.exit(.pipeline_cleanup(env$old_wd), add = TRUE)
   pipeline_config <- env$cfg
+  .sc_restore(environment())
   source(file.path(env$sdir, "sleep_visualization.R"), local = TRUE)
   invisible(TRUE)
 }
@@ -566,6 +581,7 @@ run_report <- function(config = NULL, project_dir = ".") {
 run_figure_index <- function(viz_dir = "latest_visualization") {
   # generate_figure_index is defined in inst/scripts/make_figure_index.R
   # which is sourced at call time
+  sleepcleanr_loaded <- TRUE
   source(file.path(scripts_dir(), "make_figure_index.R"), local = TRUE)
   generate_figure_index(viz_dir)
   invisible(TRUE)

@@ -1,15 +1,10 @@
-# test-global-leakage.R — assert the legacy chain writes only its protocol objects.
+# test-global-leakage.R -- the legacy entry chain must not add objects to the
+# global environment.
 #
-# The source()d scripts (00_MAIN_entry.R + step scripts) share data through
-# .GlobalEnv by design: pipeline_config / sleepcleanr_scripts_dir / corrected_ema_data
-# / review_output / checkforerrors_summary / reasonable_unusual_df are the
-# explicit assign() protocol, and a handful of top-level working objects
-# (clean_df, error_df, ...) are the legacy chain's accepted data-passing style.
-#
-# What this test guards against: a refactor that silently adds a NEW global
-# (stray counter, leftover temporary, or an object that should have been local
-# to a step) without it being an intentional part of the contract. The
-# whitelist is the frozen contract; anything outside it fails.
+# Since 1.5.0 run_pipeline() keeps its objects in the package (pipeline_results()),
+# so the only globals after a legacy run are the ones the runner below assigns
+# itself, as a legacy user would, and one the legacy entry script defines. Anything else fails: a refactor that adds a global
+# (stray counter, leftover temporary, a result left behind) is caught here.
 
 test_that("legacy chain writes only protocol globals", {
   cfg_path <- system.file("extdata", "synthetic_config.yaml", package = "sleepcleanr")
@@ -33,15 +28,10 @@ test_that("legacy chain writes only protocol globals", {
     pattern = "^00_MAIN_entry\\.R$", full.names = TRUE, recursive = TRUE
   )[1])
 
-  whitelist <- c(
-    "pipeline_config", "sleepcleanr_scripts_dir", "sleepcleanr_loaded",
-    "corrected_ema_data", "ema_data_release_timecalc", "review_output",
-    "checkforerrors_summary", "reasonable_unusual_df", "multi_process",
-    # error_unusual publishes its result set via list2env(..., .GlobalEnv):
-    "equal_time_df", "error_df", "unusual_df", "clean_df", "correction_summary",
-    "substance_decimal_anomalies", "checkforerrors_processed",
-    "raw_csv_data", "data_with_flags_local"
-  )
+  # the two objects the runner assigns itself, as a legacy user would, and
+  # multi_process, which the sourced legacy entry script 00_MAIN_entry.R defines
+  # at its top level (it is the user's script, not package code)
+  whitelist <- c("pipeline_config", "sleepcleanr_scripts_dir", "multi_process")
 
   runner <- tempfile("splleak_run_", fileext = ".R")
   writeLines(c(
