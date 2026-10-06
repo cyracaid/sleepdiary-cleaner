@@ -408,6 +408,13 @@ inject_cross_participant_spikes <- function(target_n) {
 # Main enrichment loop
 # ---------------------------------------------------------------------------
 target_per_cat <- catalog$meta$enrichment_target_per_category
+# Optional per-category override: catalog$categories$<name>$enrichment_target (used by
+# prevalence_grid.R to set error rates and type mixes). Absent = the global target,
+# so the committed catalog behaves exactly as before.
+cat_target <- function(name) {
+  v <- catalog$categories[[name]]$enrichment_target
+  if (is.null(v)) target_per_cat else as.integer(v)
+}
 
 simple_categories <- list(
   list(name = "ampm_swap", fn = function(i) inject_ampm_swap(i)),
@@ -445,7 +452,7 @@ simple_categories <- list(
 
 log_lines <- character(0)
 for (cat_spec in simple_categories) {
-  target <- target_per_cat
+  target <- cat_target(cat_spec$name)
   rows_i <- sample_rows_weighted(target)
   applied <- 0
   for (i in rows_i) {
@@ -468,9 +475,10 @@ for (cat_spec in simple_categories) {
                                      cat_spec$name, target, applied))
 }
 
-cp_applied <- inject_cross_participant_spikes(target_per_cat)
+cp_target <- cat_target("cross_participant_spike")
+cp_applied <- if (cp_target > 0) inject_cross_participant_spikes(cp_target) else 0
 log_lines <- c(log_lines, sprintf("%-28s target=%-5d applied=%-5d",
-                                   "cross_participant_spike", target_per_cat, cp_applied))
+                                   "cross_participant_spike", cp_target, cp_applied))
 
 # no_error_control: everything never touched
 untouched_idx <- which(!used_row)

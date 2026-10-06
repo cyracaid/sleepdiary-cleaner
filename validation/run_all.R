@@ -11,7 +11,8 @@
 # non-zero status if any value differs by more than 1e-9.
 #
 # Usage (from the repository root):
-#   Rscript validation/run_all.R [--workdir=DIR]
+#   Rscript validation/run_all.R [--workdir=DIR] [--with-grid]
+# --with-grid also regenerates prevalence_grid.csv (16 cells; adds about 10 minutes).
 #
 # Needs the sleepcleanr version you want to check to be installed (the pipeline is
 # run through library(sleepcleanr)), plus dplyr, readr, tibble and digest. Takes a
@@ -59,6 +60,8 @@ steps <- list(
   c("metric_distortion.R"),
   c("low_prevalence.R")                        # the benchmark at about 5% injected rows
 )
+with_grid <- "--with-grid" %in% args
+if (with_grid) steps <- c(steps, list(c("prevalence_grid.R")))   # 16 cells, several minutes more
 
 owd <- setwd(work); on.exit(setwd(owd), add = TRUE)
 for (st in steps) {
@@ -79,6 +82,7 @@ produced <- c("recall_specificity_ci.csv", "ppv_curve.csv", "far_flag_alter.csv"
               "detection_outcomes_v4_current.csv", "correction_level_recall.csv",
               "correction_level_recall_per_category.csv", "metric_distortion.csv",
               "low_prevalence.csv")
+if (with_grid) produced <- c(produced, "prevalence_grid.csv")
 cat("\n== comparison with the committed tables\n")
 n_bad <- 0L
 for (f in produced) {

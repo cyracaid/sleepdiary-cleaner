@@ -84,7 +84,7 @@ FIELD_TO_RAW_HHMM <- c(time_bed_am_ampm="time_bed_am_hhmm", time_sleep_am_ampm="
 # all-timestamp fields in this catalog, never mixed.
 resolve_multifield <- function(field_str, true_str, rraw) {
   fields <- strsplit(field_str, "\\|")[[1]]
-  trues  <- strsplit(true_str,  "\\|")[[1]]
+  trues  <- strsplit(as.character(true_str),  "\\|")[[1]]   # as.character: a ground-truth file with no multi-field rows is read as numeric
 
   if (length(fields) == 1 && fields[1] %in% DURATION_FIELDS) {
     return(list(duration_field = fields[1], duration_true = trues[1], timestamps = list()))

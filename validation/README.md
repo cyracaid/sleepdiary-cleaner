@@ -70,6 +70,20 @@ cleaning accuracy).
   tested on the synthetic data; **it has not been run on the study data**. See
   `blind_audit/README.md`.
 
+- `synthetic/prevalence_grid.R` runs the benchmark over a grid: four overall error rates
+  (2, 5, 10 and 20% of the 7,000 rows) by four error-type mixes (equal numbers per
+  type; the real-world proportions in the error catalog; timestamp errors only; duration
+  errors only). Result (`results/prevalence_grid.csv`): in all 16 cells at least 98.6% of
+  injected errors were flagged or corrected to the true value (exact interval lower
+  bounds 94.9 to 99.7%), no clean row was flagged or altered, and every flagged row
+  carried an injected error. What varies with the mix is the work left for a person:
+  the share corrected without one is 14 to 19% when window contradictions dominate (the
+  real-world proportions) and 57 to 62% for timestamp errors only, and the rows flagged
+  per 1,000 entries range from 8 to 151. At the real-world proportions and a 10% error
+  rate the benchmark flags 75 rows per 1,000, more than the study's 16 to 22, so the
+  benchmark's mix is harsher than the study data. Run it with
+  `Rscript validation/run_all.R --with-grid`.
+
 ## What these numbers do not show
 
 - Zero false alarms is on constructively clean generator rows; it does not
