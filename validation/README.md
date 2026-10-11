@@ -62,7 +62,9 @@ cleaning accuracy).
   injected errors flagged or corrected to the true value, 45.7% corrected, 53.7%
   flagged only, 0.6% repaired wrongly; every flagged row carried an injected error and
   no clean row was flagged or altered; 29.7 rows per 1,000 are flagged for review (the
-  study's own queue is about 16 per 1,000). Clean rows here are built to pass, so the
+  study's own queue is 79 per 1,000 diary entries with the reviewers' files applied and 108
+  without; only 2,848 of its 13,990 submissions have all four times, which is why the same
+  queue is 16 and 22 per 1,000 submissions). Clean rows here are built to pass, so the
   precision of 1.0 is a property of the benchmark, not a promise for real data.
 - `blind_audit/` is the procedure and the tooling for the check that the benchmark
   cannot give: two people judge raw study entries without seeing the pipeline's output,
@@ -80,8 +82,8 @@ cleaning accuracy).
   the share corrected without one is 14 to 19% when window contradictions dominate (the
   real-world proportions) and 57 to 62% for timestamp errors only, and the rows flagged
   per 1,000 entries range from 8 to 151. At the real-world proportions and a 10% error
-  rate the benchmark flags 75 rows per 1,000, more than the study's 16 to 22, so the
-  benchmark's mix is harsher than the study data. Run it with
+  rate the benchmark flags 75 rows per 1,000, close to the study's 79 per 1,000 diary
+  entries (108 before the reviewers' files were applied). Run it with
   `Rscript validation/run_all.R --with-grid`.
 
 ## What these numbers do not show
@@ -125,6 +127,6 @@ cleaning accuracy).
   efficiency (the `pipeline_excl_flagged` arm), while the flagged rows alone are
   114 minutes too long on latency. Two cautions. The benchmark is enriched with
   errors (5,391 of 7,000 rows are injected), so setting aside the flagged rows
-  costs 42% of the rows here, whereas the review queue is about 1.6% of rows in
-  the study data. And no shift in the unflagged rows means the injected error
+  costs 42% of the rows here, whereas the review queue is 7.9% of the diary entries with all four times
+  in the study data (226 of 2,848; 1.6% of all 13,990 submissions). And no shift in the unflagged rows means the injected error
   types the pipeline handles; it says nothing about error types not injected.

@@ -71,8 +71,9 @@ Full package in [VALIDATION_REPORT.md](VALIDATION_REPORT.md). Summary:
 - **Real study data** (n = 13,990): in the study's run, the rules applied an
   automatic order or format correction to 93 rows (10 of them were also corrected
   by a reviewer) and reviewers corrected 75 further rows. The review queue at the
-  end of a run is 226 rows (1.6%) with the manual files applied and 307 (2.2%)
-  without. The 1,048 rows flagged in the v1.4.5 audit came from a report-only
+  end of a run is 226 rows with the manual files applied and 307 without. Of the 13,990
+  submissions, 2,848 have all four times, so that is 79 and 108 rows per 1,000 diary entries
+  (1.6% and 2.2% of all submissions). The 1,048 rows flagged in the v1.4.5 audit came from a report-only
   pass that modified no data.
 - **External public datasets**: the pipeline runs on other schemas after a short
   conversion script. These datasets contain no known errors, so they are a
