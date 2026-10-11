@@ -1,5 +1,31 @@
 # Changelog
 
+## sleepcleanr (development version)
+
+### New
+
+- [`cleaning_report()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/cleaning_report.md):
+  a short factual description of the last run (entries and participants,
+  entries corrected by each rule, reviewer corrections, entries left in
+  the review queue, the reference thresholds), meant to be adapted for a
+  Methods section. It reads only what the run produced and makes no
+  claim about accuracy.
+
+### Validation
+
+- `validation/synthetic/prevalence_grid.R` (new;
+  `run_all.R --with-grid`): the benchmark over four error rates (2, 5,
+  10, 20%) and four error-type mixes. At least 98.6% of injected errors
+  were flagged or corrected to the true value in every one of the 16
+  cells and no clean row was flagged or altered; the share corrected
+  without a person ranged from 14% to 62% and the rows flagged per 1,000
+  from 8 to 151, depending on the
+  1009. `inject_errors.R` accepts an optional per-category target in the
+        catalog; the committed catalog is unchanged, so the main
+        benchmark is unchanged.
+- `evaluate_detection.R` failed on a ground-truth file with no
+  multi-field rows (its `true_value` column was read as numeric); fixed.
+
 ## sleepcleanr 1.5.0
 
 The package no longer writes to the global environment (a breaking

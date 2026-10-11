@@ -53,6 +53,24 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="development version" id="sleepcleanr-development-version">sleepcleanr (development version)<a class="anchor" aria-label="anchor" href="#sleepcleanr-development-version"></a></h2>
+<div class="section level3">
+<h3 id="new-development-version">New<a class="anchor" aria-label="anchor" href="#new-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/cleaning_report.html">cleaning_report()</a></code>: a short factual description of the last run (entries and participants, entries corrected by each rule, reviewer corrections, entries left in the review queue, the reference thresholds), meant to be adapted for a Methods section. It reads only what the run produced and makes no claim about accuracy.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="validation-development-version">Validation<a class="anchor" aria-label="anchor" href="#validation-development-version"></a></h3>
+<ul><li>
+<code>validation/synthetic/prevalence_grid.R</code> (new; <code>run_all.R --with-grid</code>): the benchmark over four error rates (2, 5, 10, 20%) and four error-type mixes. At least 98.6% of injected errors were flagged or corrected to the true value in every one of the 16 cells and no clean row was flagged or altered; the share corrected without a person ranged from 14% to 62% and the rows flagged per 1,000 from 8 to 151, depending on the
+<ol start="1009" style="list-style-type: lower-roman"><li>
+<code>inject_errors.R</code> accepts an optional per-category target in the catalog; the committed catalog is unchanged, so the main benchmark is unchanged.</li>
+</ol></li>
+<li>
+<code>evaluate_detection.R</code> failed on a ground-truth file with no multi-field rows (its <code>true_value</code> column was read as numeric); fixed.</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.5.0" id="sleepcleanr-150">sleepcleanr 1.5.0<a class="anchor" aria-label="anchor" href="#sleepcleanr-150"></a></h2>
 <p>The package no longer writes to the global environment (a breaking change for code that read <code>corrected_ema_data</code> or <code>review_output</code> from it); cleaning logic, thresholds and every computed number are unchanged. Also new in this release: the realistic-error-rate benchmark, <code>validation/run_all.R</code>, the blind-audit tooling, the Zenodo DOI in the citation files, and corrected validation text.</p>
 <div class="section level3">

@@ -21,6 +21,9 @@
   : Clean a sleep diary: data-first entry point
 - [`cleaning_chain`](https://cyracaid.github.io/sleepdiary-cleaner/reference/cleaning_chain.md)
   : Pipeline step adapters and the cleaning chain
+- [`cleaning_report()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/cleaning_report.md)
+  : Describe what a pipeline run changed, in words a Methods section can
+  use
 - [`dim(`*`<sleep_diary>`*`)`](https://cyracaid.github.io/sleepdiary-cleaner/reference/dim.sleep_diary.md)
   : Dimensions of a sleep_diary
 - [`.step_ledger_env`](https://cyracaid.github.io/sleepdiary-cleaner/reference/dot-step_ledger_env.md)
