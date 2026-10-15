@@ -113,47 +113,18 @@ subprocess-based tests also gained an explicit package-root resolution
 (test_dir chdirs, so `load_all(getwd())` inside the subprocess loaded
 the wrong directory and hung).
 
-## 5. Two parallel pipeline implementations
-
-**Status: OPEN (2026-08-13).** `run_pipeline()` (R/pipeline.R, 8 `source()`
-calls) and `.run_pipeline_internal()` (00_MAIN_entry.R, 16 `source()` calls)
-are separate implementations of the same 10 steps. The packaged entry wraps
-the S3 chain; the legacy entry re-sources every step itself.
-
-**Why:** 00_MAIN_entry.R predates the package wrapper and was kept for
-back-compat (users `source()` it directly).
-
-**Cost:** Proven by P2: the smoke test caught `.cfg` being used before
-assignment in 00_MAIN_entry's Step 1 — a bug that existed since 2cbe1be8
-(2026-08-06) because the two paths can drift independently. Every fix must
-land in both copies plus the sync gate.
-
-**Resolution options:** (a) make `.run_pipeline_internal()` delegate to the
-packaged `run_pipeline()`, keeping 00_MAIN_entry as a thin shim; (b) deprecate
-00_MAIN_entry entirely once smoke coverage is strong. Option (a) is lower
-risk; the legacy-entry smoke test (2911d06) must stay green either way.
-
----
-
 ## 6. verify_v1_3_snapshot.R carries a local cfg_get() duplicate
 
-**Status: OPEN (2026-08-13).** The snapshot verifier defines its own 3-arg
-`cfg_get(key, default, cfg_arg)` (verify_v1_3_snapshot.R:57 + inst/
-verification copy) that shadows the package version. `cfg_arg` avoids the
-parameter-vs-closure name clash; body logic duplicates R/config.R.
+**Status: RESOLVED (2026-08-13, commit 9eca901).** The verifier-local 3-arg
+`cfg_get(key, default, cfg_arg)` is deleted. Under `pkgload::load_all` the
+package `cfg_get()` resolves directly; all 6 call sites now pass
+`cfg = cfg` explicitly, avoiding the deprecated implicit-config warning.
+The root duplicate copy was removed later (commit 725d147); the single copy
+lives in `inst/verification/`.
 
-**Why:** The verifier runs standalone (`Rscript verify_v1_3_snapshot.R`)
-without the package attached in the same way as the pipeline, and its closure
-needs the local `cfg` binding.
-
-**Cost:** Package `cfg_get()` semantics change → verifier version drifts
-silently; the sync test only checks the two verifier copies against each
-other, not against R/config.R.
-
-**Resolution:** Export `cfg_get` (already exported) and make the verifier
-call the package version with explicit `cfg`; delete the local definition.
-Requires the verifier to `library(sleepcleanr)` (or `pkgload::load_all`) first —
-it already does for other package functions.
+**Last verified:** 2026-10-16 — `git merge-base --is-ancestor 9eca901 main`
+passes; no local `cfg_get` definition remains in the script; 6/6 call sites
+pass `cfg = cfg` (lines 81, 100-101, 129-130, 181).
 
 ---
 
@@ -194,10 +165,20 @@ were fixed while chasing the noise:
   `cfg_get()` call, so `.s_col()` kept hitting the deprecated
   .GlobalEnv fallback; fixed in both copies.
 
-Remaining 29 warnings are framework-level deprecation noise: dplyr
-name-repair inside `mutate()`, ggplot2 `size` aesthetic deprecation and a
-manual-scale "no shared levels" hint in figure code. Cosmetic; not worth
-chasing further.
+**Update (2026-10-16).** The four `cfg_get(...)` implicit-config
+deprecation warnings are also fixed: they came from an unfinished
+cfg-threading in `inst/scripts/sleep_visualization.R` (six bare calls in
+`add_quality_flags()` and the Figure P26 title block), which now pass
+`cfg = pipeline_config` like the rest of the file. Verified on a full
+synthetic run: **25** warnings, down from 29, none of them
+implicit-config; the per-message counts sum to 25 with no new entries.
+
+Remaining 25 warnings are cosmetic device/framework noise: PNG
+`mbcsToSbcs` Unicode substitutions in figure titles (10), ggplot2
+dropped-row notices (8), one `size`→`linewidth` deprecation, one unknown
+`label.size`, one mutate coercion-NA notice, one sprintf unused-argument,
+one gridExtra version note — plus a `git rev-parse` notice that only
+appears in non-git sandboxes. Cosmetic; not worth chasing further.
 
 **Why:** Legacy step scripts use `mutate()` with `:=`/`!!` patterns that
 trigger dplyr's name-repair warnings on the synthetic column set.
@@ -210,7 +191,7 @@ known-benign mutate in the relevant step, with a comment), or fix the
 name-repair root cause (explicit `.name_repair`). Cosmetic; do not block
 release work.
 
-**Last updated:** 2026-08-13
+**Last updated:** 2026-10-16
 
 ---
 
