@@ -361,11 +361,11 @@ add_quality_flags <- function(data) {
   data <- data %>%
     mutate(
       flag_poor_efficiency = ifelse(!is.na(sleep_efficiency_pct),
-        sleep_efficiency_pct < cfg_get("classification.flag_severity.poor_efficiency_threshold_pct", 70), FALSE),
+        sleep_efficiency_pct < cfg_get("classification.flag_severity.poor_efficiency_threshold_pct", 70, cfg = pipeline_config), FALSE),
       flag_high_sol = ifelse(!is.na(sol_h),
-        sol_h > cfg_get("classification.flag_severity.high_sol_threshold_hours", 1), FALSE),
+        sol_h > cfg_get("classification.flag_severity.high_sol_threshold_hours", 1, cfg = pipeline_config), FALSE),
       flag_high_waso = ifelse(!is.na(waso_h),
-        waso_h > cfg_get("classification.flag_severity.high_waso_threshold_hours", 1.5), FALSE),
+        waso_h > cfg_get("classification.flag_severity.high_waso_threshold_hours", 1.5, cfg = pipeline_config), FALSE),
       
       flag_sleep_calculation_issue = ifelse(
         !is.na(self_diffcalc_sol_minutes) & !is.na(duration_totalmin_sol_estimate_am_mincalc),
@@ -2580,9 +2580,9 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
                     "wrong. Self-report/measured discrepancies are preserved by design, not corrected ",
                     "(see Figure 2).\nMinor = 1 flag, Major = 2+ flags from {SE<%s%%, SOL>%sh, WASO>%sh}."),
              n_show, n_participants, overall_clean_pct, n_high_flag,
-             cfg_get("classification.flag_severity.poor_efficiency_threshold_pct", 70),
-             cfg_get("classification.flag_severity.high_sol_threshold_hours", 1),
-             cfg_get("classification.flag_severity.high_waso_threshold_hours", 1.5))) +
+             cfg_get("classification.flag_severity.poor_efficiency_threshold_pct", 70, cfg = pipeline_config),
+             cfg_get("classification.flag_severity.high_sol_threshold_hours", 1, cfg = pipeline_config),
+             cfg_get("classification.flag_severity.high_waso_threshold_hours", 1.5, cfg = pipeline_config))) +
       theme(plot.title = element_text(hjust = 0.5, size = 15, face = "bold"),
             plot.subtitle = element_text(hjust = 0.5, size = 10, color = "#424242"))
 
