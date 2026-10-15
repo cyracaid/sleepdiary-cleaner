@@ -15,7 +15,7 @@
 | 6-7 | Correct & compute metrics (S3 chain) | Manual + duration corrections; TST/SOL/WASO/SE metrics; has_correction enum |
 | 8 | Auto-detect remaining issues | TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED flag classification |
 | 8.5 | Cross-participant consistency check | Global consistency audit across participants |
-| 9 | Generate diagnostic figures | 30 figures (14 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt |
+| 9 | Generate diagnostic figures | 32 figures (16 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt |
 | 10 | Build delivered datasets | finalize_columns() selects/renames to Dataset A/B per column dictionary |
 
 **Delivered columns (36, from column dictionary):**
@@ -82,6 +82,31 @@ file.copy(system.file("config_template.yaml", package = "sleepcleanr"), "my_stud
 # Edit my_study.yaml → set data.files.main to your file
 run_pipeline(config = "my_study.yaml")
 ```
+
+## Human-Review Corrections (opt-in)
+
+Since v1.5.0, `run_pipeline()` does **not** apply human-review corrections
+by default. Review worksheets are still regenerated under `output/` every
+run for human fill-in; to apply completed reviews, opt in explicitly:
+
+```r
+run_pipeline(config = "my_study.yaml", include_manual_corrections = TRUE)
+```
+
+- `FALSE` (default): algorithmic-only run; a banner states that no human corrections were applied.
+- `TRUE`: applies the review files configured under `data.files.manual_*` / `second_review`.
+- `"ask"`: prompts interactively; non-interactive sessions degrade to `FALSE`.
+
+Templates for every review file live in `templates/`; the review workflow
+is walked through in `vignettes/interpreting-output.Rmd`.
+
+## Fetching Results
+
+The pipeline writes nothing to your global environment. Main results are
+kept package-private and retrieved with `pipeline_results()`;
+`cleaning_report()` builds a prevalence report from the same results
+object. Pass `export_env = globalenv()` to `run_pipeline()` only if the
+pre-v1.5.0 behaviour is needed.
 
 ## Key Columns
 
