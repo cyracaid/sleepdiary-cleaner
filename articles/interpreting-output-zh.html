@@ -10,7 +10,8 @@
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="如何读懂管线输出（中文）">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
+<meta property="og:title" content="如何读懂管线输出（中文）">
 <meta name="description" content="怎么读 correction_status_final.csv、step flag ledger、回归检查与诊断图表——每个输出的含义、检查要点，以及每张图的详细参考。">
 <meta property="og:description" content="怎么读 correction_status_final.csv、step flag ledger、回归检查与诊断图表——每个输出的含义、检查要点，以及每张图的详细参考。">
 </head>
@@ -90,63 +91,6 @@
 文件告诉你一切。本文说明怎么读它们、怎么对比上一次运行做回归检查、以及怎么看图。</p>
 <p>第 1–3 节讲怎么运行管线和准备人工输入文件；第 4–7 节讲两个输出
 CSV、回归检查和快速检查卡；第 8–9 节讲怎么看图。</p>
-<style>
-:root {
-  color-scheme: light dark;
-  --bg: #f6f3ea; --fg: #2d2f2e; --muted: #6b6f6c; --border: #ddd8c8; --link: #2f6f8f;
-  --code-bg: #ece8db; --pre-bg: #efebdf; --stripe: #efece1; --thead: #e6e1d0;
-  --h2-bg: #dbe8df; --h2-bar: #4d8471; --h2-fg: #1f4a3b;
-  --h3-fg: #2e5f4f; --h3-line: #b7d0c3;
-  --h4-bg: #dde8f2; --h4-bar: #4a7aa6; --h4-fg: #1d3f5f;
-  --quote-bg: #efece1; --quote-bar: #b9b39c;
-  --toc-bg: #efece1; --sum-bg: #ebe7d9;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #1c1f24; --fg: #d5d8dc; --muted: #9aa1a8; --border: #363b43; --link: #8cb8e0;
-    --code-bg: #2a2f37; --pre-bg: #23272e; --stripe: #22262c; --thead: #2b3038;
-    --h2-bg: #24352f; --h2-bar: #6fb39b; --h2-fg: #bfe3d4;
-    --h3-fg: #9ccdb9; --h3-line: #3d5a4f;
-    --h4-bg: #24344a; --h4-bar: #6b9bd1; --h4-fg: #c4dcf3;
-    --quote-bg: #22262c; --quote-bar: #4a505a;
-    --toc-bg: #22262c; --sum-bg: #2a2f37;
-  }
-  pre.sourceCode span, pre code span { color: #d5d8dc !important; }
-  pre.sourceCode span.co, pre code span.co { color: #8b929a !important; font-style: italic; }
-  pre.sourceCode span.st, pre code span.st { color: #c9d9a0 !important; }
-  pre.sourceCode span.fu, pre code span.fu { color: #8cb8e0 !important; }
-}
-html, body { background: var(--bg) !important; color: var(--fg) !important; }
-body { line-height: 1.65; }
-a { color: var(--link); }
-h1.title { color: var(--fg); }
-h2 { background: var(--h2-bg); color: var(--h2-fg); border-left: 7px solid var(--h2-bar); border-bottom: none;
-     padding: 0.35em 0.7em; margin-top: 2.2em; border-radius: 0 6px 6px 0; font-size: 1.55em; }
-h3 { color: var(--h3-fg); border-bottom: 2px solid var(--h3-line); padding-bottom: 0.2em; margin-top: 1.9em; font-size: 1.38em; }
-h4 { background: var(--h4-bg); color: var(--h4-fg); border-left: 6px solid var(--h4-bar);
-     padding: 0.35em 0.75em; margin-top: 2em; border-radius: 0 5px 5px 0; font-size: 1.22em; }
-code { background: var(--code-bg); color: var(--fg); border-radius: 3px; padding: 0.05em 0.3em; }
-pre, div.sourceCode { background: var(--pre-bg) !important; border: 1px solid var(--border); }
-pre code { background: transparent; }
-table { border-color: var(--border) !important; color: var(--fg) !important; }
-table tr, table td, table th { background-color: transparent !important; color: var(--fg) !important; border-color: var(--border) !important; }
-table thead th, table thead tr { background-color: var(--thead) !important; }
-table tbody tr.even, table tbody tr:nth-child(even) { background-color: var(--stripe) !important; }
-blockquote { background: var(--quote-bg); border-left: 4px solid var(--quote-bar); color: var(--fg); padding: 0.3em 1em; }
-hr { border-color: var(--border); }
-details { margin: 0.35em 0; }
-details > summary { cursor: pointer; background: var(--sum-bg); border-radius: 4px; padding: 0.25em 0.7em; }
-details > summary:hover { filter: brightness(0.97); }
-details[open] > summary { margin-bottom: 0.4em; }
-.toc-box { border: 1px solid var(--border); border-radius: 6px; background: var(--toc-bg); padding: 0.5em 1.2em 0.7em; margin: 1.2em 0; font-size: 0.95em; }
-.toc-box .toc-title { font-weight: bold; margin: 0.3em 0; }
-.toc-box ul { list-style: none !important; margin: 0.15em 0; padding-left: 1.1em; }
-.toc-box > ul { padding-left: 0; }
-.toc-box > ul > li { margin: 0.25em 0; font-weight: 600; }
-.toc-box > ul > li > ul > li, .toc-box details li { font-weight: normal; }
-.toc-box details > summary { background: transparent; padding: 0; }
-.toc-box details ul { columns: 2; column-gap: 2em; }
-</style>
 <nav class="toc-box"><p class="toc-title">
 目录
 </p>
