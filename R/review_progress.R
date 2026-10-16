@@ -160,3 +160,81 @@ print_review_summary <- function(ws_list, final, flags = NULL, applied = TRUE, v
     cat("    Every row is handled and passes the re-check.\n")
   invisible(cnt)
 }
+
+#' Rows that still need a person after the corrections, and rows the
+#' corrections turned into errors
+#'
+#' The Step 5 worksheet lists the records the rules flag BEFORE corrections, so
+#' it always has the same rows. This compares that list with the corrected data:
+#' \itemize{
+#'   \item `remaining`: worksheet rows whose final `data_category` is not
+#'     clean / equal-time-ok / reasonable-unusual;
+#'   \item `new`: rows that are NOT on either Step 5 worksheet but end as
+#'     `error` (a correction, or a later step, made them one);
+#'   \item `resolved`: number of worksheet rows that now pass.
+#' }
+#' @param ws_error,ws_unusual Annotated Step 5 worksheets (data frames).
+#' @param final Corrected data with `pid`, `day_num`, `row_id`, `data_category`.
+#' @return list(remaining, new, n_before, n_resolved)
+#' @noRd
+post_correction_review <- function(ws_error, ws_unusual, final) {
+  final <- .rp_clean_names(final)
+  ws_error <- .rp_clean_names(ws_error)
+  ws_unusual <- .rp_clean_names(ws_unusual)
+  fkey <- .rp_key(final)
+  cat_of <- function(k) as.character(final$data_category)[match(k, fkey)]
+
+  k_err <- .rp_key(ws_error)
+  still_err <- is.na(cat_of(k_err)) | !(cat_of(k_err) %in% .rp_ok_categories)
+  remaining <- ws_error[still_err, , drop = FALSE]
+
+  on_sheet <- c(k_err, .rp_key(ws_unusual))
+  is_err <- as.character(final$data_category) %in% "error"
+  new <- final[is_err & !(fkey %in% on_sheet), , drop = FALSE]
+
+  list(remaining = remaining, new = new,
+       n_before = nrow(ws_error), n_resolved = sum(!still_err))
+}
+
+#' Write the post-correction review worksheet
+#'
+#' Replaces the Step 5 worksheet file with the rows that still need a person
+#' (`review_status` = "remaining") followed by the errors that appeared after
+#' corrections (`review_status` = "new_after_correction"). On a first run
+#' with no manual files this is the same list as Step 5 wrote.
+#' @noRd
+write_post_correction_review <- function(ws_list, final, file = "[NEW]manual_error_correction_review.csv",
+                                         verbose = TRUE) {
+  ws_error <- ws_list[["error"]]
+  if (is.null(ws_error)) return(invisible(NULL))
+  r <- post_correction_review(ws_error, ws_list[["unusual"]], final)
+
+  rem <- r$remaining
+  if (nrow(rem) > 0) rem$review_status <- "remaining"
+  new <- r$new
+  if (nrow(new) > 0) {
+    shared <- intersect(names(new), names(ws_error))
+    add <- ws_error[rep(NA_integer_, nrow(new)), , drop = FALSE]
+    rownames(add) <- NULL
+    for (nm in shared) add[[nm]] <- new[[nm]]
+    for (nm in setdiff(names(add), shared)) add[[nm]] <- NA
+    add$review_status <- "new_after_correction"
+    new <- add
+  }
+  if (nrow(rem) == 0 && nrow(new) == 0) {
+    out <- ws_error[0, , drop = FALSE]; out$review_status <- character(0)
+  } else {
+    out <- rbind(if (nrow(rem) > 0) rem, if (nrow(new) > 0) new)
+  }
+  front <- intersect(c("pid", "day_num", "row_id", "review_status"), names(out))
+  out <- out[, c(front, setdiff(names(out), front)), drop = FALSE]
+  utils::write.csv(out, file, row.names = FALSE, na = "")
+
+  if (verbose) {
+    cat(sprintf(paste0("\n  [review result] %d error rows flagged before correction: ",
+                       "%d now pass, %d remain; %d NEW error row(s) appeared after correction.\n",
+                       "                  Written to %s (column review_status).\n"),
+                r$n_before, r$n_resolved, nrow(r$remaining), nrow(r$new), file))
+  }
+  invisible(r)
+}

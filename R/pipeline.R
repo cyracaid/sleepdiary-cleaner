@@ -31,6 +31,14 @@ utils::globalVariables(c(
 
 .pipeline_init <- function(config, project_dir, verbose) {
   old_wd <- setwd(project_dir)
+  # A relative config path is read from project_dir (as before). If it is not
+  # there but exists relative to the directory the call came from, use that,
+  # so run_pipeline("my_config.yaml", project_dir = "study") finds the file
+  # the user is looking at.
+  if (is.character(config) && length(config) == 1L && nzchar(config) &&
+      !file.exists(config) && file.exists(file.path(old_wd, config))) {
+    config <- file.path(old_wd, config)
+  }
   sdir   <- scripts_dir()
   .sc_set("sleepcleanr_scripts_dir", sdir)
 
@@ -455,6 +463,13 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
     print_review_summary(.review_ws, corrected_ema_data, review_output$data_with_flags,
                          applied = .include_manual, verbose = verbose),
     error = function(e) if (verbose) cat("  [review progress] skipped:", conditionMessage(e), "\n")
+  )
+
+  # The worksheet from Step 5 lists the errors BEFORE corrections. Replace it
+  # with what is still open after them, and the errors the corrections created.
+  tryCatch(
+    write_post_correction_review(.review_ws, corrected_ema_data, verbose = verbose),
+    error = function(e) if (verbose) cat("  [review result] skipped:", conditionMessage(e), "\n")
   )
 
   # -- Step 9: Visualization -------------------------------------------
