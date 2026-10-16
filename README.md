@@ -53,7 +53,10 @@ Messy sleep diary data (CSV / RDS)
    signal, not an error.
 2. **No silent corrections.** Every change carries a recorded correction type, and
    flags persist until a human resolves them explicitly. The correction ledger is
-   part of the output (`correction_status_final.csv`, `step_flag_ledger.csv`).
+   part of the output (`correction_status_final.csv`, `step_flag_ledger.csv`), and
+   every run regenerates the human-review worksheets
+   (`[NEW]manual_error_correction_review.csv`, `[NEW]manual_unusual_review.csv`)
+   in the project root — not in `output/`.
 3. **Configurable, documented thresholds.** Rule thresholds ship as YAML defaults
    with rationale (see [THRESHOLDS.md](THRESHOLDS.md)) and are meant to be
    re-checked against your own data.
@@ -193,7 +196,7 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995
 
 ## Status and data availability
 
-**Status.** sleepcleanr 1.5.0 is research software under active development. It
+**Status.** sleepcleanr 1.5.1 is research software under active development. It
 was built for one longitudinal sleep study, has not yet been peer reviewed, and
 is not on CRAN. Treat the shipped thresholds as references to check against your
 own data.
@@ -403,7 +406,7 @@ sleepcleanr 刻意**既非全自动、也非全部人工 flag**：
 - **不全自动：** 高置信、仅涉时序/AM-PM 的规则才安全自动修正；但值级错误（如 SOL 与就寝→入睡窗口的矛盾）绝不覆盖 — 一个看似偏大的 SOL 是真实的心理信号，静默"修正"会破坏管线所服务的睡眠–情绪关联。
 - **不全 flag**：1048 行 FLAG 队列手动看不过来。高置信规则吃掉确定性个案；FLAG 只把歧义个案留给人审。
 
-结果不是"管线把 mess 洗干净"，而是把 mess **显式化**：每个候选错误要么被呈现，要么被记录，永不被静默隐藏。
+结果不是"管线把 mess 洗干净"，而是把 mess **显式化**：每个候选错误要么被呈现，要么被记录，永不被静默隐藏。每轮 run 会在**项目根目录**（不是 `output/`）重新生成两张人工评审工作表：`[NEW]manual_error_correction_review.csv` 与 `[NEW]manual_unusual_review.csv`——填好后以 `include_manual_corrections = TRUE` 重跑即应用。
 
 > **阈值只是参考，不是教条。** 这里的 swap/flip 阈值（如 3 小时相邻对调、12 小时 AM/PM 翻转）在我们的数据集上验证过 — 见 VALIDATION_REPORT。你的研究日记可能落在这区间内或外；它们都是 YAML 可配置的，应按你自己的数据重新审视，而非盲抄。
 
@@ -413,7 +416,7 @@ sleepcleanr 刻意**既非全自动、也非全部人工 flag**：
 
 ## 状态与数据可用性
 
-**状态。** sleepcleanr 1.5.0 是仍在开发中的研究软件，为一项纵向睡眠研究而写，尚未经同行评审，也未上线 CRAN。随包给出的阈值只是参考，请用你自己的数据核对。
+**状态。** sleepcleanr 1.5.1 是仍在开发中的研究软件，为一项纵向睡眠研究而写，尚未经同行评审，也未上线 CRAN。随包给出的阈值只是参考，请用你自己的数据核对。
 
 **数据可用性。** 研究数据不公开（参与者隐私）。不需要这些数据也能用到的东西：
 

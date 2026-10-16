@@ -2,7 +2,7 @@
 
 <!-- AUTO:SKILL_FACTS_START -->
 
-**Version:** 1.5.0
+**Version:** 1.5.1
 **Pipeline steps:** 10
 
 | Step | Label | Description |
@@ -136,6 +136,12 @@ Template: `inst/config_template.yaml`
 | `output/appendix_step_ledger.csv` | Per-step flag tracking |
 | `output/flagged_records_self_reported.csv` | SELF_REPORTED_FLAG records |
 | `column_map.csv` | Column source mapping |
+| `[NEW]manual_error_correction_review.csv` | Step 5 review worksheet: `error` records awaiting human decisions — written to the **project root**, not `output/` |
+| `[NEW]manual_unusual_review.csv` | Step 5 review worksheet: `unusual` records — also project root |
+
+The `[NEW]` prefix is literal. In R, list these files with
+`list.files(pattern = "\\[NEW\\]")` — an unescaped `[NEW]*` pattern is a
+regex character class and matches nothing.
 
 ## Key Figures
 
