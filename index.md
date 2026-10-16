@@ -52,7 +52,11 @@ Psychophysiology Laboratory’s intensive-longitudinal sleep study.
 2.  **No silent corrections.** Every change carries a recorded
     correction type, and flags persist until a human resolves them
     explicitly. The correction ledger is part of the output
-    (`correction_status_final.csv`, `step_flag_ledger.csv`).
+    (`correction_status_final.csv`, `step_flag_ledger.csv`), and every
+    run regenerates the human-review worksheets
+    (`[NEW]manual_error_correction_review.csv`,
+    `[NEW]manual_unusual_review.csv`) in the project root — not in
+    `output/`.
 3.  **Configurable, documented thresholds.** Rule thresholds ship as
     YAML defaults with rationale (see
     [THRESHOLDS.md](https://cyracaid.github.io/sleepdiary-cleaner/THRESHOLDS.md))
@@ -238,7 +242,7 @@ breakdown.
 
 ## Status and data availability
 
-**Status.** sleepcleanr 1.5.0 is research software under active
+**Status.** sleepcleanr 1.5.1 is research software under active
 development. It was built for one longitudinal sleep study, has not yet
 been peer reviewed, and is not on CRAN. Treat the shipped thresholds as
 references to check against your own data.
@@ -472,7 +476,11 @@ sleepcleanr 刻意**既非全自动、也非全部人工 flag**：
   只把歧义个案留给人审。
 
 结果不是”管线把 mess 洗干净”，而是把 mess
-**显式化**：每个候选错误要么被呈现，要么被记录，永不被静默隐藏。
+**显式化**：每个候选错误要么被呈现，要么被记录，永不被静默隐藏。每轮 run
+会在**项目根目录**（不是
+`output/`）重新生成两张人工评审工作表：`[NEW]manual_error_correction_review.csv`
+与 `[NEW]manual_unusual_review.csv`——填好后以
+`include_manual_corrections = TRUE` 重跑即应用。
 
 > **阈值只是参考，不是教条。** 这里的 swap/flip 阈值（如 3
 > 小时相邻对调、12 小时 AM/PM 翻转）在我们的数据集上验证过 — 见
@@ -486,7 +494,7 @@ sleepcleanr 刻意**既非全自动、也非全部人工 flag**：
 
 ## 状态与数据可用性
 
-**状态。** sleepcleanr 1.5.0
+**状态。** sleepcleanr 1.5.1
 是仍在开发中的研究软件，为一项纵向睡眠研究而写，尚未经同行评审，也未上线
 CRAN。随包给出的阈值只是参考，请用你自己的数据核对。
 
