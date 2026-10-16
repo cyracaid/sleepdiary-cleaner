@@ -370,42 +370,48 @@ run. They hold real participant rows; never commit them. Details:
 <tbody>
 <tr class="odd">
 <td><code>[NEW]manual_error_correction_review.csv</code></td>
-<td>Step 5</td>
-<td>
-<code>error</code> records for a person to fill in (same rows as
-<code>error_df_pre</code>)</td>
+<td>Step 5, rewritten after Step 8.5</td>
+<td>Records still waiting for a person: old <code>error</code> rows not
+yet in a manual file that still fail, plus records that became errors
+after the corrections (column <code>review_status</code>)</td>
 </tr>
 <tr class="even">
+<td><code>output/errors_incorporated_still_open.csv</code></td>
+<td>After Step 8.5</td>
+<td>Rows already in a manual file that still fail the re-check (only
+written when there are any)</td>
+</tr>
+<tr class="odd">
 <td><code>[NEW]manual_unusual_review.csv</code></td>
 <td>Step 5</td>
 <td>
 <code>unusual</code> records for a person to fill in</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>manual_error_correction_updated.csv</code></td>
 <td>Step 6</td>
 <td>Record of the corrections applied: your
 <code>manual_error_corrections.csv</code> as the pipeline incorporated
 it, <code>manually_corrected</code> marks the rows actually used</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>reasonable_unusual_records.csv</code></td>
 <td>Step 6</td>
 <td>
 <code>unusual</code> rows accepted as “reasonable unusual
 record”</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>cross_participant_flagged_rows.csv</code></td>
 <td>Step 8.5</td>
 <td>Days far from the participant’s own median SOL/WASO</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>cross_participant_suspicious_slices.csv</code></td>
 <td>Step 8.5</td>
 <td>All days of the participants in the file above, for context</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>cross_participant_field_misentries.csv</code></td>
 <td>Step 8.5</td>
 <td>Rows where SOL/WASO looks typed into another time field</td>

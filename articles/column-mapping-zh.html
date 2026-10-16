@@ -352,38 +352,43 @@ interpreting-output §4）；n_corrected；标记计数；平均 TST、SOL</td>
 <tbody>
 <tr class="odd">
 <td><code>[NEW]manual_error_correction_review.csv</code></td>
-<td>Step 5</td>
-<td>给人填写的 <code>error</code> 记录（与 <code>error_df_pre</code>
-同一批行）</td>
+<td>Step 5 写出，Step 8.5 之后重写</td>
+<td>仍在等人处理的记录：还没进人工文件、仍不通过的旧 <code>error</code>
+行，加上修正之后才变成错误的记录（<code>review_status</code> 列）</td>
 </tr>
 <tr class="even">
+<td><code>output/errors_incorporated_still_open.csv</code></td>
+<td>Step 8.5 之后</td>
+<td>已在人工文件里、重新检查仍不通过的行（有才写）</td>
+</tr>
+<tr class="odd">
 <td><code>[NEW]manual_unusual_review.csv</code></td>
 <td>Step 5</td>
 <td>给人填写的 <code>unusual</code> 记录</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>manual_error_correction_updated.csv</code></td>
 <td>Step 6</td>
 <td>已应用修正的记录：你的 <code>manual_error_corrections.csv</code>
 被流水线纳入后的副本，<code>manually_corrected</code>
 标明实际用上的行</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>reasonable_unusual_records.csv</code></td>
 <td>Step 6</td>
 <td>被接受为”reasonable unusual record”的 <code>unusual</code> 行</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>cross_participant_flagged_rows.csv</code></td>
 <td>Step 8.5</td>
 <td>SOL/WASO 偏离此人自己中位数的日子</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>cross_participant_suspicious_slices.csv</code></td>
 <td>Step 8.5</td>
 <td>上一个文件中参与者的全部天数，作上下文</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>cross_participant_field_misentries.csv</code></td>
 <td>Step 8.5</td>
 <td>SOL/WASO 数字像填进别的时间栏的行</td>

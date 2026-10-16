@@ -1,5 +1,34 @@
 # Changelog
 
+## sleepcleanr 1.5.1
+
+### Changed
+
+- `[NEW]manual_error_correction_review.csv` is rewritten after Step 8.5
+  so that it lists only what still needs a person: old rows that are not
+  yet in a manual file and still fail the re-check (`review_status` =
+  `remaining`), and records that became errors only after the
+  corrections (`new_after_correction`). Before, it kept listing every
+  record flagged before correction and never got shorter. A first run
+  with no manual files gives the same list as before.
+- Rows that are already in a manual file but still fail the re-check are
+  written to `output/errors_incorporated_still_open.csv` and counted in
+  the run summary, so a correction that did not work is not lost.
+- The run summary prints, for the error worksheet, how many rows now
+  pass, how many are not yet incorporated, how many are incorporated but
+  still a problem, and how many new errors appeared.
+- A relative `config` path that is not found in `project_dir` is also
+  looked for in the directory the call came from.
+
+### Documentation
+
+- `interpreting-output` and `column-mapping` (English and Chinese): the
+  working files written to the project root and what each is; the
+  contents of `latest_visualization_<tag>_n<rows>/`; the columns of
+  `correction_status_final.csv` (`*_first`, `*_last`, `delta_*`) and
+  what first and last mean; that `include_manual_corrections` is an
+  argument, not a YAML setting, and that its default changed in 1.4.7.
+
 ## sleepcleanr (development version)
 
 ### New

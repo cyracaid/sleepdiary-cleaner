@@ -546,6 +546,30 @@ by review files left in the working directory.</td>
 </tr>
 </tbody>
 </table>
+<p><strong><code>include_manual_corrections</code> is an argument, not a
+YAML setting.</strong> Writing it in the config file has no effect; it
+must be in the call. The YAML only says <em>where</em> each human-review
+file is (<code>data.files.manual_error</code>, …). Two things
+follow:</p>
+<ul>
+<li>
+<strong>If a run prints
+<code>No corrections file found () — skipping</code></strong> for the
+nap/exercise, sleep-metric-duration and metric-acceptance steps, the
+empty <code>()</code> means the path was blanked on purpose: the run was
+algorithmic-only (<code>include_manual_corrections = FALSE</code>, the
+default). It is not a missing or misspelled file. Rerun with
+<code>include_manual_corrections = TRUE</code> to apply them.</li>
+<li>
+<strong>The default changed in version 1.4.7.</strong> Earlier
+versions applied the manual files in the config without being asked.
+After upgrading, the same call
+<code>run_pipeline(config = "my_study.yaml")</code> no longer applies
+them. Add <code>include_manual_corrections = TRUE</code> to reproduce an
+earlier full run.</li>
+</ul>
+<p>Step 5 writes the <code>[NEW]</code> review worksheets in both
+modes.</p>
 <p>From a shell you can also run <code>inst/scripts/run.sh</code>
 (installs the package if missing, then runs <code><a href="../reference/run_pipeline.html">run_pipeline()</a></code>
 with the default config).</p>
@@ -745,22 +769,33 @@ not commit them.</p>
 <tbody>
 <tr class="odd">
 <td><code>[NEW]manual_error_correction_review.csv</code></td>
-<td>Step 5</td>
-<td>The <code>error</code> records (the same rows as
-<code>error_df_pre</code>), with the raw times, the algorithm’s
-corrected times, the error type, and <strong>blank</strong> reviewer
-columns</td>
+<td>Step 5, <strong>rewritten after Step 8.5</strong>
+</td>
+<td>What still needs a person: the <code>error</code> records (same rows
+as <code>error_df_pre</code>) that are not yet in a manual file and
+still fail after the corrections (<code>review_status</code> =
+<code>remaining</code>), plus records that became errors only after the
+corrections (<code>new_after_correction</code>). Raw times, corrected
+times, error type, and <strong>blank</strong> reviewer columns. On a
+first run, with no manual files, it is the full Step 5 list</td>
 <td>Fill it in, save as <code>manual_error_corrections.csv</code>
 </td>
 </tr>
 <tr class="even">
+<td><code>output/errors_incorporated_still_open.csv</code></td>
+<td>After Step 8.5</td>
+<td>Records that are already in a manual file but still fail after the
+re-check (handled, not fixed). Written only when there are any</td>
+<td>Look at what the correction did; correct the manual file</td>
+</tr>
+<tr class="odd">
 <td><code>[NEW]manual_unusual_review.csv</code></td>
 <td>Step 5</td>
 <td>Same, for <code>unusual</code> records</td>
 <td>Fill it in, save as <code>manual_unusual_corrections.csv</code>
 </td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>manual_error_correction_updated.csv</code></td>
 <td>Step 6</td>
 <td>The record of the corrections applied: <strong>your</strong>
@@ -772,14 +807,14 @@ pipeline’s copy</td>
 <code>TRUE</code> was not applied — find out why. It is a record, not a
 new worklist</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>reasonable_unusual_records.csv</code></td>
 <td>Step 6</td>
 <td>The <code>unusual</code> rows you marked “reasonable unusual record”
 (odd but plausible, left as is)</td>
 <td>A record of what was accepted</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>cross_participant_flagged_rows.csv</code></td>
 <td>Step 8.5</td>
 <td>Days whose SOL or WASO is far from that participant’s
@@ -787,14 +822,14 @@ new worklist</td>
 on one)</td>
 <td>Review as a possible entry error</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>cross_participant_suspicious_slices.csv</code></td>
 <td>Step 8.5</td>
 <td>All days of the participants in the file above</td>
 <td>Context: is the day a one-off or the participant’s usual
 pattern?</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>cross_participant_field_misentries.csv</code></td>
 <td>Step 8.5</td>
 <td>Rows where the SOL or WASO number looks like it was typed into
@@ -914,6 +949,15 @@ is, and whether you fixed it</td>
 </tr>
 <tr class="odd">
 <td>
+<strong>Status</strong> (added after the corrections)</td>
+<td><code>review_status</code></td>
+<td>
+<code>remaining</code> = an old row not yet in a manual file;
+<code>new_after_correction</code> = a record that became an error only
+after the corrections</td>
+</tr>
+<tr class="even">
+<td>
 <strong>Where it was handled</strong> (added by the pipeline)</td>
 <td>
 <code>in_manual_file</code>, <code>review_resolution</code>,
@@ -924,10 +968,27 @@ means nobody has handled this record yet</td>
 </tr>
 </tbody>
 </table>
-<p><strong>How to know you are done.</strong> The <code>[NEW]</code>
-files always list every record the rules flag on the data as it stands
-<em>before</em> corrections, so they do not shrink to empty. Read the
-four added columns instead:</p>
+<p><strong>How to know you are done.</strong> Step 5 first writes every
+record the rules flag on the data <em>before</em> corrections. After
+Steps 6–8.5 the pipeline rewrites
+<code>[NEW]manual_error_correction_review.csv</code> so that it keeps
+only what is still open:</p>
+<ul>
+<li>old rows that are <strong>not yet in a manual file</strong> and
+still fail the re-check (<code>review_status</code> =
+<code>remaining</code>);</li>
+<li>records that <strong>became errors after the corrections</strong>
+and were not on the Step 5 list
+(<code>new_after_correction</code>).</li>
+</ul>
+<p>Rows you have already put in a manual file leave this worksheet. If
+they still fail the re-check they are written to
+<code>output/errors_incorporated_still_open.csv</code> instead, so a
+correction that did not work is not lost. The file shrinks as you work,
+and you are done when it is empty and the second file does not exist.
+The four columns <code>in_manual_file</code>,
+<code>review_resolution</code>, <code>resolved_at</code>,
+<code>resolved_by</code> still say where a row was handled:</p>
 <table class="table">
 <colgroup>
 <col width="50%">

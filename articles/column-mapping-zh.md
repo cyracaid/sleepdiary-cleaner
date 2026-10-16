@@ -154,15 +154,16 @@ run_pipeline(config = "my_study_config.yaml")
 这些文件在运行中写在 `output/`
 文件夹旁边。含真实参与者行，不要提交。详见 `interpreting-output` §2.2。
 
-| 文件                                      | 写出于   | 内容                                                                                                              |
-|-------------------------------------------|----------|-------------------------------------------------------------------------------------------------------------------|
-| `[NEW]manual_error_correction_review.csv` | Step 5   | 给人填写的 `error` 记录（与 `error_df_pre` 同一批行）                                                             |
-| `[NEW]manual_unusual_review.csv`          | Step 5   | 给人填写的 `unusual` 记录                                                                                         |
-| `manual_error_correction_updated.csv`     | Step 6   | 已应用修正的记录：你的 `manual_error_corrections.csv` 被流水线纳入后的副本，`manually_corrected` 标明实际用上的行 |
-| `reasonable_unusual_records.csv`          | Step 6   | 被接受为”reasonable unusual record”的 `unusual` 行                                                                |
-| `cross_participant_flagged_rows.csv`      | Step 8.5 | SOL/WASO 偏离此人自己中位数的日子                                                                                 |
-| `cross_participant_suspicious_slices.csv` | Step 8.5 | 上一个文件中参与者的全部天数，作上下文                                                                            |
-| `cross_participant_field_misentries.csv`  | Step 8.5 | SOL/WASO 数字像填进别的时间栏的行                                                                                 |
+| 文件                                        | 写出于                         | 内容                                                                                                              |
+|---------------------------------------------|--------------------------------|-------------------------------------------------------------------------------------------------------------------|
+| `[NEW]manual_error_correction_review.csv`   | Step 5 写出，Step 8.5 之后重写 | 仍在等人处理的记录：还没进人工文件、仍不通过的旧 `error` 行，加上修正之后才变成错误的记录（`review_status` 列）   |
+| `output/errors_incorporated_still_open.csv` | Step 8.5 之后                  | 已在人工文件里、重新检查仍不通过的行（有才写）                                                                    |
+| `[NEW]manual_unusual_review.csv`            | Step 5                         | 给人填写的 `unusual` 记录                                                                                         |
+| `manual_error_correction_updated.csv`       | Step 6                         | 已应用修正的记录：你的 `manual_error_corrections.csv` 被流水线纳入后的副本，`manually_corrected` 标明实际用上的行 |
+| `reasonable_unusual_records.csv`            | Step 6                         | 被接受为”reasonable unusual record”的 `unusual` 行                                                                |
+| `cross_participant_flagged_rows.csv`        | Step 8.5                       | SOL/WASO 偏离此人自己中位数的日子                                                                                 |
+| `cross_participant_suspicious_slices.csv`   | Step 8.5                       | 上一个文件中参与者的全部天数，作上下文                                                                            |
+| `cross_participant_field_misentries.csv`    | Step 8.5                       | SOL/WASO 数字像填进别的时间栏的行                                                                                 |
 
 输出结构的关键规则： - `latest_visualization_<tag>_n<rows>/`
 是”最新”而非”历史”——每次可视化运行清空重建。 -

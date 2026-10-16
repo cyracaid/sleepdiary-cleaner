@@ -53,6 +53,22 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.5.1" id="sleepcleanr-151">sleepcleanr 1.5.1<a class="anchor" aria-label="anchor" href="#sleepcleanr-151"></a></h2>
+<div class="section level3">
+<h3 id="changed-1-5-1">Changed<a class="anchor" aria-label="anchor" href="#changed-1-5-1"></a></h3>
+<ul><li>
+<code>[NEW]manual_error_correction_review.csv</code> is rewritten after Step 8.5 so that it lists only what still needs a person: old rows that are not yet in a manual file and still fail the re-check (<code>review_status</code> = <code>remaining</code>), and records that became errors only after the corrections (<code>new_after_correction</code>). Before, it kept listing every record flagged before correction and never got shorter. A first run with no manual files gives the same list as before.</li>
+<li>Rows that are already in a manual file but still fail the re-check are written to <code>output/errors_incorporated_still_open.csv</code> and counted in the run summary, so a correction that did not work is not lost.</li>
+<li>The run summary prints, for the error worksheet, how many rows now pass, how many are not yet incorporated, how many are incorporated but still a problem, and how many new errors appeared.</li>
+<li>A relative <code>config</code> path that is not found in <code>project_dir</code> is also looked for in the directory the call came from.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-1-5-1">Documentation<a class="anchor" aria-label="anchor" href="#documentation-1-5-1"></a></h3>
+<ul><li>
+<code>interpreting-output</code> and <code>column-mapping</code> (English and Chinese): the working files written to the project root and what each is; the contents of <code>latest_visualization_&lt;tag&gt;_n&lt;rows&gt;/</code>; the columns of <code>correction_status_final.csv</code> (<code>*_first</code>, <code>*_last</code>, <code>delta_*</code>) and what first and last mean; that <code>include_manual_corrections</code> is an argument, not a YAML setting, and that its default changed in 1.4.7.</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="sleepcleanr-development-version">sleepcleanr (development version)<a class="anchor" aria-label="anchor" href="#sleepcleanr-development-version"></a></h2>
 <div class="section level3">
 <h3 id="new-development-version">New<a class="anchor" aria-label="anchor" href="#new-development-version"></a></h3>
