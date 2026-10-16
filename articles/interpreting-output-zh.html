@@ -653,6 +653,84 @@ git 和发布构建之外（<code>.gitignore</code> + <code>.Rbuildignore</code>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"stub_error_corrections.csv"</span>, package <span class="op">=</span> <span class="st">"sleepcleanr"</span><span class="op">)</span></span></code></pre></div>
 <p>把模板复制到工作目录，改成配置里期望的文件名，再填写。</p>
+<p><a id="s-2-2"></a></p>
+</div>
+<div class="section level3">
+<h3 id="流水线写到项目根目录的文件">2.2 流水线写到项目根目录的文件<a class="anchor" aria-label="anchor" href="#%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%86%99%E5%88%B0%E9%A1%B9%E7%9B%AE%E6%A0%B9%E7%9B%AE%E5%BD%95%E7%9A%84%E6%96%87%E4%BB%B6"></a>
+</h3>
+<p>除了
+<code>output/</code>，一次运行还会在<strong>项目根目录</strong>（你传给
+<code>project_dir</code>
+的目录）写出若干工作文件。它们是审查循环的中间文件，不是最终结果。全部包含真实参与者行，不要提交。</p>
+<table class="table">
+<colgroup>
+<col width="19%">
+<col width="29%">
+<col width="25%">
+<col width="25%">
+</colgroup>
+<thead><tr class="header">
+<th>文件</th>
+<th>何时写出</th>
+<th>是什么</th>
+<th>怎么用</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>[NEW]manual_error_correction_review.csv</code></td>
+<td>Step 5</td>
+<td>
+<code>error</code> 记录（与 <code>error_df_pre</code>
+同一批行）：原始时间、算法修正后的时间、错误类型，以及<strong>空白</strong>的审核列</td>
+<td>填写后另存为 <code>manual_error_corrections.csv</code>
+</td>
+</tr>
+<tr class="even">
+<td><code>[NEW]manual_unusual_review.csv</code></td>
+<td>Step 5</td>
+<td>同上，针对 <code>unusual</code> 记录</td>
+<td>填写后另存为 <code>manual_unusual_corrections.csv</code>
+</td>
+</tr>
+<tr class="odd">
+<td><code>manual_error_correction_updated.csv</code></td>
+<td>Step 6</td>
+<td>已应用修正的记录：<strong>你填的</strong>
+<code>manual_error_corrections.csv</code>
+被流水线纳入之后的副本，<code>manually_corrected</code>
+列标明哪些行真的被用上了。你自己的文件不会被改动，这是流水线的副本</td>
+<td>与你的输入对照。你填了但没标 <code>TRUE</code>
+的行就是没生效，要查原因。它是记录，不是新的待办清单</td>
+</tr>
+<tr class="even">
+<td><code>reasonable_unusual_records.csv</code></td>
+<td>Step 6</td>
+<td>你标为”reasonable unusual record”（异常但合理，保持原样）的
+<code>unusual</code> 行</td>
+<td>留档：哪些被接受了</td>
+</tr>
+<tr class="odd">
+<td><code>cross_participant_flagged_rows.csv</code></td>
+<td>Step 8.5</td>
+<td>SOL 或 WASO
+明显偏离<strong>此人自己</strong>中位数的日子（例如多数天 5–30
+分钟，某天 400 分钟）</td>
+<td>当作可能的录入错误来审</td>
+</tr>
+<tr class="even">
+<td><code>cross_participant_suspicious_slices.csv</code></td>
+<td>Step 8.5</td>
+<td>上一个文件中那些参与者的全部天数</td>
+<td>看上下文：这一天是偶发，还是此人的一贯模式</td>
+</tr>
+<tr class="odd">
+<td><code>cross_participant_field_misentries.csv</code></td>
+<td>Step 8.5</td>
+<td>SOL 或 WASO 的数字像是填进了别的时间栏的行</td>
+<td>当作可能的栏位填错来审</td>
+</tr>
+</tbody>
+</table>
 <p><a id="s-3"></a></p>
 </div>
 </div>
@@ -842,6 +920,21 @@ error，或仍被标记）。改过的记录仍可能通不过复查，所以最
 <td>必须等于输入行数。若更小，某处丢了记录。</td>
 </tr>
 <tr class="even">
+<td>
+<code>run_id</code>、<code>timestamp</code>
+</td>
+<td>运行时间（<code>YYYYMMDD_HHMM</code> 与完整时间）</td>
+<td>每次运行追加一行，用它们区分各次运行。</td>
+</tr>
+<tr class="odd">
+<td>
+<code>checkpoint_first</code>、<code>checkpoint_last</code>
+</td>
+<td>下面 <code>*_first</code>、<code>*_last</code>
+取自哪两个检查点（见表后说明）</td>
+<td>通常是 <code>A</code> 和 <code>E</code>。</td>
+</tr>
+<tr class="even">
 <td><code>tst_mean_h</code></td>
 <td>平均总睡眠时间（小时）</td>
 <td>大多数成人研究 6.0–8.5 h 正常。若 &lt; 5 或 &gt;
@@ -854,14 +947,27 @@ error，或仍被标记）。改过的记录仍可能通不过复查，所以最
 混淆未完全修正。</td>
 </tr>
 <tr class="even">
-<td><code>n_clean</code></td>
-<td>通过所有检查的记录</td>
-<td>同数据多次运行应相同。</td>
+<td>
+<code>n_clean_first</code>、<code>n_clean_last</code>、<code>delta_clean</code>
+</td>
+<td>第一个和最后一个检查点上通过所有检查的记录数；<code>delta_clean = n_clean_last - n_clean_first</code>
+</td>
+<td>
+<code>n_clean_last</code>
+同数据多次运行应相同。<code>delta_clean</code> &gt; 0
+表示清洗让更多记录变干净。</td>
 </tr>
 <tr class="odd">
-<td><code>n_error</code></td>
-<td>时序不可能记录（如 getup 早于 bed）</td>
-<td>应 &lt; 总记录 1%。若 &gt; 5%，审查问卷设计。</td>
+<td>
+<code>n_error_first</code>、<code>n_error_last</code>、<code>delta_error</code>
+</td>
+<td>第一个和最后一个检查点上时序不可能的记录数（如 getup 早于
+bed）；<code>delta_error = n_error_last - n_error_first</code>
+</td>
+<td>看 <code>n_error_last</code>（清洗后剩余）：应 &lt; 总记录 1%，若
+&gt; 5% 审查问卷设计。<code>n_error_first</code>
+是清洗前，本来就偏高。<code>delta_error</code> &lt; 0
+表示错误被消除。</td>
 </tr>
 <tr class="even">
 <td><code>n_corrected</code></td>
@@ -890,6 +996,42 @@ error，或仍被标记）。改过的记录仍可能通不过复查，所以最
 </tr>
 </tbody>
 </table>
+<p><strong><code>first</code> 和 <code>last</code> 指什么。</strong>
+两者都是<strong>同一次运行内</strong>的快照，不是两次运行，也不是数据的首行和末行。流水线在五个检查点统计各类别（<code>data_category</code>）的记录数：</p>
+<table class="table">
+<thead><tr class="header">
+<th>ID</th>
+<th>取自</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>A</code></td>
+<td>Step 4 之后（自动规范化：规则修正）</td>
+</tr>
+<tr class="even">
+<td><code>B</code></td>
+<td>Step 6 之后（时间戳人工修正）</td>
+</tr>
+<tr class="odd">
+<td><code>C</code></td>
+<td>Step 6.5 之后（时长修正）</td>
+</tr>
+<tr class="even">
+<td><code>D</code></td>
+<td>Step 7 之后（指标已算）</td>
+</tr>
+<tr class="odd">
+<td><code>E</code></td>
+<td>Step 8 之后（自动检测，运行结束）</td>
+</tr>
+</tbody>
+</table>
+<p><code>*_first</code> 取第一个已完成分类的检查点（通常是
+<code>A</code>），<code>*_last</code> 取最后一个检查点（通常是
+<code>E</code>），具体用了哪两个写在
+<code>checkpoint_first</code>、<code>checkpoint_last</code>。<code>delta_*</code>
+= <code>last - first</code>。要看将用于分析的数据状态，读
+<code>last</code>；要看清洗做了什么，读 <code>delta</code>。</p>
 <p><strong>稳定性规则</strong>：同一数据跑两次 →
 每个数字必须相同。否则非确定性。</p>
 <p><strong>关于 SOL 的说明</strong>：上面的 <code>sol_mean_min</code>
@@ -1055,7 +1197,7 @@ error，或仍被标记）。改过的记录仍可能通不过复查，所以最
 <span><span class="va">new</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"output/correction_status_final.csv"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">old</span><span class="op">$</span><span class="va">tst_mean_h</span>, <span class="va">new</span><span class="op">$</span><span class="va">tst_mean_h</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">old</span><span class="op">$</span><span class="va">sol_mean_min</span>, <span class="va">new</span><span class="op">$</span><span class="va">sol_mean_min</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">old</span><span class="op">$</span><span class="va">n_clean</span>, <span class="va">new</span><span class="op">$</span><span class="va">n_clean</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">old</span><span class="op">$</span><span class="va">n_clean_last</span>, <span class="va">new</span><span class="op">$</span><span class="va">n_clean_last</span><span class="op">)</span></span></code></pre></div>
 <p>输入数据没变但结果不同 → 管线输出变了，需调查。</p>
 <p><a id="s-7"></a></p>
 </div>
@@ -1093,7 +1235,7 @@ error，或仍被标记）。改过的记录仍可能通不过复查，所以最
 </tr>
 <tr class="even">
 <td>错误少</td>
-<td><code>n_error &lt; 0.01 * n_total</code></td>
+<td><code>n_error_last &lt; 0.01 * n_total</code></td>
 <td>是</td>
 </tr>
 <tr class="odd">
@@ -1225,7 +1367,114 @@ QC。这里出现的每个图号（比如 “01”、“13D”）都对应 §9.2
 <p>管线产出的每一张图都在下面记成一张自成一体的卡片：每个部分是什么意思、它是根据什么精确规则画出来的、健康数据长什么样、异常意味着什么，以及一段可以直接用在论文里的图注。图落在
 <code>latest_visualization_&lt;tag&gt;_n&lt;rows&gt;/pipeline_cleaning/</code>（诊断用）和
 <code>.../research_ready/</code>（出版用）两个文件夹里。</p>
+<p><a id="s-9-0"></a></p>
+<div class="section level3">
+<h3 id="latest_visualization_tag_nrows-文件夹里有什么">9.0 <code>latest_visualization_&lt;tag&gt;_n&lt;rows&gt;/</code>
+文件夹里有什么<a class="anchor" aria-label="anchor" href="#latest_visualization_tag_nrows-%E6%96%87%E4%BB%B6%E5%A4%B9%E9%87%8C%E6%9C%89%E4%BB%80%E4%B9%88"></a>
+</h3>
+<p>文件夹名 = <code>latest_visualization_</code> +
+数据集<strong>标签</strong>（<code>real</code>、<code>synth</code> …）+
+<code>_n</code> + <strong>输入记录数</strong>（例如
+<code>latest_visualization_real_n13990</code> 表示真实数据、13,990
+条记录的一次运行）。每次可视化运行都会<strong>从头重建</strong>，是”最新”而不是”历史”，想保留的东西请在重跑前复制走。标签是
+<code>real</code> 时里面是由参与者数据生成的图：已被
+gitignore，不要提交或外传。</p>
+<table class="table">
+<colgroup>
+<col width="23%">
+<col width="30%">
+<col width="46%">
+</colgroup>
+<thead><tr class="header">
+<th>项目</th>
+<th>是什么</th>
+<th>什么时候看</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>pipeline_cleaning/</code></td>
+<td>14 张诊断图：流水线发现了什么、改了什么（卡片见 §9.2）</td>
+<td>检查清洗是否正常；补充材料的审计链</td>
+</tr>
+<tr class="even">
+<td><code>research_ready/</code></td>
+<td>16 张面向论文的图：睡眠指标、感知偏差、物质使用（卡片见 §9.3）</td>
+<td>为 Results 选图</td>
+</tr>
+<tr class="odd">
+<td><code>figure_index.png</code></td>
+<td>全部图的总览。顶部红色块列出被跳过的图及原因</td>
+<td>运行后先看这个</td>
+</tr>
+<tr class="even">
+<td><code>all_figures_review.pdf</code></td>
+<td>每页一张图，按生成顺序，与 PNG 同尺寸</td>
+<td>快速翻看全部图，或发给研究团队内的合作者</td>
+</tr>
+<tr class="odd">
+<td><code>figures_not_generated.csv</code></td>
+<td>
+<code>file</code>、<code>reason</code>：<strong>没有</strong>生成的图及原因（如”完整数据的标记列不足
+2 列”、或缺少某个验证文件）。与红色块同一份清单</td>
+<td>少了某张 PNG：先看这里，不要先怀疑有 bug</td>
+</tr>
+<tr class="even">
+<td><code>flag_distribution.csv</code></td>
+<td>每条日记一行（<code>pid</code>、<code>day_num</code>、<code>row_id</code>），含各类标记数（<code>timestamp_flags</code>、<code>duration_flags</code>、<code>amount_flags</code>、<code>review_flags</code>）、<code>flag_details</code>、<code>raw_category</code>、<code>final_status</code>、是否
+<code>manually_corrected</code>
+</td>
+<td>标记类图（07、13、17、18）背后的表；筛选它找到某根柱子对应的条目</td>
+</tr>
+<tr class="odd">
+<td><code>classification_summary.csv</code></td>
+<td>各最终分类（clean / error / unusual
+…）的数量。仅当本次运行产生了最终分类才写出</td>
+<td>与 <code>correction_status_final.csv</code>（§4）对照</td>
+</tr>
+<tr class="even">
+<td><code>RUN_INFO.txt</code></td>
+<td>运行时间、数据集标签、记录数、输入文件名、包版本、验证文件位置</td>
+<td>记录这批图来自哪次运行</td>
+</tr>
+</tbody>
+</table>
+<p><strong>同级的
+<code>verification/&lt;tag&gt;_n&lt;rows&gt;/</code></strong>（与本文件夹并列，真实数据时在
+<code>output/</code>
+下）在图被重建时<strong>不会被清空</strong>。里面是检验流水线用的证据，不是论文用图：</p>
+<table class="table">
+<colgroup>
+<col width="42%">
+<col width="57%">
+</colgroup>
+<thead><tr class="header">
+<th>项目</th>
+<th>是什么</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>
+<code>bland_altman_sol.png</code>、<code>bland_altman_waso.png</code>
+</td>
+<td>Bland-Altman 图：自报与计算的 SOL / WASO 的一致性</td>
+</tr>
+<tr class="even">
+<td><code>threshold_validation.csv</code></td>
+<td>每个标记阈值、测量噪声（<code>loa_half_width</code>）、两者之比与评估（如
+“CONSERVATIVE”、“SAFE”）</td>
+</tr>
+<tr class="odd">
+<td><code>snapshot_*.rds</code></td>
+<td>在命名时点保存的数据副本，用于 §6 的回归对照</td>
+</tr>
+<tr class="even">
+<td><code>PROVENANCE.txt</code></td>
+<td>说明某个文件为何存在、何时生成</td>
+</tr>
+</tbody>
+</table>
 <p><a id="s-9-1"></a></p>
+</div>
 <div class="section level3">
 <h3 id="图索引">9.1 图索引<a class="anchor" aria-label="anchor" href="#%E5%9B%BE%E7%B4%A2%E5%BC%95"></a>
 </h3>

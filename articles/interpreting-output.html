@@ -719,6 +719,90 @@ included in the installed package</td>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"stub_error_corrections.csv"</span>, package <span class="op">=</span> <span class="st">"sleepcleanr"</span><span class="op">)</span></span></code></pre></div>
 <p>Copy a stub to your working directory under the name your config
 expects, then fill it in.</p>
+<p><a id="s-2-2"></a></p>
+</div>
+<div class="section level3">
+<h3 id="files-the-pipeline-writes-to-the-project-root">2.2 Files the pipeline writes to the project root<a class="anchor" aria-label="anchor" href="#files-the-pipeline-writes-to-the-project-root"></a>
+</h3>
+<p>Besides <code>output/</code>, a run writes several working files
+<strong>into the project root</strong> (the directory you passed as
+<code>project_dir</code>). They are intermediate files for the review
+cycle, not final results. All of them contain real participant rows — do
+not commit them.</p>
+<table class="table">
+<colgroup>
+<col width="12%">
+<col width="22%">
+<col width="24%">
+<col width="40%">
+</colgroup>
+<thead><tr class="header">
+<th>File</th>
+<th>Written at</th>
+<th>What it is</th>
+<th>What to do with it</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>[NEW]manual_error_correction_review.csv</code></td>
+<td>Step 5</td>
+<td>The <code>error</code> records (the same rows as
+<code>error_df_pre</code>), with the raw times, the algorithm’s
+corrected times, the error type, and <strong>blank</strong> reviewer
+columns</td>
+<td>Fill it in, save as <code>manual_error_corrections.csv</code>
+</td>
+</tr>
+<tr class="even">
+<td><code>[NEW]manual_unusual_review.csv</code></td>
+<td>Step 5</td>
+<td>Same, for <code>unusual</code> records</td>
+<td>Fill it in, save as <code>manual_unusual_corrections.csv</code>
+</td>
+</tr>
+<tr class="odd">
+<td><code>manual_error_correction_updated.csv</code></td>
+<td>Step 6</td>
+<td>The record of the corrections applied: <strong>your</strong>
+<code>manual_error_corrections.csv</code> after the pipeline
+incorporated it, with the <code>manually_corrected</code> column marking
+which rows were really used. Your own file is never edited; this is the
+pipeline’s copy</td>
+<td>Compare with your input. A row you filled in but that is not marked
+<code>TRUE</code> was not applied — find out why. It is a record, not a
+new worklist</td>
+</tr>
+<tr class="even">
+<td><code>reasonable_unusual_records.csv</code></td>
+<td>Step 6</td>
+<td>The <code>unusual</code> rows you marked “reasonable unusual record”
+(odd but plausible, left as is)</td>
+<td>A record of what was accepted</td>
+</tr>
+<tr class="odd">
+<td><code>cross_participant_flagged_rows.csv</code></td>
+<td>Step 8.5</td>
+<td>Days whose SOL or WASO is far from that participant’s
+<strong>own</strong> median (for example 5–30 min on most days, 400 min
+on one)</td>
+<td>Review as a possible entry error</td>
+</tr>
+<tr class="even">
+<td><code>cross_participant_suspicious_slices.csv</code></td>
+<td>Step 8.5</td>
+<td>All days of the participants in the file above</td>
+<td>Context: is the day a one-off or the participant’s usual
+pattern?</td>
+</tr>
+<tr class="odd">
+<td><code>cross_participant_field_misentries.csv</code></td>
+<td>Step 8.5</td>
+<td>Rows where the SOL or WASO number looks like it was typed into
+another time field</td>
+<td>Review as a possible mis-entered field</td>
+</tr>
+</tbody>
+</table>
 <p><a id="s-3"></a></p>
 </div>
 </div>
@@ -925,6 +1009,23 @@ expected?”</em></p>
 somewhere.</td>
 </tr>
 <tr class="even">
+<td>
+<code>run_id</code>, <code>timestamp</code>
+</td>
+<td>When the run was made (<code>YYYYMMDD_HHMM</code> and full
+time)</td>
+<td>Rows are appended, so each run adds one row; use these to tell runs
+apart.</td>
+</tr>
+<tr class="odd">
+<td>
+<code>checkpoint_first</code>, <code>checkpoint_last</code>
+</td>
+<td>Which two checkpoints <code>*_first</code> and <code>*_last</code>
+below were read at (see the box after this table)</td>
+<td>Usually <code>A</code> and <code>E</code>.</td>
+</tr>
+<tr class="even">
 <td><code>tst_mean_h</code></td>
 <td>Mean total sleep time in hours</td>
 <td>6.0–8.5 h is normal for most adult studies. If &lt; 5 or &gt; 10,
@@ -938,16 +1039,32 @@ unusual.</td>
 insomnia or AM/PM confusion was not fully corrected.</td>
 </tr>
 <tr class="even">
-<td><code>n_clean</code></td>
-<td>Records that passed every check</td>
-<td>Should be stable across runs (same data = same count).</td>
+<td>
+<code>n_clean_first</code>, <code>n_clean_last</code>,
+<code>delta_clean</code>
+</td>
+<td>Records that passed every check at the first and at the last
+checkpoint; <code>delta_clean = n_clean_last - n_clean_first</code>
+</td>
+<td>
+<code>n_clean_last</code> should be stable across runs (same data =
+same count). <code>delta_clean</code> &gt; 0 means cleaning made records
+clean.</td>
 </tr>
 <tr class="odd">
-<td><code>n_error</code></td>
-<td>Records with impossible temporal order (e.g., getup before
-bedtime)</td>
-<td>Should be &lt; 1% of total. If &gt; 5%, review the survey design or
-data collection.</td>
+<td>
+<code>n_error_first</code>, <code>n_error_last</code>,
+<code>delta_error</code>
+</td>
+<td>Records with impossible temporal order (e.g., getup before bedtime)
+at the first and at the last checkpoint;
+<code>delta_error = n_error_last - n_error_first</code>
+</td>
+<td>Judge <code>n_error_last</code> (what is left after cleaning):
+should be &lt; 1% of total; if &gt; 5%, review the survey design or data
+collection. <code>n_error_first</code> is before cleaning and is
+expected to be higher. <code>delta_error</code> &lt; 0 means errors were
+removed.</td>
 </tr>
 <tr class="even">
 <td><code>n_corrected</code></td>
@@ -981,6 +1098,45 @@ Bias).</td>
 </tr>
 </tbody>
 </table>
+<p><strong>What <code>first</code> and <code>last</code> mean.</strong>
+Both are snapshots taken inside the <em>same</em> run, not two runs and
+not the first and last row of the data. The pipeline counts the records
+in each class (<code>data_category</code>) at five checkpoints:</p>
+<table class="table">
+<thead><tr class="header">
+<th>ID</th>
+<th>Taken after</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>A</code></td>
+<td>Step 4 (auto-normalize: rule-based corrections)</td>
+</tr>
+<tr class="even">
+<td><code>B</code></td>
+<td>Step 6 (timestamp corrections)</td>
+</tr>
+<tr class="odd">
+<td><code>C</code></td>
+<td>Step 6.5 (duration corrections)</td>
+</tr>
+<tr class="even">
+<td><code>D</code></td>
+<td>Step 7 (metrics computed)</td>
+</tr>
+<tr class="odd">
+<td><code>E</code></td>
+<td>Step 8 (auto-detection, the end of the run)</td>
+</tr>
+</tbody>
+</table>
+<p><code>*_first</code> is the first checkpoint at which records have
+been classified (normally <code>A</code>), <code>*_last</code> is the
+final checkpoint (normally <code>E</code>), and the two used are written
+in <code>checkpoint_first</code> and <code>checkpoint_last</code>.
+<code>delta_*</code> is <code>last - first</code>. Read the
+<code>last</code> values for the state of the data you will analyse, and
+the <code>delta</code> values for what the cleaning did.</p>
 <p><strong>Stability rule:</strong> Run twice on the same data → every
 number must be identical. If not, something is non-deterministic.</p>
 <p><strong>A note on SOL:</strong> <code>sol_mean_min</code> above is
@@ -1160,7 +1316,7 @@ rerunning:</p>
 <span><span class="va">new</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"output/correction_status_final.csv"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">old</span><span class="op">$</span><span class="va">tst_mean_h</span>, <span class="va">new</span><span class="op">$</span><span class="va">tst_mean_h</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">old</span><span class="op">$</span><span class="va">sol_mean_min</span>, <span class="va">new</span><span class="op">$</span><span class="va">sol_mean_min</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">old</span><span class="op">$</span><span class="va">n_clean</span>, <span class="va">new</span><span class="op">$</span><span class="va">n_clean</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">old</span><span class="op">$</span><span class="va">n_clean_last</span>, <span class="va">new</span><span class="op">$</span><span class="va">n_clean_last</span><span class="op">)</span></span></code></pre></div>
 <p>If they differ and the input data did not change, the pipeline output
 has changed. Investigate.</p>
 <p><a id="s-7"></a></p>
@@ -1199,7 +1355,7 @@ has changed. Investigate.</p>
 </tr>
 <tr class="even">
 <td>Few errors</td>
-<td><code>n_error &lt; 0.01 * n_total</code></td>
+<td><code>n_error_last &lt; 0.01 * n_total</code></td>
 <td>Yes</td>
 </tr>
 <tr class="odd">
@@ -1341,7 +1497,135 @@ healthy data look like, what anomalies mean, and a paper-ready caption.
 Figures land in
 <code>latest_visualization_&lt;tag&gt;_n&lt;rows&gt;/pipeline_cleaning/</code>
 (diagnostic) and <code>.../research_ready/</code> (publication).</p>
+<p><a id="s-9-0"></a></p>
+<div class="section level3">
+<h3 id="what-is-in-the-latest_visualization_tag_nrows-folder">9.0 What is in the
+<code>latest_visualization_&lt;tag&gt;_n&lt;rows&gt;/</code> folder<a class="anchor" aria-label="anchor" href="#what-is-in-the-latest_visualization_tag_nrows-folder"></a>
+</h3>
+<p>The folder name is <code>latest_visualization_</code> + the dataset
+<strong>tag</strong> (<code>real</code>, <code>synth</code>, …) +
+<code>_n</code> + the <strong>number of input records</strong> (for
+example <code>latest_visualization_real_n13990</code> is a run on real
+data with 13,990 records). It is rebuilt from scratch on every
+visualization run — it is “latest”, not “history”. Copy anything you
+want to keep before rerunning. If the tag is <code>real</code> it holds
+figures derived from participant data: it is gitignored, do not commit
+or share it.</p>
+<table class="table">
+<colgroup>
+<col width="17%">
+<col width="32%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th>Item</th>
+<th>What it is</th>
+<th>When to open it</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>pipeline_cleaning/</code></td>
+<td>14 diagnostic figures: what the pipeline found and changed (cards in
+§9.2)</td>
+<td>Checking that cleaning behaved; the audit trail for a
+supplement</td>
+</tr>
+<tr class="even">
+<td><code>research_ready/</code></td>
+<td>16 publication-oriented figures: sleep metrics, perception bias,
+substance use (cards in §9.3)</td>
+<td>Choosing figures for Results</td>
+</tr>
+<tr class="odd">
+<td><code>figure_index.png</code></td>
+<td>One contact sheet of all figures. A red block at the top lists the
+figures that were skipped and why</td>
+<td>First look after a run</td>
+</tr>
+<tr class="even">
+<td><code>all_figures_review.pdf</code></td>
+<td>Every figure, one per page, in generation order, at the same size as
+the PNGs</td>
+<td>Flipping through all figures quickly or sharing with a collaborator
+on the study team</td>
+</tr>
+<tr class="odd">
+<td><code>figures_not_generated.csv</code></td>
+<td>
+<code>file</code>, <code>reason</code>: each figure that was
+<strong>not</strong> produced and why (for example “fewer than 2 flag
+columns had complete data”, or a validation file that was not found).
+Same list as the red block</td>
+<td>A missing PNG: look here before suspecting a bug</td>
+</tr>
+<tr class="even">
+<td><code>flag_distribution.csv</code></td>
+<td>One row per diary entry (<code>pid</code>, <code>day_num</code>,
+<code>row_id</code>) with its flag counts (<code>timestamp_flags</code>,
+<code>duration_flags</code>, <code>amount_flags</code>,
+<code>review_flags</code>), <code>flag_details</code>,
+<code>raw_category</code> and <code>final_status</code>, and whether it
+was <code>manually_corrected</code>
+</td>
+<td>The table behind the flag figures (07, 13, 17, 18); filter it to
+find the entries behind a bar</td>
+</tr>
+<tr class="odd">
+<td><code>classification_summary.csv</code></td>
+<td>Counts per final classification (clean / error / unusual / …).
+Written only when the run produced a final classification</td>
+<td>Cross-check with <code>correction_status_final.csv</code> (§4)</td>
+</tr>
+<tr class="even">
+<td><code>RUN_INFO.txt</code></td>
+<td>When the run was made, dataset tag, number of records, input file
+names, package version, where the verification files are</td>
+<td>Recording which run a set of figures came from</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The sibling folder
+<code>verification/&lt;tag&gt;_n&lt;rows&gt;/</code></strong> (next to
+this one, or under <code>output/</code> for real data) is
+<strong>not</strong> wiped when the figures are rebuilt. It holds the
+evidence used to check the pipeline, not figures for the paper:</p>
+<table class="table">
+<colgroup>
+<col width="35%">
+<col width="64%">
+</colgroup>
+<thead><tr class="header">
+<th>Item</th>
+<th>What it is</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>
+<code>bland_altman_sol.png</code>,
+<code>bland_altman_waso.png</code>
+</td>
+<td>Bland-Altman plots: agreement between self-reported and computed SOL
+/ WASO</td>
+</tr>
+<tr class="even">
+<td><code>threshold_validation.csv</code></td>
+<td>Each flagging threshold, the measurement noise
+(<code>loa_half_width</code>), their ratio and an assessment (for
+example “CONSERVATIVE”, “SAFE”)</td>
+</tr>
+<tr class="odd">
+<td><code>snapshot_*.rds</code></td>
+<td>Saved copies of the data at named points, used for the regression
+comparison in §6</td>
+</tr>
+<tr class="even">
+<td><code>PROVENANCE.txt</code></td>
+<td>Why a file is there and when it was produced</td>
+</tr>
+</tbody>
+</table>
 <p><a id="s-9-1"></a></p>
+</div>
 <div class="section level3">
 <h3 id="figure-index">9.1 Figure Index<a class="anchor" aria-label="anchor" href="#figure-index"></a>
 </h3>

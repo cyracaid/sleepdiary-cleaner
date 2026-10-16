@@ -153,13 +153,29 @@ participant data are gitignored. Templates with synthetic data live in
 
 ## Output
 
-| File                                                           | Contents                                                        |
-|----------------------------------------------------------------|-----------------------------------------------------------------|
-| `output/correction_status_final.csv`                           | Per-run summary: n_total, tst, sol, error/corrected/flag counts |
-| `output/appendix_step_ledger.csv`                              | Per-step flag tracking ledger                                   |
-| `output/flagged_records_self_reported.csv`                     | Records flagged as SELF_REPORTED_FLAG                           |
-| `latest_visualization_*/figure_index.png`                      | Contact-sheet index of all generated figures                    |
-| `output/verification/real_n13990/`, `verification/synth_n280/` | Stable, never-overwritten verification artifacts                |
+| File                                                           | Contents                                                                                                                                                                                                           |
+|----------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `output/correction_status_final.csv`                           | Per-run summary (one row appended per run): n_total; n_clean and n_error at the first and last checkpoint (`*_first`, `*_last`, `delta_*`; see interpreting-output §4); n_corrected; flag counts; mean TST and SOL |
+| `output/appendix_step_ledger.csv`                              | Per-step flag tracking ledger                                                                                                                                                                                      |
+| `output/flagged_records_self_reported.csv`                     | Records flagged as SELF_REPORTED_FLAG                                                                                                                                                                              |
+| `latest_visualization_*/figure_index.png`                      | Contact-sheet index of all generated figures                                                                                                                                                                       |
+| `output/verification/real_n13990/`, `verification/synth_n280/` | Stable, never-overwritten verification artifacts                                                                                                                                                                   |
+
+### Working files in the project root (next to `output/`, not inside it)
+
+These are written beside the `output/` folder during a run. They hold
+real participant rows; never commit them. Details: `interpreting-output`
+§2.2.
+
+| File                                      | Written at | Contents                                                                                                                                                  |
+|-------------------------------------------|------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `[NEW]manual_error_correction_review.csv` | Step 5     | `error` records for a person to fill in (same rows as `error_df_pre`)                                                                                     |
+| `[NEW]manual_unusual_review.csv`          | Step 5     | `unusual` records for a person to fill in                                                                                                                 |
+| `manual_error_correction_updated.csv`     | Step 6     | Record of the corrections applied: your `manual_error_corrections.csv` as the pipeline incorporated it, `manually_corrected` marks the rows actually used |
+| `reasonable_unusual_records.csv`          | Step 6     | `unusual` rows accepted as “reasonable unusual record”                                                                                                    |
+| `cross_participant_flagged_rows.csv`      | Step 8.5   | Days far from the participant’s own median SOL/WASO                                                                                                       |
+| `cross_participant_suspicious_slices.csv` | Step 8.5   | All days of the participants in the file above, for context                                                                                               |
+| `cross_participant_field_misentries.csv`  | Step 8.5   | Rows where SOL/WASO looks typed into another time field                                                                                                   |
 
 Key rules the output structure encodes: -
 `latest_visualization_<tag>_n<rows>/` is “latest”, not “history” — wiped

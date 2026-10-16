@@ -197,6 +197,21 @@ system.file("extdata", "stub_error_corrections.csv", package = "sleepcleanr")
 
 把模板复制到工作目录，改成配置里期望的文件名，再填写。
 
+### 2.2 流水线写到项目根目录的文件
+
+除了 `output/`，一次运行还会在**项目根目录**（你传给 `project_dir`
+的目录）写出若干工作文件。它们是审查循环的中间文件，不是最终结果。全部包含真实参与者行，不要提交。
+
+| 文件                                      | 何时写出 | 是什么                                                                                                                                                                      | 怎么用                                                                                   |
+|-------------------------------------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
+| `[NEW]manual_error_correction_review.csv` | Step 5   | `error` 记录（与 `error_df_pre` 同一批行）：原始时间、算法修正后的时间、错误类型，以及**空白**的审核列                                                                      | 填写后另存为 `manual_error_corrections.csv`                                              |
+| `[NEW]manual_unusual_review.csv`          | Step 5   | 同上，针对 `unusual` 记录                                                                                                                                                   | 填写后另存为 `manual_unusual_corrections.csv`                                            |
+| `manual_error_correction_updated.csv`     | Step 6   | 已应用修正的记录：**你填的** `manual_error_corrections.csv` 被流水线纳入之后的副本，`manually_corrected` 列标明哪些行真的被用上了。你自己的文件不会被改动，这是流水线的副本 | 与你的输入对照。你填了但没标 `TRUE` 的行就是没生效，要查原因。它是记录，不是新的待办清单 |
+| `reasonable_unusual_records.csv`          | Step 6   | 你标为”reasonable unusual record”（异常但合理，保持原样）的 `unusual` 行                                                                                                    | 留档：哪些被接受了                                                                       |
+| `cross_participant_flagged_rows.csv`      | Step 8.5 | SOL 或 WASO 明显偏离**此人自己**中位数的日子（例如多数天 5–30 分钟，某天 400 分钟）                                                                                         | 当作可能的录入错误来审                                                                   |
+| `cross_participant_suspicious_slices.csv` | Step 8.5 | 上一个文件中那些参与者的全部天数                                                                                                                                            | 看上下文：这一天是偶发，还是此人的一贯模式                                               |
+| `cross_participant_field_misentries.csv`  | Step 8.5 | SOL 或 WASO 的数字像是填进了别的时间栏的行                                                                                                                                  | 当作可能的栏位填错来审                                                                   |
+
 ## 3. 人工审查循环（人话版）
 
 **常见疑问：**”那一堆人工 CSV——是靠不停问 AI
@@ -284,18 +299,37 @@ error，或仍被标记）。改过的记录仍可能通不过复查，所以最
 read.csv("output/correction_status_final.csv")
 ```
 
-| 列                   | 它告诉你…                           | 检查这个                                                                    |
-|----------------------|-------------------------------------|-----------------------------------------------------------------------------|
-| `n_total`            | 总记录数                            | 必须等于输入行数。若更小，某处丢了记录。                                    |
-| `tst_mean_h`         | 平均总睡眠时间（小时）              | 大多数成人研究 6.0–8.5 h 正常。若 \< 5 或 \> 10，时间戳解析或研究人群异常。 |
-| `sol_mean_min`       | 平均入睡潜伏期（分钟）              | 10–45 min 正常。若 \> 60，人群失眠率高或 AM/PM 混淆未完全修正。             |
-| `n_clean`            | 通过所有检查的记录                  | 同数据多次运行应相同。                                                      |
-| `n_error`            | 时序不可能记录（如 getup 早于 bed） | 应 \< 总记录 1%。若 \> 5%，审查问卷设计。                                   |
-| `n_corrected`        | 经 CSV 人工修正的记录               | 应与 `manual_error_corrections.csv` 行数一致。                              |
-| `timestamp_issue`    | 无法解析为有效时间的时间戳          | 0 正常。\> 0 表示参与者填了非标准时间格式。                                 |
-| `duration_issue`     | 超出配置阈值的睡眠指标              | 少量正常。若很大，阈值太严或数据质量有问题。                                |
-| `amount_flag`        | 异常物质使用条目                    | 应为 0 或很低。                                                             |
-| `self_reported_flag` | 自报 SOL/WASO 与计算值分歧的记录    | 指示感知偏差。看图 20（SOL 感知偏差）。                                     |
+| 列                                             | 它告诉你…                                                                                                     | 检查这个                                                                                                                                           |
+|------------------------------------------------|---------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| `n_total`                                      | 总记录数                                                                                                      | 必须等于输入行数。若更小，某处丢了记录。                                                                                                           |
+| `run_id`、`timestamp`                          | 运行时间（`YYYYMMDD_HHMM` 与完整时间）                                                                        | 每次运行追加一行，用它们区分各次运行。                                                                                                             |
+| `checkpoint_first`、`checkpoint_last`          | 下面 `*_first`、`*_last` 取自哪两个检查点（见表后说明）                                                       | 通常是 `A` 和 `E`。                                                                                                                                |
+| `tst_mean_h`                                   | 平均总睡眠时间（小时）                                                                                        | 大多数成人研究 6.0–8.5 h 正常。若 \< 5 或 \> 10，时间戳解析或研究人群异常。                                                                        |
+| `sol_mean_min`                                 | 平均入睡潜伏期（分钟）                                                                                        | 10–45 min 正常。若 \> 60，人群失眠率高或 AM/PM 混淆未完全修正。                                                                                    |
+| `n_clean_first`、`n_clean_last`、`delta_clean` | 第一个和最后一个检查点上通过所有检查的记录数；`delta_clean = n_clean_last - n_clean_first`                    | `n_clean_last` 同数据多次运行应相同。`delta_clean` \> 0 表示清洗让更多记录变干净。                                                                 |
+| `n_error_first`、`n_error_last`、`delta_error` | 第一个和最后一个检查点上时序不可能的记录数（如 getup 早于 bed）；`delta_error = n_error_last - n_error_first` | 看 `n_error_last`（清洗后剩余）：应 \< 总记录 1%，若 \> 5% 审查问卷设计。`n_error_first` 是清洗前，本来就偏高。`delta_error` \< 0 表示错误被消除。 |
+| `n_corrected`                                  | 经 CSV 人工修正的记录                                                                                         | 应与 `manual_error_corrections.csv` 行数一致。                                                                                                     |
+| `timestamp_issue`                              | 无法解析为有效时间的时间戳                                                                                    | 0 正常。\> 0 表示参与者填了非标准时间格式。                                                                                                        |
+| `duration_issue`                               | 超出配置阈值的睡眠指标                                                                                        | 少量正常。若很大，阈值太严或数据质量有问题。                                                                                                       |
+| `amount_flag`                                  | 异常物质使用条目                                                                                              | 应为 0 或很低。                                                                                                                                    |
+| `self_reported_flag`                           | 自报 SOL/WASO 与计算值分歧的记录                                                                              | 指示感知偏差。看图 20（SOL 感知偏差）。                                                                                                            |
+
+**`first` 和 `last` 指什么。**
+两者都是**同一次运行内**的快照，不是两次运行，也不是数据的首行和末行。流水线在五个检查点统计各类别（`data_category`）的记录数：
+
+| ID  | 取自                                |
+|-----|-------------------------------------|
+| `A` | Step 4 之后（自动规范化：规则修正） |
+| `B` | Step 6 之后（时间戳人工修正）       |
+| `C` | Step 6.5 之后（时长修正）           |
+| `D` | Step 7 之后（指标已算）             |
+| `E` | Step 8 之后（自动检测，运行结束）   |
+
+`*_first` 取第一个已完成分类的检查点（通常是 `A`），`*_last`
+取最后一个检查点（通常是 `E`），具体用了哪两个写在
+`checkpoint_first`、`checkpoint_last`。`delta_*` =
+`last - first`。要看将用于分析的数据状态，读
+`last`；要看清洗做了什么，读 `delta`。
 
 **稳定性规则**：同一数据跑两次 → 每个数字必须相同。否则非确定性。
 
@@ -373,7 +407,7 @@ old <- read.csv("output/correction_status_old.csv")
 new <- read.csv("output/correction_status_final.csv")
 identical(old$tst_mean_h, new$tst_mean_h)
 identical(old$sol_mean_min, new$sol_mean_min)
-identical(old$n_clean, new$n_clean)
+identical(old$n_clean_last, new$n_clean_last)
 ```
 
 输入数据没变但结果不同 → 管线输出变了，需调查。
@@ -385,7 +419,7 @@ identical(old$n_clean, new$n_clean)
 | 管线完成                         | `file.exists("output/correction_status_final.csv")`                                   | `TRUE`   |
 | TST 合理                         | `tst_mean_h` 在 6–8.5                                                                 | 是       |
 | SOL 合理（原始时长，非感知偏差） | `sol_mean_min` 在 10–45                                                               | 是       |
-| 错误少                           | `n_error < 0.01 * n_total`                                                            | 是       |
+| 错误少                           | `n_error_last < 0.01 * n_total`                                                       | 是       |
 | data_category 稳定               | Steps 6–8.5 计数相同                                                                  | 是       |
 | flag_severity 稳定               | Steps 7–8.5 计数相同                                                                  | 是       |
 | 全记录有交代                     | `clean + unusual + reasonable_unusual + equal_time_ok + error + skipped_na = n_total` | 是       |
@@ -430,6 +464,36 @@ QC。这里出现的每个图号（比如 “01”、“13D”）都对应 §9.2
 管线产出的每一张图都在下面记成一张自成一体的卡片：每个部分是什么意思、它是根据什么精确规则画出来的、健康数据长什么样、异常意味着什么，以及一段可以直接用在论文里的图注。图落在
 `latest_visualization_<tag>_n<rows>/pipeline_cleaning/`（诊断用）和
 `.../research_ready/`（出版用）两个文件夹里。
+
+### 9.0 `latest_visualization_<tag>_n<rows>/` 文件夹里有什么
+
+文件夹名 = `latest_visualization_` + 数据集**标签**（`real`、`synth`
+…）+ `_n` + **输入记录数**（例如 `latest_visualization_real_n13990`
+表示真实数据、13,990
+条记录的一次运行）。每次可视化运行都会**从头重建**，是”最新”而不是”历史”，想保留的东西请在重跑前复制走。标签是
+`real` 时里面是由参与者数据生成的图：已被 gitignore，不要提交或外传。
+
+| 项目                         | 是什么                                                                                                                                                                                                     | 什么时候看                                                       |
+|------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------|
+| `pipeline_cleaning/`         | 14 张诊断图：流水线发现了什么、改了什么（卡片见 §9.2）                                                                                                                                                     | 检查清洗是否正常；补充材料的审计链                               |
+| `research_ready/`            | 16 张面向论文的图：睡眠指标、感知偏差、物质使用（卡片见 §9.3）                                                                                                                                             | 为 Results 选图                                                  |
+| `figure_index.png`           | 全部图的总览。顶部红色块列出被跳过的图及原因                                                                                                                                                               | 运行后先看这个                                                   |
+| `all_figures_review.pdf`     | 每页一张图，按生成顺序，与 PNG 同尺寸                                                                                                                                                                      | 快速翻看全部图，或发给研究团队内的合作者                         |
+| `figures_not_generated.csv`  | `file`、`reason`：**没有**生成的图及原因（如”完整数据的标记列不足 2 列”、或缺少某个验证文件）。与红色块同一份清单                                                                                          | 少了某张 PNG：先看这里，不要先怀疑有 bug                         |
+| `flag_distribution.csv`      | 每条日记一行（`pid`、`day_num`、`row_id`），含各类标记数（`timestamp_flags`、`duration_flags`、`amount_flags`、`review_flags`）、`flag_details`、`raw_category`、`final_status`、是否 `manually_corrected` | 标记类图（07、13、17、18）背后的表；筛选它找到某根柱子对应的条目 |
+| `classification_summary.csv` | 各最终分类（clean / error / unusual …）的数量。仅当本次运行产生了最终分类才写出                                                                                                                            | 与 `correction_status_final.csv`（§4）对照                       |
+| `RUN_INFO.txt`               | 运行时间、数据集标签、记录数、输入文件名、包版本、验证文件位置                                                                                                                                             | 记录这批图来自哪次运行                                           |
+
+**同级的 `verification/<tag>_n<rows>/`**（与本文件夹并列，真实数据时在
+`output/`
+下）在图被重建时**不会被清空**。里面是检验流水线用的证据，不是论文用图：
+
+| 项目                                            | 是什么                                                                                  |
+|-------------------------------------------------|-----------------------------------------------------------------------------------------|
+| `bland_altman_sol.png`、`bland_altman_waso.png` | Bland-Altman 图：自报与计算的 SOL / WASO 的一致性                                       |
+| `threshold_validation.csv`                      | 每个标记阈值、测量噪声（`loa_half_width`）、两者之比与评估（如 “CONSERVATIVE”、“SAFE”） |
+| `snapshot_*.rds`                                | 在命名时点保存的数据副本，用于 §6 的回归对照                                            |
+| `PROVENANCE.txt`                                | 说明某个文件为何存在、何时生成                                                          |
 
 ### 9.1 图索引
 

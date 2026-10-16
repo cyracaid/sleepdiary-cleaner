@@ -307,7 +307,9 @@ cannabis_amount_pm_doses</td>
 <tbody>
 <tr class="odd">
 <td><code>output/correction_status_final.csv</code></td>
-<td>每次运行摘要：n_total, tst, sol, error/corrected/flag 计数</td>
+<td>每次运行摘要（每次运行追加一行）：n_total；第一个与最后一个检查点上的
+n_clean、n_error（<code>*_first</code>、<code>*_last</code>、<code>delta_*</code>，见
+interpreting-output §4）；n_corrected；标记计数；平均 TST、SOL</td>
 </tr>
 <tr class="even">
 <td><code>output/appendix_step_ledger.csv</code></td>
@@ -330,6 +332,64 @@ cannabis_amount_pm_doses</td>
 </tr>
 </tbody>
 </table>
+<div class="section level3">
+<h3 id="项目根目录的工作文件与-output-同级不在其中">项目根目录的工作文件（与 <code>output/</code> 同级，不在其中）<a class="anchor" aria-label="anchor" href="#%E9%A1%B9%E7%9B%AE%E6%A0%B9%E7%9B%AE%E5%BD%95%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%96%87%E4%BB%B6%E4%B8%8E-output-%E5%90%8C%E7%BA%A7%E4%B8%8D%E5%9C%A8%E5%85%B6%E4%B8%AD"></a>
+</h3>
+<p>这些文件在运行中写在 <code>output/</code>
+文件夹旁边。含真实参与者行，不要提交。详见
+<code>interpreting-output</code> §2.2。</p>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th>文件</th>
+<th>写出于</th>
+<th>内容</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>[NEW]manual_error_correction_review.csv</code></td>
+<td>Step 5</td>
+<td>给人填写的 <code>error</code> 记录（与 <code>error_df_pre</code>
+同一批行）</td>
+</tr>
+<tr class="even">
+<td><code>[NEW]manual_unusual_review.csv</code></td>
+<td>Step 5</td>
+<td>给人填写的 <code>unusual</code> 记录</td>
+</tr>
+<tr class="odd">
+<td><code>manual_error_correction_updated.csv</code></td>
+<td>Step 6</td>
+<td>已应用修正的记录：你的 <code>manual_error_corrections.csv</code>
+被流水线纳入后的副本，<code>manually_corrected</code>
+标明实际用上的行</td>
+</tr>
+<tr class="even">
+<td><code>reasonable_unusual_records.csv</code></td>
+<td>Step 6</td>
+<td>被接受为”reasonable unusual record”的 <code>unusual</code> 行</td>
+</tr>
+<tr class="odd">
+<td><code>cross_participant_flagged_rows.csv</code></td>
+<td>Step 8.5</td>
+<td>SOL/WASO 偏离此人自己中位数的日子</td>
+</tr>
+<tr class="even">
+<td><code>cross_participant_suspicious_slices.csv</code></td>
+<td>Step 8.5</td>
+<td>上一个文件中参与者的全部天数，作上下文</td>
+</tr>
+<tr class="odd">
+<td><code>cross_participant_field_misentries.csv</code></td>
+<td>Step 8.5</td>
+<td>SOL/WASO 数字像填进别的时间栏的行</td>
+</tr>
+</tbody>
+</table>
 <p>输出结构的关键规则： -
 <code>latest_visualization_&lt;tag&gt;_n&lt;rows&gt;/</code>
 是”最新”而非”历史”——每次可视化运行清空重建。 -
@@ -337,6 +397,7 @@ cannabis_amount_pm_doses</td>
 是同级目录，永不被清空逻辑触碰。 - 真实数据输出只落在
 <code>output/</code>（gitignore）；合成输出路由到 <code>output/</code>
 之外。</p>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

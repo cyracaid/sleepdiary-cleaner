@@ -323,7 +323,10 @@ cannabis_amount_pm_doses</td>
 <tbody>
 <tr class="odd">
 <td><code>output/correction_status_final.csv</code></td>
-<td>Per-run summary: n_total, tst, sol, error/corrected/flag counts</td>
+<td>Per-run summary (one row appended per run): n_total; n_clean and
+n_error at the first and last checkpoint (<code>*_first</code>,
+<code>*_last</code>, <code>delta_*</code>; see interpreting-output §4);
+n_corrected; flag counts; mean TST and SOL</td>
 </tr>
 <tr class="even">
 <td><code>output/appendix_step_ledger.csv</code></td>
@@ -346,6 +349,69 @@ cannabis_amount_pm_doses</td>
 </tr>
 </tbody>
 </table>
+<div class="section level3">
+<h3 id="working-files-in-the-project-root-next-to-output-not-inside-it">Working files in the project root (next to <code>output/</code>, not
+inside it)<a class="anchor" aria-label="anchor" href="#working-files-in-the-project-root-next-to-output-not-inside-it"></a>
+</h3>
+<p>These are written beside the <code>output/</code> folder during a
+run. They hold real participant rows; never commit them. Details:
+<code>interpreting-output</code> §2.2.</p>
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="22%">
+<col width="40%">
+<col width="37%">
+</colgroup>
+<thead><tr class="header">
+<th>File</th>
+<th>Written at</th>
+<th>Contents</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>[NEW]manual_error_correction_review.csv</code></td>
+<td>Step 5</td>
+<td>
+<code>error</code> records for a person to fill in (same rows as
+<code>error_df_pre</code>)</td>
+</tr>
+<tr class="even">
+<td><code>[NEW]manual_unusual_review.csv</code></td>
+<td>Step 5</td>
+<td>
+<code>unusual</code> records for a person to fill in</td>
+</tr>
+<tr class="odd">
+<td><code>manual_error_correction_updated.csv</code></td>
+<td>Step 6</td>
+<td>Record of the corrections applied: your
+<code>manual_error_corrections.csv</code> as the pipeline incorporated
+it, <code>manually_corrected</code> marks the rows actually used</td>
+</tr>
+<tr class="even">
+<td><code>reasonable_unusual_records.csv</code></td>
+<td>Step 6</td>
+<td>
+<code>unusual</code> rows accepted as “reasonable unusual
+record”</td>
+</tr>
+<tr class="odd">
+<td><code>cross_participant_flagged_rows.csv</code></td>
+<td>Step 8.5</td>
+<td>Days far from the participant’s own median SOL/WASO</td>
+</tr>
+<tr class="even">
+<td><code>cross_participant_suspicious_slices.csv</code></td>
+<td>Step 8.5</td>
+<td>All days of the participants in the file above, for context</td>
+</tr>
+<tr class="odd">
+<td><code>cross_participant_field_misentries.csv</code></td>
+<td>Step 8.5</td>
+<td>Rows where SOL/WASO looks typed into another time field</td>
+</tr>
+</tbody>
+</table>
 <p>Key rules the output structure encodes: -
 <code>latest_visualization_&lt;tag&gt;_n&lt;rows&gt;/</code> is
 “latest”, not “history” — wiped on every visualization run. -
@@ -353,6 +419,7 @@ cannabis_amount_pm_doses</td>
 is never touched by the wipe. - Real-tagged output only ever lands under
 <code>output/</code> (gitignored); synthetic output routes outside
 <code>output/</code>.</p>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
