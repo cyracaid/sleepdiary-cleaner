@@ -180,7 +180,8 @@ participant rows; never commit them. Details: `interpreting-output` §2.2.
 
 | File | Written at | Contents |
 |------|-----------|----------|
-| `[NEW]manual_error_correction_review.csv` | Step 5 | `error` records for a person to fill in (same rows as `error_df_pre`) |
+| `[NEW]manual_error_correction_review.csv` | Step 5, rewritten after Step 8.5 | Records still waiting for a person: old `error` rows not yet in a manual file that still fail, plus records that became errors after the corrections (column `review_status`) |
+| `output/errors_incorporated_still_open.csv` | After Step 8.5 | Rows already in a manual file that still fail the re-check (only written when there are any) |
 | `[NEW]manual_unusual_review.csv` | Step 5 | `unusual` records for a person to fill in |
 | `manual_error_correction_updated.csv` | Step 6 | Record of the corrections applied: your `manual_error_corrections.csv` as the pipeline incorporated it, `manually_corrected` marks the rows actually used |
 | `reasonable_unusual_records.csv` | Step 6 | `unusual` rows accepted as "reasonable unusual record" |

@@ -161,21 +161,23 @@ print_review_summary <- function(ws_list, final, flags = NULL, applied = TRUE, v
   invisible(cnt)
 }
 
-#' Rows that still need a person after the corrections, and rows the
-#' corrections turned into errors
+#' Rows still waiting for a person, and rows the corrections turned into errors
 #'
 #' The Step 5 worksheet lists the records the rules flag BEFORE corrections, so
 #' it always has the same rows. This compares that list with the corrected data:
 #' \itemize{
-#'   \item `remaining`: worksheet rows whose final `data_category` is not
-#'     clean / equal-time-ok / reasonable-unusual;
-#'   \item `new`: rows that are NOT on either Step 5 worksheet but end as
-#'     `error` (a correction, or a later step, made them one);
-#'   \item `resolved`: number of worksheet rows that now pass.
+#'   \item `remaining`: worksheet rows that are NOT yet in a manual correction
+#'     file (`in_manual_file` empty) and still end outside clean / equal-time-ok /
+#'     reasonable-unusual. These are the only old rows left to do;
+#'   \item `new`: rows that are on neither Step 5 worksheet but end as `error`
+#'     (a correction, or a later step, made them one);
+#'   \item `incorporated_open`: rows already in a manual file that still end as a
+#'     problem. They are not on the worksheet (a person has already handled
+#'     them) but are counted and written to a separate file so none is lost;
+#'   \item `n_resolved`: worksheet rows that now pass.
 #' }
 #' @param ws_error,ws_unusual Annotated Step 5 worksheets (data frames).
 #' @param final Corrected data with `pid`, `day_num`, `row_id`, `data_category`.
-#' @return list(remaining, new, n_before, n_resolved)
 #' @noRd
 post_correction_review <- function(ws_error, ws_unusual, final) {
   final <- .rp_clean_names(final)
@@ -186,24 +188,29 @@ post_correction_review <- function(ws_error, ws_unusual, final) {
 
   k_err <- .rp_key(ws_error)
   still_err <- is.na(cat_of(k_err)) | !(cat_of(k_err) %in% .rp_ok_categories)
-  remaining <- ws_error[still_err, , drop = FALSE]
+  handled <- if ("in_manual_file" %in% names(ws_error))
+    !is.na(ws_error$in_manual_file) & ws_error$in_manual_file != "" else rep(FALSE, nrow(ws_error))
 
   on_sheet <- c(k_err, .rp_key(ws_unusual))
   is_err <- as.character(final$data_category) %in% "error"
-  new <- final[is_err & !(fkey %in% on_sheet), , drop = FALSE]
 
-  list(remaining = remaining, new = new,
+  list(remaining = ws_error[still_err & !handled, , drop = FALSE],
+       incorporated_open = ws_error[still_err & handled, , drop = FALSE],
+       new = final[is_err & !(fkey %in% on_sheet), , drop = FALSE],
        n_before = nrow(ws_error), n_resolved = sum(!still_err))
 }
 
 #' Write the post-correction review worksheet
 #'
-#' Replaces the Step 5 worksheet file with the rows that still need a person
+#' Replaces the Step 5 worksheet file with the old rows not yet incorporated
 #' (`review_status` = "remaining") followed by the errors that appeared after
-#' corrections (`review_status` = "new_after_correction"). On a first run
-#' with no manual files this is the same list as Step 5 wrote.
+#' corrections (`review_status` = "new_after_correction"). Rows already in a
+#' manual file that are still a problem go to `incorporated_file`.
+#' On a first run with no manual files this is the same list Step 5 wrote.
 #' @noRd
-write_post_correction_review <- function(ws_list, final, file = "[NEW]manual_error_correction_review.csv",
+write_post_correction_review <- function(ws_list, final,
+                                         file = "[NEW]manual_error_correction_review.csv",
+                                         incorporated_file = file.path("output", "errors_incorporated_still_open.csv"),
                                          verbose = TRUE) {
   ws_error <- ws_list[["error"]]
   if (is.null(ws_error)) return(invisible(NULL))
@@ -230,11 +237,20 @@ write_post_correction_review <- function(ws_list, final, file = "[NEW]manual_err
   out <- out[, c(front, setdiff(names(out), front)), drop = FALSE]
   utils::write.csv(out, file, row.names = FALSE, na = "")
 
+  inc <- r$incorporated_open
+  if (nrow(inc) > 0) {
+    dir.create(dirname(incorporated_file), showWarnings = FALSE, recursive = TRUE)
+    utils::write.csv(inc, incorporated_file, row.names = FALSE, na = "")
+  }
+
   if (verbose) {
-    cat(sprintf(paste0("\n  [review result] %d error rows flagged before correction: ",
-                       "%d now pass, %d remain; %d NEW error row(s) appeared after correction.\n",
-                       "                  Written to %s (column review_status).\n"),
-                r$n_before, r$n_resolved, nrow(r$remaining), nrow(r$new), file))
+    cat(sprintf(paste0("\n  [review result] %d error rows flagged before correction: %d now pass; ",
+                       "%d not yet incorporated; %d already incorporated but still a problem; ",
+                       "%d NEW error row(s) appeared after correction.\n",
+                       "                  Worksheet (not yet incorporated + new): %s (column review_status).\n"),
+                r$n_before, r$n_resolved, nrow(r$remaining), nrow(inc), nrow(r$new), file))
+    if (nrow(inc) > 0)
+      cat(sprintf("                  Incorporated but still a problem: %s\n", incorporated_file))
   }
   invisible(r)
 }
