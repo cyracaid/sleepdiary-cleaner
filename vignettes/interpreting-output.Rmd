@@ -232,6 +232,25 @@ system.file("extdata", "stub_error_corrections.csv", package = "sleepcleanr")
 
 Copy a stub to your working directory under the name your config expects, then fill it in.
 
+<a id="s-2-2"></a>
+
+### 2.2 Files the pipeline writes to the project root
+
+Besides `output/`, a run writes several working files **into the project
+root** (the directory you passed as `project_dir`). They are intermediate
+files for the review cycle, not final results. All of them contain real
+participant rows — do not commit them.
+
+| File | Written at | What it is | What to do with it |
+|------|-----------|------------|--------------------|
+| `[NEW]manual_error_correction_review.csv` | Step 5 | The `error` records (the same rows as `error_df_pre`), with the raw times, the algorithm's corrected times, the error type, and **blank** reviewer columns | Fill it in, save as `manual_error_corrections.csv` |
+| `[NEW]manual_unusual_review.csv` | Step 5 | Same, for `unusual` records | Fill it in, save as `manual_unusual_corrections.csv` |
+| `manual_error_correction_updated.csv` | Step 6 | The record of the corrections applied: **your** `manual_error_corrections.csv` after the pipeline incorporated it, with the `manually_corrected` column marking which rows were really used. Your own file is never edited; this is the pipeline's copy | Compare with your input. A row you filled in but that is not marked `TRUE` was not applied — find out why. It is a record, not a new worklist |
+| `reasonable_unusual_records.csv` | Step 6 | The `unusual` rows you marked "reasonable unusual record" (odd but plausible, left as is) | A record of what was accepted |
+| `cross_participant_flagged_rows.csv` | Step 8.5 | Days whose SOL or WASO is far from that participant's **own** median (for example 5–30 min on most days, 400 min on one) | Review as a possible entry error |
+| `cross_participant_suspicious_slices.csv` | Step 8.5 | All days of the participants in the file above | Context: is the day a one-off or the participant's usual pattern? |
+| `cross_participant_field_misentries.csv` | Step 8.5 | Rows where the SOL or WASO number looks like it was typed into another time field | Review as a possible mis-entered field |
+
 <a id="s-3"></a>
 
 ## 3. The manual-review cycle (plain language)
@@ -329,15 +348,35 @@ read.csv("output/correction_status_final.csv")
 | Column | It tells you... | Check this |
 |--------|----------------|------------|
 | `n_total` | Total records in your data | Must equal your input row count. If smaller, records were dropped somewhere. |
+| `run_id`, `timestamp` | When the run was made (`YYYYMMDD_HHMM` and full time) | Rows are appended, so each run adds one row; use these to tell runs apart. |
+| `checkpoint_first`, `checkpoint_last` | Which two checkpoints `*_first` and `*_last` below were read at (see the box after this table) | Usually `A` and `E`. |
 | `tst_mean_h` | Mean total sleep time in hours | 6.0–8.5 h is normal for most adult studies. If < 5 or > 10, something is off with the timestamp parsing or the study population is unusual. |
 | `sol_mean_min` | Mean sleep onset latency in minutes | 10–45 min is normal. If > 60, either the population has high insomnia or AM/PM confusion was not fully corrected. |
-| `n_clean` | Records that passed every check | Should be stable across runs (same data = same count). |
-| `n_error` | Records with impossible temporal order (e.g., getup before bedtime) | Should be < 1% of total. If > 5%, review the survey design or data collection. |
+| `n_clean_first`, `n_clean_last`, `delta_clean` | Records that passed every check at the first and at the last checkpoint; `delta_clean = n_clean_last - n_clean_first` | `n_clean_last` should be stable across runs (same data = same count). `delta_clean` > 0 means cleaning made records clean. |
+| `n_error_first`, `n_error_last`, `delta_error` | Records with impossible temporal order (e.g., getup before bedtime) at the first and at the last checkpoint; `delta_error = n_error_last - n_error_first` | Judge `n_error_last` (what is left after cleaning): should be < 1% of total; if > 5%, review the survey design or data collection. `n_error_first` is before cleaning and is expected to be higher. `delta_error` < 0 means errors were removed. |
 | `n_corrected` | Records manually corrected via your CSV files | Should match the number of rows in your `manual_error_corrections.csv`. |
 | `timestamp_issue` | Timestamps that could not be parsed into a valid time | 0 is normal. > 0 means some participants entered non-standard time formats. |
 | `duration_issue` | Sleep metrics (SOL, SE, TST) outside configured thresholds | Small numbers are normal. If very large, your thresholds may be too strict or the data has quality problems. |
 | `amount_flag` | Substance-use entries with unusual values | Should be 0 or very low. |
 | `self_reported_flag` | Records where self-reported SOL/WASO disagrees with the computed value | Indicates perception bias. Check Figure 20 (SOL Perception Bias). |
+
+**What `first` and `last` mean.** Both are snapshots taken inside the *same*
+run, not two runs and not the first and last row of the data. The pipeline
+counts the records in each class (`data_category`) at five checkpoints:
+
+| ID | Taken after |
+|----|-------------|
+| `A` | Step 4 (auto-normalize: rule-based corrections) |
+| `B` | Step 6 (timestamp corrections) |
+| `C` | Step 6.5 (duration corrections) |
+| `D` | Step 7 (metrics computed) |
+| `E` | Step 8 (auto-detection, the end of the run) |
+
+`*_first` is the first checkpoint at which records have been classified
+(normally `A`), `*_last` is the final checkpoint (normally `E`), and the
+two used are written in `checkpoint_first` and `checkpoint_last`.
+`delta_*` is `last - first`. Read the `last` values for the state of the
+data you will analyse, and the `delta` values for what the cleaning did.
 
 **Stability rule:** Run twice on the same data → every number must be
 identical. If not, something is non-deterministic.
@@ -428,7 +467,7 @@ old <- read.csv("output/correction_status_old.csv")
 new <- read.csv("output/correction_status_final.csv")
 identical(old$tst_mean_h, new$tst_mean_h)
 identical(old$sol_mean_min, new$sol_mean_min)
-identical(old$n_clean, new$n_clean)
+identical(old$n_clean_last, new$n_clean_last)
 ```
 
 If they differ and the input data did not change, the pipeline output has
@@ -443,7 +482,7 @@ changed. Investigate.
 | Pipeline finished | `file.exists("output/correction_status_final.csv")` | `TRUE` |
 | Reasonable TST | `tst_mean_h` between 6–8.5 | Yes |
 | Reasonable SOL (raw duration, not perception bias) | `sol_mean_min` between 10–45 | Yes |
-| Few errors | `n_error < 0.01 * n_total` | Yes |
+| Few errors | `n_error_last < 0.01 * n_total` | Yes |
 | data_category stable | Counts identical across Steps 6–8.5 | Yes |
 | flag_severity stable | Counts identical across Steps 7–8.5 | Yes |
 | All records accounted | `clean + unusual + reasonable_unusual + equal_time_ok + error + skipped_na = n_total` | Yes |
@@ -490,6 +529,41 @@ just checking your data, ignore it and go by figure number.
 ## 9. Figure-by-Figure Reference
 
 Every figure the pipeline produces is documented as a self-contained card below: what each part means, the exact rules it is built from, what healthy data look like, what anomalies mean, and a paper-ready caption. Figures land in `latest_visualization_<tag>_n<rows>/pipeline_cleaning/` (diagnostic) and `.../research_ready/` (publication).
+
+<a id="s-9-0"></a>
+
+### 9.0 What is in the `latest_visualization_<tag>_n<rows>/` folder
+
+The folder name is `latest_visualization_` + the dataset **tag** (`real`,
+`synth`, …) + `_n` + the **number of input records** (for example
+`latest_visualization_real_n13990` is a run on real data with 13,990
+records). It is rebuilt from scratch on every visualization run — it is
+"latest", not "history". Copy anything you want to keep before rerunning.
+If the tag is `real` it holds figures derived from participant data: it is
+gitignored, do not commit or share it.
+
+| Item | What it is | When to open it |
+|------|-----------|-----------------|
+| `pipeline_cleaning/` | 14 diagnostic figures: what the pipeline found and changed (cards in §9.2) | Checking that cleaning behaved; the audit trail for a supplement |
+| `research_ready/` | 16 publication-oriented figures: sleep metrics, perception bias, substance use (cards in §9.3) | Choosing figures for Results |
+| `figure_index.png` | One contact sheet of all figures. A red block at the top lists the figures that were skipped and why | First look after a run |
+| `all_figures_review.pdf` | Every figure, one per page, in generation order, at the same size as the PNGs | Flipping through all figures quickly or sharing with a collaborator on the study team |
+| `figures_not_generated.csv` | `file`, `reason`: each figure that was **not** produced and why (for example "fewer than 2 flag columns had complete data", or a validation file that was not found). Same list as the red block | A missing PNG: look here before suspecting a bug |
+| `flag_distribution.csv` | One row per diary entry (`pid`, `day_num`, `row_id`) with its flag counts (`timestamp_flags`, `duration_flags`, `amount_flags`, `review_flags`), `flag_details`, `raw_category` and `final_status`, and whether it was `manually_corrected` | The table behind the flag figures (07, 13, 17, 18); filter it to find the entries behind a bar |
+| `classification_summary.csv` | Counts per final classification (clean / error / unusual / …). Written only when the run produced a final classification | Cross-check with `correction_status_final.csv` (§4) |
+| `RUN_INFO.txt` | When the run was made, dataset tag, number of records, input file names, package version, where the verification files are | Recording which run a set of figures came from |
+
+**The sibling folder `verification/<tag>_n<rows>/`** (next to this one,
+or under `output/` for real data) is **not** wiped when the figures are
+rebuilt. It holds the evidence used to check the pipeline, not figures
+for the paper:
+
+| Item | What it is |
+|------|-----------|
+| `bland_altman_sol.png`, `bland_altman_waso.png` | Bland-Altman plots: agreement between self-reported and computed SOL / WASO |
+| `threshold_validation.csv` | Each flagging threshold, the measurement noise (`loa_half_width`), their ratio and an assessment (for example "CONSERVATIVE", "SAFE") |
+| `snapshot_*.rds` | Saved copies of the data at named points, used for the regression comparison in §6 |
+| `PROVENANCE.txt` | Why a file is there and when it was produced |
 
 <a id="s-9-1"></a>
 

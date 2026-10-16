@@ -151,11 +151,25 @@ run_pipeline(config = "my_study_config.yaml")
 
 | 文件 | 内容 |
 |---|---|
-| `output/correction_status_final.csv` | 每次运行摘要：n_total, tst, sol, error/corrected/flag 计数 |
+| `output/correction_status_final.csv` | 每次运行摘要（每次运行追加一行）：n_total；第一个与最后一个检查点上的 n_clean、n_error（`*_first`、`*_last`、`delta_*`，见 interpreting-output §4）；n_corrected；标记计数；平均 TST、SOL |
 | `output/appendix_step_ledger.csv` | 逐步标记追踪账本 |
 | `output/flagged_records_self_reported.csv` | 标为 SELF_REPORTED_FLAG 的记录 |
 | `latest_visualization_*/figure_index.png` | 所有生成图的总览 |
 | `output/verification/real_n13990/`, `verification/synth_n280/` | 稳定、永不被覆盖的验证产物 |
+
+### 项目根目录的工作文件（与 `output/` 同级，不在其中）
+
+这些文件在运行中写在 `output/` 文件夹旁边。含真实参与者行，不要提交。详见 `interpreting-output` §2.2。
+
+| 文件 | 写出于 | 内容 |
+|---|---|---|
+| `[NEW]manual_error_correction_review.csv` | Step 5 | 给人填写的 `error` 记录（与 `error_df_pre` 同一批行）|
+| `[NEW]manual_unusual_review.csv` | Step 5 | 给人填写的 `unusual` 记录 |
+| `manual_error_correction_updated.csv` | Step 6 | 已应用修正的记录：你的 `manual_error_corrections.csv` 被流水线纳入后的副本，`manually_corrected` 标明实际用上的行 |
+| `reasonable_unusual_records.csv` | Step 6 | 被接受为"reasonable unusual record"的 `unusual` 行 |
+| `cross_participant_flagged_rows.csv` | Step 8.5 | SOL/WASO 偏离此人自己中位数的日子 |
+| `cross_participant_suspicious_slices.csv` | Step 8.5 | 上一个文件中参与者的全部天数，作上下文 |
+| `cross_participant_field_misentries.csv` | Step 8.5 | SOL/WASO 数字像填进别的时间栏的行 |
 
 输出结构的关键规则：
 - `latest_visualization_<tag>_n<rows>/` 是"最新"而非"历史"——每次可视化运行清空重建。
