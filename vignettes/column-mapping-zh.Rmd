@@ -163,8 +163,7 @@ run_pipeline(config = "my_study_config.yaml")
 
 | 文件 | 写出于 | 内容 |
 |---|---|---|
-| `[NEW]manual_error_correction_review.csv` | Step 5 写出，Step 8.5 之后重写 | 仍在等人处理的记录：还没进人工文件、仍不通过的旧 `error` 行，加上修正之后才变成错误的记录（`review_status` 列）|
-| `output/errors_incorporated_still_open.csv` | Step 8.5 之后 | 已在人工文件里、重新检查仍不通过的行（有才写）|
+| `[NEW]manual_error_correction_review.csv` | Step 5 写出，Step 8.5 之后重写 | 一张状态表：Step 5 的每条 `error` 行，加上修正之后才变成错误的记录，每行有 `status_after_corrections`、`in_manual_file`、修正前后类别和 Step 8 标记 |
 | `[NEW]manual_unusual_review.csv` | Step 5 | 给人填写的 `unusual` 记录 |
 | `manual_error_correction_updated.csv` | Step 6 | 已应用修正的记录：你的 `manual_error_corrections.csv` 被流水线纳入后的副本，`manually_corrected` 标明实际用上的行 |
 | `reasonable_unusual_records.csv` | Step 6 | 被接受为"reasonable unusual record"的 `unusual` 行 |
