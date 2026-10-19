@@ -165,6 +165,7 @@ run_pipeline(config = "my_study_config.yaml")
 |---|---|---|
 | `[NEW]manual_error_correction_review.csv` | Step 5 写出，Step 8.5 之后重写 | 一张状态表：Step 5 的每条 `error` 行，加上修正之后才变成错误的记录，每行有 `status_after_corrections`、`in_manual_file`、修正前后类别和 Step 8 标记 |
 | `[NEW]manual_unusual_review.csv` | Step 5 | 给人填写的 `unusual` 记录 |
+| `review_status.csv` | Step 8.5 之后 | 两张待审表合成一张，每行按配置里的 `review:` 规则标为 `needs_review` / `not_incorporated` / `incorporated` |
 | `manual_error_correction_updated.csv` | Step 6 | 已应用修正的记录：你的 `manual_error_corrections.csv` 被流水线纳入后的副本，`manually_corrected` 标明实际用上的行 |
 | `reasonable_unusual_records.csv` | Step 6 | 被接受为"reasonable unusual record"的 `unusual` 行 |
 | `cross_participant_flagged_rows.csv` | Step 8.5 | SOL/WASO 偏离此人自己中位数的日子 |

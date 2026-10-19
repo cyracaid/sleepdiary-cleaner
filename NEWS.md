@@ -1,3 +1,42 @@
+# sleepcleanr (development version)
+
+## Added
+* `review_status.csv` (project root): one status table for both Step 5 worksheets and for
+  every record that became an error after the corrections. Each row has one `review_state`,
+  `needs_review`, `not_incorporated` or `incorporated`, and a `review_state_reason` naming
+  the rule that put it there. Rows are ordered needs_review first, in a locale-independent
+  order, so the same input gives the same file byte for byte.
+* User-defined review rules in a new `review:` config block (defaults in
+  `inst/config_default.yaml` are the previous behaviour): `done_when.max_needs_review`
+  (default `0`), `step8_flags_need_review` (default `false`), `fail_if_not_done` (default
+  `false`) and the suggestion rules `suggestions` / `suggestion_default`.
+* `review_verdict()`: DONE / NOT DONE by `review.done_when`, with the three counts. Every run
+  prints it; `pipeline_results()` now also returns `review_status` and `review_verdict`.
+  With `review.fail_if_not_done: true` a run that is NOT DONE stops with an error after all
+  outputs are written.
+* `output/review_runs.csv`: one line per run in one file (content hashes of the data, the
+  manual files and the config without file paths; hash of `review_status.csv`; counts;
+  verdict). The run prints whether inputs and result match the previous line, and warns if
+  the same inputs gave a different table.
+* `review_rules()` and `suggest_review_labels()`.
+* `validation/reproducibility.R`: builds an error-injected synthetic diary twice from a fixed
+  seed, runs the pipeline in new R processes and new directories, then again in a
+  directory with old outputs left in place, and compares every output file.
+
+## Changed
+* `inst/scripts/generate_ai_review_csvs.R` takes its suggested labels (`ai_label`,
+  `ai_reason`, new `ai_rule`) from `review.suggestions` instead of rules written in the
+  script, and recomputes them every run, so a rule change always takes effect. Only the
+  human columns (`human_decision`, `corrected_value`, `notes`) are carried over from the
+  previous file.
+* `[NEW]manual_error_correction_review.csv` keeps its 1.5.2 content for this release;
+  `review_status.csv` supersedes it as the table to read.
+
+## Known
+* `output/correction_status*.csv` and the `calculation_timestamp` attribute of the `.rds`
+  outputs record wall-clock time, so those files differ between runs in exactly those
+  fields; `validation/reproducibility.R` compares them without those fields.
+
 # sleepcleanr 1.5.2
 
 ## Changed

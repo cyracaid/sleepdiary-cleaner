@@ -56,7 +56,7 @@
 - `cannabis_doses`
 - `StartDate`
 
-**Runtime dependencies:** 13 packages in Imports (`renv::install()` covers all)
+**Runtime dependencies:** 14 packages in Imports (`renv::install()` covers all)
 
 <!-- AUTO:SKILL_FACTS_END -->
 
@@ -100,6 +100,23 @@ run_pipeline(config = "my_study.yaml", include_manual_corrections = TRUE)
 Templates for every review file live in `templates/`; the review workflow
 is walked through in `vignettes/interpreting-output.Rmd`.
 
+## Review Rules and the End Point
+
+The user, not the agent, defines what counts as done, in the config's
+`review:` block (`done_when.max_needs_review`, `step8_flags_need_review`,
+`fail_if_not_done`, `suggestions`). An agent running the pipeline must:
+
+- read the verdict from `review_verdict()` (or the printed `Review DONE /
+  NOT DONE` line) and report it as is; never declare the review finished
+  on its own judgement, and never edit the `review:` block unless the user
+  asks for that change;
+- report the three counts of `review_status.csv` (`needs_review`,
+  `not_incorporated`, `incorporated`) and list the `needs_review` rows with
+  their `review_state_reason` as options for the user;
+- treat `ai_label` suggestions as suggestions: a row stays open until a
+  person fills in `human_decision`;
+- check reproducibility with `Rscript validation/reproducibility.R`.
+
 ## Fetching Results
 
 The pipeline writes nothing to your global environment. Main results are
@@ -138,6 +155,8 @@ Template: `inst/config_template.yaml`
 | `column_map.csv` | Column source mapping |
 | `[NEW]manual_error_correction_review.csv` | Step 5 review worksheet: `error` records awaiting human decisions — written to the **project root**, not `output/` |
 | `[NEW]manual_unusual_review.csv` | Step 5 review worksheet: `unusual` records — also project root |
+| `review_status.csv` | Both worksheets in one table; each row `needs_review` / `not_incorporated` / `incorporated` (project root) |
+| `output/review_runs.csv` | One line per run: input/config/result hashes, counts, verdict |
 
 The `[NEW]` prefix is literal. In R, list these files with
 `list.files(pattern = "\\[NEW\\]")` — an unescaped `[NEW]*` pattern is a
