@@ -468,8 +468,8 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   # The worksheet from Step 5 lists the errors BEFORE corrections. Replace it
   # with what is still open after them, and the errors the corrections created.
   tryCatch(
-    write_post_correction_review(.review_ws, corrected_ema_data, verbose = verbose),
-    error = function(e) if (verbose) cat("  [review result] skipped:", conditionMessage(e), "\n")
+    write_review_status_table(.review_ws, corrected_ema_data, review_output$data_with_flags, verbose = verbose),
+    error = function(e) if (verbose) cat("  [review status] skipped:", conditionMessage(e), "\n")
   )
 
   # -- Step 9: Visualization -------------------------------------------
