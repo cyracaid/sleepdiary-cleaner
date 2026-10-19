@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Interpreting the Pipeline Output • sleepcleanr</title>
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -21,11 +21,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top " aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,6 +64,14 @@
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/cyracaid/sleepdiary-cleaner/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
+<li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="dark"><span class="fa fa-moon"></span> Dark</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="auto"><span class="fa fa-adjust"></span> Auto</button></li>
+  </ul>
+</li>
       </ul>
 </div>
 
@@ -715,31 +723,25 @@ not commit them.</p>
 <td><code>[NEW]manual_error_correction_review.csv</code></td>
 <td>Step 5, <strong>rewritten after Step 8.5</strong>
 </td>
-<td>What still needs a person: the <code>error</code> records (same rows
-as <code>error_df_pre</code>) that are not yet in a manual file and
-still fail after the corrections (<code>review_status</code> =
-<code>remaining</code>), plus records that became errors only after the
-corrections (<code>new_after_correction</code>). Raw times, corrected
-times, error type, and <strong>blank</strong> reviewer columns. On a
-first run, with no manual files, it is the full Step 5 list</td>
-<td>Fill it in, save as <code>manual_error_corrections.csv</code>
-</td>
+<td>One status table: every <code>error</code> record from Step 5 (same
+rows as <code>error_df_pre</code>) plus every record that became an
+error only after the corrections. Each row says what happened to it
+(<code>status_after_corrections</code>), whether it is in a manual file
+(<code>in_manual_file</code>), its category before and after the
+corrections, and its Step 8 flags. Ordered so the rows that still need a
+person come first. Reviewer columns are blank</td>
+<td>Read <code>status_after_corrections</code>; act on the
+<code>..._still_fails</code> and <code>new_after_corrections</code>
+rows</td>
 </tr>
 <tr class="even">
-<td><code>output/errors_incorporated_still_open.csv</code></td>
-<td>After Step 8.5</td>
-<td>Records that are already in a manual file but still fail after the
-re-check (handled, not fixed). Written only when there are any</td>
-<td>Look at what the correction did; correct the manual file</td>
-</tr>
-<tr class="odd">
 <td><code>[NEW]manual_unusual_review.csv</code></td>
 <td>Step 5</td>
 <td>Same, for <code>unusual</code> records</td>
 <td>Fill it in, save as <code>manual_unusual_corrections.csv</code>
 </td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>manual_error_correction_updated.csv</code></td>
 <td>Step 6</td>
 <td>The record of the corrections applied: <strong>your</strong>
@@ -751,14 +753,14 @@ pipeline’s copy</td>
 <code>TRUE</code> was not applied — find out why. It is a record, not a
 new worklist</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>reasonable_unusual_records.csv</code></td>
 <td>Step 6</td>
 <td>The <code>unusual</code> rows you marked “reasonable unusual record”
 (odd but plausible, left as is)</td>
 <td>A record of what was accepted</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>cross_participant_flagged_rows.csv</code></td>
 <td>Step 8.5</td>
 <td>Days whose SOL or WASO is far from that participant’s
@@ -766,14 +768,14 @@ new worklist</td>
 on one)</td>
 <td>Review as a possible entry error</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>cross_participant_suspicious_slices.csv</code></td>
 <td>Step 8.5</td>
 <td>All days of the participants in the file above</td>
 <td>Context: is the day a one-off or the participant’s usual
 pattern?</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>cross_participant_field_misentries.csv</code></td>
 <td>Step 8.5</td>
 <td>Rows where the SOL or WASO number looks like it was typed into
@@ -894,11 +896,14 @@ is, and whether you fixed it</td>
 <tr class="odd">
 <td>
 <strong>Status</strong> (added after the corrections)</td>
-<td><code>review_status</code></td>
 <td>
-<code>remaining</code> = an old row not yet in a manual file;
-<code>new_after_correction</code> = a record that became an error only
-after the corrections</td>
+<code>source</code>, <code>status_after_corrections</code>,
+<code>category_before_corrections</code>,
+<code>category_after_corrections</code>,
+<code>step8_flags_after_corrections</code>
+</td>
+<td>Where the row came from and what happened to it (see below). Step 8
+flags are reported separately and do not change the status</td>
 </tr>
 <tr class="even">
 <td>
@@ -912,27 +917,57 @@ means nobody has handled this record yet</td>
 </tr>
 </tbody>
 </table>
-<p><strong>How to know you are done.</strong> Step 5 first writes every
-record the rules flag on the data <em>before</em> corrections. After
-Steps 6–8.5 the pipeline rewrites
-<code>[NEW]manual_error_correction_review.csv</code> so that it keeps
-only what is still open:</p>
-<ul>
-<li>old rows that are <strong>not yet in a manual file</strong> and
-still fail the re-check (<code>review_status</code> =
-<code>remaining</code>);</li>
-<li>records that <strong>became errors after the corrections</strong>
-and were not on the Step 5 list
-(<code>new_after_correction</code>).</li>
-</ul>
-<p>Rows you have already put in a manual file leave this worksheet. If
-they still fail the re-check they are written to
-<code>output/errors_incorporated_still_open.csv</code> instead, so a
-correction that did not work is not lost. The file shrinks as you work,
-and you are done when it is empty and the second file does not exist.
-The four columns <code>in_manual_file</code>,
-<code>review_resolution</code>, <code>resolved_at</code>,
-<code>resolved_by</code> still say where a row was handled:</p>
+<p><strong>How to read the status table.</strong> Step 5 first writes
+every record the rules flag on the data <em>before</em> corrections.
+After Steps 6–8.5 the pipeline rewrites
+<code>[NEW]manual_error_correction_review.csv</code> as one table in
+which no row is dropped. <code>status_after_corrections</code> is one
+of:</p>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th><code>status_after_corrections</code></th>
+<th>Meaning</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>not_in_manual_file_still_fails</code></td>
+<td>Not in any manual file and not clean after the corrections — to
+do</td>
+</tr>
+<tr class="even">
+<td><code>in_manual_file_still_fails</code></td>
+<td>In a manual file, but still not clean — the correction did not
+work</td>
+</tr>
+<tr class="odd">
+<td><code>new_after_corrections</code></td>
+<td>Not on the Step 5 list; became an error only after the
+corrections</td>
+</tr>
+<tr class="even">
+<td><code>not_in_manual_file_now_passes</code></td>
+<td>Not in a manual file; the rules fixed it</td>
+</tr>
+<tr class="odd">
+<td><code>in_manual_file_now_passes</code></td>
+<td>In a manual file and now clean</td>
+</tr>
+</tbody>
+</table>
+<p>“Clean” means the final category is <code>clean</code>,
+<code>equal_time_ok</code> or <code>reasonable_unusual</code>. The
+pipeline reports; it does not decide when a row is finished.
+<code>step8_flags_after_corrections</code> shows any Step 8 flag on the
+row (for example a long SOL) and you decide whether that counts as a
+problem. Rows are ordered so that the ones that still need a person come
+first, in the same order every run. The four columns
+<code>in_manual_file</code>, <code>review_resolution</code>,
+<code>resolved_at</code>, <code>resolved_by</code> still say where a row
+was handled:</p>
 <table class="table">
 <colgroup>
 <col width="50%">

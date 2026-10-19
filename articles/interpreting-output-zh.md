@@ -218,16 +218,15 @@ system.file("extdata", "stub_error_corrections.csv", package = "sleepcleanr")
 除了 `output/`，一次运行还会在**项目根目录**（你传给 `project_dir`
 的目录）写出若干工作文件。它们是审查循环的中间文件，不是最终结果。全部包含真实参与者行，不要提交。
 
-| 文件                                        | 何时写出                           | 是什么                                                                                                                                                                                                                                                                                            | 怎么用                                                                                   |
-|---------------------------------------------|------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
-| `[NEW]manual_error_correction_review.csv`   | Step 5 写出，**Step 8.5 之后重写** | 仍需人处理的：`error` 记录（与 `error_df_pre` 同一批行）中**还没进人工文件**、修正后仍不通过的（`review_status` = `remaining`），加上**修正之后才变成错误**的记录（`new_after_correction`）。含原始时间、修正后时间、错误类型和**空白**审核列。第一次运行、没有人工文件时，就是 Step 5 的完整清单 | 填写后另存为 `manual_error_corrections.csv`                                              |
-| `output/errors_incorporated_still_open.csv` | Step 8.5 之后                      | 已经在人工文件里、但重新检查后仍不通过的记录（处理过但没改对）。只在有这类记录时写出                                                                                                                                                                                                              | 看那次修正做了什么，改人工文件                                                           |
-| `[NEW]manual_unusual_review.csv`            | Step 5                             | 同上，针对 `unusual` 记录                                                                                                                                                                                                                                                                         | 填写后另存为 `manual_unusual_corrections.csv`                                            |
-| `manual_error_correction_updated.csv`       | Step 6                             | 已应用修正的记录：**你填的** `manual_error_corrections.csv` 被流水线纳入之后的副本，`manually_corrected` 列标明哪些行真的被用上了。你自己的文件不会被改动，这是流水线的副本                                                                                                                       | 与你的输入对照。你填了但没标 `TRUE` 的行就是没生效，要查原因。它是记录，不是新的待办清单 |
-| `reasonable_unusual_records.csv`            | Step 6                             | 你标为”reasonable unusual record”（异常但合理，保持原样）的 `unusual` 行                                                                                                                                                                                                                          | 留档：哪些被接受了                                                                       |
-| `cross_participant_flagged_rows.csv`        | Step 8.5                           | SOL 或 WASO 明显偏离**此人自己**中位数的日子（例如多数天 5–30 分钟，某天 400 分钟）                                                                                                                                                                                                               | 当作可能的录入错误来审                                                                   |
-| `cross_participant_suspicious_slices.csv`   | Step 8.5                           | 上一个文件中那些参与者的全部天数                                                                                                                                                                                                                                                                  | 看上下文：这一天是偶发，还是此人的一贯模式                                               |
-| `cross_participant_field_misentries.csv`    | Step 8.5                           | SOL 或 WASO 的数字像是填进了别的时间栏的行                                                                                                                                                                                                                                                        | 当作可能的栏位填错来审                                                                   |
+| 文件                                      | 何时写出                           | 是什么                                                                                                                                                                                                                                                             | 怎么用                                                                                   |
+|-------------------------------------------|------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
+| `[NEW]manual_error_correction_review.csv` | Step 5 写出，**Step 8.5 之后重写** | 一张状态表：Step 5 的每条 `error` 记录（与 `error_df_pre` 同一批行），加上修正之后才变成错误的记录。每行说明发生了什么（`status_after_corrections`）、是否在人工文件里（`in_manual_file`）、修正前后的类别，以及 Step 8 的标记。仍需人处理的行排在最前。审核列为空 | 读 `status_after_corrections`；处理 `..._still_fails` 和 `new_after_corrections` 的行    |
+| `[NEW]manual_unusual_review.csv`          | Step 5                             | 同上，针对 `unusual` 记录                                                                                                                                                                                                                                          | 填写后另存为 `manual_unusual_corrections.csv`                                            |
+| `manual_error_correction_updated.csv`     | Step 6                             | 已应用修正的记录：**你填的** `manual_error_corrections.csv` 被流水线纳入之后的副本，`manually_corrected` 列标明哪些行真的被用上了。你自己的文件不会被改动，这是流水线的副本                                                                                        | 与你的输入对照。你填了但没标 `TRUE` 的行就是没生效，要查原因。它是记录，不是新的待办清单 |
+| `reasonable_unusual_records.csv`          | Step 6                             | 你标为”reasonable unusual record”（异常但合理，保持原样）的 `unusual` 行                                                                                                                                                                                           | 留档：哪些被接受了                                                                       |
+| `cross_participant_flagged_rows.csv`      | Step 8.5                           | SOL 或 WASO 明显偏离**此人自己**中位数的日子（例如多数天 5–30 分钟，某天 400 分钟）                                                                                                                                                                                | 当作可能的录入错误来审                                                                   |
+| `cross_participant_suspicious_slices.csv` | Step 8.5                           | 上一个文件中那些参与者的全部天数                                                                                                                                                                                                                                   | 看上下文：这一天是偶发，还是此人的一贯模式                                               |
+| `cross_participant_field_misentries.csv`  | Step 8.5                           | SOL 或 WASO 的数字像是填进了别的时间栏的行                                                                                                                                                                                                                         | 当作可能的栏位填错来审                                                                   |
 
 ## 3. 人工审查循环（人话版）
 
@@ -276,29 +275,34 @@ Equal-time
 
 **一份 `[NEW]` 审查文件里有什么（列，按顺序）：**
 
-| 列组                         | 列                                                                                                                | 含义                                                                                  |
-|------------------------------|-------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
-| 身份                         | `pid`, `day_num`, `row_id`                                                                                        | 哪个参与者、哪一天、哪一行                                                            |
-| 原始录入                     | `time_bed/sleep/awake/getup_am_hhmm_ampm`                                                                         | 参与者原样填写的内容（未改动）                                                        |
-| 解析后时间                   | `time_bed/sleep/awake/getup_corrected`                                                                            | 管线目前最好的猜测                                                                    |
-| 差值                         | `bed_sleep_diff_h`, `sleep_awake_diff_h`, `awake_getup_diff_h`, `reasonable_temporal_order`                       | 上面那些规则据以触发的数字                                                            |
-| 机器判定                     | `error_type`, `corrected`, `correction_type`                                                                      | 哪条规则触发了；算法是否已经修正                                                      |
-| **人工填写**                 | `problem_humanidentified`, `solution_humanidentified`, `column_to_correct`, `correct_value`, `manually_corrected` | 空白列——写清楚哪一列错了、正确值是什么、你是否已经修正                                |
-| **状态**（修正之后添加）     | `review_status`                                                                                                   | `remaining` = 还没进人工文件的旧行；`new_after_correction` = 修正之后才变成错误的记录 |
-| **在哪里处理过**（管线添加） | `in_manual_file`, `review_resolution`, `resolved_at`, `resolved_by`                                               | 从你的人工文件里对应的那一行带过来。四列全空表示这条记录还没人处理过                  |
+| 列组                         | 列                                                                                                                                 | 含义                                                                  |
+|------------------------------|------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------|
+| 身份                         | `pid`, `day_num`, `row_id`                                                                                                         | 哪个参与者、哪一天、哪一行                                            |
+| 原始录入                     | `time_bed/sleep/awake/getup_am_hhmm_ampm`                                                                                          | 参与者原样填写的内容（未改动）                                        |
+| 解析后时间                   | `time_bed/sleep/awake/getup_corrected`                                                                                             | 管线目前最好的猜测                                                    |
+| 差值                         | `bed_sleep_diff_h`, `sleep_awake_diff_h`, `awake_getup_diff_h`, `reasonable_temporal_order`                                        | 上面那些规则据以触发的数字                                            |
+| 机器判定                     | `error_type`, `corrected`, `correction_type`                                                                                       | 哪条规则触发了；算法是否已经修正                                      |
+| **人工填写**                 | `problem_humanidentified`, `solution_humanidentified`, `column_to_correct`, `correct_value`, `manually_corrected`                  | 空白列——写清楚哪一列错了、正确值是什么、你是否已经修正                |
+| **状态**（修正之后添加）     | `source`, `status_after_corrections`, `category_before_corrections`, `category_after_corrections`, `step8_flags_after_corrections` | 这一行从哪来、之后发生了什么（见下）。Step 8 标记单独报告，不改变状态 |
+| **在哪里处理过**（管线添加） | `in_manual_file`, `review_resolution`, `resolved_at`, `resolved_by`                                                                | 从你的人工文件里对应的那一行带过来。四列全空表示这条记录还没人处理过  |
 
-**怎么知道做完了。** Step 5
-先写出规则在*修正之前*的数据上标记的所有记录。Step 6–8.5
-之后，管线会重写
-`[NEW]manual_error_correction_review.csv`，只保留仍未完成的：
+**怎么读这张状态表。** Step 5
+先写出规则在*修正之前*的数据上标记的所有记录。Step 6–8.5 之后，管线把
+`[NEW]manual_error_correction_review.csv`
+重写成一张不丢任何行的表。`status_after_corrections` 取值：
 
-- **还没进人工文件**、重新检查后仍不通过的旧行（`review_status` =
-  `remaining`）；
-- **修正之后才变成错误**、不在 Step 5
-  清单里的记录（`new_after_correction`）。
+| `status_after_corrections`       | 含义                                       |
+|----------------------------------|--------------------------------------------|
+| `not_in_manual_file_still_fails` | 不在任何人工文件，修正之后仍不干净——要做   |
+| `in_manual_file_still_fails`     | 在人工文件里，但仍不干净——那次修正没有奏效 |
+| `new_after_corrections`          | 不在 Step 5 清单里，修正之后才变成错误     |
+| `not_in_manual_file_now_passes`  | 不在人工文件；规则已经修好                 |
+| `in_manual_file_now_passes`      | 在人工文件里，现在干净                     |
 
-你已经放进人工文件的行会离开这张表。如果它们重新检查后仍不通过，改为写到
-`output/errors_incorporated_still_open.csv`，这样”改了但没改对”的修正不会丢。这个文件会随着你的工作缩小，当它为空、且第二个文件不存在时，就做完了。`in_manual_file`、`review_resolution`、`resolved_at`、`resolved_by`
+“干净”指最终类别是 `clean`、`equal_time_ok` 或
+`reasonable_unusual`。管线只报告，不替你决定一行什么时候算做完。`step8_flags_after_corrections`
+显示这一行上的 Step 8 标记（例如 SOL
+过长），算不算问题由你判断。行的排列让仍需人处理的排在最前，每次运行顺序相同。`in_manual_file`、`review_resolution`、`resolved_at`、`resolved_by`
 四列仍然说明一行在哪里处理过：
 
 | 看到的情况                                          | 含义                                         |

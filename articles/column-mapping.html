@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Column Mapping, Config &amp; Data Format • sleepcleanr</title>
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -21,11 +21,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top " aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,6 +64,14 @@
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/cyracaid/sleepdiary-cleaner/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
+<li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="dark"><span class="fa fa-moon"></span> Dark</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="auto"><span class="fa fa-adjust"></span> Auto</button></li>
+  </ul>
+</li>
       </ul>
 </div>
 
@@ -372,47 +380,42 @@ run. They hold real participant rows; never commit them. Details:
 <tr class="odd">
 <td><code>[NEW]manual_error_correction_review.csv</code></td>
 <td>Step 5, rewritten after Step 8.5</td>
-<td>Records still waiting for a person: old <code>error</code> rows not
-yet in a manual file that still fail, plus records that became errors
-after the corrections (column <code>review_status</code>)</td>
+<td>One status table: every Step 5 <code>error</code> row plus records
+that became errors after the corrections, each with
+<code>status_after_corrections</code>, <code>in_manual_file</code>,
+category before/after and Step 8 flags</td>
 </tr>
 <tr class="even">
-<td><code>output/errors_incorporated_still_open.csv</code></td>
-<td>After Step 8.5</td>
-<td>Rows already in a manual file that still fail the re-check (only
-written when there are any)</td>
-</tr>
-<tr class="odd">
 <td><code>[NEW]manual_unusual_review.csv</code></td>
 <td>Step 5</td>
 <td>
 <code>unusual</code> records for a person to fill in</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>manual_error_correction_updated.csv</code></td>
 <td>Step 6</td>
 <td>Record of the corrections applied: your
 <code>manual_error_corrections.csv</code> as the pipeline incorporated
 it, <code>manually_corrected</code> marks the rows actually used</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>reasonable_unusual_records.csv</code></td>
 <td>Step 6</td>
 <td>
 <code>unusual</code> rows accepted as “reasonable unusual
 record”</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>cross_participant_flagged_rows.csv</code></td>
 <td>Step 8.5</td>
 <td>Days far from the participant’s own median SOL/WASO</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>cross_participant_suspicious_slices.csv</code></td>
 <td>Step 8.5</td>
 <td>All days of the participants in the file above, for context</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>cross_participant_field_misentries.csv</code></td>
 <td>Step 8.5</td>
 <td>Rows where SOL/WASO looks typed into another time field</td>

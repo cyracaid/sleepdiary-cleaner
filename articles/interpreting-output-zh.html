@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>如何读懂管线输出（中文） • sleepcleanr</title>
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -19,11 +19,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top " aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,6 +62,14 @@
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/cyracaid/sleepdiary-cleaner/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
+<li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="dark"><span class="fa fa-moon"></span> Dark</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="auto"><span class="fa fa-adjust"></span> Auto</button></li>
+  </ul>
+</li>
       </ul>
 </div>
 
@@ -641,28 +649,22 @@ git 和发布构建之外（<code>.gitignore</code> + <code>.Rbuildignore</code>
 <td><code>[NEW]manual_error_correction_review.csv</code></td>
 <td>Step 5 写出，<strong>Step 8.5 之后重写</strong>
 </td>
-<td>仍需人处理的：<code>error</code> 记录（与 <code>error_df_pre</code>
-同一批行）中<strong>还没进人工文件</strong>、修正后仍不通过的（<code>review_status</code>
-=
-<code>remaining</code>），加上<strong>修正之后才变成错误</strong>的记录（<code>new_after_correction</code>）。含原始时间、修正后时间、错误类型和<strong>空白</strong>审核列。第一次运行、没有人工文件时，就是
-Step 5 的完整清单</td>
-<td>填写后另存为 <code>manual_error_corrections.csv</code>
-</td>
+<td>一张状态表：Step 5 的每条 <code>error</code> 记录（与
+<code>error_df_pre</code>
+同一批行），加上修正之后才变成错误的记录。每行说明发生了什么（<code>status_after_corrections</code>）、是否在人工文件里（<code>in_manual_file</code>）、修正前后的类别，以及
+Step 8 的标记。仍需人处理的行排在最前。审核列为空</td>
+<td>读 <code>status_after_corrections</code>；处理
+<code>..._still_fails</code> 和 <code>new_after_corrections</code>
+的行</td>
 </tr>
 <tr class="even">
-<td><code>output/errors_incorporated_still_open.csv</code></td>
-<td>Step 8.5 之后</td>
-<td>已经在人工文件里、但重新检查后仍不通过的记录（处理过但没改对）。只在有这类记录时写出</td>
-<td>看那次修正做了什么，改人工文件</td>
-</tr>
-<tr class="odd">
 <td><code>[NEW]manual_unusual_review.csv</code></td>
 <td>Step 5</td>
 <td>同上，针对 <code>unusual</code> 记录</td>
 <td>填写后另存为 <code>manual_unusual_corrections.csv</code>
 </td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>manual_error_correction_updated.csv</code></td>
 <td>Step 6</td>
 <td>已应用修正的记录：<strong>你填的</strong>
@@ -672,14 +674,14 @@ Step 5 的完整清单</td>
 <td>与你的输入对照。你填了但没标 <code>TRUE</code>
 的行就是没生效，要查原因。它是记录，不是新的待办清单</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>reasonable_unusual_records.csv</code></td>
 <td>Step 6</td>
 <td>你标为”reasonable unusual record”（异常但合理，保持原样）的
 <code>unusual</code> 行</td>
 <td>留档：哪些被接受了</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>cross_participant_flagged_rows.csv</code></td>
 <td>Step 8.5</td>
 <td>SOL 或 WASO
@@ -687,13 +689,13 @@ Step 5 的完整清单</td>
 分钟，某天 400 分钟）</td>
 <td>当作可能的录入错误来审</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>cross_participant_suspicious_slices.csv</code></td>
 <td>Step 8.5</td>
 <td>上一个文件中那些参与者的全部天数</td>
 <td>看上下文：这一天是偶发，还是此人的一贯模式</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>cross_participant_field_misentries.csv</code></td>
 <td>Step 8.5</td>
 <td>SOL 或 WASO 的数字像是填进了别的时间栏的行</td>
@@ -806,11 +808,14 @@ bed → sleep → awake → getup 的顺序被违反（比如起床早于就寝�
 <tr class="odd">
 <td>
 <strong>状态</strong>（修正之后添加）</td>
-<td><code>review_status</code></td>
 <td>
-<code>remaining</code> =
-还没进人工文件的旧行；<code>new_after_correction</code> =
-修正之后才变成错误的记录</td>
+<code>source</code>, <code>status_after_corrections</code>,
+<code>category_before_corrections</code>,
+<code>category_after_corrections</code>,
+<code>step8_flags_after_corrections</code>
+</td>
+<td>这一行从哪来、之后发生了什么（见下）。Step 8
+标记单独报告，不改变状态</td>
 </tr>
 <tr class="even">
 <td>
@@ -823,20 +828,47 @@ bed → sleep → awake → getup 的顺序被违反（比如起床早于就寝�
 </tr>
 </tbody>
 </table>
-<p><strong>怎么知道做完了。</strong> Step 5
+<p><strong>怎么读这张状态表。</strong> Step 5
 先写出规则在<em>修正之前</em>的数据上标记的所有记录。Step 6–8.5
-之后，管线会重写
-<code>[NEW]manual_error_correction_review.csv</code>，只保留仍未完成的：</p>
-<ul>
-<li>
-<strong>还没进人工文件</strong>、重新检查后仍不通过的旧行（<code>review_status</code>
-= <code>remaining</code>）；</li>
-<li>
-<strong>修正之后才变成错误</strong>、不在 Step 5
-清单里的记录（<code>new_after_correction</code>）。</li>
-</ul>
-<p>你已经放进人工文件的行会离开这张表。如果它们重新检查后仍不通过，改为写到
-<code>output/errors_incorporated_still_open.csv</code>，这样”改了但没改对”的修正不会丢。这个文件会随着你的工作缩小，当它为空、且第二个文件不存在时，就做完了。<code>in_manual_file</code>、<code>review_resolution</code>、<code>resolved_at</code>、<code>resolved_by</code>
+之后，管线把 <code>[NEW]manual_error_correction_review.csv</code>
+重写成一张不丢任何行的表。<code>status_after_corrections</code>
+取值：</p>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th><code>status_after_corrections</code></th>
+<th>含义</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>not_in_manual_file_still_fails</code></td>
+<td>不在任何人工文件，修正之后仍不干净——要做</td>
+</tr>
+<tr class="even">
+<td><code>in_manual_file_still_fails</code></td>
+<td>在人工文件里，但仍不干净——那次修正没有奏效</td>
+</tr>
+<tr class="odd">
+<td><code>new_after_corrections</code></td>
+<td>不在 Step 5 清单里，修正之后才变成错误</td>
+</tr>
+<tr class="even">
+<td><code>not_in_manual_file_now_passes</code></td>
+<td>不在人工文件；规则已经修好</td>
+</tr>
+<tr class="odd">
+<td><code>in_manual_file_now_passes</code></td>
+<td>在人工文件里，现在干净</td>
+</tr>
+</tbody>
+</table>
+<p>“干净”指最终类别是 <code>clean</code>、<code>equal_time_ok</code> 或
+<code>reasonable_unusual</code>。管线只报告，不替你决定一行什么时候算做完。<code>step8_flags_after_corrections</code>
+显示这一行上的 Step 8 标记（例如 SOL
+过长），算不算问题由你判断。行的排列让仍需人处理的排在最前，每次运行顺序相同。<code>in_manual_file</code>、<code>review_resolution</code>、<code>resolved_at</code>、<code>resolved_by</code>
 四列仍然说明一行在哪里处理过：</p>
 <table class="table">
 <colgroup>
