@@ -1,12 +1,12 @@
 ---
-title: "Column Mapping, Config & Data Format"
+title: "Input Data and Configuration"
 description: >
   How to adapt sleepcleanr to your own dataset: YAML column mapping, threshold
   configuration, timestamp format, input data structure, and manual
   correction CSV templates.
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Column Mapping, Config & Data Format}
+  %\VignetteIndexEntry{Input Data and Configuration}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

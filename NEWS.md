@@ -1,3 +1,15 @@
+# sleepcleanr (development version)
+
+## Documentation
+* New articles, English and Chinese: Getting started, Output files (every file a run writes,
+  where it goes, which step writes it), and Troubleshooting (symptom, cause, fix).
+* The articles are listed in the order a user needs them: getting started, input data and
+  configuration, data-first entry, reading the output and the review loop, output files,
+  troubleshooting, then architecture, validation and testing.
+* Two articles were renamed: "Input Data and Configuration" (was "Column Mapping, Config &
+  Data Format") and "Reading the Output and the Review Loop" (was "Interpreting the Pipeline
+  Output"). The file names, and so the web addresses, are unchanged.
+
 # sleepcleanr 1.5.2
 
 ## Changed

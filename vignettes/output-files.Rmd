@@ -1,0 +1,71 @@
+---
+title: "Output files"
+description: "Every file a run writes: where it goes, which step writes it, and what it is."
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Output files}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+[中文版 →](output-files-zh.html)
+
+A run writes files in three places: the **project folder** (the `project_dir` you gave), its
+`output/` folder, and the figure folders. Files in the project folder are working files for the
+review; they contain participant rows and must not be committed. Within each table the files are
+listed in the order they are written.
+
+## Project folder (not `output/`)
+
+| File | Written at | What it is |
+|---|---|---|
+| `cross_participant_field_misentries.csv` | Step 1.5 | Rows where the SOL or WASO number looks typed into another time field. Written on the raw data |
+| `[NEW]manual_error_correction_review.csv` | Step 5, rewritten after Step 8.5 | One status table: every `error` record from Step 5, plus every record that became an error only after the corrections. Columns `status_after_corrections`, `in_manual_file`, `category_before_corrections`, `category_after_corrections`, `step8_flags_after_corrections`. Rows that still need a person come first. See [Reading the output and the review loop](interpreting-output.html) |
+| `[NEW]manual_unusual_review.csv` | Step 5 | The `unusual` records, with blank reviewer columns |
+| `manual_error_correction_updated.csv` | Step 6 | The record of the corrections applied: your `manual_error_corrections.csv` as the pipeline incorporated it, with `manually_corrected` marking the rows actually used. Your own file is never edited. Not a worklist |
+| `reasonable_unusual_records.csv` | Step 6 | `unusual` rows you marked "reasonable unusual record" (odd but plausible, left as is) |
+| `cross_participant_flagged_rows.csv` | Step 8.5 | Days whose SOL or WASO is far from that participant's **own** median |
+| `cross_participant_suspicious_slices.csv` | Step 8.5 | All days of the participants in the previous file, for context |
+
+## `output/`
+
+| File | Written at | What it is |
+|---|---|---|
+| `correction_status.csv` | At each checkpoint | One row per checkpoint (A–E) with the counts of each record class, mean TST and SOL; rows are added at every run, with a `run_id` |
+| `step_flag_ledger.csv` | After Step 9 | One row per step × standard × category: how many records fall in each class at that step (logged during the run, written near the end) |
+| `flagged_records_self_reported.csv` | Step 8 | Records flagged `SELF_REPORTED_FLAG` (for example SOL over 120 min) |
+| `corrected_ema_data.rds` | Step 7 | The pipeline's working data after corrections and the sleep metrics, all columns |
+| `audit_integrity_report.csv` | After Step 9 | Integrity check of the corrected data against the input: rows, columns, untouched variables, duplicates |
+| `appendix_step_ledger.csv` | Step 9 | The full per-step ledger drawn in figure A1 |
+| `cleaned_data_final.csv` / `.rds` | Step 10 | **Dataset A**, the analysis-facing columns (driven by the column dictionary) |
+| `cleaned_data_prepostcorrection.csv` / `.rds` | Step 10 | **Dataset B**: before and after values with the audit disposition per row |
+| `cleaned_data_full.rds` | Step 10 | Everything, unchanged |
+| `column_dictionary_gaps.csv` | Step 10 | Columns in the data that the column dictionary does not describe |
+| `correction_status_final.csv` | End | **The run summary.** One row per run (appended). See [Reading the output and the review loop](interpreting-output.html#s-4) |
+
+## Figure folder `latest_visualization_<tag>_n<rows>/`
+
+Rebuilt from scratch at every visualization run. `<tag>` is the dataset tag (`real`, `synth`); `n` is the
+number of input records.
+
+| Item | What it is |
+|---|---|
+| `pipeline_cleaning/`, `research_ready/` | The diagnostic and publication figures |
+| `figure_index.png` | Contact sheet of all figures; a red block lists the ones that were skipped |
+| `all_figures_review.pdf` | Every figure, one per page |
+| `figures_not_generated.csv` | Each figure that was not produced, and why |
+| `flag_distribution.csv` | One row per entry with its flag counts and details |
+| `classification_summary.csv` | Counts per final classification (written only when the run produced one) |
+| `RUN_INFO.txt` | When, which tag, how many records, which package version |
+
+## Verification folder `verification/<tag>_n<rows>/`
+
+Not wiped when figures are rebuilt: Bland-Altman plots of self-reported against computed SOL and WASO,
+`threshold_validation.csv`, saved snapshots used for the comparison with a previous run, and
+`PROVENANCE.txt`.
+
+## Before you rerun
+
+A rerun overwrites these files. To keep a previous result, copy the whole project folder first and
+run in the copy.

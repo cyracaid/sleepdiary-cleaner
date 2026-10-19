@@ -1,9 +1,9 @@
 ---
-title: "列映射、配置与数据格式（中文）"
+title: "输入数据与配置（中文）"
 description: "如何把 sleepcleanr 适配到自己的数据集：YAML 列映射、阈值配置、时间戳格式、输入数据结构与人工修正 CSV 模板。"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{列映射、配置与数据格式（中文）}
+  %\VignetteIndexEntry{输入数据与配置（中文）}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

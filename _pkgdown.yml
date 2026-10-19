@@ -8,36 +8,49 @@ template:
 # to the second, and every article links to its counterpart at the top.
 navbar:
   components:
-    # The Articles entry opens a menu with the two languages kept apart
-    # (headers "English" / "中文"), instead of one mixed list.
+    # The Articles entry opens a menu with the two languages kept apart,
+    # each in the order a user needs them: start, inputs, run and read, outputs,
+    # problems, then how it works and how it was checked.
     articles:
       text: Articles
       menu:
         - text: "English"
-        - text: "Validation Methodology"
-          href: articles/validation-methodology.html
-        - text: "Pipeline Architecture"
-          href: articles/pipeline-architecture.html
+        - text: "Getting started"
+          href: articles/getting-started.html
+        - text: "Input Data and Configuration"
+          href: articles/column-mapping.html
         - text: "Data-first entry: clean_sleep_diary()"
           href: articles/data-first.html
-        - text: "Column Mapping, Config & Data Format"
-          href: articles/column-mapping.html
-        - text: "Interpreting the Pipeline Output"
+        - text: "Reading the Output and the Review Loop"
           href: articles/interpreting-output.html
+        - text: "Output files"
+          href: articles/output-files.html
+        - text: "Troubleshooting"
+          href: articles/troubleshooting.html
+        - text: "Pipeline Architecture"
+          href: articles/pipeline-architecture.html
+        - text: "Validation Methodology"
+          href: articles/validation-methodology.html
         - text: "Testing Coverage"
           href: articles/testing-coverage.html
         - text: "-------"
         - text: "中文"
-        - text: "验证方法学"
-          href: articles/validation-methodology-zh.html
-        - text: "管线架构"
-          href: articles/pipeline-architecture-zh.html
+        - text: "快速开始"
+          href: articles/getting-started-zh.html
+        - text: "输入数据与配置"
+          href: articles/column-mapping-zh.html
         - text: "数据优先入口：clean_sleep_diary()"
           href: articles/data-first-zh.html
-        - text: "列映射、配置与数据格式"
-          href: articles/column-mapping-zh.html
-        - text: "如何读懂管线输出"
+        - text: "读懂输出与审核循环"
           href: articles/interpreting-output-zh.html
+        - text: "输出文件一览"
+          href: articles/output-files-zh.html
+        - text: "排错"
+          href: articles/troubleshooting-zh.html
+        - text: "管线架构"
+          href: articles/pipeline-architecture-zh.html
+        - text: "验证方法学"
+          href: articles/validation-methodology-zh.html
         - text: "测试覆盖率"
           href: articles/testing-coverage-zh.html
         - text: "-------"
@@ -47,21 +60,27 @@ articles:
   - title: "English"
     desc: >
       <span id="english"></span>Choose your language: English articles are
-      listed here; [中文版请看下面 / Chinese articles below ↓](#chinese).
+      listed here, in the order you need them; [中文版请看下面 / Chinese articles below ↓](#chinese).
     contents:
-      - validation-methodology
-      - pipeline-architecture
-      - data-first
+      - getting-started
       - column-mapping
+      - data-first
       - interpreting-output
+      - output-files
+      - troubleshooting
+      - pipeline-architecture
+      - validation-methodology
       - testing-coverage
   - title: "Chinese (中文)"
     desc: >
-      <span id="chinese"></span>中文文章。[Back to English ↑](#english)
+      <span id="chinese"></span>中文文章，顺序与英文相同。[Back to English ↑](#english)
     contents:
-      - validation-methodology-zh
-      - pipeline-architecture-zh
-      - data-first-zh
+      - getting-started-zh
       - column-mapping-zh
+      - data-first-zh
       - interpreting-output-zh
+      - output-files-zh
+      - troubleshooting-zh
+      - pipeline-architecture-zh
+      - validation-methodology-zh
       - testing-coverage-zh

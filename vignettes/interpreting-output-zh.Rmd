@@ -1,11 +1,11 @@
 ---
-title: "如何读懂管线输出（中文）"
+title: "读懂输出与审核循环（中文）"
 description: "怎么读 correction_status_final.csv、step flag ledger、回归检查与诊断图表——每个输出的含义、检查要点，以及每张图的详细参考。"
 output:
   rmarkdown::html_vignette:
     md_extensions: "+east_asian_line_breaks"
 vignette: >
-  %\VignetteIndexEntry{如何读懂管线输出（中文）}
+  %\VignetteIndexEntry{读懂输出与审核循环（中文）}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

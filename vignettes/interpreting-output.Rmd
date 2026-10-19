@@ -1,12 +1,12 @@
 ---
-title: "Interpreting the Pipeline Output"
+title: "Reading the Output and the Review Loop"
 description: >
   How to read correction_status_final.csv, the step flag ledger, regression
   checks, and the diagnostic figures — what each output means and what to
   check for.
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Interpreting the Pipeline Output}
+  %\VignetteIndexEntry{Reading the Output and the Review Loop}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
