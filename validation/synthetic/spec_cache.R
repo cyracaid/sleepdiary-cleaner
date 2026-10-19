@@ -143,6 +143,7 @@ run_spec_once <- function(label, overrides, input_rds = INPUT_RD,
   dir.create(run_dir, showWarnings = FALSE, recursive = TRUE)
   file.copy(input_rds, file.path(run_dir, "main.rds"), overwrite = TRUE)
   cfg$data$files$main <- "main.rds"
+  cfg$data$tag <- "synth"
   if (!is.null(extra_file)) {
     file.copy(extra_file, file.path(run_dir, "extra.csv"), overwrite = TRUE)
     cfg$data$files$extra <- "extra.csv"

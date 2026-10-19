@@ -48,6 +48,7 @@ file.copy(input_rds, file.path(project_dir, "main.rds"), overwrite = TRUE)
 # Minimal config: bundled default, only data.files.main overridden.
 cfg <- yaml::read_yaml(system.file("config_default.yaml", package = "sleepcleanr"))
 cfg$data$files$main <- "main.rds"
+cfg$data$tag <- "synth"
 cfg$data$files$extra <- NULL
 config_path <- file.path(project_dir, "config.yaml")
 yaml::write_yaml(cfg, config_path)

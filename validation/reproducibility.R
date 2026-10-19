@@ -90,7 +90,7 @@ one_run <- function(dir, manual_error = NULL) {
   code <- paste(load,
     "cfg <- yaml::read_yaml(system.file('config_default.yaml', package = 'sleepcleanr'))",
     sprintf("cfg$data$files$main <- %s", deparse(input)),
-    "cfg$data$files$extra <- NULL", manual,
+    "cfg$data$files$extra <- NULL", "cfg$data$tag <- 'synth'", manual,
     sprintf(paste0("run_pipeline(config = cfg, project_dir = %s, skip_visualization = TRUE, ",
                    "verbose = TRUE, include_manual_corrections = %s)"),
             deparse(dir), !is.null(manual_error)),

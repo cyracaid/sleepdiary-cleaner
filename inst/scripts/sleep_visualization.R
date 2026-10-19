@@ -92,18 +92,18 @@ if (!exists("ema_data_release_timecalc")) {
 .n_records <- if (exists("corrected_ema_data"))
   nrow(get("corrected_ema_data")) else NA_integer_
 
-# Derive the tag from the configured input file. "unknown" when it cannot be
-# determined -- an honest label beats a confidently wrong one.
+# The tag is data.tag from the config when the user states it; otherwise it is
+# inferred from the input file name (see resolve_data_tag() in R/config.R), and
+# the run says so. "unknown" when there is no file name.
 .rds_name <- tryCatch(
   basename(cfg_get("data.files.main", "", cfg = pipeline_config)),
   error = function(e) ""
 )
-.data_tag <- if (!nzchar(.rds_name)) {
-  "unknown"
-} else if (grepl("synthetic|synth|stub|demo|example", .rds_name, ignore.case = TRUE)) {
-  "synth"
-} else {
-  "real"
+.data_tag_info <- resolve_data_tag(pipeline_config)
+.data_tag <- .data_tag_info$tag
+if (!identical(.data_tag_info$source, "config")) {
+  cat(sprintf(paste0("  [data tag] '%s', inferred from the input file name (data.tag is not set ",
+                     "in the config). Set data.tag: real / synth to state it.\n"), .data_tag))
 }
 
 output_dir <- figure_run_dir(cfg = pipeline_config, data_tag = .data_tag,
@@ -3272,7 +3272,9 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) && "revi
   "sleepcleanr figure output",
   "========================================",
   sprintf("Run time    : %s", format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z")),
-  sprintf("Dataset tag : %s", .data_tag),
+  sprintf("Dataset tag : %s (%s)", .data_tag,
+          if (identical(.data_tag_info$source, "config")) "stated in the config (data.tag)"
+          else "inferred from the input file name; data.tag not set"),
   sprintf("Records in  : %s", if (is.na(.n_records)) "unknown" else format(.n_records, big.mark = ",")),
   sprintf("Input RDS   : %s", if (nzchar(.rds_name)) .rds_name else "unknown"),
   sprintf("Input CSV   : %s",

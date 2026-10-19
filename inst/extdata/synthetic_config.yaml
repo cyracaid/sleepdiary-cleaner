@@ -9,6 +9,7 @@ pipeline:
   version: "1.0.0"
 
 data:
+  tag: synth
   files:
     main: "inst/extdata/synthetic_sleep_data.rds"
     extra: "inst/extdata/synthetic_ema_data.csv"

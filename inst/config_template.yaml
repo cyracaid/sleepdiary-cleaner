@@ -12,6 +12,10 @@ pipeline:
 # YOUR DATA
 # =============================================================================
 data:
+  # -- What kind of data this is: real (participant data), synth (synthetic
+  #    or test data) or unknown. Decides where figures go (only real goes
+  #    under output/). Leave empty to infer it from the main file's name.
+  tag: "real"
   files:
     # -- Your main data file --
     main: "your_data.rds"
@@ -74,7 +78,7 @@ data:
 # =============================================================================
 # OUTPUT SETTINGS (optional -- defaults are correct for most studies)
 # =============================================================================
-# Only a run whose data_tag resolves to "real" is written to
+# Only a run whose data.tag is (or, when empty, is inferred as) "real" is written to
 # output/latest_visualization_real_n<rows>/. Synthetic/test runs AND runs
 # whose data_tag could not be determined ("unknown") both go to
 # latest_visualization_<tag>_n<rows>/ in the project root (never inside

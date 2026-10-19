@@ -90,6 +90,34 @@ cfg_get <- function(key, default = NULL, cfg = NULL) {
   config_get(cfg, key, default)
 }
 
+#' Which kind of data a run is on: "real", "synth" or "unknown"
+#'
+#' The user states it in the config as \code{data.tag}. When the config does
+#' not, the older rule is used: the name of \code{data.files.main} containing
+#' synthetic, synth, stub, demo or example means "synth", any other name means
+#' "real", and no name means "unknown". The tag decides where figures are
+#' written (only "real" goes under \code{output/}).
+#'
+#' @param cfg A configuration list.
+#' @return A list with \code{tag} and \code{source} ("config" when the user
+#'   stated it, "file name" when it was inferred, "none" when unknown).
+#' @export
+resolve_data_tag <- function(cfg) {
+  tags <- c("real", "synth", "unknown")
+  stated <- config_get(cfg, "data.tag", NULL)
+  if (!is.null(stated) && length(stated) == 1 && !is.na(stated) && nzchar(stated)) {
+    stated <- tolower(trimws(as.character(stated)))
+    if (!stated %in% tags)
+      stop("data.tag must be one of: ", paste(tags, collapse = ", "), call. = FALSE)
+    return(list(tag = stated, source = "config"))
+  }
+  nm <- tryCatch(basename(config_get(cfg, "data.files.main", "")), error = function(e) "")
+  if (length(nm) != 1 || is.na(nm) || !nzchar(nm)) return(list(tag = "unknown", source = "none"))
+  if (grepl("synthetic|synth|stub|demo|example", nm, ignore.case = TRUE))
+    return(list(tag = "synth", source = "file name"))
+  list(tag = "real", source = "file name")
+}
+
 #' Resolve the figure output directory for a run
 #'
 #' Builds the run-specific visualization directory name:

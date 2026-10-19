@@ -2,6 +2,7 @@ pipeline:
   name: Sleep EMA Data Cleaning Pipeline
   version: 1.0.0
 data:
+  tag: synth
   files:
     main: main.rds
     manual_error: manual_error_corrections.csv

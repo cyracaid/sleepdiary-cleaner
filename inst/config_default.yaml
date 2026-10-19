@@ -14,6 +14,11 @@ pipeline:
 # DATA FILES
 # =============================================================================
 data:
+  # What kind of data this is: "real" (participant data; figures go under
+  # output/, which is gitignored), "synth" (synthetic or test data) or
+  # "unknown". Leave empty to infer it from the main file's name (a name with
+  # synthetic/synth/stub/demo/example is synth, any other name is real).
+  tag: ""
   files:
     main: "your_data.rds"
     # -- Your main sleep diary file. Accepts .rds (R data) or .csv (plain text).

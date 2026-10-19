@@ -46,6 +46,16 @@
   final status, so the lines add up to the total. Before, a manually fixed row was counted
   both as `CLEAN` and as `CLEAN (Manually Fixed)`.
 * `flag_distribution.csv` has a new column `data_category_after_corrections`.
+* Test data could be tagged `real` and have its figures written under `output/` (the
+  real-data area): the tag was guessed from the input file name, and any name without
+  synthetic/synth/stub/demo/example counted as real (for example the benchmark's
+  `main.rds` or an injected `corrupted.rds`). The config now has `data.tag`
+  (`real` / `synth` / `unknown`); when it is set it is used as stated, and an invalid value
+  is an error. When it is empty the old file-name rule still applies, so existing configs
+  keep their figure location, but the run and `RUN_INFO.txt` now say the tag was inferred.
+  The bundled synthetic config, `validation/synthetic/run_one.R`, `spec_cache.R`,
+  `operating_point_sweep.R`, `run_ppv/config.yaml` and `validation/reproducibility.R` state
+  `synth`; the config template states `real`. New `resolve_data_tag()`.
 
 ## Known
 * The bundled demo data (`data-raw/generate_synthetic_data.R`) set wake time equal to
