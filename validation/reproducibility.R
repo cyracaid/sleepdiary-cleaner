@@ -6,7 +6,12 @@
 #    empty directory (a deleted-and-rebuilt environment).
 # 3. Runs it once more in the first directory with the old outputs still there
 #    (a reset environment that was not cleaned).
-# Every output file of every run is compared with the first run's.
+# 4. Writes a manual error-correction file from the first run's worksheet (fixed
+#    content: six sleep-awake switches marked corrected, one row marked pending),
+#    runs twice more with include_manual_corrections = TRUE in new directories,
+#    and requires at least one row of each kind: incorporated, pending, and in a
+#    manual file but still failing.
+# Every output file of every run is compared with the first run of its kind.
 #
 # What "identical" means, per file -- written here so nothing is excluded silently:
 #   * every file not listed below: byte for byte (MD5);
@@ -75,16 +80,20 @@ if (!identical(readRDS(input), readRDS(input_b)))
   problems <- c(problems, "input: the two builds of the synthetic data differ")
 
 # -- 2./3. pipeline runs ----------------------------------------------------
-one_run <- function(dir) {
+one_run <- function(dir, manual_error = NULL) {
   dir.create(dir, showWarnings = FALSE)
+  manual <- if (is.null(manual_error)) "invisible(NULL)" else paste(
+    sprintf("cfg$data$files$manual_error <- %s", deparse(manual_error)),
+    "cfg$data$files$manual_unusual <- ''", sep = "; ")
   load <- if (installed) "library(sleepcleanr)" else
     sprintf("pkgload::load_all(%s, quiet = TRUE)", deparse(root))
   code <- paste(load,
     "cfg <- yaml::read_yaml(system.file('config_default.yaml', package = 'sleepcleanr'))",
     sprintf("cfg$data$files$main <- %s", deparse(input)),
-    "cfg$data$files$extra <- NULL",
-    sprintf("run_pipeline(config = cfg, project_dir = %s, skip_visualization = TRUE, verbose = TRUE)",
-            deparse(dir)),
+    "cfg$data$files$extra <- NULL", manual,
+    sprintf(paste0("run_pipeline(config = cfg, project_dir = %s, skip_visualization = TRUE, ",
+                   "verbose = TRUE, include_manual_corrections = %s)"),
+            deparse(dir), !is.null(manual_error)),
     sep = "; ")
   run_r(c("--vanilla", "-e", shQuote(code)), file.path(work, paste0(basename(dir), ".log")))
 }
@@ -142,11 +151,46 @@ for (x in intersect(appended, names(ref)))
     problems <- c(problems, sprintf("rerun_in_fresh_1: %s should have grown from %d to %d lines, has %d",
                                     x, ref[[x]]$n, 2L * ref[[x]]$n, again[[x]]$n))
 
+# -- 4. manual corrections applied ------------------------------------------
+ws <- utils::read.csv(file.path(dirs[1], "[NEW]manual_error_correction_review.csv"),
+                      check.names = FALSE, colClasses = "character")
+ws <- ws[ws$source == "on_step5_list", setdiff(names(ws), c("source", "status_after_corrections",
+  "category_before_corrections", "category_after_corrections", "step8_flags_after_corrections",
+  "in_manual_file", "review_resolution", "resolved_at", "resolved_by")), drop = FALSE]
+ws <- ws[order(as.numeric(ws$row_id)), , drop = FALSE]
+swap <- utils::head(ws$row_id, 6)
+pend <- ws$row_id[7]
+m <- ws[ws$row_id %in% c(swap, pend), , drop = FALSE]
+s <- m$row_id %in% swap
+m$problem_humanidentified <- ifelse(s, "sleep and awake times in each other's fields", "unclear")
+m$solution_humanidentified <- ifelse(s, "Perform sleep-awake switch", "")
+m$manually_corrected <- ifelse(s, "TRUE", "FALSE")
+m$review_resolution <- ifelse(s, "corrected", "flagged_unresolved")
+m$resolved_at <- ifelse(s, "2026-10-19", "")
+m$resolved_by <- ifelse(s, "reproducibility.R", "pending")
+manual_file <- file.path(work, "manual_error_corrections.csv")
+utils::write.csv(m, manual_file, row.names = FALSE, na = "")
+mdirs <- file.path(work, c("manual_1", "manual_2"))
+for (d in mdirs) {
+  cat(sprintf("manual run: new R process, new directory %s\n", basename(d)))
+  one_run(d, manual_file)
+}
+compare(basename(mdirs[2]), snapshot(mdirs[1]), snapshot(mdirs[2]))
+ms <- utils::read.csv(file.path(mdirs[1], "review_status.csv"))
+need <- c(incorporated = any(ms$review_state == "incorporated"),
+          pending = any(grepl("pending", ms$review_state_reason)),
+          in_file_still_fails = any(ms$status_after_corrections == "in_manual_file_still_fails"))
+for (k in names(need)[!need])
+  problems <- c(problems, sprintf("manual run: expected at least one %s row", k))
+
 # -- report -------------------------------------------------------------------
 st <- utils::read.csv(file.path(dirs[1], "review_status.csv"))
 tab <- table(factor(st$review_state, levels = c("needs_review", "not_incorporated", "incorporated")))
 cat(sprintf("\n%d output file(s) compared across %d runs.\n", length(ref), runs + 1))
 cat("review_status.csv:", paste(names(tab), tab, sep = " = ", collapse = ", "), "\n")
+mtab <- table(factor(ms$review_state, levels = names(tab)))
+cat("review_status.csv, manual corrections applied:",
+    paste(names(mtab), mtab, sep = " = ", collapse = ", "), "\n")
 if (length(problems)) {
   cat("NOT REPRODUCIBLE:\n", paste0("  ", problems, "\n"), sep = "")
   quit(status = 1)

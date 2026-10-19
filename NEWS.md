@@ -21,7 +21,8 @@
 * `review_rules()` and `suggest_review_labels()`.
 * `validation/reproducibility.R`: builds an error-injected synthetic diary twice from a fixed
   seed, runs the pipeline in new R processes and new directories, then again in a
-  directory with old outputs left in place, and compares every output file.
+  directory with old outputs left in place, then twice with a fixed manual
+  error-correction file applied, and compares every output file.
 
 ## Changed
 * `inst/scripts/generate_ai_review_csvs.R` takes its suggested labels (`ai_label`,
@@ -33,6 +34,14 @@
   `review_status.csv` supersedes it as the table to read.
 
 ## Known
+* A row marked `manually_corrected` is reported as `CLEAN (Manually Fixed)` by Step 8
+  (`checkforerrors_processing.R`) even when its corrected timestamps still fail the
+  re-check; `review_status.csv` reports such a row as `needs_review`
+  (`in_manual_file_still_fails`). Example: a plain "sleep-awake switch" on a PM sleep time
+  swaps the clock times but not the dates, so the row stays out of order.
+* The bundled demo data (`data-raw/generate_synthetic_data.R`) set wake time equal to
+  get-up time on every row, so every complete demo row is `equal_time_ok`; the demo never
+  produces review rows. `validation/reproducibility.R` uses error-injected data instead.
 * `output/correction_status*.csv` and the `calculation_timestamp` attribute of the `.rds`
   outputs record wall-clock time, so those files differ between runs in exactly those
   fields; `validation/reproducibility.R` compares them without those fields.
