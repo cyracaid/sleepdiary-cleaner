@@ -33,12 +33,21 @@
 * `[NEW]manual_error_correction_review.csv` keeps its 1.5.2 content for this release;
   `review_status.csv` supersedes it as the table to read.
 
+## Fixed
+* Step 8 labelled every manually corrected row `CLEAN (Manually Fixed)`, even when its
+  corrected times still failed the re-check. Step 8's own checks look at formats and
+  metric values, not at the order of the corrected times, so those rows also looked clean
+  there. Now a manually corrected row is `CLEAN (Manually Fixed)` only when the Step 8
+  checks and its `data_category` after corrections both pass; with a Step 8 flag it keeps
+  that flag; otherwise it is the new `STILL FAILS (Manually Corrected)`. Example: a plain
+  "sleep-awake switch" on a PM sleep time swaps the clock times but not the dates, so the
+  row stays out of order and is now reported as still failing.
+* The Step 8 flag report and the count table in Figure 13 now count each row once, by its
+  final status, so the lines add up to the total. Before, a manually fixed row was counted
+  both as `CLEAN` and as `CLEAN (Manually Fixed)`.
+* `flag_distribution.csv` has a new column `data_category_after_corrections`.
+
 ## Known
-* A row marked `manually_corrected` is reported as `CLEAN (Manually Fixed)` by Step 8
-  (`checkforerrors_processing.R`) even when its corrected timestamps still fail the
-  re-check; `review_status.csv` reports such a row as `needs_review`
-  (`in_manual_file_still_fails`). Example: a plain "sleep-awake switch" on a PM sleep time
-  swaps the clock times but not the dates, so the row stays out of order.
 * The bundled demo data (`data-raw/generate_synthetic_data.R`) set wake time equal to
   get-up time on every row, so every complete demo row is `equal_time_ok`; the demo never
   produces review rows. `validation/reproducibility.R` uses error-injected data instead.

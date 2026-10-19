@@ -283,6 +283,7 @@ classification:
     self_reported_flag: "SELF_REPORTED_FLAG"
     clean: "CLEAN"
     clean_manually_fixed: "CLEAN (Manually Fixed)"
+    still_fails_manually_corrected: "STILL FAILS (Manually Corrected)"
 
 # =============================================================================
 # OUTPUT SETTINGS

@@ -1745,17 +1745,8 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
   if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
       "review_summary" %in% names(checkforerrors_summary)) {
     rs <- checkforerrors_summary$review_summary
-    flag_dist_df <- data.frame(
-      Category = c("TIMESTAMP_ISSUE", "DURATION_ISSUE", "AMOUNT_FLAG", "SELF-REPORTED FLAG", "CLEAN", "CLEAN (Manually Fixed)"),
-      Count = c(
-        sum(rs$raw_category == "TIMESTAMP_ISSUE", na.rm = TRUE),
-        sum(rs$raw_category == "DURATION_ISSUE", na.rm = TRUE),
-        sum(rs$raw_category == "AMOUNT_FLAG", na.rm = TRUE),
-        sum(rs$raw_category == "SELF_REPORTED_FLAG", na.rm = TRUE),
-        sum(rs$raw_category == "CLEAN", na.rm = TRUE),
-        sum(rs$final_status == "CLEAN (Manually Fixed)", na.rm = TRUE)
-      )
-    )
+    # One row per final status; the counts add up to the number of rows.
+    flag_dist_df <- step8_status_counts(rs)
   }
   
   # Bar-chart and spacer panel heights are also fixed inches (not relative

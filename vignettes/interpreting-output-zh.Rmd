@@ -474,7 +474,7 @@ identical(old$n_clean_last, new$n_clean_last)
 | `figure_index.png` | 全部图的总览。顶部红色块列出被跳过的图及原因 | 运行后先看这个 |
 | `all_figures_review.pdf` | 每页一张图，按生成顺序，与 PNG 同尺寸 | 快速翻看全部图，或发给研究团队内的合作者 |
 | `figures_not_generated.csv` | `file`、`reason`：**没有**生成的图及原因（如"完整数据的标记列不足 2 列"、或缺少某个验证文件）。与红色块同一份清单 | 少了某张 PNG：先看这里，不要先怀疑有 bug |
-| `flag_distribution.csv` | 每条日记一行（`pid`、`day_num`、`row_id`），含各类标记数（`timestamp_flags`、`duration_flags`、`amount_flags`、`review_flags`）、`flag_details`、`raw_category`、`final_status`、是否 `manually_corrected` | 标记类图（07、13、17、18）背后的表；筛选它找到某根柱子对应的条目 |
+| `flag_distribution.csv` | 每条日记一行（`pid`、`day_num`、`row_id`），含各类标记数（`timestamp_flags`、`duration_flags`、`amount_flags`、`review_flags`）、`flag_details`、`raw_category`、`final_status`、是否 `manually_corrected`，以及 `data_category_after_corrections`。人工修正过的行只有在 Step 8 检查和 `data_category` 都通过时才是 `CLEAN (Manually Fixed)`；带 Step 8 标记的保留该标记；`data_category` 仍不通过的标为 `STILL FAILS (Manually Corrected)` | 标记类图（07、13、17、18）背后的表；筛选它找到某根柱子对应的条目 |
 | `classification_summary.csv` | 各最终分类（clean / error / unusual …）的数量。仅当本次运行产生了最终分类才写出 | 与 `correction_status_final.csv`（§4）对照 |
 | `RUN_INFO.txt` | 运行时间、数据集标签、记录数、输入文件名、包版本、验证文件位置 | 记录这批图来自哪次运行 |
 

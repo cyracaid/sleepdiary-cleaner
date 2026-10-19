@@ -920,7 +920,12 @@ cat(sprintf("  Part D: checkforerrors_df created with %d rows\n", nrow(checkfore
 #   AMOUNT_FLAG     — substance input anomalies (text, decimal, filler)
 #   NEEDS_REVIEW    — metrics anomalies that need manual inspection
 #   CLEAN           — no issues detected
-#   CLEAN (Manually Fixed) — had issues but were corrected in step 6
+#   CLEAN (Manually Fixed) — manually corrected in step 6, and both the Step 8
+#                            checks and the re-check of the corrected times
+#                            (data_category) pass
+#   STILL FAILS (Manually Corrected) — manually corrected, Step 8 checks pass,
+#                            but the corrected times still fail the re-check
+#   A manually corrected row with a Step 8 flag keeps that flag.
 #
 # OUTPUT: review_summary data.frame with one row per original data row,
 #         flag counts, and final category assignment.
@@ -1020,8 +1025,14 @@ raw_category[timestamp_flags == 0 & duration_flags > 0] <- "DURATION_ISSUE"
 raw_category[timestamp_flags == 0 & duration_flags == 0 & amount_flags > 0] <- "AMOUNT_FLAG"
 raw_category[timestamp_flags == 0 & duration_flags == 0 & amount_flags == 0 & review_flags > 0] <- "SELF_REPORTED_FLAG"
 raw_category[timestamp_flags == 0 & duration_flags == 0 & amount_flags == 0 & review_flags == 0] <- "CLEAN"
-final_status <- raw_category
-final_status[review_summary$manually_corrected] <- "CLEAN (Manually Fixed)"
+# Step 8 checks formats and metrics, not the order of the corrected times;
+# data_category (Steps 6/7) re-tests that. See step8_final_status().
+review_summary$data_category_after_corrections <-
+  if ("data_category" %in% names(data_with_flags_local))
+    as.character(data_with_flags_local$data_category) else NA_character_
+final_status <- step8_final_status(
+  raw_category, review_summary$manually_corrected,
+  if ("data_category" %in% names(data_with_flags_local)) data_with_flags_local$data_category else NULL)
 
 review_summary$raw_category <- raw_category
 review_summary$final_status <- final_status
@@ -1046,12 +1057,17 @@ print(table(review_summary$final_status, useNA = "ifany"))
 #        each category. This is the primary quality check output —
 #        run after the pipeline to confirm no unexpected spike in any category.
 # ============================================================================
-timestamp_count <- sum(review_summary$raw_category == "TIMESTAMP_ISSUE", na.rm = TRUE)
-duration_count <- sum(review_summary$raw_category == "DURATION_ISSUE", na.rm = TRUE)
-amount_count <- sum(review_summary$raw_category == "AMOUNT_FLAG", na.rm = TRUE)
-review_count <- sum(review_summary$raw_category == "SELF_REPORTED_FLAG", na.rm = TRUE)
-clean_count <- sum(review_summary$raw_category == "CLEAN", na.rm = TRUE)
-fixed_count <- sum(review_summary$final_status == "CLEAN (Manually Fixed)", na.rm = TRUE)
+# Counted on final_status, so every row is in exactly one line and the lines add
+# up to TOTAL (a manually fixed row is no longer also counted as CLEAN).
+status_counts <- setNames(step8_status_counts(review_summary)$Count,
+                          step8_status_counts(review_summary)$Category)
+timestamp_count <- status_counts[["TIMESTAMP_ISSUE"]]
+duration_count <- status_counts[["DURATION_ISSUE"]]
+amount_count <- status_counts[["AMOUNT_FLAG"]]
+review_count <- status_counts[["SELF-REPORTED FLAG"]]
+clean_count <- status_counts[["CLEAN"]]
+fixed_count <- status_counts[["CLEAN (Manually Fixed)"]]
+still_fails_count <- status_counts[["STILL FAILS (Manually Corrected)"]]
 
 cat("\n")
 cat(paste(rep("=", 60), collapse = ""))
@@ -1063,6 +1079,7 @@ cat(sprintf("\n  AMOUNT_FLAG     (substance/amount):  %d", amount_count))
 cat(sprintf("\n  SELF-REPORTED FLAG (SOL/WASO diary anomalies): %d", review_count))
 cat(sprintf("\n  CLEAN           (no issues):         %d", clean_count))
 cat(sprintf("\n  CLEAN (Manually Fixed):              %d", fixed_count))
+cat(sprintf("\n  STILL FAILS (Manually Corrected):    %d", still_fails_count))
 cat(sprintf("\n  ─────────────────────────────────────────"))
 cat(sprintf("\n  TOTAL:                                %d", nrow(review_summary)))
 
