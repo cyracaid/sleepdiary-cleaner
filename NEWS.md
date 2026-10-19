@@ -49,10 +49,14 @@
 * Test data could be tagged `real` and have its figures written under `output/` (the
   real-data area): the tag was guessed from the input file name, and any name without
   synthetic/synth/stub/demo/example counted as real (for example the benchmark's
-  `main.rds` or an injected `corrupted.rds`). The config now has `data.tag`
-  (`real` / `synth` / `unknown`); when it is set it is used as stated, and an invalid value
-  is an error. When it is empty the old file-name rule still applies, so existing configs
-  keep their figure location, but the run and `RUN_INFO.txt` now say the tag was inferred.
+  `main.rds` or an injected `corrupted.rds`). The tag is no longer guessed. It is
+  `data.tag` in the config (`real` / `synth` / `unknown`; an invalid value is an error).
+  When it is not set and the run makes figures, an interactive session asks once when the
+  run starts (r / s / n), for that run only, and a non-interactive run stops with an error
+  that says what to add; runs with `skip_visualization = TRUE` do not need it.
+  `RUN_INFO.txt` and `output/review_runs.csv` (new columns `data_tag`, `data_tag_source`)
+  record the tag and where it came from. **Action needed:** a config without `data.tag`
+  that is run non-interactively with figures now stops; add `data.tag: real` (or `synth`).
   The bundled synthetic config, `validation/synthetic/run_one.R`, `spec_cache.R`,
   `operating_point_sweep.R`, `run_ppv/config.yaml` and `validation/reproducibility.R` state
   `synth`; the config template states `real`. New `resolve_data_tag()`.

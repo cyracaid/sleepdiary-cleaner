@@ -92,30 +92,57 @@ cfg_get <- function(key, default = NULL, cfg = NULL) {
 
 #' Which kind of data a run is on: "real", "synth" or "unknown"
 #'
-#' The user states it in the config as \code{data.tag}. When the config does
-#' not, the older rule is used: the name of \code{data.files.main} containing
-#' synthetic, synth, stub, demo or example means "synth", any other name means
-#' "real", and no name means "unknown". The tag decides where figures are
-#' written (only "real" goes under \code{output/}).
+#' The user states it in the config as \code{data.tag}. It decides where
+#' figures are written (only "real" goes under \code{output/}). Nothing is
+#' guessed: when \code{data.tag} is not set, an interactive session asks once
+#' (r = real, s = synthetic/test, n = stop), and a non-interactive session
+#' (Rscript, CI, tests, knitting) stops with an error saying what to add to the
+#' config. The answer applies to this run only; the config file is not changed.
 #'
 #' @param cfg A configuration list.
-#' @return A list with \code{tag} and \code{source} ("config" when the user
-#'   stated it, "file name" when it was inferred, "none" when unknown).
+#' @param ask Ask when \code{data.tag} is not set? Default \code{interactive()}.
+#' @param read Function that shows a prompt and returns the typed answer
+#'   (default \code{readline}); replaceable for testing.
+#' @return A list with \code{tag} and \code{source} ("config" when stated in
+#'   the config, "asked at run time" when answered at the prompt).
 #' @export
-resolve_data_tag <- function(cfg) {
+resolve_data_tag <- function(cfg, ask = interactive(), read = readline) {
   tags <- c("real", "synth", "unknown")
   stated <- config_get(cfg, "data.tag", NULL)
-  if (!is.null(stated) && length(stated) == 1 && !is.na(stated) && nzchar(stated)) {
+  if (!is.null(stated) && length(stated) == 1 && !is.na(stated) && nzchar(trimws(stated))) {
     stated <- tolower(trimws(as.character(stated)))
     if (!stated %in% tags)
       stop("data.tag must be one of: ", paste(tags, collapse = ", "), call. = FALSE)
     return(list(tag = stated, source = "config"))
   }
-  nm <- tryCatch(basename(config_get(cfg, "data.files.main", "")), error = function(e) "")
-  if (length(nm) != 1 || is.na(nm) || !nzchar(nm)) return(list(tag = "unknown", source = "none"))
-  if (grepl("synthetic|synth|stub|demo|example", nm, ignore.case = TRUE))
-    return(list(tag = "synth", source = "file name"))
-  list(tag = "real", source = "file name")
+  main <- tryCatch(basename(config_get(cfg, "data.files.main", "")), error = function(e) "")
+  if (length(main) != 1 || is.na(main) || !nzchar(main)) main <- "(not set)"
+  how_to_fix <- paste0("Add one line under data: in your config, e.g.\n",
+                       "    data:\n      tag: real    # participant data; figures go under output/\n",
+                       "    data:\n      tag: synth   # synthetic or test data; figures go outside output/")
+  if (!isTRUE(ask)) {
+    stop("data.tag is not set in the config, so the pipeline does not know whether ",
+         main, " is real participant data or synthetic/test data, and this session ",
+         "cannot ask. ", how_to_fix,
+         "\nOr run with skip_visualization = TRUE (the tag only decides where figures go).",
+         call. = FALSE)
+  }
+  cat(sprintf(paste0(
+    "\ndata.tag is not set in the config, so the pipeline does not know what this data is:\n",
+    "  file: %s\n",
+    "  r = real participant data (figures go under output/, which is not uploaded to GitHub)\n",
+    "  s = synthetic or test data (figures go outside output/)\n",
+    "  n = stop the run; I will set data.tag in the config\n"), main))
+  repeat {
+    ans <- tolower(trimws(read("Type r / s / n: ")))
+    if (ans %in% c("r", "real")) { tag <- "real"; break }
+    if (ans %in% c("s", "synth")) { tag <- "synth"; break }
+    if (ans %in% c("n", "no")) stop("Run stopped at your request (the 'n' answer). ", how_to_fix,
+                                    call. = FALSE)
+    cat("  Please type r, s or n.\n")
+  }
+  cat(sprintf("  -> data tag '%s' for this run only. To stop being asked, add to the config:\n       data:\n         tag: %s\n", tag, tag))
+  list(tag = tag, source = "asked at run time")
 }
 
 #' Resolve the figure output directory for a run

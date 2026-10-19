@@ -16,8 +16,9 @@ pipeline:
 data:
   # What kind of data this is: "real" (participant data; figures go under
   # output/, which is gitignored), "synth" (synthetic or test data) or
-  # "unknown". Leave empty to infer it from the main file's name (a name with
-  # synthetic/synth/stub/demo/example is synth, any other name is real).
+  # "unknown". It is never guessed: when empty, an interactive run asks
+  # (r / s / n) and a non-interactive run that makes figures stops with an
+  # error. Runs with skip_visualization = TRUE do not need it.
   tag: ""
   files:
     main: "your_data.rds"

@@ -349,6 +349,8 @@ append_review_run_log <- function(cfg, status_file, verdict, applied, verbose = 
     run_at_utc = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
     sleepcleanr_version = as.character(utils::packageVersion("sleepcleanr")),
     manual_applied = applied,
+    data_tag = (.sc_get("data_tag_info") %||% list(tag = ""))$tag,
+    data_tag_source = (.sc_get("data_tag_info") %||% list(source = "not needed (no figures)"))$source,
     data_main_md5 = .md5_file(f$main),
     data_extra_md5 = .md5_file(f$extra),
     manual_error_md5 = .md5_file(f$manual_error),

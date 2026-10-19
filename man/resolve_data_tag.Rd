@@ -4,19 +4,25 @@
 \alias{resolve_data_tag}
 \title{Which kind of data a run is on: "real", "synth" or "unknown"}
 \usage{
-resolve_data_tag(cfg)
+resolve_data_tag(cfg, ask = interactive(), read = readline)
 }
 \arguments{
 \item{cfg}{A configuration list.}
+
+\item{ask}{Ask when \code{data.tag} is not set? Default \code{interactive()}.}
+
+\item{read}{Function that shows a prompt and returns the typed answer
+(default \code{readline}); replaceable for testing.}
 }
 \value{
-A list with \code{tag} and \code{source} ("config" when the user
-  stated it, "file name" when it was inferred, "none" when unknown).
+A list with \code{tag} and \code{source} ("config" when stated in
+  the config, "asked at run time" when answered at the prompt).
 }
 \description{
-The user states it in the config as \code{data.tag}. When the config does
-not, the older rule is used: the name of \code{data.files.main} containing
-synthetic, synth, stub, demo or example means "synth", any other name means
-"real", and no name means "unknown". The tag decides where figures are
-written (only "real" goes under \code{output/}).
+The user states it in the config as \code{data.tag}. It decides where
+figures are written (only "real" goes under \code{output/}). Nothing is
+guessed: when \code{data.tag} is not set, an interactive session asks once
+(r = real, s = synthetic/test, n = stop), and a non-interactive session
+(Rscript, CI, tests, knitting) stops with an error saying what to add to the
+config. The answer applies to this run only; the config file is not changed.
 }

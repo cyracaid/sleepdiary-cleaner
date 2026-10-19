@@ -112,6 +112,8 @@ run_pipeline(config = "my_study.yaml", skip_visualization = TRUE)          # cle
 | `skip_visualization` | `TRUE` skips the figures (Steps 9 and 11). |
 | `finalize` | Default `TRUE`: writes the delivered datasets (Step 10). `FALSE` stops after cleaning. |
 
+**Say what the data is: `data.tag` in the config.** `real` (participant data; figures go under `output/`, which is gitignored) or `synth` (synthetic or test data; figures go outside `output/`). The pipeline never guesses it. If it is not set and the run makes figures, an interactive session asks once when the run starts (`r` / `s` / `n` to stop), for that run only; a non-interactive run (`Rscript`, CI, knitting) stops with an error that says what to add. Runs with `skip_visualization = TRUE` do not need it. `RUN_INFO.txt` and `output/review_runs.csv` record the tag and whether it came from the config or from the prompt.
+
 **`include_manual_corrections` is an argument, not a YAML setting.** Writing
 it in the config file has no effect; it must be in the call. The YAML only says
 *where* each human-review file is (`data.files.manual_error`, …). Two things

@@ -109,6 +109,8 @@ run_pipeline(config = "my_study.yaml", skip_visualization = TRUE)          # 只
 | `skip_visualization` | 设为 `TRUE` 跳过出图（Step 9 和 Step 11）。 |
 | `finalize` | 默认 `TRUE`：写出交付数据集（Step 10）。设为 `FALSE` 则清洗完就停。 |
 
+**在配置里写明数据是什么：`data.tag`。** `real`（被试真实数据，图写进 `output/`，不会上传 GitHub）或 `synth`（合成或测试数据，图写在 `output/` 外面）。管线从不猜测。没写、而这次运行要出图时：交互运行会在一开始问一次（`r` / `s` / `n` 停止），只对这一次运行有效；非交互运行（`Rscript`、CI、编译文档）会报错停止，并说明要加什么。`skip_visualization = TRUE` 的运行不需要它。`RUN_INFO.txt` 和 `output/review_runs.csv` 会记录标记，以及它来自配置还是来自询问。
+
 **`include_manual_corrections` 是函数参数，不是 YAML 设置。** 写进配置文件不会生效，必须写在调用里。YAML 只说明每个人工审查文件**在哪里**（`data.files.manual_error` 等）。由此两点：
 
 * **如果运行时对小睡/运动、睡眠指标时长、指标接受这三步打印 `No corrections file found () — skipping`**，括号里是空的，表示路径是被**有意清空**的：这次是只跑算法（`include_manual_corrections = FALSE`，即默认值），不是文件缺失或拼错。要应用它们，用 `include_manual_corrections = TRUE` 重跑。

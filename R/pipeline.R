@@ -124,6 +124,11 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   # Seen by the sourced step scripts (they run in this frame); not the global environment.
   sleepcleanr_loaded <- TRUE
 
+  # The data tag only decides where figures go, so it is needed only when
+  # figures are made. Settled here, before any work, so a question is asked
+  # while the person is still at the keyboard (see resolve_data_tag()).
+  if (!skip_visualization) .sc_set("data_tag_info", resolve_data_tag(cfg))
+
   init_step_ledger()
   source(file.path(sdir, "report_correction_status.R"), local = TRUE)
 
@@ -584,6 +589,7 @@ run_visualization <- function(config = NULL, project_dir = ".") {
   env  <- .pipeline_init(config, project_dir, verbose = TRUE)
   on.exit(.pipeline_cleanup(env$old_wd), add = TRUE)
   pipeline_config <- env$cfg
+  .sc_set("data_tag_info", resolve_data_tag(env$cfg))
   .sc_restore(environment())
   source(file.path(env$sdir, "sleep_visualization.R"), local = TRUE)
   invisible(TRUE)
