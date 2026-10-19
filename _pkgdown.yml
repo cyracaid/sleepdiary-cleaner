@@ -2,6 +2,7 @@ url: https://cyracaid.github.io/sleepdiary-cleaner/
 destination: docs/
 template:
   bootstrap: 5
+  light-switch: true
 # Articles are grouped by language (English first, then Chinese) instead of
 # mixing both languages under each topic. The first group's description links
 # to the second, and every article links to its counterpart at the top.

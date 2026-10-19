@@ -1,4 +1,4 @@
-# sleepcleanr (development version)
+# sleepcleanr 1.5.2
 
 ## Changed
 * `[NEW]manual_error_correction_review.csv` is now one complete status table, replacing
@@ -11,6 +11,13 @@
   `category_after_corrections`, `step8_flags_after_corrections`. Rows are ordered by status so
   the ones that still need a person come first, in the same order every run. Step 8 flags are
   reported in their own column and do not change the status.
+
+## Documentation
+* The documentation site follows the system day/night setting (light or dark) on every
+  page, including the navigation bar and the search box, and has a toggle in the navbar
+  (pkgdown `light-switch`).
+* `interpreting-output` and `column-mapping` (English and Chinese) describe the status
+  table and the five values of `status_after_corrections`.
 
 # sleepcleanr 1.5.1
 

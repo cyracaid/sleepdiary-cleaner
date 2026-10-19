@@ -2,8 +2,8 @@
  *
  * Day mode is the stock pkgdown template; the only day-mode addition is the
  * neutral .toc-box below (used by the interpreting-output articles).
- * Dark mode follows the system preference (prefers-color-scheme) everywhere
- * on the site.
+ * Dark mode comes from pkgdown's light-switch (Bootstrap 5.3 colour modes): it follows
+ * the system day/night setting by default and has a toggle in the navbar.
  */
 
 /* --- in-article TOC (interpreting-output{,-zh}) ------------------------- */
@@ -26,60 +26,9 @@
 .toc-box details[open] > summary { margin-bottom: 0.4em; }
 .toc-box details ul { columns: 2; column-gap: 2em; }
 
-/* --- system dark mode ---------------------------------------------------- */
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --bs-body-bg: #1c1f24;
-    --bs-body-color: #d5d8dc;
-    --bs-secondary-color: #9aa1a8;
-    --bs-emphasis-color: #e8eaed;
-    --bs-border-color: #363b43;
-    --bs-link-color: #8cb8e0;
-    --bs-link-hover-color: #aed3f2;
-    --bs-light: #23272e;   /* flips .bg-light (navbar, dropdowns) */
-  }
-
-  html, body { background-color: var(--bs-body-bg) !important; color: var(--bs-body-color) !important; }
-
-  .navbar {
-    background-color: var(--bs-light) !important;
-    border-bottom: 1px solid var(--bs-border-color);
-  }
-  .navbar .navbar-brand, .navbar .nav-link, .navbar .navbar-text { color: var(--bs-body-color) !important; }
-  .navbar .nav-link:hover, .navbar .nav-link:focus { color: var(--bs-link-hover-color) !important; }
-  .dropdown-menu { background-color: var(--bs-light); border-color: var(--bs-border-color); }
-  .dropdown-item { color: var(--bs-body-color); }
-  .dropdown-item:hover, .dropdown-item:focus { background-color: #2b3038; color: var(--bs-emphasis-color); }
-
-  a { color: var(--bs-link-color); }
-  a:hover { color: var(--bs-link-hover-color); }
-
-  pre, div.sourceCode {
-    background-color: #23272e !important;
-    border: 1px solid var(--bs-border-color);
-  }
-  pre code { background: transparent; color: #d5d8dc; }
-  pre.sourceCode span, pre code span { color: #d5d8dc !important; }
-  pre.sourceCode span.co, pre code span.co { color: #8b929a !important; font-style: italic; }
-  pre.sourceCode span.st, pre code span.st { color: #c9d9a0 !important; }
-  pre.sourceCode span.fu, pre code span.fu { color: #8cb8e0 !important; }
-  code { background-color: #2a2f37; color: #d5d8dc; border-radius: 3px; padding: 0.05em 0.3em; }
-
-  table { border-color: var(--bs-border-color) !important; color: var(--bs-body-color) !important; }
-  table tr, table td, table th {
-    background-color: transparent !important;
-    color: var(--bs-body-color) !important;
-    border-color: var(--bs-border-color) !important;
-  }
-  table thead th, table thead tr { background-color: #2b3038 !important; }
-  table tbody tr.even, table tbody tr:nth-child(even) { background-color: #22262c !important; }
-
-  blockquote { background: #22262c; border-left: 4px solid #4a505a; color: var(--bs-body-color); }
-  hr { border-color: var(--bs-border-color); opacity: 1; }
-
-  footer { color: var(--bs-secondary-color); }
-
-  .toc-box { background-color: #22262c; border-color: var(--bs-border-color); }
-  .toc-box details > summary:hover { filter: brightness(1.1); }
+/* --- dark mode: only what Bootstrap does not know about ------------------ */
+[data-bs-theme="dark"] .toc-box {
+  background-color: var(--bs-tertiary-bg);
+  border-color: var(--bs-border-color);
 }
+[data-bs-theme="dark"] .toc-box details > summary:hover { filter: brightness(1.15); }
