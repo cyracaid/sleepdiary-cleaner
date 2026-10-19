@@ -145,3 +145,11 @@ data:
 #   metrics:
 #     subjective_sol:
 #       spike_abs_threshold: 120
+#
+# # Review rules (what counts as done; see config_default.yaml for every key).
+# # Omit to use the defaults: done when no row is needs_review.
+# review:
+#   done_when:
+#     max_needs_review: 0
+#   step8_flags_need_review: false
+#   fail_if_not_done: false

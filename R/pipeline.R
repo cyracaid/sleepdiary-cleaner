@@ -472,6 +472,13 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
     error = function(e) if (verbose) cat("  [review status] skipped:", conditionMessage(e), "\n")
   )
 
+  # One status table for both worksheets: each row is needs_review,
+  # not_incorporated or incorporated, by the rules in the config's review:
+  # block, followed by the verdict "done / not done". Not wrapped in tryCatch:
+  # a run that cannot say where the review stands must not report success.
+  .review_out <- write_unified_review_status(.review_ws, corrected_ema_data,
+    review_output$data_with_flags, cfg, applied = .include_manual, verbose = verbose)
+
   # -- Step 9: Visualization -------------------------------------------
   if (!skip_visualization) {
     if (verbose) cat("\n=== Step 9: Generating visualizations ===\n")
@@ -528,6 +535,15 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   if (!is.null(export_env)) {
     res <- Filter(Negate(is.null), pipeline_results())
     list2env(res, envir = export_env)
+  }
+  append_review_run_log(cfg, .review_out$file, .review_out$verdict,
+                        applied = .include_manual, verbose = verbose)
+  if (review_rules(cfg)$fail_if_not_done && !.review_out$verdict$done) {
+    stop(sprintf(paste0("Review NOT DONE: %d row(s) need review (%s). All outputs ",
+                        "were written; see %s. Set review.fail_if_not_done: false ",
+                        "to finish without this stop."),
+                 .review_out$verdict$counts[["needs_review"]], .review_out$verdict$rule,
+                 .review_out$file), call. = FALSE)
   }
   if (verbose) cat("\n[OK] Pipeline complete!\n")
   invisible(TRUE)
