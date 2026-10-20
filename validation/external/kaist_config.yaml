@@ -3,8 +3,11 @@
 pipeline:
   name: "KAIST HRV Sleep Diary external validation"
   version: "1.4.6"
-  data_tag: "unknown"
 data:
+  # External public data: neither this study's participants nor synthetic.
+  # "unknown" keeps its figures outside output/. (This was written as
+  # pipeline.data_tag before, a key the pipeline never read.)
+  tag: unknown
   files:
     main: external/kaist_adapted.csv
     extra: ''
