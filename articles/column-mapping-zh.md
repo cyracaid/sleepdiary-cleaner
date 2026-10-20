@@ -1,4 +1,4 @@
-# 列映射、配置与数据格式（中文）
+# 输入数据与配置（中文）
 
 [English
 →](https://cyracaid.github.io/sleepdiary-cleaner/articles/column-mapping.md)

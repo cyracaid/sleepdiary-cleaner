@@ -1,4 +1,4 @@
-# 如何读懂管线输出（中文）
+# 读懂输出与审核循环（中文）
 
 [English
 →](https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output.md)

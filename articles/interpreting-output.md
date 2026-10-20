@@ -1,4 +1,4 @@
-# Interpreting the Pipeline Output
+# Reading the Output and the Review Loop
 
 [中文版
 →](https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output-zh.md)

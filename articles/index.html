@@ -19,19 +19,25 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><h6 class="dropdown-header" data-toc-skip>English</h6></li>
-    <li><a class="dropdown-item" href="../articles/validation-methodology.html">Validation Methodology</a></li>
-    <li><a class="dropdown-item" href="../articles/pipeline-architecture.html">Pipeline Architecture</a></li>
+    <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started</a></li>
+    <li><a class="dropdown-item" href="../articles/column-mapping.html">Input Data and Configuration</a></li>
     <li><a class="dropdown-item" href="../articles/data-first.html">Data-first entry: clean_sleep_diary()</a></li>
-    <li><a class="dropdown-item" href="../articles/column-mapping.html">Column Mapping, Config &amp; Data Format</a></li>
-    <li><a class="dropdown-item" href="../articles/interpreting-output.html">Interpreting the Pipeline Output</a></li>
+    <li><a class="dropdown-item" href="../articles/interpreting-output.html">Reading the Output and the Review Loop</a></li>
+    <li><a class="dropdown-item" href="../articles/output-files.html">Output files</a></li>
+    <li><a class="dropdown-item" href="../articles/troubleshooting.html">Troubleshooting</a></li>
+    <li><a class="dropdown-item" href="../articles/pipeline-architecture.html">Pipeline Architecture</a></li>
+    <li><a class="dropdown-item" href="../articles/validation-methodology.html">Validation Methodology</a></li>
     <li><a class="dropdown-item" href="../articles/testing-coverage.html">Testing Coverage</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>中文</h6></li>
-    <li><a class="dropdown-item" href="../articles/validation-methodology-zh.html">验证方法学</a></li>
-    <li><a class="dropdown-item" href="../articles/pipeline-architecture-zh.html">管线架构</a></li>
+    <li><a class="dropdown-item" href="../articles/getting-started-zh.html">快速开始</a></li>
+    <li><a class="dropdown-item" href="../articles/column-mapping-zh.html">输入数据与配置</a></li>
     <li><a class="dropdown-item" href="../articles/data-first-zh.html">数据优先入口：clean_sleep_diary()</a></li>
-    <li><a class="dropdown-item" href="../articles/column-mapping-zh.html">列映射、配置与数据格式</a></li>
-    <li><a class="dropdown-item" href="../articles/interpreting-output-zh.html">如何读懂管线输出</a></li>
+    <li><a class="dropdown-item" href="../articles/interpreting-output-zh.html">读懂输出与审核循环</a></li>
+    <li><a class="dropdown-item" href="../articles/output-files-zh.html">输出文件一览</a></li>
+    <li><a class="dropdown-item" href="../articles/troubleshooting-zh.html">排错</a></li>
+    <li><a class="dropdown-item" href="../articles/pipeline-architecture-zh.html">管线架构</a></li>
+    <li><a class="dropdown-item" href="../articles/validation-methodology-zh.html">验证方法学</a></li>
     <li><a class="dropdown-item" href="../articles/testing-coverage-zh.html">测试覆盖率</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">All articles / 全部文章</a></li>
@@ -59,35 +65,47 @@
 
     <div class="section ">
       <h3>English</h3>
-      <div class="section-desc"><p><span id="english"></span>Choose your language: English articles are listed here; <a href="#chinese">中文版请看下面 / Chinese articles below ↓</a>.</p></div>
+      <div class="section-desc"><p><span id="english"></span>Choose your language: English articles are listed here, in the order you need them; <a href="#chinese">中文版请看下面 / Chinese articles below ↓</a>.</p></div>
 
-      <dl><dt><a href="validation-methodology.html">Validation Methodology</a></dt>
-        <dd><p>How the sleepcleanr cleaning pipeline is validated: the 9-step chain from clean-input specificity through injected-error benchmarks, Bland-Altman measurement characterization, real-data audit, and multiverse robustness.</p>
-        </dd><dt><a href="pipeline-architecture.html">Pipeline Architecture</a></dt>
-        <dd><p>The 10-step cleaning pipeline, the 8 detection rule families, the decision tri-state, and the classification systems — how sleepcleanr is structured.</p>
+      <dl><dt><a href="getting-started.html">Getting started</a></dt>
+        <dd><p>Install sleepcleanr, run it once on a copy of your data, and know what to look for.</p>
+        </dd><dt><a href="column-mapping.html">Input Data and Configuration</a></dt>
+        <dd><p>How to adapt sleepcleanr to your own dataset: YAML column mapping, threshold configuration, timestamp format, input data structure, and manual correction CSV templates.</p>
         </dd><dt><a href="data-first.html">Data-first entry: clean_sleep_diary()</a></dt>
         <dd>
-        </dd><dt><a href="column-mapping.html">Column Mapping, Config &amp; Data Format</a></dt>
-        <dd><p>How to adapt sleepcleanr to your own dataset: YAML column mapping, threshold configuration, timestamp format, input data structure, and manual correction CSV templates.</p>
-        </dd><dt><a href="interpreting-output.html">Interpreting the Pipeline Output</a></dt>
+        </dd><dt><a href="interpreting-output.html">Reading the Output and the Review Loop</a></dt>
         <dd><p>How to read correction_status_final.csv, the step flag ledger, regression checks, and the diagnostic figures — what each output means and what to check for.</p>
+        </dd><dt><a href="output-files.html">Output files</a></dt>
+        <dd><p>Every file a run writes: where it goes, which step writes it, and what it is.</p>
+        </dd><dt><a href="troubleshooting.html">Troubleshooting</a></dt>
+        <dd><p>Symptom, cause and fix for the problems seen most often.</p>
+        </dd><dt><a href="pipeline-architecture.html">Pipeline Architecture</a></dt>
+        <dd><p>The 10-step cleaning pipeline, the 8 detection rule families, the decision tri-state, and the classification systems — how sleepcleanr is structured.</p>
+        </dd><dt><a href="validation-methodology.html">Validation Methodology</a></dt>
+        <dd><p>How the sleepcleanr cleaning pipeline is validated: the 9-step chain from clean-input specificity through injected-error benchmarks, Bland-Altman measurement characterization, real-data audit, and multiverse robustness.</p>
         </dd><dt><a href="testing-coverage.html">Testing Coverage</a></dt>
         <dd><p>The 200+ testthat expectations across 16 test files: what the tests verify, how to run them, and how snapshot verification works.</p>
       </dd></dl></div>
     <div class="section ">
       <h3>Chinese (中文)</h3>
-      <div class="section-desc"><p><span id="chinese"></span>中文文章。<a href="#english">Back to English ↑</a></p></div>
+      <div class="section-desc"><p><span id="chinese"></span>中文文章，顺序与英文相同。<a href="#english">Back to English ↑</a></p></div>
 
-      <dl><dt><a href="validation-methodology-zh.html">验证方法学</a></dt>
-        <dd><p>sleepcleanr 清洗管线的验证方法：从干净输入特异度、注入错误基准、Bland-Altman 测量特性描述、真实数据审计到 multiverse 鲁棒性分析的九步验证链。</p>
-        </dd><dt><a href="pipeline-architecture-zh.html">管线架构（中文）</a></dt>
-        <dd><p>sleepcleanr 清洗管线的 10 步结构、8 个检测规则族、决策三态与分类体系。</p>
+      <dl><dt><a href="getting-started-zh.html">快速开始（中文）</a></dt>
+        <dd><p>安装 sleepcleanr，在数据副本上跑第一次，并知道该看什么。</p>
+        </dd><dt><a href="column-mapping-zh.html">输入数据与配置（中文）</a></dt>
+        <dd><p>如何把 sleepcleanr 适配到自己的数据集：YAML 列映射、阈值配置、时间戳格式、输入数据结构与人工修正 CSV 模板。</p>
         </dd><dt><a href="data-first-zh.html">数据优先入口：clean_sleep_diary()（中文）</a></dt>
         <dd><p>无需配置文件即可运行管线：列名自动推断、每个推断决策都被记录、清洗结果旁边会写出一份来源清单（provenance manifest）。</p>
-        </dd><dt><a href="column-mapping-zh.html">列映射、配置与数据格式（中文）</a></dt>
-        <dd><p>如何把 sleepcleanr 适配到自己的数据集：YAML 列映射、阈值配置、时间戳格式、输入数据结构与人工修正 CSV 模板。</p>
-        </dd><dt><a href="interpreting-output-zh.html">如何读懂管线输出（中文）</a></dt>
+        </dd><dt><a href="interpreting-output-zh.html">读懂输出与审核循环（中文）</a></dt>
         <dd><p>怎么读 correction_status_final.csv、step flag ledger、回归检查与诊断图表——每个输出的含义、检查要点，以及每张图的详细参考。</p>
+        </dd><dt><a href="output-files-zh.html">输出文件一览（中文）</a></dt>
+        <dd><p>一次运行写出的每个文件：放在哪里、哪一步写出、是什么。</p>
+        </dd><dt><a href="troubleshooting-zh.html">排错（中文）</a></dt>
+        <dd><p>最常见问题的现象、原因和处理办法。</p>
+        </dd><dt><a href="pipeline-architecture-zh.html">管线架构（中文）</a></dt>
+        <dd><p>sleepcleanr 清洗管线的 10 步结构、8 个检测规则族、决策三态与分类体系。</p>
+        </dd><dt><a href="validation-methodology-zh.html">验证方法学</a></dt>
+        <dd><p>sleepcleanr 清洗管线的验证方法：从干净输入特异度、注入错误基准、Bland-Altman 测量特性描述、真实数据审计到 multiverse 鲁棒性分析的九步验证链。</p>
         </dd><dt><a href="testing-coverage-zh.html">测试覆盖率（中文）</a></dt>
         <dd><p>16 个测试文件、200+ 条 testthat 断言：测试验证什么、怎么运行、snapshot 验证如何工作。</p>
       </dd></dl></div>

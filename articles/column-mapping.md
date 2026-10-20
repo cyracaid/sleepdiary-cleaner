@@ -1,4 +1,4 @@
-# Column Mapping, Config & Data Format
+# Input Data and Configuration
 
 [中文版
 →](https://cyracaid.github.io/sleepdiary-cleaner/articles/column-mapping-zh.md)

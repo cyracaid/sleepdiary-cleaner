@@ -1,0 +1,99 @@
+# Getting started
+
+[中文版
+→](https://cyracaid.github.io/sleepdiary-cleaner/articles/getting-started-zh.md)
+
+sleepcleanr detects and corrects typing errors in sleep-diary times and
+durations, and keeps a record of every change. It is research software
+and is not on CRAN. This page takes you from installation to a first
+run. Read [Input data and
+configuration](https://cyracaid.github.io/sleepdiary-cleaner/articles/column-mapping.md)
+first if your data are not yet in the expected shape.
+
+## 1. Install
+
+Install in a plain R session in which sleepcleanr is not loaded, from a
+directory that is not a checkout of this repository (a checkout has its
+own `renv` library, which hides your system packages).
+
+``` r
+install.packages("remotes")
+remotes::install_github("cyracaid/sleepdiary-cleaner@v1.5.2", upgrade = "never", force = TRUE)
+```
+
+Then **restart R** and check what is loaded:
+
+``` r
+library(sleepcleanr)
+getNamespaceVersion("sleepcleanr")      # "1.5.2"
+```
+
+Reinstalling while the package is loaded in another R window can leave a
+corrupted installation (`lazy-load database ... is corrupt`). Close
+every R session first, install, then restart.
+
+## 2. Prepare a project folder
+
+Make one folder per run. Put in it your data file and a config YAML
+(copy `inst/config_template.yaml` and edit the `data` section). If you
+already have human-review files, put them there too. Start from a
+**copy** of any folder that holds earlier results: a run overwrites the
+files it writes (see [Output
+files](https://cyracaid.github.io/sleepdiary-cleaner/articles/output-files.md)).
+
+## 3. Run
+
+``` r
+library(sleepcleanr)
+run_pipeline(config = "my_study.yaml", project_dir = "path/to/project",
+             include_manual_corrections = TRUE)
+```
+
+| Argument                     | What it does                                                                                                                     |
+|------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| `config`                     | Path to the config YAML. A relative path is read from `project_dir`, and if it is not there, from the directory you called from. |
+| `project_dir`                | The project folder. The run changes into it, so every relative path in the YAML (data, manual files) is relative to it.          |
+| `include_manual_corrections` | **Default `FALSE`.** Whether human-review files are applied. It is an argument of the call, not a YAML setting. See below.       |
+| `skip_visualization`         | `TRUE` skips the figures.                                                                                                        |
+
+### The two modes
+
+|                    | `include_manual_corrections = FALSE` (default)                         | `= TRUE`                                              |
+|--------------------|------------------------------------------------------------------------|-------------------------------------------------------|
+| Human-review files | Treated as absent; the run is algorithmic-only and says so in a banner | Applied, if the files named in the YAML exist         |
+| Step 5 worksheets  | Written                                                                | Written                                               |
+| Use it for         | The first run on new data, to see what the rules flag                  | Applying the corrections your reviewers have recorded |
+
+The default changed in version 1.4.7. Earlier versions applied the
+manual files without being asked, so the same call can give different
+results before and after.
+
+## 4. What to look for in the console
+
+Each step prints a heading `=== Step N: ... ===`. After a run:
+
+- The last heading tells you how far it got. If the run stops, the error
+  is printed after the last heading.
+- Step 5 should print `14. Saving review CSV files with [NEW] prefix...`
+  and a line `verified on disk` for each of the two worksheets.
+- With manual corrections on you should see
+  `Manual corrections INCLUDED`; with them off, a banner
+  `MANUAL CORRECTIONS NOT INCLUDED`.
+- Near the end, `[review status]` counts the rows of the error worksheet
+  in each status.
+
+## 5. Where the results are
+
+Working files for the review go to the **project folder** (not
+`output/`); results go to `output/`. [Output
+files](https://cyracaid.github.io/sleepdiary-cleaner/articles/output-files.md)
+lists every file, when it is written and what it is. If something is
+missing or an error appears, see
+[Troubleshooting](https://cyracaid.github.io/sleepdiary-cleaner/articles/troubleshooting.md).
+
+To read a finished run in R without opening files:
+
+``` r
+res <- pipeline_results()
+names(res)
+```

@@ -5,13 +5,13 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>列映射、配置与数据格式（中文） • sleepcleanr</title>
+<title>输入数据与配置（中文） • sleepcleanr</title>
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
-<meta property="og:title" content="列映射、配置与数据格式（中文）">
+<meta property="og:title" content="输入数据与配置（中文）">
 <meta name="description" content="如何把 sleepcleanr 适配到自己的数据集：YAML 列映射、阈值配置、时间戳格式、输入数据结构与人工修正 CSV 模板。">
 <meta property="og:description" content="如何把 sleepcleanr 适配到自己的数据集：YAML 列映射、阈值配置、时间戳格式、输入数据结构与人工修正 CSV 模板。">
 </head>
@@ -37,19 +37,25 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><h6 class="dropdown-header" data-toc-skip>English</h6></li>
-    <li><a class="dropdown-item" href="../articles/validation-methodology.html">Validation Methodology</a></li>
-    <li><a class="dropdown-item" href="../articles/pipeline-architecture.html">Pipeline Architecture</a></li>
+    <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started</a></li>
+    <li><a class="dropdown-item" href="../articles/column-mapping.html">Input Data and Configuration</a></li>
     <li><a class="dropdown-item" href="../articles/data-first.html">Data-first entry: clean_sleep_diary()</a></li>
-    <li><a class="dropdown-item" href="../articles/column-mapping.html">Column Mapping, Config &amp; Data Format</a></li>
-    <li><a class="dropdown-item" href="../articles/interpreting-output.html">Interpreting the Pipeline Output</a></li>
+    <li><a class="dropdown-item" href="../articles/interpreting-output.html">Reading the Output and the Review Loop</a></li>
+    <li><a class="dropdown-item" href="../articles/output-files.html">Output files</a></li>
+    <li><a class="dropdown-item" href="../articles/troubleshooting.html">Troubleshooting</a></li>
+    <li><a class="dropdown-item" href="../articles/pipeline-architecture.html">Pipeline Architecture</a></li>
+    <li><a class="dropdown-item" href="../articles/validation-methodology.html">Validation Methodology</a></li>
     <li><a class="dropdown-item" href="../articles/testing-coverage.html">Testing Coverage</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>中文</h6></li>
-    <li><a class="dropdown-item" href="../articles/validation-methodology-zh.html">验证方法学</a></li>
-    <li><a class="dropdown-item" href="../articles/pipeline-architecture-zh.html">管线架构</a></li>
+    <li><a class="dropdown-item" href="../articles/getting-started-zh.html">快速开始</a></li>
+    <li><a class="dropdown-item" href="../articles/column-mapping-zh.html">输入数据与配置</a></li>
     <li><a class="dropdown-item" href="../articles/data-first-zh.html">数据优先入口：clean_sleep_diary()</a></li>
-    <li><a class="dropdown-item" href="../articles/column-mapping-zh.html">列映射、配置与数据格式</a></li>
-    <li><a class="dropdown-item" href="../articles/interpreting-output-zh.html">如何读懂管线输出</a></li>
+    <li><a class="dropdown-item" href="../articles/interpreting-output-zh.html">读懂输出与审核循环</a></li>
+    <li><a class="dropdown-item" href="../articles/output-files-zh.html">输出文件一览</a></li>
+    <li><a class="dropdown-item" href="../articles/troubleshooting-zh.html">排错</a></li>
+    <li><a class="dropdown-item" href="../articles/pipeline-architecture-zh.html">管线架构</a></li>
+    <li><a class="dropdown-item" href="../articles/validation-methodology-zh.html">验证方法学</a></li>
     <li><a class="dropdown-item" href="../articles/testing-coverage-zh.html">测试覆盖率</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">All articles / 全部文章</a></li>
@@ -83,7 +89,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>列映射、配置与数据格式（中文）</h1>
+      <h1>输入数据与配置（中文）</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/vignettes/column-mapping-zh.Rmd" class="external-link"><code>vignettes/column-mapping-zh.Rmd</code></a></small>
