@@ -1176,9 +1176,9 @@ process_manual_unusual_correction <- function(data, correction,
     
     operations_applied <- TRUE
     cat(sprintf("  [OK] Undo correction: pid=%s, day=%d\n", pid, day_num))
-    
-    if (operations_applied) data$manually_corrected[row_idx] <- TRUE
-    return(data)
+    # No return here: the row's other instructions (column/value pairs,
+    # swaps) are applied next, on top of the restored raw times -- the
+    # same as process_case2_correction() does.
   }
   
   # Step 2: Process column_to_adjust and correction_value
@@ -1283,9 +1283,9 @@ process_case3_correction <- function(data, correction,
     
     operations_applied <- TRUE
     cat(sprintf("  [OK] Undo correction: pid=%s, day=%d\n", pid, day_num))
-    
-    if (operations_applied) data$manually_corrected[row_idx] <- TRUE
-    return(data)
+    # No return here: the row's other instructions (column/value pairs,
+    # swaps) are applied next, on top of the restored raw times -- the
+    # same as process_case2_correction() does.
   }
   
   # Step 2: Process column_to_correct and correct_value

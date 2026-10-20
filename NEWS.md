@@ -46,6 +46,15 @@
   final status, so the lines add up to the total. Before, a manually fixed row was counted
   both as `CLEAN` and as `CLEAN (Manually Fixed)`.
 * `flag_distribution.csv` has a new column `data_category_after_corrections`.
+* A manual correction row whose `solution_humanidentified` says "Undo correction" and
+  that also has column/value instructions (`column_to_correct` / `correct_value`,
+  `column_to_correct_2` / `correct_value_2`, or `column_to_adjust` / `correction_value` in
+  the unusual file) now gets both: the raw times are restored, then the instructions are
+  applied. Before, the case3 and unusual handlers stopped right after the undo and ignored
+  the rest of the row without saying so (the solution-text handler already did both).
+  **This can change results:** where a manual file repeated an undo row's instruction in a
+  second row for the same day (a workaround for this bug), the instruction is now applied
+  twice. Check days that have more than one row in a manual file.
 * Test data could be tagged `real` and have its figures written under `output/` (the
   real-data area): the tag was guessed from the input file name, and any name without
   synthetic/synth/stub/demo/example counted as real (for example the benchmark's
