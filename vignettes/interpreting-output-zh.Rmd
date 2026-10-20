@@ -277,7 +277,7 @@ Equal-time 记录会得到一个标签，但**永远不会进入审查文件**�
 
 | `review_state` | 规则（按顺序，第一条成立的生效） |
 |---|---|
-| `needs_review` | 修正之后才变成错误；或在人工文件里标为待确认（`flagged_unresolved` / `resolved_by` = `pending`）；或复查仍不通过；或——仅当 `review.step8_flags_need_review: true` 时——带有 Step 8 标记 |
+| `needs_review` | 修正之后才变成错误；或在人工文件里标为待确认（`flagged_unresolved` / `resolved_by` = `pending`）；或复查仍不通过；或修正后仍缺某个时间、无法复查顺序（若它在人工文件里且 `review.missing_times_ok_after_manual: true`，则算 `incorporated`）；或——仅当 `review.step8_flags_need_review: true` 时——带有 Step 8 标记 |
 | `incorporated` | 本次运行应用了针对它的人工决定，且复查通过 |
 | `not_incorporated` | 本次运行没有人工决定改动它，且复查通过（规则修好了它，或本次没有应用人工修正） |
 

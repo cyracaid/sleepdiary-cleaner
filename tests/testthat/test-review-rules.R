@@ -122,3 +122,23 @@ test_that("the run log gets one line per run in one file and compares runs", {
   expect_output(sleepcleanr:::append_review_run_log(cfg, "status.csv", v, TRUE),
                 "WARNING: same inputs gave a different")
 })
+
+test_that("a missing time after corrections follows review.missing_times_ok_after_manual", {
+  err <- mk_ws(1:3, in_file = c("m.csv", "", "m.csv"), res = c("corrected", "", "flagged_unresolved"),
+               by = c("", "", "pending"))
+  final <- final_of(1:3, c("skipped_na", "skipped_na", "skipped_na"))
+  off <- sleepcleanr:::build_unified_review_status(list(error = err), final, applied = TRUE)
+  st <- setNames(off$review_state, off$row_id)
+  expect_equal(unname(st[c("1", "2", "3")]), rep("needs_review", 3))
+  expect_match(off$review_state_reason[off$row_id == 1], "cannot be re-checked")
+  on <- sleepcleanr:::build_unified_review_status(list(error = err), final, applied = TRUE,
+    rules = review_rules(list(review = list(missing_times_ok_after_manual = TRUE))))
+  st <- setNames(on$review_state, on$row_id)
+  # handled -> incorporated; not handled or pending -> still needs review
+  expect_equal(unname(st[c("1", "2", "3")]), c("incorporated", "needs_review", "needs_review"))
+  expect_match(on$review_state_reason[on$row_id == 1], "missing_times_ok_after_manual: true")
+  # nothing is incorporated when manual corrections were not applied
+  none <- sleepcleanr:::build_unified_review_status(list(error = err), final, applied = FALSE,
+    rules = review_rules(list(review = list(missing_times_ok_after_manual = TRUE))))
+  expect_false(any(none$review_state == "incorporated"))
+})

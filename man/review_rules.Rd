@@ -11,6 +11,7 @@ review_rules(cfg = NULL)
 }
 \value{
 A list with `max_needs_review`, `step8_flags_need_review`,
+  `missing_times_ok_after_manual`,
   `fail_if_not_done`, `suggestions` and `suggestion_default`.
 }
 \description{

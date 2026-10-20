@@ -925,6 +925,10 @@ cat(sprintf("  Part D: checkforerrors_df created with %d rows\n", nrow(checkfore
 #                            (data_category) pass
 #   STILL FAILS (Manually Corrected) — manually corrected, Step 8 checks pass,
 #                            but the corrected times still fail the re-check
+#   NOT CHECKABLE (Manually Corrected) — manually corrected, but a time is
+#                            missing, so the order cannot be re-checked (counts
+#                            as CLEAN (Manually Fixed) when
+#                            review.missing_times_ok_after_manual is true)
 #   A manually corrected row with a Step 8 flag keeps that flag.
 #
 # OUTPUT: review_summary data.frame with one row per original data row,
@@ -1032,7 +1036,8 @@ review_summary$data_category_after_corrections <-
     as.character(data_with_flags_local$data_category) else NA_character_
 final_status <- step8_final_status(
   raw_category, review_summary$manually_corrected,
-  if ("data_category" %in% names(data_with_flags_local)) data_with_flags_local$data_category else NULL)
+  if ("data_category" %in% names(data_with_flags_local)) data_with_flags_local$data_category else NULL,
+  missing_ok = review_rules(pipeline_config)$missing_times_ok_after_manual)
 
 review_summary$raw_category <- raw_category
 review_summary$final_status <- final_status
@@ -1068,6 +1073,7 @@ review_count <- status_counts[["SELF-REPORTED FLAG"]]
 clean_count <- status_counts[["CLEAN"]]
 fixed_count <- status_counts[["CLEAN (Manually Fixed)"]]
 still_fails_count <- status_counts[["STILL FAILS (Manually Corrected)"]]
+not_checkable_count <- status_counts[["NOT CHECKABLE (Manually Corrected)"]]
 
 cat("\n")
 cat(paste(rep("=", 60), collapse = ""))
@@ -1080,6 +1086,7 @@ cat(sprintf("\n  SELF-REPORTED FLAG (SOL/WASO diary anomalies): %d", review_coun
 cat(sprintf("\n  CLEAN           (no issues):         %d", clean_count))
 cat(sprintf("\n  CLEAN (Manually Fixed):              %d", fixed_count))
 cat(sprintf("\n  STILL FAILS (Manually Corrected):    %d", still_fails_count))
+cat(sprintf("\n  NOT CHECKABLE (Manually Corrected):  %d", not_checkable_count))
 cat(sprintf("\n  ─────────────────────────────────────────"))
 cat(sprintf("\n  TOTAL:                                %d", nrow(review_summary)))
 

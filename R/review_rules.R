@@ -10,6 +10,7 @@
 .review_defaults <- list(
   done_when = list(max_needs_review = 0),
   step8_flags_need_review = FALSE,
+  missing_times_ok_after_manual = FALSE,
   fail_if_not_done = FALSE,
   suggestions = list(
     list(
@@ -40,6 +41,7 @@
 #'
 #' @param cfg A configuration list from [load_config()], or NULL for the defaults.
 #' @return A list with `max_needs_review`, `step8_flags_need_review`,
+#'   `missing_times_ok_after_manual`,
 #'   `fail_if_not_done`, `suggestions` and `suggestion_default`.
 #' @export
 review_rules <- function(cfg = NULL) {
@@ -52,6 +54,7 @@ review_rules <- function(cfg = NULL) {
   out <- list(
     max_needs_review = as.numeric(max_nr),
     step8_flags_need_review = isTRUE(r$step8_flags_need_review %||% d$step8_flags_need_review),
+    missing_times_ok_after_manual = isTRUE(r$missing_times_ok_after_manual %||% d$missing_times_ok_after_manual),
     fail_if_not_done = isTRUE(r$fail_if_not_done %||% d$fail_if_not_done),
     # An explicit empty list in the config means "no suggestions": keep it.
     suggestions = if ("suggestions" %in% names(r)) (r$suggestions %||% list()) else d$suggestions,
@@ -158,8 +161,9 @@ suggest_review_labels <- function(df, rules = review_rules(NULL)) {
 #' \describe{
 #'   \item{needs_review}{a person still has to look: the record fails the re-check
 #'     after corrections, became an error after corrections, is marked pending in
-#'     the manual file, or (only if `review.step8_flags_need_review` is true) has
-#'     a Step 8 flag;}
+#'     the manual file, has a time missing after corrections (unless it is in a
+#'     manual file and `review.missing_times_ok_after_manual` is true), or (only
+#'     if `review.step8_flags_need_review` is true) has a Step 8 flag;}
 #'   \item{incorporated}{a manual decision for the record was applied in this run
 #'     and the record passes the re-check;}
 #'   \item{not_incorporated}{no manual decision changed the record in this run and
@@ -235,6 +239,17 @@ build_unified_review_status <- function(ws_list, final, flags = NULL,
   }
   set(st == "new_after_corrections", "needs_review", "error after corrections; not on the Step 5 lists")
   set(pending, "needs_review", "marked pending (flagged_unresolved) in the manual file")
+  # A time missing after corrections (data_category skipped_na) means the order
+  # cannot be re-checked. Whether a handled row like that counts as done is the
+  # user's rule: review.missing_times_ok_after_manual.
+  missing <- out$category_after_corrections %in% "skipped_na"
+  set(missing & handled & applied & rules$missing_times_ok_after_manual, "incorporated",
+      paste("manual decision applied; a time is missing after corrections, so the order",
+            "cannot be re-checked (review.missing_times_ok_after_manual: true)"))
+  set(missing & handled, "needs_review",
+      "in a manual file, but a time is missing after corrections, so the order cannot be re-checked")
+  set(missing, "needs_review",
+      "not in a manual file, and a time is missing, so the order cannot be re-checked")
   set(fails & handled, "needs_review", "in a manual file but still fails the re-check")
   set(fails, "needs_review", "not in a manual file and still fails the re-check")
   set(rules$step8_flags_need_review & nzchar(step8), "needs_review",

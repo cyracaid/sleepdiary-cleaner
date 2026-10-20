@@ -23,5 +23,18 @@ test_that("the status counts put every row in one category and add up to the tot
   expect_equal(cnt$Count[cnt$Category == "SELF-REPORTED FLAG"], 1L)
   expect_equal(cnt$Count[cnt$Category == "STILL FAILS (Manually Corrected)"], 1L)
   expect_equal(cnt$Category, c("TIMESTAMP_ISSUE", "DURATION_ISSUE", "AMOUNT_FLAG",
-    "SELF-REPORTED FLAG", "CLEAN", "CLEAN (Manually Fixed)", "STILL FAILS (Manually Corrected)"))
+    "SELF-REPORTED FLAG", "CLEAN", "CLEAN (Manually Fixed)", "STILL FAILS (Manually Corrected)",
+    "NOT CHECKABLE (Manually Corrected)"))
+})
+
+test_that("a manually corrected row with a missing time is not checkable, or fixed by the user's rule", {
+  raw <- c("CLEAN", "CLEAN", "CLEAN", "DURATION_ISSUE")
+  manual <- c(TRUE, TRUE, FALSE, TRUE)
+  cat <- c("skipped_na", "error", "skipped_na", "skipped_na")
+  expect_equal(sleepcleanr:::step8_final_status(raw, manual, cat),
+               c("NOT CHECKABLE (Manually Corrected)", "STILL FAILS (Manually Corrected)",
+                 "CLEAN", "DURATION_ISSUE"))
+  expect_equal(sleepcleanr:::step8_final_status(raw, manual, cat, missing_ok = TRUE),
+               c("CLEAN (Manually Fixed)", "STILL FAILS (Manually Corrected)",
+                 "CLEAN", "DURATION_ISSUE"))
 })

@@ -290,6 +290,7 @@ classification:
     clean: "CLEAN"
     clean_manually_fixed: "CLEAN (Manually Fixed)"
     still_fails_manually_corrected: "STILL FAILS (Manually Corrected)"
+    not_checkable_manually_corrected: "NOT CHECKABLE (Manually Corrected)"
 
 # =============================================================================
 # OUTPUT SETTINGS
@@ -351,6 +352,10 @@ review:
   # true: a record that passes the re-check but carries a Step 8 flag is
   # needs_review. false: the flag is reported in its own column only.
   step8_flags_need_review: false
+  # true: a record that is in a manual file but still has a time missing after
+  # corrections (bed / sleep / wake / get-up left blank, so the order cannot be
+  # re-checked) counts as incorporated. false: it stays needs_review.
+  missing_times_ok_after_manual: false
   # true: stop the run with an error (after every output is written) when the
   # review is NOT DONE. Use this to make "done" a hard end point, e.g. in CI.
   fail_if_not_done: false

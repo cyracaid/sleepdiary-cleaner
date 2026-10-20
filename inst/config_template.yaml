@@ -157,4 +157,5 @@ data:
 #   done_when:
 #     max_needs_review: 0
 #   step8_flags_need_review: false
+#   missing_times_ok_after_manual: false
 #   fail_if_not_done: false

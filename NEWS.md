@@ -46,6 +46,13 @@
   final status, so the lines add up to the total. Before, a manually fixed row was counted
   both as `CLEAN` and as `CLEAN (Manually Fixed)`.
 * `flag_distribution.csv` has a new column `data_category_after_corrections`.
+* A manually corrected row with a time still missing after the corrections (for example a
+  bed time the participant never entered) was reported by Step 8 as `STILL FAILS`, although
+  its order cannot be checked at all. It is now `NOT CHECKABLE (Manually Corrected)`, and in
+  `review_status.csv` it is `needs_review` with the reason "a time is missing ... cannot be
+  re-checked". New rule `review.missing_times_ok_after_manual` (default `false`): when `true`,
+  such a row that is in a manual file counts as `incorporated` (Step 8: `CLEAN (Manually
+  Fixed)`).
 * A manual correction row whose `solution_humanidentified` says "Undo correction" and
   that also has column/value instructions (`column_to_correct` / `correct_value`,
   `column_to_correct_2` / `correct_value_2`, or `column_to_adjust` / `correction_value` in
