@@ -18,7 +18,7 @@
 | 9 | Generate diagnostic figures | 32 figures (16 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt |
 | 10 | Build delivered datasets | finalize_columns() selects/renames to Dataset A/B per column dictionary |
 
-**Delivered columns (36, from column dictionary):**
+**Delivered columns (35, from column dictionary):**
 - `pid`
 - `day_num`
 - `row_id`
@@ -46,10 +46,9 @@
 - `error_type`
 - `is_unusual`
 - `unusual_type`
-- `is_reasonable_unusual`
 - `record_status`
 - `flag_severity`
-- `needs_review`
+- `human_review`
 - `caffeine_num`
 - `alcohol_num`
 - `nicotine_doses`

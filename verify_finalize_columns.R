@@ -139,6 +139,9 @@ mk <- function(spec) {
 
 d   <- mk(impl[impl$source_object == "corrected_ema_data", ])
 rev <- mk(impl[impl$source_object == "review_output", ])
+# human_review is derived from Step 8's needs_review_flag, so review_data is
+# always needed even though that column is no longer delivered by name.
+if (is.null(rev)) rev <- data.frame(needs_review_flag = rep(FALSE, n))
 
 res <- tryCatch(
   finalize_columns(d, review_data = rev, dict_path = dict_path,

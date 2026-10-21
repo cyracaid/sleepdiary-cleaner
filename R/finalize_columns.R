@@ -117,6 +117,34 @@ finalize_columns <- function(data,
     data$record_status <- unname(.RECORD_STATUS_MAP[dc])
   }
 
+  # ---- 2c. Derive human_review ------------------------------------------------
+  # One column that answers "did a person look at this row, and what came of it".
+  # It reports what the review files say; it is not a judgement.
+  #   waiting   : still flagged for a person (Step 8 needs_review_flag) and not
+  #               already accepted by one
+  #   corrected : a manual correction was applied
+  #   accepted  : a person looked and kept it as it is (a "Reasonable unusual
+  #               record", or a metric warning marked confirmed-not-error)
+  #   none      : nobody had to look, or nobody has yet
+  # When several apply the first listed wins. A person's explicit acceptance
+  # is not turned back into "waiting" by an automatic flag.
+  if (is.null(review_data) && "human_review" %in% implemented$source_column) {
+    stop("human_review needs Step 8's needs_review_flag, which lives in ",
+         "review_output$data_with_flags, not in corrected_ema_data.\nPass it with: ",
+         "finalize_columns(data, review_data = review_output$data_with_flags)", call. = FALSE)
+  }
+  if (!"human_review" %in% names(data)) {
+    .col <- function(src, cn) if (!is.null(src) && cn %in% names(src)) src[[cn]] else rep(NA, nrow(data))
+    accepted  <- as.character(.col(data, "data_category")) %in% "reasonable_unusual" |
+      as.character(.col(data, "human_metric_review_status")) %in% "confirmed_not_error_do_not_correct" |
+      as.character(.col(review_data, "human_metric_review_status")) %in% "confirmed_not_error_do_not_correct"
+    waiting   <- (.col(review_data, "needs_review_flag") %in% TRUE) & !accepted
+    corrected <- .col(data, "manually_corrected") %in% TRUE
+    data$human_review <- ifelse(waiting, "waiting",
+                         ifelse(corrected, "corrected",
+                         ifelse(accepted, "accepted", "none")))
+  }
+
   .resolve <- function(i) {
     cn  <- implemented$source_column[i]
     obj <- implemented$source_object[i]

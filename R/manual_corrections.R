@@ -821,6 +821,30 @@ recalculate_and_mark_errors <- function(data,
 # ============================================
 
 # Create classified dataframes and exclude Reasonable unusual records
+# Mark the records a reviewer judged "Reasonable unusual record" in the manual
+# unusual file: they are accepted as they are. The mark has to be made on the
+# data that continues through the pipeline, not on a copy used to build the
+# classified tables, or it never reaches the delivered datasets.
+mark_reasonable_unusual <- function(data, manual_unusual_df) {
+  if (is.null(manual_unusual_df) || nrow(manual_unusual_df) == 0) return(data)
+  rec <- manual_unusual_df %>%
+    filter(!is.na(problem_humanidentified) &
+             str_detect(tolower(problem_humanidentified), "reasonable unusual record")) %>%
+    select(pid, row_id) %>%
+    distinct()
+  if (nrow(rec) == 0) return(data)
+  if (!"is_reasonable_unusual" %in% names(data)) data$is_reasonable_unusual <- FALSE
+  for (i in seq_len(nrow(rec))) {
+    target_idx <- which(data$pid == rec$pid[i] & data$row_id == rec$row_id[i])
+    if (length(target_idx) > 0) {
+      data$is_reasonable_unusual[target_idx] <- TRUE
+      data$data_category[target_idx] <- "reasonable_unusual"
+      data$is_unusual[target_idx] <- FALSE
+    }
+  }
+  data
+}
+
 create_classified_dataframes <- function(data, 
                                          bed_am_col, sleep_am_col,
                                          awake_am_col, getup_am_col,
@@ -852,20 +876,7 @@ create_classified_dataframes <- function(data,
       cat(sprintf("\n  Found %d Reasonable unusual records from manual_unusual_review.csv\n", 
                   nrow(reasonable_unusual_records)))
       
-      if (!"is_reasonable_unusual" %in% names(data)) {
-        data$is_reasonable_unusual <- FALSE
-      }
-      
-      for (i in seq_len(nrow(reasonable_unusual_records))) {
-        rec <- reasonable_unusual_records[i, ]
-        target_idx <- which(data$pid == rec$pid & data$row_id == rec$row_id)
-        
-        if (length(target_idx) > 0) {
-          data$is_reasonable_unusual[target_idx] <- TRUE
-          data$data_category[target_idx] <- "reasonable_unusual"
-          data$is_unusual[target_idx] <- FALSE
-        }
-      }
+      data <- mark_reasonable_unusual(data, manual_unusual_df)
     }
   }
   
@@ -1329,6 +1340,7 @@ apply_manual_corrections_and_recalculate <- function(ema_data, corrections_df, m
   cat("\n9. Creating classified dataframes...\n")
   
   ema_data <- ensure_marking_columns(ema_data)
+  ema_data <- mark_reasonable_unusual(ema_data, manual_unusual_df)
   
   results <- create_classified_dataframes(ema_data,
                                           time_bed_am_col, time_sleep_am_col,
