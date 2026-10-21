@@ -1,4 +1,4 @@
-# sleepcleanr (development version)
+# sleepcleanr 1.5.3
 
 ## Changed: the user defines the rules, the pipeline applies and reports them
 * The rules that decide which records go to human review were written into the code in
@@ -76,7 +76,7 @@
   `include_manual_corrections` is an argument, not a YAML setting, and that its
   default changed in 1.4.7.
 
-# sleepcleanr (development version)
+# sleepcleanr 1.5.1 (continued)
 
 ## New
 * `cleaning_report()`: a short factual description of the last run (entries and
