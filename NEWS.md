@@ -1,4 +1,8 @@
-# sleepcleanr (development version)
+# sleepcleanr 1.6.0
+
+Delivered data change in this release: Dataset A has 35 columns (one new, `human_review`, in place of
+`needs_review` and `is_reasonable_unusual`), and records a reviewer marked "Reasonable unusual record" now have
+`record_status` = `reasonable_unusual`. Update any analysis or text that used the old columns or counts.
 
 ## Changed: the delivered data say whether a person looked
 * Records a reviewer marked "Reasonable unusual record" are now marked in the data that continue through
