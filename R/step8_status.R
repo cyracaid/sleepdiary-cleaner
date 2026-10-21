@@ -26,14 +26,16 @@
 #'   NULL when not available, in which case only raw_category is used.
 #' @param missing_ok review.missing_times_ok_after_manual: does a manually corrected
 #'   row with a missing time (skipped_na) count as fixed?
+#' @param clean_categories review.clean_categories: the final categories that pass.
 #' @return Character vector, one status per row.
 #' @noRd
 step8_final_status <- function(raw_category, manually_corrected, data_category = NULL,
-                               missing_ok = FALSE) {
+                               missing_ok = FALSE,
+                               clean_categories = .sc_clean_categories_default) {
   raw_category <- as.character(raw_category)
   manual <- manually_corrected %in% TRUE
   passes <- if (is.null(data_category)) rep(TRUE, length(raw_category)) else
-    !is.na(data_category) & as.character(data_category) %in% .rp_ok_categories
+    !is.na(data_category) & as.character(data_category) %in% clean_categories
   out <- raw_category
   clean <- manual & raw_category %in% "CLEAN"
   missing <- if (is.null(data_category)) rep(FALSE, length(raw_category)) else

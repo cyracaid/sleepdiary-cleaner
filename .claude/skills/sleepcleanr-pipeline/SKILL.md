@@ -7,7 +7,7 @@ description: Run, review and maintain the sleepcleanr sleep EMA diary cleaning p
 
 <!-- AUTO:SKILL_FACTS_START -->
 
-**Version:** 1.5.2
+**Version:** 1.6.0
 **Pipeline steps:** 10
 
 | Step | Label | Description |
@@ -23,7 +23,7 @@ description: Run, review and maintain the sleepcleanr sleep EMA diary cleaning p
 | 9 | Generate diagnostic figures | 32 figures (16 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt |
 | 10 | Build delivered datasets | finalize_columns() selects/renames to Dataset A/B per column dictionary |
 
-**Delivered columns (36, from column dictionary):**
+**Delivered columns (35, from column dictionary):**
 - `pid`
 - `day_num`
 - `row_id`
@@ -51,10 +51,9 @@ description: Run, review and maintain the sleepcleanr sleep EMA diary cleaning p
 - `error_type`
 - `is_unusual`
 - `unusual_type`
-- `is_reasonable_unusual`
 - `record_status`
 - `flag_severity`
-- `needs_review`
+- `human_review`
 - `caffeine_num`
 - `alcohol_num`
 - `nicotine_doses`
@@ -231,6 +230,9 @@ builds a prevalence report from them.
 |------|----------|
 | `review_status.csv` (project root) | Both worksheets in one table; each row `needs_review` / `not_incorporated` / `incorporated` with its reason. Start here |
 | `output/review_runs.csv` | One line per run: input/config/result hashes, data tag, counts, verdict |
+| `output/effective_rules.csv` | The rules this run used (thresholds, `review.*`), each marked default or your config; also printed at the start of the run |
+| `output/manual_corrections_not_applied.csv` | Manual duration rows the interval parser overruled (`manual_corrections.manual_overrides_parser: false`) |
+| `output/second_review_rows_skipped.csv` | Second-review rows left out because `pid` / `day_num` is not a number |
 | `[NEW]manual_error_correction_review.csv` (project root) | Status table of the Step 5 error list (kept for compatibility; `review_status.csv` supersedes it) |
 | `[NEW]manual_unusual_review.csv` (project root) | Step 5 `unusual` records for a person to fill in |
 | `manual_error_correction_updated.csv` (project root) | The corrections as applied; `manually_corrected` marks the rows really used |

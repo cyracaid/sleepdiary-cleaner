@@ -27,11 +27,12 @@ is_error,corrected_ema_data,,is_error,,none,flag,implemented,Error flag from Ste
 error_type,corrected_ema_data,,error_type,,none,category,implemented,Error category text
 is_unusual,corrected_ema_data,,is_unusual,,none,flag,implemented,Unusual pattern flag
 unusual_type,corrected_ema_data,,unusual_type,,none,category,implemented,Unusual pattern text
-is_reasonable_unusual,corrected_ema_data,FALSE,is_reasonable_unusual,,none,flag,implemented,Human reviewer judged the unusual pattern acceptable
+is_reasonable_unusual,corrected_ema_data,FALSE,,,none,flag,implemented,Human reviewer judged the unusual pattern acceptable (delivered as human_review = accepted and record_status = reasonable_unusual)
 data_category,corrected_ema_data,,,,none,category,implemented,Step 5 temporal-check outcome and the SOURCE record_status is derived from (see .RECORD_STATUS_MAP in finalize_columns.R). Deliberately NOT in Dataset A: shipping two status columns invites analysts to filter on the wrong one. Kept in the dictionary so the reverse gap check does not flag it. Use record_status.
 record_status,corrected_ema_data,,record_status,,none,category,implemented,Analysis-facing status: clean / error / unusual / reasonable_unusual / equal_time / not_reported. DERIVED from data_category in finalize_columns() -- see .RECORD_STATUS_MAP. Six levels not five: reasonable_unusual records were reviewed and accepted by a human and that judgement is not the same claim as 'unusual'. EXCLUDE record_status=='error' before computing any summary statistic.
 flag_severity,corrected_ema_data,,flag_severity,,none,category,implemented,Clean / Minor issues (1 flag) / Major issues (2+ flags)
-needs_review_flag,review_output,,needs_review,,none,flag,implemented,Still awaiting human review after acceptances are applied
+needs_review_flag,review_output,,,,none,flag,implemented,Still awaiting human review after acceptances are applied (delivered as human_review = waiting)
+human_review,corrected_ema_data,,human_review,,none,category,implemented,"Did a person look at this row and what came of it: none / corrected / accepted / waiting (derived in finalize_columns; first that applies of: waiting = still flagged and not already accepted, corrected, accepted, none)"
 caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1,corrected_ema_data,,caffeine_num,,none,count,implemented,Caffeinated drinks or snacks
 alcoholtoday_PM_NumAlcoholicDrinks_1,corrected_ema_data,,alcohol_num,,none,count,implemented,Alcoholic drinks
 nicotine_amount_pm_doses,corrected_ema_data,,nicotine_doses,,none,count,implemented,Nicotine doses

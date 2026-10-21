@@ -1037,7 +1037,8 @@ review_summary$data_category_after_corrections <-
 final_status <- step8_final_status(
   raw_category, review_summary$manually_corrected,
   if ("data_category" %in% names(data_with_flags_local)) data_with_flags_local$data_category else NULL,
-  missing_ok = review_rules(pipeline_config)$missing_times_ok_after_manual)
+  missing_ok = review_rules(pipeline_config)$missing_times_ok_after_manual,
+  clean_categories = review_rules(pipeline_config)$clean_categories)
 
 review_summary$raw_category <- raw_category
 review_summary$final_status <- final_status

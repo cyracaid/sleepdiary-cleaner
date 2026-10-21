@@ -117,8 +117,6 @@ The outcome is not "the pipeline makes a mess clean" — it makes the mess **exp
 | adjacent-swap threshold | 3 h | Tuned on the development sample; see VALIDATION_REPORT |
 | `metric_validation.sol.excessive_minutes` | 120 | Gross-outlier catch, not a clinical marker |
 | `metric_validation.se.min_valid_percent` / `max_valid_percent` | 0 / 100 | Structural impossibility → always flag |
-| `interval.mmss_threshold_minutes` | 60 | Heuristic for ambiguous `MM:SS` vs `HH:MM` |
-| `timestamp.midnight_threshold_hour` | 6 | Times < 6 AM assigned to the next day |
 
 Full rationale and change guidance: [THRESHOLDS.md](THRESHOLDS.md).
 
@@ -196,7 +194,7 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995
 
 ## Status and data availability
 
-**Status.** sleepcleanr 1.5.2 is research software under active development. It
+**Status.** sleepcleanr 1.6.0 is research software under active development. It
 was built for one longitudinal sleep study, has not yet been peer reviewed, and
 is not on CRAN. Treat the shipped thresholds as references to check against your
 own data.
@@ -292,12 +290,16 @@ guidelines are in [`CONTRIBUTING.md`](CONTRIBUTING.md).
   <https://cyracaid.github.io/sleepdiary-cleaner/>
 - **Validation Report** (evidence package, machine-read from result CSVs):
   [`VALIDATION_REPORT.md`](VALIDATION_REPORT.md)
+- vignette("getting-started") — install, first run, the two modes (`include_manual_corrections`)
+- vignette("column-mapping") — input data and configuration: mapping your dataset via YAML
+- vignette("data-first") — `clean_sleep_diary()`: no-config entry, column auto-guess, run manifest
+- vignette("interpreting-output") — reading the output and the review loop (`correction_status_final.csv`, the review status table, figures)
+- vignette("output-files") — every file a run writes: where it goes, which step writes it, what it is
+- vignette("troubleshooting") — symptom, cause and fix for the problems seen most often
+- [`THRESHOLDS.md`](THRESHOLDS.md) — every detection threshold with its default and rationale, and how to set your own (also on the docs site under "Thresholds")
 - vignette("pipeline-architecture") — structure, rule families, classification
-- vignette("column-mapping") — mapping your dataset via YAML
-- vignette("interpreting-output") — reading `correction_status_final.csv` and `step_flag_ledger.csv`
 - vignette("validation-methodology") — how the rules were validated (synthetic + real data)
 - vignette("testing-coverage") — test suite coverage
-- vignette("data-first") — `clean_sleep_diary()`: no-config entry, column auto-guess, run manifest
 - Changelog: <https://github.com/cyracaid/sleepdiary-cleaner/releases>
 
 ## For developers / AI assistants
@@ -416,7 +418,7 @@ sleepcleanr 刻意**既非全自动、也非全部人工 flag**：
 
 ## 状态与数据可用性
 
-**状态。** sleepcleanr 1.5.2 是仍在开发中的研究软件，为一项纵向睡眠研究而写，尚未经同行评审，也未上线 CRAN。随包给出的阈值只是参考，请用你自己的数据核对。
+**状态。** sleepcleanr 1.6.0 是仍在开发中的研究软件，为一项纵向睡眠研究而写，尚未经同行评审，也未上线 CRAN。随包给出的阈值只是参考，请用你自己的数据核对。
 
 **数据可用性。** 研究数据不公开（参与者隐私）。不需要这些数据也能用到的东西：
 
@@ -480,9 +482,14 @@ Bug、问题和功能建议：请开 [issue](https://github.com/cyracaid/sleepdi
   <https://cyracaid.github.io/sleepdiary-cleaner/>
 - **验证报告**（证据包，数字从结果 CSV 机器读取）：
   [`VALIDATION_REPORT.md`](VALIDATION_REPORT.md)
+- vignette("getting-started-zh") — 安装、第一次运行、两种模式（`include_manual_corrections`）
+- vignette("column-mapping-zh") — 输入数据与配置：用 YAML 映射你的数据集
+- vignette("data-first-zh") — `clean_sleep_diary()`：免配置入口、列名自动推断、运行清单
+- vignette("interpreting-output-zh") — 读懂输出与审核循环（`correction_status_final.csv`、审核状态表、图）
+- vignette("output-files-zh") — 一次运行写出的每个文件：放哪里、哪一步写出、是什么
+- vignette("troubleshooting-zh") — 最常见问题的现象、原因和处理办法
+- [`THRESHOLDS.md`](THRESHOLDS.md) — 每个检测阈值的默认值与依据，以及如何设置你自己的（文档站点"Thresholds"页也有）
 - vignette("pipeline-architecture-zh") — 结构、规则族、分类体系
-- vignette("column-mapping-zh") — 用 YAML 映射你的数据集
-- vignette("interpreting-output-zh") — 读 `correction_status_final.csv` 和 `step_flag_ledger.csv`
 - vignette("validation-methodology-zh") — 规则如何验证（合成 + 真实数据）
 - vignette("testing-coverage-zh") — 测试覆盖
 - 更新日志：<https://github.com/cyracaid/sleepdiary-cleaner/releases>

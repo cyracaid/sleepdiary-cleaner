@@ -168,7 +168,6 @@ timestamp:
   # "next_day": timestamps < 6:00 AM are considered next day
   # "as_is": no adjustment
   midnight_handling: "next_day"
-  midnight_threshold_hour: 6
 
   # Sequence validation
   # Expected order: bed -> sleep -> awake -> getup
@@ -178,10 +177,82 @@ timestamp:
 
   # Interval format detection
   interval:
-    mmss_threshold_minutes: 60  # values > this and with ":" -> assume MM:SS not HH:MM
     max_plausible_minutes: 10000
     max_nap_minutes: 720       # 12 hours
     max_exercise_minutes: 360  # 6 hours
+
+# =============================================================================
+# REVIEW RULES (user-defined)
+# =============================================================================
+# These rules, and only these, decide what the review status table and the
+# review verdict say. The pipeline applies them; it never changes them.
+#
+# Every row of review_status.csv gets one review_state:
+#   needs_review      a person still has to look (fails the re-check after
+#                     corrections, became an error after corrections, marked
+#                     pending in the manual file, or a Step 8 flag when
+#                     step8_flags_need_review is true)
+#   incorporated      a manual decision was applied and the record passes
+#   not_incorporated  no manual decision changed the record and it passes
+review:
+  # Final data_category values that mean "no longer needs a person". The review
+  # status table reports a row as "now passes" when its final category is in
+  # this list. You define it; the pipeline only applies it.
+  clean_categories: ["clean", "equal_time_ok", "reasonable_unusual"]
+  done_when:
+    # The review is DONE when at most this many rows are needs_review.
+    max_needs_review: 0
+  # true: a record that passes the re-check but carries a Step 8 flag is
+  # needs_review. false: the flag is reported in its own column only.
+  step8_flags_need_review: false
+  # true: a record that is in a manual file but still has a time missing after
+  # corrections (bed / sleep / wake / get-up left blank, so the order cannot be
+  # re-checked) counts as incorporated. false: it stays needs_review.
+  missing_times_ok_after_manual: false
+  # true: stop the run with an error (after every output is written) when the
+  # review is NOT DONE. Use this to make "done" a hard end point, e.g. in CI.
+  fail_if_not_done: false
+  # Suggested labels for metric flags (inst/scripts/generate_ai_review_csvs.R).
+  # First matching rule wins. "<column>_matches" is a regular expression; any
+  # other key lists the allowed values of that column. A suggestion is never a
+  # decision: a row stays open until a person fills in human_decision.
+  # "suggestions: []" turns suggestions off (every row gets suggestion_default).
+  suggestions:
+    - label: "likely_real_issue"
+      when:
+        auto_error_desc_matches: "SE:negative|TST/TIB:exceeds_1|SOL:negative"
+      reason: "Mathematically impossible sleep metric (negative SE, TST/TIB > 1, or negative SOL); likely needs timestamp or WASO/TST review."
+    - label: "likely_false_positive"
+      when:
+        sol_category: ["excessive"]
+        se_category: ["valid"]
+        tst_tib_ratio_category: ["normal", "normal_low"]
+      reason: "SOL exceeds 120 min, but other sleep metrics are internally plausible; likely real long sleep latency rather than input error."
+  suggestion_default:
+    label: "needs_human"
+    reason: "Metric flag needs human review because the values are unusual but not automatically classifiable from available fields."
+
+# =============================================================================
+# SECOND REVIEW
+# =============================================================================
+second_review:
+  # A second-review row needs a numeric pid and day_num to identify a record. If
+  # a row does not have them (for example free text ended up in those columns):
+  #   skip : leave the row out, list it on the console and in
+  #          output/second_review_rows_skipped.csv, and carry on
+  #   stop : stop the run with the line numbers so the file can be corrected
+  on_invalid_rows: skip
+
+# =============================================================================
+# MANUAL CORRECTIONS
+# =============================================================================
+manual_corrections:
+  # When a manual sleep-metric-duration row and the interval parser disagree
+  # (the parser already converted an MM:SS value), which one is used?
+  #   false : the parser (long-standing behaviour); the manual row is listed in
+  #           output/manual_corrections_not_applied.csv
+  #   true  : the manual row
+  manual_overrides_parser: false
 
 # =============================================================================
 # NORMALIZE SETTINGS
@@ -241,14 +312,19 @@ cross_participant:
 # CLASSIFICATION THRESHOLDS
 # =============================================================================
 classification:
-  # Temporal order thresholds (for error/unusual detection)
-  temporal:
-    min_sleep_duration_minutes: 120        # 2h -- below this is flagged
-    max_sleep_duration_minutes: 780        # 13h -- above this is flagged
-    min_time_in_bed_minutes: 120
-    max_time_in_bed_minutes: 960
-    max_sol_minutes: 180                   # SOL above this is unusual
-    max_waso_minutes: 240
+  # Which records go to the human-review worksheets (Step 5), and the same rules
+  # when the data are rechecked after manual corrections (Step 6). All values are
+  # hours. Defaults are the long-standing rules; change them to fit your study.
+  step5:
+    error:                                  # a record matching any of these is an ERROR
+      bed_to_sleep_max_hours: 7             # |sleep - bed| above this
+      awake_to_getup_max_hours: 7           # |getup - awake| above this
+      sleep_to_awake_max_hours: 24          # |awake - sleep| above this
+    unusual:                                # suspicious but possible: UNUSUAL
+      sleep_to_awake_min_hours: 3           # sleep period below this
+      sleep_to_awake_max_hours: 15          # sleep period above this
+      bed_to_sleep_max_hours: 3             # sleep - bed above this
+      awake_to_getup_max_hours: 3           # getup - awake above this
 
   # Sleep metric validation (Part C auto-detection)
   metric_validation:
@@ -331,53 +407,6 @@ output:
     # every run) and one run log that gets one line per run (never a new file).
     status_file: "review_status.csv"
     run_log: "review_runs.csv"     # written under output.report.dir
-
-# =============================================================================
-# REVIEW RULES (user-defined)
-# =============================================================================
-# These rules, and only these, decide what the review status table and the
-# review verdict say. The pipeline applies them; it never changes them.
-#
-# Every row of review_status.csv gets one review_state:
-#   needs_review      a person still has to look (fails the re-check after
-#                     corrections, became an error after corrections, marked
-#                     pending in the manual file, or a Step 8 flag when
-#                     step8_flags_need_review is true)
-#   incorporated      a manual decision was applied and the record passes
-#   not_incorporated  no manual decision changed the record and it passes
-review:
-  done_when:
-    # The review is DONE when at most this many rows are needs_review.
-    max_needs_review: 0
-  # true: a record that passes the re-check but carries a Step 8 flag is
-  # needs_review. false: the flag is reported in its own column only.
-  step8_flags_need_review: false
-  # true: a record that is in a manual file but still has a time missing after
-  # corrections (bed / sleep / wake / get-up left blank, so the order cannot be
-  # re-checked) counts as incorporated. false: it stays needs_review.
-  missing_times_ok_after_manual: false
-  # true: stop the run with an error (after every output is written) when the
-  # review is NOT DONE. Use this to make "done" a hard end point, e.g. in CI.
-  fail_if_not_done: false
-  # Suggested labels for metric flags (inst/scripts/generate_ai_review_csvs.R).
-  # First matching rule wins. "<column>_matches" is a regular expression; any
-  # other key lists the allowed values of that column. A suggestion is never a
-  # decision: a row stays open until a person fills in human_decision.
-  # "suggestions: []" turns suggestions off (every row gets suggestion_default).
-  suggestions:
-    - label: "likely_real_issue"
-      when:
-        auto_error_desc_matches: "SE:negative|TST/TIB:exceeds_1|SOL:negative"
-      reason: "Mathematically impossible sleep metric (negative SE, TST/TIB > 1, or negative SOL); likely needs timestamp or WASO/TST review."
-    - label: "likely_false_positive"
-      when:
-        sol_category: ["excessive"]
-        se_category: ["valid"]
-        tst_tib_ratio_category: ["normal", "normal_low"]
-      reason: "SOL exceeds 120 min, but other sleep metrics are internally plausible; likely real long sleep latency rather than input error."
-  suggestion_default:
-    label: "needs_human"
-    reason: "Metric flag needs human review because the values are unusual but not automatically classifiable from available fields."
 
 # =============================================================================
 # VISUALIZATION OPTIONS

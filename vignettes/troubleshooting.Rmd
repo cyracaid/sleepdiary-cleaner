@@ -1,0 +1,36 @@
+---
+title: "Troubleshooting"
+description: "Symptom, cause and fix for the problems seen most often."
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Troubleshooting}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+[中文版 →](troubleshooting-zh.html)
+
+Find the line you see, then read across.
+
+| What you see | Cause | What to do |
+|---|---|---|
+| `[NEW]manual_error_correction_review.csv` is missing | (1) You looked in `output/`; the file is in the **project folder**. (2) The run stopped before Step 5. (3) You called `run_setup()`, `run_report()` or `run_visualization()`, which do not run Step 5. (4) An old version is loaded | In the project folder run `list.files(pattern = "NEW", all.files = TRUE)`. Check that the console reached `=== Step 5 ===`. Check `getNamespaceVersion("sleepcleanr")` |
+| Step 5 prints `Files saved` but no `14. Saving review CSV files` line | An old version (1.4.0 or earlier wrote nothing at this point), or an old version still loaded in memory after a reinstall | Close every R session, reinstall, restart R, check `getNamespaceVersion()` |
+| `No corrections file found () — skipping` | The path is empty on purpose: the run is algorithmic-only (`include_manual_corrections = FALSE`, the default). It is not a missing file | Rerun with `include_manual_corrections = TRUE` |
+| Same call, different results before and after an upgrade | The default of `include_manual_corrections` changed in 1.4.7 | Add `include_manual_corrections = TRUE` to reproduce an older full run |
+| `Config file not found: my_study.yaml` | Your working directory is not the project folder, or the file is elsewhere | `getwd()`; `list.files(pattern = "yaml$")`; give the full path, or `setwd()` to the project folder |
+| `Cannot find your data file` | The data path in the YAML is wrong, or the file is not in `project_dir`. Relative paths are relative to `project_dir`. A path written as `paste0(dir, ...)` inside the YAML is plain text, not R code | Use a plain path |
+| `lazy-load database ... is corrupt` | The package was reinstalled while loaded in a running R session | Close all R sessions, reinstall, restart R |
+| `there is no package called 'sleepdiary-cleaner'` | `sleepdiary-cleaner` is the repository name. The package is `sleepcleanr` | `packageVersion("sleepcleanr")` |
+| `there is no package called 'remotes'`, or `The project is out-of-sync -- use renv::status()` | You are running R inside a checkout of this repository, which uses its own `renv` library | `cd ~` first, then `Rscript --vanilla -e '...'` |
+| `Failed to install ... No commit found for the ref v1.x.y` | That tag does not exist | See the releases page for existing tags |
+| `[VERIFY]` lines in Step 5.75 show text instead of ids, for example `pid= not format error ...` | Some rows of `second_review_checklist.csv` have text in the `pid` or `day_num` columns (for example a note that was split across columns when the file was made). The file is valid CSV, but those rows cannot identify a record | The run lists the file line numbers, leaves those rows out and writes them to `output/second_review_rows_skipped.csv`. Correct the rows in the checklist. To make the run stop instead, set `second_review.on_invalid_rows: stop` |
+| `list.files(pattern = "[NEW")` fails, or `"[NEW]*"` finds nothing | `pattern` is a regular expression and `[NEW]` is a character class | Use `pattern = "NEW"` or `"\\[NEW\\]"` |
+| The review file still has the same number of rows after you added corrections | In versions up to 1.5.1 it lists the errors found **before** correction. From 1.5.2 it is a status table: look at `status_after_corrections` | Read `status_after_corrections` |
+| `Parser already converted ... skipped manual override`, or `Correction rows skipped: N` | A manual sleep-metric-duration row was not applied. By default the interval parser wins when it already converted an MM:SS value | Open `output/manual_corrections_not_applied.csv` to see each row and its reason. To let the manual row win, set `manual_corrections.manual_overrides_parser: true` in the config |
+| `remove.packages` says there is no package | It was not installed in that library | Ignore it and install |
+
+If none of these fits, send the console output from the line `=== SPL Sleep Pipeline` to the last
+`=== Step` heading and what follows it, the output of `getNamespaceVersion("sleepcleanr")` and
+`list.files(".", all.files = TRUE)` in the project folder. Remove participant ids first if you share it.

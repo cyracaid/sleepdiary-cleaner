@@ -1425,9 +1425,19 @@ process_case2_correction <- function(data, correction,
 # ============================================
 
 # Recalculate time differences and mark errors/unusual records
+# Standalone use (sourcing this script without the package): the same defaults.
+if (!exists(".sc_step5_thresholds", mode = "function")) {
+  .sc_step5_thresholds <- function(cfg = NULL) {
+    list(bed_sleep_error = 7, awake_getup_error = 7, sleep_awake_error = 24,
+         sleep_awake_min = 3, sleep_awake_max = 15, bed_sleep_unusual = 3,
+         awake_getup_unusual = 3)
+  }
+}
+
 recalculate_and_mark_errors <- function(data, 
                                         bed_corr_col, sleep_corr_col,
                                         awake_corr_col, getup_corr_col) {
+  thr <- .sc_step5_thresholds()
   
   cat("  Recalculating time differences and marking...\n")
   
@@ -1459,9 +1469,9 @@ recalculate_and_mark_errors <- function(data,
                              NA),
       
       reasonable_temporal_order = order_correct,
-      reasonable_sleep_latency = ifelse(!has_na, abs(bed_sleep_diff_h) <= 7, NA),
-      reasonable_time_in_bed_after_waking = ifelse(!has_na, abs(awake_getup_diff_h) <= 7, NA),
-      reasonable_sleep_duration = ifelse(!has_na, abs(sleep_awake_diff_h) <= 24, NA),
+      reasonable_sleep_latency = ifelse(!has_na, abs(bed_sleep_diff_h) <= thr$bed_sleep_error, NA),
+      reasonable_time_in_bed_after_waking = ifelse(!has_na, abs(awake_getup_diff_h) <= thr$awake_getup_error, NA),
+      reasonable_sleep_duration = ifelse(!has_na, abs(sleep_awake_diff_h) <= thr$sleep_awake_error, NA),
       
       bed_sleep_equal = ifelse(!has_na, bed_sleep_diff_h == 0, NA),
       awake_getup_equal = ifelse(!has_na, awake_getup_diff_h == 0, NA),
@@ -1473,9 +1483,9 @@ recalculate_and_mark_errors <- function(data,
         TRUE ~ FALSE
       ),
       
-      sleep_awake_suspicious = ifelse(!has_na, sleep_awake_diff_h < 3 | sleep_awake_diff_h > 15, NA),
-      bed_sleep_suspicious = ifelse(!has_na, bed_sleep_diff_h > 3, NA),
-      awake_getup_suspicious = ifelse(!has_na, awake_getup_diff_h > 3, NA),
+      sleep_awake_suspicious = ifelse(!has_na, sleep_awake_diff_h < thr$sleep_awake_min | sleep_awake_diff_h > thr$sleep_awake_max, NA),
+      bed_sleep_suspicious = ifelse(!has_na, bed_sleep_diff_h > thr$bed_sleep_unusual, NA),
+      awake_getup_suspicious = ifelse(!has_na, awake_getup_diff_h > thr$awake_getup_unusual, NA),
       
       is_unusual = case_when(
         has_na ~ FALSE,
@@ -1526,6 +1536,30 @@ recalculate_and_mark_errors <- function(data,
 # ============================================
 
 # Create classified dataframes and exclude Reasonable unusual records
+# Mark the records a reviewer judged "Reasonable unusual record" in the manual
+# unusual file: they are accepted as they are. The mark has to be made on the
+# data that continues through the pipeline, not on a copy used to build the
+# classified tables, or it never reaches the delivered datasets.
+mark_reasonable_unusual <- function(data, manual_unusual_df) {
+  if (is.null(manual_unusual_df) || nrow(manual_unusual_df) == 0) return(data)
+  rec <- manual_unusual_df %>%
+    filter(!is.na(problem_humanidentified) &
+             str_detect(tolower(problem_humanidentified), "reasonable unusual record")) %>%
+    select(pid, row_id) %>%
+    distinct()
+  if (nrow(rec) == 0) return(data)
+  if (!"is_reasonable_unusual" %in% names(data)) data$is_reasonable_unusual <- FALSE
+  for (i in seq_len(nrow(rec))) {
+    target_idx <- which(data$pid == rec$pid[i] & data$row_id == rec$row_id[i])
+    if (length(target_idx) > 0) {
+      data$is_reasonable_unusual[target_idx] <- TRUE
+      data$data_category[target_idx] <- "reasonable_unusual"
+      data$is_unusual[target_idx] <- FALSE
+    }
+  }
+  data
+}
+
 create_classified_dataframes <- function(data, 
                                          bed_am_col, sleep_am_col,
                                          awake_am_col, getup_am_col,
@@ -1557,20 +1591,7 @@ create_classified_dataframes <- function(data,
       cat(sprintf("\n  Found %d Reasonable unusual records from manual_unusual_review.csv\n", 
                   nrow(reasonable_unusual_records)))
       
-      if (!"is_reasonable_unusual" %in% names(data)) {
-        data$is_reasonable_unusual <- FALSE
-      }
-      
-      for (i in seq_len(nrow(reasonable_unusual_records))) {
-        rec <- reasonable_unusual_records[i, ]
-        target_idx <- which(data$pid == rec$pid & data$row_id == rec$row_id)
-        
-        if (length(target_idx) > 0) {
-          data$is_reasonable_unusual[target_idx] <- TRUE
-          data$data_category[target_idx] <- "reasonable_unusual"
-          data$is_unusual[target_idx] <- FALSE
-        }
-      }
+      data <- mark_reasonable_unusual(data, manual_unusual_df)
     }
   }
   
@@ -2034,6 +2055,7 @@ apply_manual_corrections_and_recalculate <- function(ema_data, corrections_df, m
   cat("\n9. Creating classified dataframes...\n")
   
   ema_data <- ensure_marking_columns(ema_data)
+  ema_data <- mark_reasonable_unusual(ema_data, manual_unusual_df)
   
   results <- create_classified_dataframes(ema_data,
                                           time_bed_am_col, time_sleep_am_col,

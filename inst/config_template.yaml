@@ -131,10 +131,25 @@ data:
 # Uncomment and adjust only if your study population needs different cutoffs.
 #
 # classification:
+#   step5:                  # which records go to the review worksheets (hours)
+#     error:
+#       bed_to_sleep_max_hours: 7
+#       awake_to_getup_max_hours: 7
+#       sleep_to_awake_max_hours: 24
+#     unusual:
+#       sleep_to_awake_min_hours: 3
+#       sleep_to_awake_max_hours: 15
+#       bed_to_sleep_max_hours: 3
+#       awake_to_getup_max_hours: 3
 #   flag_severity:
 #     poor_efficiency_threshold_pct: 70
 #     high_sol_threshold_hours: 1
 #     high_waso_threshold_hours: 1.5
+#
+# review:
+#   clean_categories: ["clean", "equal_time_ok", "reasonable_unusual"]
+# manual_corrections:
+#   manual_overrides_parser: false   # true: a manual metric-duration row wins over the parser
 #
 # # Minor order-error swap threshold (Step 4). Gap in hours below which an
 # # out-of-order timestamp pair is corrected by swapping. Default 3.

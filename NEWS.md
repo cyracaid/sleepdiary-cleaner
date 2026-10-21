@@ -23,6 +23,11 @@
   seed, runs the pipeline in new R processes and new directories, then again in a
   directory with old outputs left in place, then twice with a fixed manual
   error-correction file applied, and compares every output file.
+* Works with the 1.5.3 / 1.6.0 rules: the review status table, the verdict and Step 8 use
+  `review.clean_categories` for "passes the re-check" (one `review:` block in the config holds
+  both), and `effective_rules.csv` lists `review.done_when.max_needs_review`,
+  `review.missing_times_ok_after_manual`, `review.step8_flags_need_review` and
+  `review.fail_if_not_done`.
 
 ## Changed
 * `inst/scripts/generate_ai_review_csvs.R` takes its suggested labels (`ai_label`,
@@ -85,6 +90,65 @@
   outputs record wall-clock time, so those files differ between runs in exactly those
   fields; `validation/reproducibility.R` compares them without those fields.
 
+# sleepcleanr 1.6.0
+
+Delivered data change in this release: Dataset A has 35 columns (one new, `human_review`, in place of
+`needs_review` and `is_reasonable_unusual`), and records a reviewer marked "Reasonable unusual record" now have
+`record_status` = `reasonable_unusual`. Update any analysis or text that used the old columns or counts.
+
+## Changed: the delivered data say whether a person looked
+* Records a reviewer marked "Reasonable unusual record" are now marked in the data that continue through
+  the pipeline. Before, the mark was made on a copy used to build the classified tables and never reached the
+  delivered datasets: `is_reasonable_unusual` was empty and the records stayed `unusual` in `record_status`.
+  They now have `data_category` / `record_status` = `reasonable_unusual`, so the counts of `unusual` fall and of
+  `reasonable_unusual` rise by the same amount (on the study data: 31 `unusual` -> 0, 33 `reasonable_unusual`;
+  two of the 33 were `equal_time`).
+* Dataset A has one new column, `human_review` (`waiting`, `corrected`, `accepted`, `none`), that replaces
+  `needs_review` and `is_reasonable_unusual`: 35 columns instead of 36. `accepted` covers both reasonable-unusual
+  records and metric warnings marked confirmed-not-error, which A could not show before. It reports what the review
+  files say and decides nothing.
+* Figure 6 draws the accepted records as their own group, "Reasonable Unusual (accepted)", instead of leaving them
+  out now that they are no longer `unusual`.
+* The output-files article starts with a quick guide to which file and column answers which question.
+
+## Changed
+* Second-review rows whose `pid` or `day_num` is not a number (for example free text that ended up in those
+  columns) can no longer be read as records: they are left out, listed with their file line numbers on the
+  console and in `output/second_review_rows_skipped.csv`, and the run carries on. Set
+  `second_review.on_invalid_rows: stop` to stop the run instead.
+* The closing line of the rules block says how many rules were set in your config and how many by the call
+  (`include_manual_corrections`), instead of counting both as "differ from the defaults".
+
+# sleepcleanr 1.5.3
+
+## Changed: the user defines the rules, the pipeline applies and reports them
+* The rules that decide which records go to human review were written into the code in
+  four places (7 h, 24 h, 3 h, 15 h). They are now configuration, under
+  `classification.step5` (`error` and `unusual`), read from one place and used by Step 5,
+  by the recalculation after manual corrections and by the category evaluators. The defaults
+  are the old values, so results do not change unless you change them. A value that is present
+  but not a single number stops the run with a message.
+* `review.clean_categories` (default `clean`, `equal_time_ok`, `reasonable_unusual`) says which
+  final categories count as "now passes" in the review status table. It was fixed in the code.
+* Every run now prints `=== Rules in effect for this run ===` and saves the same list in
+  `output/effective_rules.csv`, saying for each rule whether the value is the default or comes
+  from your config.
+* Manual sleep-metric-duration rows that are not applied are listed, with the reason for each,
+  in `output/manual_corrections_not_applied.csv` (header only when all were applied).
+  `manual_corrections.manual_overrides_parser` (default `false`, the long-standing behaviour)
+  lets the manual row win over the interval parser.
+* Removed the `classification.temporal.*` keys from the default config: no code ever read them,
+  so changing them had no effect.
+
+## Documentation
+* New articles, English and Chinese: Getting started, Output files (every file a run writes,
+  where it goes, which step writes it), and Troubleshooting (symptom, cause, fix).
+* The articles are listed in the order a user needs them: getting started, input data and
+  configuration, data-first entry, reading the output and the review loop, output files,
+  troubleshooting, then architecture, validation and testing.
+* Two articles were renamed: "Input Data and Configuration" (was "Column Mapping, Config &
+  Data Format") and "Reading the Output and the Review Loop" (was "Interpreting the Pipeline
+  Output"). The file names, and so the web addresses, are unchanged.
 # sleepcleanr 1.5.2
 
 ## Changed
@@ -132,7 +196,7 @@
   `include_manual_corrections` is an argument, not a YAML setting, and that its
   default changed in 1.4.7.
 
-# sleepcleanr (development version)
+# sleepcleanr 1.5.1 (continued)
 
 ## New
 * `cleaning_report()`: a short factual description of the last run (entries and

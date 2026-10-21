@@ -31,7 +31,6 @@
 }
 
 # Categories a corrected record may end in without needing another look.
-.rp_ok_categories <- c("clean", "equal_time_ok", "reasonable_unusual")
 .rp_added_cols <- c("in_manual_file", "review_resolution", "resolved_at", "resolved_by")
 
 #' Add the four "where was this handled" columns to one worksheet
@@ -114,7 +113,7 @@ review_state_counts <- function(ws_list, final, flags = NULL) {
     # A reviewed record the pipeline keeps as "unusual" is an accepted outcome of
     # the unusual worksheet (reviewed and kept as reported); on the error
     # worksheet it is not: a corrected error should end up clean / equal-time.
-    ok <- if (identical(w, "unusual")) c(.rp_ok_categories, "unusual") else .rp_ok_categories
+    ok <- if (identical(w, "unusual")) c(.sc_clean_categories(), "unusual") else .sc_clean_categories()
     still <- handled & (is.na(cat_final) | !(cat_final %in% ok) | flagged)
     res <- tolower(ws$review_resolution)
     data.frame(
@@ -214,7 +213,7 @@ build_review_status_table <- function(ws_error, ws_unusual, final, flags = NULL)
 
   k_err <- .rp_key(ws_error)
   ca <- cat_after(k_err)
-  passes <- !is.na(ca) & ca %in% .rp_ok_categories
+  passes <- !is.na(ca) & ca %in% .sc_clean_categories()
   handled <- if ("in_manual_file" %in% names(ws_error))
     !is.na(ws_error$in_manual_file) & ws_error$in_manual_file != "" else rep(FALSE, nrow(ws_error))
   old <- ws_error

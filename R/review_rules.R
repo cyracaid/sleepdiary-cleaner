@@ -40,7 +40,8 @@
 #' with the bundled default. Nothing else decides these values.
 #'
 #' @param cfg A configuration list from [load_config()], or NULL for the defaults.
-#' @return A list with `max_needs_review`, `step8_flags_need_review`,
+#' @return A list with `clean_categories` (from `review.clean_categories`),
+#'   `max_needs_review`, `step8_flags_need_review`,
 #'   `missing_times_ok_after_manual`,
 #'   `fail_if_not_done`, `suggestions` and `suggestion_default`.
 #' @export
@@ -52,6 +53,9 @@ review_rules <- function(cfg = NULL) {
   if (!is.numeric(max_nr) || length(max_nr) != 1 || is.na(max_nr) || max_nr < 0)
     stop("review.done_when.max_needs_review must be one number >= 0", call. = FALSE)
   out <- list(
+    # Final categories that count as passing the re-check (shared with the rest
+    # of the package through .sc_clean_categories()).
+    clean_categories = if (is.null(cfg)) .sc_clean_categories_default else .sc_clean_categories(cfg),
     max_needs_review = as.numeric(max_nr),
     step8_flags_need_review = isTRUE(r$step8_flags_need_review %||% d$step8_flags_need_review),
     missing_times_ok_after_manual = isTRUE(r$missing_times_ok_after_manual %||% d$missing_times_ok_after_manual),
@@ -123,13 +127,13 @@ suggest_review_labels <- function(df, rules = review_rules(NULL)) {
 # Status rows for one Step 5 worksheet. Same five statuses as
 # build_review_status_table(); a record kept as "unusual" passes on the unusual
 # worksheet (reviewed and kept as reported) but not on the error worksheet.
-.worksheet_status <- function(ws, worksheet, final) {
+.worksheet_status <- function(ws, worksheet, final, clean_categories = .sc_clean_categories_default) {
   ws <- .rp_clean_names(ws)
   if (nrow(ws) == 0) return(NULL)
   for (nm in .rp_added_cols) if (!nm %in% names(ws)) ws[[nm]] <- rep("", nrow(ws))
   k <- .rp_key(ws)
   ca <- as.character(final$data_category)[match(k, .rp_key(final))]
-  ok <- if (identical(worksheet, "unusual")) c(.rp_ok_categories, "unusual") else .rp_ok_categories
+  ok <- if (identical(worksheet, "unusual")) c(clean_categories, "unusual") else clean_categories
   passes <- !is.na(ca) & ca %in% ok
   handled <- !is.na(ws$in_manual_file) & ws$in_manual_file != ""
   ws$worksheet <- worksheet
@@ -182,8 +186,8 @@ suggest_review_labels <- function(df, rules = review_rules(NULL)) {
 build_unified_review_status <- function(ws_list, final, flags = NULL,
                                         rules = review_rules(NULL), applied = TRUE) {
   final <- .rp_clean_names(final)
-  parts <- list(.worksheet_status(ws_list[["error"]], "error", final),
-                .worksheet_status(ws_list[["unusual"]], "unusual", final))
+  parts <- list(.worksheet_status(ws_list[["error"]], "error", final, rules$clean_categories),
+                .worksheet_status(ws_list[["unusual"]], "unusual", final, rules$clean_categories))
 
   on_sheet <- unlist(lapply(parts, .rp_key))
   fkey <- .rp_key(final)

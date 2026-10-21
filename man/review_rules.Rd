@@ -10,7 +10,8 @@ review_rules(cfg = NULL)
 \item{cfg}{A configuration list from [load_config()], or NULL for the defaults.}
 }
 \value{
-A list with `max_needs_review`, `step8_flags_need_review`,
+A list with `clean_categories` (from `review.clean_categories`),
+  `max_needs_review`, `step8_flags_need_review`,
   `missing_times_ok_after_manual`,
   `fail_if_not_done`, `suggestions` and `suggestion_default`.
 }

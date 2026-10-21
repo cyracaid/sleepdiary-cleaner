@@ -142,3 +142,16 @@ test_that("a missing time after corrections follows review.missing_times_ok_afte
     rules = review_rules(list(review = list(missing_times_ok_after_manual = TRUE))))
   expect_false(any(none$review_state == "incorporated"))
 })
+
+test_that("review.clean_categories decides what passes, in the status table and in Step 8", {
+  err <- mk_ws(1:2)
+  final <- final_of(1:2, c("clean", "equal_time_ok"))
+  strict <- review_rules(list(review = list(clean_categories = list("clean"))))
+  expect_equal(strict$clean_categories, "clean")
+  out <- sleepcleanr:::build_unified_review_status(list(error = err), final, rules = strict)
+  expect_equal(out$review_state[out$row_id == 2], "needs_review")
+  expect_equal(out$review_state[out$row_id == 1], "not_incorporated")
+  expect_equal(sleepcleanr:::step8_final_status(c("CLEAN", "CLEAN"), c(TRUE, TRUE),
+                 c("clean", "equal_time_ok"), clean_categories = "clean"),
+               c("CLEAN (Manually Fixed)", "STILL FAILS (Manually Corrected)"))
+})

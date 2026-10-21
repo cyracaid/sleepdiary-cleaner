@@ -44,6 +44,10 @@ theme_set(theme_minimal(base_size = 14))
 
 # Config: use defaults if not running inside run_pipeline()
 if (!exists("pipeline_config")) { pipeline_config <- list() }
+if (!exists(".sc_step5_thresholds", mode = "function")) {
+  .sc_step5_thresholds <- function(cfg = NULL) list(bed_sleep_error = 7, sleep_awake_error = 24, bed_sleep_unusual = 3)
+}
+.thr5 <- .sc_step5_thresholds(pipeline_config)
 
 # ============================================================================
 # AUTO-SAVE SETUP
@@ -839,11 +843,11 @@ if(all(c("data_category", "manually_corrected", "corrected") %in% names(correcte
                  "FINAL RECORD CLASSES (each record gets exactly one; first match wins):",
                  sprintf("Not Reported: %s (%s%%) = any of bed / sleep / awake / getup time is missing",
                          format(n_not_rpt, big.mark = ","), round(n_not_rpt / n_total * 100, 1)),
-                 sprintf("Error (Reviewed): %s = order broken (not bed \u2264 sleep \u2264 awake \u2264 getup), sleep = awake, a gap > 7 h, or sleep span > 24 h; reviewed and fixed", n_error),
+                 sprintf("Error (Reviewed): %s = order broken (not bed \u2264 sleep \u2264 awake \u2264 getup), sleep = awake, a gap > %s h, or sleep span > %s h; reviewed and fixed", n_error, .thr5$bed_sleep_error, .thr5$sleep_awake_error),
                  sprintf("Equal Time: %s = bed = sleep and/or awake = getup (difference < 0.01 h, about 36 s), order intact; benign diary habit, not an error", n_equal),
-                 sprintf("Unusual (Accepted): %s = order intact but a gap > 3 h (bed\u2192sleep or awake\u2192getup); odd but possible, reviewed and kept as-is", n_unusual),
-                 sprintf("Clean: %s (%s%%) = order intact, no gap > 3 h",
-                         format(n_clean, big.mark = ","), round(n_clean / n_total * 100, 1)),
+                 sprintf("Unusual (Accepted): %s = order intact but a gap > %s h (bed\u2192sleep or awake\u2192getup); odd but possible, reviewed and kept as-is", n_unusual, .thr5$bed_sleep_unusual),
+                 sprintf("Clean: %s (%s%%) = order intact, no gap > %s h",
+                         format(n_clean, big.mark = ","), round(n_clean / n_total * 100, 1), .thr5$bed_sleep_unusual),
                  sprintf("Participants w/ \u22651 correction: %s / %s (%s%%)",
                          n_pid_any_corr, n_pid_total, round(n_pid_any_corr / n_pid_total * 100, 1))
                ), function(l) paste(strwrap(l, width = 68, exdent = 3), collapse = "\n"), character(1)),
@@ -1278,8 +1282,9 @@ if(length(available_vars) > 0) {
 # DATA SOURCE: clean_df (has sleep_duration_h) + corrected_ema_data (has final categories)
 # ============================================================================
 # WHAT THIS FIGURE SHOWS:
-# Density curves comparing sleep duration distributions across four final
-# classification groups: Clean, Unusual, Manually Corrected, and Error.
+# Density curves comparing sleep duration distributions across five final
+# classification groups: Clean, Unusual, Reasonable Unusual (accepted by a
+# reviewer), Manually Corrected, and Error.
 #
 # INTERPRETATION:
 # Clean and Manually Corrected distributions should overlap substantially,
@@ -1306,13 +1311,14 @@ if (exists("clean_df") && exists("corrected_ema_data") &&
         manually_corrected == TRUE ~ "Manually Corrected",
         data_category == "clean" ~ "Clean",
         data_category == "unusual" ~ "Unusual",
+        data_category == "reasonable_unusual" ~ "Reasonable Unusual (accepted)",
         data_category == "error" ~ "Error",
         data_category == "equal_time_ok" ~ "Equal Time",
         data_category == "skipped_na" ~ "Not Reported",
         TRUE ~ "Other"
       )
     ) %>%
-    filter(status %in% c("Clean", "Unusual", "Manually Corrected", "Error"))
+    filter(status %in% c("Clean", "Unusual", "Reasonable Unusual (accepted)", "Manually Corrected", "Error"))
   
   cat("  Records after filtering:", nrow(p6_data), "\n")
   cat("  Status counts:\n")
@@ -1323,6 +1329,7 @@ if (exists("clean_df") && exists("corrected_ema_data") &&
     color_map <- c(
       "Clean" = "#2E7D32",
       "Unusual" = "#FF8C00",
+      "Reasonable Unusual (accepted)" = "#8E6BBF",
       "Manually Corrected" = "#4CAF50",
       "Error" = "#D32F2F"
     )
@@ -1335,6 +1342,7 @@ if (exists("clean_df") && exists("corrected_ema_data") &&
       subtitle = paste0("WHAT THIS ANSWERS: did the human corrections distort the overall sleep-duration distribution? Each curve = the distribution of sleep durations for one record class after corrections (Steps 5-6.5). ",
                         "Clean: ", sum(p6_data$status == "Clean"),
                         " | Unusual: ", sum(p6_data$status == "Unusual"),
+                        " | Reasonable Unusual (accepted): ", sum(p6_data$status == "Reasonable Unusual (accepted)"),
                         " | Manually Corrected: ", sum(p6_data$status == "Manually Corrected"),
                         " | Error: ", sum(p6_data$status == "Error")),
            x = "Sleep Duration (hours)", 

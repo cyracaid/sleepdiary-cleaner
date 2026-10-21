@@ -120,14 +120,18 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   env <- .pipeline_init(config, project_dir, verbose)
   on.exit(.pipeline_cleanup(env$old_wd), add = TRUE)
   cfg  <- env$cfg
+  # Fail fast: an invalid step-5 rule value stops the run before data is read
+  # or anything is written (the same validator Step 5 uses downstream).
+  .sc_step5_thresholds(cfg)
+  review_rules(cfg)   # same for the review: block
+  # The data tag only decides where figures go, so it is needed only when
+  # figures are made. Settled here, before anything is written, so a question
+  # is asked while the person is still at the keyboard (see resolve_data_tag()).
+  if (!skip_visualization) .sc_set("data_tag_info", resolve_data_tag(cfg))
+  report_effective_rules(cfg, include_manual_corrections, verbose)
   sdir <- env$sdir
   # Seen by the sourced step scripts (they run in this frame); not the global environment.
   sleepcleanr_loaded <- TRUE
-
-  # The data tag only decides where figures go, so it is needed only when
-  # figures are made. Settled here, before any work, so a question is asked
-  # while the person is still at the keyboard (see resolve_data_tag()).
-  if (!skip_visualization) .sc_set("data_tag_info", resolve_data_tag(cfg))
 
   init_step_ledger()
   source(file.path(sdir, "report_correction_status.R"), local = TRUE)
@@ -227,7 +231,7 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   # -- Step 5: Classify & generate review CSVs -------------------------
   if (verbose) cat("\n=== Step 5: Generating correction files ===\n")
   source(file.path(sdir, "generate_correction_files.R"), local = TRUE)
-  suppressMessages(generated_files <- generate_correction_files(ema_data_release_timecalc))
+  suppressMessages(generated_files <- generate_correction_files(ema_data_release_timecalc, cfg = cfg))
   log_step(ema_data_release_timecalc, "5", "Classify records", cfg)
 
   # STRICT PATH MATCHING: manual_error_path / manual_unusual_path are used

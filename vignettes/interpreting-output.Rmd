@@ -1,12 +1,12 @@
 ---
-title: "Interpreting the Pipeline Output"
+title: "Reading the Output and the Review Loop"
 description: >
   How to read correction_status_final.csv, the step flag ledger, regression
   checks, and the diagnostic figures — what each output means and what to
   check for.
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Interpreting the Pipeline Output}
+  %\VignetteIndexEntry{Reading the Output and the Review Loop}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -245,6 +245,11 @@ Step 5 lists every record the rules flag on the data BEFORE corrections, so
 ```
 
 **What puts a record on the review pile (the exact rules, in priority order):**
+
+The hour limits below are the defaults. You can change each one under `classification.step5` in your config
+(see [Input data and configuration](column-mapping.html)); every run prints the values it used and saves them
+in `output/effective_rules.csv`.
+Where these defaults come from: the Step 5 limits are recorded in the project's March 2026 logic document, and the code has used the same values since the first release (July 2026) until they became configuration. To reproduce the study's results, keep the defaults. All thresholds, with their rationale, are on the [Thresholds](../THRESHOLDS.html) page.
 
 *ERROR — physically impossible, must be fixed (`generate_correction_files.R:315`):*
 1. `sleep_awake_equal_error` — sleep time == awake time (a zero-length sleep
@@ -710,7 +715,7 @@ Both. Figure 1 classifies the FINAL data: errors that were fixed are no longer e
 
 **Paper use** Supplement
 
-**What each part means** Density curves of final sleep duration by record class (Clean / Unusual / Manually Corrected / Error) after Steps 5–6.5. WHAT THIS ANSWERS: did the human corrections distort the overall sleep-duration distribution? (The corrected class's curve should overlap the clean curve.)
+**What each part means** Density curves of final sleep duration by record class (Clean / Unusual / Reasonable Unusual (accepted) / Manually Corrected / Error) after Steps 5–6.5. WHAT THIS ANSWERS: did the human corrections distort the overall sleep-duration distribution? (The corrected class's curve should overlap the clean curve.)
 
 **Healthy look** One smooth peak around 6–8 hours, with nothing piled up at 0 or beyond 12 hours — the shape of normal night sleep. It also shows the human corrections did not distort the overall distribution.
 
@@ -719,8 +724,8 @@ Both. Figure 1 classifies the FINAL data: errors that were fixed are no longer e
 <details>
 <summary><strong>Precise rules</strong></summary>
 
-- **What is drawn.** A smoothed curve of the final `sleep_duration_h` (TST in hours) for each record class: Clean, Unusual, Manually Corrected and Error. Each curve is scaled to its own area, so compare shapes, not heights; the subtitle lists how many records each curve rests on.
-- **Who is included.** Only records with a computed sleep duration, and only those four classes. A record that was manually corrected is shown as Manually Corrected, whatever its original class.
+- **What is drawn.** A smoothed curve of the final `sleep_duration_h` (TST in hours) for each record class: Clean, Unusual, Reasonable Unusual (accepted), Manually Corrected and Error. Each curve is scaled to its own area, so compare shapes, not heights; the subtitle lists how many records each curve rests on.
+- **Who is included.** Only records with a computed sleep duration, and only those five classes. Reasonable Unusual (accepted) is a record a reviewer marked "Reasonable unusual record": it is shown on its own, not folded into Unusual. A record that was manually corrected is shown as Manually Corrected, whatever its original class.
 - **What it is for.** To check that human corrections did not distort the overall distribution: compare with Figure 14, which shows the same kind of curve before any manual correction.
 
 </details>
@@ -730,7 +735,7 @@ Both. Figure 1 classifies the FINAL data: errors that were fixed are no longer e
 <details>
 <summary>Why are there far fewer records here than the "usable for analysis" count in Figure 1?</summary>
 
-Figure 6 draws only the Clean, Unusual, Manually Corrected and Error classes. Equal Time records (benign) and Not Reported records (no computed duration) are not in it.
+Figure 6 draws only the Clean, Unusual, Reasonable Unusual (accepted), Manually Corrected and Error classes. Equal Time records (benign) and Not Reported records (no computed duration) are not in it.
 
 </details>
 
