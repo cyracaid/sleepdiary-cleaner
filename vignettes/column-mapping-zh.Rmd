@@ -167,6 +167,8 @@ review:
   clean_categories: ["clean", "equal_time_ok", "reasonable_unusual"]   # 状态表里"现在通过"的含义
 manual_corrections:
   manual_overrides_parser: false    # true：人工睡眠指标时长修正优先于区间解析器
+second_review:
+  on_invalid_rows: skip             # skip：排除 pid/day_num 不是数字的二审行并列出；stop：直接停止
 ```
 
 值存在但不是单个数字时，运行会停下并给出提示，绝不会被悄悄替换。

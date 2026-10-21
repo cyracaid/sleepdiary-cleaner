@@ -34,6 +34,7 @@ listed in the order they are written.
 |---|---|---|
 | `effective_rules.csv` | Start of the run | Every rule and threshold the run used (key, value, default, whether it comes from the default or from your config, meaning). Compare two runs by comparing this file |
 | `manual_corrections_not_applied.csv` | When manual metric-duration rows are applied | Each manual sleep-metric-duration row that was not applied and why (`parser_already_converted_MMSS`, `row_not_marked_manually_corrected`, `column_not_found`, `no_unique_row_match`). Header only when every row was applied |
+| `second_review_rows_skipped.csv` | Step 5.75 | Second-review rows left out because their `pid` or `day_num` is not a number: file line, `target_csv`, reason. Header only when none |
 | `correction_status.csv` | At each checkpoint | One row per checkpoint (A–E) with the counts of each record class, mean TST and SOL; rows are added at every run, with a `run_id` |
 | `step_flag_ledger.csv` | After Step 9 | One row per step × standard × category: how many records fall in each class at that step (logged during the run, written near the end) |
 | `flagged_records_self_reported.csv` | Step 8 | Records flagged `SELF_REPORTED_FLAG` (for example SOL over 120 min) |

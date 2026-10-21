@@ -25,7 +25,7 @@ vignette: >
 | `there is no package called 'sleepdiary-cleaner'` | `sleepdiary-cleaner` 是仓库名，包名是 `sleepcleanr` | `packageVersion("sleepcleanr")` |
 | `there is no package called 'remotes'`，或 `The project is out-of-sync -- use renv::status()` | 你在本仓库的检出目录里运行 R，它用自己的 `renv` 库 | 先 `cd ~`，再 `Rscript --vanilla -e '...'` |
 | `Failed to install ... No commit found for the ref v1.x.y` | 那个 tag 不存在 | 到 releases 页面看现有的 tag |
-| Step 5.75 的 `[VERIFY]` 行里显示的是文字而不是 id，例如 `pid= not format error ...` | `second_review_checklist.csv` 里某条备注含有没加引号的逗号，一行被拆到了几列里 | 把备注用双引号包起来（或在表格软件里另存为 CSV）|
+| Step 5.75 的 `[VERIFY]` 行里显示的是文字而不是 id，例如 `pid= not format error ...` | `second_review_checklist.csv` 里有几行的 `pid` 或 `day_num` 列里是文字（例如一条备注在做文件时被拆到了几列里）。文件本身是合法的 CSV，但这些行无法确定是哪条记录 | 运行会列出这些行在文件里的行号，把它们排除在外，并写到 `output/second_review_rows_skipped.csv`。请在清单里改正这些行。想让运行直接停下，设 `second_review.on_invalid_rows: stop` |
 | `list.files(pattern = "[NEW")` 报错，或 `"[NEW]*"` 什么也找不到 | `pattern` 是正则表达式，`[NEW]` 是字符类 | 用 `pattern = "NEW"` 或 `"\\[NEW\\]"` |
 | 加了修正之后，审核文件的行数还是一样 | 1.5.1 及更早版本里它列的是**修正之前**发现的错误。从 1.5.2 起它是状态表：看 `status_after_corrections` | 读 `status_after_corrections` |
 | `Parser already converted ... skipped manual override`，或 `Correction rows skipped: N` | 有人工睡眠指标时长修正没有被应用。默认情况下，如果解析器已经转换了 MM:SS 的值，以解析器为准 | 打开 `output/manual_corrections_not_applied.csv`，看每一行和原因。想让人工那行优先，在配置里设 `manual_corrections.manual_overrides_parser: true` |

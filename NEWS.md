@@ -1,3 +1,13 @@
+# sleepcleanr (development version)
+
+## Changed
+* Second-review rows whose `pid` or `day_num` is not a number (for example free text that ended up in those
+  columns) can no longer be read as records: they are left out, listed with their file line numbers on the
+  console and in `output/second_review_rows_skipped.csv`, and the run carries on. Set
+  `second_review.on_invalid_rows: stop` to stop the run instead.
+* The closing line of the rules block says how many rules were set in your config and how many by the call
+  (`include_manual_corrections`), instead of counting both as "differ from the defaults".
+
 # sleepcleanr 1.5.3
 
 ## Changed: the user defines the rules, the pipeline applies and reports them

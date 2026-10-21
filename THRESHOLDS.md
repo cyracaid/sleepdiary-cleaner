@@ -42,7 +42,8 @@ insomnia. For clinical samples (insomnia, elderly, shift-work), revisit every ro
 | `classification.step5.unusual.sleep_to_awake_min_hours` / `_max_hours` | `3` / `15` | Sleep period < 3 h or > 15 h is unusual | Possible but worth a look |
 | `classification.step5.unusual.bed_to_sleep_max_hours` | `3` | Sleep − bed > 3 h is unusual | Most people fall asleep within an hour |
 | `classification.step5.unusual.awake_to_getup_max_hours` | `3` | Getup − awake > 3 h is unusual | Long time in bed after waking |
-| `review.clean_categories` | `clean`, `equal_time_ok`, `reasonable_unusual` | Final categories that count as "now passes" in the review status table | Yours to define |
+| `review.clean_categories` | `clean`, `equal_time_ok`, `reasonable_unusual` | Final categories that count as "now passes" in the review status table | Yours to define. In our study a record with a missing time (`skipped_na`) is not counted as passing, so it stays listed as not passing |
+| `second_review.on_invalid_rows` | `skip` | `skip`: second-review rows whose `pid` or `day_num` is not a number are left out and listed in `output/second_review_rows_skipped.csv`; `stop`: stop the run | Such a row cannot identify a record |
 | `manual_corrections.manual_overrides_parser` | `false` | `true`: a manual sleep-metric-duration row wins over the interval parser | Long-standing behaviour is that the parser wins; every skipped row is listed in `output/manual_corrections_not_applied.csv` |
 | `timestamp.interval.mmss_threshold_minutes` | `60` | value > 60 with `:` → MM:SS | Heuristic for ambiguous formats |
 

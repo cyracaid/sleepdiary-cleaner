@@ -31,6 +31,7 @@ vignette: >
 |---|---|---|
 | `effective_rules.csv` | 运行开头 | 这次运行用到的每条规则和阈值（key、取值、默认值、来自默认还是你的配置、含义）。比较两次运行，就比较这个文件 |
 | `manual_corrections_not_applied.csv` | 应用人工睡眠指标时长修正时 | 每一条没有被应用的人工睡眠指标时长修正及原因（`parser_already_converted_MMSS`、`row_not_marked_manually_corrected`、`column_not_found`、`no_unique_row_match`）。全部应用时只有表头 |
+| `second_review_rows_skipped.csv` | Step 5.75 | 因为 `pid` 或 `day_num` 不是数字而被排除的二审行：文件行号、`target_csv`、原因。没有时只有表头 |
 | `correction_status.csv` | 每个检查点 | 每个检查点（A–E）一行：各类记录的数量、平均 TST 和 SOL；每次运行追加，带 `run_id` |
 | `step_flag_ledger.csv` | Step 9 之后 | 每行是 步骤 × 标准 × 类别：该步骤中有多少记录落入这一类（运行中记录，接近结尾写出）|
 | `flagged_records_self_reported.csv` | Step 8 | 标为 `SELF_REPORTED_FLAG` 的记录（例如 SOL 超过 120 分钟）|
