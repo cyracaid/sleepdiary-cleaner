@@ -159,14 +159,19 @@
 <code>clean</code>, <code>equal_time_ok</code>, <code>reasonable_unusual</code>
 </td>
 <td>Final categories that count as “now passes” in the review status table</td>
-<td>Yours to define</td>
-</tr><tr class="even"><td><code>manual_corrections.manual_overrides_parser</code></td>
+<td>Yours to define. In our study a record with a missing time (<code>skipped_na</code>) is not counted as passing, so it stays listed as not passing</td>
+</tr><tr class="even"><td><code>second_review.on_invalid_rows</code></td>
+<td><code>skip</code></td>
+<td>
+<code>skip</code>: second-review rows whose <code>pid</code> or <code>day_num</code> is not a number are left out and listed in <code>output/second_review_rows_skipped.csv</code>; <code>stop</code>: stop the run</td>
+<td>Such a row cannot identify a record</td>
+</tr><tr class="odd"><td><code>manual_corrections.manual_overrides_parser</code></td>
 <td><code>false</code></td>
 <td>
 <code>true</code>: a manual sleep-metric-duration row wins over the interval parser</td>
 <td>Long-standing behaviour is that the parser wins; every skipped row is listed in <code>output/manual_corrections_not_applied.csv</code>
 </td>
-</tr><tr class="odd"><td><code>timestamp.interval.mmss_threshold_minutes</code></td>
+</tr><tr class="even"><td><code>timestamp.interval.mmss_threshold_minutes</code></td>
 <td><code>60</code></td>
 <td>value &gt; 60 with <code>:</code> → MM:SS</td>
 <td>Heuristic for ambiguous formats</td>

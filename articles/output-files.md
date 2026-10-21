@@ -3,6 +3,42 @@
 [中文版
 →](https://cyracaid.github.io/sleepdiary-cleaner/articles/output-files-zh.md)
 
+## Quick guide: which file answers which question
+
+The pipeline delivers three datasets. Use **A** for analysis, **B** to
+see what changed, and the full file when you need a column that A and B
+leave out.
+
+| File                                              | Size in the study run    | Use it for                                                                                       |
+|---------------------------------------------------|--------------------------|--------------------------------------------------------------------------------------------------|
+| **A** `output/cleaned_data_final.csv`             | 13,990 rows × 35 columns | Analysis: times, sleep metrics, and the status columns below                                     |
+| **B** `output/cleaned_data_prepostcorrection.csv` | 13,990 × 16              | What changed: the four times before and after correction, `correction_type`, `audit_disposition` |
+| Full `output/cleaned_data_full.rds`               | 13,990 × 135             | Everything the pipeline computed, nothing dropped                                                |
+
+| I want to know…                                             | Open                                                       | Column                                                                                                 |
+|-------------------------------------------------------------|------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
+| Was this entry changed, and by what?                        | A or B                                                     | `has_correction`: `none`, `algorithmic`, `manual` or `both`. B also has `correction_type` (which rule) |
+| What was typed, and what is it now?                         | B                                                          | `bedtime_precorrection` / `bedtime_postcorrection`, and the same for sleep onset, awakening, get-up    |
+| Is it clean, an error, unusual, or not reported?            | A                                                          | `record_status`, `flag_severity` (with `error_type`, `unusual_type`)                                   |
+| Did a person look at it, and what came of it?               | A                                                          | `human_review`: `none`, `corrected`, `accepted` or `waiting` (explained below)                         |
+| Which Step 5 rows are in which review state after this run? | `[NEW]manual_error_correction_review.csv` (project folder) | `status_after_corrections`, `in_manual_file`                                                           |
+| Who resolved a row, and when?                               | The review files you keep                                  | `review_resolution`, `resolved_by`, `resolved_at`                                                      |
+| Why was a manual correction not used?                       | `output/manual_corrections_not_applied.csv`                | `reason`                                                                                               |
+| Which rules did this run use?                               | `output/effective_rules.csv`                               | `value`, `source`                                                                                      |
+
+`human_review` has one value per row, the first that applies:
+
+| Value       | Meaning                                                                                                                                                                                |
+|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `waiting`   | Still flagged for a person (Step 8) and not already accepted by one                                                                                                                    |
+| `corrected` | A manual correction was applied                                                                                                                                                        |
+| `accepted`  | A person looked and kept it as it is: a “Reasonable unusual record”, or a metric warning marked confirmed-not-error. `record_status` also says `reasonable_unusual` for the first kind |
+| `none`      | Nobody had to look, or nobody has yet                                                                                                                                                  |
+
+It reports what the review files say. It does not decide anything.
+(`has_correction` still says whether the pipeline or a person changed
+the entry.)
+
 A run writes files in three places: the **project folder** (the
 `project_dir` you gave), its `output/` folder, and the figure folders.
 Files in the project folder are working files for the review; they
@@ -27,6 +63,7 @@ the files are listed in the order they are written.
 |-----------------------------------------------|----------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `effective_rules.csv`                         | Start of the run                             | Every rule and threshold the run used (key, value, default, whether it comes from the default or from your config, meaning). Compare two runs by comparing this file                                                         |
 | `manual_corrections_not_applied.csv`          | When manual metric-duration rows are applied | Each manual sleep-metric-duration row that was not applied and why (`parser_already_converted_MMSS`, `row_not_marked_manually_corrected`, `column_not_found`, `no_unique_row_match`). Header only when every row was applied |
+| `second_review_rows_skipped.csv`              | Step 5.75                                    | Second-review rows left out because their `pid` or `day_num` is not a number: file line, `target_csv`, reason. Header only when none                                                                                         |
 | `correction_status.csv`                       | At each checkpoint                           | One row per checkpoint (A–E) with the counts of each record class, mean TST and SOL; rows are added at every run, with a `run_id`                                                                                            |
 | `step_flag_ledger.csv`                        | After Step 9                                 | One row per step × standard × category: how many records fall in each class at that step (logged during the run, written near the end)                                                                                       |
 | `flagged_records_self_reported.csv`           | Step 8                                       | Records flagged `SELF_REPORTED_FLAG` (for example SOL over 120 min)                                                                                                                                                          |

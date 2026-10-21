@@ -173,6 +173,8 @@ review:
   clean_categories: ["clean", "equal_time_ok", "reasonable_unusual"]   # what "now passes" means in the status table
 manual_corrections:
   manual_overrides_parser: false    # true: a manual sleep-metric-duration row wins over the interval parser
+second_review:
+  on_invalid_rows: skip             # skip: leave out second-review rows whose pid/day_num is not a number and list them; stop: stop the run
 ```
 
 A value that is present but not a single number stops the run with a

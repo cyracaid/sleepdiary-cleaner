@@ -345,7 +345,9 @@ prints the values it used and saves them in
 <span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="fu">review</span><span class="kw">:</span></span>
 <span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="at">  </span><span class="fu">clean_categories</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="st">"clean"</span><span class="kw">,</span><span class="at"> </span><span class="st">"equal_time_ok"</span><span class="kw">,</span><span class="at"> </span><span class="st">"reasonable_unusual"</span><span class="kw">]</span><span class="co">   # what "now passes" means in the status table</span></span>
 <span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="fu">manual_corrections</span><span class="kw">:</span></span>
-<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="at">  </span><span class="fu">manual_overrides_parser</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span><span class="co">    # true: a manual sleep-metric-duration row wins over the interval parser</span></span></code></pre></div>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="at">  </span><span class="fu">manual_overrides_parser</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span><span class="co">    # true: a manual sleep-metric-duration row wins over the interval parser</span></span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a><span class="fu">second_review</span><span class="kw">:</span></span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a><span class="at">  </span><span class="fu">on_invalid_rows</span><span class="kw">:</span><span class="at"> skip</span><span class="co">             # skip: leave out second-review rows whose pid/day_num is not a number and list them; stop: stop the run</span></span></code></pre></div>
 <p>A value that is present but not a single number stops the run with a
 message; it is never replaced silently.</p>
 <p>Where these defaults come from: the Step 5 limits (7, 7 and 24 hours

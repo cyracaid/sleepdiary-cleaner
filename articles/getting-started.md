@@ -91,8 +91,10 @@ Each step prints a heading `=== Step N: ... ===`. After a run:
 Working files for the review go to the **project folder** (not
 `output/`); results go to `output/`. [Output
 files](https://cyracaid.github.io/sleepdiary-cleaner/articles/output-files.md)
-lists every file, when it is written and what it is. If something is
-missing or an error appears, see
+starts with a quick guide to which file and column answers which
+question (was it changed, does it still need a person, did someone
+accept it), then lists every file, when it is written and what it is. If
+something is missing or an error appears, see
 [Troubleshooting](https://cyracaid.github.io/sleepdiary-cleaner/articles/troubleshooting.md).
 
 To read a finished run in R without opening files:

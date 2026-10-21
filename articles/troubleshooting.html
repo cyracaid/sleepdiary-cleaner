@@ -203,10 +203,15 @@ its own <code>renv</code> library</td>
 <code>[VERIFY]</code> lines in Step 5.75 show text instead of ids,
 for example <code>pid= not format error ...</code>
 </td>
-<td>A note in <code>second_review_checklist.csv</code> contains an
-unquoted comma, so the row is split across columns</td>
-<td>Put the note in double quotes (or save the file from a spreadsheet
-program as CSV)</td>
+<td>Some rows of <code>second_review_checklist.csv</code> have text in
+the <code>pid</code> or <code>day_num</code> columns (for example a note
+that was split across columns when the file was made). The file is valid
+CSV, but those rows cannot identify a record</td>
+<td>The run lists the file line numbers, leaves those rows out and
+writes them to <code>output/second_review_rows_skipped.csv</code>.
+Correct the rows in the checklist. To make the run stop instead, set
+<code>second_review.on_invalid_rows: stop</code>
+</td>
 </tr>
 <tr class="even">
 <td>

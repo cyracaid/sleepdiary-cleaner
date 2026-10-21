@@ -327,7 +327,9 @@ cannabis_amount_pm_doses</td>
 <span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="fu">review</span><span class="kw">:</span></span>
 <span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="at">  </span><span class="fu">clean_categories</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="st">"clean"</span><span class="kw">,</span><span class="at"> </span><span class="st">"equal_time_ok"</span><span class="kw">,</span><span class="at"> </span><span class="st">"reasonable_unusual"</span><span class="kw">]</span><span class="co">   # 状态表里"现在通过"的含义</span></span>
 <span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="fu">manual_corrections</span><span class="kw">:</span></span>
-<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="at">  </span><span class="fu">manual_overrides_parser</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span><span class="co">    # true：人工睡眠指标时长修正优先于区间解析器</span></span></code></pre></div>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="at">  </span><span class="fu">manual_overrides_parser</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span><span class="co">    # true：人工睡眠指标时长修正优先于区间解析器</span></span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a><span class="fu">second_review</span><span class="kw">:</span></span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a><span class="at">  </span><span class="fu">on_invalid_rows</span><span class="kw">:</span><span class="at"> skip</span><span class="co">             # skip：排除 pid/day_num 不是数字的二审行并列出；stop：直接停止</span></span></code></pre></div>
 <p>值存在但不是单个数字时，运行会停下并给出提示，绝不会被悄悄替换。</p>
 <p>这些默认值的来历：Step 5 的限制（错误：7、7、24
 小时；unusual：3、15、3、3 小时）记录在项目 2026 年 3

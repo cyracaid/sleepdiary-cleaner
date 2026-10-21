@@ -3,6 +3,40 @@
 [English
 →](https://cyracaid.github.io/sleepdiary-cleaner/articles/output-files.md)
 
+## 快速指引：哪个文件回答哪个问题
+
+流水线交付三份数据。做分析用 **A**，看改了什么用 **B**，需要 A 和 B
+里没有的列时用全量文件。
+
+| 文件                                              | 这次研究运行的大小 | 用途                                                                   |
+|---------------------------------------------------|--------------------|------------------------------------------------------------------------|
+| **A** `output/cleaned_data_final.csv`             | 13,990 行 × 35 列  | 分析：时间、睡眠指标，以及下面的状态列                                 |
+| **B** `output/cleaned_data_prepostcorrection.csv` | 13,990 × 16        | 看改了什么：四个时间的修正前后、`correction_type`、`audit_disposition` |
+| 全量 `output/cleaned_data_full.rds`               | 13,990 × 135       | 流水线算出的全部内容，一列不删                                         |
+
+| 我想知道…                                         | 打开                                                   | 列                                                                                                |
+|---------------------------------------------------|--------------------------------------------------------|---------------------------------------------------------------------------------------------------|
+| 这条记录被改过吗，被谁改的？                      | A 或 B                                                 | `has_correction`：`none`、`algorithmic`、`manual` 或 `both`。B 另有 `correction_type`（哪条规则） |
+| 参与者填了什么，现在是什么？                      | B                                                      | `bedtime_precorrection` / `bedtime_postcorrection`，入睡、醒来、起床同理                          |
+| 它是干净、错误、异常，还是未填写？                | A                                                      | `record_status`、`flag_severity`（以及 `error_type`、`unusual_type`）                             |
+| 有人看过吗，结果怎样？                            | A                                                      | `human_review`：`none`、`corrected`、`accepted` 或 `waiting`（见下）                              |
+| 这次运行后，Step 5 清单里的各行处于哪种审核状态？ | 项目文件夹的 `[NEW]manual_error_correction_review.csv` | `status_after_corrections`、`in_manual_file`                                                      |
+| 谁处理的这一行，什么时候？                        | 你们自己维护的审核文件                                 | `review_resolution`、`resolved_by`、`resolved_at`                                                 |
+| 为什么某条人工修正没被用上？                      | `output/manual_corrections_not_applied.csv`            | `reason`                                                                                          |
+| 这次运行用了哪些规则？                            | `output/effective_rules.csv`                           | `value`、`source`                                                                                 |
+
+`human_review` 每行一个值，取第一个适用的：
+
+| 值          | 含义                                                                                                                                           |
+|-------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| `waiting`   | 仍被 Step 8 标记，等人看，且还没有人接受过                                                                                                     |
+| `corrected` | 应用了人工修正                                                                                                                                 |
+| `accepted`  | 有人看过并保持原样：标为 “Reasonable unusual record”，或指标警告被标为确认不是错误。前一种在 `record_status` 里同样显示为 `reasonable_unusual` |
+| `none`      | 不需要人看，或还没有人看                                                                                                                       |
+
+它只如实报告审核文件里写了什么，不做任何决定。（这条记录是流水线改的还是人改的，仍看
+`has_correction`。）
+
 一次运行把文件写在三个地方：**项目文件夹**（你给的
 `project_dir`）、它下面的
 `output/`，以及图的文件夹。项目文件夹里的是审核用的工作文件，含参与者的行，不能提交。每张表里的文件按写出顺序排列。
@@ -25,6 +59,7 @@
 |-----------------------------------------------|----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `effective_rules.csv`                         | 运行开头                   | 这次运行用到的每条规则和阈值（key、取值、默认值、来自默认还是你的配置、含义）。比较两次运行，就比较这个文件                                                                         |
 | `manual_corrections_not_applied.csv`          | 应用人工睡眠指标时长修正时 | 每一条没有被应用的人工睡眠指标时长修正及原因（`parser_already_converted_MMSS`、`row_not_marked_manually_corrected`、`column_not_found`、`no_unique_row_match`）。全部应用时只有表头 |
+| `second_review_rows_skipped.csv`              | Step 5.75                  | 因为 `pid` 或 `day_num` 不是数字而被排除的二审行：文件行号、`target_csv`、原因。没有时只有表头                                                                                      |
 | `correction_status.csv`                       | 每个检查点                 | 每个检查点（A–E）一行：各类记录的数量、平均 TST 和 SOL；每次运行追加，带 `run_id`                                                                                                   |
 | `step_flag_ledger.csv`                        | Step 9 之后                | 每行是 步骤 × 标准 × 类别：该步骤中有多少记录落入这一类（运行中记录，接近结尾写出）                                                                                                 |
 | `flagged_records_self_reported.csv`           | Step 8                     | 标为 `SELF_REPORTED_FLAG` 的记录（例如 SOL 超过 120 分钟）                                                                                                                          |

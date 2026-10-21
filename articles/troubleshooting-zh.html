@@ -196,9 +196,14 @@
 <code>pid= not format error ...</code>
 </td>
 <td>
-<code>second_review_checklist.csv</code>
-里某条备注含有没加引号的逗号，一行被拆到了几列里</td>
-<td>把备注用双引号包起来（或在表格软件里另存为 CSV）</td>
+<code>second_review_checklist.csv</code> 里有几行的 <code>pid</code>
+或 <code>day_num</code>
+列里是文字（例如一条备注在做文件时被拆到了几列里）。文件本身是合法的
+CSV，但这些行无法确定是哪条记录</td>
+<td>运行会列出这些行在文件里的行号，把它们排除在外，并写到
+<code>output/second_review_rows_skipped.csv</code>。请在清单里改正这些行。想让运行直接停下，设
+<code>second_review.on_invalid_rows: stop</code>
+</td>
 </tr>
 <tr class="even">
 <td>

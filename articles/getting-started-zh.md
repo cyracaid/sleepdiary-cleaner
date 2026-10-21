@@ -79,7 +79,7 @@ run_pipeline(config = "my_study.yaml", project_dir = "path/to/project",
 ## 5. 结果在哪里
 
 审核用的工作文件写到**项目文件夹**（不在 `output/`）；结果写到
-`output/`。[输出文件一览](https://cyracaid.github.io/sleepdiary-cleaner/articles/output-files-zh.md)列出每个文件、何时写出、是什么。如果缺文件或出现错误，见[排错](https://cyracaid.github.io/sleepdiary-cleaner/articles/troubleshooting-zh.md)。
+`output/`。[输出文件一览](https://cyracaid.github.io/sleepdiary-cleaner/articles/output-files-zh.md)开头有一份快速指引，说明哪个文件、哪一列回答哪个问题（是否被改过、是否还需要人看、是否有人接受），然后列出每个文件、何时写出、是什么。如果缺文件或出现错误，见[排错](https://cyracaid.github.io/sleepdiary-cleaner/articles/troubleshooting-zh.md)。
 
 不打开文件，在 R 里读一次完成的运行：
 

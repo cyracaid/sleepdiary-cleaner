@@ -66,6 +66,20 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="development version" id="sleepcleanr-development-version">sleepcleanr (development version)<a class="anchor" aria-label="anchor" href="#sleepcleanr-development-version"></a></h2>
+<div class="section level3">
+<h3 id="changed-the-delivered-data-say-whether-a-person-looked-development-version">Changed: the delivered data say whether a person looked<a class="anchor" aria-label="anchor" href="#changed-the-delivered-data-say-whether-a-person-looked-development-version"></a></h3>
+<ul><li>Records a reviewer marked “Reasonable unusual record” are now marked in the data that continue through the pipeline. Before, the mark was made on a copy used to build the classified tables and never reached the delivered datasets: <code>is_reasonable_unusual</code> was empty and the records stayed <code>unusual</code> in <code>record_status</code>. They now have <code>data_category</code> / <code>record_status</code> = <code>reasonable_unusual</code>, so the counts of <code>unusual</code> fall and of <code>reasonable_unusual</code> rise by the same amount (on the study data: 31 <code>unusual</code> -&gt; 0, 33 <code>reasonable_unusual</code>; two of the 33 were <code>equal_time</code>).</li>
+<li>Dataset A has one new column, <code>human_review</code> (<code>waiting</code>, <code>corrected</code>, <code>accepted</code>, <code>none</code>), that replaces <code>needs_review</code> and <code>is_reasonable_unusual</code>: 35 columns instead of 36. <code>accepted</code> covers both reasonable-unusual records and metric warnings marked confirmed-not-error, which A could not show before. It reports what the review files say and decides nothing.</li>
+<li>The output-files article starts with a quick guide to which file and column answers which question.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="changed-development-version">Changed<a class="anchor" aria-label="anchor" href="#changed-development-version"></a></h3>
+<ul><li>Second-review rows whose <code>pid</code> or <code>day_num</code> is not a number (for example free text that ended up in those columns) can no longer be read as records: they are left out, listed with their file line numbers on the console and in <code>output/second_review_rows_skipped.csv</code>, and the run carries on. Set <code>second_review.on_invalid_rows: stop</code> to stop the run instead.</li>
+<li>The closing line of the rules block says how many rules were set in your config and how many by the call (<code>include_manual_corrections</code>), instead of counting both as “differ from the defaults”.</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.5.3" id="sleepcleanr-153">sleepcleanr 1.5.3<a class="anchor" aria-label="anchor" href="#sleepcleanr-153"></a></h2>
 <div class="section level3">
 <h3 id="changed-the-user-defines-the-rules-the-pipeline-applies-and-reports-them-1-5-3">Changed: the user defines the rules, the pipeline applies and reports them<a class="anchor" aria-label="anchor" href="#changed-the-user-defines-the-rules-the-pipeline-applies-and-reports-them-1-5-3"></a></h3>
