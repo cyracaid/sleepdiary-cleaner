@@ -1,6 +1,12 @@
 # Changelog
 
-## sleepcleanr (development version)
+## sleepcleanr 1.6.0
+
+Delivered data change in this release: Dataset A has 35 columns (one
+new, `human_review`, in place of `needs_review` and
+`is_reasonable_unusual`), and records a reviewer marked “Reasonable
+unusual record” now have `record_status` = `reasonable_unusual`. Update
+any analysis or text that used the old columns or counts.
 
 ### Changed: the delivered data say whether a person looked
 
@@ -19,6 +25,9 @@
   both reasonable-unusual records and metric warnings marked
   confirmed-not-error, which A could not show before. It reports what
   the review files say and decides nothing.
+- Figure 6 draws the accepted records as their own group, “Reasonable
+  Unusual (accepted)”, instead of leaving them out now that they are no
+  longer `unusual`.
 - The output-files article starts with a quick guide to which file and
   column answers which question.
 

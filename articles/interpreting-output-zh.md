@@ -684,7 +684,8 @@ Load（全部日记条目）→ Parsed（有时间戳的条目）→ Auto-Correc
 
 **论文用途** Supplement
 
-**每部分是什么意思** 按记录类别（Clean / Unusual / Manually Corrected /
+**每部分是什么意思** 按记录类别（Clean / Unusual / Reasonable Unusual
+(accepted) / Manually Corrected /
 Error）画出的最终睡眠时长密度曲线，取自 Step 5–6.5
 之后。这回答的问题是：人工修正有没有扭曲整体睡眠时长的分布？（被修正类别的曲线应该和
 clean 曲线重叠。）
@@ -698,11 +699,13 @@ clean 曲线重叠。）
 
 **精确规则**
 
-- **画的是什么。** 每一类记录（Clean、Unusual、Manually
-  Corrected、Error）的最终
+- **画的是什么。** 每一类记录（Clean、Unusual、Reasonable Unusual
+  (accepted)、Manually Corrected、Error）的最终
   `sleep_duration_h`（TST，小时）的平滑曲线。每条曲线按自己的面积缩放，所以比的是形状，不是高度；副标题写明了每条曲线依据多少条记录。
 - **包含哪些记录。**
-  只有算得出睡眠时长的记录，而且只有这四类。被人工修正过的记录一律显示为
+  只有算得出睡眠时长的记录，而且只有这五类。Reasonable Unusual
+  (accepted) 是审阅者标为 “Reasonable unusual record”
+  的记录：单独显示，不并入 Unusual。被人工修正过的记录一律显示为
   Manually Corrected，不管它原来属于哪一类。
 - **它的用途。** 检查人工修正有没有扭曲整体分布：可以和图 14 对照，图 14
   是没做任何人工修正之前的同类曲线。
@@ -711,8 +714,9 @@ clean 曲线重叠。）
 
 为什么这里的记录数比图 1 里”可用于分析”的数量少得多？
 
-图 6 只画 Clean、Unusual、Manually Corrected 和 Error 这几类。Equal Time
-记录（良性的）和 Not Reported 记录（算不出时长）不在里面。
+图 6 只画 Clean、Unusual、Reasonable Unusual (accepted)、Manually
+Corrected 和 Error 这几类。Equal Time 记录（良性的）和 Not Reported
+记录（算不出时长）不在里面。
 
 为什么 Unusual 的曲线和 Clean 的不一样？
 

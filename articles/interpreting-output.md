@@ -803,10 +803,10 @@ generated at `sleep_visualization.R:1339`
 **Paper use** Supplement
 
 **What each part means** Density curves of final sleep duration by
-record class (Clean / Unusual / Manually Corrected / Error) after Steps
-5–6.5. WHAT THIS ANSWERS: did the human corrections distort the overall
-sleep-duration distribution? (The corrected class’s curve should overlap
-the clean curve.)
+record class (Clean / Unusual / Reasonable Unusual (accepted) / Manually
+Corrected / Error) after Steps 5–6.5. WHAT THIS ANSWERS: did the human
+corrections distort the overall sleep-duration distribution? (The
+corrected class’s curve should overlap the clean curve.)
 
 **Healthy look** One smooth peak around 6–8 hours, with nothing piled up
 at 0 or beyond 12 hours — the shape of normal night sleep. It also shows
@@ -819,12 +819,14 @@ records slipped through.
 **Precise rules**
 
 - **What is drawn.** A smoothed curve of the final `sleep_duration_h`
-  (TST in hours) for each record class: Clean, Unusual, Manually
-  Corrected and Error. Each curve is scaled to its own area, so compare
-  shapes, not heights; the subtitle lists how many records each curve
-  rests on.
+  (TST in hours) for each record class: Clean, Unusual, Reasonable
+  Unusual (accepted), Manually Corrected and Error. Each curve is scaled
+  to its own area, so compare shapes, not heights; the subtitle lists
+  how many records each curve rests on.
 - **Who is included.** Only records with a computed sleep duration, and
-  only those four classes. A record that was manually corrected is shown
+  only those five classes. Reasonable Unusual (accepted) is a record a
+  reviewer marked “Reasonable unusual record”: it is shown on its own,
+  not folded into Unusual. A record that was manually corrected is shown
   as Manually Corrected, whatever its original class.
 - **What it is for.** To check that human corrections did not distort
   the overall distribution: compare with Figure 14, which shows the same
@@ -835,9 +837,9 @@ records slipped through.
 Why are there far fewer records here than the “usable for analysis”
 count in Figure 1?
 
-Figure 6 draws only the Clean, Unusual, Manually Corrected and Error
-classes. Equal Time records (benign) and Not Reported records (no
-computed duration) are not in it.
+Figure 6 draws only the Clean, Unusual, Reasonable Unusual (accepted),
+Manually Corrected and Error classes. Equal Time records (benign) and
+Not Reported records (no computed duration) are not in it.
 
 Why does the Unusual curve look different from the Clean one?
 

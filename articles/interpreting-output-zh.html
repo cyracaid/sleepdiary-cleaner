@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -1932,7 +1932,8 @@ benign、not-reported）以及至少接受过一次修正的参与者比例。TS
 生成于 <code>sleep_visualization.R:1339</code></p>
 <p><strong>论文用途</strong> Supplement</p>
 <p><strong>每部分是什么意思</strong> 按记录类别（Clean / Unusual /
-Manually Corrected / Error）画出的最终睡眠时长密度曲线，取自 Step 5–6.5
+Reasonable Unusual (accepted) / Manually Corrected /
+Error）画出的最终睡眠时长密度曲线，取自 Step 5–6.5
 之后。这回答的问题是：人工修正有没有扭曲整体睡眠时长的分布？（被修正类别的曲线应该和
 clean 曲线重叠。）</p>
 <p><strong>健康外观</strong> 只有一个平滑的峰，位于 6–8 小时，0 处和 12
@@ -1943,21 +1944,24 @@ clean 曲线重叠。）</p>
 <details><summary><strong>精确规则</strong>
 </summary><ul>
 <li>
-<strong>画的是什么。</strong> 每一类记录（Clean、Unusual、Manually
-Corrected、Error）的最终
+<strong>画的是什么。</strong> 每一类记录（Clean、Unusual、Reasonable
+Unusual (accepted)、Manually Corrected、Error）的最终
 <code>sleep_duration_h</code>（TST，小时）的平滑曲线。每条曲线按自己的面积缩放，所以比的是形状，不是高度；副标题写明了每条曲线依据多少条记录。</li>
 <li>
 <strong>包含哪些记录。</strong>
-只有算得出睡眠时长的记录，而且只有这四类。被人工修正过的记录一律显示为
-Manually Corrected，不管它原来属于哪一类。</li>
+只有算得出睡眠时长的记录，而且只有这五类。Reasonable Unusual (accepted)
+是审阅者标为 “Reasonable unusual record” 的记录：单独显示，不并入
+Unusual。被人工修正过的记录一律显示为 Manually
+Corrected，不管它原来属于哪一类。</li>
 <li>
 <strong>它的用途。</strong> 检查人工修正有没有扭曲整体分布：可以和图
 14 对照，图 14 是没做任何人工修正之前的同类曲线。</li>
 </ul></details><p><strong>常见问题</strong></p>
 <details><summary>
 为什么这里的记录数比图 1 里”可用于分析”的数量少得多？
-</summary><p>图 6 只画 Clean、Unusual、Manually Corrected 和 Error 这几类。Equal
-Time 记录（良性的）和 Not Reported 记录（算不出时长）不在里面。</p>
+</summary><p>图 6 只画 Clean、Unusual、Reasonable Unusual (accepted)、Manually
+Corrected 和 Error 这几类。Equal Time 记录（良性的）和 Not Reported
+记录（算不出时长）不在里面。</p>
 </details><details><summary>
 为什么 Unusual 的曲线和 Clean 的不一样？
 </summary><p>Unusual

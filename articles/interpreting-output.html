@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -2168,10 +2168,11 @@ time; SOL = sleep onset latency.</p>
 generated at <code>sleep_visualization.R:1339</code></p>
 <p><strong>Paper use</strong> Supplement</p>
 <p><strong>What each part means</strong> Density curves of final sleep
-duration by record class (Clean / Unusual / Manually Corrected / Error)
-after Steps 5–6.5. WHAT THIS ANSWERS: did the human corrections distort
-the overall sleep-duration distribution? (The corrected class’s curve
-should overlap the clean curve.)</p>
+duration by record class (Clean / Unusual / Reasonable Unusual
+(accepted) / Manually Corrected / Error) after Steps 5–6.5. WHAT THIS
+ANSWERS: did the human corrections distort the overall sleep-duration
+distribution? (The corrected class’s curve should overlap the clean
+curve.)</p>
 <p><strong>Healthy look</strong> One smooth peak around 6–8 hours, with
 nothing piled up at 0 or beyond 12 hours — the shape of normal night
 sleep. It also shows the human corrections did not distort the overall
@@ -2184,14 +2185,15 @@ zero-duration records slipped through.</p>
 <li>
 <strong>What is drawn.</strong> A smoothed curve of the final
 <code>sleep_duration_h</code> (TST in hours) for each record class:
-Clean, Unusual, Manually Corrected and Error. Each curve is scaled to
-its own area, so compare shapes, not heights; the subtitle lists how
-many records each curve rests on.</li>
+Clean, Unusual, Reasonable Unusual (accepted), Manually Corrected and
+Error. Each curve is scaled to its own area, so compare shapes, not
+heights; the subtitle lists how many records each curve rests on.</li>
 <li>
 <strong>Who is included.</strong> Only records with a computed sleep
-duration, and only those four classes. A record that was manually
-corrected is shown as Manually Corrected, whatever its original
-class.</li>
+duration, and only those five classes. Reasonable Unusual (accepted) is
+a record a reviewer marked “Reasonable unusual record”: it is shown on
+its own, not folded into Unusual. A record that was manually corrected
+is shown as Manually Corrected, whatever its original class.</li>
 <li>
 <strong>What it is for.</strong> To check that human corrections did
 not distort the overall distribution: compare with Figure 14, which
@@ -2200,9 +2202,10 @@ shows the same kind of curve before any manual correction.</li>
 <details><summary>
 Why are there far fewer records here than the “usable for analysis”
 count in Figure 1?
-</summary><p>Figure 6 draws only the Clean, Unusual, Manually Corrected and Error
-classes. Equal Time records (benign) and Not Reported records (no
-computed duration) are not in it.</p>
+</summary><p>Figure 6 draws only the Clean, Unusual, Reasonable Unusual
+(accepted), Manually Corrected and Error classes. Equal Time records
+(benign) and Not Reported records (no computed duration) are not in
+it.</p>
 </details><details><summary>
 Why does the Unusual curve look different from the Clean one?
 </summary><p>Unusual records were picked by a rule about odd gaps, so they are not
