@@ -10,21 +10,50 @@ gross outliers, not to diagnose insomnia. For clinical samples
 > sample. Document your own study population here so downstream users
 > know the reference.
 
+## How to use these values
+
+- **For our study data the values below are fixed.** They are the rules
+  the study ran with. The Step 5 limits (7, 7 and 24 hours for errors;
+  3, 15, 3 and 3 hours for unusual records) were written down in the
+  project’s March 2026 logic document. The code has used these same
+  values since the first release (July 2026) until they became
+  configuration (see `NEWS.md`). To reproduce our results, keep the
+  defaults.
+- **For your own data you decide.** Every key in the table can be set in
+  your config YAML (the commented examples are in
+  `inst/config_template.yaml`). The pipeline applies what you set and
+  reports it; it does not choose rules for you. A value that is present
+  but not a number stops the run.
+- **Every run states the rules it used.** The run prints
+  `=== Rules in effect for this run ===` and saves the same list as
+  `output/effective_rules.csv` (key, value, default, whether the value
+  comes from the default or from your config, meaning). Keep that file
+  with your results and cite it in your Methods. To compare two runs,
+  compare their `effective_rules.csv`.
+
 ## Threshold table
 
-| Config key                                                   | Default | Flags                        | Rationale                                                                                     |
-|--------------------------------------------------------------|---------|------------------------------|-----------------------------------------------------------------------------------------------|
-| `classification.metric_validation.sol.excessive_minutes`     | `120`   | SOL \> 2h                    | Very lenient. Clinical SOL marker ~30 min (Lichstein et al.). 2h catches only gross outliers. |
-| `classification.metric_validation.se.min_valid_percent`      | `0`     | SE \< 0%                     | Structural impossibility → always flag                                                        |
-| `classification.metric_validation.se.max_valid_percent`      | `100`   | SE \> 100%                   | Structural impossibility → always flag                                                        |
-| `classification.flag_severity.poor_efficiency_threshold_pct` | `70`    | SE \< 70%                    | Lenient. Insomnia cutoff ~85%. 70% flags markedly poor efficiency.                            |
-| `classification.flag_severity.high_sol_threshold_hours`      | `1`     | SOL \> 1h                    | Lenient vs 30-min clinical marker.                                                            |
-| `classification.flag_severity.high_waso_threshold_hours`     | `1.5`   | WASO \> 1.5h                 | Lenient. Clinical WASO marker often \> 30 min.                                                |
-| `classification.metric_validation.tst_tib_ratio.min_ratio`   | `0.5`   | TST/TIB \< 0.5               | Equivalent to SE \< 50%                                                                       |
-| `classification.metric_validation.tst_tib_ratio.max_ratio`   | `1.0`   | TST/TIB \> 1.0               | Impossible → hard error                                                                       |
-| `timestamp.sequence.max_gap_hours`                           | `12`    | AM/PM flip trigger           | Assumes no legitimate interval \>= 12h                                                        |
-| `timestamp.midnight_threshold_hour`                          | `6`     | Times \< 6AM → next day      | Standard diary convention                                                                     |
-| `interval.mmss_threshold_minutes`                            | `60`    | value \> 60 with `:` → MM:SS | Heuristic for ambiguous formats                                                               |
+| Config key                                                             | Default                                        | Flags                                                                    | Rationale                                                                                                                   |
+|------------------------------------------------------------------------|------------------------------------------------|--------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
+| `classification.metric_validation.sol.excessive_minutes`               | `120`                                          | SOL \> 2h                                                                | Very lenient. Clinical SOL marker ~30 min (Lichstein et al.). 2h catches only gross outliers.                               |
+| `classification.metric_validation.se.min_valid_percent`                | `0`                                            | SE \< 0%                                                                 | Structural impossibility → always flag                                                                                      |
+| `classification.metric_validation.se.max_valid_percent`                | `100`                                          | SE \> 100%                                                               | Structural impossibility → always flag                                                                                      |
+| `classification.flag_severity.poor_efficiency_threshold_pct`           | `70`                                           | SE \< 70%                                                                | Lenient. Insomnia cutoff ~85%. 70% flags markedly poor efficiency.                                                          |
+| `classification.flag_severity.high_sol_threshold_hours`                | `1`                                            | SOL \> 1h                                                                | Lenient vs 30-min clinical marker.                                                                                          |
+| `classification.flag_severity.high_waso_threshold_hours`               | `1.5`                                          | WASO \> 1.5h                                                             | Lenient. Clinical WASO marker often \> 30 min.                                                                              |
+| `classification.metric_validation.tst_tib_ratio.min_ratio`             | `0.5`                                          | TST/TIB \< 0.5                                                           | Equivalent to SE \< 50%                                                                                                     |
+| `classification.metric_validation.tst_tib_ratio.max_ratio`             | `1.0`                                          | TST/TIB \> 1.0                                                           | Impossible → hard error                                                                                                     |
+| `timestamp.sequence.max_gap_hours`                                     | `12`                                           | AM/PM flip trigger                                                       | Assumes no legitimate interval \>= 12h                                                                                      |
+| `timestamp.midnight_threshold_hour`                                    | `6`                                            | Times \< 6AM → next day                                                  | Standard diary convention                                                                                                   |
+| `classification.step5.error.bed_to_sleep_max_hours`                    | `7`                                            | \|sleep − bed\| \> 7 h is an error                                       | Nobody takes 7 hours to fall asleep; more likely one of the two times was mis-entered                                       |
+| `classification.step5.error.awake_to_getup_max_hours`                  | `7`                                            | \|getup − awake\| \> 7 h is an error                                     | Lying in bed more than 7 h after waking is implausible                                                                      |
+| `classification.step5.error.sleep_to_awake_max_hours`                  | `24`                                           | \|awake − sleep\| \> 24 h is an error                                    | A sleep period cannot exceed a day                                                                                          |
+| `classification.step5.unusual.sleep_to_awake_min_hours` / `_max_hours` | `3` / `15`                                     | Sleep period \< 3 h or \> 15 h is unusual                                | Possible but worth a look                                                                                                   |
+| `classification.step5.unusual.bed_to_sleep_max_hours`                  | `3`                                            | Sleep − bed \> 3 h is unusual                                            | Most people fall asleep within an hour                                                                                      |
+| `classification.step5.unusual.awake_to_getup_max_hours`                | `3`                                            | Getup − awake \> 3 h is unusual                                          | Long time in bed after waking                                                                                               |
+| `review.clean_categories`                                              | `clean`, `equal_time_ok`, `reasonable_unusual` | Final categories that count as “now passes” in the review status table   | Yours to define                                                                                                             |
+| `manual_corrections.manual_overrides_parser`                           | `false`                                        | `true`: a manual sleep-metric-duration row wins over the interval parser | Long-standing behaviour is that the parser wins; every skipped row is listed in `output/manual_corrections_not_applied.csv` |
+| `timestamp.interval.mmss_threshold_minutes`                            | `60`                                           | value \> 60 with `:` → MM:SS                                             | Heuristic for ambiguous formats                                                                                             |
 
 ## Suggested config comments
 

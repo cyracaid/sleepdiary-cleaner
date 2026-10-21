@@ -254,6 +254,12 @@ AI）只需要填写*正确的值应该是什么*。循环是这样运作的：
 
 **什么会让一条记录进入审查堆（精确规则，按优先级）：**
 
+下面的小时数是默认值。每一个都可以在配置的 `classification.step5`
+下修改（见[输入数据与配置](https://cyracaid.github.io/sleepdiary-cleaner/articles/column-mapping-zh.md)）；每次运行都会打印它实际用的值，并保存在
+`output/effective_rules.csv` 里。 这些默认值的来历：Step 5
+的限制记录在项目 2026 年 3 月的逻辑文档里，代码从第一次发布（2026 年 7
+月）起一直使用同样的数值，直到它们变成配置项。要复现研究的结果，保留默认值。所有阈值及其依据见[Thresholds](https://cyracaid.github.io/sleepdiary-cleaner/THRESHOLDS.md)页。
+
 *ERROR——物理上不可能，必须修正（`generate_correction_files.R:315`）：* 1.
 `sleep_awake_equal_error` — 入睡时间 ==
 醒来时间（零时长睡眠；记录从根本上坏了） 2. `order_error` — bed → sleep

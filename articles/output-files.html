@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,6 +61,7 @@
     <li><a class="dropdown-item" href="../articles/index.html">All articles / 全部文章</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../THRESHOLDS.html">Thresholds</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -189,6 +190,22 @@ Your own file is never edited. Not a worklist</td>
 <th>What it is</th>
 </tr></thead>
 <tbody>
+<tr class="odd">
+<td><code>effective_rules.csv</code></td>
+<td>Start of the run</td>
+<td>Every rule and threshold the run used (key, value, default, whether
+it comes from the default or from your config, meaning). Compare two
+runs by comparing this file</td>
+</tr>
+<tr class="even">
+<td><code>manual_corrections_not_applied.csv</code></td>
+<td>When manual metric-duration rows are applied</td>
+<td>Each manual sleep-metric-duration row that was not applied and why
+(<code>parser_already_converted_MMSS</code>,
+<code>row_not_marked_manually_corrected</code>,
+<code>column_not_found</code>, <code>no_unique_row_match</code>). Header
+only when every row was applied</td>
+</tr>
 <tr class="odd">
 <td><code>correction_status.csv</code></td>
 <td>At each checkpoint</td>

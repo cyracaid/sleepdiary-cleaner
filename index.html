@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,6 +61,7 @@
     <li><a class="dropdown-item" href="articles/index.html">All articles / 全部文章</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="THRESHOLDS.html">Thresholds</a></li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -411,7 +412,7 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <div class="section level2">
 <h2 id="status-and-data-availability">Status and data availability<a class="anchor" aria-label="anchor" href="#status-and-data-availability"></a>
 </h2>
-<p><strong>Status.</strong> sleepcleanr 1.5.2 is research software under active development. It was built for one longitudinal sleep study, has not yet been peer reviewed, and is not on CRAN. Treat the shipped thresholds as references to check against your own data.</p>
+<p><strong>Status.</strong> sleepcleanr 1.5.3 is research software under active development. It was built for one longitudinal sleep study, has not yet been peer reviewed, and is not on CRAN. Treat the shipped thresholds as references to check against your own data.</p>
 <p><strong>Data availability.</strong> The study data are not public (participant privacy). What you can use without them:</p>
 <ul>
 <li>a bundled synthetic fixture (<code>inst/extdata/</code>, 280 rows, 20 participants) that <code><a href="reference/run_pipeline.html">run_pipeline()</a></code> runs on by default;</li>
@@ -498,6 +499,8 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <li>vignette(“interpreting-output”) — reading the output and the review loop (<code>correction_status_final.csv</code>, the review status table, figures)</li>
 <li>vignette(“output-files”) — every file a run writes: where it goes, which step writes it, what it is</li>
 <li>vignette(“troubleshooting”) — symptom, cause and fix for the problems seen most often</li>
+<li>
+<a href="THRESHOLDS.html"><code>THRESHOLDS.md</code></a> — every detection threshold with its default and rationale, and how to set your own (also on the docs site under “Thresholds”)</li>
 <li>vignette(“pipeline-architecture”) — structure, rule families, classification</li>
 <li>vignette(“validation-methodology”) — how the rules were validated (synthetic + real data)</li>
 <li>vignette(“testing-coverage”) — test suite coverage</li>
@@ -667,7 +670,7 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <div class="section level2">
 <h2 id="状态与数据可用性">状态与数据可用性<a class="anchor" aria-label="anchor" href="#%E7%8A%B6%E6%80%81%E4%B8%8E%E6%95%B0%E6%8D%AE%E5%8F%AF%E7%94%A8%E6%80%A7"></a>
 </h2>
-<p><strong>状态。</strong> sleepcleanr 1.5.2 是仍在开发中的研究软件，为一项纵向睡眠研究而写，尚未经同行评审，也未上线 CRAN。随包给出的阈值只是参考，请用你自己的数据核对。</p>
+<p><strong>状态。</strong> sleepcleanr 1.5.3 是仍在开发中的研究软件，为一项纵向睡眠研究而写，尚未经同行评审，也未上线 CRAN。随包给出的阈值只是参考，请用你自己的数据核对。</p>
 <p><strong>数据可用性。</strong> 研究数据不公开（参与者隐私）。不需要这些数据也能用到的东西：</p>
 <ul>
 <li>内置合成数据（<code>inst/extdata/</code>，280 行、20 名参与者），<code><a href="reference/run_pipeline.html">run_pipeline()</a></code> 默认就跑它；</li>
@@ -745,6 +748,8 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <li>vignette(“interpreting-output-zh”) — 读懂输出与审核循环（<code>correction_status_final.csv</code>、审核状态表、图）</li>
 <li>vignette(“output-files-zh”) — 一次运行写出的每个文件：放哪里、哪一步写出、是什么</li>
 <li>vignette(“troubleshooting-zh”) — 最常见问题的现象、原因和处理办法</li>
+<li>
+<a href="THRESHOLDS.html"><code>THRESHOLDS.md</code></a> — 每个检测阈值的默认值与依据，以及如何设置你自己的（文档站点”Thresholds”页也有）</li>
 <li>vignette(“pipeline-architecture-zh”) — 结构、规则族、分类体系</li>
 <li>vignette(“validation-methodology-zh”) — 规则如何验证（合成 + 真实数据）</li>
 <li>vignette(“testing-coverage-zh”) — 测试覆盖</li>

@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,6 +61,7 @@
     <li><a class="dropdown-item" href="../articles/index.html">All articles / 全部文章</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../THRESHOLDS.html">Thresholds</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -228,6 +229,18 @@ look at <code>status_after_corrections</code>
 </td>
 </tr>
 <tr class="even">
+<td>
+<code>Parser already converted ... skipped manual override</code>,
+or <code>Correction rows skipped: N</code>
+</td>
+<td>A manual sleep-metric-duration row was not applied. By default the
+interval parser wins when it already converted an MM:SS value</td>
+<td>Open <code>output/manual_corrections_not_applied.csv</code> to see
+each row and its reason. To let the manual row win, set
+<code>manual_corrections.manual_overrides_parser: true</code> in the
+config</td>
+</tr>
+<tr class="odd">
 <td>
 <code>remove.packages</code> says there is no package</td>
 <td>It was not installed in that library</td>

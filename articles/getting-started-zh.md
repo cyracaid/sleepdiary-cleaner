@@ -66,6 +66,9 @@ run_pipeline(config = "my_study.yaml", project_dir = "path/to/project",
 每一步会打印标题 `=== Step N: ... ===`。运行之后：
 
 - 最后一个标题告诉你跑到了哪一步。如果运行中途停了，错误信息就在最后一个标题之后。
+- 在 Step 1 之前，运行会打印
+  `=== Rules in effect for this run ===`：它将使用的每个阈值，以及来自默认值还是你的配置。同一份清单保存在
+  `output/effective_rules.csv`。
 - Step 5 应该打印
   `14. Saving review CSV files with [NEW] prefix...`，以及两张审核表各一行
   `verified on disk`。

@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,6 +63,7 @@
     <li><a class="dropdown-item" href="../articles/index.html">All articles / 全部文章</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../THRESHOLDS.html">Thresholds</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -820,6 +821,15 @@ Step 5 lists every record the rules flag on the data BEFORE corrections, so
    no row is unhandled and none is still a problem (see "How to know you are done").</code></pre>
 <p><strong>What puts a record on the review pile (the exact rules, in
 priority order):</strong></p>
+<p>The hour limits below are the defaults. You can change each one under
+<code>classification.step5</code> in your config (see <a href="column-mapping.html">Input data and configuration</a>); every run
+prints the values it used and saves them in
+<code>output/effective_rules.csv</code>. Where these defaults come from:
+the Step 5 limits are recorded in the project’s March 2026 logic
+document, and the code has used the same values since the first release
+(July 2026) until they became configuration. To reproduce the study’s
+results, keep the defaults. All thresholds, with their rationale, are on
+the <a href="../THRESHOLDS.html">Thresholds</a> page.</p>
 <p><em>ERROR — physically impossible, must be fixed
 (<code>generate_correction_files.R:315</code>):</em> 1.
 <code>sleep_awake_equal_error</code> — sleep time == awake time (a

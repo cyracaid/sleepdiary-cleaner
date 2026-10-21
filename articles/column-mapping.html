@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,6 +63,7 @@
     <li><a class="dropdown-item" href="../articles/index.html">All articles / 全部文章</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../THRESHOLDS.html">Thresholds</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -322,6 +323,39 @@ cannabis_amount_pm_doses</td>
 </tr>
 </tbody>
 </table>
+</div>
+<div class="section level2">
+<h2 id="rules-you-can-change">Rules you can change<a class="anchor" aria-label="anchor" href="#rules-you-can-change"></a>
+</h2>
+<p>The rules that decide what goes to review are configuration, not
+code. Defaults are shown; set only what you want to change. Each run
+prints the values it used and saves them in
+<code>output/effective_rules.csv</code>.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">classification</span><span class="kw">:</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="at">  </span><span class="fu">step5</span><span class="kw">:</span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="at">    </span><span class="fu">error</span><span class="kw">:</span><span class="co">                          # a record matching any of these is an ERROR</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="at">      </span><span class="fu">bed_to_sleep_max_hours</span><span class="kw">:</span><span class="at"> </span><span class="dv">7</span><span class="co">     # |sleep - bed| above this</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="at">      </span><span class="fu">awake_to_getup_max_hours</span><span class="kw">:</span><span class="at"> </span><span class="dv">7</span><span class="co">   # |getup - awake| above this</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="at">      </span><span class="fu">sleep_to_awake_max_hours</span><span class="kw">:</span><span class="at"> </span><span class="dv">24</span><span class="co">  # |awake - sleep| above this</span></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="at">    </span><span class="fu">unusual</span><span class="kw">:</span><span class="co">                        # suspicious but possible</span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a><span class="at">      </span><span class="fu">sleep_to_awake_min_hours</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a><span class="at">      </span><span class="fu">sleep_to_awake_max_hours</span><span class="kw">:</span><span class="at"> </span><span class="dv">15</span></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a><span class="at">      </span><span class="fu">bed_to_sleep_max_hours</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a><span class="at">      </span><span class="fu">awake_to_getup_max_hours</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="fu">review</span><span class="kw">:</span></span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="at">  </span><span class="fu">clean_categories</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="st">"clean"</span><span class="kw">,</span><span class="at"> </span><span class="st">"equal_time_ok"</span><span class="kw">,</span><span class="at"> </span><span class="st">"reasonable_unusual"</span><span class="kw">]</span><span class="co">   # what "now passes" means in the status table</span></span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="fu">manual_corrections</span><span class="kw">:</span></span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="at">  </span><span class="fu">manual_overrides_parser</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span><span class="co">    # true: a manual sleep-metric-duration row wins over the interval parser</span></span></code></pre></div>
+<p>A value that is present but not a single number stops the run with a
+message; it is never replaced silently.</p>
+<p>Where these defaults come from: the Step 5 limits (7, 7 and 24 hours
+for errors; 3, 15, 3 and 3 hours for unusual records) are recorded in
+the project’s March 2026 logic document, and the code has used the same
+values since the first release (July 2026) until they became
+configuration. To reproduce the study’s results, keep the defaults. All
+thresholds, with their rationale, are on the <a href="../THRESHOLDS.html">Thresholds</a> page.</p>
+<p>The keys <code>classification.temporal.*</code> that older default
+configs contained were never read by the code and have been removed.</p>
 </div>
 <div class="section level2">
 <h2 id="output">Output<a class="anchor" aria-label="anchor" href="#output"></a>

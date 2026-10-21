@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,6 +61,7 @@
     <li><a class="dropdown-item" href="../articles/index.html">All articles / 全部文章</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../THRESHOLDS.html">Thresholds</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -209,6 +210,9 @@ R 会话，再安装，再重启。</p>
 <p>每一步会打印标题 <code>=== Step N: ... ===</code>。运行之后：</p>
 <ul>
 <li>最后一个标题告诉你跑到了哪一步。如果运行中途停了，错误信息就在最后一个标题之后。</li>
+<li>在 Step 1 之前，运行会打印
+<code>=== Rules in effect for this run ===</code>：它将使用的每个阈值，以及来自默认值还是你的配置。同一份清单保存在
+<code>output/effective_rules.csv</code>。</li>
 <li>Step 5 应该打印
 <code>14. Saving review CSV files with [NEW] prefix...</code>，以及两张审核表各一行
 <code>verified on disk</code>。</li>

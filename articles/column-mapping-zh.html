@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,6 +61,7 @@
     <li><a class="dropdown-item" href="../articles/index.html">All articles / 全部文章</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../THRESHOLDS.html">Thresholds</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -306,6 +307,34 @@ cannabis_amount_pm_doses</td>
 </tr>
 </tbody>
 </table>
+</div>
+<div class="section level2">
+<h2 id="你可以修改的规则">你可以修改的规则<a class="anchor" aria-label="anchor" href="#%E4%BD%A0%E5%8F%AF%E4%BB%A5%E4%BF%AE%E6%94%B9%E7%9A%84%E8%A7%84%E5%88%99"></a>
+</h2>
+<p>决定哪些记录进入审核的规则是配置，不是代码。下面是默认值；只设你想改的。每次运行都会打印它用到的值，并保存在
+<code>output/effective_rules.csv</code>。</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">classification</span><span class="kw">:</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="at">  </span><span class="fu">step5</span><span class="kw">:</span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="at">    </span><span class="fu">error</span><span class="kw">:</span><span class="co">                          # 符合任何一条就是 ERROR</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="at">      </span><span class="fu">bed_to_sleep_max_hours</span><span class="kw">:</span><span class="at"> </span><span class="dv">7</span><span class="co">     # |sleep - bed| 超过这个值</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="at">      </span><span class="fu">awake_to_getup_max_hours</span><span class="kw">:</span><span class="at"> </span><span class="dv">7</span><span class="co">   # |getup - awake| 超过这个值</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="at">      </span><span class="fu">sleep_to_awake_max_hours</span><span class="kw">:</span><span class="at"> </span><span class="dv">24</span><span class="co">  # |awake - sleep| 超过这个值</span></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="at">    </span><span class="fu">unusual</span><span class="kw">:</span><span class="co">                        # 可疑但可能</span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a><span class="at">      </span><span class="fu">sleep_to_awake_min_hours</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a><span class="at">      </span><span class="fu">sleep_to_awake_max_hours</span><span class="kw">:</span><span class="at"> </span><span class="dv">15</span></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a><span class="at">      </span><span class="fu">bed_to_sleep_max_hours</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a><span class="at">      </span><span class="fu">awake_to_getup_max_hours</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="fu">review</span><span class="kw">:</span></span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="at">  </span><span class="fu">clean_categories</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="st">"clean"</span><span class="kw">,</span><span class="at"> </span><span class="st">"equal_time_ok"</span><span class="kw">,</span><span class="at"> </span><span class="st">"reasonable_unusual"</span><span class="kw">]</span><span class="co">   # 状态表里"现在通过"的含义</span></span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="fu">manual_corrections</span><span class="kw">:</span></span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="at">  </span><span class="fu">manual_overrides_parser</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span><span class="co">    # true：人工睡眠指标时长修正优先于区间解析器</span></span></code></pre></div>
+<p>值存在但不是单个数字时，运行会停下并给出提示，绝不会被悄悄替换。</p>
+<p>这些默认值的来历：Step 5 的限制（错误：7、7、24
+小时；unusual：3、15、3、3 小时）记录在项目 2026 年 3
+月的逻辑文档里，代码从第一次发布（2026 年 7
+月）起一直使用同样的数值，直到它们变成配置项。要复现研究的结果，保留默认值。所有阈值及其依据见<a href="../THRESHOLDS.html">Thresholds</a>页。</p>
+<p>旧版默认配置里的 <code>classification.temporal.*</code>
+从未被代码读取，已经删除。</p>
 </div>
 <div class="section level2">
 <h2 id="输出">输出<a class="anchor" aria-label="anchor" href="#%E8%BE%93%E5%87%BA"></a>

@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,6 +61,7 @@
     <li><a class="dropdown-item" href="../articles/index.html">All articles / 全部文章</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../THRESHOLDS.html">Thresholds</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -217,6 +218,18 @@
 </td>
 </tr>
 <tr class="even">
+<td>
+<code>Parser already converted ... skipped manual override</code>，或
+<code>Correction rows skipped: N</code>
+</td>
+<td>有人工睡眠指标时长修正没有被应用。默认情况下，如果解析器已经转换了
+MM:SS 的值，以解析器为准</td>
+<td>打开
+<code>output/manual_corrections_not_applied.csv</code>，看每一行和原因。想让人工那行优先，在配置里设
+<code>manual_corrections.manual_overrides_parser: true</code>
+</td>
+</tr>
+<tr class="odd">
 <td>
 <code>remove.packages</code> 说没有这个包</td>
 <td>那个库里没装过</td>

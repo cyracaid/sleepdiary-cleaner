@@ -301,6 +301,18 @@ this:
 **What puts a record on the review pile (the exact rules, in priority
 order):**
 
+The hour limits below are the defaults. You can change each one under
+`classification.step5` in your config (see [Input data and
+configuration](https://cyracaid.github.io/sleepdiary-cleaner/articles/column-mapping.md));
+every run prints the values it used and saves them in
+`output/effective_rules.csv`. Where these defaults come from: the Step 5
+limits are recorded in the project’s March 2026 logic document, and the
+code has used the same values since the first release (July 2026) until
+they became configuration. To reproduce the study’s results, keep the
+defaults. All thresholds, with their rationale, are on the
+[Thresholds](https://cyracaid.github.io/sleepdiary-cleaner/THRESHOLDS.md)
+page.
+
 *ERROR — physically impossible, must be fixed
 (`generate_correction_files.R:315`):* 1. `sleep_awake_equal_error` —
 sleep time == awake time (a zero-length sleep period; the record is

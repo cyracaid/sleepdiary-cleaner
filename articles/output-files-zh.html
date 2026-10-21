@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,6 +61,7 @@
     <li><a class="dropdown-item" href="../articles/index.html">All articles / 全部文章</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../THRESHOLDS.html">Thresholds</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -177,6 +178,16 @@
 <th>是什么</th>
 </tr></thead>
 <tbody>
+<tr class="odd">
+<td><code>effective_rules.csv</code></td>
+<td>运行开头</td>
+<td>这次运行用到的每条规则和阈值（key、取值、默认值、来自默认还是你的配置、含义）。比较两次运行，就比较这个文件</td>
+</tr>
+<tr class="even">
+<td><code>manual_corrections_not_applied.csv</code></td>
+<td>应用人工睡眠指标时长修正时</td>
+<td>每一条没有被应用的人工睡眠指标时长修正及原因（<code>parser_already_converted_MMSS</code>、<code>row_not_marked_manually_corrected</code>、<code>column_not_found</code>、<code>no_unique_row_match</code>）。全部应用时只有表头</td>
+</tr>
 <tr class="odd">
 <td><code>correction_status.csv</code></td>
 <td>每个检查点</td>

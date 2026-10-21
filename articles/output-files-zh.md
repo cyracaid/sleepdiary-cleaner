@@ -21,19 +21,21 @@
 
 ## `output/`
 
-| 文件                                          | 何时写出    | 是什么                                                                                                                                          |
-|-----------------------------------------------|-------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
-| `correction_status.csv`                       | 每个检查点  | 每个检查点（A–E）一行：各类记录的数量、平均 TST 和 SOL；每次运行追加，带 `run_id`                                                               |
-| `step_flag_ledger.csv`                        | Step 9 之后 | 每行是 步骤 × 标准 × 类别：该步骤中有多少记录落入这一类（运行中记录，接近结尾写出）                                                             |
-| `flagged_records_self_reported.csv`           | Step 8      | 标为 `SELF_REPORTED_FLAG` 的记录（例如 SOL 超过 120 分钟）                                                                                      |
-| `corrected_ema_data.rds`                      | Step 7      | 流水线修正并算出睡眠指标之后的工作数据，所有列                                                                                                  |
-| `audit_integrity_report.csv`                  | Step 9 之后 | 修正后数据与输入的完整性检查：行、列、未触及的变量、重复                                                                                        |
-| `appendix_step_ledger.csv`                    | Step 9      | 图 A1 画的完整逐步账本                                                                                                                          |
-| `cleaned_data_final.csv` / `.rds`             | Step 10     | **数据集 A**，面向分析的列（由列字典决定）                                                                                                      |
-| `cleaned_data_prepostcorrection.csv` / `.rds` | Step 10     | **数据集 B**：修正前后的值，以及每行的审计处置                                                                                                  |
-| `cleaned_data_full.rds`                       | Step 10     | 全部内容，未改动                                                                                                                                |
-| `column_dictionary_gaps.csv`                  | Step 10     | 数据里有、但列字典没有描述的列                                                                                                                  |
-| `correction_status_final.csv`                 | 结束时      | **运行摘要。** 每次运行追加一行。见[读懂输出与审核循环](https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output-zh.html#s-4) |
+| 文件                                          | 何时写出                   | 是什么                                                                                                                                                                              |
+|-----------------------------------------------|----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `effective_rules.csv`                         | 运行开头                   | 这次运行用到的每条规则和阈值（key、取值、默认值、来自默认还是你的配置、含义）。比较两次运行，就比较这个文件                                                                         |
+| `manual_corrections_not_applied.csv`          | 应用人工睡眠指标时长修正时 | 每一条没有被应用的人工睡眠指标时长修正及原因（`parser_already_converted_MMSS`、`row_not_marked_manually_corrected`、`column_not_found`、`no_unique_row_match`）。全部应用时只有表头 |
+| `correction_status.csv`                       | 每个检查点                 | 每个检查点（A–E）一行：各类记录的数量、平均 TST 和 SOL；每次运行追加，带 `run_id`                                                                                                   |
+| `step_flag_ledger.csv`                        | Step 9 之后                | 每行是 步骤 × 标准 × 类别：该步骤中有多少记录落入这一类（运行中记录，接近结尾写出）                                                                                                 |
+| `flagged_records_self_reported.csv`           | Step 8                     | 标为 `SELF_REPORTED_FLAG` 的记录（例如 SOL 超过 120 分钟）                                                                                                                          |
+| `corrected_ema_data.rds`                      | Step 7                     | 流水线修正并算出睡眠指标之后的工作数据，所有列                                                                                                                                      |
+| `audit_integrity_report.csv`                  | Step 9 之后                | 修正后数据与输入的完整性检查：行、列、未触及的变量、重复                                                                                                                            |
+| `appendix_step_ledger.csv`                    | Step 9                     | 图 A1 画的完整逐步账本                                                                                                                                                              |
+| `cleaned_data_final.csv` / `.rds`             | Step 10                    | **数据集 A**，面向分析的列（由列字典决定）                                                                                                                                          |
+| `cleaned_data_prepostcorrection.csv` / `.rds` | Step 10                    | **数据集 B**：修正前后的值，以及每行的审计处置                                                                                                                                      |
+| `cleaned_data_full.rds`                       | Step 10                    | 全部内容，未改动                                                                                                                                                                    |
+| `column_dictionary_gaps.csv`                  | Step 10                    | 数据里有、但列字典没有描述的列                                                                                                                                                      |
+| `correction_status_final.csv`                 | 结束时                     | **运行摘要。** 每次运行追加一行。见[读懂输出与审核循环](https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output-zh.html#s-4)                                     |
 
 ## 图文件夹 `latest_visualization_<tag>_n<rows>/`
 

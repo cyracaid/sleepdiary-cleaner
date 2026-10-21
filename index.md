@@ -242,7 +242,7 @@ breakdown.
 
 ## Status and data availability
 
-**Status.** sleepcleanr 1.5.2 is research software under active
+**Status.** sleepcleanr 1.5.3 is research software under active
 development. It was built for one longitudinal sleep study, has not yet
 been peer reviewed, and is not on CRAN. Treat the shipped thresholds as
 references to check against your own data.
@@ -361,6 +361,9 @@ Contribution guidelines are in
   which step writes it, what it is
 - vignette(“troubleshooting”) — symptom, cause and fix for the problems
   seen most often
+- [`THRESHOLDS.md`](https://cyracaid.github.io/sleepdiary-cleaner/THRESHOLDS.md)
+  — every detection threshold with its default and rationale, and how to
+  set your own (also on the docs site under “Thresholds”)
 - vignette(“pipeline-architecture”) — structure, rule families,
   classification
 - vignette(“validation-methodology”) — how the rules were validated
@@ -501,7 +504,7 @@ sleepcleanr 刻意**既非全自动、也非全部人工 flag**：
 
 ## 状态与数据可用性
 
-**状态。** sleepcleanr 1.5.2
+**状态。** sleepcleanr 1.5.3
 是仍在开发中的研究软件，为一项纵向睡眠研究而写，尚未经同行评审，也未上线
 CRAN。随包给出的阈值只是参考，请用你自己的数据核对。
 
@@ -595,6 +598,9 @@ Bug、问题和功能建议：请开
 - vignette(“output-files-zh”) —
   一次运行写出的每个文件：放哪里、哪一步写出、是什么
 - vignette(“troubleshooting-zh”) — 最常见问题的现象、原因和处理办法
+- [`THRESHOLDS.md`](https://cyracaid.github.io/sleepdiary-cleaner/THRESHOLDS.md)
+  —
+  每个检测阈值的默认值与依据，以及如何设置你自己的（文档站点”Thresholds”页也有）
 - vignette(“pipeline-architecture-zh”) — 结构、规则族、分类体系
 - vignette(“validation-methodology-zh”) — 规则如何验证（合成 +
   真实数据）

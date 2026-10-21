@@ -1,6 +1,31 @@
 # Changelog
 
-## sleepcleanr (development version)
+## sleepcleanr 1.5.3
+
+### Changed: the user defines the rules, the pipeline applies and reports them
+
+- The rules that decide which records go to human review were written
+  into the code in four places (7 h, 24 h, 3 h, 15 h). They are now
+  configuration, under `classification.step5` (`error` and `unusual`),
+  read from one place and used by Step 5, by the recalculation after
+  manual corrections and by the category evaluators. The defaults are
+  the old values, so results do not change unless you change them. A
+  value that is present but not a single number stops the run with a
+  message.
+- `review.clean_categories` (default `clean`, `equal_time_ok`,
+  `reasonable_unusual`) says which final categories count as “now
+  passes” in the review status table. It was fixed in the code.
+- Every run now prints `=== Rules in effect for this run ===` and saves
+  the same list in `output/effective_rules.csv`, saying for each rule
+  whether the value is the default or comes from your config.
+- Manual sleep-metric-duration rows that are not applied are listed,
+  with the reason for each, in
+  `output/manual_corrections_not_applied.csv` (header only when all were
+  applied). `manual_corrections.manual_overrides_parser` (default
+  `false`, the long-standing behaviour) lets the manual row win over the
+  interval parser.
+- Removed the `classification.temporal.*` keys from the default config:
+  no code ever read them, so changing them had no effect.
 
 ### Documentation
 
@@ -73,7 +98,7 @@
   what first and last mean; that `include_manual_corrections` is an
   argument, not a YAML setting, and that its default changed in 1.4.7.
 
-## sleepcleanr (development version)
+## sleepcleanr 1.5.1 (continued)
 
 ### New
 

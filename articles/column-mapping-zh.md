@@ -139,6 +139,38 @@ run_pipeline(config = "my_study_config.yaml")
 | `templates/template_manual_metric_review_acceptances.csv`         | `manual_metric_review_acceptances.csv`         | 人工接受的指标标记        |
 | `templates/template_second_review_checklist.csv`                  | `second_review_checklist.csv`                  | 第二人验证决定            |
 
+## 你可以修改的规则
+
+决定哪些记录进入审核的规则是配置，不是代码。下面是默认值；只设你想改的。每次运行都会打印它用到的值，并保存在
+`output/effective_rules.csv`。
+
+``` yaml
+classification:
+  step5:
+    error:                          # 符合任何一条就是 ERROR
+      bed_to_sleep_max_hours: 7     # |sleep - bed| 超过这个值
+      awake_to_getup_max_hours: 7   # |getup - awake| 超过这个值
+      sleep_to_awake_max_hours: 24  # |awake - sleep| 超过这个值
+    unusual:                        # 可疑但可能
+      sleep_to_awake_min_hours: 3
+      sleep_to_awake_max_hours: 15
+      bed_to_sleep_max_hours: 3
+      awake_to_getup_max_hours: 3
+review:
+  clean_categories: ["clean", "equal_time_ok", "reasonable_unusual"]   # 状态表里"现在通过"的含义
+manual_corrections:
+  manual_overrides_parser: false    # true：人工睡眠指标时长修正优先于区间解析器
+```
+
+值存在但不是单个数字时，运行会停下并给出提示，绝不会被悄悄替换。
+
+这些默认值的来历：Step 5 的限制（错误：7、7、24
+小时；unusual：3、15、3、3 小时）记录在项目 2026 年 3
+月的逻辑文档里，代码从第一次发布（2026 年 7
+月）起一直使用同样的数值，直到它们变成配置项。要复现研究的结果，保留默认值。所有阈值及其依据见[Thresholds](https://cyracaid.github.io/sleepdiary-cleaner/THRESHOLDS.md)页。
+
+旧版默认配置里的 `classification.temporal.*` 从未被代码读取，已经删除。
+
 ## 输出
 
 | 文件                                                           | 内容                                                                                                                                                                                      |

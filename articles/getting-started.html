@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,6 +61,7 @@
     <li><a class="dropdown-item" href="../articles/index.html">All articles / 全部文章</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../THRESHOLDS.html">Thresholds</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -222,6 +223,10 @@ run:</p>
 <ul>
 <li>The last heading tells you how far it got. If the run stops, the
 error is printed after the last heading.</li>
+<li>Before Step 1 the run prints
+<code>=== Rules in effect for this run ===</code>: every threshold it
+will use and whether it is the default or comes from your config. The
+same list is saved in <code>output/effective_rules.csv</code>.</li>
 <li>Step 5 should print
 <code>14. Saving review CSV files with [NEW] prefix...</code> and a line
 <code>verified on disk</code> for each of the two worksheets.</li>

@@ -74,6 +74,10 @@ Each step prints a heading `=== Step N: ... ===`. After a run:
 
 - The last heading tells you how far it got. If the run stops, the error
   is printed after the last heading.
+- Before Step 1 the run prints `=== Rules in effect for this run ===`:
+  every threshold it will use and whether it is the default or comes
+  from your config. The same list is saved in
+  `output/effective_rules.csv`.
 - Step 5 should print `14. Saving review CSV files with [NEW] prefix...`
   and a line `verified on disk` for each of the two worksheets.
 - With manual corrections on you should see

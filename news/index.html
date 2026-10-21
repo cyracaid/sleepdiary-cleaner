@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,6 +42,7 @@
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">All articles / 全部文章</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="../THRESHOLDS.html">Thresholds</a></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -65,9 +66,18 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="sleepcleanr-development-version">sleepcleanr (development version)<a class="anchor" aria-label="anchor" href="#sleepcleanr-development-version"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.5.3" id="sleepcleanr-153">sleepcleanr 1.5.3<a class="anchor" aria-label="anchor" href="#sleepcleanr-153"></a></h2>
 <div class="section level3">
-<h3 id="documentation-development-version">Documentation<a class="anchor" aria-label="anchor" href="#documentation-development-version"></a></h3>
+<h3 id="changed-the-user-defines-the-rules-the-pipeline-applies-and-reports-them-1-5-3">Changed: the user defines the rules, the pipeline applies and reports them<a class="anchor" aria-label="anchor" href="#changed-the-user-defines-the-rules-the-pipeline-applies-and-reports-them-1-5-3"></a></h3>
+<ul><li>The rules that decide which records go to human review were written into the code in four places (7 h, 24 h, 3 h, 15 h). They are now configuration, under <code>classification.step5</code> (<code>error</code> and <code>unusual</code>), read from one place and used by Step 5, by the recalculation after manual corrections and by the category evaluators. The defaults are the old values, so results do not change unless you change them. A value that is present but not a single number stops the run with a message.</li>
+<li>
+<code>review.clean_categories</code> (default <code>clean</code>, <code>equal_time_ok</code>, <code>reasonable_unusual</code>) says which final categories count as “now passes” in the review status table. It was fixed in the code.</li>
+<li>Every run now prints <code>=== Rules in effect for this run ===</code> and saves the same list in <code>output/effective_rules.csv</code>, saying for each rule whether the value is the default or comes from your config.</li>
+<li>Manual sleep-metric-duration rows that are not applied are listed, with the reason for each, in <code>output/manual_corrections_not_applied.csv</code> (header only when all were applied). <code>manual_corrections.manual_overrides_parser</code> (default <code>false</code>, the long-standing behaviour) lets the manual row win over the interval parser.</li>
+<li>Removed the <code>classification.temporal.*</code> keys from the default config: no code ever read them, so changing them had no effect.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-1-5-3">Documentation<a class="anchor" aria-label="anchor" href="#documentation-1-5-3"></a></h3>
 <ul><li>New articles, English and Chinese: Getting started, Output files (every file a run writes, where it goes, which step writes it), and Troubleshooting (symptom, cause, fix).</li>
 <li>The articles are listed in the order a user needs them: getting started, input data and configuration, data-first entry, reading the output and the review loop, output files, troubleshooting, then architecture, validation and testing.</li>
 <li>Two articles were renamed: “Input Data and Configuration” (was “Column Mapping, Config &amp; Data Format”) and “Reading the Output and the Review Loop” (was “Interpreting the Pipeline Output”). The file names, and so the web addresses, are unchanged.</li>
@@ -104,14 +114,14 @@
 </ul></div>
 </div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="sleepcleanr-development-version-1">sleepcleanr (development version)<a class="anchor" aria-label="anchor" href="#sleepcleanr-development-version-1"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.5.1" id="sleepcleanr-151-continued">sleepcleanr 1.5.1 (continued)<a class="anchor" aria-label="anchor" href="#sleepcleanr-151-continued"></a></h2>
 <div class="section level3">
-<h3 id="new-development-version">New<a class="anchor" aria-label="anchor" href="#new-development-version"></a></h3>
+<h3 id="new-1-5-1">New<a class="anchor" aria-label="anchor" href="#new-1-5-1"></a></h3>
 <ul><li>
 <code><a href="../reference/cleaning_report.html">cleaning_report()</a></code>: a short factual description of the last run (entries and participants, entries corrected by each rule, reviewer corrections, entries left in the review queue, the reference thresholds), meant to be adapted for a Methods section. It reads only what the run produced and makes no claim about accuracy.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="validation-development-version">Validation<a class="anchor" aria-label="anchor" href="#validation-development-version"></a></h3>
+<h3 id="validation-1-5-1">Validation<a class="anchor" aria-label="anchor" href="#validation-1-5-1"></a></h3>
 <ul><li>
 <code>validation/synthetic/prevalence_grid.R</code> (new; <code>run_all.R --with-grid</code>): the benchmark over four error rates (2, 5, 10, 20%) and four error-type mixes. At least 98.6% of injected errors were flagged or corrected to the true value in every one of the 16 cells and no clean row was flagged or altered; the share corrected without a person ranged from 14% to 62% and the rows flagged per 1,000 from 8 to 151, depending on the
 <ol start="1009" style="list-style-type: lower-roman"><li>
