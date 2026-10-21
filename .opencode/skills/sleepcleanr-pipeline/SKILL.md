@@ -60,51 +60,142 @@
 
 <!-- AUTO:SKILL_FACTS_END -->
 
-## Overview
+## Safety Rules (read first)
 
-Pipeline: raw timestamps → parse → correct → metrics → detect → visualize (see the auto-generated step table above).
-Configurable via YAML — maps your dataset columns without code changes.
+The pipeline runs on real participant data. These rules come from the
+project's local `AGENTS.md`, which is gitignored and therefore missing from
+git worktrees and fresh clones; this section is the copy agents can always see.
 
-**Input:** .rds or .csv sleep diary data
-**Output:** Cleaned dataset + diagnostic figures + figure_index.png contact sheet + audit reports
+Without the user's explicit permission in this conversation, do not:
+
+- `git add` (any staging), commit, push, tag, release or deploy;
+- run the pipeline on real data (`run_pipeline()`, `run.sh`, any
+  `real_data_config*.yaml`), or run the full test suite (one test file is fine);
+- edit `R/` or `inst/scripts/`: show the diff first, write it after approval;
+- `R CMD build` / `devtools::build()`;
+- overwrite or delete `output/`, `latest_visualization*/`, or any `*.csv` /
+  `*.rds` data file.
+
+Always:
+
+- run anything that writes outputs in a temporary directory, never with
+  `project_dir` pointing into the repository;
+- treat a new file whose name looks like real data (`manual_*`, `fasttrack_*`,
+  `disambiguation_*`, `tiered_*`, `timegap_*`, `real_data_config*`, `audit_*`,
+  `second_review*`, `sber_*`, `deidentified_*`, `cleaned_*`,
+  `*.provenance.json`, backups such as `*.bak`) and is not covered by
+  `.gitignore` as a possible leak: stop, report, wait;
+- keep backups of real files outside the repository;
+- on any unexpected overwrite or leak: stop, report, wait. Do not fix it on
+  your own.
 
 ## Quick Start
 
 ```r
 renv::install("cyracaid/sleepdiary-cleaner")
 library(sleepcleanr)
-run_pipeline()
+run_synthetic_demo(project_dir = tempfile())   # bundled synthetic data
 ```
 
 For your own data:
 ```r
 file.copy(system.file("config_template.yaml", package = "sleepcleanr"), "my_study.yaml")
-# Edit my_study.yaml → set data.files.main to your file
+# Edit my_study.yaml: data.tag, data.files.main, column_mapping
 run_pipeline(config = "my_study.yaml")
 ```
 
+`data.tag` (`real` / `synth` / `unknown`) says what the data is and decides
+where figures go (only `real` goes under `output/`). It is never guessed: if it
+is not set and the run makes figures, an interactive session asks once
+(r / s / n) and a non-interactive run stops with an error. Runs with
+`skip_visualization = TRUE` do not need it.
+
 ## Human-Review Corrections (opt-in)
 
-Since v1.5.0, `run_pipeline()` does **not** apply human-review corrections
-by default. Review worksheets are still regenerated under `output/` every
-run for human fill-in; to apply completed reviews, opt in explicitly:
+`run_pipeline()` applies human-review files only when asked:
 
 ```r
 run_pipeline(config = "my_study.yaml", include_manual_corrections = TRUE)
 ```
 
-- `FALSE` (default): algorithmic-only run; a banner states that no human corrections were applied.
-- `TRUE`: applies the review files configured under `data.files.manual_*` / `second_review`.
-- `"ask"`: prompts interactively; non-interactive sessions degrade to `FALSE`.
+- `FALSE` (default): algorithmic-only run; a banner says no human corrections
+  were applied.
+- `TRUE`: applies the files configured under `data.files.manual_*` and
+  `second_review`. If one is missing, an interactive session asks whether to
+  continue without it; a non-interactive run warns and continues, unless the
+  config sets `data.require_manual_corrections: true`, which makes it stop.
+- `"ask"`: **currently behaves exactly like `TRUE`** (no question is asked),
+  although the function documentation says it prompts. Do not rely on it.
 
-Templates for every review file live in `templates/`; the review workflow
-is walked through in `vignettes/interpreting-output.Rmd`.
+Step 5 writes the review worksheets `[NEW]manual_error_correction_review.csv`
+and `[NEW]manual_unusual_review.csv` to the **project root** (not `output/`).
+After Step 8.5 the error worksheet is rewritten as a status table. Templates
+for every review file are in `templates/`; the cycle is described in
+`vignettes/interpreting-output.Rmd`.
+
+## Writing Manual Correction Rows
+
+Each row is matched by `pid` + `day_num`; the instruction is applied to the
+first data row of that day. Rows are applied in file order, so two rows for the
+same day both apply: a repeated `Plus 12 hours` shifts the time twice.
+
+How a row in `manual_error_corrections.csv` is read:
+
+| The row has | It is handled as | What is read |
+|---|---|---|
+| `column_to_correct` **and** `correct_value` | column/value row | the column/value pairs; `solution_humanidentified` is read **only** for "undo correction" and the switch phrases below |
+| only `solution_humanidentified` | text row | the phrases in the table below |
+| nothing | skipped | — |
+
+Column names must be full names: `time_bed_corrected`, `time_sleep_corrected`,
+`time_awake_corrected`, `time_getup_corrected` (several separated by commas).
+A short name such as `time_bed` is skipped.
+
+`correct_value` / `correct_value_2` (and `correction_value` / `_2` in the
+unusual file):
+
+| Write | Effect |
+|---|---|
+| `Same day 10:00:00 AM` (or `Same day 22:30`) | keep the date, set the clock time |
+| `Minus 12 hours` / `Plus 12 hours` | shift the named column(s) by 12 h |
+| `10:00` or `10:00:00` | set the clock time |
+
+Phrases read in `solution_humanidentified`:
+
+| Phrase | Effect |
+|---|---|
+| `Undo correction` | restore the four raw times first; the row's other instructions are then applied on top |
+| `sleep-awake switch`, `awake-getup switch`, `bed-sleep switch` (also `awake/getup switch`, `perform ... switch`) | swap the two times. Text rows also accept `sleep-awake swap` etc.; column/value rows accept only the `switch` forms. `Swap awake/getup` is not recognised |
+| `Bed time AM/PM conversion` (also sleep / awake / getup) | text rows only |
+| `Change sleep time into 23:30` | text rows only |
+| `Align awake time's hour to getup time's hour` | text rows only |
+| `Minus 12 hours` / `Plus 12 hours` | text rows only, and it shifts **all four** times |
+
+**Anything else is skipped without an error or a warning**: a full date-time
+such as `2022-01-15 06:00:00`, free text such as `Set time_awake equal to
+time_getup`, a short column name. The row then stays on the review list.
+`correction_type` containing "swap" marks the record as manually corrected
+even when nothing was changed.
+
+### When a row is still `needs_review` after corrections
+
+1. Read its `review_state_reason` in `review_status.csv`.
+2. Look up the row in the manual file: are the column names full, and is every
+   value in one of the forms above?
+3. Compare the raw times (`time_*_am_hhmm_ampm`) with the corrected times
+   (`time_*_corrected`) in `pipeline_results()$corrected_ema_data`: was the
+   instruction applied, and is the order bed ≤ sleep ≤ awake ≤ getup?
+4. A blank raw time cannot be re-checked: `data_category` is `skipped_na`.
+   Whether that counts as done is the user's rule
+   (`review.missing_times_ok_after_manual`).
+5. Report the cause and the options; let the user change the manual file.
 
 ## Review Rules and the End Point
 
 The user, not the agent, defines what counts as done, in the config's
 `review:` block (`done_when.max_needs_review`, `step8_flags_need_review`,
-`fail_if_not_done`, `suggestions`). An agent running the pipeline must:
+`missing_times_ok_after_manual`, `fail_if_not_done`, `suggestions`). An agent
+running the pipeline must:
 
 - read the verdict from `review_verdict()` (or the printed `Review DONE /
   NOT DONE` line) and report it as is; never declare the review finished
@@ -117,58 +208,34 @@ The user, not the agent, defines what counts as done, in the config's
   person fills in `human_decision`;
 - check reproducibility with `Rscript validation/reproducibility.R`.
 
+Step 8 labels a manually corrected record `CLEAN (Manually Fixed)` only when
+its Step 8 checks and its `data_category` both pass; otherwise it keeps its
+flag, or is `STILL FAILS (Manually Corrected)`, or `NOT CHECKABLE (Manually
+Corrected)` when a time is missing.
+
 ## Fetching Results
 
-The pipeline writes nothing to your global environment. Main results are
-kept package-private and retrieved with `pipeline_results()`;
-`cleaning_report()` builds a prevalence report from the same results
-object. Pass `export_env = globalenv()` to `run_pipeline()` only if the
-pre-v1.5.0 behaviour is needed.
-
-## Key Columns
-
-| Column | Source | Description |
-|--------|--------|-------------|
-| `has_correction` | Step 7 | none / algorithmic / manual / both |
-| `data_category` | Step 6 | clean / error / unusual / equal_time_ok / skipped_na |
-| `flag_severity` | Step 7 | Clean / Minor (1 flag) / Major (2+ flags) |
-| `needs_review_flag` | Step 8 | Combined auto-detection flag |
-| `auto_error_desc` | Step 8 | All detected issues in text form |
-
-## Config System
-
-- `data.files.main` — your data file (.rds or .csv, auto-detected)
-- `data.files.extra` — optional supplementary file (StartDate, WASO counts)
-- `column_mapping` — map your column names to pipeline internals
-- `classification.*` — adjustable detection thresholds
-
-Template: `inst/config_template.yaml`
+The pipeline writes nothing to the global environment. `pipeline_results()`
+returns `corrected_ema_data`, `review_output`, `checkforerrors_summary`,
+`pipeline_config`, `review_status` and `review_verdict`; `cleaning_report()`
+builds a prevalence report from them.
 
 ## Output
 
 | Path | Contents |
 |------|----------|
-| `latest_visualization_*/` | All figures + RUN_INFO.txt + figure_index.png |
-| `output/correction_status_final.csv` | Per-run summary |
-| `output/appendix_step_ledger.csv` | Per-step flag tracking |
-| `output/flagged_records_self_reported.csv` | SELF_REPORTED_FLAG records |
-| `column_map.csv` | Column source mapping |
-| `[NEW]manual_error_correction_review.csv` | Step 5 review worksheet: `error` records awaiting human decisions — written to the **project root**, not `output/` |
-| `[NEW]manual_unusual_review.csv` | Step 5 review worksheet: `unusual` records — also project root |
-| `review_status.csv` | Both worksheets in one table; each row `needs_review` / `not_incorporated` / `incorporated` (project root) |
-| `output/review_runs.csv` | One line per run: input/config/result hashes, counts, verdict |
+| `review_status.csv` (project root) | Both worksheets in one table; each row `needs_review` / `not_incorporated` / `incorporated` with its reason. Start here |
+| `output/review_runs.csv` | One line per run: input/config/result hashes, data tag, counts, verdict |
+| `[NEW]manual_error_correction_review.csv` (project root) | Status table of the Step 5 error list (kept for compatibility; `review_status.csv` supersedes it) |
+| `[NEW]manual_unusual_review.csv` (project root) | Step 5 `unusual` records for a person to fill in |
+| `manual_error_correction_updated.csv` (project root) | The corrections as applied; `manually_corrected` marks the rows really used |
+| `output/cleaned_data_final.*`, `output/cleaned_data_prepostcorrection.*` | Delivered datasets A and B |
+| `output/correction_status_final.csv`, `output/appendix_step_ledger.csv` | Per-run summary; per-step flag counts |
+| `<figures>/RUN_INFO.txt`, `<figures>/figure_index.png` | Run provenance (incl. data tag and its source); contact sheet of all figures |
+
+`<figures>` is `output/latest_visualization_real_n<rows>/` for `data.tag: real`
+and `latest_visualization_<tag>_n<rows>/` in the project root otherwise.
 
 The `[NEW]` prefix is literal. In R, list these files with
-`list.files(pattern = "\\[NEW\\]")` — an unescaped `[NEW]*` pattern is a
-regex character class and matches nothing.
-
-## Key Figures
-
-- `01_Pipeline_Flow_Diagram` — record flow with counts and percentages
-- `02_Correction_Impact` — delta lollipops + identity scatter + summary table
-- `A1_Step_Flag_Ledger` — per-step flag counts (merges former Fig 12 checkpoint convergence)
-- `figure_index.png` — contact sheet of all figures
-
-## Repo
-
-https://github.com/cyracaid/sleepdiary-cleaner
+`list.files(pattern = "\\[NEW\\]")`; an unescaped `[NEW]*` is a regex
+character class and matches nothing.
