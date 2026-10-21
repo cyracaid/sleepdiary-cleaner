@@ -1286,8 +1286,9 @@ if(length(available_vars) > 0) {
 # DATA SOURCE: clean_df (has sleep_duration_h) + corrected_ema_data (has final categories)
 # ============================================================================
 # WHAT THIS FIGURE SHOWS:
-# Density curves comparing sleep duration distributions across four final
-# classification groups: Clean, Unusual, Manually Corrected, and Error.
+# Density curves comparing sleep duration distributions across five final
+# classification groups: Clean, Unusual, Reasonable Unusual (accepted by a
+# reviewer), Manually Corrected, and Error.
 #
 # INTERPRETATION:
 # Clean and Manually Corrected distributions should overlap substantially,
@@ -1314,13 +1315,14 @@ if (exists("clean_df") && exists("corrected_ema_data") &&
         manually_corrected == TRUE ~ "Manually Corrected",
         data_category == "clean" ~ "Clean",
         data_category == "unusual" ~ "Unusual",
+        data_category == "reasonable_unusual" ~ "Reasonable Unusual (accepted)",
         data_category == "error" ~ "Error",
         data_category == "equal_time_ok" ~ "Equal Time",
         data_category == "skipped_na" ~ "Not Reported",
         TRUE ~ "Other"
       )
     ) %>%
-    filter(status %in% c("Clean", "Unusual", "Manually Corrected", "Error"))
+    filter(status %in% c("Clean", "Unusual", "Reasonable Unusual (accepted)", "Manually Corrected", "Error"))
   
   cat("  Records after filtering:", nrow(p6_data), "\n")
   cat("  Status counts:\n")
@@ -1331,6 +1333,7 @@ if (exists("clean_df") && exists("corrected_ema_data") &&
     color_map <- c(
       "Clean" = "#2E7D32",
       "Unusual" = "#FF8C00",
+      "Reasonable Unusual (accepted)" = "#8E6BBF",
       "Manually Corrected" = "#4CAF50",
       "Error" = "#D32F2F"
     )
@@ -1343,6 +1346,7 @@ if (exists("clean_df") && exists("corrected_ema_data") &&
       subtitle = paste0("WHAT THIS ANSWERS: did the human corrections distort the overall sleep-duration distribution? Each curve = the distribution of sleep durations for one record class after corrections (Steps 5-6.5). ",
                         "Clean: ", sum(p6_data$status == "Clean"),
                         " | Unusual: ", sum(p6_data$status == "Unusual"),
+                        " | Reasonable Unusual (accepted): ", sum(p6_data$status == "Reasonable Unusual (accepted)"),
                         " | Manually Corrected: ", sum(p6_data$status == "Manually Corrected"),
                         " | Error: ", sum(p6_data$status == "Error")),
            x = "Sleep Duration (hours)", 

@@ -11,6 +11,8 @@
   `needs_review` and `is_reasonable_unusual`: 35 columns instead of 36. `accepted` covers both reasonable-unusual
   records and metric warnings marked confirmed-not-error, which A could not show before. It reports what the review
   files say and decides nothing.
+* Figure 6 draws the accepted records as their own group, "Reasonable Unusual (accepted)", instead of leaving them
+  out now that they are no longer `unusual`.
 * The output-files article starts with a quick guide to which file and column answers which question.
 
 ## Changed
