@@ -22,7 +22,15 @@ insomnia. For clinical samples (insomnia, elderly, shift-work), revisit every ro
 | `classification.metric_validation.tst_tib_ratio.max_ratio` | `1.0` | TST/TIB > 1.0 | Impossible → hard error |
 | `timestamp.sequence.max_gap_hours` | `12` | AM/PM flip trigger | Assumes no legitimate interval >= 12h |
 | `timestamp.midnight_threshold_hour` | `6` | Times < 6AM → next day | Standard diary convention |
-| `interval.mmss_threshold_minutes` | `60` | value > 60 with `:` → MM:SS | Heuristic for ambiguous formats |
+| `classification.step5.error.bed_to_sleep_max_hours` | `7` | \|sleep − bed\| > 7 h is an error | Nobody takes 7 hours to fall asleep; more likely one of the two times was mis-entered |
+| `classification.step5.error.awake_to_getup_max_hours` | `7` | \|getup − awake\| > 7 h is an error | Lying in bed more than 7 h after waking is implausible |
+| `classification.step5.error.sleep_to_awake_max_hours` | `24` | \|awake − sleep\| > 24 h is an error | A sleep period cannot exceed a day |
+| `classification.step5.unusual.sleep_to_awake_min_hours` / `_max_hours` | `3` / `15` | Sleep period < 3 h or > 15 h is unusual | Possible but worth a look |
+| `classification.step5.unusual.bed_to_sleep_max_hours` | `3` | Sleep − bed > 3 h is unusual | Most people fall asleep within an hour |
+| `classification.step5.unusual.awake_to_getup_max_hours` | `3` | Getup − awake > 3 h is unusual | Long time in bed after waking |
+| `review.clean_categories` | `clean`, `equal_time_ok`, `reasonable_unusual` | Final categories that count as "now passes" in the review status table | Yours to define |
+| `manual_corrections.manual_overrides_parser` | `false` | `true`: a manual sleep-metric-duration row wins over the interval parser | Long-standing behaviour is that the parser wins; every skipped row is listed in `output/manual_corrections_not_applied.csv` |
+| `timestamp.interval.mmss_threshold_minutes` | `60` | value > 60 with `:` → MM:SS | Heuristic for ambiguous formats |
 
 ## Suggested config comments
 

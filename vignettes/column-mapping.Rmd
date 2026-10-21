@@ -163,6 +163,33 @@ participant data are gitignored. Templates with synthetic data live in
 | `templates/template_manual_metric_review_acceptances.csv` | `manual_metric_review_acceptances.csv` | Human-accepted metric flags |
 | `templates/template_second_review_checklist.csv` | `second_review_checklist.csv` | Second-person verification decisions |
 
+## Rules you can change
+
+The rules that decide what goes to review are configuration, not code. Defaults are shown; set only what
+you want to change. Each run prints the values it used and saves them in `output/effective_rules.csv`.
+
+```yaml
+classification:
+  step5:
+    error:                          # a record matching any of these is an ERROR
+      bed_to_sleep_max_hours: 7     # |sleep - bed| above this
+      awake_to_getup_max_hours: 7   # |getup - awake| above this
+      sleep_to_awake_max_hours: 24  # |awake - sleep| above this
+    unusual:                        # suspicious but possible
+      sleep_to_awake_min_hours: 3
+      sleep_to_awake_max_hours: 15
+      bed_to_sleep_max_hours: 3
+      awake_to_getup_max_hours: 3
+review:
+  clean_categories: ["clean", "equal_time_ok", "reasonable_unusual"]   # what "now passes" means in the status table
+manual_corrections:
+  manual_overrides_parser: false    # true: a manual sleep-metric-duration row wins over the interval parser
+```
+
+A value that is present but not a single number stops the run with a message; it is never replaced silently.
+The keys `classification.temporal.*` that older default configs contained were never read by the code and have
+been removed.
+
 ## Output
 
 | File | Contents |

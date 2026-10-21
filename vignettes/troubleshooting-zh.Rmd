@@ -28,6 +28,7 @@ vignette: >
 | Step 5.75 的 `[VERIFY]` 行里显示的是文字而不是 id，例如 `pid= not format error ...` | `second_review_checklist.csv` 里某条备注含有没加引号的逗号，一行被拆到了几列里 | 把备注用双引号包起来（或在表格软件里另存为 CSV）|
 | `list.files(pattern = "[NEW")` 报错，或 `"[NEW]*"` 什么也找不到 | `pattern` 是正则表达式，`[NEW]` 是字符类 | 用 `pattern = "NEW"` 或 `"\\[NEW\\]"` |
 | 加了修正之后，审核文件的行数还是一样 | 1.5.1 及更早版本里它列的是**修正之前**发现的错误。从 1.5.2 起它是状态表：看 `status_after_corrections` | 读 `status_after_corrections` |
+| `Parser already converted ... skipped manual override`，或 `Correction rows skipped: N` | 有人工睡眠指标时长修正没有被应用。默认情况下，如果解析器已经转换了 MM:SS 的值，以解析器为准 | 打开 `output/manual_corrections_not_applied.csv`，看每一行和原因。想让人工那行优先，在配置里设 `manual_corrections.manual_overrides_parser: true` |
 | `remove.packages` 说没有这个包 | 那个库里没装过 | 忽略，直接安装 |
 
 如果都不是，把控制台里从 `=== SPL Sleep Pipeline` 到最后一个 `=== Step` 标题及其后面的输出、`getNamespaceVersion("sleepcleanr")` 的输出、项目文件夹里 `list.files(".", all.files = TRUE)` 的结果发出来。分享之前先去掉参与者 id。

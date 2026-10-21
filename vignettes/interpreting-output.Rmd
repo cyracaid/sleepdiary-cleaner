@@ -243,6 +243,10 @@ Step 5 lists every record the rules flag on the data BEFORE corrections, so
 
 **What puts a record on the review pile (the exact rules, in priority order):**
 
+The hour limits below are the defaults. You can change each one under `classification.step5` in your config
+(see [Input data and configuration](column-mapping.html)); every run prints the values it used and saves them
+in `output/effective_rules.csv`.
+
 *ERROR — physically impossible, must be fixed (`generate_correction_files.R:315`):*
 1. `sleep_awake_equal_error` — sleep time == awake time (a zero-length sleep
    period; the record is fundamentally broken)
