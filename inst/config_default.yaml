@@ -187,6 +187,17 @@ review:
   clean_categories: ["clean", "equal_time_ok", "reasonable_unusual"]
 
 # =============================================================================
+# SECOND REVIEW
+# =============================================================================
+second_review:
+  # A second-review row needs a numeric pid and day_num to identify a record. If
+  # a row does not have them (for example free text ended up in those columns):
+  #   skip : leave the row out, list it on the console and in
+  #          output/second_review_rows_skipped.csv, and carry on
+  #   stop : stop the run with the line numbers so the file can be corrected
+  on_invalid_rows: skip
+
+# =============================================================================
 # MANUAL CORRECTIONS
 # =============================================================================
 manual_corrections:

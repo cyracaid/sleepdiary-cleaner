@@ -21,7 +21,8 @@
       "classification.flag_severity.poor_efficiency_threshold_pct",
       "classification.flag_severity.high_sol_threshold_hours",
       "classification.flag_severity.high_waso_threshold_hours",
-      "manual_corrections.manual_overrides_parser"),
+      "manual_corrections.manual_overrides_parser",
+      "second_review.on_invalid_rows"),
     meaning = c(
       "Step 4: a gap of at least this many hours between adjacent times triggers an AM/PM flip",
       "Step 4: an out-of-order pair closer than this many hours is swapped",
@@ -43,7 +44,8 @@
       "Flag severity: sleep efficiency below this percent",
       "Flag severity: SOL above this many hours",
       "Flag severity: WASO above this many hours",
-      "Manual sleep-metric-duration rows: TRUE = the manual row wins over the interval parser"),
+      "Manual sleep-metric-duration rows: TRUE = the manual row wins over the interval parser",
+      "Second-review rows whose pid or day_num is not a number: skip (list them) or stop"),
     stringsAsFactors = FALSE)
 }
 
@@ -76,6 +78,9 @@ effective_rules <- function(cfg, include_manual_corrections = FALSE) {
   k <- "manual_corrections.manual_overrides_parser"
   if (!nzchar(dv[[k]])) dv[[k]] <- "FALSE"
   if (!nzchar(val[[k]])) val[[k]] <- .sc_fmt_val(isTRUE(config_get(cfg, k, FALSE)))
+  k <- "second_review.on_invalid_rows"
+  if (!nzchar(dv[[k]])) dv[[k]] <- "skip"
+  if (!nzchar(val[[k]])) val[[k]] <- .sc_fmt_val(config_get(cfg, k, "skip"))
   out <- data.frame(key = reg$key, value = unname(val), default = unname(dv),
                     source = ifelse(val == dv, "default", "your config"),
                     meaning = reg$meaning, stringsAsFactors = FALSE)
@@ -102,9 +107,10 @@ report_effective_rules <- function(cfg, include_manual_corrections = FALSE, verb
     cat("\n=== Rules in effect for this run ===\n")
     for (i in seq_len(nrow(r)))
       cat(sprintf("  %-62s %-22s [%s]\n", r$key[i], r$value[i], r$source[i]))
-    n_changed <- sum(r$source != "default")
-    cat(sprintf("  %d rule(s) differ from the defaults. Saved to %s\n", n_changed,
-                file.path(out_dir, "effective_rules.csv")))
+    n_cfg <- sum(r$source == "your config")
+    n_arg <- sum(r$source == "call argument")
+    cat(sprintf("  %d rule(s) set in your config, %d set by the call; the rest are defaults. Saved to %s\n",
+                n_cfg, n_arg, file.path(out_dir, "effective_rules.csv")))
   }
   invisible(r)
 }

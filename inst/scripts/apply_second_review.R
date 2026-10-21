@@ -44,6 +44,34 @@ append_with_antijoin <- function(existing_file, new_rows, join_cols = c("pid", "
 }
 
 
+# A checklist row identifies a record by pid and day_num, which must be numbers.
+# Rows where they are not (for example free text that ended up in those columns)
+# cannot be routed. What happens to them is the user's choice
+# (second_review.on_invalid_rows: "skip" or "stop"); they are never used silently.
+.second_review_drop_invalid <- function(checklist, checklist_path) {
+  num_ok <- function(v) !is.na(suppressWarnings(as.numeric(as.character(v))))
+  how <- cfg_get("second_review.on_invalid_rows", "skip", cfg = pipeline_config)
+  if (!how %in% c("skip", "stop"))
+    stop("Config value second_review.on_invalid_rows must be \"skip\" or \"stop\"; got: ", how, call. = FALSE)
+  if (!all(c("pid", "day_num") %in% names(checklist))) return(checklist)
+  bad <- !(num_ok(checklist$pid) & num_ok(checklist$day_num))
+  lines <- which(bad) + 1L   # +1: the header is line 1
+  msg <- sprintf("%d row(s) of %s have a pid or day_num that is not a number (file line%s %s)",
+                 sum(bad), basename(checklist_path), if (sum(bad) > 1) "s" else "",
+                 paste(lines, collapse = ", "))
+  if (any(bad) && identical(how, "stop"))
+    stop(msg, ". Correct them, or set second_review.on_invalid_rows to \"skip\".", call. = FALSE)
+  out_dir <- cfg_get("output.report.dir", "output", cfg = pipeline_config)
+  dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
+  skipped_file <- file.path(out_dir, "second_review_rows_skipped.csv")
+  utils::write.csv(data.frame(file_line = lines, target_csv = as.character(checklist$target_csv[bad]),
+                              reason = rep("pid or day_num is not a number", length(lines)),
+                              stringsAsFactors = FALSE), skipped_file, row.names = FALSE)
+  if (any(bad))
+    cat(sprintf("  [second review] %s: skipped. Listed in %s\n", msg, skipped_file))
+  checklist[!bad, , drop = FALSE]
+}
+
 apply_second_review <- function(checklist_path = NULL) {
   if (is.null(checklist_path)) {
     checklist_path <- cfg_get("data.files.second_review", "second_review_checklist.csv", cfg = pipeline_config)
@@ -56,6 +84,7 @@ apply_second_review <- function(checklist_path = NULL) {
   checklist <- read.csv(checklist_path, stringsAsFactors = FALSE)
 
   stopifnot("target_csv" %in% names(checklist))
+  checklist <- .second_review_drop_invalid(checklist, checklist_path)
   accepted_routes <- c("manual_metric_review_acceptances",
                        "manual_error_corrections",
                        "manual_nap_exercise_corrections")

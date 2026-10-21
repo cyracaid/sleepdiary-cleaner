@@ -27,3 +27,14 @@ test_that("the rules are printed and saved with the results", {
   expect_true(nrow(saved) >= 20)
   unlink(d, recursive = TRUE)
 })
+
+test_that("the closing line says where changed rules come from", {
+  d <- tempfile("rules"); dir.create(d)
+  cfg <- sleepcleanr::load_config(NULL); cfg$output$report$dir <- d
+  out <- capture.output(sleepcleanr:::report_effective_rules(cfg, TRUE, verbose = TRUE))
+  expect_true(any(grepl("0 rule\\(s\\) set in your config, 1 set by the call", out)))
+  cfg$classification$step5$error$bed_to_sleep_max_hours <- 5
+  out2 <- capture.output(sleepcleanr:::report_effective_rules(cfg, FALSE, verbose = TRUE))
+  expect_true(any(grepl("1 rule\\(s\\) set in your config, 0 set by the call", out2)))
+  unlink(d, recursive = TRUE)
+})
