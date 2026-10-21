@@ -12,7 +12,7 @@
 #   inst/extdata/column_dictionary.csv (status == "implemented")
 #
 # Output targets (between AUTO markers):
-#   .opencode/skills/sleepcleanr-pipeline/SKILL.md
+#   .claude/skills/sleepcleanr-pipeline/SKILL.md
 #   README.md
 #
 # Usage: Rscript tools/render_docs.R   (from repo root)
@@ -143,7 +143,7 @@ main <- function() {
   ver <- pkg_version()
   n_imp <- length(pkg_imports())
 
-  skill_path <- file.path(root, ".opencode", "skills", "sleepcleanr-pipeline", "SKILL.md")
+  skill_path <- file.path(root, ".claude", "skills", "sleepcleanr-pipeline", "SKILL.md")
   readme_path <- file.path(root, "README.md")
 
   if (!file.exists(skill_path)) stop("SKILL.md not found at ", skill_path)

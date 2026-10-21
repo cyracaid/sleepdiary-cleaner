@@ -303,7 +303,7 @@ guidelines are in [`CONTRIBUTING.md`](CONTRIBUTING.md).
 ## For developers / AI assistants
 
 The repository ships an agent skill at
-`.opencode/skills/sleepcleanr-pipeline/SKILL.md` that documents how to run the
+`.claude/skills/sleepcleanr-pipeline/SKILL.md` (also linked from `.agents/skills/`, so Claude Code, Codex and opencode all find it) that documents how to run the
 pipeline, interpret checkpoint reports, add manual corrections, and diagnose
 issues.
 
@@ -489,7 +489,7 @@ Bug、问题和功能建议：请开 [issue](https://github.com/cyracaid/sleepdi
 
 ## 开发/AI 助手
 
-仓库自带 agent skill：`.opencode/skills/sleepcleanr-pipeline/SKILL.md`，说明如何
+仓库自带 agent skill：`.claude/skills/sleepcleanr-pipeline/SKILL.md`（`.agents/skills/` 下有指向它的链接，Claude Code、Codex 和 opencode 都能读到），说明如何
 运行管线、解读检查点报告、添加人工修正与诊断问题。
 
 ### 管线步骤

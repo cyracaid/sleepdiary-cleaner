@@ -3,7 +3,7 @@
   "skills": {
     "sleepcleanr-pipeline": {
       "description": "Run and maintain the sleepcleanr sleep EMA diary data cleaning pipeline. Install R package, run_pipeline(), interpret figures and correction reports.",
-      "location": ".opencode/skills/sleepcleanr-pipeline/SKILL.md",
+      "location": ".claude/skills/sleepcleanr-pipeline/SKILL.md",
       "triggers": [
         "sleepcleanr",
         "sleep pipeline",

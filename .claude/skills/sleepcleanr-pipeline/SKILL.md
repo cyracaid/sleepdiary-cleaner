@@ -1,3 +1,8 @@
+---
+name: sleepcleanr-pipeline
+description: Run, review and maintain the sleepcleanr sleep EMA diary cleaning pipeline (R package, repository sleepdiary-cleaner). Use for run_pipeline(), manual correction files, review_status.csv and the review verdict, config YAML, figures, and any work on this repository's R/ or inst/scripts. Read the Safety Rules section before touching real data.
+---
+
 # sleepcleanr-pipeline Skill
 
 <!-- AUTO:SKILL_FACTS_START -->

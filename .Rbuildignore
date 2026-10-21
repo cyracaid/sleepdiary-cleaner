@@ -150,3 +150,6 @@ Rplots\.pdf$
 ^CODE_OF_CONDUCT\.md$
 ^LICENSE\.md$
 ^VISUALIZATION_TREE_PROPOSAL\.md$
+^\.claude$
+^CLAUDE\.md$
+^AGENTS\.md$
