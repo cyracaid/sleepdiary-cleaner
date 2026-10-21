@@ -122,23 +122,19 @@
 <td><code>12</code></td>
 <td>AM/PM flip trigger</td>
 <td>Assumes no legitimate interval &gt;= 12h</td>
-</tr><tr class="even"><td><code>timestamp.midnight_threshold_hour</code></td>
-<td><code>6</code></td>
-<td>Times &lt; 6AM → next day</td>
-<td>Standard diary convention</td>
-</tr><tr class="odd"><td><code>classification.step5.error.bed_to_sleep_max_hours</code></td>
+</tr><tr class="even"><td><code>classification.step5.error.bed_to_sleep_max_hours</code></td>
 <td><code>7</code></td>
 <td>|sleep − bed| &gt; 7 h is an error</td>
 <td>Nobody takes 7 hours to fall asleep; more likely one of the two times was mis-entered</td>
-</tr><tr class="even"><td><code>classification.step5.error.awake_to_getup_max_hours</code></td>
+</tr><tr class="odd"><td><code>classification.step5.error.awake_to_getup_max_hours</code></td>
 <td><code>7</code></td>
 <td>|getup − awake| &gt; 7 h is an error</td>
 <td>Lying in bed more than 7 h after waking is implausible</td>
-</tr><tr class="odd"><td><code>classification.step5.error.sleep_to_awake_max_hours</code></td>
+</tr><tr class="even"><td><code>classification.step5.error.sleep_to_awake_max_hours</code></td>
 <td><code>24</code></td>
 <td>|awake − sleep| &gt; 24 h is an error</td>
 <td>A sleep period cannot exceed a day</td>
-</tr><tr class="even"><td>
+</tr><tr class="odd"><td>
 <code>classification.step5.unusual.sleep_to_awake_min_hours</code> / <code>_max_hours</code>
 </td>
 <td>
@@ -146,35 +142,31 @@
 </td>
 <td>Sleep period &lt; 3 h or &gt; 15 h is unusual</td>
 <td>Possible but worth a look</td>
-</tr><tr class="odd"><td><code>classification.step5.unusual.bed_to_sleep_max_hours</code></td>
+</tr><tr class="even"><td><code>classification.step5.unusual.bed_to_sleep_max_hours</code></td>
 <td><code>3</code></td>
 <td>Sleep − bed &gt; 3 h is unusual</td>
 <td>Most people fall asleep within an hour</td>
-</tr><tr class="even"><td><code>classification.step5.unusual.awake_to_getup_max_hours</code></td>
+</tr><tr class="odd"><td><code>classification.step5.unusual.awake_to_getup_max_hours</code></td>
 <td><code>3</code></td>
 <td>Getup − awake &gt; 3 h is unusual</td>
 <td>Long time in bed after waking</td>
-</tr><tr class="odd"><td><code>review.clean_categories</code></td>
+</tr><tr class="even"><td><code>review.clean_categories</code></td>
 <td>
 <code>clean</code>, <code>equal_time_ok</code>, <code>reasonable_unusual</code>
 </td>
 <td>Final categories that count as “now passes” in the review status table</td>
 <td>Yours to define. In our study a record with a missing time (<code>skipped_na</code>) is not counted as passing, so it stays listed as not passing</td>
-</tr><tr class="even"><td><code>second_review.on_invalid_rows</code></td>
+</tr><tr class="odd"><td><code>second_review.on_invalid_rows</code></td>
 <td><code>skip</code></td>
 <td>
 <code>skip</code>: second-review rows whose <code>pid</code> or <code>day_num</code> is not a number are left out and listed in <code>output/second_review_rows_skipped.csv</code>; <code>stop</code>: stop the run</td>
 <td>Such a row cannot identify a record</td>
-</tr><tr class="odd"><td><code>manual_corrections.manual_overrides_parser</code></td>
+</tr><tr class="even"><td><code>manual_corrections.manual_overrides_parser</code></td>
 <td><code>false</code></td>
 <td>
 <code>true</code>: a manual sleep-metric-duration row wins over the interval parser</td>
 <td>Long-standing behaviour is that the parser wins; every skipped row is listed in <code>output/manual_corrections_not_applied.csv</code>
 </td>
-</tr><tr class="even"><td><code>timestamp.interval.mmss_threshold_minutes</code></td>
-<td><code>60</code></td>
-<td>value &gt; 60 with <code>:</code> → MM:SS</td>
-<td>Heuristic for ambiguous formats</td>
 </tr></tbody></table></div>
 <div class="section level2">
 <h2 id="suggested-config-comments">Suggested config comments<a class="anchor" aria-label="anchor" href="#suggested-config-comments"></a></h2>

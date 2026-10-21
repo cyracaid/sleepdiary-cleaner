@@ -136,8 +136,6 @@ silently hidden.
 | adjacent-swap threshold                                        | 3 h     | Tuned on the development sample; see VALIDATION_REPORT |
 | `metric_validation.sol.excessive_minutes`                      | 120     | Gross-outlier catch, not a clinical marker             |
 | `metric_validation.se.min_valid_percent` / `max_valid_percent` | 0 / 100 | Structural impossibility → always flag                 |
-| `interval.mmss_threshold_minutes`                              | 60      | Heuristic for ambiguous `MM:SS` vs `HH:MM`             |
-| `timestamp.midnight_threshold_hour`                            | 6       | Times \< 6 AM assigned to the next day                 |
 
 Full rationale and change guidance:
 [THRESHOLDS.md](https://cyracaid.github.io/sleepdiary-cleaner/THRESHOLDS.md).
