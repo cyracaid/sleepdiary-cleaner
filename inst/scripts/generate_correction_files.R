@@ -86,7 +86,17 @@ verify_file_written <- function(path, expected_rows, run_start_time) {
   invisible(TRUE)
 }
 
-generate_correction_files <- function(ema_data_release_timecalc) {
+# Standalone use (sourcing this script without the package): the same defaults.
+if (!exists(".sc_step5_thresholds", mode = "function")) {
+  .sc_step5_thresholds <- function(cfg = NULL) {
+    list(bed_sleep_error = 7, awake_getup_error = 7, sleep_awake_error = 24,
+         sleep_awake_min = 3, sleep_awake_max = 15, bed_sleep_unusual = 3,
+         awake_getup_unusual = 3)
+  }
+}
+
+generate_correction_files <- function(ema_data_release_timecalc, cfg = NULL) {
+  thr <- .sc_step5_thresholds(cfg)
 
   # Load required libraries
   require(dplyr)
@@ -291,19 +301,19 @@ generate_correction_files <- function(ema_data_release_timecalc) {
       # The gap between going to bed and falling asleep exceeds 7 hours.
       # Reasonable sleep latency is minutes, not hours. >7h likely means the
       # participant entered one of the two times incorrectly.
-      bed_sleep_diff_error = abs(bed_sleep_diff_h) > 7 &
+      bed_sleep_diff_error = abs(bed_sleep_diff_h) > thr$bed_sleep_error &
         !order_error & !is_equal_time & !sleep_awake_equal_error,
       
       # Priority 3 — awake_getup_diff_error: |diff| > 7 hours
       # The gap between final waking and getting out of bed exceeds 7 hours.
       # Lying in bed >7h after waking is implausible; likely an entry error.
-      awake_getup_diff_error = abs(awake_getup_diff_h) > 7 &
+      awake_getup_diff_error = abs(awake_getup_diff_h) > thr$awake_getup_error &
         !order_error & !bed_sleep_diff_error & !is_equal_time & !sleep_awake_equal_error,
       
       # Priority 4 — sleep_awake_24h_error: |diff| > 24 hours
       # The total sleep period exceeds 24 hours. This is impossible for a single
       # night and suggests the timestamps span multiple days incorrectly.
-      sleep_awake_24h_error = abs(sleep_awake_diff_h) > 24 &
+      sleep_awake_24h_error = abs(sleep_awake_diff_h) > thr$sleep_awake_error &
         !order_error & !bed_sleep_diff_error & !awake_getup_diff_error &
         !is_equal_time & !sleep_awake_equal_error,
       
@@ -366,17 +376,17 @@ generate_correction_files <- function(ema_data_release_timecalc) {
       # Condition 1 — sleep_awake_suspicious: <3h OR >15h
       # Very short or very long total sleep duration. Both ends of the spectrum
       # can be legitimate but warrant a human look.
-      sleep_awake_suspicious = (sleep_awake_diff_h < 3 | sleep_awake_diff_h > 15) & 
+      sleep_awake_suspicious = (sleep_awake_diff_h < thr$sleep_awake_min | sleep_awake_diff_h > thr$sleep_awake_max) & 
         !is_error & !is_equal_time,
       
       # Condition 2 — bed_sleep_suspicious: >3h
       # Unusually long sleep latency. Most people fall asleep in <1h; >3h is
       # unusual enough to flag.
-      bed_sleep_suspicious = bed_sleep_diff_h > 3 & !is_error & !is_equal_time,
+      bed_sleep_suspicious = bed_sleep_diff_h > thr$bed_sleep_unusual & !is_error & !is_equal_time,
       
       # Condition 3 — awake_getup_suspicious: >3h
       # Unusually long time in bed after waking.
-      awake_getup_suspicious = awake_getup_diff_h > 3 & !is_error & !is_equal_time,
+      awake_getup_suspicious = awake_getup_diff_h > thr$awake_getup_unusual & !is_error & !is_equal_time,
       
       # Condition 4 — multiple_suspicious: multiple suspicious conditions
       # When >=2 individual conditions fire simultaneously, the record is

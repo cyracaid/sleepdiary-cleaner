@@ -178,6 +178,26 @@ timestamp:
     max_exercise_minutes: 360  # 6 hours
 
 # =============================================================================
+# REVIEW SETTINGS
+# =============================================================================
+review:
+  # Final data_category values that mean "no longer needs a person". The review
+  # status table reports a row as "now passes" when its final category is in
+  # this list. You define it; the pipeline only applies it.
+  clean_categories: ["clean", "equal_time_ok", "reasonable_unusual"]
+
+# =============================================================================
+# MANUAL CORRECTIONS
+# =============================================================================
+manual_corrections:
+  # When a manual sleep-metric-duration row and the interval parser disagree
+  # (the parser already converted an MM:SS value), which one is used?
+  #   false : the parser (long-standing behaviour); the manual row is listed in
+  #           output/manual_corrections_not_applied.csv
+  #   true  : the manual row
+  manual_overrides_parser: false
+
+# =============================================================================
 # NORMALIZE SETTINGS
 # =============================================================================
 # Minor order-error correction (Step 4, Section 5 of normalize_sleep_time_sequence)
@@ -235,14 +255,19 @@ cross_participant:
 # CLASSIFICATION THRESHOLDS
 # =============================================================================
 classification:
-  # Temporal order thresholds (for error/unusual detection)
-  temporal:
-    min_sleep_duration_minutes: 120        # 2h -- below this is flagged
-    max_sleep_duration_minutes: 780        # 13h -- above this is flagged
-    min_time_in_bed_minutes: 120
-    max_time_in_bed_minutes: 960
-    max_sol_minutes: 180                   # SOL above this is unusual
-    max_waso_minutes: 240
+  # Which records go to the human-review worksheets (Step 5), and the same rules
+  # when the data are rechecked after manual corrections (Step 6). All values are
+  # hours. Defaults are the long-standing rules; change them to fit your study.
+  step5:
+    error:                                  # a record matching any of these is an ERROR
+      bed_to_sleep_max_hours: 7             # |sleep - bed| above this
+      awake_to_getup_max_hours: 7           # |getup - awake| above this
+      sleep_to_awake_max_hours: 24          # |awake - sleep| above this
+    unusual:                                # suspicious but possible: UNUSUAL
+      sleep_to_awake_min_hours: 3           # sleep period below this
+      sleep_to_awake_max_hours: 15          # sleep period above this
+      bed_to_sleep_max_hours: 3             # sleep - bed above this
+      awake_to_getup_max_hours: 3           # getup - awake above this
 
   # Sleep metric validation (Part C auto-detection)
   metric_validation:

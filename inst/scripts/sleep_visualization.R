@@ -44,6 +44,10 @@ theme_set(theme_minimal(base_size = 14))
 
 # Config: use defaults if not running inside run_pipeline()
 if (!exists("pipeline_config")) { pipeline_config <- list() }
+if (!exists(".sc_step5_thresholds", mode = "function")) {
+  .sc_step5_thresholds <- function(cfg = NULL) list(bed_sleep_error = 7, sleep_awake_error = 24, bed_sleep_unusual = 3)
+}
+.thr5 <- .sc_step5_thresholds(pipeline_config)
 
 # ============================================================================
 # AUTO-SAVE SETUP
@@ -843,11 +847,11 @@ if(all(c("data_category", "manually_corrected", "corrected") %in% names(correcte
                  "FINAL RECORD CLASSES (each record gets exactly one; first match wins):",
                  sprintf("Not Reported: %s (%s%%) = any of bed / sleep / awake / getup time is missing",
                          format(n_not_rpt, big.mark = ","), round(n_not_rpt / n_total * 100, 1)),
-                 sprintf("Error (Reviewed): %s = order broken (not bed \u2264 sleep \u2264 awake \u2264 getup), sleep = awake, a gap > 7 h, or sleep span > 24 h; reviewed and fixed", n_error),
+                 sprintf("Error (Reviewed): %s = order broken (not bed \u2264 sleep \u2264 awake \u2264 getup), sleep = awake, a gap > %s h, or sleep span > %s h; reviewed and fixed", n_error, .thr5$bed_sleep_error, .thr5$sleep_awake_error),
                  sprintf("Equal Time: %s = bed = sleep and/or awake = getup (difference < 0.01 h, about 36 s), order intact; benign diary habit, not an error", n_equal),
-                 sprintf("Unusual (Accepted): %s = order intact but a gap > 3 h (bed\u2192sleep or awake\u2192getup); odd but possible, reviewed and kept as-is", n_unusual),
-                 sprintf("Clean: %s (%s%%) = order intact, no gap > 3 h",
-                         format(n_clean, big.mark = ","), round(n_clean / n_total * 100, 1)),
+                 sprintf("Unusual (Accepted): %s = order intact but a gap > %s h (bed\u2192sleep or awake\u2192getup); odd but possible, reviewed and kept as-is", n_unusual, .thr5$bed_sleep_unusual),
+                 sprintf("Clean: %s (%s%%) = order intact, no gap > %s h",
+                         format(n_clean, big.mark = ","), round(n_clean / n_total * 100, 1), .thr5$bed_sleep_unusual),
                  sprintf("Participants w/ \u22651 correction: %s / %s (%s%%)",
                          n_pid_any_corr, n_pid_total, round(n_pid_any_corr / n_pid_total * 100, 1))
                ), function(l) paste(strwrap(l, width = 68, exdent = 3), collapse = "\n"), character(1)),

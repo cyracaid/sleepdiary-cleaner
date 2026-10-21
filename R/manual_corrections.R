@@ -722,6 +722,7 @@ process_case2_correction <- function(data, correction,
 recalculate_and_mark_errors <- function(data, 
                                         bed_corr_col, sleep_corr_col,
                                         awake_corr_col, getup_corr_col) {
+  thr <- .sc_step5_thresholds()
   
   cat("  Recalculating time differences and marking...\n")
   
@@ -753,9 +754,9 @@ recalculate_and_mark_errors <- function(data,
                              NA),
       
       reasonable_temporal_order = order_correct,
-      reasonable_sleep_latency = ifelse(!has_na, abs(bed_sleep_diff_h) <= 7, NA),
-      reasonable_time_in_bed_after_waking = ifelse(!has_na, abs(awake_getup_diff_h) <= 7, NA),
-      reasonable_sleep_duration = ifelse(!has_na, abs(sleep_awake_diff_h) <= 24, NA),
+      reasonable_sleep_latency = ifelse(!has_na, abs(bed_sleep_diff_h) <= thr$bed_sleep_error, NA),
+      reasonable_time_in_bed_after_waking = ifelse(!has_na, abs(awake_getup_diff_h) <= thr$awake_getup_error, NA),
+      reasonable_sleep_duration = ifelse(!has_na, abs(sleep_awake_diff_h) <= thr$sleep_awake_error, NA),
       
       bed_sleep_equal = ifelse(!has_na, bed_sleep_diff_h == 0, NA),
       awake_getup_equal = ifelse(!has_na, awake_getup_diff_h == 0, NA),
@@ -767,9 +768,9 @@ recalculate_and_mark_errors <- function(data,
         TRUE ~ FALSE
       ),
       
-      sleep_awake_suspicious = ifelse(!has_na, sleep_awake_diff_h < 3 | sleep_awake_diff_h > 15, NA),
-      bed_sleep_suspicious = ifelse(!has_na, bed_sleep_diff_h > 3, NA),
-      awake_getup_suspicious = ifelse(!has_na, awake_getup_diff_h > 3, NA),
+      sleep_awake_suspicious = ifelse(!has_na, sleep_awake_diff_h < thr$sleep_awake_min | sleep_awake_diff_h > thr$sleep_awake_max, NA),
+      bed_sleep_suspicious = ifelse(!has_na, bed_sleep_diff_h > thr$bed_sleep_unusual, NA),
+      awake_getup_suspicious = ifelse(!has_na, awake_getup_diff_h > thr$awake_getup_unusual, NA),
       
       is_unusual = case_when(
         has_na ~ FALSE,

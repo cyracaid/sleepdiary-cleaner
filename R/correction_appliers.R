@@ -154,11 +154,21 @@ apply_sleep_metric_duration_corrections <- function(data, cfg = NULL) {
 
   applied_count <- 0
   skipped_count <- 0
+  not_applied <- list()
+  record_skip <- function(reason) {
+    not_applied[[length(not_applied) + 1L]] <<- data.frame(
+      pid = r$pid, day_num = r$day_num, row_id = r$row_id, variable = r$variable,
+      reason = reason, stringsAsFactors = FALSE)
+  }
+  # Which wins when a manual row and the interval parser disagree: the parser
+  # (FALSE, the long-standing behaviour) or the manual row (TRUE).
+  manual_overrides_parser <- isTRUE(cfg_get("manual_corrections.manual_overrides_parser", FALSE, cfg = cfg))
 
   for (i in seq_len(nrow(corr))) {
     r <- corr[i, ]
 
     if (!isTRUE(r$manually_corrected)) {
+      record_skip("row_not_marked_manually_corrected")
       skipped_count <- skipped_count + 1
       next
     }
@@ -176,6 +186,7 @@ apply_sleep_metric_duration_corrections <- function(data, cfg = NULL) {
     if (!(min_col %in% names(data))) {
       cat(sprintf("  Skipping correction row: pid=%s day=%s variable=%s\n",
                   pid_val, day_val, var_name))
+      record_skip("column_not_found")
       skipped_count <- skipped_count + 1
       next
     }
@@ -184,6 +195,7 @@ apply_sleep_metric_duration_corrections <- function(data, cfg = NULL) {
     if (length(idx) != 1) {
       cat(sprintf("  No unique match: pid=%s day=%s row_id=%s - skipped\n",
                   pid_val, day_val, row_val))
+      record_skip("no_unique_row_match")
       skipped_count <- skipped_count + 1
       next
     }
@@ -197,7 +209,8 @@ apply_sleep_metric_duration_corrections <- function(data, cfg = NULL) {
     # NA writes (explicit original-value removal decided in the 2026-08-20
     # audit) override the parser; non-NA writes from older objective-SOL
     # workaround rows still defer to the parser-derived value.
-    if (!is.na(correct_min) &&
+    if (!manual_overrides_parser &&
+        !is.na(correct_min) &&
         !is.na(existing_audit) &&
         grepl("sleep metric duration MM:SS threshold conversion", existing_audit, fixed = TRUE)) {
       if (err_col %in% names(data)) {
@@ -205,6 +218,7 @@ apply_sleep_metric_duration_corrections <- function(data, cfg = NULL) {
       }
       cat(sprintf("  Parser already converted pid=%s day=%s row_id=%s %s via MM:SS threshold - skipped manual override\n",
                   pid_val, day_val, row_val, var_name))
+      record_skip("parser_already_converted_MMSS")
       skipped_count <- skipped_count + 1
       next
     }
@@ -249,6 +263,19 @@ apply_sleep_metric_duration_corrections <- function(data, cfg = NULL) {
     applied_count <- applied_count + 1
   }
 
+  na_df <- if (length(not_applied) > 0) do.call(rbind, not_applied) else
+    data.frame(pid = character(0), day_num = character(0), row_id = character(0),
+               variable = character(0), reason = character(0), stringsAsFactors = FALSE)
+  out_dir <- cfg_get("output.report.dir", "output", cfg = cfg)
+  dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
+  na_file <- file.path(out_dir, "manual_corrections_not_applied.csv")
+  utils::write.csv(na_df, na_file, row.names = FALSE)
+  if (nrow(na_df) > 0) {
+    cat("  Rows not applied, by reason:\n")
+    for (rs in names(table(na_df$reason)))
+      cat(sprintf("    %-38s %d\n", rs, sum(na_df$reason == rs)))
+    cat(sprintf("  Each row and its reason: %s\n", na_file))
+  }
   cat(sprintf("  Sleep metric duration corrections applied: %d\n", applied_count))
   cat(sprintf("  Correction rows skipped: %d\n", skipped_count))
   return(data)

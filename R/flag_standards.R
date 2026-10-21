@@ -45,6 +45,7 @@ eval_data_category <- function(df, cfg = NULL) {
   awake_getup_diff_h <- .diff_h(getup, awake)
   sleep_awake_diff_h <- .diff_h(awake, sleep)
 
+  thr <- .sc_step5_thresholds(cfg)
   has_na <- is.na(bed) | is.na(sleep) | is.na(awake) | is.na(getup)
   temporal_order_ok <- (bed <= sleep) & (sleep <= awake) & (awake <= getup)
 
@@ -54,13 +55,13 @@ eval_data_category <- function(df, cfg = NULL) {
 
   sleep_awake_equal_error <- abs(sleep_awake_diff_h) < 0.01
   order_error <- !temporal_order_ok & !sleep_awake_equal_error
-  bed_sleep_diff_error   <- abs(bed_sleep_diff_h) > 7 & !order_error & !is_equal_time & !sleep_awake_equal_error
-  awake_getup_diff_error <- abs(awake_getup_diff_h) > 7 & !order_error & !bed_sleep_diff_error & !is_equal_time & !sleep_awake_equal_error
-  sleep_awake_24h_error  <- abs(sleep_awake_diff_h) > 24 & !order_error & !bed_sleep_diff_error & !awake_getup_diff_error & !is_equal_time & !sleep_awake_equal_error
+  bed_sleep_diff_error   <- abs(bed_sleep_diff_h) > thr$bed_sleep_error & !order_error & !is_equal_time & !sleep_awake_equal_error
+  awake_getup_diff_error <- abs(awake_getup_diff_h) > thr$awake_getup_error & !order_error & !bed_sleep_diff_error & !is_equal_time & !sleep_awake_equal_error
+  sleep_awake_24h_error  <- abs(sleep_awake_diff_h) > thr$sleep_awake_error & !order_error & !bed_sleep_diff_error & !awake_getup_diff_error & !is_equal_time & !sleep_awake_equal_error
   is_error <- order_error | bed_sleep_diff_error | awake_getup_diff_error | sleep_awake_24h_error | sleep_awake_equal_error
 
-  bed_sleep_susp   <- bed_sleep_diff_h   > 3 & !is_error & !is_equal_time
-  awake_getup_susp <- awake_getup_diff_h > 3 & !is_error & !is_equal_time
+  bed_sleep_susp   <- bed_sleep_diff_h   > thr$bed_sleep_unusual & !is_error & !is_equal_time
+  awake_getup_susp <- awake_getup_diff_h > thr$awake_getup_unusual & !is_error & !is_equal_time
   is_unusual <- (bed_sleep_susp | awake_getup_susp) & !is_error & !is_equal_time
 
   out <- rep("clean", n)
