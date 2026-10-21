@@ -86,7 +86,7 @@ Each step prints a heading `=== Step N: ... ===`. After a run:
 ## 5. Where the results are
 
 Working files for the review go to the **project folder** (not `output/`); results go to `output/`.
-[Output files](output-files.html) lists every file, when it is written and what it is. If something is
+[Output files](output-files.html) starts with a quick guide to which file and column answers which question (was it changed, does it still need a person, did someone accept it), then lists every file, when it is written and what it is. If something is
 missing or an error appears, see [Troubleshooting](troubleshooting.html).
 
 To read a finished run in R without opening files:
