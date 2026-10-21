@@ -120,6 +120,9 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   env <- .pipeline_init(config, project_dir, verbose)
   on.exit(.pipeline_cleanup(env$old_wd), add = TRUE)
   cfg  <- env$cfg
+  # Fail fast: an invalid step-5 rule value stops the run before data is read
+  # or anything is written (the same validator Step 5 uses downstream).
+  .sc_step5_thresholds(cfg)
   report_effective_rules(cfg, include_manual_corrections, verbose)
   sdir <- env$sdir
   # Seen by the sourced step scripts (they run in this frame); not the global environment.

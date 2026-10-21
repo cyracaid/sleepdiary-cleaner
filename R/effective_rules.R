@@ -9,8 +9,6 @@
     key = c(
       "timestamp.sequence.max_gap_hours",
       "normalize.swap_threshold_hours",
-      "timestamp.midnight_threshold_hour",
-      "timestamp.interval.mmss_threshold_minutes",
       unname(.sc_rule_keys),
       "review.clean_categories",
       "classification.metric_validation.sol.excessive_minutes",
@@ -26,8 +24,6 @@
     meaning = c(
       "Step 4: a gap of at least this many hours between adjacent times triggers an AM/PM flip",
       "Step 4: an out-of-order pair closer than this many hours is swapped",
-      "Step 4: times before this hour are treated as the next day",
-      "Interval parser: a value above this with a colon is read as MM:SS, not HH:MM",
       "Step 5 error: |sleep - bed| above this many hours",
       "Step 5 error: |getup - awake| above this many hours",
       "Step 5 error: |awake - sleep| above this many hours",
@@ -96,12 +92,19 @@ effective_rules <- function(cfg, include_manual_corrections = FALSE) {
 #' Print the rules in force and save them with the results
 #' @noRd
 report_effective_rules <- function(cfg, include_manual_corrections = FALSE, verbose = TRUE) {
-  r <- tryCatch(effective_rules(cfg, include_manual_corrections), error = function(e) NULL)
+  r <- tryCatch(effective_rules(cfg, include_manual_corrections),
+                error = function(e) {
+                  cat("\n  [rules] WARNING: could not compute the rules report:",
+                      conditionMessage(e), "\n")
+                  NULL
+                })
   if (is.null(r)) return(invisible(NULL))
-  out_dir <- config_get(cfg, "output.report.dir", "output")
-  try({
+  out_dir  <- config_get(cfg, "output.report.dir", "output")
+  csv_path <- file.path(out_dir, "effective_rules.csv")
+  write_ok <- try({
     dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
-    utils::write.csv(r, file.path(out_dir, "effective_rules.csv"), row.names = FALSE)
+    utils::write.csv(r, csv_path, row.names = FALSE)
+    TRUE
   }, silent = TRUE)
   if (verbose) {
     cat("\n=== Rules in effect for this run ===\n")
@@ -109,8 +112,13 @@ report_effective_rules <- function(cfg, include_manual_corrections = FALSE, verb
       cat(sprintf("  %-62s %-22s [%s]\n", r$key[i], r$value[i], r$source[i]))
     n_cfg <- sum(r$source == "your config")
     n_arg <- sum(r$source == "call argument")
-    cat(sprintf("  %d rule(s) set in your config, %d set by the call; the rest are defaults. Saved to %s\n",
-                n_cfg, n_arg, file.path(out_dir, "effective_rules.csv")))
+    cat(sprintf("  %d rule(s) set in your config, %d set by the call; the rest are defaults.\n",
+                n_cfg, n_arg))
+    if (isTRUE(write_ok)) {
+      cat(sprintf("  Saved to %s\n", csv_path))
+    } else {
+      cat(sprintf("  WARNING: could not save %s (report shown above only).\n", csv_path))
+    }
   }
   invisible(r)
 }

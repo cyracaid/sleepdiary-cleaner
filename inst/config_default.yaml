@@ -162,7 +162,6 @@ timestamp:
   # "next_day": timestamps < 6:00 AM are considered next day
   # "as_is": no adjustment
   midnight_handling: "next_day"
-  midnight_threshold_hour: 6
 
   # Sequence validation
   # Expected order: bed -> sleep -> awake -> getup
@@ -172,7 +171,6 @@ timestamp:
 
   # Interval format detection
   interval:
-    mmss_threshold_minutes: 60  # values > this and with ":" -> assume MM:SS not HH:MM
     max_plausible_minutes: 10000
     max_nap_minutes: 720       # 12 hours
     max_exercise_minutes: 360  # 6 hours
