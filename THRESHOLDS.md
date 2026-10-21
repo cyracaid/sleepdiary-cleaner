@@ -8,6 +8,20 @@ insomnia. For clinical samples (insomnia, elderly, shift-work), revisit every ro
 > **Provenance:** defaults tuned on healthy young-adult university EMA sample.
 > Document your own study population here so downstream users know the reference.
 
+## How to use these values
+
+* **For our study data the values below are fixed.** They are the rules the study ran with. The
+  Step 5 limits (7, 7 and 24 hours for errors; 3, 15, 3 and 3 hours for unusual records) were written
+  down in the project's March 2026 logic document and were part of the code unchanged until they became
+  configuration (see `NEWS.md`). To reproduce our results, keep the defaults.
+* **For your own data you decide.** Every key in the table can be set in your config YAML (the
+  commented examples are in `inst/config_template.yaml`). The pipeline applies what you set and reports
+  it; it does not choose rules for you. A value that is present but not a number stops the run.
+* **Every run states the rules it used.** The run prints `=== Rules in effect for this run ===` and saves
+  the same list as `output/effective_rules.csv` (key, value, default, whether the value comes from the
+  default or from your config, meaning). Keep that file with your results and cite it in your Methods.
+  To compare two runs, compare their `effective_rules.csv`.
+
 ## Threshold table
 
 | Config key | Default | Flags | Rationale |

@@ -7,7 +7,14 @@ template:
 # mixing both languages under each topic. The first group's description links
 # to the second, and every article links to its counterpart at the top.
 navbar:
+  structure:
+    left: [intro, reference, articles, thresholds, news]
+    right: [search, github, lightswitch]
   components:
+    # The detection thresholds, with their defaults and rationale
+    thresholds:
+      text: Thresholds
+      href: THRESHOLDS.html
     # The Articles entry opens a menu with the two languages kept apart,
     # each in the order a user needs them: start, inputs, run and read, outputs,
     # problems, then how it works and how it was checked.

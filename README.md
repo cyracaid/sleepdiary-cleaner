@@ -298,6 +298,7 @@ guidelines are in [`CONTRIBUTING.md`](CONTRIBUTING.md).
 - vignette("interpreting-output") — reading the output and the review loop (`correction_status_final.csv`, the review status table, figures)
 - vignette("output-files") — every file a run writes: where it goes, which step writes it, what it is
 - vignette("troubleshooting") — symptom, cause and fix for the problems seen most often
+- [`THRESHOLDS.md`](THRESHOLDS.md) — every detection threshold with its default and rationale, and how to set your own (also on the docs site under "Thresholds")
 - vignette("pipeline-architecture") — structure, rule families, classification
 - vignette("validation-methodology") — how the rules were validated (synthetic + real data)
 - vignette("testing-coverage") — test suite coverage
@@ -489,6 +490,7 @@ Bug、问题和功能建议：请开 [issue](https://github.com/cyracaid/sleepdi
 - vignette("interpreting-output-zh") — 读懂输出与审核循环（`correction_status_final.csv`、审核状态表、图）
 - vignette("output-files-zh") — 一次运行写出的每个文件：放哪里、哪一步写出、是什么
 - vignette("troubleshooting-zh") — 最常见问题的现象、原因和处理办法
+- [`THRESHOLDS.md`](THRESHOLDS.md) — 每个检测阈值的默认值与依据，以及如何设置你自己的（文档站点"Thresholds"页也有）
 - vignette("pipeline-architecture-zh") — 结构、规则族、分类体系
 - vignette("validation-methodology-zh") — 规则如何验证（合成 + 真实数据）
 - vignette("testing-coverage-zh") — 测试覆盖
