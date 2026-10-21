@@ -1,5 +1,18 @@
 # sleepcleanr (development version)
 
+## Changed: the delivered data say whether a person looked
+* Records a reviewer marked "Reasonable unusual record" are now marked in the data that continue through
+  the pipeline. Before, the mark was made on a copy used to build the classified tables and never reached the
+  delivered datasets: `is_reasonable_unusual` was empty and the records stayed `unusual` in `record_status`.
+  They now have `data_category` / `record_status` = `reasonable_unusual`, so the counts of `unusual` fall and of
+  `reasonable_unusual` rise by the same amount (on the study data: 31 `unusual` -> 0, 33 `reasonable_unusual`;
+  two of the 33 were `equal_time`).
+* Dataset A has one new column, `human_review` (`waiting`, `corrected`, `accepted`, `none`), that replaces
+  `needs_review` and `is_reasonable_unusual`: 35 columns instead of 36. `accepted` covers both reasonable-unusual
+  records and metric warnings marked confirmed-not-error, which A could not show before. It reports what the review
+  files say and decides nothing.
+* The output-files article starts with a quick guide to which file and column answers which question.
+
 ## Changed
 * Second-review rows whose `pid` or `day_num` is not a number (for example free text that ended up in those
   columns) can no longer be read as records: they are left out, listed with their file line numbers on the
