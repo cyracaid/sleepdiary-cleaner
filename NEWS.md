@@ -1,3 +1,32 @@
+# sleepcleanr 1.6.1
+
+## Fixed
+* Figure text is ASCII-only. PNG devices on non-UTF-8 locales (CRAN's Windows
+  check machines) hard-fail on characters they cannot encode; every figure
+  title/label/caption/annotate with `<=`, `->` or dashes broke the run there.
+  Console markers (check/cross/warning signs, `----` rules) are unchanged, and
+  the ten font-substitution warnings disappear with the substitutions.
+* `effective_rules.csv` no longer certifies two config keys nothing reads:
+  `timestamp.midnight_threshold_hour` and `timestamp.interval.mmss_threshold_minutes`
+  are removed from the registry, the default config, THRESHOLDS.md and the
+  README table. The operative values (15:00 evening rollover, 240-minute m:ss
+  gate) are hardcoded and now documented as such.
+* The rules report no longer claims success it did not have: a failed
+  `effective_rules()` computation or CSV write prints a WARNING, and
+  "Saved to ..." is only printed when the write succeeded.
+* An invalid `classification.step5.*` value stops the run at start-up, before
+  any data is read or output written (was: at Step 5, after Steps 1-4).
+
+## Chore
+* `renv.lock` records `readxl` and `jsonlite` (with `cellranger`/`rematch`),
+  which `clean_sleep_diary()` imports; restore-from-lock environments were
+  missing them.
+* `LICENSE` is the two-line CRAN stub; the full MIT text moves to
+  `LICENSE.md`. `CITATION.cff` gains the archived 1.6.0 DOI. Vignette links to
+  the Thresholds page are absolute (the relative link broke inside the CRAN
+  tarball).
+* New CI job: `R CMD check --as-cran` (offline incoming-feasibility mode).
+
 # sleepcleanr 1.6.0
 
 Delivered data change in this release: Dataset A has 35 columns (one new, `human_review`, in place of
