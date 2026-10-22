@@ -104,7 +104,7 @@ bland_altman <- function(data,
                          linewidth = 0.6, alpha = 0.15) +
     ggplot2::scale_y_continuous(labels = function(z) sprintf("%+.0f", z)) +
     ggplot2::labs(
-      title    = sprintf("Bland-Altman: %s (computed \u2212 reported)", label),
+      title    = sprintf("Bland-Altman: %s (computed - reported)", label),
       subtitle = sprintf("Bias %+.1f  |  95%% LoA [%+.1f, %+.1f]  |  %.1f%% outside  |  n = %d",
                          bias, lower_loa, upper_loa, pct_outside * 100, n_pairs),
       x        = sprintf("Mean %s (minutes)", label),

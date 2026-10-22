@@ -32,7 +32,7 @@ figure12_step_flag_table <- function(cfg = NULL, output_dir = ".", save_png = NU
     if (all(is.na(vs))) NA_integer_ else sum(vs, na.rm = TRUE)
   }
 
-  fmt <- function(x) ifelse(is.na(x), "\u2014", as.character(x))
+  fmt <- function(x) ifelse(is.na(x), "-", as.character(x))
 
   # Step label: id and short label on separate lines so long labels
   # ("5.75 Second-review consensus") wrap instead of truncating in a
@@ -91,7 +91,7 @@ figure12_step_flag_table <- function(cfg = NULL, output_dir = ".", save_png = NU
         } else {
           # Centred under the (centred) header; "not computable" dashes greyed
           # so the real numbers stand out.
-          is_dash <- identical(disp_chr[[j]][i], "\u2014")
+          is_dash <- identical(disp_chr[[j]][i], "-")
           grid::textGrob(disp_chr[[j]][i], x = 0.5, hjust = 0.5,
                          gp = grid::gpar(fontsize = 7.2,
                                          col = if (is_dash) "grey65" else "black"))
@@ -118,10 +118,10 @@ figure12_step_flag_table <- function(cfg = NULL, output_dir = ".", save_png = NU
                                  l = rep(seq_len(nc), nr), z = 1)
 
   # -- Vertical stack: title / subtitle / table / legend -----------------------
-  title <- grid::textGrob("1.1 \u2014 Step Flag Ledger",
+  title <- grid::textGrob("1.1 - Step Flag Ledger",
                     gp = grid::gpar(fontsize = 14, fontface = "bold"))
   sub <- grid::textGrob(paste0("Records in each final-standard flag category at every pipeline step. ",
-                         "\u2014 = not yet computable at that step (first number = generation point)."),
+                         "- = not yet computable at that step (first number = generation point)."),
                   gp = grid::gpar(fontsize = 9, col = "grey30"))
   legend <- grid::textGrob(paste0(
     "N = records in run.   DC:error = records whose timestamp order is impossible (Step 5).   ",
