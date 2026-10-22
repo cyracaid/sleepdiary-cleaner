@@ -1,0 +1,44 @@
+# R CMD check --as-cran via GitHub Actions
+# Catches the class of problems plain check misses: CRAN=true behaviour in
+# tests, encoding-sensitive device code, CRAN incoming-feasibility-style flags.
+# The incoming-feasibility download is skipped (_R_CHECK_CRAN_INCOMING_=false);
+# everything else about --as-cran is exercised. Offline equivalent used by rhub.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+name: R-CMD-check-as-cran
+
+jobs:
+  as-cran:
+    # The legacy-entry subprocess test hung under --as-cran once (issue #3,
+    # never reproduced on the tarball); bound the job so a recurrence fails
+    # instead of burning the whole runner window.
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+      _R_CHECK_CRAN_INCOMING_: false
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            any::rcmdcheck
+            any::testthat
+            any::yaml
+          needs: check
+
+      - uses: r-lib/actions/check-r-package@v2
+        with:
+          error-on: '"error"'
+          args: 'c("--as-cran", "--no-manual")'
+          upload-snapshots: true
+          build_args: 'c("--no-build-vignettes", "--no-manual")'

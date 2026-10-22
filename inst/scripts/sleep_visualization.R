@@ -229,8 +229,20 @@ save_png <- function(plot, name, w = NULL, h = NULL, subdir = NULL) {
   # 4B, 6, 7, 13C, 13D, 20, 20B, R26). Wrap them to the figure width here so
   # every figure is covered without editing each labs() call. ~9.5 chars/inch
   # is conservative for 8-10pt text.
+  # PNG devices on non-UTF-8 locales (CRAN's Windows check machines) hard-fail
+  # on characters they cannot encode; transliterate before the text reaches
+  # the device. Source-level strings are already ASCII; this also covers
+  # dynamically built subtitles and captions.
+  .fig_ascii <- function(x) {
+    if (!is.character(x)) return(x)
+    for (.m in list(c("\u2264","<="), c("\u2265",">="), c("\u2192","->"),
+                    c("\u2212","-"), c("\u2014","-"), c("\u2013","-"),
+                    c("\u00d7","x"), c("\u2260","!="), c("\u00b1","+/-"))) x <- gsub(.m[[1]], .m[[2]], x, fixed = TRUE)
+    x
+  }
   .wrap_txt <- function(x) {
     if (!is.character(x) || length(x) != 1 || is.na(x)) return(x)
+    x <- .fig_ascii(x)
     paste(vapply(strsplit(x, "\n", fixed = TRUE)[[1]],
                  function(l) paste(strwrap(l, width = floor(w * 9.5)), collapse = "\n"),
                  character(1)), collapse = "\n")
@@ -843,12 +855,12 @@ if(all(c("data_category", "manually_corrected", "corrected") %in% names(correcte
                  "FINAL RECORD CLASSES (each record gets exactly one; first match wins):",
                  sprintf("Not Reported: %s (%s%%) = any of bed / sleep / awake / getup time is missing",
                          format(n_not_rpt, big.mark = ","), round(n_not_rpt / n_total * 100, 1)),
-                 sprintf("Error (Reviewed): %s = order broken (not bed \u2264 sleep \u2264 awake \u2264 getup), sleep = awake, a gap > %s h, or sleep span > %s h; reviewed and fixed", n_error, .thr5$bed_sleep_error, .thr5$sleep_awake_error),
+                 sprintf("Error (Reviewed): %s = order broken (not bed <= sleep <= awake <= getup), sleep = awake, a gap > %s h, or sleep span > %s h; reviewed and fixed", n_error, .thr5$bed_sleep_error, .thr5$sleep_awake_error),
                  sprintf("Equal Time: %s = bed = sleep and/or awake = getup (difference < 0.01 h, about 36 s), order intact; benign diary habit, not an error", n_equal),
-                 sprintf("Unusual (Accepted): %s = order intact but a gap > %s h (bed\u2192sleep or awake\u2192getup); odd but possible, reviewed and kept as-is", n_unusual, .thr5$bed_sleep_unusual),
+                 sprintf("Unusual (Accepted): %s = order intact but a gap > %s h (bed->sleep or awake->getup); odd but possible, reviewed and kept as-is", n_unusual, .thr5$bed_sleep_unusual),
                  sprintf("Clean: %s (%s%%) = order intact, no gap > %s h",
                          format(n_clean, big.mark = ","), round(n_clean / n_total * 100, 1), .thr5$bed_sleep_unusual),
-                 sprintf("Participants w/ \u22651 correction: %s / %s (%s%%)",
+                 sprintf("Participants w/ >=1 correction: %s / %s (%s%%)",
                          n_pid_any_corr, n_pid_total, round(n_pid_any_corr / n_pid_total * 100, 1))
                ), function(l) paste(strwrap(l, width = 68, exdent = 3), collapse = "\n"), character(1)),
                collapse = "\n")) +
@@ -2632,7 +2644,7 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
                color = c("orange", "red"), size = 3.1,
                label = c("15 min: small mismatch (minor)",
                          "60 min: large mismatch (notable)")) +
-      labs(caption = "bias = |computed \u2212 self-reported|  (minutes)") +
+      labs(caption = "bias = |computed - self-reported|  (minutes)") +
       labs(title = "Figure 20: SOL Perception Bias (Subjective vs Objective)",
       subtitle = paste0("Absolute difference: subjective SOL (self-reported) vs objective SOL (time_sleep - time_bed). N=", length(valid_rows), ".\n",
                         "This gap is preserved, not corrected -- perception/measurement mismatch is signal, not error. ",
@@ -2689,9 +2701,9 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
                    color = c("orange", "red"), size = 3.1,
                    label = c("15 min: small mismatch (minor)",
                              "60 min: large mismatch (notable)")) +
-          labs(caption = "bias = |computed \u2212 self-reported|  (minutes)") +
+          labs(caption = "bias = |computed - self-reported|  (minutes)") +
            labs(title = "Figure 20B: Self-Reported Nighttime Wakefulness vs Post-Awakening Time in Bed",
-            subtitle = paste0("Note: self-reported WASO (within sleep period) and post-awakening interval (getup − awake) are different time windows. ",
+            subtitle = paste0("Note: self-reported WASO (within sleep period) and post-awakening interval (getup - awake) are different time windows. ",
                               "The latter captures time spent in bed after final awakening, not wakefulness during sleep. N=", length(valid_waso_rows), ".\n",
                               "This gap is preserved, not corrected -- perception/measurement mismatch is signal, not error. ",
                               "The >60min line flags cases worth a manual look for a possible input error, not a discrepancy to \"fix.\""),
@@ -3040,7 +3052,7 @@ if (all(c("time_bed_corrected", "time_getup_corrected") %in% names(corrected_ema
       stat_summary(fun = median, geom = "point", size = 2, color = "black") +
       facet_wrap(~event, scales = "free_y") +
       scale_fill_manual(values = c("Weekday" = "#1976D2", "Weekend" = "#FF8C00")) +
-      labs(title = "Figure R25: Sleep Regularity — Weekday vs Weekend",
+      labs(title = "Figure R25: Sleep Regularity - Weekday vs Weekend",
            subtitle = paste0("Violin + boxplot of bedtime and get-up time by day type (weekend = Sat/Sun); N = ", nrow(sr), " records.\n",
                              "Bedtime = time_bed_corrected, get-up = time_getup_corrected. Bedtime hours above 24 are after midnight (26 = 02:00)."),
            x = "", y = "Clock Hour") +
@@ -3094,7 +3106,7 @@ if (all(c("self_diffcalc_totalsleeptime_minutes", "self_diffcalc_sol_minutes",
     scale_fill_manual(name = NULL, values = c("Total Sleep Time (TST)" = "#2E7D32",
                                  "Sleep Onset Latency (SOL)" = "#FF8C00",
                                  "Wake After Sleep Onset (WASO)" = "#D32F2F")) +
-    labs(title = "Figure R26: Sleep Composition — TIB Breakdown",
+    labs(title = "Figure R26: Sleep Composition - TIB Breakdown",
          subtitle = paste0("Average proportion of Time in Bed (TIB) spent in each stage (N=", nrow(sc),
                            " valid records after pipeline correction). TIB = TST (Total Sleep Time, asleep) + SOL (Sleep Onset Latency, falling asleep) + WASO (Wake After Sleep Onset, awake in the night)."),
          x = "", y = "") +
@@ -3337,7 +3349,7 @@ if (is.list(.ro) && is.list(.ro$review_audit)) {
   } else if (.aud$n_pending == 0) {
     .fig13 <- c(
       "",
-      "Figures 13-18: NOT GENERATED — Auto-Detection Review Queue Empty",
+      "Figures 13-18: NOT GENERATED - Auto-Detection Review Queue Empty",
       sprintf("  The auto-detection system (Parts A/B/C) raised %d candidate record(s).",
               .aud$n_flagged),
       sprintf("  All %d were reviewed by a human and marked as 'not an error'", .aud$n_accepted),
@@ -3345,7 +3357,7 @@ if (is.list(.ro) && is.list(.ro$review_audit)) {
       "  Current pending review queue: 0 records.",
       "",
       "  Figures 13-18 plot the outstanding review queue. An empty queue is the",
-      "  COMPLETED state — the human review is finished, not missing.",
+      "  COMPLETED state - the human review is finished, not missing.",
       "",
       "  What to report in Methods:",
       sprintf("  'Automated detection proposed %d candidates; all were manually", .aud$n_flagged),
