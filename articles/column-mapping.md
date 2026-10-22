@@ -186,7 +186,7 @@ project’s March 2026 logic document, and the code has used the same
 values since the first release (July 2026) until they became
 configuration. To reproduce the study’s results, keep the defaults. All
 thresholds, with their rationale, are on the
-[Thresholds](https://cyracaid.github.io/sleepdiary-cleaner/THRESHOLDS.md)
+[Thresholds](https://cyracaid.github.io/sleepdiary-cleaner/THRESHOLDS.html)
 page.
 
 The keys `classification.temporal.*` that older default configs
