@@ -190,7 +190,7 @@ second_review:
 
 A value that is present but not a single number stops the run with a message; it is never replaced silently.
 
-Where these defaults come from: the Step 5 limits (7, 7 and 24 hours for errors; 3, 15, 3 and 3 hours for unusual records) are recorded in the project's March 2026 logic document, and the code has used the same values since the first release (July 2026) until they became configuration. To reproduce the study's results, keep the defaults. All thresholds, with their rationale, are on the [Thresholds](../THRESHOLDS.html) page.
+Where these defaults come from: the Step 5 limits (7, 7 and 24 hours for errors; 3, 15, 3 and 3 hours for unusual records) are recorded in the project's March 2026 logic document, and the code has used the same values since the first release (July 2026) until they became configuration. To reproduce the study's results, keep the defaults. All thresholds, with their rationale, are on the [Thresholds](https://cyracaid.github.io/sleepdiary-cleaner/THRESHOLDS.html) page.
 
 The keys `classification.temporal.*` that older default configs contained were never read by the code and have
 been removed.
