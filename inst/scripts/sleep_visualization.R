@@ -1180,7 +1180,7 @@ if(all(c("time_in_bed_h", "sleep_duration_h", "flag_severity") %in% names(clean_
                                     "Major issues (2+ flags)" = "#D32F2F"),
                          name = "Data Quality") +
       labs(title = "Figure 4: Sleep Duration vs Time in Bed",
-           subtitle = sprintf("TIME IN BED = from getting into bed to getting out. SLEEP DURATION = time actually asleep (TIB minus SOL minus WASO). | COLOR-CODED by data quality | r = %.3f | Black line = linear trend; gray band around it = uncertainty range of the trend | Dashed diagonal = TIB == TST (impossible to sleep all of TIB) (based on final corrected data)", overall_cor, clean_cor),
+           subtitle = sprintf("TIME IN BED = from getting into bed to getting out. SLEEP DURATION = time actually asleep (TIB minus SOL minus WASO). | COLOR-CODED by data quality | r = %.3f (all records) / %.3f (clean only) | Black line = linear trend; gray band around it = uncertainty range of the trend | Dashed diagonal = TIB == TST (impossible to sleep all of TIB) (based on final corrected data)", overall_cor, clean_cor),
            x = "Time in Bed (hours)",
            y = "Total Sleep Time (hours)") +
       theme(legend.position = "bottom") +
@@ -1576,9 +1576,15 @@ if(!"flag_severity" %in% names(clean_df)) {
   clean_df$flag_duration_extreme <- eval_duration_extreme(clean_df, .cfg)
 }
 
-flag_columns <- c()
-if("flag_severity" %in% names(clean_df)) flag_columns <- c(flag_columns, "Severity" = "flag_severity")
-if("flag_duration_extreme" %in% names(clean_df)) flag_columns <- c(flag_columns, "Extreme Duration" = "flag_duration_extreme")
+# Co-occurrence is over the binary flag columns. flag_severity is a 3-level
+# character label, not a flag: as.numeric() on it turned every row NA and the
+# heatmap never drew (warnings 13 + "fewer than 2 complete flag columns").
+# flag_duration_extreme is excluded: it is entirely NA on the study data, and
+# one all-NA column empties complete.cases() and kills the heatmap.
+binary_flag_cols <- c("flag_poor_efficiency", "flag_high_sol", "flag_high_waso",
+                      "flag_sleep_calculation_issue")
+flag_columns <- intersect(binary_flag_cols, names(clean_df))
+names(flag_columns) <- gsub("^flag_", "", flag_columns)
 
 if(length(flag_columns) >= 2) {
   

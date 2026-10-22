@@ -105,3 +105,26 @@ test_that("apply_manual_corrections_and_recalculate undo via solution_humanident
   # undo restores sleep_manual from original corrected (23:30)
   expect_equal(format(out$corrected_ema_data$time_sleep_manual[out$corrected_ema_data$row_id == 10], "%H:%M"), "23:30")
 })
+
+test_that("unrecognized instruction formats are recorded, not silently skipped", {
+  ema <- .mk_ema()
+  corr <- data.frame(
+    pid = 1, day_num = 1, row_id = 10,
+    column_to_correct = "time_sleep_corrected",
+    correct_value = "2022-01-15 06:00:00",   # legacy absolute datetime: unrecognized
+    column_to_correct_2 = NA, correct_value_2 = NA,
+    solution_humanidentified = "legacy absolute-datetime format",
+    stringsAsFactors = FALSE)
+  .sc_clear()
+  out <- apply_manual_corrections_and_recalculate(ema, corr)
+  # the bad instruction changed nothing...
+  expect_equal(format(out$corrected_ema_data$time_sleep_manual[out$corrected_ema_data$row_id == 10], "%H:%M"), "23:30")
+  expect_false(isTRUE(out$corrected_ema_data$manually_corrected[out$corrected_ema_data$row_id == 10]))
+  # ...and it was recorded for the not-applied ledger instead of vanishing
+  na <- .sc_get("manual_corrections_not_applied_error")
+  expect_true(!is.null(na) && nrow(na) == 1)
+  expect_equal(na$reason, "unrecognized_instruction_format")
+  expect_equal(na$pid, "1")
+  expect_equal(na$variable, "time_sleep_corrected")
+  .sc_clear()
+})

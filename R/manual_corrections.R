@@ -65,6 +65,38 @@ apply_time_instruction_case3 <- function(current_time, instruction) {
   return(current_time)
 }
 
+
+# TRUE when the instruction matches one of the formats implemented by
+# apply_time_instruction_case3. Reviewers writing anything else must get a row
+# in manual_corrections_not_applied.csv (same contract as the duration applier)
+# instead of a silent no-op. Keep the four patterns in sync with
+# apply_time_instruction_case3 above.
+instruction_recognized <- function(instruction) {
+  if (is.na(instruction) || instruction == "") return(FALSE)
+  instruction_lower <- tolower(instruction)
+  if (str_detect(instruction_lower, "^same day")) return(TRUE)
+  if (str_detect(instruction_lower, "minus 12 hours")) return(TRUE)
+  if (str_detect(instruction_lower, "plus 12 hours")) return(TRUE)
+  if (str_detect(instruction, "^\\d{1,2}:\\d{2}(:\\d{2})?$")) return(TRUE)
+  FALSE
+}
+
+# Accumulate error-correction rows whose instruction format is unrecognized;
+# the sleep-metric-duration applier merges these into
+# output/manual_corrections_not_applied.csv (it runs after this step and is
+# the single writer of that file).
+.sc_record_not_applied_error <- function(pid, day_num, row_id, variable) {
+  cur <- .sc_get("manual_corrections_not_applied_error")
+  new_row <- data.frame(pid = as.character(pid), day_num = as.character(day_num),
+                        row_id = as.character(row_id), variable = as.character(variable),
+                        reason = "unrecognized_instruction_format", stringsAsFactors = FALSE)
+  .sc_set("manual_corrections_not_applied_error",
+          if (is.null(cur)) new_row else rbind(cur, new_row))
+  cat(sprintf("  [not applied] pid=%s day=%s: unrecognized instruction format for %s (listed in manual_corrections_not_applied.csv)\n",
+              pid, day_num, variable))
+  invisible(NULL)
+}
+
 # Handle 'Same day' instruction
 handle_same_day_instruction <- function(current_time, instruction) {
   
@@ -596,6 +628,12 @@ process_case3_correction <- function(data, correction,
       current_time <- data[[target_col]][row_idx]
       if (is.na(current_time)) next
       
+      if (!instruction_recognized(correct_value)) {
+        rid <- if ("row_id" %in% names(correction)) as.character(correction$row_id) else ""
+        .sc_record_not_applied_error(pid, day_num, rid, col)
+        next
+      }
+      
       corrected_time <- apply_time_instruction_case3(current_time, correct_value)
       
       if (!identical(current_time, corrected_time)) {
@@ -619,6 +657,12 @@ process_case3_correction <- function(data, correction,
       
       current_time <- data[[target_col]][row_idx]
       if (is.na(current_time)) next
+      
+      if (!instruction_recognized(correct_value_2)) {
+        rid <- if ("row_id" %in% names(correction)) as.character(correction$row_id) else ""
+        .sc_record_not_applied_error(pid, day_num, rid, col)
+        next
+      }
       
       corrected_time <- apply_time_instruction_case3(current_time, correct_value_2)
       

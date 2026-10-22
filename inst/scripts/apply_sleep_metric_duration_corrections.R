@@ -137,6 +137,10 @@ apply_sleep_metric_duration_corrections <- function(data, cfg = NULL) {
   na_df <- if (length(not_applied) > 0) do.call(rbind, not_applied) else
     data.frame(pid = character(0), day_num = character(0), row_id = character(0),
                variable = character(0), reason = character(0), stringsAsFactors = FALSE)
+  # Error-correction rows with unrecognized instruction formats were collected
+  # earlier (Step 6); this file is the single not-applied ledger.
+  err_na <- .sc_get("manual_corrections_not_applied_error")
+  if (!is.null(err_na) && nrow(err_na) > 0) na_df <- rbind(na_df, err_na)
   out_dir <- cfg_get("output.report.dir", "output", cfg = cfg)
   dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
   na_file <- file.path(out_dir, "manual_corrections_not_applied.csv")

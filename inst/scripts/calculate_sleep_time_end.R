@@ -246,6 +246,7 @@ calculate_sleep_time_vars_end <- function(data, cfg = NULL) {
   cleaned_data$time_in_bed_h <- cleaned_data$self_diffcalc_timeinbed_minutes / 60
 
   # ---- Block 1b: Correction traceability ----
+  if (!"manually_corrected" %in% names(cleaned_data)) cleaned_data$manually_corrected <- FALSE
   cleaned_data$has_correction <- dplyr::case_when(
     cleaned_data$corrected & cleaned_data$manually_corrected ~ "both",
     cleaned_data$corrected                                 ~ "algorithmic",
