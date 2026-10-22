@@ -29,6 +29,14 @@
   `review.missing_times_ok_after_manual`, `review.step8_flags_need_review` and
   `review.fail_if_not_done`.
 
+* Manual-file instructions the correction engine cannot read (a short column name such as
+  `time_bed`, free text in `correct_value`, a `solution_humanidentified` with no known
+  phrase) are no longer skipped in silence: Step 6 prints each one as a WARNING, and its
+  record is `needs_review` in `review_status.csv` with the reason. A full date-time
+  (`2022-01-15 06:00:00`) is now a valid `correct_value`.
+* `include_manual_corrections = "ask"` asks y / n when the run starts. It used to apply the
+  manual files without asking; a non-interactive session now stops with an error instead.
+
 ## Changed
 * `inst/scripts/generate_ai_review_csvs.R` takes its suggested labels (`ai_label`,
   `ai_reason`, new `ai_rule`) from `review.suggestions` instead of rules written in the
@@ -39,6 +47,10 @@
   `review_status.csv` supersedes it as the table to read.
 
 ## Fixed
+* A record whose `correction_type` names a swap was marked as manually corrected even when no
+  manual instruction changed it. `correction_type` is written by the algorithm (Step 4), so
+  this recorded an automatic swap as a human correction. Such a record is now only reported
+  on the console.
 * Step 8 labelled every manually corrected row `CLEAN (Manually Fixed)`, even when its
   corrected times still failed the re-check. Step 8's own checks look at formats and
   metric values, not at the order of the corrected times, so those rows also looked clean

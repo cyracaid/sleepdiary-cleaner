@@ -99,9 +99,10 @@ utils::globalVariables(c(
 #'   prominent banner states that no human corrections were applied. TRUE:
 #'   apply the manual-correction files configured in the config YAML
 #'   (the pre-2026-09-29 behaviour). The strings "ask" / "y" / "n" / "yes" /
-#'   "no" are also accepted: "ask" prompts interactively (in an interactive
-#'   session only; in a non-interactive session it degrades to FALSE with a
-#'   notice). The point of the default-off switch: a package user must
+#'   "no" are also accepted: "ask" asks y / n once when the run starts, before
+#'   any data is read; a non-interactive session cannot answer, so "ask" stops
+#'   the run there with an error (use TRUE or FALSE). The point of the
+#'   default-off switch: a package user must
 #'   OPT IN to human corrections so that a dataset can never be silently
 #'   modified by review files left over in the working directory.
 #'
@@ -128,6 +129,8 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   # figures are made. Settled here, before anything is written, so a question
   # is asked while the person is still at the keyboard (see resolve_data_tag()).
   if (!skip_visualization) .sc_set("data_tag_info", resolve_data_tag(cfg))
+  # "ask" is answered here too, before anything is read or written.
+  include_manual_corrections <- .resolve_include_manual(include_manual_corrections)
   report_effective_rules(cfg, include_manual_corrections, verbose)
   sdir <- env$sdir
   # Seen by the sourced step scripts (they run in this frame); not the global environment.
@@ -556,6 +559,31 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   }
   if (verbose) cat("\n[OK] Pipeline complete!\n")
   invisible(TRUE)
+}
+
+# include_manual_corrections as TRUE / FALSE. "ask" asks y / n in an interactive
+# session; a non-interactive session cannot answer, so it stops instead of
+# deciding for the user.
+.resolve_include_manual <- function(x, ask = interactive(), read = readline) {
+  v <- if (is.character(x)) tolower(trimws(x)) else x
+  if (identical(v, "ask")) {
+    if (!isTRUE(ask))
+      stop('include_manual_corrections = "ask" needs someone to answer, and this ',
+           "session is not interactive. Use include_manual_corrections = TRUE (apply ",
+           "the human-review files named in the config) or FALSE (algorithmic only).",
+           call. = FALSE)
+    cat("\nApply the human-review files named in the config",
+        "(data.files.manual_*, second_review) in this run?\n")
+    repeat {
+      a <- tolower(trimws(read("Type y / n: ")))
+      if (a %in% c("y", "yes")) return(TRUE)
+      if (a %in% c("n", "no")) return(FALSE)
+      cat("  Please type y or n.\n")
+    }
+  }
+  if (is.character(v) && v %in% c("y", "yes")) return(TRUE)
+  if (is.character(v) && v %in% c("n", "no")) return(FALSE)
+  isTRUE(v)
 }
 
 # -- Sub-pipeline entry points (unchanged behaviour) -------------------------

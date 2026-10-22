@@ -92,7 +92,11 @@ test_that("process_align_operations aligns source hour to target", {
   expect_equal(format(res$data$time_awake_manual[1], "%H:%M"), "08:30")
 })
 
-test_that("check_swap_corrections marks swap rows as manually corrected", {
+# Changed 2026-10: correction_type is written by the algorithm (Step 4), not by a
+# person, so a row it names is no longer marked as manually corrected when no
+# manual instruction changed it. The old expectation (marked TRUE) recorded an
+# automatic swap as a human correction.
+test_that("check_swap_corrections does not mark rows that no manual instruction changed", {
   data_df <- data.frame(
     pid = c(1, 1), day_num = c(1, 2), row_id = c(10, 11),
     time_bed_corrected = as.POSIXct(c("2020-01-01 23:00:00", "2020-01-01 22:00:00"), tz = "UTC"),
@@ -103,9 +107,13 @@ test_that("check_swap_corrections marks swap rows as manually corrected", {
     pid = 1, day_num = 1, row_id = 10,
     correction_type = "bed-sleep swap",
     stringsAsFactors = FALSE)
-  res <- check_swap_corrections(data_df, corr_df)
-  expect_true(res$manually_corrected[res$pid == 1 & res$day_num == 1])
+  expect_output(res <- check_swap_corrections(data_df, corr_df), "not marked as manually corrected")
+  expect_false(res$manually_corrected[res$pid == 1 & res$day_num == 1])
   expect_false(res$manually_corrected[res$pid == 1 & res$day_num == 2])
+  # a row a manual instruction did change stays marked
+  data_df$manually_corrected[1] <- TRUE
+  res2 <- suppressMessages(check_swap_corrections(data_df, corr_df))
+  expect_true(res2$manually_corrected[res2$pid == 1 & res2$day_num == 1])
 })
 
 test_that("process_swap_operations handles case2 pattern set", {

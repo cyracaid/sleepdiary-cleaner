@@ -128,8 +128,8 @@ run_pipeline(config = "my_study.yaml", include_manual_corrections = TRUE)
   `second_review`. If one is missing, an interactive session asks whether to
   continue without it; a non-interactive run warns and continues, unless the
   config sets `data.require_manual_corrections: true`, which makes it stop.
-- `"ask"`: **currently behaves exactly like `TRUE`** (no question is asked),
-  although the function documentation says it prompts. Do not rely on it.
+- `"ask"`: asks y / n once when the run starts. A non-interactive session
+  cannot answer, so the run stops there with an error.
 
 Step 5 writes the review worksheets `[NEW]manual_error_correction_review.csv`
 and `[NEW]manual_unusual_review.csv` to the **project root** (not `output/`).
@@ -163,6 +163,7 @@ unusual file):
 | `Same day 10:00:00 AM` (or `Same day 22:30`) | keep the date, set the clock time |
 | `Minus 12 hours` / `Plus 12 hours` | shift the named column(s) by 12 h |
 | `10:00` or `10:00:00` | set the clock time |
+| `2022-01-15 06:00:00` (or `2022-01-15 06:00`) | set date and time |
 
 Phrases read in `solution_humanidentified`:
 
@@ -175,17 +176,19 @@ Phrases read in `solution_humanidentified`:
 | `Align awake time's hour to getup time's hour` | text rows only |
 | `Minus 12 hours` / `Plus 12 hours` | text rows only, and it shifts **all four** times |
 
-**Anything else is skipped without an error or a warning**: a full date-time
-such as `2022-01-15 06:00:00`, free text such as `Set time_awake equal to
-time_getup`, a short column name. The row then stays on the review list.
-`correction_type` containing "swap" marks the record as manually corrected
-even when nothing was changed.
+**Anything else is skipped**, for example free text such as `Set time_awake
+equal to time_getup` or a short column name. Each skipped instruction is
+printed as a WARNING during Step 6, and its record is `needs_review` in
+`review_status.csv` with the reason "manual instruction not understood and
+skipped: ...". `correction_type` is written by the algorithm (Step 4), not by a
+person; it never marks a record as manually corrected.
 
 ### When a row is still `needs_review` after corrections
 
 1. Read its `review_state_reason` in `review_status.csv`.
-2. Look up the row in the manual file: are the column names full, and is every
-   value in one of the forms above?
+2. If the reason says an instruction was not understood, rewrite it in one of
+   the forms above. Otherwise look up the row in the manual file: are the
+   column names full, and is every value in one of the forms above?
 3. Compare the raw times (`time_*_am_hhmm_ampm`) with the corrected times
    (`time_*_corrected`) in `pipeline_results()$corrected_ema_data`: was the
    instruction applied, and is the order bed ≤ sleep ≤ awake ≤ getup?

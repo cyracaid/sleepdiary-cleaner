@@ -165,7 +165,8 @@ suggest_review_labels <- function(df, rules = review_rules(NULL)) {
 #' \describe{
 #'   \item{needs_review}{a person still has to look: the record fails the re-check
 #'     after corrections, became an error after corrections, is marked pending in
-#'     the manual file, has a time missing after corrections (unless it is in a
+#'     the manual file, has a manual instruction the engine could not read, has a
+#'     time missing after corrections (unless it is in a
 #'     manual file and `review.missing_times_ok_after_manual` is true), or (only
 #'     if `review.step8_flags_need_review` is true) has a Step 8 flag;}
 #'   \item{incorporated}{a manual decision for the record was applied in this run
@@ -180,11 +181,14 @@ suggest_review_labels <- function(df, rules = review_rules(NULL)) {
 #' @param flags Optional Step 8 data with `needs_review_flag`, `auto_error_desc`.
 #' @param rules Output of [review_rules()].
 #' @param applied Were manual corrections applied in this run?
+#' @param not_understood Manual instructions the correction engine could not read
+#'   (from `manual_instruction_problems()`); their records are needs_review.
 #' @return A data frame ordered needs_review, not_incorporated, incorporated, then
 #'   by worksheet, pid, day_num, row_id (locale-independent order).
 #' @noRd
 build_unified_review_status <- function(ws_list, final, flags = NULL,
-                                        rules = review_rules(NULL), applied = TRUE) {
+                                        rules = review_rules(NULL), applied = TRUE,
+                                        not_understood = NULL) {
   final <- .rp_clean_names(final)
   parts <- list(.worksheet_status(ws_list[["error"]], "error", final, rules$clean_categories),
                 .worksheet_status(ws_list[["unusual"]], "unusual", final, rules$clean_categories))
@@ -243,6 +247,22 @@ build_unified_review_status <- function(ws_list, final, flags = NULL,
   }
   set(st == "new_after_corrections", "needs_review", "error after corrections; not on the Step 5 lists")
   set(pending, "needs_review", "marked pending (flagged_unresolved) in the manual file")
+  # An instruction in the manual file that the engine could not read was skipped:
+  # the record must go back to a person, whatever the re-check says.
+  if (applied && !is.null(not_understood) && nrow(not_understood) > 0) {
+    nu_key <- paste(not_understood$pid, not_understood$day_num, sep = "|")
+    why_nu <- tapply(paste0(not_understood$field, ": ", not_understood$problem), nu_key,
+                     paste, collapse = "; ")
+    k_pd <- paste(out$pid, out$day_num, sep = "|")
+    hit <- handled & k_pd %in% names(why_nu)
+    if (any(hit)) {
+      reason <- rep(NA_character_, nrow(out))
+      reason[hit] <- paste("manual instruction not understood and skipped:", why_nu[k_pd[hit]])
+      take <- hit & is.na(state)
+      state[take] <- "needs_review"
+      why[take] <- reason[take]
+    }
+  }
   # A time missing after corrections (data_category skipped_na) means the order
   # cannot be re-checked. Whether a handled row like that counts as done is the
   # user's rule: review.missing_times_ok_after_manual.
@@ -321,7 +341,8 @@ print.review_verdict <- function(x, ...) {
 #' @noRd
 write_unified_review_status <- function(ws_list, final, flags, cfg, applied, verbose = TRUE) {
   rules <- review_rules(cfg)
-  out <- build_unified_review_status(ws_list, final, flags, rules, applied)
+  out <- build_unified_review_status(ws_list, final, flags, rules, applied,
+                                     not_understood = .sc_get("manual_not_understood"))
   file <- cfg_get("output.review.status_file", "review_status.csv", cfg = cfg)
   utils::write.csv(out, file, row.names = FALSE, na = "")
   attr(out, "manual_applied") <- applied

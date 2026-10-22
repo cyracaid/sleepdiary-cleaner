@@ -130,6 +130,7 @@ importFrom(lubridate,
   parse_date_time,
   period,
   second,
+  tz,
   ymd_hms
 )
 importFrom(patchwork,plot_annotation)
@@ -147,6 +148,7 @@ importFrom(stats,
   update
 )
 importFrom(stringr,
+  fixed,
   str_detect,
   str_extract_all,
   str_match,
