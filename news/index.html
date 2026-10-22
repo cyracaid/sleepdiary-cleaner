@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.6.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,6 +65,25 @@
       <small>Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.6.1" id="sleepcleanr-161">sleepcleanr 1.6.1<a class="anchor" aria-label="anchor" href="#sleepcleanr-161"></a></h2>
+<div class="section level3">
+<h3 id="fixed-1-6-1">Fixed<a class="anchor" aria-label="anchor" href="#fixed-1-6-1"></a></h3>
+<ul><li>Figure text is ASCII-only. PNG devices on non-UTF-8 locales (CRAN’s Windows check machines) hard-fail on characters they cannot encode; every figure title/label/caption/annotate with <code>&lt;=</code>, <code>-&gt;</code> or dashes broke the run there. Console markers (check/cross/warning signs, <code>----</code> rules) are unchanged, and the ten font-substitution warnings disappear with the substitutions.</li>
+<li>
+<code>effective_rules.csv</code> no longer certifies two config keys nothing reads: <code>timestamp.midnight_threshold_hour</code> and <code>timestamp.interval.mmss_threshold_minutes</code> are removed from the registry, the default config, THRESHOLDS.md and the README table. The operative values (15:00 evening rollover, 240-minute m:ss gate) are hardcoded and now documented as such.</li>
+<li>The rules report no longer claims success it did not have: a failed <code>effective_rules()</code> computation or CSV write prints a WARNING, and “Saved to …” is only printed when the write succeeded.</li>
+<li>An invalid <code>classification.step5.*</code> value stops the run at start-up, before any data is read or output written (was: at Step 5, after Steps 1-4).</li>
+</ul></div>
+<div class="section level3">
+<h3 id="chore-1-6-1">Chore<a class="anchor" aria-label="anchor" href="#chore-1-6-1"></a></h3>
+<ul><li>
+<code>renv.lock</code> records <code>readxl</code> and <code>jsonlite</code> (with <code>cellranger</code>/<code>rematch</code>), which <code><a href="../reference/clean_sleep_diary.html">clean_sleep_diary()</a></code> imports; restore-from-lock environments were missing them.</li>
+<li>
+<code>LICENSE</code> is the two-line CRAN stub; the full MIT text moves to <code>LICENSE.md</code>. <code>CITATION.cff</code> gains the archived 1.6.0 DOI. Vignette links to the Thresholds page are absolute (the relative link broke inside the CRAN tarball).</li>
+<li>New CI job: <code>R CMD check --as-cran</code> (offline incoming-feasibility mode).</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.6.0" id="sleepcleanr-160">sleepcleanr 1.6.0<a class="anchor" aria-label="anchor" href="#sleepcleanr-160"></a></h2>
 <p>Delivered data change in this release: Dataset A has 35 columns (one new, <code>human_review</code>, in place of <code>needs_review</code> and <code>is_reasonable_unusual</code>), and records a reviewer marked “Reasonable unusual record” now have <code>record_status</code> = <code>reasonable_unusual</code>. Update any analysis or text that used the old columns or counts.</p>
