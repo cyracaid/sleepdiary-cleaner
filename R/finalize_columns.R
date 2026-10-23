@@ -20,6 +20,17 @@
 #' @param write       Write files to disk. Set FALSE to inspect the return
 #'   value without touching the filesystem.
 #' @param verbose     Print a summary.
+#' @param audit_ledger Optional path to the private audit ledger
+#'   (`audit_dispositions.csv`). `run_pipeline()` passes
+#'   `data.files.audit_dispositions` from the config. When given it must
+#'   exist (a missing named ledger stops). `NULL` or blank falls back to the
+#'   `sleepcleanr.audit_ledger` option, then the working directory; with no
+#'   ledger `audit_disposition` is `"none"` for every row.
+#' @param manual_metric_duration Optional path to the manual metric-duration
+#'   corrections file the run used, for the ledger consistency check.
+#'   `run_pipeline()` passes the resolved config value (blank for an
+#'   algorithmic-only run). `NULL` falls back to the
+#'   `sleepcleanr.audit_manual_corrections` option, then the working directory.
 #' @return Invisibly, a list with `final` (Dataset A), `prepost` (Dataset B)
 #'   and `full` (everything, unchanged).
 #' @export
@@ -28,7 +39,9 @@ finalize_columns <- function(data,
                              dict_path   = NULL,
                              output_dir  = "output",
                              write       = TRUE,
-                             verbose     = TRUE) {
+                             verbose     = TRUE,
+                             audit_ledger = NULL,
+                             manual_metric_duration = NULL) {
 
   stopifnot(is.data.frame(data))
 
@@ -69,7 +82,8 @@ finalize_columns <- function(data,
   # here as a per-row roll-up so Dataset B can carry the outcome; Dataset A is
   # untouched. No ledger -> column all "none". Value changes never flow through
   # here -- they go through manual_sleep_metric_duration_corrections.csv.
-  data <- audit_dispositions_attach(data)
+  data <- audit_dispositions_attach(data, ledger_path = audit_ledger,
+                                    manual_path = manual_metric_duration)
 
   # ---- 2. Resolve each column to its source object ----------------------------
   if (!is.null(review_data)) {

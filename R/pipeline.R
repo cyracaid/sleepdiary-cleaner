@@ -513,7 +513,14 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
     # the dictionary drifts out of sync the correct fix is to stop the run
     # so CI and anyone else notices, then repair the dictionary -- not to walk
     # away with a green exit code and no delivered files.
-    finalize_columns(corrected_ema_data, review_data = rv, verbose = verbose)
+    # Same files the run used: the audit ledger from the config, and the
+    # manual metric-duration path as resolved above (blank when an
+    # algorithmic-only run blanked it).
+    finalize_columns(
+      corrected_ema_data, review_data = rv, verbose = verbose,
+      audit_ledger = cfg_get("data.files.audit_dispositions", NULL, cfg = cfg),
+      manual_metric_duration = cfg_get(
+        "data.files.manual_metric_duration", NULL, cfg = cfg))
   }
 
   # -- Step 11: Generate figure_index contact sheet ---------------------------

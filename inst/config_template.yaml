@@ -56,6 +56,15 @@ data:
     manual_metric_accept: ""
     second_review: ""
 
+    # -- Private audit ledger (optional; leave empty if you have none) --
+    #   Per pid/day/field audit decisions (keep, keep_flagged,
+    #   corrected_manual, set_na), rolled up into Dataset B's
+    #   audit_disposition column. Empty = inactive, column is "none".
+    #   If you name a file here and it is missing, the run stops rather than
+    #   silently writing "none". Keep it private (gitignored); it never moves
+    #   values -- only manual_metric_duration does.
+    audit_dispositions: ""
+
     # -- Require manual review files to exist (default false) --
     #   false (default): if manual_error/manual_unusual are configured but
     #     the file isn't found, the pipeline warns and continues with an

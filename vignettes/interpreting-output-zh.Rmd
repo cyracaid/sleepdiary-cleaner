@@ -145,6 +145,8 @@ source("validation/reproduce_fasttrack_chain.R")   # derive → disambiguate →
 | `manual_metric_review_acceptances.csv` | Step 6.5（`apply_metric_review_acceptances`） | 对计算出的睡眠指标（TST、SOL、WASO、SE）的人工接受/拒绝决定 | 手动创建；`apply_second_review` 可能追加 |
 | `audit_dispositions.csv` | Step 9 之后（`audit_data_integrity`） | 记录每条被改动记录处置结果的审计账本，用于可回溯性 | 由管线自身写出 |
 
+**审计账本路径：** 私有审计账本为可选项，在配置中以 `data.files.audit_dispositions` 指定（默认为空：不启用，`audit_disposition` 全部为 `"none"`）。若指定的文件不存在，运行会报错停止，而不是静默写入 `"none"`。与人工修正文件的一致性检查使用本次运行实际采用的 `data.files.manual_metric_duration`。
+
 **格式：** 每个文件都是纯 CSV；error/unusual 文件包含
 `pid, day_num, row_id, variable, old_value_hhmm, old_value_ampm,
 new_value_hhmm, new_value_ampm, correction_type, confidence,
