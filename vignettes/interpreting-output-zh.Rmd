@@ -32,7 +32,7 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 <li><a href="#s-6">6. 回归检查（对比上次运行）</a></li>
 <li><a href="#s-7">7. 快速检查卡</a></li>
 <li><a href="#s-8">8. 如何看图</a></li>
-<li><a href="#s-9">9. 逐图参考</a><ul><li><a href="#s-9-1">9.1 图索引</a></li><li><details><summary><a href="#s-9-2">9.2 管线清洗图卡片（<code>pipeline_cleaning/</code>）（15 张）</a></summary><ul><li><a href="#c-01">01 · 管线记录流</a></li><li><a href="#c-06">06 · 修正后睡眠时长</a></li><li><a href="#c-07">07 · 标记构成堆叠图</a></li><li><a href="#c-10">10 · 极端睡眠时长</a></li><li><a href="#c-13">13 · 错误类别分布</a></li><li><a href="#c-13b">13B · 相邻时间戳间隔</a></li><li><a href="#c-13c">13C · 检测结果热力图</a></li><li><a href="#c-13d">13D · 阈值 vs 测量噪声</a></li><li><a href="#c-14">14 · 修正前睡眠时长</a></li><li><a href="#c-15">15 · 错误时间线</a></li><li><a href="#c-16">16 · 常见错误模式</a></li><li><a href="#c-17">17 · 标记率最高的参与者</a></li><li><a href="#c-18">18 · 自动检测仪表板</a></li><li><a href="#c-a1">A1 · 逐步标记账本</a></li><li><a href="#c-p26">P26 · 值得二次检查的参与者</a></li></ul></details></li><li><details><summary><a href="#s-9-3">9.3 研究结果图卡片（<code>research_ready/</code>）（16 张）</a></summary><ul><li><a href="#c-02">02 · 修正影响</a></li><li><a href="#c-02b">02B · 睡眠变量分布</a></li><li><a href="#c-03">03 · TST 分布</a></li><li><a href="#c-04">04 · 睡眠时长 vs 卧床时间</a></li><li><a href="#c-04b">04B · SOL vs 睡眠时长</a></li><li><a href="#c-05">05 · 睡眠变量的变异性</a></li><li><a href="#c-09">09 · 就寝 vs 起床时间分布</a></li><li><a href="#c-20">20 · SOL 感知偏差</a></li><li><a href="#c-20b">20B · WASO 感知偏差</a></li><li><a href="#c-21">21 · 物质使用数据可得性</a></li><li><a href="#c-22">22 · 物质使用数值分布</a></li><li><a href="#c-23">23 · 咖啡因摄入</a></li><li><a href="#c-24">24 · 酒精摄入</a></li><li><a href="#c-r25">R25 · 睡眠规律性——工作日 vs 周末</a></li><li><a href="#c-r26">R26 · 睡眠构成——TIB 拆分</a></li><li><a href="#c-r27">R27 · 睡眠指标相关矩阵</a></li></ul></details></li></ul></li>
+<li><a href="#s-9">9. 逐图参考</a><ul><li><a href="#s-9-1">9.1 图索引</a><ul><li><a href="#s-9-1-naming">图是怎么编号的，为什么有些编号缺失</a></li></ul></li><li><details><summary><a href="#s-9-2">9.2 管线清洗图卡片（<code>pipeline_cleaning/</code>）（16 张）</a></summary><ul><li><a href="#c-01">01 · 管线记录流</a></li><li><a href="#c-06">06 · 修正后睡眠时长</a></li><li><a href="#c-07">07 · 标记构成堆叠图</a></li><li><a href="#c-10">10 · 极端睡眠时长</a></li><li><a href="#c-11">11 · 标记共现图</a></li><li><a href="#c-13">13 · 错误类别分布</a></li><li><a href="#c-13b">13B · 相邻时间戳间隔</a></li><li><a href="#c-13c">13C · 检测结果热力图</a></li><li><a href="#c-13d">13D · 阈值 vs 测量噪声</a></li><li><a href="#c-14">14 · 修正前睡眠时长</a></li><li><a href="#c-15">15 · 错误时间线</a></li><li><a href="#c-16">16 · 常见错误模式</a></li><li><a href="#c-17">17 · 标记率最高的参与者</a></li><li><a href="#c-18">18 · 自动检测仪表板</a></li><li><a href="#c-a1">A1 · 逐步标记账本</a></li><li><a href="#c-p26">P26 · 值得二次检查的参与者</a></li></ul></details></li><li><details><summary><a href="#s-9-3">9.3 研究结果图卡片（<code>research_ready/</code>）（16 张）</a></summary><ul><li><a href="#c-02">02 · 修正影响</a></li><li><a href="#c-02b">02B · 睡眠变量分布</a></li><li><a href="#c-03">03 · TST 分布</a></li><li><a href="#c-04">04 · 睡眠时长 vs 卧床时间</a></li><li><a href="#c-04b">04B · SOL vs 睡眠时长</a></li><li><a href="#c-05">05 · 睡眠变量的变异性</a></li><li><a href="#c-09">09 · 就寝 vs 起床时间分布</a></li><li><a href="#c-20">20 · SOL 感知偏差</a></li><li><a href="#c-20b">20B · WASO 感知偏差</a></li><li><a href="#c-21">21 · 物质使用数据可得性</a></li><li><a href="#c-22">22 · 物质使用数值分布</a></li><li><a href="#c-23">23 · 咖啡因摄入</a></li><li><a href="#c-24">24 · 酒精摄入</a></li><li><a href="#c-r25">R25 · 睡眠规律性——工作日 vs 周末</a></li><li><a href="#c-r26">R26 · 睡眠构成——TIB 拆分</a></li><li><a href="#c-r27">R27 · 睡眠指标相关矩阵</a></li></ul></details></li></ul></li>
 </ul>
 </nav>
 
@@ -459,7 +459,7 @@ identical(old$n_clean_last, new$n_clean_last)
 
 | 项目 | 是什么 | 什么时候看 |
 |------|--------|------------|
-| `pipeline_cleaning/` | 14 张诊断图：流水线发现了什么、改了什么（卡片见 §9.2）| 检查清洗是否正常；补充材料的审计链 |
+| `pipeline_cleaning/` | 16 张诊断图：流水线发现了什么、改了什么（卡片见 §9.2）| 检查清洗是否正常；补充材料的审计链 |
 | `research_ready/` | 16 张面向论文的图：睡眠指标、感知偏差、物质使用（卡片见 §9.3）| 为 Results 选图 |
 | `figure_index.png` | 全部图的总览。顶部红色块列出被跳过的图及原因 | 运行后先看这个 |
 | `all_figures_review.pdf` | 每页一张图，按生成顺序，与 PNG 同尺寸 | 快速翻看全部图，或发给研究团队内的合作者 |
@@ -519,6 +519,16 @@ identical(old$n_clean_last, new$n_clean_last)
 `11`（标记共现图，见[下方卡片](#c-11)）在完整数据的标记列少于两列、或没有任何一对标记同时出现时跳过，原因会写在
 `figure_index.png` 顶部的红色区块里。`14`、`15`、`16` 在有东西可画时都会生成（见下面的卡片）；某次运行确实没东西可展示时（例如待审队列已清空，因为一切都已审查过），跳过原因会明确说明。
 
+<a id="s-9-1-naming"></a>
+
+#### 图是怎么编号的，为什么有些编号缺失
+
+- **编号跟着数据来源走，不跟文件夹走。** 01 到 24 的编号来自最初那一个可视化脚本，脚本开头按数据来源把它们分组：1 到 12 用修正后的数据，13 到 18 用修正前的自动检测结果，19 到 24 用检测汇总加修正后的数据。它们和输出文件夹对不上：02 和 03 在 `research_ready/`，06 和 07 在 `pipeline_cleaning/`。
+- **编号后面的字母（02B、04B、13B、13C、13D、20B）表示伴随图**，放在同编号的图旁边，这样后面的编号不用挪动。04B 和 20B 在首个版本（2026-07-15）里就有；13B、13C、13D 于 2026-09-07 加入；02B 于 2026-09-15 从重复的第二个"Figure 2"改标而来，以消除重复标题。
+- **A1、P26、R25、R26、R27 是遗留标识**，原样保留，免得改代码；它们不按数字顺序排。项目的图树提案（`VISUALIZATION_TREE_PROPOSAL.md`）记录了不重命名它们的决定。这些字母代表什么没有文档记载，所以本页不去猜。可以确定的是：R25 到 R27 在 `research_ready/`，A1 和 P26 在 `pipeline_cleaning/`。
+- **缺失的编号不是遗漏。** 08 被移除了（代码注释说，类别不均衡时它会退化成一把小提琴）。12 并入了 A1 逐步标记账本。19 并入了 13，13 的表格已经显示同样的划分。相关代码注释在 `inst/scripts/sleep_visualization.R` 中，位于 "Figure 8: REMOVED"、"Figure 12 MERGED INTO STEP FLAG LEDGER" 和 "Figure 19 FOLDED INTO FIGURE 13" 附近。08、12、19 都没有对应的文件。
+- **文件名保持不变。** 重命名会牵动代码、图索引的登记表，以及你自己读取这些文件的脚本。提案还建议用分层的显示编号（例如 "1.2-13"）作为图注前缀；那只是提案，没有实现：`figure_index.png` 给每张缩略图标的是文件名加一句简短说明，上面这些编号是唯一在用的编号。
+
 > **仅供参考。** 下面的建议只是一个起点，不是规定；具体选哪些图取决于你论文要讲的内容和期刊的限制。
 
 **为论文选图——一个建议。** 上面"论文用途"这一栏是默认建议，不是定论。对于管线支持的 Methods/Results 结构，这样分效果不错：
@@ -530,7 +540,7 @@ identical(old$n_clean_last, new$n_clean_last)
   （相关矩阵）如果你引用了指标之间的相互关系。正文里最好不要超过五张——
   其余的放进补充材料里读起来更舒服。
 - **补充材料（其余全部）。** 所有 `pipeline_cleaning/` 图（13、13B、
-  13C、13D、17、18、A1、P26、06、07、10）构成审计轨迹：把它们放进一个标题为"数据质量与清洗审计"的补充材料里，在 Methods 里用一句话统一引用（"完整审计轨迹见补充材料 S1"）。物质使用相关的图（21–24）跟着论文报告的物质使用分析走，没有的话也放补充材料。
+  13C、13D、17、18、A1、P26、06、07、10、11）构成审计轨迹：把它们放进一个标题为"数据质量与清洗审计"的补充材料里，在 Methods 里用一句话统一引用（"完整审计轨迹见补充材料 S1"）。物质使用相关的图（21–24）跟着论文报告的物质使用分析走，没有的话也放补充材料。
 
 如果篇幅紧张，最简版：**Methods 里放 01 + 02，Results 里放 03 + 20 +
 R27，其余进补充材料的审计轨迹部分。** 每一张的图注都已经写好，在下面
