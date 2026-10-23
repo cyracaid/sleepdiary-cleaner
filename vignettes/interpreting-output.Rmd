@@ -1500,6 +1500,15 @@ From Step 8 on it counts the records in each outcome of the automatic check's su
 
 **Anomaly →** A long list means a systemic issue affecting many participants, not individual behavior.
 
+**What to do with this list** No, you do not have to re-check everything. The table only says whom to look at first. It changes no data and is not a completion criterion: whether the review is finished is decided by the review status tables for the error and unusual worksheets (see [the manual-review cycle](#s-3)), not by this table. It is worth a look when some rows are tinted orange (20% flagged or more) or red (50% or more), when the list is long, or before you treat the results as final, when it is a good idea to spot-check the top few rows.
+
+To check one listed participant:
+
+1. **See which flag drives the rate:** poor sleep efficiency, high SOL or high WASO. The defaults are efficiency below 70%, SOL above 1 hour and WASO above 1.5 hours (`classification.flag_severity.poor_efficiency_threshold_pct`, `high_sol_threshold_hours`, `high_waso_threshold_hours`). They come from the configuration, so your run may use other values; the figure's subtitle shows the ones in force.
+2. **If it is mostly SOL,** remember that high SOL is calculated from the corrected bed and sleep times, not from the SOL the participant typed. Compare the two (the [Figure 11 card](#11-flag-co-occurrence-heatmap) explains `flag_sleep_calculation_issue`). A large gap between them is usually a descriptive difference, not an error; keep it.
+3. **Check whether those records were already handled by a person:** the `human_review` and `has_correction` columns of the output, and `audit_disposition` in `cleaned_data_prepostcorrection.csv`. Records already handled do not need a second pass.
+4. **If the timestamps themselves look wrong** (bedtime after sleep onset, or the order broken across midnight), send the record to review through the manual-review cycle. Otherwise leave it as it is and note your decision.
+
 <details>
 <summary><strong>Precise rules</strong></summary>
 
@@ -1515,6 +1524,13 @@ From Step 8 on it counts the records in each outcome of the automatic check's su
 <summary>A participant has a high flag rate. Is their data wrong?</summary>
 
 Not necessarily. The list says whose records are worth checking first; the verdict comes from looking at the records, not from this table.
+
+</details>
+
+<details>
+<summary>Does a high rate mean we have to redo the cleaning?</summary>
+
+No. A high rate means these participants' records are worth a look first; it does not mean the cleaning failed. The flags are descriptive: they include self-report-versus-computed disagreements that the pipeline keeps on purpose, and a person whose sleep latency is persistently long will appear in the list even when every entry is correct. Also, the high-SOL flag cannot tell a truly long SOL from ordinary reporting disagreement (see [Figure 11](#11-flag-co-occurrence-heatmap) and [Validation Methodology](validation-methodology.html)).
 
 </details>
 
