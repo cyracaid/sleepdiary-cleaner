@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.6.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.6.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,6 +65,21 @@
       <small>Source: <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.6.2" id="sleepcleanr-162">sleepcleanr 1.6.2<a class="anchor" aria-label="anchor" href="#sleepcleanr-162"></a></h2>
+<div class="section level3">
+<h3 id="fixed-1-6-2">Fixed<a class="anchor" aria-label="anchor" href="#fixed-1-6-2"></a></h3>
+<ul><li>Figure 4’s subtitle printed only the first of two correlations it computed (sprintf had one placeholder for two arguments); it now shows both, labelled “r = X (all records) / Y (clean only)”.</li>
+<li>Figure 11 (flag co-occurrence heatmap) never drew: its column list was built from a character label (flag_severity) and an all-NA column instead of the binary flag columns, so every row was dropped as incomplete. It now uses the four binary quality flags and renders.</li>
+<li>
+<code>manually_corrected</code> is read defensively when computing <code>has_correction</code>, removing the “Unknown or uninitialised column” warning on inputs that lack the column.</li>
+<li>A manual error-correction row whose <code>correct_value</code> uses a format the parser does not implement (only “Same day …”, “Plus/Minus 12 hours” and bare “HH:MM[:SS]” are recognized) was silently skipped – on the study data this hid an unapplied reviewer swap for months. Such rows now print a console note and are listed with their reason in <code>output/manual_corrections_not_applied.csv</code> (the same ledger the sleep-metric-duration applier writes).</li>
+</ul></div>
+<div class="section level3">
+<h3 id="chore-1-6-2">Chore<a class="anchor" aria-label="anchor" href="#chore-1-6-2"></a></h3>
+<ul><li>Internalised-script copies kept in sync with the R/ versions above (parity gates green).</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.6.1" id="sleepcleanr-161">sleepcleanr 1.6.1<a class="anchor" aria-label="anchor" href="#sleepcleanr-161"></a></h2>
 <div class="section level3">

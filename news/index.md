@@ -1,5 +1,32 @@
 # Changelog
 
+## sleepcleanr 1.6.2
+
+### Fixed
+
+- Figure 4’s subtitle printed only the first of two correlations it
+  computed (sprintf had one placeholder for two arguments); it now shows
+  both, labelled “r = X (all records) / Y (clean only)”.
+- Figure 11 (flag co-occurrence heatmap) never drew: its column list was
+  built from a character label (flag_severity) and an all-NA column
+  instead of the binary flag columns, so every row was dropped as
+  incomplete. It now uses the four binary quality flags and renders.
+- `manually_corrected` is read defensively when computing
+  `has_correction`, removing the “Unknown or uninitialised column”
+  warning on inputs that lack the column.
+- A manual error-correction row whose `correct_value` uses a format the
+  parser does not implement (only “Same day …”, “Plus/Minus 12 hours”
+  and bare “HH:MM\[:SS\]” are recognized) was silently skipped – on the
+  study data this hid an unapplied reviewer swap for months. Such rows
+  now print a console note and are listed with their reason in
+  `output/manual_corrections_not_applied.csv` (the same ledger the
+  sleep-metric-duration applier writes).
+
+### Chore
+
+- Internalised-script copies kept in sync with the R/ versions above
+  (parity gates green).
+
 ## sleepcleanr 1.6.1
 
 ### Fixed
