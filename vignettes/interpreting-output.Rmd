@@ -1032,12 +1032,18 @@ It collects flagged records whose check message does not begin with one of the f
 
 **Anomaly →** A large negative mass means widespread order errors that the normalizer will flip; two clusters near ±12 h point to a 12-hour-dial AM/PM habit.
 
+**How to read it, in words** A tall red-band count in the Sleep -> Awake panel means many raw rows have sleep and awake times that look swapped or AM/PM-flipped; the normaliser and the review then deal with them. A count near zero in a panel means the pattern is rare in that pair of events. The number is about how often the pattern occurred in the raw entries, not about what is still open (see the FAQ below).
+
 <details>
 <summary><strong>Precise rules</strong></summary>
 
 - **What a gap is.** For each of three neighbouring pairs — bed to sleep, sleep to awake, awake to getup — the gap is the later time minus the earlier time, in hours. It is computed on the raw (decoded) times, before any correction.
 - **A negative gap** means the later event has an earlier clock time than the earlier one (for example awake at 01:00 but asleep at 23:00 in the same row). That is the raw signature of an order error or a 12-hour AM/PM slip.
 - **The red band** marks gaps of −3 to −6 h, the range that defines the "AM/PM decode or field-swap candidate" definition used in the validation work; the count in the band is printed on it.
+- **What the red `n=` label is.** There is one label per panel (Bed -> Sleep, Sleep -> Awake (TST), Awake -> Getup). It is the number of records in that panel whose raw, pre-correction gap is negative and between 3 and 6 hours in size (both ends included). It is counted live from the current run's data, never typed in, so it changes from run to run and from dataset to dataset; this is on purpose, so the label cannot drift from the real count.
+- **Where the band comes from.** The 3 to 6 hour range is a definition fixed in the validation work (`validation/derive_timegap_candidates.R`): a reversal of that size is a typical signature of an AM/PM decode error or swapped fields. It is a definition for finding candidates, not a measured error rate.
+- **What is outside the band.** Gaps reversed by less than 3 hours (small swaps) or by more than 6 hours are not counted in `n=`; other rules cover them (the shape notes above say which repair fits which pattern).
+- **Adding up.** The per-panel numbers add up to the total number of candidates, and one record can appear in more than one panel.
 - **How to read the shape.** A negative mass of roughly −1 to −3 h points to order swaps (repaired by the swap step); two clusters near ±12 h point to PM times typed as AM (repaired by the 12-hour flip).
 
 </details>
@@ -1061,7 +1067,9 @@ Each pair has its own typical size: bed→sleep and awake→getup gaps are usual
 <details>
 <summary>Does a count in the red band mean that many records are wrong?</summary>
 
-Not exactly. It counts records whose raw gap falls in that range and therefore look like AM/PM or swap candidates. Some are real long gaps; the rules and the review decide which are errors.
+No. The number counts *candidates*, selected only by the size of the raw gap (negative, 3 to 6 hours). Some of them are real long gaps, or entries that run in the "wrong" direction out of habit; which ones are errors is decided by the cleaning rules and by review, not by this label.
+
+It is also a picture of history: how often the pattern occurred in the raw entries. It does not show what is still unresolved after correction and review. For that, see the review status tables in [the manual-review cycle](#s-3) and the final record classification in [the run summary](#s-4).
 
 </details>
 
