@@ -558,6 +558,7 @@ for the paper:
 | **07** | `pipeline_cleaning/07_Flag_Composition_Stacked.png` | Supplement | `sleep_visualization.R:1404` | [§9.2 · Flag Composition Stacked](#07-flag-composition-stacked) | 2026-09-25 |
 | **09** | `research_ready/09_Bedtime_vs_Getup_Distribution.png` | Results | `sleep_visualization.R:1458` | [§9.3 · Bedtime vs Get-up Distribution](#09-bedtime-vs-get-up-distribution) | 2026-09-25 |
 | **10** | `pipeline_cleaning/10_Extreme_Sleep_Duration.png` | Supplement | `sleep_visualization.R:1514` | [§9.2 · Extreme Sleep Durations](#10-extreme-sleep-durations) | 2026-09-25 |
+| **11** | `pipeline_cleaning/11_Flag_Cooccurrence_Heatmap.png` | Supplement | `sleep_visualization.R:1571` | [§9.2 · Flag Co-occurrence Heatmap](#11-flag-co-occurrence-heatmap) | 2026-10-23 |
 | **13** | `pipeline_cleaning/13_Error_Category_Distribution.png` | Supplement | `sleep_visualization.R:1794` | [§9.2 · Error Category Distribution](#13-error-category-distribution) | 2026-09-25 |
 | **13B** | `pipeline_cleaning/13B_Adjacent_Timestamp_Gaps.png` | Supplement | `sleep_visualization.R:1877` | [§9.2 · Adjacent Timestamp Gaps](#13b-adjacent-timestamp-gaps) | 2026-09-25 |
 | **13C** | `pipeline_cleaning/13C_Detection_Outcomes_Heatmap.png` | Supplement | `sleep_visualization.R:1936` | [§9.2 · Detection Outcomes Heatmap](#13c-detection-outcomes-heatmap) | 2026-09-25 |
@@ -579,7 +580,7 @@ for the paper:
 | **R26** | `research_ready/R26_Sleep_Composition_TIB_Breakdown.png` | Results | `sleep_visualization.R:3096` | [§9.3 · Sleep Composition — TIB Breakdown](#r26-sleep-composition--tib-breakdown) | 2026-09-25 |
 | **R27** | `research_ready/R27_Sleep_Metrics_Correlation_Matrix.png` | Results | `sleep_visualization.R:3125` | [§9.3 · Sleep Metrics Correlation Matrix](#r27-sleep-metrics-correlation-matrix) | 2026-09-25 |
 
-`11` (flag co-occurrence) is skipped whenever fewer than two flag columns have complete data, and the reason is printed on the red block at the top of `figure_index.png`. `14`, `15` and `16` are generated whenever there is something to plot (cards below); when a run has nothing to show (e.g. the review queue is empty because everything was already reviewed), the skip reason says so explicitly.
+`11` (flag co-occurrence, [card below](#11-flag-co-occurrence-heatmap)) is skipped whenever fewer than two flag columns have complete data or no pair of flags co-occurs, and the reason is printed on the red block at the top of `figure_index.png`. `14`, `15` and `16` are generated whenever there is something to plot (cards below); when a run has nothing to show (e.g. the review queue is empty because everything was already reviewed), the skip reason says so explicitly.
 
 > **For reference only.** The suggestions below are a starting point, not a rule; which figures to use depends on your paper's story and the journal's limits.
 
@@ -856,6 +857,80 @@ Only records outside the 4–10 h range are drawn, and most nights fall inside i
 **Paper caption**
 
 > **Figure 10.** Scatter of total sleep time (TST, hours) versus sleep efficiency (SE, %) restricted to extreme durations (< 4 h short, > 10 h long). Point shape encodes short vs long sleep; point color encodes record quality. The horizontal line marks the SE = 85% poor-efficiency threshold.
+
+<a id="11-flag-co-occurrence-heatmap"></a>
+
+#### 11 · Flag Co-occurrence Heatmap
+
+**File** `pipeline_cleaning/11_Flag_Cooccurrence_Heatmap.png` — generated at `sleep_visualization.R:1571`
+
+**Paper use** Supplement
+
+**What each part means** Heatmap of how often two quality flags are raised on the same record, based on the final corrected data. Each axis lists the same four flags; each cell is the number of records on which both flags are TRUE, printed in the cell, with the colour running from pale to red as the count grows (square-root scale, legend "Co-occurrence Count").
+
+| Axis label | Flag | Raised when |
+|---|---|---|
+| `poor_efficiency` | `flag_poor_efficiency` | Sleep efficiency is below `classification.flag_severity.poor_efficiency_threshold_pct` (default 70%) |
+| `high_sol` | `flag_high_sol` | Sleep onset latency is above `classification.flag_severity.high_sol_threshold_hours` (default 1 h) |
+| `high_waso` | `flag_high_waso` | Wake after sleep onset is above `classification.flag_severity.high_waso_threshold_hours` (default 1.5 h) |
+| `sleep_calculation_issue` | `flag_sleep_calculation_issue` | Calculated and self-reported sleep onset latency differ by more than 30 minutes |
+
+**Where the numbers come from** Not every flag rests on the same kind of value, which matters when you read the figure:
+
+- `high_sol` uses the **calculated** SOL, not the self-reported one: the corrected bedtime and corrected sleep-onset time, `time_sleep_corrected − time_bed_corrected`, in minutes divided by 60.
+- `high_waso` uses the **self-reported** WASO estimate (the minutes the participant gave, divided by 60).
+- `sleep_calculation_issue` compares the calculated SOL with the self-reported SOL; it is the only flag that looks at the gap between the two.
+
+**Healthy look** Most cells are pale or absent, and no pair dominates. A few moderate cells are normal: a long calculated onset latency lowers sleep efficiency, and a large gap between calculated and reported SOL goes naturally with a high-SOL flag.
+
+**Anomaly →** One cell far darker than the rest, or most pairs dark together, means one cause is setting off several flags at once (often a timestamp problem shared by many records, or thresholds that overlap by design). Check the records behind the dark cells, starting with `high_sol` × `sleep_calculation_issue`.
+
+<details>
+<summary><strong>Precise rules</strong></summary>
+
+- **What is counted.** Only records with a non-missing value in all four flag columns are used (`complete.cases`). A cell is the number of those records where both flags are TRUE.
+- **Symmetric matrix.** The count of A with B equals the count of B with A, so every pair is drawn twice (once on each side of the diagonal). Read one triangle. The diagonal (a flag with itself) is not drawn.
+- **Empty cells.** Pairs whose count is 0 are left out, not drawn as a zero cell. A blank cell means "never together", not "missing".
+- **Colour scale.** Square-root, so that a few large counts do not flatten the small ones. Compare colours roughly; read the printed number for the exact count.
+- **Data source.** The final corrected data (`clean_df`), the same data as Figures 07 and 10.
+- **Flags not used.** `flag_duration_extreme` and the three-level `flag_severity` label (Clean/Minor/Major, Figure 07) are not part of this figure: neither is a plain TRUE/FALSE flag that can be counted in pairs.
+- **When it is skipped.** If fewer than two of the four flag columns have complete data, or if no pair co-occurs on any record, the figure is not drawn and the reason is printed on the red block of `figure_index.png`.
+
+</details>
+
+**FAQ**
+
+<details>
+<summary>Is a "high SOL" here something the participant reported?</summary>
+
+No. It is calculated from the corrected timestamps (time of falling asleep minus time of going to bed). The participant's own SOL answer enters this figure only through `sleep_calculation_issue`, which compares the two.
+
+</details>
+
+<details>
+<summary>Does a dark high_sol cell mean the participants really took a long time to fall asleep?</summary>
+
+Not necessarily. In the validation data the calculated and the self-reported SOL can differ by up to about 75 minutes (see [Validation Methodology](validation-methodology.html)), so a high-SOL flag cannot tell a truly long onset from ordinary disagreement between the two sources. These flags are descriptive indicators for human review, not automated error signals.
+
+</details>
+
+<details>
+<summary>Why are some pairs missing?</summary>
+
+Their count is 0 in this run. Pairs with no co-occurrence are not drawn.
+
+</details>
+
+<details>
+<summary>Why does the figure not appear in my output?</summary>
+
+Either fewer than two flag columns had complete data, or no pair of flags occurred together. The reason is printed on the red block at the top of `figure_index.png`.
+
+</details>
+
+**Paper caption**
+
+> **Figure 11.** Co-occurrence of data quality flags in the final corrected data. Each cell gives the number of records on which both flags are present (poor efficiency: SE < 70%; high SOL: calculated SOL > 1 h; high WASO: self-reported WASO > 1.5 h; sleep calculation issue: calculated and self-reported SOL differ by more than 30 min). Only records with complete values on all four flags are counted; pairs that never co-occur are not drawn. Colour is on a square-root scale. Flags are descriptive indicators for review, not error classifications.
 
 <a id="13-error-category-distribution"></a>
 

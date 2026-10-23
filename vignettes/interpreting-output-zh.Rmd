@@ -494,6 +494,7 @@ identical(old$n_clean_last, new$n_clean_last)
 | **07** | `pipeline_cleaning/07_Flag_Composition_Stacked.png` | Supplement | `sleep_visualization.R:1404` | [§9.2 · 标记构成堆叠图](#c-07) | 2026-09-25 |
 | **09** | `research_ready/09_Bedtime_vs_Getup_Distribution.png` | Results | `sleep_visualization.R:1458` | [§9.3 · 就寝 vs 起床时间分布](#c-09) | 2026-09-25 |
 | **10** | `pipeline_cleaning/10_Extreme_Sleep_Duration.png` | Supplement | `sleep_visualization.R:1514` | [§9.2 · 极端睡眠时长](#c-10) | 2026-09-25 |
+| **11** | `pipeline_cleaning/11_Flag_Cooccurrence_Heatmap.png` | Supplement | `sleep_visualization.R:1571` | [§9.2 · 标记共现图](#c-11) | 2026-10-23 |
 | **13** | `pipeline_cleaning/13_Error_Category_Distribution.png` | Supplement | `sleep_visualization.R:1794` | [§9.2 · 错误类别分布](#c-13) | 2026-09-25 |
 | **13B** | `pipeline_cleaning/13B_Adjacent_Timestamp_Gaps.png` | Supplement | `sleep_visualization.R:1877` | [§9.2 · 相邻时间戳间隔](#c-13b) | 2026-09-25 |
 | **13C** | `pipeline_cleaning/13C_Detection_Outcomes_Heatmap.png` | Supplement | `sleep_visualization.R:1936` | [§9.2 · 检测结果热力图](#c-13c) | 2026-09-25 |
@@ -515,7 +516,7 @@ identical(old$n_clean_last, new$n_clean_last)
 | **R26** | `research_ready/R26_Sleep_Composition_TIB_Breakdown.png` | Results | `sleep_visualization.R:3096` | [§9.3 · 睡眠构成——TIB 拆分](#c-r26) | 2026-09-25 |
 | **R27** | `research_ready/R27_Sleep_Metrics_Correlation_Matrix.png` | Results | `sleep_visualization.R:3125` | [§9.3 · 睡眠指标相关矩阵](#c-r27) | 2026-09-25 |
 
-`11`（标记共现图）在完整数据的标记列少于两列时跳过，原因会写在
+`11`（标记共现图，见[下方卡片](#c-11)）在完整数据的标记列少于两列、或没有任何一对标记同时出现时跳过，原因会写在
 `figure_index.png` 顶部的红色区块里。`14`、`15`、`16` 在有东西可画时都会生成（见下面的卡片）；某次运行确实没东西可展示时（例如待审队列已清空，因为一切都已审查过），跳过原因会明确说明。
 
 > **仅供参考。** 下面的建议只是一个起点，不是规定；具体选哪些图取决于你论文要讲的内容和期刊的限制。
@@ -793,6 +794,80 @@ Quality"。展示质量问题是否集中在极端时长处。
 **论文图注**
 
 > **Figure 10.** 总睡眠时间（TST，小时）对睡眠效率（SE，%）的散点图，限制在极端时长（< 4 h 短，> 10 h 长）。点的形状编码短/长睡眠；点的颜色编码记录质量。水平线标出 SE = 85% 的低效率阈值。
+
+<a id="c-11"></a>
+
+#### 11 · 标记共现图
+
+**文件** `pipeline_cleaning/11_Flag_Cooccurrence_Heatmap.png` — 生成于 `sleep_visualization.R:1571`
+
+**论文用途** Supplement
+
+**每部分是什么意思** 热力图，显示两个质量标记在同一条记录上同时出现的频率，基于最终修正后的数据。两条轴列出同样的四个标记；每个格子是两个标记都为 TRUE 的记录数，数字写在格子里，颜色随计数增大由浅变红（平方根刻度，图例为"Co-occurrence Count"）。
+
+| 轴标签 | 标记 | 触发条件 |
+|---|---|---|
+| `poor_efficiency` | `flag_poor_efficiency` | 睡眠效率低于 `classification.flag_severity.poor_efficiency_threshold_pct`（默认 70%）|
+| `high_sol` | `flag_high_sol` | 入睡潜伏期高于 `classification.flag_severity.high_sol_threshold_hours`（默认 1 小时）|
+| `high_waso` | `flag_high_waso` | 睡后觉醒高于 `classification.flag_severity.high_waso_threshold_hours`（默认 1.5 小时）|
+| `sleep_calculation_issue` | `flag_sleep_calculation_issue` | 计算得到的入睡潜伏期与自评的入睡潜伏期相差超过 30 分钟 |
+
+**数字从哪来** 并不是每个标记都基于同一类数值，读图时要注意：
+
+- `high_sol` 用的是**计算得到的** SOL，不是自评的：用修正后的上床时间和修正后的入睡时间，`time_sleep_corrected − time_bed_corrected`，换算成分钟后再除以 60。
+- `high_waso` 用的是**自评的** WASO 估计值（参与者填写的分钟数，除以 60）。
+- `sleep_calculation_issue` 比较计算 SOL 与自评 SOL，是唯一看两者差距的标记。
+
+**健康外观** 大多数格子颜色很浅或没有，也没有哪一对特别突出。出现少数中等深度的格子是正常的：计算出的入睡潜伏期很长会拉低睡眠效率，计算 SOL 与自评 SOL 差距很大，也自然会伴随高 SOL 标记。
+
+**异常 →** 某一格明显比其他格深得多，或多数组合同时偏深，说明同一个原因同时触发了多个标记（常见于许多记录共有的时间戳问题，或阈值本身就互相重叠）。去看深色格子背后的记录，先从 `high_sol` × `sleep_calculation_issue` 看起。
+
+<details>
+<summary><strong>精确规则</strong></summary>
+
+- **数的是什么。** 只使用四个标记列都有非缺失值的记录（`complete.cases`）。每个格子是这些记录中两个标记都为 TRUE 的条数。
+- **对称矩阵。** A 与 B 的计数等于 B 与 A 的计数，所以每一对都画了两次（对角线两侧各一次），读一侧即可。对角线（标记与自己）不画。
+- **空白格子。** 计数为 0 的组合不画，而不是画成一个 0 的格子。空白表示"从未同时出现"，不是"缺失"。
+- **颜色刻度。** 平方根刻度，避免少数很大的计数把小计数压平。颜色只能粗略比较；确切数量请读格子里的数字。
+- **数据来源。** 最终修正后的数据（`clean_df`），与图 07、图 10 同源。
+- **没有使用的标记。** `flag_duration_extreme` 和三级的 `flag_severity` 标签（Clean/Minor/Major，见图 07）不在这张图里：它们都不是可以两两计数的普通 TRUE/FALSE 标记。
+- **何时跳过。** 四个标记列中完整数据少于两列，或没有任何一对标记在同一条记录上同时出现，这张图就不画，原因会写在 `figure_index.png` 的红色区块里。
+
+</details>
+
+**常见问题**
+
+<details>
+<summary>这里的"高 SOL"是参与者自己报告的吗？</summary>
+
+不是。它由修正后的时间戳计算得到（入睡时间减去上床时间）。参与者自己填的 SOL 只通过 `sleep_calculation_issue` 进入这张图，该标记比较的就是两者。
+
+</details>
+
+<details>
+<summary>high_sol 的格子很深，是不是说明参与者真的入睡很慢？</summary>
+
+不一定。在验证数据里，计算 SOL 与自评 SOL 最多可相差约 75 分钟（见[验证方法学](validation-methodology-zh.html)），所以高 SOL 标记分不清是真的入睡很久，还是两种来源之间的一般性分歧。这些标记是供人工复核的描述性指示，不是自动的错误信号。
+
+</details>
+
+<details>
+<summary>为什么有些组合没有画出来？</summary>
+
+它们在这次运行中的计数为 0。从未同时出现的组合不画。
+
+</details>
+
+<details>
+<summary>为什么我的输出里没有这张图？</summary>
+
+要么完整数据的标记列少于两列，要么没有任何一对标记同时出现。原因会写在 `figure_index.png` 顶部的红色区块里。
+
+</details>
+
+**论文图注**
+
+> **Figure 11.** 最终修正数据中数据质量标记的共现情况。每个格子给出两个标记同时出现的记录数（低效率：SE < 70%；高 SOL：计算 SOL > 1 h；高 WASO：自评 WASO > 1.5 h；睡眠计算问题：计算 SOL 与自评 SOL 相差超过 30 min）。只统计四个标记都有完整值的记录；从未同时出现的组合不画。颜色为平方根刻度。这些标记是供复核的描述性指示，不是错误分类。
 
 <a id="c-13"></a>
 
