@@ -881,6 +881,10 @@ Only records outside the 4–10 h range are drawn, and most nights fall inside i
 - `high_waso` uses the **self-reported** WASO estimate (the minutes the participant gave, divided by 60).
 - `sleep_calculation_issue` compares the calculated SOL with the self-reported SOL; it is the only flag that looks at the gap between the two.
 
+**How to read a cell** Find the two flags on the axes and read the number in the cell. For example, the cell pairing `high_sol` with `sleep_calculation_issue` counts the records that have a long calculated SOL *and* disagree with the participant's own SOL answer. Those are the first records to look at, because the long SOL may come from a timestamp problem rather than from slow sleep onset. Each pair appears twice (see the precise rules), so read either copy.
+
+Two questions come up often; the FAQ below answers them in full: [is high SOL self-reported or calculated?](#fig11-q-sol) and [what does `sleep_calculation_issue` mean?](#fig11-q-calc)
+
 **Healthy look** Most cells are pale or absent, and no pair dominates. A few moderate cells are normal: a long calculated onset latency lowers sleep efficiency, and a large gap between calculated and reported SOL goes naturally with a high-SOL flag.
 
 **Anomaly →** One cell far darker than the rest, or most pairs dark together, means one cause is setting off several flags at once (often a timestamp problem shared by many records, or thresholds that overlap by design). Check the records behind the dark cells, starting with `high_sol` × `sleep_calculation_issue`.
@@ -900,10 +904,25 @@ Only records outside the 4–10 h range are drawn, and most nights fall inside i
 
 **FAQ**
 
-<details>
-<summary>Is a "high SOL" here something the participant reported?</summary>
+<a id="fig11-q-sol"></a>
 
-No. It is calculated from the corrected timestamps (time of falling asleep minus time of going to bed). The participant's own SOL answer enters this figure only through `sleep_calculation_issue`, which compares the two.
+<details>
+<summary>Is a "high SOL" here self-reported or calculated?</summary>
+
+**Calculated.** `flag_high_sol` uses `sol_h = self_diffcalc_sol_minutes / 60`, where `self_diffcalc_sol_minutes` is the corrected sleep-onset time minus the corrected bedtime, in minutes. The SOL the participant typed (`duration_totalmin_sol_estimate_am_mincalc`) is **not** used for this flag. It enters the figure only through `sleep_calculation_issue`, which compares the two. By contrast, `flag_high_waso` uses the self-reported WASO estimate.
+
+Do not confuse it with `SELF_REPORTED_FLAG` from Step 8 (the file `flagged_records_self_reported.csv`). That is a different flag: it marks records whose self-reported values look implausible, for example a self-reported SOL over 120 min (or a very low TST/TIB ratio). It is not part of this figure.
+
+</details>
+
+<a id="fig11-q-calc"></a>
+
+<details>
+<summary>What does sleep_calculation_issue mean?</summary>
+
+`flag_sleep_calculation_issue` is TRUE when the calculated SOL and the self-reported SOL differ by more than 30 minutes. It looks at SOL only, not WASO or total sleep time. Despite the name it does **not** mean a calculation bug; it means the two accounts of how long it took to fall asleep do not match. Typical causes are a timestamp error, a mistyped SOL (for instance a clock time entered in the minutes field), or ordinary perception bias.
+
+Two things to know: if either value is missing the flag is FALSE (not NA), so "not flagged" does not mean the two agree. And the 30-minute cutoff is fixed in the code (`sleep_visualization.R`, `add_quality_flags()`); it is not a config key and does not appear on the Thresholds page.
 
 </details>
 

@@ -818,6 +818,10 @@ Quality"。展示质量问题是否集中在极端时长处。
 - `high_waso` 用的是**自评的** WASO 估计值（参与者填写的分钟数，除以 60）。
 - `sleep_calculation_issue` 比较计算 SOL 与自评 SOL，是唯一看两者差距的标记。
 
+**怎么读一个格子** 在两条轴上找到两个标记，读格子里的数字。例如 `high_sol` 与 `sleep_calculation_issue` 交叉的格子，数的是既有较长的计算 SOL、又与参与者自己填的 SOL 对不上的记录。这些记录最值得先看，因为长 SOL 可能来自时间戳问题，而不是真的入睡慢。每一对都出现两次（见精确规则），读哪一份都行。
+
+有两个问题常被问到，下面的常见问题有完整回答：[高 SOL 是自评的还是计算的？](#fig11-q-sol)以及 [`sleep_calculation_issue` 是什么意思？](#fig11-q-calc)
+
 **健康外观** 大多数格子颜色很浅或没有，也没有哪一对特别突出。出现少数中等深度的格子是正常的：计算出的入睡潜伏期很长会拉低睡眠效率，计算 SOL 与自评 SOL 差距很大，也自然会伴随高 SOL 标记。
 
 **异常 →** 某一格明显比其他格深得多，或多数组合同时偏深，说明同一个原因同时触发了多个标记（常见于许多记录共有的时间戳问题，或阈值本身就互相重叠）。去看深色格子背后的记录，先从 `high_sol` × `sleep_calculation_issue` 看起。
@@ -837,10 +841,25 @@ Quality"。展示质量问题是否集中在极端时长处。
 
 **常见问题**
 
-<details>
-<summary>这里的"高 SOL"是参与者自己报告的吗？</summary>
+<a id="fig11-q-sol"></a>
 
-不是。它由修正后的时间戳计算得到（入睡时间减去上床时间）。参与者自己填的 SOL 只通过 `sleep_calculation_issue` 进入这张图，该标记比较的就是两者。
+<details>
+<summary>这里的"高 SOL"是自评的还是计算的？</summary>
+
+**计算的。** `flag_high_sol` 用的是 `sol_h = self_diffcalc_sol_minutes / 60`，其中 `self_diffcalc_sol_minutes` 是修正后的入睡时间减去修正后的上床时间（分钟）。参与者自己填的 SOL（`duration_totalmin_sol_estimate_am_mincalc`）**不**用于这个标记，只通过 `sleep_calculation_issue` 进入这张图，该标记比较的就是两者。相反，`flag_high_waso` 用的是自评的 WASO 估计值。
+
+不要把它和第 8 步的 `SELF_REPORTED_FLAG`（文件 `flagged_records_self_reported.csv`）混淆。那是另一个标记：标出自评数值看起来不合理的记录，例如自评 SOL 超过 120 分钟（或 TST/TIB 比值很低）。它不属于这张图。
+
+</details>
+
+<a id="fig11-q-calc"></a>
+
+<details>
+<summary>sleep_calculation_issue 是什么意思？</summary>
+
+当计算 SOL 与自评 SOL 相差超过 30 分钟时，`flag_sleep_calculation_issue` 为 TRUE。它只看 SOL，不看 WASO 或总睡眠时间。尽管名字里有"calculation"，它**不**表示计算有 bug；它的意思是关于"花了多久才睡着"的两种说法对不上。常见原因有：时间戳错误、SOL 填错（例如在分钟栏里填了钟点），或一般的感知偏差。
+
+还有两点要知道：任何一个值缺失时该标记为 FALSE（不是 NA），所以"没有被标记"并不表示两者一致。另外，30 分钟的界限写死在代码里（`sleep_visualization.R` 的 `add_quality_flags()`），不是配置项，也没有出现在阈值页面上。
 
 </details>
 
