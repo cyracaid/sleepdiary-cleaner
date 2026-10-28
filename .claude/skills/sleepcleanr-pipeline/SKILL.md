@@ -7,7 +7,7 @@ description: Run, review and maintain the sleepcleanr sleep EMA diary cleaning p
 
 <!-- AUTO:SKILL_FACTS_START -->
 
-**Version:** 1.7.0
+**Version:** 1.7.1
 **Pipeline steps:** 10
 
 | Step | Label | Description |
@@ -23,7 +23,7 @@ description: Run, review and maintain the sleepcleanr sleep EMA diary cleaning p
 | 9 | Generate diagnostic figures | 32 figures (16 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt |
 | 10 | Build delivered datasets | finalize_columns() selects/renames to Dataset A/B per column dictionary |
 
-**Delivered columns (35, from column dictionary):**
+**Delivered columns (39, from column dictionary):**
 - `pid`
 - `day_num`
 - `row_id`
@@ -59,6 +59,10 @@ description: Run, review and maintain the sleepcleanr sleep EMA diary cleaning p
 - `nicotine_doses`
 - `cannabis_doses`
 - `StartDate`
+- `sol_selfreport_raw`
+- `sol_selfreport_ambiguous`
+- `waso_selfreport_raw`
+- `waso_selfreport_ambiguous`
 
 **Runtime dependencies:** 14 packages in Imports (`renv::install()` covers all)
 

@@ -2146,7 +2146,7 @@ apply_manual_corrections_and_recalculate <- function(ema_data, corrections_df, m
   if (!"manually_corrected" %in% names(ema_data)) ema_data$manually_corrected <- FALSE
   # The corrections file carries manually_corrected_mtb, not this name; the
   # write-back below marks it and would otherwise read a missing column.
-  if (!"manually_corrected" %in% names(corrections_df)) corrections_df$manually_corrected <- FALSE
+  if (!"manually_corrected" %in% names(corrections_df)) corrections_df$manually_corrected <- logical(nrow(corrections_df))
   
   corrected_pids <- ema_data %>% 
     filter(manually_corrected == TRUE) %>% 

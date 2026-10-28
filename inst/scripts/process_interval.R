@@ -481,6 +481,14 @@ process_interval<- function(df, varname, format) {
     # Keep ordinary long SOL values such as "01:30" as HH:MM; only reinterpret
     # the implausible tail where HH:MM would be at least 4 hours.
     if (grepl("duration_totalmin_sol_estimate_am|duration_totalmin_waso_estimate_am", varname)) {
+      # 1.7.1: snapshot the raw text and init the ambiguity flag for EVERY row
+      # of the sleep-metric duration fields; the flag is set where the MM:SS
+      # recode fires. Done before any later step (undo, manual duration files)
+      # can overwrite the raw column. finalize_columns maps these to Dataset A.
+      duration_calculations[[paste0(varname, "_raw_orig")]] <-
+        duration_calculations[[paste0(varname, "_unsep")]]
+      duration_calculations[[paste0(varname, "_ambig")]] <- FALSE
+
       h_col <- paste0(varname, "_h_num")
       m_col <- paste0(varname, "_m_num")
       min_col <- paste0(varname, "_mincalc")
@@ -491,6 +499,8 @@ process_interval<- function(df, varname, format) {
         mincalc <- duration_calculations[[min_col]]
         mmss_recode <- !is.na(hh) & !is.na(mm) & !is.na(mincalc) &
           hh > 0 & hh <= 59 & mm >= 0 & mm < 60 & mincalc >= 240
+
+        duration_calculations[[paste0(varname, "_ambig")]] <- mmss_recode
 
         if (any(mmss_recode, na.rm = TRUE)) {
           duration_calculations[[min_col]][mmss_recode] <- hh[mmss_recode] + (mm[mmss_recode] / 60)
@@ -537,16 +547,26 @@ process_interval<- function(df, varname, format) {
       review_flags <- ifelse(is.na(structural_flag), FALSE, structural_flag)
     }
 
+    attach_mmss <- grepl("duration_totalmin_sol_estimate_am|duration_totalmin_waso_estimate_am", varname)
+    ro_col <- paste0(varname, "_raw_orig"); ab_col <- paste0(varname, "_ambig")
     if (dim(df)[1] == dim(duration_calculations)[1]) {
       data_with_interval_results = df %>%
         mutate(!!as.symbol(paste0(varname, "_mincalc")) := duration_calculations[, paste0(varname, "_mincalc")],
                !!as.symbol(paste0(varname, "_checkforerrors")) := review_flags,
                !!as.symbol(paste0(varname, "_correctionsmade")) := duration_calculations[, "corrections"])
+      if (attach_mmss && all(c(ro_col, ab_col) %in% names(duration_calculations)))
+        data_with_interval_results <- data_with_interval_results %>%
+          mutate(!!as.symbol(ro_col) := duration_calculations[[ro_col]],
+                 !!as.symbol(ab_col) := duration_calculations[[ab_col]])
     } else {
       data_with_interval_results = df %>%
         mutate(!!as.symbol(paste0(varname, "_mincalc")) := NA_real_,
                !!as.symbol(paste0(varname, "_checkforerrors")) := NA,
                !!as.symbol(paste0(varname, "_correctionsmade")) := NA_character_)
+      if (attach_mmss)
+        data_with_interval_results <- data_with_interval_results %>%
+          mutate(!!as.symbol(ro_col) := NA_character_,
+                 !!as.symbol(ab_col) := FALSE)
     }
     
     # Overwrite the original column with the cleaned-up values

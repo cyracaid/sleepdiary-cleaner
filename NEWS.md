@@ -1,6 +1,21 @@
-# sleepcleanr (development version)
+# sleepcleanr 1.7.1
 
 ## Changed
+* All 32 figure files use one continuous scheme, `F01`-`F32` (was a mix of
+  `01`-`12`, `13B`-`13D`, `A1`, `P26`, `R25`-`R27` with gaps). Files keep
+  their folder (`pipeline_cleaning/`, `research_ready/`); in-figure titles,
+  the expected-figures list, the figure index, README and the articles use
+  the same numbers. Old aliases are gone -- update any external references.
+* Dataset A carries the self-reported SOL/WASO raw text
+  (`sol_selfreport_raw`, `waso_selfreport_raw`) and a recode flag
+  (`sol_selfreport_ambiguous`, `waso_selfreport_ambiguous`) for entries the
+  interval parser reinterpreted under the MM:SS rule (a clock-looking
+  "12:05" read as 12 min 5 s). 35 -> 39 columns; see SCHEMA.md. Flagged rows
+  are marked, not re-queued for review.
+* Figure 1's class list now includes "Reasonable unusual (accepted)" (the
+  1.6.0 reclassification was missing from the diagram, so the counts did not
+  sum to the total), and the error-class wording no longer claims every
+  reviewed error was fixed.
 * The silent-error audit ledger path is now configurable: set
   `data.files.audit_dispositions` in the YAML config (empty by default, so the
   ledger stays inactive and Dataset B's `audit_disposition` stays "none").
@@ -23,7 +38,7 @@
 * Figure 4's subtitle printed only the first of two correlations it computed
   (sprintf had one placeholder for two arguments); it now shows both,
   labelled "r = X (all records) / Y (clean only)".
-* Figure 11 (flag co-occurrence heatmap) never drew: its column list was
+* Figure 5 (flag co-occurrence heatmap) never drew: its column list was
   built from a character label (flag_severity) and an all-NA column instead
   of the binary flag columns, so every row was dropped as incomplete. It now
   uses the four binary quality flags and renders.
@@ -131,7 +146,7 @@
   that flag; otherwise it is the new `STILL FAILS (Manually Corrected)`. Example: a plain
   "sleep-awake switch" on a PM sleep time swaps the clock times but not the dates, so the
   row stays out of order and is now reported as still failing.
-* The Step 8 flag report and the count table in Figure 13 now count each row once, by its
+* The Step 8 flag report and the count table in Figure 6 now count each row once, by its
   final status, so the lines add up to the total. Before, a manually fixed row was counted
   both as `CLEAN` and as `CLEAN (Manually Fixed)`.
 * `flag_distribution.csv` has a new column `data_category_after_corrections`.

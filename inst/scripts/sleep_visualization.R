@@ -13,7 +13,7 @@
 #                Shows: Potential issues needing human review
 #
 # Figure 1:      Pipeline record flow diagram (post-correction)
-# Figure 18:     Auto-detected issues dashboard (raw algorithm output)
+# Figure 14:     Auto-detected issues dashboard (raw algorithm output)
 # ============================================================================
 # OVERVIEW
 # ============================================================================
@@ -175,7 +175,7 @@ cat(sprintf("\nFigures auto-saving to: %s/\n", output_dir))
 # the edge of the tiny page). The actual named PNG deliverables
 # (pipeline_cleaning/*.png, research_ready/*.png, saved via ggsave() at
 # their own correct size) were never affected by this -- confirmed by
-# comparing 10_Extreme_Sleep_Duration.png (clean) against the same figure's
+# comparing F04.png (clean) against the same figure's
 # page in Rplots.pdf (subtitle and legend clipped).
 #
 # Fix: open the default device ourselves, sized to match save_png()'s own
@@ -746,7 +746,7 @@ if (checkforerrors_exists) {
 
 cat("\n")
 cat(paste(rep("=", 80), collapse = ""))
-cat("\nSTEP 6: GENERATING FIGURES 1-12 (Final Corrected Data)\n")
+cat("\nSTEP 6: GENERATING PIPELINE FIGURES F01-F16 (Final Corrected Data)\n")
 cat(paste(rep("=", 80), collapse = ""))
 cat("\n\n")
 
@@ -801,6 +801,7 @@ if(all(c("data_category", "manually_corrected", "corrected") %in% names(correcte
   n_clean     <- sum(corrected_ema_data$data_category == "clean", na.rm = TRUE)
   n_unusual   <- sum(corrected_ema_data$data_category == "unusual", na.rm = TRUE)
   n_equal     <- sum(corrected_ema_data$data_category == "equal_time_ok", na.rm = TRUE)
+  n_reasonable <- sum(corrected_ema_data$data_category == "reasonable_unusual", na.rm = TRUE)
   n_valid     <- sum(!is.na(corrected_ema_data$self_diffcalc_totalsleeptime_minutes))
 
   # PARTICIPANT-LEVEL COUNTS (2026-09-25): row counts alone hide whether a
@@ -855,9 +856,10 @@ if(all(c("data_category", "manually_corrected", "corrected") %in% names(correcte
                  "FINAL RECORD CLASSES (each record gets exactly one; first match wins):",
                  sprintf("Not Reported: %s (%s%%) = any of bed / sleep / awake / getup time is missing",
                          format(n_not_rpt, big.mark = ","), round(n_not_rpt / n_total * 100, 1)),
-                 sprintf("Error (Reviewed): %s = order broken (not bed <= sleep <= awake <= getup), sleep = awake, a gap > %s h, or sleep span > %s h; reviewed and fixed", n_error, .thr5$bed_sleep_error, .thr5$sleep_awake_error),
+                 sprintf("Error (Reviewed): %s = order broken (not bed <= sleep <= awake <= getup), sleep = awake, a gap > %s h, or sleep span > %s h; reviewed; fixed or kept flagged per review", n_error, .thr5$bed_sleep_error, .thr5$sleep_awake_error),
                  sprintf("Equal Time: %s = bed = sleep and/or awake = getup (difference < 0.01 h, about 36 s), order intact; benign diary habit, not an error", n_equal),
                  sprintf("Unusual (Accepted): %s = order intact but a gap > %s h (bed->sleep or awake->getup); odd but possible, reviewed and kept as-is", n_unusual, .thr5$bed_sleep_unusual),
+                 sprintf("Reasonable unusual (accepted): %s = an unusual pattern a reviewer marked as reasonable; counts as valid (1.6.0 reclassification)", n_reasonable),
                  sprintf("Clean: %s (%s%%) = order intact, no gap > %s h",
                          format(n_clean, big.mark = ","), round(n_clean / n_total * 100, 1), .thr5$bed_sleep_unusual),
                  sprintf("Participants w/ >=1 correction: %s / %s (%s%%)",
@@ -882,7 +884,7 @@ if(all(c("data_category", "manually_corrected", "corrected") %in% names(correcte
     )
 
   print(p1)
-  save_png(p1, "01_Pipeline_Flow_Diagram", subdir = "pipeline_cleaning")
+  save_png(p1, "F01", subdir = "pipeline_cleaning")
   cat("✓ Figure 1 completed (pipeline flow diagram)\n\n")
 
 } else {
@@ -894,7 +896,7 @@ if(all(c("data_category", "manually_corrected", "corrected") %in% names(correcte
 # ============================================================================
 # (Note: the stray duplicate "Figure 2: Distribution of Sleep Variables" header
 # that used to sit directly above this one has been removed -- that section is
-# below, now correctly labeled Figure 2B. See VISUALIZATION_TREE_PROPOSAL.md §0.)
+# below, now correctly labeled Figure 18. See VISUALIZATION_TREE_PROPOSAL.md §0.)
 # WHAT THIS FIGURE SHOWS:
 # The magnitude of changes introduced by algorithmic and manual corrections.
 # Only 81 / 13,990 records (0.58%) were modified, so this figure leads with
@@ -1033,7 +1035,7 @@ if (has_raw_times && has_metrics) {
     )
 
   print(p2)
-  save_png(p2, "02_Correction_Impact", subdir = "research_ready")
+  save_png(p2, "F17", subdir = "research_ready")
   cat("✓ Figure 2 completed (before/after delta)\n\n")
 
 } else {
@@ -1053,7 +1055,7 @@ if (has_raw_times && has_metrics) {
 # subpopulations with different sleep patterns or data quality issues. Long
 # tails in WASO or SOL suggest problematic records worth investigating.
 # ============================================================================
-cat("Generating Figure 2B...\n")
+cat("Generating Figure 18...\n")
 
 vars_to_plot <- c()
 if("sleep_duration_h" %in% names(clean_df)) vars_to_plot <- c(vars_to_plot, sleep_duration = "sleep_duration_h")
@@ -1073,12 +1075,12 @@ if(length(vars_to_plot) > 0) {
     geom_histogram(aes(y = after_stat(density)), bins = 40, fill = "#2E7D32", alpha = 0.5) +
     geom_density(color = "#D32F2F", size = 1) +
     facet_wrap(~variable, scales = "free") +
-    labs(title = "Figure 2B: Distribution of Sleep Variables",
+    labs(title = "Figure 18: Distribution of Sleep Variables",
          subtitle = "Histograms with density curves for key sleep metrics (based on final corrected data)",
          x = "Value", y = "Density")
   print(p2)
-  save_png(p2, "02B_Distribution_Sleep_Variables", subdir = "research_ready")
-  cat("✓ Figure 2B completed\n\n")
+  save_png(p2, "F18", subdir = "research_ready")
+  cat("✓ Figure 18 completed\n\n")
 }
 
 # ----------------------------------------------------------------------------
@@ -1128,7 +1130,7 @@ if("sleep_duration_h" %in% names(clean_df)) {
              label = paste("n =", sum(!is.na(clean_df$sleep_duration_h))),
              hjust = 1.1, vjust = 1.5, size = 3.5)
   print(p3)
-  save_png(p3, "03_Sleep_Duration_Distribution", subdir = "research_ready")
+  save_png(p3, "F19", subdir = "research_ready")
   cat("✓ Figure 3 completed\n\n")
 }
 
@@ -1183,7 +1185,7 @@ if(all(c("time_in_bed_h", "sleep_duration_h", "flag_severity") %in% names(clean_
       coord_cartesian(xlim = c(0, 16), ylim = c(0, 16))
     
     print(p4)
-  save_png(p4, "04_Sleep_Duration_vs_Time_in_Bed", subdir = "research_ready")
+  save_png(p4, "F20", subdir = "research_ready")
     cat("✓ FIGURE 4 completed\n\n")
   }
 }
@@ -1235,7 +1237,7 @@ if(all(c("sol_h", "sleep_duration_h", "flag_severity") %in% names(clean_df))) {
                color = "red", alpha = 0.7)
     
     print(p4b)
-  save_png(p4b, "04B_SOL_vs_Sleep_Duration", subdir = "research_ready")
+  save_png(p4b, "F21", subdir = "research_ready")
     cat("✓ FIGURE 4B completed\n\n")
   }
 }
@@ -1285,7 +1287,7 @@ if(length(available_vars) > 0) {
           axis.ticks.x = element_blank(),
           legend.position = "none")
   print(p5)
-  save_png(p5, "05_Variability_Sleep_Variables", subdir = "research_ready")
+  save_png(p5, "F22", subdir = "research_ready")
   cat("✓ Figure 5 completed\n\n")
 }
 
@@ -1363,7 +1365,7 @@ if (exists("clean_df") && exists("corrected_ema_data") &&
       theme(legend.position = "bottom")
     
     print(p6)
-  save_png(p6, "06_Sleep_Duration_Post_Correction", subdir = "pipeline_cleaning")
+  save_png(p6, "F02", subdir = "pipeline_cleaning")
     cat("✓ Figure 6 completed\n\n")
   } else {
     cat("⚠ No valid data for Figure 6\n\n")
@@ -1428,7 +1430,7 @@ if(all(c("sleep_duration_h", "flag_severity") %in% names(clean_df))) {
       theme(legend.position = "bottom")
     
     print(p7)
-  save_png(p7, "07_Flag_Composition_Stacked", subdir = "pipeline_cleaning")
+  save_png(p7, "F03", subdir = "pipeline_cleaning")
     cat("✓ Figure 7 completed\n\n")
   }
 }
@@ -1440,7 +1442,7 @@ if(all(c("sleep_duration_h", "flag_severity") %in% names(clean_df))) {
 # whenever the clean/unusual/error categories were unbalanced (the common
 # case, not an edge case) -- a named failure mode for grouped violin/box
 # comparisons at unbalanced group sizes, not a one-off rendering issue.
-# Figure 07 (Flag Composition Stacked) covers the same question -- data
+# Figure 3 (Flag Composition Stacked) covers the same question -- data
 # quality vs. sleep-duration range -- without this failure mode, since it
 # keeps N visible as bar height rather than needing three comparable
 # violin/box shapes.
@@ -1482,12 +1484,12 @@ if(all(c("time_bed_corrected", "time_getup_corrected") %in% names(clean_df))) {
     scale_fill_manual(values = c("Bedtime" = "#2E7D32", "Get-up Time" = "#FF8C00")) +
     scale_x_continuous(breaks = seq(0, 24, 2))
   print(p9)
-  save_png(p9, "09_Bedtime_vs_Getup_Distribution", subdir = "research_ready")
+  save_png(p9, "F23", subdir = "research_ready")
   cat("✓ Figure 9 completed\n\n")
 }
 
 # ----------------------------------------------------------------------------
-# Figure 10: Extreme Sleep Duration with Efficiency Context
+# Figure 4: Extreme Sleep Duration with Efficiency Context
 # ----------------------------------------------------------------------------
 # DATA SOURCE: clean_df
 # WHAT IT SHOWS: Scatter plot of extreme sleep durations (<4h or >10h)
@@ -1529,7 +1531,7 @@ if(all(c("sleep_duration_h", "sleep_efficiency_pct", "flag_severity") %in% names
                                     "Minor issues (1 flag)" = "#FF8C00",
                                     "Major issues (2+ flags)" = "#D32F2F"),
                          name = "Data Quality") +
-      labs(title = "Figure 10: Extreme Sleep Durations with Efficiency Context",
+      labs(title = "Figure 4: Extreme Sleep Durations with Efficiency Context",
            subtitle = "COLOR-CODED by data quality | SHAPE indicates short vs long sleep (based on final corrected data)",
            x = "Sleep Duration (hours)", 
            y = "Sleep Efficiency (%)",
@@ -1538,15 +1540,15 @@ if(all(c("sleep_duration_h", "sleep_efficiency_pct", "flag_severity") %in% names
       theme(legend.position = "bottom")
     
     print(p10)
-  save_png(p10, "10_Extreme_Sleep_Duration", subdir = "pipeline_cleaning")
-    cat("✓ Figure 10 completed\n\n")
+  save_png(p10, "F04", subdir = "pipeline_cleaning")
+    cat("✓ Figure 4 completed\n\n")
   } else {
     cat("⚠ No extreme values for Figure 10\n\n")
   }
 }
 
 # ----------------------------------------------------------------------------
-# Figure 11: Flag Co-occurrence Heatmap
+# Figure 5: Flag Co-occurrence Heatmap
 # ----------------------------------------------------------------------------
 # DATA SOURCE: clean_df
 # WHAT IT SHOWS: Heatmap showing how often different quality flags occur together
@@ -1615,7 +1617,7 @@ if(length(flag_columns) >= 2) {
         scale_fill_gradient(low = "#FEE5D9", high = "#D32F2F", 
                             name = "Co-occurrence\nCount",
                             trans = "sqrt") +
-        labs(title = "Figure 11: Data Quality Flag Co-occurrence Heatmap",
+        labs(title = "Figure 5: Data Quality Flag Co-occurrence Heatmap",
              subtitle = "Shows which quality issues tend to occur together (based on final corrected data)",
              x = "", y = "") +
         theme_minimal(base_size = 12) +
@@ -1625,21 +1627,21 @@ if(length(flag_columns) >= 2) {
               legend.position = "right")
       
       print(p11_heatmap)
-  save_png(p11_heatmap, "11_Flag_Cooccurrence_Heatmap", subdir = "pipeline_cleaning")
+  save_png(p11_heatmap, "F05", subdir = "pipeline_cleaning")
       cat("✓ FIGURE 11 (Heatmap) completed\n\n")
     } else {
-      cat("⚠ Figure 11: no flag pairs co-occur in this run's data -- nothing to plot.\n\n")
-      .mark_skip("pipeline_cleaning/11_Flag_Cooccurrence_Heatmap.png",
+      cat("⚠ Figure 5: no flag pairs co-occur in this run's data -- nothing to plot.\n\n")
+      .mark_skip("pipeline_cleaning/F05.png",
                  "No flag pairs co-occurred in this run's data (all flags mutually exclusive or absent).")
     }
   } else {
-    cat("⚠ Figure 11: fewer than 2 flag columns had complete (non-NA) data -- skipping.\n\n")
-    .mark_skip("pipeline_cleaning/11_Flag_Cooccurrence_Heatmap.png",
+    cat("⚠ Figure 5: fewer than 2 flag columns had complete (non-NA) data -- skipping.\n\n")
+    .mark_skip("pipeline_cleaning/F05.png",
                "Fewer than 2 flag columns had complete (non-NA) data to compare this run.")
   }
 } else {
-  cat("⚠ Figure 11: fewer than 2 of the expected flag columns (flag_severity, flag_duration_extreme) exist -- skipping.\n\n")
-  .mark_skip("pipeline_cleaning/11_Flag_Cooccurrence_Heatmap.png",
+  cat("⚠ Figure 5: fewer than 2 of the expected flag columns (flag_severity, flag_duration_extreme) exist -- skipping.\n\n")
+  .mark_skip("pipeline_cleaning/F05.png",
              "Fewer than 2 of the expected flag columns (flag_severity, flag_duration_extreme) exist this run.")
 }
 
@@ -1650,7 +1652,7 @@ if(length(flag_columns) >= 2) {
 # The former standalone "Figure 12: Pipeline Correction Progress" three-panel
 # table (12_Pipeline_Correction_Progress.png) is removed. Its question --
 # per-step counts and convergence -- is answered by the Step Flag Ledger
-# (A1_Step_Flag_Ledger.png, generated by R/figure12_step_flag_table.R via
+# (F15.png, generated by R/figure12_step_flag_table.R via
 # generate_appendix_ledger() at the end of this script), which shows the same
 # per-step counts against shared final standards, plus corrected/suppressed
 # columns the old grid.arrange table lacked. The old figure also had a
@@ -1664,14 +1666,14 @@ if(length(flag_columns) >= 2) {
 
 cat("\n")
 cat(paste(rep("=", 80), collapse = ""))
-cat("\nSTEP 7: GENERATING FIGURES 13-20 (Auto-Detection Flags)\n")
+cat("\nSTEP 7: GENERATING DETECTION FIGURES F06-F14 (Auto-Detection Flags)\n")
 cat(paste(rep("=", 80), collapse = ""))
 cat("\n\n")
 
 if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
   
   # --------------------------------------------------------------------------
-  # Figure 13: Error Category Distribution (Auto-Detection)
+  # Figure 6: Error Category Distribution (Auto-Detection)
   # --------------------------------------------------------------------------
   # DATA SOURCE: checkforerrors_processed
   # WHAT IT SHOWS: Bar chart of error categories from algorithm detection
@@ -1806,7 +1808,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
   p13 <- p13_content +
     plot_layout(heights = p13_heights) +
     plot_annotation(
-      title = "Figure 13: Distribution of Error/Review Categories (Auto-Detection)",
+      title = "Figure 6: Distribution of Error/Review Categories (Auto-Detection)",
       subtitle = sprintf("Auto-detection (pre-correction): flags from timestamp parsing (Part A), temporal error_type (Part B), and sleep metrics validation (Part C: SOL>120min, SE<0 or >100%%, TST/TIB<0.5) | Total: %s (%.1f%% of all data)",
                          format(nrow(checkforerrors_processed), big.mark=","),
                          nrow(checkforerrors_processed)/nrow(clean_df) * 100),
@@ -1815,8 +1817,8 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
     )
 
   print(p13)
-  save_png(p13, "13_Error_Category_Distribution", subdir = "pipeline_cleaning", h = p13_total_h)
-  cat("✓ Figure 13 completed\n\n")
+  save_png(p13, "F06", subdir = "pipeline_cleaning", h = p13_total_h)
+  cat("✓ Figure 6 completed\n\n")
   
   # ----------------------------------------------------------------------------
   # Helper: compute adjacent timestamp gaps from clean_df's already-decoded,
@@ -1849,10 +1851,10 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
   }
 
   # --------------------------------------------------------------------------
-  # Figure 13B: Adjacent Timestamp Gap Distribution (raw, pre-correction)
+  # Figure 7: Adjacent Timestamp Gap Distribution (raw, pre-correction)
   # --------------------------------------------------------------------------
   if (cfg_get("visualization.gap_analysis.enabled", TRUE, cfg = pipeline_config)) {
-    cat("Generating Figure 13B (Adjacent Timestamp Gap Distribution)...\n")
+    cat("Generating Figure 7 (Adjacent Timestamp Gap Distribution)...\n")
     gaps <- compute_adjacent_gaps(clean_df)
     if (!is.null(gaps) && nrow(gaps) > 0) {
       pair_labels <- c(
@@ -1887,7 +1889,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
                   size = 3.2, fontface = "bold") +
         facet_wrap(~ pair_label, scales = "free", ncol = 1) +
         labs(
-          title = "Figure 13B: Adjacent Timestamp Gap Distribution (raw, pre-correction)",
+          title = "Figure 7: Adjacent Timestamp Gap Distribution (raw, pre-correction)",
           subtitle = paste0("Shaded band = 3-6h negative gap, the locked AM/PM-decode / ",
                             "field-swap candidate definition. Counts computed live from this run."),
           x = "Gap (hours) -- negative = the later event's clock time precedes the earlier one's",
@@ -1898,22 +1900,22 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
               plot.subtitle = element_text(size = 9))
 
       print(p13b)
-      save_png(p13b, "13B_Adjacent_Timestamp_Gaps", subdir = "pipeline_cleaning")
-      cat(sprintf("✓ Figure 13B completed (candidates: %s)\n\n",
+      save_png(p13b, "F07", subdir = "pipeline_cleaning")
+      cat(sprintf("✓ Figure 7 completed (candidates: %s)\n\n",
                   paste(sprintf("%s=%d", as.character(band_counts$pair_label),
                                 band_counts$n_candidates), collapse = ", ")))
     } else {
-      cat("⚠ Cannot generate Figure 13B: timestamp columns missing or no valid gaps\n\n")
+      cat("⚠ Cannot generate Figure 7: timestamp columns missing or no valid gaps\n\n")
     }
   } else {
-    cat("⊘ Figure 13B skipped (visualization.gap_analysis.enabled = false)\n\n")
+    cat("⊘ Figure 7 skipped (visualization.gap_analysis.enabled = false)\n\n")
   }
 
   # --------------------------------------------------------------------------
-  # Figure 13C: Synthetic Error-Injection Detection Outcomes (heatmap)
+  # Figure 8: Synthetic Error-Injection Detection Outcomes (heatmap)
   # --------------------------------------------------------------------------
   if (cfg_get("visualization.detection_outcomes.enabled", TRUE, cfg = pipeline_config)) {
-    cat("Generating Figure 13C (Detection Outcomes Heatmap)...\n")
+    cat("Generating Figure 8 (Detection Outcomes Heatmap)...\n")
     det_path <- "validation/synthetic/results/detection_outcomes_v4_current.csv"
     if (file.exists(det_path)) {
       det_raw <- read.csv(det_path, stringsAsFactors = FALSE)
@@ -1941,7 +1943,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
         scale_fill_gradient(low = "white", high = "#1976D2", limits = c(0, 100),
                              name = "% of n") +
         labs(
-          title = "Figure 13C: Synthetic Error-Injection Detection Outcomes",
+          title = "Figure 8: Synthetic Error-Injection Detection Outcomes",
           subtitle = paste0(
             "n = ", format(sum(det$n), big.mark = ","),
             " injected rows across ", length(unique(det$category)),
@@ -1957,24 +1959,24 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
               panel.grid = element_blank())
 
       print(p13c)
-      save_png(p13c, "13C_Detection_Outcomes_Heatmap", subdir = "pipeline_cleaning")
-      cat(sprintf("✓ Figure 13C completed (%d categories, %s total injected rows)\n\n",
+      save_png(p13c, "F08", subdir = "pipeline_cleaning")
+      cat(sprintf("✓ Figure 8 completed (%d categories, %s total injected rows)\n\n",
                   length(unique(det$category)), format(sum(det$n), big.mark = ",")))
     } else {
-      cat(sprintf("⚠ Cannot generate Figure 13C: %s not found (run the validation/synthetic/ benchmark harness first)\n\n",
+      cat(sprintf("⚠ Cannot generate Figure 8: %s not found (run the validation/synthetic/ benchmark harness first)\n\n",
                     det_path))
-      .mark_skip("pipeline_cleaning/13C_Detection_Outcomes_Heatmap.png",
+      .mark_skip("pipeline_cleaning/F08.png",
                  sprintf("%s not found (run the validation/synthetic/ benchmark harness first).", det_path))
     }
   } else {
-    cat("⊘ Figure 13C skipped (visualization.detection_outcomes.enabled = false)\n\n")
+    cat("⊘ Figure 8 skipped (visualization.detection_outcomes.enabled = false)\n\n")
   }
 
   # --------------------------------------------------------------------------
-  # Figure 13D: Cleaning Thresholds vs Bland-Altman Measurement-Noise Ratio
+  # Figure 9: Cleaning Thresholds vs Bland-Altman Measurement-Noise Ratio
   # --------------------------------------------------------------------------
   if (cfg_get("visualization.threshold_noise.enabled", TRUE, cfg = pipeline_config)) {
-    cat("Generating Figure 13D (Threshold vs Noise Ratio)...\n")
+    cat("Generating Figure 9 (Threshold vs Noise Ratio)...\n")
     if (exists(".ba_result") && !is.null(.ba_result)) {
       ba_df <- as.data.frame(.ba_result)
       n_no_ba <- sum(is.na(ba_df$ratio_to_noise))
@@ -1990,7 +1992,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
           scale_fill_gradient2(low = "#D32F2F", mid = "grey85", high = "#1976D2",
                                 midpoint = 3, guide = "none") +
           labs(
-            title = "Figure 13D: Cleaning Thresholds vs Bland-Altman Measurement Noise",
+            title = "Figure 9: Cleaning Thresholds vs Bland-Altman Measurement Noise",
             subtitle = paste0(
               "Ratio = threshold value / 95% limits-of-agreement half-width (self-report vs ",
               "pipeline-computed). Dashed lines at 2x (borderline) and 3x (safe) per ",
@@ -2003,21 +2005,21 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
           theme(plot.subtitle = element_text(size = 8.5))
 
         print(p13d)
-        save_png(p13d, "13D_Threshold_vs_Noise_Ratio", subdir = "pipeline_cleaning")
-        cat(sprintf("✓ Figure 13D completed (%s)\n\n",
+        save_png(p13d, "F09", subdir = "pipeline_cleaning")
+        cat(sprintf("✓ Figure 9 completed (%s)\n\n",
                     paste(sprintf("%s=%.1fx", ba_df$threshold_name, ba_df$ratio_to_noise), collapse = ", ")))
       } else {
-        cat("⚠ Cannot generate Figure 13D: no thresholds have a valid noise ratio (no BA data)\n\n")
+        cat("⚠ Cannot generate Figure 9: no thresholds have a valid noise ratio (no BA data)\n\n")
       }
     } else {
-      cat("⚠ Cannot generate Figure 13D: .ba_result not available (corrected_ema_data missing or validate_thresholds() failed earlier in this run)\n\n")
+      cat("⚠ Cannot generate Figure 9: .ba_result not available (corrected_ema_data missing or validate_thresholds() failed earlier in this run)\n\n")
     }
   } else {
-    cat("⊘ Figure 13D skipped (visualization.threshold_noise.enabled = false)\n\n")
+    cat("⊘ Figure 9 skipped (visualization.threshold_noise.enabled = false)\n\n")
   }
 
   # --------------------------------------------------------------------------
-  # Figure 14: Sleep Duration - Clean vs Flagged (PRE-CORRECTION / AUTO-DETECTION)
+  # Figure 10: Sleep Duration - Clean vs Flagged (PRE-CORRECTION / AUTO-DETECTION)
   # DATA SOURCE: checkforerrors_processed (from _checkforerrors flags)
   # WHAT IT SHOWS: Distribution of sleep duration for algorithm-detected issues
   #                - No Issues (Clean): Records with no _checkforerrors flags
@@ -2063,7 +2065,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
                                      "Needs Review (Auto-detected) - Has _checkforerrors flags" = "#D32F2F")) +
         scale_color_manual(values = c("No Issues (Clean) - No _checkforerrors flags" = "#2E7D32", 
                                       "Needs Review (Auto-detected) - Has _checkforerrors flags" = "#D32F2F")) +
-        labs(title = "Figure 14: Sleep Duration Distribution (Pre-Correction / Auto-Detection)",
+        labs(title = "Figure 10: Sleep Duration Distribution (Pre-Correction / Auto-Detection)",
              subtitle = paste0("Based on _checkforerrors flags (algorithm only, no manual corrections) | ",
                                "Clean sample: ", clean_count, " records | ",
                                "Flagged: ", flagged_count, " records"),
@@ -2074,23 +2076,23 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
         theme(legend.position = "bottom")
       
       print(p14)
-  save_png(p14, "14_Sleep_Duration_Pre_Correction", subdir = "pipeline_cleaning")
-      cat("✓ Figure 14 completed (using _checkforerrors auto-detection)\n\n")
+  save_png(p14, "F10", subdir = "pipeline_cleaning")
+      cat("✓ Figure 10 completed (using _checkforerrors auto-detection)\n\n")
     } else {
-      cat("⚠ No flagged data for Figure 14 -- review queue is empty (see below).\n\n")
-      .mark_skip("pipeline_cleaning/14_Sleep_Duration_Pre_Correction.png",
+      cat("⚠ No flagged data for Figure 10 -- review queue is empty (see below).\n\n")
+      .mark_skip("pipeline_cleaning/F10.png",
                  "No records remain in the pre-correction review queue with usable sleep_duration_h.")
       .explain_no_review_figures()
     }
   } else {
-    cat("⚠ No valid sleep duration data for Figure 14 -- review queue is empty (see below).\n\n")
-    .mark_skip("pipeline_cleaning/14_Sleep_Duration_Pre_Correction.png",
+    cat("⚠ No valid sleep duration data for Figure 10 -- review queue is empty (see below).\n\n")
+    .mark_skip("pipeline_cleaning/F10.png",
                "No usable sleep_duration_h values in the pre-correction review queue.")
     .explain_no_review_figures()
   }
   
   # --------------------------------------------------------------------------
-  # Figure 15: Timing of Flagged Temporal Patterns Over the Study Period
+  # Figure 11: Timing of Flagged Temporal Patterns Over the Study Period
   # --------------------------------------------------------------------------
   # DATA SOURCE: clean_df$error_type / clean_df$unusual_type (2026-09-17:
   # was checkforerrors_processed$error_category -- see note below)
@@ -2151,7 +2153,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
         geom_col(position = "stack", alpha = 0.85, width = 25) +
         scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
         scale_fill_brewer(palette = "Set2", name = "Pattern Type") +
-        labs(title = "Figure 15: Timing of Flagged Temporal Patterns Over the Study Period",
+        labs(title = "Figure 11: Timing of Flagged Temporal Patterns Over the Study Period",
              subtitle = paste0("Records with a timestamp-order or awake/getup/bed-sleep pattern flag (Step 6 classification), counted per month. ",
                                "A flag is not a verdict that the record is wrong -- most were reviewed and kept unchanged (see Figure 2)."),
              x = "Month",
@@ -2160,23 +2162,23 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
               legend.text = element_text(size = 8))
 
       print(p15)
-  save_png(p15, "15_Error_Timeline", subdir = "pipeline_cleaning")
-      cat("✓ Figure 15 completed\n\n")
+  save_png(p15, "F11", subdir = "pipeline_cleaning")
+      cat("✓ Figure 11 completed\n\n")
     } else {
-      cat("ℹ Figure 15: no timestamped error_type/unusual_type records found -- nothing to plot.\n")
-      .mark_skip("pipeline_cleaning/15_Error_Timeline.png",
+      cat("ℹ Figure 11: no timestamped error_type/unusual_type records found -- nothing to plot.\n")
+      .mark_skip("pipeline_cleaning/F11.png",
                  "No record has both a bed timestamp and an error_type/unusual_type classification.")
       .explain_no_review_figures()
     }
   } else {
     cat("⚠ Missing time_bed_corrected/error_type/unusual_type in corrected_ema_data -- skipping Figure 15\n")
-    .mark_skip("pipeline_cleaning/15_Error_Timeline.png",
+    .mark_skip("pipeline_cleaning/F11.png",
                "time_bed_corrected / error_type / unusual_type not present in corrected_ema_data.")
     .explain_no_review_figures()
   }
   
   # --------------------------------------------------------------------------
-  # Figure 16: Most Common Error Patterns (Auto-Detection)
+  # Figure 12: Most Common Error Patterns (Auto-Detection)
   # --------------------------------------------------------------------------
   # DATA SOURCE: checkforerrors_processed$auto_error_desc
   # WHAT IT SHOWS: Horizontal bar chart of most common specific error patterns
@@ -2243,7 +2245,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
           sapply(x, function(s) paste(strwrap(s, width = 35), collapse = "\n"))
         }) +
         scale_fill_gradient(low = "#FF8C00", high = "#D32F2F", name = "Count") +
-        labs(title = "Figure 16: Most Common Error/Review Patterns (Auto-Detection)",
+        labs(title = "Figure 12: Most Common Error/Review Patterns (Auto-Detection)",
              x = "", y = "Count") +
         coord_flip() +
         scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
@@ -2251,22 +2253,22 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
         theme(legend.position = "bottom")
       
       print(p16)
-  save_png(p16, "16_Common_Error_Patterns", subdir = "pipeline_cleaning")
-      cat("✓ Figure 16 completed\n\n")
+  save_png(p16, "F12", subdir = "pipeline_cleaning")
+      cat("✓ Figure 12 completed\n\n")
     } else {
       cat("⚠ No specific patterns identified (all 'Other') -- review queue is empty (see below).\n\n")
-      .mark_skip("pipeline_cleaning/16_Common_Error_Patterns.png",
+      .mark_skip("pipeline_cleaning/F12.png",
                  "All records remaining in the review queue fell into 'Other' -- no named pattern matched, or the queue is empty.")
       .explain_no_review_figures()
     }
   } else {
-    cat("⚠ Figure 16: auto_error_desc column not available -- skipping.\n\n")
-    .mark_skip("pipeline_cleaning/16_Common_Error_Patterns.png",
+    cat("⚠ Figure 12: auto_error_desc column not available -- skipping.\n\n")
+    .mark_skip("pipeline_cleaning/F12.png",
                "auto_error_desc column not present in checkforerrors_processed this run.")
   }
   
   # --------------------------------------------------------------------------
-  # Figure 17: Flagged Records by Participant (Auto-Detection)
+  # Figure 13: Flagged Records by Participant (Auto-Detection)
   # --------------------------------------------------------------------------
   # DATA SOURCE: checkforerrors_processed (flag count), clean_df (each
   # participant's own total observed days, used only as a denominator)
@@ -2320,7 +2322,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
                   vjust = -0.3, size = 2.8) +
         scale_y_continuous(expand = expansion(mult = c(0, 0.10))) +
         scale_fill_gradient(low = "#FF8C00", high = "#D32F2F", name = "Flag Rate (%)") +
-        labs(title = "Figure 17: Top 15 Participants by Flag Rate (Auto-Detection)",
+        labs(title = "Figure 13: Top 15 Participants by Flag Rate (Auto-Detection)",
              subtitle = sprintf("Flags as %% of each participant's own total observed days. Total participants with algorithm-detected issues: %d", length(unique(checkforerrors_processed$pid))),
              x = "Participant ID",
              y = "% of Observed Days Flagged") +
@@ -2330,13 +2332,13 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
               legend.position = "bottom")
 
       print(p17)
-  save_png(p17, "17_Top_Participants_Flags", subdir = "pipeline_cleaning")
-      cat("✓ Figure 17 completed (rate-normalized)\n\n")
+  save_png(p17, "F13", subdir = "pipeline_cleaning")
+      cat("✓ Figure 13 completed (rate-normalized)\n\n")
     }
   }
   
   # --------------------------------------------------------------------------
-  # Figure 18: Auto-Detected Review Flags Dashboard
+  # Figure 14: Auto-Detected Review Flags Dashboard
   # --------------------------------------------------------------------------
   # DATA SOURCE: review_output from checkforerrors_processing.R
   # WHAT IT SHOWS: Dashboard of algorithm-detected issues
@@ -2423,7 +2425,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
       p18 <- (p18_left | p18_right) + 
         plot_layout(widths = c(0.45, 0.55)) +
         plot_annotation(
-          title = "Figure 18: Auto-Detected Review Flags Dashboard",
+          title = "Figure 14: Auto-Detected Review Flags Dashboard",
           subtitle = sprintf("Based on auto-detection from checkforerrors_processing.R | %d records (%.1f%%) need review, %d (%.1f%%) already corrected",
                              flagged_records, flagged_records/total_records*100,
                              manually_corrected_count, manually_corrected_count/total_records*100),
@@ -2432,13 +2434,13 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
         )
       
       print(p18)
-  save_png(p18, "18_Auto_Detected_Dashboard", subdir = "pipeline_cleaning")
-      cat("✓ Figure 18 completed (using checkforerrors_processing.R output)\n\n")
+  save_png(p18, "F14", subdir = "pipeline_cleaning")
+      cat("✓ Figure 14 completed (using checkforerrors_processing.R output)\n\n")
       
-      cat("\n--- Auto-Detected Issues Breakdown (Figure 18) ---\n")
+      cat("\n--- Auto-Detected Issues Breakdown (Figure 14) ---\n")
       print(review_classification)
       
-      cat("\n--- Interpretation Guide for Figure 18 ---\n")
+      cat("\n--- Interpretation Guide for Figure 14 ---\n")
       cat("  • Manually Corrected: Records fixed by human review (no longer need attention)\n")
       cat("  • Auto-Detected: Algorithm-flagged records requiring human review\n")
       cat("  • Temporal Issues: Chronological order errors (e.g., sleep before bed)\n")
@@ -2474,7 +2476,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
 
 cat("\n")
 cat(paste(rep("=", 80), collapse = ""))
-cat("\nSTEP 8: GENERATING FIGURES 19-21 (Unified Classification)\n")
+cat("\nSTEP 8: GENERATING RESEARCH FIGURES F17-F32 (Unified Classification)\n")
 cat(paste(rep("=", 80), collapse = ""))
 cat("\n\n")
 
@@ -2506,7 +2508,7 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
   # --------------------------------------------------------------------------
   
   # --------------------------------------------------------------------------
-  # Figure P26: Per-Participant Final Flag Rate (Ranked Table)
+  # Figure 12: Per-Participant Final Flag Rate (Ranked Table)
   # --------------------------------------------------------------------------
   # REDESIGNED (per VISUALIZATION_TREE_PROPOSAL.md; MultiQC "General
   # Statistics table" precedent for one-metric-per-sample at large N): the
@@ -2585,7 +2587,7 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
     n_high_flag <- sum(pid_wide$flagged_pct >= 20)
 
     p26_title <- ggplot() + theme_void() +
-      labs(title = "Figure P26: Participants Worth a Second Look (Highest Flagged-Record Rate)",
+      labs(title = "Figure 12: Participants Worth a Second Look (Highest Flagged-Record Rate)",
            subtitle = sprintf(
              paste0("Showing the %d of %d participants with the highest %% of their own records flagged ",
                     "(Minor + Major). Overall %.0f%% of all records are Clean; %d participant(s) are at or ",
@@ -2602,18 +2604,18 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
     p_p26 <- (p26_title / p26_tab) + plot_layout(heights = c(0.14, 1))
 
     print(p_p26)
-    save_png(p_p26, "P26_PerParticipant_Flag_Rate", subdir = "pipeline_cleaning")
-    cat("✓ Figure P26 completed (table form)\n\n")
+    save_png(p_p26, "F16", subdir = "pipeline_cleaning")
+    cat("✓ Figure 12 completed (table form)\n\n")
   } else {
-    cat("⚠ Missing flag_severity or pid — skipping Figure P26\n\n")
+    cat("⚠ Missing flag_severity or pid — skipping Figure 16\n\n")
   }
   
   # --------------------------------------------------------------------------
-  # Figure 20: SOL Perception Bias (主观 vs 客观)
+  # Figure 29: SOL Perception Bias (主观 vs 客观)
   # 客观 SOL = time_sleep_corrected - time_bed_corrected
   # 主观 SOL = duration_totalmin_sol_estimate_am
   # --------------------------------------------------------------------------
-  cat("Generating Figure 20 (SOL bias: subjective vs objective)...\n")
+  cat("Generating Figure 29 (SOL bias: subjective vs objective)...\n")
   
   # 客观 SOL（基于校正后的时间戳）
   obj_sol <- as.numeric(difftime(corrected_ema_data$time_sleep_corrected, 
@@ -2651,7 +2653,7 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
                label = c("15 min: small mismatch (minor)",
                          "60 min: large mismatch (notable)")) +
       labs(caption = "bias = |computed - self-reported|  (minutes)") +
-      labs(title = "Figure 20: SOL Perception Bias (Subjective vs Objective)",
+      labs(title = "Figure 29: SOL Perception Bias (Subjective vs Objective)",
       subtitle = paste0("Absolute difference: subjective SOL (self-reported) vs objective SOL (time_sleep - time_bed). N=", length(valid_rows), ".\n",
                         "This gap is preserved, not corrected -- perception/measurement mismatch is signal, not error. ",
                         "The >60min line flags cases worth a manual look for a possible input error, not a discrepancy to \"fix.\""),
@@ -2660,19 +2662,19 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
       theme_minimal(base_size = 12)
     
     print(p20)
-  save_png(p20, "20_SOL_Perception_Bias", subdir = "research_ready")
-    cat("✓ Figure 20 completed\n\n")
+  save_png(p20, "F24", subdir = "research_ready")
+    cat("✓ Figure 29 completed\n\n")
   } else {
     cat("⚠ No valid SOL bias data.\n\n")
   }
   
   # --------------------------------------------------------------------------
-  # Figure 20B: WASO Perception Bias (with same thresholds as SOL)
+  # Figure 25: WASO Perception Bias (with same thresholds as SOL)
   # 客观 WASO = time_getup_corrected - time_awake_corrected
   # 主观 WASO = duration_totalmin_waso_estimate_am
   # Thresholds: Minor = 15min, Red Line = 60min (same as SOL)
   # --------------------------------------------------------------------------
-  cat("Generating Figure 20B (WASO bias: subjective vs objective)...\n")
+  cat("Generating Figure 25 (WASO bias: subjective vs objective)...\n")
   
   if (exists("corrected_ema_data")) {
     
@@ -2708,7 +2710,7 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
                    label = c("15 min: small mismatch (minor)",
                              "60 min: large mismatch (notable)")) +
           labs(caption = "bias = |computed - self-reported|  (minutes)") +
-           labs(title = "Figure 20B: Self-Reported Nighttime Wakefulness vs Post-Awakening Time in Bed",
+           labs(title = "Figure 25: Self-Reported Nighttime Wakefulness vs Post-Awakening Time in Bed",
             subtitle = paste0("Note: self-reported WASO (within sleep period) and post-awakening interval (getup - awake) are different time windows. ",
                               "The latter captures time spent in bed after final awakening, not wakefulness during sleep. N=", length(valid_waso_rows), ".\n",
                               "This gap is preserved, not corrected -- perception/measurement mismatch is signal, not error. ",
@@ -2718,8 +2720,8 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
           theme_minimal(base_size = 12)
         
         print(p20b)
-  save_png(p20b, "20B_WASO_Perception_Bias", subdir = "research_ready")
-        cat("✓ Figure 20B completed\n\n")
+  save_png(p20b, "F25", subdir = "research_ready")
+        cat("✓ Figure 25 completed\n\n")
         
         cat("  Objective WASO non-NA:", sum(!is.na(obj_waso)), "\n")
         cat("  Subjective WASO parsed:", sum(!is.na(subj_waso)), "\n")
@@ -2729,15 +2731,15 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
         cat("⚠ No valid WASO bias data.\n\n")
       }
     } else {
-      cat("⚠ Missing WASO columns. Skipping Figure 20B.\n\n")
+      cat("⚠ Missing WASO columns. Skipping Figure 25.\n\n")
     }
   } else {
-    cat("⚠ corrected_ema_data not found. Skipping Figure 20B.\n\n")
+    cat("⚠ corrected_ema_data not found. Skipping Figure 25.\n\n")
   }
   
   
   # --------------------------------------------------------------------------
-  # Figure 21: Substance Use Data Availability
+  # Figure 26: Substance Use Data Availability
   # --------------------------------------------------------------------------
   cat("Generating Figure 21...\n")
   
@@ -2780,7 +2782,7 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
     geom_col(alpha = 0.8, width = 0.7) +
     geom_text(aes(label = paste0(n_non_na, "/", total_n, " (", pct, "%)  range: ", range)),
               vjust = -0.3, size = 3.5) +
-    labs(title = "Figure 21: Substance Use Data Availability",
+    labs(title = "Figure 26: Substance Use Data Availability",
          subtitle = paste("Non-NA entries and value range for each substance variable (total N =", total_n, ")"),
          x = "", y = "% of records with data") +
     scale_fill_brewer(palette = "Set2") +
@@ -2790,13 +2792,13 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
           legend.position = "none")
   
   print(p21)
-  save_png(p21, "21_Substance_Use_Availability", subdir = "research_ready")
-  cat("✓ Figure 21 completed\n\n")
+  save_png(p21, "F26", subdir = "research_ready")
+  cat("✓ Figure 26 completed\n\n")
   
   # --------------------------------------------------------------------------
-  # Figure 22: Substance Use Value Distribution (Detailed Statistics)
+  # Figure 27: Substance Use Value Distribution (Detailed Statistics)
   # --------------------------------------------------------------------------
-  cat("Generating Figure 22 (Substance Use Value Distribution)...\n")
+  cat("Generating Figure 27 (Substance Use Value Distribution)...\n")
   
   # Define substance columns and units
   subst_list <- list(
@@ -2883,7 +2885,7 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
       geom_boxplot(alpha = 0.7, outlier.shape = NA) +
       geom_jitter(width = 0.2, alpha = 0.3, size = 0.8, color = "gray30") +
       labs(
-        title = "Figure 22: Substance Use Value Distribution",
+        title = "Figure 27: Substance Use Value Distribution",
         subtitle = "Box = middle 50% of reports with the median line inside; each gray dot = one participant's report (jittered sideways to avoid overlap)",
         y = "Reported Value", 
         x = ""
@@ -2893,11 +2895,11 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
       theme(legend.position = "none")
     
     print(p22)
-  save_png(p22, "22_Substance_Use_Distribution", subdir = "research_ready")
-    cat("✓ Figure 22 completed\n\n")
+  save_png(p22, "F27", subdir = "research_ready")
+    cat("✓ Figure 27 completed\n\n")
     
     # Print statistics table to console
-    cat("--- Substance Use Statistics (Figure 22 data) ---\n")
+    cat("--- Substance Use Statistics (Figure 27 data) ---\n")
     print(stats_table)
     cat("\n")
     
@@ -2920,9 +2922,9 @@ cat(paste(rep("=", 80), collapse = ""))
 cat("\n\n")
 
 # --------------------------------------------------------------------------
-# Figure 23: Caffeine Consumption Distribution
+# Figure 28: Caffeine Consumption Distribution
 # --------------------------------------------------------------------------
-# Non-NA/non-Inf numeric filter (defined defensively here: the Figure 22
+# Non-NA/non-Inf numeric filter (defined defensively here: the Figure 27
 # block that usually carries it may be skipped entirely).
 .finite_values <- function(x) {
   xv <- suppressWarnings(as.numeric(x))
@@ -2940,7 +2942,7 @@ cat("\n\n")
   out[!is.na(x) & abs(x - 0.25) < 1e-9] <- "1/4"
   out
 }
-cat("Generating Figure 23 (Caffeine consumption)...\n")
+cat("Generating Figure 28 (Caffeine consumption)...\n")
 
 caf_col <- "caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1"
 if (exists("corrected_ema_data") && caf_col %in% names(corrected_ema_data)) {
@@ -2960,22 +2962,22 @@ if (exists("corrected_ema_data") && caf_col %in% names(corrected_ema_data)) {
       geom_col(alpha = 0.85, width = 0.7, fill = "#1976D2") +
       geom_text(aes(label = paste0(n, " (", round(pct, 1), "%)")),
                 vjust = -0.3, size = 3) +
-      labs(title = "Figure 23: Caffeine Consumption Distribution",
+      labs(title = "Figure 28: Caffeine Consumption Distribution",
            subtitle = sprintf("Based on %d non-NA records | Median: %s cups | Range: %s - %s | Fractional answers (e.g. half a cup) are kept as reported",
                               length(caf_non_na), format(median(caf_non_na)), format(min(caf_non_na)), format(max(caf_non_na))),
            x = "Caffeine (cups/day)", y = "Number of records") +
       theme_minimal(base_size = 12)
 
     print(p23)
-  save_png(p23, "23_Caffeine_Consumption", subdir = "research_ready")
-    cat(sprintf("✓ Figure 23 completed (%d non-NA records)\n\n", length(caf_non_na)))
+  save_png(p23, "F28", subdir = "research_ready")
+    cat(sprintf("✓ Figure 28 completed (%d non-NA records)\n\n", length(caf_non_na)))
   }
 }
 
 # --------------------------------------------------------------------------
-# Figure 24: Alcohol Consumption Distribution
+# Figure 29: Alcohol Consumption Distribution
 # --------------------------------------------------------------------------
-cat("Generating Figure 24 (Alcohol consumption)...\n")
+cat("Generating Figure 29 (Alcohol consumption)...\n")
 
 alc_col <- "alcoholtoday_PM_NumAlcoholicDrinks_1"
 if (exists("corrected_ema_data") && alc_col %in% names(corrected_ema_data)) {
@@ -2995,20 +2997,20 @@ if (exists("corrected_ema_data") && alc_col %in% names(corrected_ema_data)) {
       geom_col(alpha = 0.85, width = 0.7, fill = "#FF8C00") +
       geom_text(aes(label = paste0(n, " (", round(pct, 1), "%)")),
                 vjust = -0.3, size = 3) +
-      labs(title = "Figure 24: Alcohol Consumption Distribution",
+      labs(title = "Figure 29: Alcohol Consumption Distribution",
            subtitle = sprintf("Based on %d non-NA records | Median: %s drinks | Range: %s - %s | Fractional answers are kept as reported",
                               length(alc_non_na), format(median(alc_non_na)), format(min(alc_non_na)), format(max(alc_non_na))),
            x = "Alcohol (drinks/day)", y = "Number of records") +
       theme_minimal(base_size = 12)
 
     print(p24)
-  save_png(p24, "24_Alcohol_Consumption", subdir = "research_ready")
-    cat(sprintf("✓ Figure 24 completed (%d non-NA records)\n\n", length(alc_non_na)))
+  save_png(p24, "F29", subdir = "research_ready")
+    cat(sprintf("✓ Figure 29 completed (%d non-NA records)\n\n", length(alc_non_na)))
   }
 }
 
 # --------------------------------------------------------------------------
-# Figure R25: Sleep Regularity — Weekday vs Weekend
+# Figure 30: Sleep Regularity — Weekday vs Weekend
 # --------------------------------------------------------------------------
 cat("Generating FIGURE R25 (Sleep Regularity: Weekday vs Weekend)...\n")
 
@@ -3058,7 +3060,7 @@ if (all(c("time_bed_corrected", "time_getup_corrected") %in% names(corrected_ema
       stat_summary(fun = median, geom = "point", size = 2, color = "black") +
       facet_wrap(~event, scales = "free_y") +
       scale_fill_manual(values = c("Weekday" = "#1976D2", "Weekend" = "#FF8C00")) +
-      labs(title = "Figure R25: Sleep Regularity - Weekday vs Weekend",
+      labs(title = "Figure 30: Sleep Regularity - Weekday vs Weekend",
            subtitle = paste0("Violin + boxplot of bedtime and get-up time by day type (weekend = Sat/Sun); N = ", nrow(sr), " records.\n",
                              "Bedtime = time_bed_corrected, get-up = time_getup_corrected. Bedtime hours above 24 are after midnight (26 = 02:00)."),
            x = "", y = "Clock Hour") +
@@ -3066,17 +3068,17 @@ if (all(c("time_bed_corrected", "time_getup_corrected") %in% names(corrected_ema
       theme(legend.position = "bottom",
             strip.text = element_text(face = "bold", size = 13))
     print(p_r25)
-    save_png(p_r25, "R25_Sleep_Regularity_Weekday_Weekend", subdir = "research_ready")
-    cat("✓ Figure R25 completed\n\n")
+    save_png(p_r25, "F30", subdir = "research_ready")
+    cat("✓ Figure 30 completed\n\n")
   } else {
     cat("  R25: no non-NA records found — skipping\n\n")
   }
 } else {
-  cat("⚠ Missing required columns (time_bed_corrected, time_getup_corrected) — skipping Figure R25\n\n")
+  cat("⚠ Missing required columns (time_bed_corrected, time_getup_corrected) — skipping Figure 30\n\n")
 }
 
 # --------------------------------------------------------------------------
-# Figure R26: Sleep Composition — TIB = TST + SOL + WASO
+# Figure 31: Sleep Composition — TIB = TST + SOL + WASO
 # --------------------------------------------------------------------------
 cat("Generating FIGURE R26 (Sleep Composition)...\n")
 
@@ -3112,21 +3114,21 @@ if (all(c("self_diffcalc_totalsleeptime_minutes", "self_diffcalc_sol_minutes",
     scale_fill_manual(name = NULL, values = c("Total Sleep Time (TST)" = "#2E7D32",
                                  "Sleep Onset Latency (SOL)" = "#FF8C00",
                                  "Wake After Sleep Onset (WASO)" = "#D32F2F")) +
-    labs(title = "Figure R26: Sleep Composition - TIB Breakdown",
+    labs(title = "Figure 31: Sleep Composition - TIB Breakdown",
          subtitle = paste0("Average proportion of Time in Bed (TIB) spent in each stage (N=", nrow(sc),
                            " valid records after pipeline correction). TIB = TST (Total Sleep Time, asleep) + SOL (Sleep Onset Latency, falling asleep) + WASO (Wake After Sleep Onset, awake in the night)."),
          x = "", y = "") +
     theme_void(base_size = 12) +
     theme(legend.position = "bottom", plot.margin = margin(10, 30, 10, 30))
   print(p_r26)
-  save_png(p_r26, "R26_Sleep_Composition_TIB_Breakdown", subdir = "research_ready")
-  cat("✓ Figure R26 completed\n\n")
+  save_png(p_r26, "F31", subdir = "research_ready")
+  cat("✓ Figure 31 completed\n\n")
 } else {
-  cat("⚠ Missing required columns — skipping Figure R26\n\n")
+  cat("⚠ Missing required columns — skipping Figure 31\n\n")
 }
 
 # --------------------------------------------------------------------------
-# Figure R27: Sleep Metrics Correlation Matrix
+# Figure 32: Sleep Metrics Correlation Matrix
 # --------------------------------------------------------------------------
 cat("Generating FIGURE R27 (Sleep Metrics Correlation Matrix)...\n")
 
@@ -3148,7 +3150,7 @@ if (requireNamespace("corrplot", quietly = TRUE) &&
   if (nrow(cor_data) > 50) {
     M <- cor(cor_data, use = "pairwise.complete.obs")
 
-    png(file.path(output_dir, "research_ready", "R27_Sleep_Metrics_Correlation_Matrix.png"),
+    png(file.path(output_dir, "research_ready", "F32.png"),
         width = 8, height = 7, units = "in", res = 150)
     par(oma = c(0, 0, 4.5, 0))  # outer top margin holds the title/subtitle clear of the rotated labels
     corrplot::corrplot(M, method = "color", type = "upper",
@@ -3156,18 +3158,18 @@ if (requireNamespace("corrplot", quietly = TRUE) &&
                        addCoef.col = "black", number.cex = 0.7,
                        col = colorRampPalette(c("#D32F2F", "white", "#2E7D32"))(200),
                        title = "", mar = c(2, 2, 1, 2))
-    mtext("Figure R27: Sleep Metrics Correlation Matrix", side = 3, outer = TRUE, line = 2.4, cex = 1.3, font = 2)
+    mtext("Figure 32: Sleep Metrics Correlation Matrix", side = 3, outer = TRUE, line = 2.4, cex = 1.3, font = 2)
     mtext(side = 3, outer = TRUE, line = 0.9, cex = 0.8,
           sprintf("Pairwise Pearson correlations (N=%d valid records after pipeline correction). Red = negative, Green = positive.", nrow(cor_data)))
     dev.off()
     # No flat top-level copy: subfolders are the single location for figures
     # (see save_png above).
-    cat("✓ Figure R27 completed\n\n")
+    cat("✓ Figure 32 completed\n\n")
   } else {
-    cat("⚠ Too few records for correlation matrix — skipping Figure R27\n\n")
+    cat("⚠ Too few records for correlation matrix — skipping Figure 32\n\n")
   }
 } else {
-  cat("⚠ corrplot package or required columns missing — skipping Figure R27\n\n")
+  cat("⚠ corrplot package or required columns missing — skipping Figure 32\n\n")
 }
 
 
@@ -3181,34 +3183,34 @@ cat("\nCOMPLETE FIGURE SUMMARY\n")
 cat(paste(rep("=", 80), collapse = ""))
 cat("\n\n")
 
-cat("FIGURES 1-12 (Based on FINAL CORRECTED DATA - Post-Correction):\n")
+cat("PIPELINE FIGURES F01-F16 (Based on FINAL CORRECTED DATA - Post-Correction):\n")
 cat("  Source: corrected_ema_data from apply_manual_corrections_and_recalculate()\n")
 cat("  What they show: Final dataset after all manual corrections applied\n")
 cat("  Figure 1: Pipeline Record Flow Diagram (Post-Correction)\n")
 cat("  Figure 2: Impact of Corrections on Sleep Metrics\n")
-cat("  Figure 2B: Distribution of Sleep Variables\n")
+cat("  Figure 18: Distribution of Sleep Variables\n")
 cat("  Figure 3: Sleep Duration Distribution\n")
 cat("  Figure 4: Sleep Duration vs Time in Bed (COLOR-CODED)\n")
 cat("  Figure 4B: SOL vs Sleep Duration (COLOR-CODED)\n")
 cat("  Figure 5: Variability of Sleep Variables (Violin Plot)\n")
 cat("  Figure 6: Clean vs Unusual Comparison\n")
 cat("  Figure 7: Flag Composition (Stacked Histogram)\n")
-cat("  [Figure 8 removed -- see VISUALIZATION_TREE_PROPOSAL.md]\n")
+cat("  [retired -- see VISUALIZATION_TREE_PROPOSAL.md]\n")
 cat("  Figure 9: Bedtime vs Get-up Time Distribution\n")
-cat("  Figure 10: Extreme Durations with Efficiency (COLOR-CODED)\n")
-cat("  Figure 11: Flag Co-occurrence Heatmap\n")
-cat("  Figure 12: MERGED into Step Flag Ledger (A1) — per-step flag counts table\n\n")
+cat("  Figure 4: Extreme Durations with Efficiency (COLOR-CODED)\n")
+cat("  Figure 5: Flag Co-occurrence Heatmap\n")
+cat("  Figure 15: Step Flag Ledger (per-step flag counts table)\n\n")
 
 if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
-  cat("FIGURES 13-18 (Based on AUTO-DETECTION - Pre-Correction):\n")
+  cat("DETECTION FIGURES F06-F14 (Based on AUTO-DETECTION - Pre-Correction):\n")
   cat("  Source: review_output from checkforerrors_processing.R (checkforerrors_df)\n")
   cat("  What they show: Algorithm-detected potential issues needing human review\n")
-  cat("  Figure 13: Error Category Distribution (Auto-Detection)\n")
-  cat("  Figure 14: Flagged vs Clean Sleep Duration (Auto-Detection)\n")
-  cat("  Figure 15: Timing of Flagged Temporal Patterns Over the Study Period\n")
-  cat("  Figure 16: Most Common Error Patterns (Auto-Detection)\n")
-  cat("  Figure 17: Top 15 Participants by Flag Rate (Auto-Detection)\n")
-  cat("  Figure 18: Auto-Detected Review Flags Dashboard\n\n")
+  cat("  Figure 6: Error Category Distribution (Auto-Detection)\n")
+  cat("  Figure 10: Flagged vs Clean Sleep Duration (Auto-Detection)\n")
+  cat("  Figure 11: Timing of Flagged Temporal Patterns Over the Study Period\n")
+  cat("  Figure 12: Most Common Error Patterns (Auto-Detection)\n")
+  cat("  Figure 13: Top 15 Participants by Flag Rate (Auto-Detection)\n")
+  cat("  Figure 14: Auto-Detected Review Flags Dashboard\n\n")
 } else {
   cat("FIGURES 13-18: NOT GENERATED (the human-review queue is empty)\n")
   .explain_no_review_figures()
@@ -3216,21 +3218,21 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
 }
 
 cat("ADDITIONAL PIPELINE CLEANING FIGURES:\n")
-cat("  Figure 19: FOLDED into Figure 13 (final-status split shown in Fig 13's flag table)\n")
-cat("  Figure P26: Per-Participant Final Flag Rate\n\n")
+cat("  Figure 19: FOLDED into Figure 6 (final-status split shown in Fig 13's flag table)\n")
+cat("  Figure 12: Per-Participant Final Flag Rate\n\n")
 
-cat("FIGURES 20-24 (Research: Sleep Perception + Substance Use):\n")
-cat("  Figure 20: SOL Perception Bias\n")
-cat("  Figure 20B: WASO Perception Bias\n")
-cat("  Figure 21: Substance Use Availability\n")
-cat("  Figure 22: Substance Use Distribution\n")
-cat("  Figure 23: Caffeine Consumption\n")
-cat("  Figure 24: Alcohol Consumption\n\n")
+cat("RESEARCH FIGURES F17-F32 (Sleep Perception + Substance Use):\n")
+cat("  Figure 29: SOL Perception Bias\n")
+cat("  Figure 25: WASO Perception Bias\n")
+cat("  Figure 26: Substance Use Availability\n")
+cat("  Figure 27: Substance Use Distribution\n")
+cat("  Figure 28: Caffeine Consumption\n")
+cat("  Figure 29: Alcohol Consumption\n\n")
 
 cat("ADDITIONAL RESEARCH FIGURES:\n")
-cat("  Figure R25: Sleep Regularity — Weekday vs Weekend\n")
-cat("  Figure R26: Sleep Composition — TIB = TST + SOL + WASO\n")
-cat("  Figure R27: Sleep Metrics Correlation Matrix\n\n")
+cat("  Figure 30: Sleep Regularity — Weekday vs Weekend\n")
+cat("  Figure 31: Sleep Composition — TIB = TST + SOL + WASO\n")
+cat("  Figure 32: Sleep Metrics Correlation Matrix\n\n")
 
 cat("FOLDER STRUCTURE:\n")
 cat(sprintf("  %s/pipeline_cleaning/  — Data cleaning pipeline progress & quality control\n", output_dir))
@@ -3410,21 +3412,21 @@ generate_appendix_ledger <- function() {
   figure12_step_flag_table(
     cfg = get0("cfg"),
     output_dir = output_dir,
-    save_png = function(plot, filename, w, h, subdir, ...) { save_png(plot, "A1_Step_Flag_Ledger", w = w, h = h, subdir = subdir) },
-    filename = "A1_Step_Flag_Ledger"
+    save_png = function(plot, filename, w, h, subdir, ...) { save_png(plot, "F15", w = w, h = h, subdir = subdir) },
+    filename = "F15"
   )
 
   # A1 previously needed copying into latest_visualization/ because it was
   # generated after the mirror step. There is no mirror step now -- figures are
   # written straight into output_dir -- so it lands in the right place by
   # construction. Verify rather than copy.
-  a1_path <- file.path(output_dir, "pipeline_cleaning", "A1_Step_Flag_Ledger.png")
+  a1_path <- file.path(output_dir, "pipeline_cleaning", "F15.png")
   cat(sprintf("✓ Appendix Ledger: %s + %s%s\n", csv_path, a1_path,
               if (file.exists(a1_path)) "" else "  (WARNING: PNG not found)"))
   invisible(TRUE)
 }
 
-# Run the appendix ledger BEFORE the catalog check below: A1_Step_Flag_Ledger.png
+# Run the appendix ledger BEFORE the catalog check below: F15.png
 # is written by it, so checking first reported A1 as "not generated" on every
 # run (2026-09-30).
 generate_appendix_ledger()
@@ -3440,38 +3442,38 @@ generate_appendix_ledger()
 # make_figure_index.R) a footer block on the contact sheet itself.
 # ============================================================================
 .expected_figures <- c(
-  "pipeline_cleaning/01_Pipeline_Flow_Diagram.png",
-  "pipeline_cleaning/06_Sleep_Duration_Post_Correction.png",
-  "pipeline_cleaning/07_Flag_Composition_Stacked.png",
-  "pipeline_cleaning/10_Extreme_Sleep_Duration.png",
-  "pipeline_cleaning/11_Flag_Cooccurrence_Heatmap.png",
-  "pipeline_cleaning/13_Error_Category_Distribution.png",
-  "pipeline_cleaning/13B_Adjacent_Timestamp_Gaps.png",
-  "pipeline_cleaning/13C_Detection_Outcomes_Heatmap.png",
-  "pipeline_cleaning/13D_Threshold_vs_Noise_Ratio.png",
-  "pipeline_cleaning/14_Sleep_Duration_Pre_Correction.png",
-  "pipeline_cleaning/15_Error_Timeline.png",
-  "pipeline_cleaning/16_Common_Error_Patterns.png",
-  "pipeline_cleaning/17_Top_Participants_Flags.png",
-  "pipeline_cleaning/18_Auto_Detected_Dashboard.png",
-  "pipeline_cleaning/A1_Step_Flag_Ledger.png",
-  "pipeline_cleaning/P26_PerParticipant_Flag_Rate.png",
-  "research_ready/02_Correction_Impact.png",
-  "research_ready/02B_Distribution_Sleep_Variables.png",
-  "research_ready/03_Sleep_Duration_Distribution.png",
-  "research_ready/04_Sleep_Duration_vs_Time_in_Bed.png",
-  "research_ready/04B_SOL_vs_Sleep_Duration.png",
-  "research_ready/05_Variability_Sleep_Variables.png",
-  "research_ready/09_Bedtime_vs_Getup_Distribution.png",
-  "research_ready/20_SOL_Perception_Bias.png",
-  "research_ready/20B_WASO_Perception_Bias.png",
-  "research_ready/21_Substance_Use_Availability.png",
-  "research_ready/22_Substance_Use_Distribution.png",
-  "research_ready/23_Caffeine_Consumption.png",
-  "research_ready/24_Alcohol_Consumption.png",
-  "research_ready/R25_Sleep_Regularity_Weekday_Weekend.png",
-  "research_ready/R26_Sleep_Composition_TIB_Breakdown.png",
-  "research_ready/R27_Sleep_Metrics_Correlation_Matrix.png"
+  "pipeline_cleaning/F01.png",
+  "pipeline_cleaning/F02.png",
+  "pipeline_cleaning/F03.png",
+  "pipeline_cleaning/F04.png",
+  "pipeline_cleaning/F05.png",
+  "pipeline_cleaning/F06.png",
+  "pipeline_cleaning/F07.png",
+  "pipeline_cleaning/F08.png",
+  "pipeline_cleaning/F09.png",
+  "pipeline_cleaning/F10.png",
+  "pipeline_cleaning/F11.png",
+  "pipeline_cleaning/F12.png",
+  "pipeline_cleaning/F13.png",
+  "pipeline_cleaning/F14.png",
+  "pipeline_cleaning/F15.png",
+  "pipeline_cleaning/F16.png",
+  "research_ready/F17.png",
+  "research_ready/F18.png",
+  "research_ready/F19.png",
+  "research_ready/F20.png",
+  "research_ready/F21.png",
+  "research_ready/F22.png",
+  "research_ready/F23.png",
+  "research_ready/F24.png",
+  "research_ready/F25.png",
+  "research_ready/F26.png",
+  "research_ready/F27.png",
+  "research_ready/F28.png",
+  "research_ready/F29.png",
+  "research_ready/F30.png",
+  "research_ready/F31.png",
+  "research_ready/F32.png"
 )
 .missing_figures <- .expected_figures[!file.exists(file.path(output_dir, .expected_figures))]
 

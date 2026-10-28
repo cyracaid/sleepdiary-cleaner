@@ -168,5 +168,5 @@ flagged_rows_vs_corrected_ema_data.csv
 fasttrack_audit_2026-09-24.csv
 
 # 1.7.0 run artifacts at project root (also written under output/, which is ignored)
-^review_status\.csv$
-^review_runs\.csv$
+/review_status.csv
+/review_runs.csv

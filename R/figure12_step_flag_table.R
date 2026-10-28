@@ -12,7 +12,7 @@
 #' @param filename Output PNG filename without extension.
 #' @export
 figure12_step_flag_table <- function(cfg = NULL, output_dir = ".", save_png = NULL,
-                                      filename = "A1_Step_Flag_Ledger") {
+                                      filename = "F15") {
   long <- get_step_ledger_long()
   if (nrow(long) == 0) {
     cat("WARNING: Step ledger empty -- did run_pipeline call init_step_ledger()/log_step()? Skipping Figure 12.\n")
