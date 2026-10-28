@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.7.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.7.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,10 +66,13 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="sleepcleanr-development-version">sleepcleanr (development version)<a class="anchor" aria-label="anchor" href="#sleepcleanr-development-version"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.7.1" id="sleepcleanr-171">sleepcleanr 1.7.1<a class="anchor" aria-label="anchor" href="#sleepcleanr-171"></a></h2>
 <div class="section level3">
-<h3 id="changed-development-version">Changed<a class="anchor" aria-label="anchor" href="#changed-development-version"></a></h3>
-<ul><li>The silent-error audit ledger path is now configurable: set <code>data.files.audit_dispositions</code> in the YAML config (empty by default, so the ledger stays inactive and Dataset B’s <code>audit_disposition</code> stays “none”). <code><a href="../reference/run_pipeline.html">run_pipeline()</a></code> passes it, and the manual metric-duration path it actually used, to <code><a href="../reference/finalize_columns.html">finalize_columns()</a></code> (new arguments <code>audit_ledger</code> and <code>manual_metric_duration</code>). Precedence: argument, then YAML, then the <code>sleepcleanr.audit_ledger</code> / <code>sleepcleanr.audit_manual_corrections</code> options, then the working-directory default.</li>
+<h3 id="changed-1-7-1">Changed<a class="anchor" aria-label="anchor" href="#changed-1-7-1"></a></h3>
+<ul><li>All 32 figure files use one continuous scheme, <code>F01</code>-<code>F32</code> (was a mix of <code>01</code>-<code>12</code>, <code>13B</code>-<code>13D</code>, <code>A1</code>, <code>P26</code>, <code>R25</code>-<code>R27</code> with gaps). Files keep their folder (<code>pipeline_cleaning/</code>, <code>research_ready/</code>); in-figure titles, the expected-figures list, the figure index, README and the articles use the same numbers. Old aliases are gone – update any external references.</li>
+<li>Dataset A carries the self-reported SOL/WASO raw text (<code>sol_selfreport_raw</code>, <code>waso_selfreport_raw</code>) and a recode flag (<code>sol_selfreport_ambiguous</code>, <code>waso_selfreport_ambiguous</code>) for entries the interval parser reinterpreted under the MM:SS rule (a clock-looking “12:05” read as 12 min 5 s). 35 -&gt; 39 columns; see SCHEMA.md. Flagged rows are marked, not re-queued for review.</li>
+<li>Figure 1’s class list now includes “Reasonable unusual (accepted)” (the 1.6.0 reclassification was missing from the diagram, so the counts did not sum to the total), and the error-class wording no longer claims every reviewed error was fixed.</li>
+<li>The silent-error audit ledger path is now configurable: set <code>data.files.audit_dispositions</code> in the YAML config (empty by default, so the ledger stays inactive and Dataset B’s <code>audit_disposition</code> stays “none”). <code><a href="../reference/run_pipeline.html">run_pipeline()</a></code> passes it, and the manual metric-duration path it actually used, to <code><a href="../reference/finalize_columns.html">finalize_columns()</a></code> (new arguments <code>audit_ledger</code> and <code>manual_metric_duration</code>). Precedence: argument, then YAML, then the <code>sleepcleanr.audit_ledger</code> / <code>sleepcleanr.audit_manual_corrections</code> options, then the working-directory default.</li>
 <li>A ledger named in the config that does not exist now stops the run instead of silently writing “none”. With no ledger named, behaviour is unchanged.</li>
 <li>The ledger/manual-corrections consistency check now uses the manual file the run used. An algorithmic-only run (manual paths blanked) with a ledger that declares <code>corrected_manual</code> / <code>set_na</code> rows therefore stops, since no manual correction was applied. No values move; the delivered column dictionary is unchanged.</li>
 </ul></div>
@@ -79,7 +82,7 @@
 <div class="section level3">
 <h3 id="fixed-1-6-2">Fixed<a class="anchor" aria-label="anchor" href="#fixed-1-6-2"></a></h3>
 <ul><li>Figure 4’s subtitle printed only the first of two correlations it computed (sprintf had one placeholder for two arguments); it now shows both, labelled “r = X (all records) / Y (clean only)”.</li>
-<li>Figure 11 (flag co-occurrence heatmap) never drew: its column list was built from a character label (flag_severity) and an all-NA column instead of the binary flag columns, so every row was dropped as incomplete. It now uses the four binary quality flags and renders.</li>
+<li>Figure 5 (flag co-occurrence heatmap) never drew: its column list was built from a character label (flag_severity) and an all-NA column instead of the binary flag columns, so every row was dropped as incomplete. It now uses the four binary quality flags and renders.</li>
 <li>
 <code>manually_corrected</code> is read defensively when computing <code>has_correction</code>, removing the “Unknown or uninitialised column” warning on inputs that lack the column.</li>
 <li>A manual error-correction row whose <code>correct_value</code> uses a format the parser does not implement (only “Same day …”, “Plus/Minus 12 hours” and bare “HH:MM[:SS]” are recognized) was silently skipped – on the study data this hid an unapplied reviewer swap for months. Such rows now print a console note and are listed with their reason in <code>output/manual_corrections_not_applied.csv</code> (the same ledger the sleep-metric-duration applier writes).</li>
@@ -130,7 +133,7 @@
 <h3 id="fixed-1-6-1-1">Fixed<a class="anchor" aria-label="anchor" href="#fixed-1-6-1-1"></a></h3>
 <ul><li>A record whose <code>correction_type</code> names a swap was marked as manually corrected even when no manual instruction changed it. <code>correction_type</code> is written by the algorithm (Step 4), so this recorded an automatic swap as a human correction. Such a record is now only reported on the console.</li>
 <li>Step 8 labelled every manually corrected row <code>CLEAN (Manually Fixed)</code>, even when its corrected times still failed the re-check. Step 8’s own checks look at formats and metric values, not at the order of the corrected times, so those rows also looked clean there. Now a manually corrected row is <code>CLEAN (Manually Fixed)</code> only when the Step 8 checks and its <code>data_category</code> after corrections both pass; with a Step 8 flag it keeps that flag; otherwise it is the new <code>STILL FAILS (Manually Corrected)</code>. Example: a plain “sleep-awake switch” on a PM sleep time swaps the clock times but not the dates, so the row stays out of order and is now reported as still failing.</li>
-<li>The Step 8 flag report and the count table in Figure 13 now count each row once, by its final status, so the lines add up to the total. Before, a manually fixed row was counted both as <code>CLEAN</code> and as <code>CLEAN (Manually Fixed)</code>.</li>
+<li>The Step 8 flag report and the count table in Figure 6 now count each row once, by its final status, so the lines add up to the total. Before, a manually fixed row was counted both as <code>CLEAN</code> and as <code>CLEAN (Manually Fixed)</code>.</li>
 <li>
 <code>flag_distribution.csv</code> has a new column <code>data_category_after_corrections</code>.</li>
 <li>A manually corrected row with a time still missing after the corrections (for example a bed time the participant never entered) was reported by Step 8 as <code>STILL FAILS</code>, although its order cannot be checked at all. It is now <code>NOT CHECKABLE (Manually Corrected)</code>, and in <code>review_status.csv</code> it is <code>needs_review</code> with the reason “a time is missing … cannot be re-checked”. New rule <code>review.missing_times_ok_after_manual</code> (default <code>false</code>): when <code>true</code>, such a row that is in a manual file counts as <code>incorporated</code> (Step 8: <code>CLEAN (Manually   Fixed)</code>).</li>

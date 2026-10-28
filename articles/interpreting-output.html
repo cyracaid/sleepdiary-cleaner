@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.7.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.7.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -1255,7 +1255,7 @@ strict or the data has quality problems.</td>
 <td><code>self_reported_flag</code></td>
 <td>Records where self-reported SOL/WASO disagrees with the computed
 value</td>
-<td>Indicates perception bias. Check Figure 20 (SOL Perception
+<td>Indicates perception bias. Check Figure 29 (SOL Perception
 Bias).</td>
 </tr>
 </tbody>
@@ -1303,7 +1303,7 @@ the <code>delta</code> values for what the cleaning did.</p>
 number must be identical. If not, something is non-deterministic.</p>
 <p><strong>A note on SOL:</strong> <code>sol_mean_min</code> above is
 the <strong>raw SOL duration</strong>. This is a different quantity from
-the “SOL perception bias” checked by Figure 20 (the gap between
+the “SOL perception bias” checked by Figure 29 (the gap between
 self-reported and computed SOL, in §9.3) — the two use different
 reference numbers (10–45 min here vs. 15/60 min there) because they
 measure different things. Don’t read one against the other.</p>
@@ -1581,13 +1581,13 @@ data, ignore it and go by figure number.</p>
 <tbody>
 <tr class="odd">
 <td><strong>Figure 1 — Pipeline Flow</strong></td>
-<td><code>pipeline_cleaning/01_Pipeline_Flow_Diagram.png</code></td>
+<td><code>pipeline_cleaning/F01.png</code></td>
 <td>Vertical flow diagram: raw → parsed → algo-corrected →
 manual-corrected → final valid, with counts and % at each stage</td>
 </tr>
 <tr class="even">
 <td><strong>Figure 2 — Correction Impact</strong></td>
-<td><code>research_ready/02_Correction_Impact.png</code></td>
+<td><code>research_ready/F17.png</code></td>
 <td>A/B delta lollipops (only modified records, TST &amp; SOL) +
 identity scatter + before/after summary table</td>
 </tr>
@@ -1816,7 +1816,7 @@ comparison in §6</td>
 <tbody>
 <tr class="odd">
 <td><strong>01</strong></td>
-<td><code>pipeline_cleaning/01_Pipeline_Flow_Diagram.png</code></td>
+<td><code>pipeline_cleaning/F01.png</code></td>
 <td>Methods Fig 1</td>
 <td><code>sleep_visualization.R:862</code></td>
 <td><a href="#id_01-pipeline-record-flow">§9.2 · Pipeline Record
@@ -1825,7 +1825,7 @@ Flow</a></td>
 </tr>
 <tr class="even">
 <td><strong>02</strong></td>
-<td><code>research_ready/02_Correction_Impact.png</code></td>
+<td><code>research_ready/F17.png</code></td>
 <td>Methods Fig 2</td>
 <td><code>sleep_visualization.R:1013</code></td>
 <td><a href="#id_02-correction-impact">§9.3 · Correction Impact</a></td>
@@ -1833,7 +1833,7 @@ Flow</a></td>
 </tr>
 <tr class="odd">
 <td><strong>02B</strong></td>
-<td><code>research_ready/02B_Distribution_Sleep_Variables.png</code></td>
+<td><code>research_ready/F18.png</code></td>
 <td>Results</td>
 <td><code>sleep_visualization.R:1057</code></td>
 <td><a href="#id_02b-distribution-of-sleep-variables">§9.3 ·
@@ -1842,7 +1842,7 @@ Distribution of Sleep Variables</a></td>
 </tr>
 <tr class="even">
 <td><strong>03</strong></td>
-<td><code>research_ready/03_Sleep_Duration_Distribution.png</code></td>
+<td><code>research_ready/F19.png</code></td>
 <td>Results</td>
 <td><code>sleep_visualization.R:1108</code></td>
 <td><a href="#id_03-tst-distribution">§9.3 · TST Distribution</a></td>
@@ -1850,7 +1850,7 @@ Distribution of Sleep Variables</a></td>
 </tr>
 <tr class="odd">
 <td><strong>04</strong></td>
-<td><code>research_ready/04_Sleep_Duration_vs_Time_in_Bed.png</code></td>
+<td><code>research_ready/F20.png</code></td>
 <td>Results</td>
 <td><code>sleep_visualization.R:1163</code></td>
 <td><a href="#id_04-sleep-duration-vs-time-in-bed">§9.3 · Sleep Duration
@@ -1859,7 +1859,7 @@ vs Time in Bed</a></td>
 </tr>
 <tr class="even">
 <td><strong>04B</strong></td>
-<td><code>research_ready/04B_SOL_vs_Sleep_Duration.png</code></td>
+<td><code>research_ready/F21.png</code></td>
 <td>Results</td>
 <td><code>sleep_visualization.R:1215</code></td>
 <td><a href="#id_04b-sol-vs-sleep-duration">§9.3 · SOL vs Sleep
@@ -1868,7 +1868,7 @@ Duration</a></td>
 </tr>
 <tr class="odd">
 <td><strong>05</strong></td>
-<td><code>research_ready/05_Variability_Sleep_Variables.png</code></td>
+<td><code>research_ready/F22.png</code></td>
 <td>Results</td>
 <td><code>sleep_visualization.R:1265</code></td>
 <td><a href="#id_05-variability-of-sleep-variables">§9.3 · Variability
@@ -1877,7 +1877,7 @@ of Sleep Variables</a></td>
 </tr>
 <tr class="even">
 <td><strong>06</strong></td>
-<td><code>pipeline_cleaning/06_Sleep_Duration_Post_Correction.png</code></td>
+<td><code>pipeline_cleaning/F02.png</code></td>
 <td>Supplement</td>
 <td><code>sleep_visualization.R:1339</code></td>
 <td><a href="#id_06-sleep-duration-post-correction">§9.2 · Sleep
@@ -1886,7 +1886,7 @@ Duration Post-Correction</a></td>
 </tr>
 <tr class="odd">
 <td><strong>07</strong></td>
-<td><code>pipeline_cleaning/07_Flag_Composition_Stacked.png</code></td>
+<td><code>pipeline_cleaning/F03.png</code></td>
 <td>Supplement</td>
 <td><code>sleep_visualization.R:1404</code></td>
 <td><a href="#id_07-flag-composition-stacked">§9.2 · Flag Composition
@@ -1895,7 +1895,7 @@ Stacked</a></td>
 </tr>
 <tr class="even">
 <td><strong>09</strong></td>
-<td><code>research_ready/09_Bedtime_vs_Getup_Distribution.png</code></td>
+<td><code>research_ready/F23.png</code></td>
 <td>Results</td>
 <td><code>sleep_visualization.R:1458</code></td>
 <td><a href="#id_09-bedtime-vs-get-up-distribution">§9.3 · Bedtime vs
@@ -1904,7 +1904,7 @@ Get-up Distribution</a></td>
 </tr>
 <tr class="odd">
 <td><strong>10</strong></td>
-<td><code>pipeline_cleaning/10_Extreme_Sleep_Duration.png</code></td>
+<td><code>pipeline_cleaning/F04.png</code></td>
 <td>Supplement</td>
 <td><code>sleep_visualization.R:1514</code></td>
 <td><a href="#id_10-extreme-sleep-durations">§9.2 · Extreme Sleep
@@ -1913,7 +1913,7 @@ Durations</a></td>
 </tr>
 <tr class="even">
 <td><strong>11</strong></td>
-<td><code>pipeline_cleaning/11_Flag_Cooccurrence_Heatmap.png</code></td>
+<td><code>pipeline_cleaning/F05.png</code></td>
 <td>Supplement</td>
 <td><code>sleep_visualization.R:1571</code></td>
 <td><a href="#id_11-flag-co-occurrence-heatmap">§9.2 · Flag
@@ -1922,7 +1922,7 @@ Co-occurrence Heatmap</a></td>
 </tr>
 <tr class="odd">
 <td><strong>13</strong></td>
-<td><code>pipeline_cleaning/13_Error_Category_Distribution.png</code></td>
+<td><code>pipeline_cleaning/F06.png</code></td>
 <td>Supplement</td>
 <td><code>sleep_visualization.R:1794</code></td>
 <td><a href="#id_13-error-category-distribution">§9.2 · Error Category
@@ -1931,7 +1931,7 @@ Distribution</a></td>
 </tr>
 <tr class="even">
 <td><strong>13B</strong></td>
-<td><code>pipeline_cleaning/13B_Adjacent_Timestamp_Gaps.png</code></td>
+<td><code>pipeline_cleaning/F07.png</code></td>
 <td>Supplement</td>
 <td><code>sleep_visualization.R:1877</code></td>
 <td><a href="#id_13b-adjacent-timestamp-gaps">§9.2 · Adjacent Timestamp
@@ -1940,7 +1940,7 @@ Gaps</a></td>
 </tr>
 <tr class="odd">
 <td><strong>13C</strong></td>
-<td><code>pipeline_cleaning/13C_Detection_Outcomes_Heatmap.png</code></td>
+<td><code>pipeline_cleaning/F08.png</code></td>
 <td>Supplement</td>
 <td><code>sleep_visualization.R:1936</code></td>
 <td><a href="#id_13c-detection-outcomes-heatmap">§9.2 · Detection
@@ -1949,7 +1949,7 @@ Outcomes Heatmap</a></td>
 </tr>
 <tr class="even">
 <td><strong>13D</strong></td>
-<td><code>pipeline_cleaning/13D_Threshold_vs_Noise_Ratio.png</code></td>
+<td><code>pipeline_cleaning/F09.png</code></td>
 <td>Supplement</td>
 <td><code>sleep_visualization.R:1980</code></td>
 <td><a href="#id_13d-threshold-vs-measurement-noise">§9.2 · Threshold vs
@@ -1958,7 +1958,7 @@ Measurement Noise</a></td>
 </tr>
 <tr class="odd">
 <td><strong>14</strong></td>
-<td><code>pipeline_cleaning/14_Sleep_Duration_Pre_Correction.png</code></td>
+<td><code>pipeline_cleaning/F10.png</code></td>
 <td>Supplement</td>
 <td><code>sleep_visualization.R:2051</code></td>
 <td><a href="#id_14-sleep-duration-pre-correction">§9.2 · Sleep Duration
@@ -1967,7 +1967,7 @@ Pre-Correction</a></td>
 </tr>
 <tr class="even">
 <td><strong>15</strong></td>
-<td><code>pipeline_cleaning/15_Error_Timeline.png</code></td>
+<td><code>pipeline_cleaning/F11.png</code></td>
 <td>Supplement</td>
 <td><code>sleep_visualization.R:2137</code></td>
 <td><a href="#id_15-error-timeline">§9.2 · Error Timeline</a></td>
@@ -1975,7 +1975,7 @@ Pre-Correction</a></td>
 </tr>
 <tr class="odd">
 <td><strong>16</strong></td>
-<td><code>pipeline_cleaning/16_Common_Error_Patterns.png</code></td>
+<td><code>pipeline_cleaning/F12.png</code></td>
 <td>Supplement</td>
 <td><code>sleep_visualization.R:2228</code></td>
 <td><a href="#id_16-common-error-patterns">§9.2 · Common Error
@@ -1984,7 +1984,7 @@ Patterns</a></td>
 </tr>
 <tr class="even">
 <td><strong>17</strong></td>
-<td><code>pipeline_cleaning/17_Top_Participants_Flags.png</code></td>
+<td><code>pipeline_cleaning/F13.png</code></td>
 <td>Supplement</td>
 <td><code>sleep_visualization.R:2307</code></td>
 <td><a href="#id_17-top-participants-by-flag-rate">§9.2 · Top
@@ -1993,7 +1993,7 @@ Participants by Flag Rate</a></td>
 </tr>
 <tr class="odd">
 <td><strong>18</strong></td>
-<td><code>pipeline_cleaning/18_Auto_Detected_Dashboard.png</code></td>
+<td><code>pipeline_cleaning/F14.png</code></td>
 <td>Supplement</td>
 <td><code>sleep_visualization.R:2409</code></td>
 <td><a href="#id_18-auto-detected-dashboard">§9.2 · Auto-Detected
@@ -2002,7 +2002,7 @@ Dashboard</a></td>
 </tr>
 <tr class="even">
 <td><strong>20</strong></td>
-<td><code>research_ready/20_SOL_Perception_Bias.png</code></td>
+<td><code>research_ready/F24.png</code></td>
 <td>Results</td>
 <td><code>sleep_visualization.R:2637</code></td>
 <td><a href="#id_20-sol-perception-bias">§9.3 · SOL Perception
@@ -2011,7 +2011,7 @@ Bias</a></td>
 </tr>
 <tr class="odd">
 <td><strong>20B</strong></td>
-<td><code>research_ready/20B_WASO_Perception_Bias.png</code></td>
+<td><code>research_ready/F25.png</code></td>
 <td>Results</td>
 <td><code>sleep_visualization.R:2695</code></td>
 <td><a href="#id_20b-waso-perception-bias">§9.3 · WASO Perception
@@ -2020,7 +2020,7 @@ Bias</a></td>
 </tr>
 <tr class="even">
 <td><strong>21</strong></td>
-<td><code>research_ready/21_Substance_Use_Availability.png</code></td>
+<td><code>research_ready/F26.png</code></td>
 <td>Supplement</td>
 <td><code>sleep_visualization.R:2767</code></td>
 <td><a href="#id_21-substance-use-availability">§9.3 · Substance Use
@@ -2029,7 +2029,7 @@ Availability</a></td>
 </tr>
 <tr class="odd">
 <td><strong>22</strong></td>
-<td><code>research_ready/22_Substance_Use_Distribution.png</code></td>
+<td><code>research_ready/F27.png</code></td>
 <td>Supplement</td>
 <td><code>sleep_visualization.R:2870</code></td>
 <td><a href="#id_22-substance-use-value-distribution">§9.3 · Substance
@@ -2038,7 +2038,7 @@ Use Value Distribution</a></td>
 </tr>
 <tr class="even">
 <td><strong>23</strong></td>
-<td><code>research_ready/23_Caffeine_Consumption.png</code></td>
+<td><code>research_ready/F28.png</code></td>
 <td>Supplement</td>
 <td><code>sleep_visualization.R:2944</code></td>
 <td><a href="#id_23-caffeine-consumption">§9.3 · Caffeine
@@ -2047,7 +2047,7 @@ Consumption</a></td>
 </tr>
 <tr class="odd">
 <td><strong>24</strong></td>
-<td><code>research_ready/24_Alcohol_Consumption.png</code></td>
+<td><code>research_ready/F29.png</code></td>
 <td>Supplement</td>
 <td><code>sleep_visualization.R:2979</code></td>
 <td><a href="#id_24-alcohol-consumption">§9.3 · Alcohol
@@ -2056,7 +2056,7 @@ Consumption</a></td>
 </tr>
 <tr class="even">
 <td><strong>A1</strong></td>
-<td><code>pipeline_cleaning/A1_Step_Flag_Ledger.png</code></td>
+<td><code>pipeline_cleaning/F15.png</code></td>
 <td>Supplement</td>
 <td><code>figure12_step_flag_table.R:15</code></td>
 <td><a href="#a1-step-flag-ledger">§9.2 · Step Flag Ledger</a></td>
@@ -2064,7 +2064,7 @@ Consumption</a></td>
 </tr>
 <tr class="odd">
 <td><strong>P26</strong></td>
-<td><code>pipeline_cleaning/P26_PerParticipant_Flag_Rate.png</code></td>
+<td><code>pipeline_cleaning/F16.png</code></td>
 <td>Supplement</td>
 <td><code>sleep_visualization.R:2579</code></td>
 <td><a href="#p26-participants-worth-a-second-look">§9.2 · Participants
@@ -2073,7 +2073,7 @@ Worth a Second Look</a></td>
 </tr>
 <tr class="even">
 <td><strong>R25</strong></td>
-<td><code>research_ready/R25_Sleep_Regularity_Weekday_Weekend.png</code></td>
+<td><code>research_ready/F30.png</code></td>
 <td>Results</td>
 <td><code>sleep_visualization.R:3043</code></td>
 <td><a href="#r25-sleep-regularity--weekday-vs-weekend">§9.3 · Sleep
@@ -2082,7 +2082,7 @@ Regularity — Weekday vs Weekend</a></td>
 </tr>
 <tr class="odd">
 <td><strong>R26</strong></td>
-<td><code>research_ready/R26_Sleep_Composition_TIB_Breakdown.png</code></td>
+<td><code>research_ready/F31.png</code></td>
 <td>Results</td>
 <td><code>sleep_visualization.R:3096</code></td>
 <td><a href="#r26-sleep-composition--tib-breakdown">§9.3 · Sleep
@@ -2091,7 +2091,7 @@ Composition — TIB Breakdown</a></td>
 </tr>
 <tr class="even">
 <td><strong>R27</strong></td>
-<td><code>research_ready/R27_Sleep_Metrics_Correlation_Matrix.png</code></td>
+<td><code>research_ready/F32.png</code></td>
 <td>Results</td>
 <td><code>sleep_visualization.R:3125</code></td>
 <td><a href="#r27-sleep-metrics-correlation-matrix">§9.3 · Sleep Metrics
@@ -2204,9 +2204,8 @@ trail.</strong> Captions for every one of these are ready in §9.2 and
 <div class="section level4">
 <h4 id="pipeline-record-flow">01 · Pipeline Record Flow<a class="anchor" aria-label="anchor" href="#pipeline-record-flow"></a>
 </h4>
-<p><strong>File</strong>
-<code>pipeline_cleaning/01_Pipeline_Flow_Diagram.png</code> — generated
-at <code>sleep_visualization.R:862</code></p>
+<p><strong>File</strong> <code>pipeline_cleaning/F01.png</code> —
+generated at <code>sleep_visualization.R:862</code></p>
 <p><strong>Paper use</strong> Methods Fig 1</p>
 <p><strong>What each part means</strong> Vertical flow of 5 stages, each
 self-describing: Raw Load (all diary entries) → Parsed (entries with
@@ -2332,8 +2331,7 @@ time; SOL = sleep onset latency.</p>
 <div class="section level4">
 <h4 id="sleep-duration-post-correction">06 · Sleep Duration Post-Correction<a class="anchor" aria-label="anchor" href="#sleep-duration-post-correction"></a>
 </h4>
-<p><strong>File</strong>
-<code>pipeline_cleaning/06_Sleep_Duration_Post_Correction.png</code> —
+<p><strong>File</strong> <code>pipeline_cleaning/F02.png</code> —
 generated at <code>sleep_visualization.R:1339</code></p>
 <p><strong>Paper use</strong> Supplement</p>
 <p><strong>What each part means</strong> Density curves of final sleep
@@ -2365,7 +2363,7 @@ its own, not folded into Unusual. A record that was manually corrected
 is shown as Manually Corrected, whatever its original class.</li>
 <li>
 <strong>What it is for.</strong> To check that human corrections did
-not distort the overall distribution: compare with Figure 14, which
+not distort the overall distribution: compare with Figure 10, which
 shows the same kind of curve before any manual correction.</li>
 </ul></details><p><strong>FAQ</strong></p>
 <details><summary>
@@ -2399,8 +2397,7 @@ centered on 6–8 h indicate healthy sleep durations; spikes at zero or
 <div class="section level4">
 <h4 id="flag-composition-stacked">07 · Flag Composition Stacked<a class="anchor" aria-label="anchor" href="#flag-composition-stacked"></a>
 </h4>
-<p><strong>File</strong>
-<code>pipeline_cleaning/07_Flag_Composition_Stacked.png</code> —
+<p><strong>File</strong> <code>pipeline_cleaning/F03.png</code> —
 generated at <code>sleep_visualization.R:1404</code></p>
 <p><strong>Paper use</strong> Supplement</p>
 <p><strong>What each part means</strong> Stacked histogram: x = sleep
@@ -2461,7 +2458,7 @@ this page.</li>
 </ul></details><p><strong>FAQ</strong></p>
 <details><summary>
 So this is about computed-metric flags, not timestamp errors?
-</summary><p>Correct. Figure 13 is about timestamp and format problems; Figure 7
+</summary><p>Correct. Figure 6 is about timestamp and format problems; Figure 7
 shows how many metric flags occur at each sleep duration. They are two
 different systems (<code>flag_severity</code> versus
 <code>data_category</code>).</p>
@@ -2489,9 +2486,8 @@ extreme durations.</p>
 <div class="section level4">
 <h4 id="extreme-sleep-durations">10 · Extreme Sleep Durations<a class="anchor" aria-label="anchor" href="#extreme-sleep-durations"></a>
 </h4>
-<p><strong>File</strong>
-<code>pipeline_cleaning/10_Extreme_Sleep_Duration.png</code> — generated
-at <code>sleep_visualization.R:1514</code></p>
+<p><strong>File</strong> <code>pipeline_cleaning/F04.png</code> —
+generated at <code>sleep_visualization.R:1514</code></p>
 <p><strong>Paper use</strong> Supplement</p>
 <p><strong>What each part means</strong> Scatter: x = TST (h), y = sleep
 efficiency (%), restricted to extreme durations (&lt; 4 h or &gt; 10
@@ -2571,8 +2567,7 @@ poor-efficiency threshold.</p>
 <div class="section level4">
 <h4 id="flag-co-occurrence-heatmap">11 · Flag Co-occurrence Heatmap<a class="anchor" aria-label="anchor" href="#flag-co-occurrence-heatmap"></a>
 </h4>
-<p><strong>File</strong>
-<code>pipeline_cleaning/11_Flag_Cooccurrence_Heatmap.png</code> —
+<p><strong>File</strong> <code>pipeline_cleaning/F05.png</code> —
 generated at <code>sleep_visualization.R:1571</code></p>
 <p><strong>Paper use</strong> Supplement</p>
 <p><strong>What each part means</strong> Heatmap of how often two
@@ -2683,7 +2678,7 @@ printed number for the exact count.</li>
 <li>
 <strong>Flags not used.</strong> <code>flag_duration_extreme</code>
 and the three-level <code>flag_severity</code> label (Clean/Minor/Major,
-Figure 07) are not part of this figure: neither is a plain TRUE/FALSE
+Figure 3) are not part of this figure: neither is a plain TRUE/FALSE
 flag that can be counted in pairs.</li>
 <li>
 <strong>When it is skipped.</strong> If fewer than two of the four
@@ -2757,8 +2752,7 @@ error classifications.</p>
 <div class="section level4">
 <h4 id="error-category-distribution">13 · Error Category Distribution<a class="anchor" aria-label="anchor" href="#error-category-distribution"></a>
 </h4>
-<p><strong>File</strong>
-<code>pipeline_cleaning/13_Error_Category_Distribution.png</code> —
+<p><strong>File</strong> <code>pipeline_cleaning/F06.png</code> —
 generated at <code>sleep_visualization.R:1794</code></p>
 <p><strong>Paper use</strong> Supplement</p>
 <p><strong>What each part means</strong> Bar chart of auto-detection
@@ -2794,7 +2788,7 @@ example SELF_REPORTED_FLAG, CLEAN).</li>
 <details><summary>
 Why is it called “pre-correction”?
 </summary><p>It answers “what did the raw data contain that needed attention?” —
-the load the pipeline had to absorb. Figure 18 shows what is still
+the load the pipeline had to absorb. Figure 14 shows what is still
 flagged afterwards.</p>
 </details><details><summary>
 Does a record in a bar mean the record is wrong?
@@ -2828,8 +2822,7 @@ to absorb.</p>
 <div class="section level4">
 <h4 id="b-adjacent-timestamp-gaps">13B · Adjacent Timestamp Gaps<a class="anchor" aria-label="anchor" href="#b-adjacent-timestamp-gaps"></a>
 </h4>
-<p><strong>File</strong>
-<code>pipeline_cleaning/13B_Adjacent_Timestamp_Gaps.png</code> —
+<p><strong>File</strong> <code>pipeline_cleaning/F07.png</code> —
 generated at <code>sleep_visualization.R:1877</code></p>
 <p><strong>Paper use</strong> Supplement</p>
 <p><strong>What each part means</strong> Histogram of gap hours between
@@ -2932,8 +2925,7 @@ order errors and 12 h AM/PM dial habits.</p>
 <div class="section level4">
 <h4 id="c-detection-outcomes-heatmap">13C · Detection Outcomes Heatmap<a class="anchor" aria-label="anchor" href="#c-detection-outcomes-heatmap"></a>
 </h4>
-<p><strong>File</strong>
-<code>pipeline_cleaning/13C_Detection_Outcomes_Heatmap.png</code> —
+<p><strong>File</strong> <code>pipeline_cleaning/F08.png</code> —
 generated at <code>sleep_visualization.R:1936</code></p>
 <p><strong>Paper use</strong> Supplement</p>
 <p><strong>What each part means</strong> A heatmap from the synthetic
@@ -3015,8 +3007,7 @@ type’s rows with that outcome.</p>
 <div class="section level4">
 <h4 id="d-threshold-vs-measurement-noise">13D · Threshold vs Measurement Noise<a class="anchor" aria-label="anchor" href="#d-threshold-vs-measurement-noise"></a>
 </h4>
-<p><strong>File</strong>
-<code>pipeline_cleaning/13D_Threshold_vs_Noise_Ratio.png</code> —
+<p><strong>File</strong> <code>pipeline_cleaning/F09.png</code> —
 generated at <code>sleep_visualization.R:1980</code></p>
 <p><strong>Paper use</strong> Supplement</p>
 <p><strong>What each part means</strong> Horizontal bars, one for each
@@ -3084,8 +3075,7 @@ agreement between self-reported and computed values). Dashed lines mark
 <div class="section level4">
 <h4 id="sleep-duration-pre-correction">14 · Sleep Duration Pre-Correction<a class="anchor" aria-label="anchor" href="#sleep-duration-pre-correction"></a>
 </h4>
-<p><strong>File</strong>
-<code>pipeline_cleaning/14_Sleep_Duration_Pre_Correction.png</code> —
+<p><strong>File</strong> <code>pipeline_cleaning/F10.png</code> —
 generated at <code>sleep_visualization.R:2051</code></p>
 <p><strong>Paper use</strong> Supplement</p>
 <p><strong>What each part means</strong> Two overlaid density curves of
@@ -3138,9 +3128,8 @@ correction.</p>
 <div class="section level4">
 <h4 id="error-timeline">15 · Error Timeline<a class="anchor" aria-label="anchor" href="#error-timeline"></a>
 </h4>
-<p><strong>File</strong>
-<code>pipeline_cleaning/15_Error_Timeline.png</code> — generated at
-<code>sleep_visualization.R:2137</code></p>
+<p><strong>File</strong> <code>pipeline_cleaning/F11.png</code> —
+generated at <code>sleep_visualization.R:2137</code></p>
 <p><strong>Paper use</strong> Supplement</p>
 <p><strong>What each part means</strong> Stacked columns, one per month,
 counting records that carry a temporal classification from Step 5/6:
@@ -3201,9 +3190,8 @@ classification), by pattern type.</p>
 <div class="section level4">
 <h4 id="common-error-patterns">16 · Common Error Patterns<a class="anchor" aria-label="anchor" href="#common-error-patterns"></a>
 </h4>
-<p><strong>File</strong>
-<code>pipeline_cleaning/16_Common_Error_Patterns.png</code> — generated
-at <code>sleep_visualization.R:2228</code></p>
+<p><strong>File</strong> <code>pipeline_cleaning/F12.png</code> —
+generated at <code>sleep_visualization.R:2228</code></p>
 <p><strong>Paper use</strong> Supplement</p>
 <p><strong>What each part means</strong> Horizontal bars ranking the
 specific patterns found in the auto-detection review queue: temporal
@@ -3250,7 +3238,7 @@ out what they are.</p>
 </details><details><summary>
 Is this the same as Figure 13?
 </summary><p>They draw on the same flagged records but group them differently.
-Figure 13 groups by the kind of check; Figure 16 names the specific
+Figure 6 groups by the kind of check; Figure 12 names the specific
 pattern inside each message.</p>
 </details><p><strong>Paper caption</strong></p>
 <blockquote>
@@ -3263,9 +3251,8 @@ records that match no named pattern.</p>
 <div class="section level4">
 <h4 id="top-participants-by-flag-rate">17 · Top Participants by Flag Rate<a class="anchor" aria-label="anchor" href="#top-participants-by-flag-rate"></a>
 </h4>
-<p><strong>File</strong>
-<code>pipeline_cleaning/17_Top_Participants_Flags.png</code> — generated
-at <code>sleep_visualization.R:2307</code></p>
+<p><strong>File</strong> <code>pipeline_cleaning/F13.png</code> —
+generated at <code>sleep_visualization.R:2307</code></p>
 <p><strong>Paper use</strong> Supplement</p>
 <p><strong>What each part means</strong> Bar chart: top 15 participants
 by algorithm-flagged record RATE (flags ÷ days), with PID labels.</p>
@@ -3304,8 +3291,8 @@ Open that person’s raw entries and look at the pattern before deciding
 anything.</p>
 </details><details><summary>
 How is this different from Figure P26?
-</summary><p>Figure 17 ranks by automatic-check flags (algorithm only, before
-manual review). Figure P26 ranks by the final metric flags
+</summary><p>Figure 13 ranks by automatic-check flags (algorithm only, before
+manual review). Figure 12 ranks by the final metric flags
 (<code>flag_severity</code>) of the corrected data.</p>
 </details><p><strong>Paper caption</strong></p>
 <blockquote>
@@ -3318,8 +3305,7 @@ counts, so participants with few diary days are not overrepresented.</p>
 <div class="section level4">
 <h4 id="auto-detected-dashboard">18 · Auto-Detected Dashboard<a class="anchor" aria-label="anchor" href="#auto-detected-dashboard"></a>
 </h4>
-<p><strong>File</strong>
-<code>pipeline_cleaning/18_Auto_Detected_Dashboard.png</code> —
+<p><strong>File</strong> <code>pipeline_cleaning/F14.png</code> —
 generated at <code>sleep_visualization.R:2409</code></p>
 <p><strong>Paper use</strong> Supplement</p>
 <p><strong>What each part means</strong> Left text panel “Key Metrics”:
@@ -3358,10 +3344,10 @@ reaches zero only when every flagged record has been dealt with. The
 fixed.</p>
 </details><details><summary>
 What should I do if a slice is large?
-</summary><p>Open the matching card: a large Metrics slice points to Figure 13D
-(are the thresholds above the noise?), a large Amount/Input slice points
-to the substance-use coding (Figures 22–24), a large Temporal slice
-points to Figures 13B and 15.</p>
+</summary><p>Open the matching card: a large Metrics slice points to Figure 9 (are
+the thresholds above the noise?), a large Amount/Input slice points to
+the substance-use coding (Figures 22–24), a large Temporal slice points
+to Figures 13B and 15.</p>
 </details><details><summary>
 Why is there a pie when pies are hard to read?
 </summary><p>It has only a handful of slices and its job is to show one dominant
@@ -3379,9 +3365,8 @@ review-source classes. Counts must match
 <div class="section level4">
 <h4 id="a1-step-flag-ledger">A1 · Step Flag Ledger<a class="anchor" aria-label="anchor" href="#a1-step-flag-ledger"></a>
 </h4>
-<p><strong>File</strong>
-<code>pipeline_cleaning/A1_Step_Flag_Ledger.png</code> — generated at
-<code>figure12_step_flag_table.R:15</code></p>
+<p><strong>File</strong> <code>pipeline_cleaning/F15.png</code> —
+generated at <code>figure12_step_flag_table.R:15</code></p>
 <p><strong>Paper use</strong> Supplement</p>
 <p><strong>What each part means</strong> Grid table: one row per
 pipeline step; columns are N (records in the run), DC:error / DC:unusual
@@ -3439,7 +3424,7 @@ check’s summary (for example SELF_REPORTED_FLAG), which is the same
 table behind <code>correction_status_final.csv</code>. That summary is
 built before a person’s accepted rows are withdrawn, so it still counts
 them (85 in the real run), and it classifies the
-duration-reinterpretation flags as clean (39). Figure 13 counts the open
+duration-reinterpretation flags as clean (39). Figure 6 counts the open
 queue instead, which is why it shows 226 where this column shows 272.
 Steps before 8 show a dash because the check has not run yet.</p>
 </details><details><summary>
@@ -3459,8 +3444,7 @@ constant thereafter.</p>
 <div class="section level4">
 <h4 id="p26-participants-worth-a-second-look">P26 · Participants Worth a Second Look<a class="anchor" aria-label="anchor" href="#p26-participants-worth-a-second-look"></a>
 </h4>
-<p><strong>File</strong>
-<code>pipeline_cleaning/P26_PerParticipant_Flag_Rate.png</code> —
+<p><strong>File</strong> <code>pipeline_cleaning/F16.png</code> —
 generated at <code>sleep_visualization.R:2579</code></p>
 <p><strong>Paper use</strong> Supplement</p>
 <p><strong>What each part means</strong> A table (not a bar chart) of
@@ -3496,7 +3480,7 @@ shows the ones in force.</li>
 <li>
 <strong>If it is mostly SOL,</strong> remember that high SOL is
 calculated from the corrected bed and sleep times, not from the SOL the
-participant typed. Compare the two (the <a href="#id_11-flag-co-occurrence-heatmap">Figure 11 card</a> explains
+participant typed. Compare the two (the <a href="#id_11-flag-co-occurrence-heatmap">Figure 5 card</a> explains
 <code>flag_sleep_calculation_issue</code>). A large gap between them is
 usually a descriptive difference, not an error; keep it.</li>
 <li>
@@ -3549,7 +3533,7 @@ Why is nobody coloured in my figure?
 table is working as intended — there is no one who stands out.</p>
 </details><details><summary>
 How is this different from Figure 17?
-</summary><p>Figure 17 ranks by the automatic check’s flags before manual review;
+</summary><p>Figure 13 ranks by the automatic check’s flags before manual review;
 this table ranks by the final metric flags (<code>flag_severity</code>)
 of the corrected data.</p>
 </details><p><strong>Paper caption</strong></p>
@@ -3569,9 +3553,8 @@ wrong.</p>
 <div class="section level4">
 <h4 id="correction-impact">02 · Correction Impact<a class="anchor" aria-label="anchor" href="#correction-impact"></a>
 </h4>
-<p><strong>File</strong>
-<code>research_ready/02_Correction_Impact.png</code> — generated at
-<code>sleep_visualization.R:1013</code></p>
+<p><strong>File</strong> <code>research_ready/F17.png</code> — generated
+at <code>sleep_visualization.R:1013</code></p>
 <p><strong>Paper use</strong> Methods Fig 2</p>
 <p><strong>Purpose</strong> An audit of how much, and in which
 direction, corrections changed the data. It answers “how invasive was
@@ -3700,9 +3683,8 @@ were modified.</p>
 <div class="section level4">
 <h4 id="b-distribution-of-sleep-variables">02B · Distribution of Sleep Variables<a class="anchor" aria-label="anchor" href="#b-distribution-of-sleep-variables"></a>
 </h4>
-<p><strong>File</strong>
-<code>research_ready/02B_Distribution_Sleep_Variables.png</code> —
-generated at <code>sleep_visualization.R:1057</code></p>
+<p><strong>File</strong> <code>research_ready/F18.png</code> — generated
+at <code>sleep_visualization.R:1057</code></p>
 <p><strong>Paper use</strong> Results</p>
 <p><strong>What each part means</strong> Histograms + density curves for
 key sleep metrics (TST, SOL, WASO, SE) on the <strong>final
@@ -3762,9 +3744,8 @@ sleep time (TST), sleep onset latency (SOL), wake after sleep onset
 <div class="section level4">
 <h4 id="tst-distribution">03 · TST Distribution<a class="anchor" aria-label="anchor" href="#tst-distribution"></a>
 </h4>
-<p><strong>File</strong>
-<code>research_ready/03_Sleep_Duration_Distribution.png</code> —
-generated at <code>sleep_visualization.R:1108</code></p>
+<p><strong>File</strong> <code>research_ready/F19.png</code> — generated
+at <code>sleep_visualization.R:1108</code></p>
 <p><strong>Paper use</strong> Results</p>
 <p><strong>What each part means</strong> Histogram + density of total
 sleep time (TST — see Terminology, above).</p>
@@ -3825,7 +3806,7 @@ records with a computed TST.</li>
 </ul></details><p><strong>FAQ</strong></p>
 <details><summary>
 Why two distribution figures (02B and 03)?
-</summary><p>02B is a five-metric dashboard in small panels. Figure 03 isolates
+</summary><p>02B is a five-metric dashboard in small panels. Figure 19 isolates
 TST and marks the mean and median, which is the usual first figure for a
 paper.</p>
 </details><details><summary>
@@ -3853,9 +3834,8 @@ period minus WASO (TST = TIB − SOL − WASO).</p>
 <div class="section level4">
 <h4 id="sleep-duration-vs-time-in-bed">04 · Sleep Duration vs Time in Bed<a class="anchor" aria-label="anchor" href="#sleep-duration-vs-time-in-bed"></a>
 </h4>
-<p><strong>File</strong>
-<code>research_ready/04_Sleep_Duration_vs_Time_in_Bed.png</code> —
-generated at <code>sleep_visualization.R:1163</code></p>
+<p><strong>File</strong> <code>research_ready/F20.png</code> — generated
+at <code>sleep_visualization.R:1163</code></p>
 <p><strong>Paper use</strong> Results</p>
 <p><strong>What each part means</strong> Scatter of TIME IN BED (from
 getting into bed to getting out) vs SLEEP DURATION (time actually asleep
@@ -3918,9 +3898,8 @@ impossible.</p>
 <div class="section level4">
 <h4 id="b-sol-vs-sleep-duration">04B · SOL vs Sleep Duration<a class="anchor" aria-label="anchor" href="#b-sol-vs-sleep-duration"></a>
 </h4>
-<p><strong>File</strong>
-<code>research_ready/04B_SOL_vs_Sleep_Duration.png</code> — generated at
-<code>sleep_visualization.R:1215</code></p>
+<p><strong>File</strong> <code>research_ready/F21.png</code> — generated
+at <code>sleep_visualization.R:1215</code></p>
 <p><strong>Paper use</strong> Results</p>
 <p><strong>What each part means</strong> Scatter of SOL (how long it
 took to fall asleep after getting into bed) vs TST. Each dot = one diary
@@ -3977,9 +3956,8 @@ clinical pattern.</p>
 <div class="section level4">
 <h4 id="variability-of-sleep-variables">05 · Variability of Sleep Variables<a class="anchor" aria-label="anchor" href="#variability-of-sleep-variables"></a>
 </h4>
-<p><strong>File</strong>
-<code>research_ready/05_Variability_Sleep_Variables.png</code> —
-generated at <code>sleep_visualization.R:1265</code></p>
+<p><strong>File</strong> <code>research_ready/F22.png</code> — generated
+at <code>sleep_visualization.R:1265</code></p>
 <p><strong>Paper use</strong> Results</p>
 <p><strong>What each part means</strong> Violin plots + inner boxplots,
 one per sleep variable, <strong>free Y axis per panel</strong>. Shows
@@ -4015,7 +3993,7 @@ of the data.</p>
 A violin has two bulges. What does that mean?
 </summary><p>Two groups of behaviour are mixed together — for example weekday
 versus weekend, or a mix of 12-hour and 24-hour time entries. Check
-Figure R25 or the parsing before trusting a single summary number.</p>
+Figure 30 or the parsing before trusting a single summary number.</p>
 </details><details><summary>
 Why is there a long thin line at the top or bottom?
 </summary><p>A few extreme records stretch the range. The thin line is those
@@ -4031,9 +4009,8 @@ compared by distribution shape, not absolute values.</p>
 <div class="section level4">
 <h4 id="bedtime-vs-get-up-distribution">09 · Bedtime vs Get-up Distribution<a class="anchor" aria-label="anchor" href="#bedtime-vs-get-up-distribution"></a>
 </h4>
-<p><strong>File</strong>
-<code>research_ready/09_Bedtime_vs_Getup_Distribution.png</code> —
-generated at <code>sleep_visualization.R:1458</code></p>
+<p><strong>File</strong> <code>research_ready/F23.png</code> — generated
+at <code>sleep_visualization.R:1458</code></p>
 <p><strong>Paper use</strong> Results</p>
 <p><strong>What each part means</strong> Two density curves over
 hour-of-day (0–24): bedtime distribution vs get-up distribution (final
@@ -4070,7 +4047,7 @@ that turned an evening time into a morning time. Compare with Figure
 13B.</p>
 </details><details><summary>
 Is this the same as the weekday/weekend figure?
-</summary><p>No. This figure pools all days; Figure R25 splits by weekday and
+</summary><p>No. This figure pools all days; Figure 30 splits by weekday and
 weekend.</p>
 </details><p><strong>Paper caption</strong></p>
 <blockquote>
@@ -4083,9 +4060,8 @@ morning get-ups) is the healthy circadian signature.</p>
 <div class="section level4">
 <h4 id="sol-perception-bias">20 · SOL Perception Bias<a class="anchor" aria-label="anchor" href="#sol-perception-bias"></a>
 </h4>
-<p><strong>File</strong>
-<code>research_ready/20_SOL_Perception_Bias.png</code> — generated at
-<code>sleep_visualization.R:2637</code></p>
+<p><strong>File</strong> <code>research_ready/F24.png</code> — generated
+at <code>sleep_visualization.R:2637</code></p>
 <p><strong>Paper use</strong> Results</p>
 <p><strong>Note:</strong> this figure measures something
 <em>different</em> from the SOL duration range in the quick reference
@@ -4160,9 +4136,8 @@ minutes.</p>
 <div class="section level4">
 <h4 id="b-waso-perception-bias">20B · WASO Perception Bias<a class="anchor" aria-label="anchor" href="#b-waso-perception-bias"></a>
 </h4>
-<p><strong>File</strong>
-<code>research_ready/20B_WASO_Perception_Bias.png</code> — generated at
-<code>sleep_visualization.R:2695</code></p>
+<p><strong>File</strong> <code>research_ready/F25.png</code> — generated
+at <code>sleep_visualization.R:2695</code></p>
 <p><strong>Paper use</strong> Results</p>
 <p><strong>What each part means</strong> Histogram of the absolute
 difference between two different quantities: the self-reported nighttime
@@ -4222,9 +4197,8 @@ self-reported nighttime wakefulness, in minutes.</p>
 <div class="section level4">
 <h4 id="substance-use-availability">21 · Substance Use Availability<a class="anchor" aria-label="anchor" href="#substance-use-availability"></a>
 </h4>
-<p><strong>File</strong>
-<code>research_ready/21_Substance_Use_Availability.png</code> —
-generated at <code>sleep_visualization.R:2767</code></p>
+<p><strong>File</strong> <code>research_ready/F26.png</code> — generated
+at <code>sleep_visualization.R:2767</code></p>
 <p><strong>Paper use</strong> Supplement</p>
 <p><strong>What each part means</strong> Bar chart: % of records with
 data per substance (caffeine, alcohol, nicotine, cannabis).</p>
@@ -4275,9 +4249,8 @@ completely each substance domain was reported.</p>
 <div class="section level4">
 <h4 id="substance-use-value-distribution">22 · Substance Use Value Distribution<a class="anchor" aria-label="anchor" href="#substance-use-value-distribution"></a>
 </h4>
-<p><strong>File</strong>
-<code>research_ready/22_Substance_Use_Distribution.png</code> —
-generated at <code>sleep_visualization.R:2870</code></p>
+<p><strong>File</strong> <code>research_ready/F27.png</code> — generated
+at <code>sleep_visualization.R:2870</code></p>
 <p><strong>Paper use</strong> Supplement</p>
 <p><strong>What each part means</strong> Boxplots (box = middle 50% of
 reports; line inside = median) with <strong>gray dots</strong> — each
@@ -4331,9 +4304,8 @@ nicotine and cannabis = doses.</p>
 <div class="section level4">
 <h4 id="caffeine-consumption">23 · Caffeine Consumption<a class="anchor" aria-label="anchor" href="#caffeine-consumption"></a>
 </h4>
-<p><strong>File</strong>
-<code>research_ready/23_Caffeine_Consumption.png</code> — generated at
-<code>sleep_visualization.R:2944</code></p>
+<p><strong>File</strong> <code>research_ready/F28.png</code> — generated
+at <code>sleep_visualization.R:2944</code></p>
 <p><strong>Paper use</strong> Supplement</p>
 <p><strong>What each part means</strong> Bar chart, <strong>one bar per
 distinct reported value</strong> (0, 1/3, 1/2, 1, 1 1/2, … cups/day —
@@ -4394,9 +4366,8 @@ expected; spikes at implausible values indicate unit confusion.</p>
 <div class="section level4">
 <h4 id="alcohol-consumption">24 · Alcohol Consumption<a class="anchor" aria-label="anchor" href="#alcohol-consumption"></a>
 </h4>
-<p><strong>File</strong>
-<code>research_ready/24_Alcohol_Consumption.png</code> — generated at
-<code>sleep_visualization.R:2979</code></p>
+<p><strong>File</strong> <code>research_ready/F29.png</code> — generated
+at <code>sleep_visualization.R:2979</code></p>
 <p><strong>Paper use</strong> Supplement</p>
 <p><strong>What each part means</strong> Bar chart, one bar per distinct
 reported value (drinks/day), same discrete construction as Figure 23;
@@ -4448,9 +4419,8 @@ consumption (standard drinks/day).</p>
 <div class="section level4">
 <h4 id="r25-sleep-regularity-weekday-vs-weekend">R25 · Sleep Regularity — Weekday vs Weekend<a class="anchor" aria-label="anchor" href="#r25-sleep-regularity-weekday-vs-weekend"></a>
 </h4>
-<p><strong>File</strong>
-<code>research_ready/R25_Sleep_Regularity_Weekday_Weekend.png</code> —
-generated at <code>sleep_visualization.R:3043</code></p>
+<p><strong>File</strong> <code>research_ready/F30.png</code> — generated
+at <code>sleep_visualization.R:3043</code></p>
 <p><strong>Paper use</strong> Results</p>
 <p><strong>What each part means</strong> Two side-by-side panels —
 <strong>left = Bedtime, right = Get-up Time</strong> (bold labels on
@@ -4523,9 +4493,8 @@ jetlag.</p>
 <div class="section level4">
 <h4 id="r26-sleep-composition-tib-breakdown">R26 · Sleep Composition — TIB Breakdown<a class="anchor" aria-label="anchor" href="#r26-sleep-composition-tib-breakdown"></a>
 </h4>
-<p><strong>File</strong>
-<code>research_ready/R26_Sleep_Composition_TIB_Breakdown.png</code> —
-generated at <code>sleep_visualization.R:3096</code></p>
+<p><strong>File</strong> <code>research_ready/F31.png</code> — generated
+at <code>sleep_visualization.R:3096</code></p>
 <p><strong>Paper use</strong> Results</p>
 <p><strong>What each part means</strong> Stacked bar of Time in Bed
 composition; the figure subtitle defines every abbreviation: TIB = TST
@@ -4581,9 +4550,8 @@ construction. Healthy composition places TST at 80–90% of TIB.</p>
 <div class="section level4">
 <h4 id="r27-sleep-metrics-correlation-matrix">R27 · Sleep Metrics Correlation Matrix<a class="anchor" aria-label="anchor" href="#r27-sleep-metrics-correlation-matrix"></a>
 </h4>
-<p><strong>File</strong>
-<code>research_ready/R27_Sleep_Metrics_Correlation_Matrix.png</code> —
-generated at <code>sleep_visualization.R:3125</code></p>
+<p><strong>File</strong> <code>research_ready/F32.png</code> — generated
+at <code>sleep_visualization.R:3125</code></p>
 <p><strong>Paper use</strong> Results</p>
 <p><strong>What each part means</strong> Corrplot upper-triangle of
 pairwise Pearson correlations among TST, SOL, WASO, SE, TIB (final
