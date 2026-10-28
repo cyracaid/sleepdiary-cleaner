@@ -32,7 +32,7 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 <li><a href="#s-6">6. 回归检查（对比上次运行）</a></li>
 <li><a href="#s-7">7. 快速检查卡</a></li>
 <li><a href="#s-8">8. 如何看图</a></li>
-<li><a href="#s-9">9. 逐图参考</a><ul><li><a href="#s-9-1">9.1 图索引</a></li><li><details><summary><a href="#s-9-2">9.2 管线清洗图卡片（<code>pipeline_cleaning/</code>）（15 张）</a></summary><ul><li><a href="#c-01">01 · 管线记录流</a></li><li><a href="#c-06">06 · 修正后睡眠时长</a></li><li><a href="#c-07">07 · 标记构成堆叠图</a></li><li><a href="#c-10">10 · 极端睡眠时长</a></li><li><a href="#c-13">13 · 错误类别分布</a></li><li><a href="#c-13b">13B · 相邻时间戳间隔</a></li><li><a href="#c-13c">13C · 检测结果热力图</a></li><li><a href="#c-13d">13D · 阈值 vs 测量噪声</a></li><li><a href="#c-14">14 · 修正前睡眠时长</a></li><li><a href="#c-15">15 · 错误时间线</a></li><li><a href="#c-16">16 · 常见错误模式</a></li><li><a href="#c-17">17 · 标记率最高的参与者</a></li><li><a href="#c-18">18 · 自动检测仪表板</a></li><li><a href="#c-a1">A1 · 逐步标记账本</a></li><li><a href="#c-p26">P26 · 值得二次检查的参与者</a></li></ul></details></li><li><details><summary><a href="#s-9-3">9.3 研究结果图卡片（<code>research_ready/</code>）（16 张）</a></summary><ul><li><a href="#c-02">02 · 修正影响</a></li><li><a href="#c-02b">02B · 睡眠变量分布</a></li><li><a href="#c-03">03 · TST 分布</a></li><li><a href="#c-04">04 · 睡眠时长 vs 卧床时间</a></li><li><a href="#c-04b">04B · SOL vs 睡眠时长</a></li><li><a href="#c-05">05 · 睡眠变量的变异性</a></li><li><a href="#c-09">09 · 就寝 vs 起床时间分布</a></li><li><a href="#c-20">20 · SOL 感知偏差</a></li><li><a href="#c-20b">20B · WASO 感知偏差</a></li><li><a href="#c-21">21 · 物质使用数据可得性</a></li><li><a href="#c-22">22 · 物质使用数值分布</a></li><li><a href="#c-23">23 · 咖啡因摄入</a></li><li><a href="#c-24">24 · 酒精摄入</a></li><li><a href="#c-r25">R25 · 睡眠规律性——工作日 vs 周末</a></li><li><a href="#c-r26">R26 · 睡眠构成——TIB 拆分</a></li><li><a href="#c-r27">R27 · 睡眠指标相关矩阵</a></li></ul></details></li></ul></li>
+<li><a href="#s-9">9. 逐图参考</a><ul><li><a href="#s-9-1">9.1 图索引</a><ul><li><a href="#s-9-1-naming">图是怎么编号的，为什么有些编号缺失</a></li></ul></li><li><details><summary><a href="#s-9-2">9.2 管线清洗图卡片（<code>pipeline_cleaning/</code>）（16 张）</a></summary><ul><li><a href="#c-01">01 · 管线记录流</a></li><li><a href="#c-06">06 · 修正后睡眠时长</a></li><li><a href="#c-07">07 · 标记构成堆叠图</a></li><li><a href="#c-10">10 · 极端睡眠时长</a></li><li><a href="#c-11">11 · 标记共现图</a></li><li><a href="#c-13">13 · 错误类别分布</a></li><li><a href="#c-13b">13B · 相邻时间戳间隔</a></li><li><a href="#c-13c">13C · 检测结果热力图</a></li><li><a href="#c-13d">13D · 阈值 vs 测量噪声</a></li><li><a href="#c-14">14 · 修正前睡眠时长</a></li><li><a href="#c-15">15 · 错误时间线</a></li><li><a href="#c-16">16 · 常见错误模式</a></li><li><a href="#c-17">17 · 标记率最高的参与者</a></li><li><a href="#c-18">18 · 自动检测仪表板</a></li><li><a href="#c-a1">A1 · 逐步标记账本</a></li><li><a href="#c-p26">P26 · 值得二次检查的参与者</a></li></ul></details></li><li><details><summary><a href="#s-9-3">9.3 研究结果图卡片（<code>research_ready/</code>）（16 张）</a></summary><ul><li><a href="#c-02">02 · 修正影响</a></li><li><a href="#c-02b">02B · 睡眠变量分布</a></li><li><a href="#c-03">03 · TST 分布</a></li><li><a href="#c-04">04 · 睡眠时长 vs 卧床时间</a></li><li><a href="#c-04b">04B · SOL vs 睡眠时长</a></li><li><a href="#c-05">05 · 睡眠变量的变异性</a></li><li><a href="#c-09">09 · 就寝 vs 起床时间分布</a></li><li><a href="#c-20">20 · SOL 感知偏差</a></li><li><a href="#c-20b">20B · WASO 感知偏差</a></li><li><a href="#c-21">21 · 物质使用数据可得性</a></li><li><a href="#c-22">22 · 物质使用数值分布</a></li><li><a href="#c-23">23 · 咖啡因摄入</a></li><li><a href="#c-24">24 · 酒精摄入</a></li><li><a href="#c-r25">R25 · 睡眠规律性——工作日 vs 周末</a></li><li><a href="#c-r26">R26 · 睡眠构成——TIB 拆分</a></li><li><a href="#c-r27">R27 · 睡眠指标相关矩阵</a></li></ul></details></li></ul></li>
 </ul>
 </nav>
 
@@ -474,7 +474,7 @@ identical(old$n_clean_last, new$n_clean_last)
 
 | 项目 | 是什么 | 什么时候看 |
 |------|--------|------------|
-| `pipeline_cleaning/` | 14 张诊断图：流水线发现了什么、改了什么（卡片见 §9.2）| 检查清洗是否正常；补充材料的审计链 |
+| `pipeline_cleaning/` | 16 张诊断图：流水线发现了什么、改了什么（卡片见 §9.2）| 检查清洗是否正常；补充材料的审计链 |
 | `research_ready/` | 16 张面向论文的图：睡眠指标、感知偏差、物质使用（卡片见 §9.3）| 为 Results 选图 |
 | `figure_index.png` | 全部图的总览。顶部红色块列出被跳过的图及原因 | 运行后先看这个 |
 | `all_figures_review.pdf` | 每页一张图，按生成顺序，与 PNG 同尺寸 | 快速翻看全部图，或发给研究团队内的合作者 |
@@ -509,6 +509,7 @@ identical(old$n_clean_last, new$n_clean_last)
 | **07** | `pipeline_cleaning/07_Flag_Composition_Stacked.png` | Supplement | `sleep_visualization.R:1404` | [§9.2 · 标记构成堆叠图](#c-07) | 2026-09-25 |
 | **09** | `research_ready/09_Bedtime_vs_Getup_Distribution.png` | Results | `sleep_visualization.R:1458` | [§9.3 · 就寝 vs 起床时间分布](#c-09) | 2026-09-25 |
 | **10** | `pipeline_cleaning/10_Extreme_Sleep_Duration.png` | Supplement | `sleep_visualization.R:1514` | [§9.2 · 极端睡眠时长](#c-10) | 2026-09-25 |
+| **11** | `pipeline_cleaning/11_Flag_Cooccurrence_Heatmap.png` | Supplement | `sleep_visualization.R:1571` | [§9.2 · 标记共现图](#c-11) | 2026-10-23 |
 | **13** | `pipeline_cleaning/13_Error_Category_Distribution.png` | Supplement | `sleep_visualization.R:1794` | [§9.2 · 错误类别分布](#c-13) | 2026-09-25 |
 | **13B** | `pipeline_cleaning/13B_Adjacent_Timestamp_Gaps.png` | Supplement | `sleep_visualization.R:1877` | [§9.2 · 相邻时间戳间隔](#c-13b) | 2026-09-25 |
 | **13C** | `pipeline_cleaning/13C_Detection_Outcomes_Heatmap.png` | Supplement | `sleep_visualization.R:1936` | [§9.2 · 检测结果热力图](#c-13c) | 2026-09-25 |
@@ -530,8 +531,18 @@ identical(old$n_clean_last, new$n_clean_last)
 | **R26** | `research_ready/R26_Sleep_Composition_TIB_Breakdown.png` | Results | `sleep_visualization.R:3096` | [§9.3 · 睡眠构成——TIB 拆分](#c-r26) | 2026-09-25 |
 | **R27** | `research_ready/R27_Sleep_Metrics_Correlation_Matrix.png` | Results | `sleep_visualization.R:3125` | [§9.3 · 睡眠指标相关矩阵](#c-r27) | 2026-09-25 |
 
-`11`（标记共现图）在完整数据的标记列少于两列时跳过，原因会写在
+`11`（标记共现图，见[下方卡片](#c-11)）在完整数据的标记列少于两列、或没有任何一对标记同时出现时跳过，原因会写在
 `figure_index.png` 顶部的红色区块里。`14`、`15`、`16` 在有东西可画时都会生成（见下面的卡片）；某次运行确实没东西可展示时（例如待审队列已清空，因为一切都已审查过），跳过原因会明确说明。
+
+<a id="s-9-1-naming"></a>
+
+#### 图是怎么编号的，为什么有些编号缺失
+
+- **编号跟着数据来源走，不跟文件夹走。** 01 到 24 的编号来自最初那一个可视化脚本，脚本开头按数据来源把它们分组：1 到 12 用修正后的数据，13 到 18 用修正前的自动检测结果，19 到 24 用检测汇总加修正后的数据。它们和输出文件夹对不上：02 和 03 在 `research_ready/`，06 和 07 在 `pipeline_cleaning/`。
+- **编号后面的字母（02B、04B、13B、13C、13D、20B）表示伴随图**，放在同编号的图旁边，这样后面的编号不用挪动。04B 和 20B 在首个版本（2026-07-15）里就有；13B、13C、13D 于 2026-09-07 加入；02B 于 2026-09-15 从重复的第二个"Figure 2"改标而来，以消除重复标题。
+- **A1、P26、R25、R26、R27 是遗留标识**，原样保留，免得改代码；它们不按数字顺序排。项目的图树提案（`VISUALIZATION_TREE_PROPOSAL.md`）记录了不重命名它们的决定。这些字母代表什么没有文档记载，所以本页不去猜。可以确定的是：R25 到 R27 在 `research_ready/`，A1 和 P26 在 `pipeline_cleaning/`。
+- **缺失的编号不是遗漏。** 08 被移除了（代码注释说，类别不均衡时它会退化成一把小提琴）。12 并入了 A1 逐步标记账本。19 并入了 13，13 的表格已经显示同样的划分。相关代码注释在 `inst/scripts/sleep_visualization.R` 中，位于 "Figure 8: REMOVED"、"Figure 12 MERGED INTO STEP FLAG LEDGER" 和 "Figure 19 FOLDED INTO FIGURE 13" 附近。08、12、19 都没有对应的文件。
+- **文件名保持不变。** 重命名会牵动代码、图索引的登记表，以及你自己读取这些文件的脚本。提案还建议用分层的显示编号（例如 "1.2-13"）作为图注前缀；那只是提案，没有实现：`figure_index.png` 给每张缩略图标的是文件名加一句简短说明，上面这些编号是唯一在用的编号。
 
 > **仅供参考。** 下面的建议只是一个起点，不是规定；具体选哪些图取决于你论文要讲的内容和期刊的限制。
 
@@ -544,7 +555,7 @@ identical(old$n_clean_last, new$n_clean_last)
   （相关矩阵）如果你引用了指标之间的相互关系。正文里最好不要超过五张——
   其余的放进补充材料里读起来更舒服。
 - **补充材料（其余全部）。** 所有 `pipeline_cleaning/` 图（13、13B、
-  13C、13D、17、18、A1、P26、06、07、10）构成审计轨迹：把它们放进一个标题为"数据质量与清洗审计"的补充材料里，在 Methods 里用一句话统一引用（"完整审计轨迹见补充材料 S1"）。物质使用相关的图（21–24）跟着论文报告的物质使用分析走，没有的话也放补充材料。
+  13C、13D、17、18、A1、P26、06、07、10、11）构成审计轨迹：把它们放进一个标题为"数据质量与清洗审计"的补充材料里，在 Methods 里用一句话统一引用（"完整审计轨迹见补充材料 S1"）。物质使用相关的图（21–24）跟着论文报告的物质使用分析走，没有的话也放补充材料。
 
 如果篇幅紧张，最简版：**Methods 里放 01 + 02，Results 里放 03 + 20 +
 R27，其余进补充材料的审计轨迹部分。** 每一张的图注都已经写好，在下面
@@ -809,6 +820,99 @@ Quality"。展示质量问题是否集中在极端时长处。
 
 > **Figure 10.** 总睡眠时间（TST，小时）对睡眠效率（SE，%）的散点图，限制在极端时长（< 4 h 短，> 10 h 长）。点的形状编码短/长睡眠；点的颜色编码记录质量。水平线标出 SE = 85% 的低效率阈值。
 
+<a id="c-11"></a>
+
+#### 11 · 标记共现图
+
+**文件** `pipeline_cleaning/11_Flag_Cooccurrence_Heatmap.png` — 生成于 `sleep_visualization.R:1571`
+
+**论文用途** Supplement
+
+**每部分是什么意思** 热力图，显示两个质量标记在同一条记录上同时出现的频率，基于最终修正后的数据。两条轴列出同样的四个标记；每个格子是两个标记都为 TRUE 的记录数，数字写在格子里，颜色随计数增大由浅变红（平方根刻度，图例为"Co-occurrence Count"）。
+
+| 轴标签 | 标记 | 触发条件 |
+|---|---|---|
+| `poor_efficiency` | `flag_poor_efficiency` | 睡眠效率低于 `classification.flag_severity.poor_efficiency_threshold_pct`（默认 70%）|
+| `high_sol` | `flag_high_sol` | 入睡潜伏期高于 `classification.flag_severity.high_sol_threshold_hours`（默认 1 小时）|
+| `high_waso` | `flag_high_waso` | 睡后觉醒高于 `classification.flag_severity.high_waso_threshold_hours`（默认 1.5 小时）|
+| `sleep_calculation_issue` | `flag_sleep_calculation_issue` | 计算得到的入睡潜伏期与自评的入睡潜伏期相差超过 30 分钟 |
+
+**数字从哪来** 并不是每个标记都基于同一类数值，读图时要注意：
+
+- `high_sol` 用的是**计算得到的** SOL，不是自评的：用修正后的上床时间和修正后的入睡时间，`time_sleep_corrected − time_bed_corrected`，换算成分钟后再除以 60。
+- `high_waso` 用的是**自评的** WASO 估计值（参与者填写的分钟数，除以 60）。
+- `sleep_calculation_issue` 比较计算 SOL 与自评 SOL，是唯一看两者差距的标记。
+
+**怎么读一个格子** 在两条轴上找到两个标记，读格子里的数字。例如 `high_sol` 与 `sleep_calculation_issue` 交叉的格子，数的是既有较长的计算 SOL、又与参与者自己填的 SOL 对不上的记录。这些记录最值得先看，因为长 SOL 可能来自时间戳问题，而不是真的入睡慢。每一对都出现两次（见精确规则），读哪一份都行。
+
+有两个问题常被问到，下面的常见问题有完整回答：[高 SOL 是自评的还是计算的？](#fig11-q-sol)以及 [`sleep_calculation_issue` 是什么意思？](#fig11-q-calc)
+
+**健康外观** 大多数格子颜色很浅或没有，也没有哪一对特别突出。出现少数中等深度的格子是正常的：计算出的入睡潜伏期很长会拉低睡眠效率，计算 SOL 与自评 SOL 差距很大，也自然会伴随高 SOL 标记。
+
+**异常 →** 某一格明显比其他格深得多，或多数组合同时偏深，说明同一个原因同时触发了多个标记（常见于许多记录共有的时间戳问题，或阈值本身就互相重叠）。去看深色格子背后的记录，先从 `high_sol` × `sleep_calculation_issue` 看起。
+
+<details>
+<summary><strong>精确规则</strong></summary>
+
+- **数的是什么。** 只使用四个标记列都有非缺失值的记录（`complete.cases`）。每个格子是这些记录中两个标记都为 TRUE 的条数。
+- **对称矩阵。** A 与 B 的计数等于 B 与 A 的计数，所以每一对都画了两次（对角线两侧各一次），读一侧即可。对角线（标记与自己）不画。
+- **空白格子。** 计数为 0 的组合不画，而不是画成一个 0 的格子。空白表示"从未同时出现"，不是"缺失"。
+- **颜色刻度。** 平方根刻度，避免少数很大的计数把小计数压平。颜色只能粗略比较；确切数量请读格子里的数字。
+- **数据来源。** 最终修正后的数据（`clean_df`），与图 07、图 10 同源。
+- **没有使用的标记。** `flag_duration_extreme` 和三级的 `flag_severity` 标签（Clean/Minor/Major，见图 07）不在这张图里：它们都不是可以两两计数的普通 TRUE/FALSE 标记。
+- **何时跳过。** 四个标记列中完整数据少于两列，或没有任何一对标记在同一条记录上同时出现，这张图就不画，原因会写在 `figure_index.png` 的红色区块里。
+
+</details>
+
+**常见问题**
+
+<a id="fig11-q-sol"></a>
+
+<details>
+<summary>这里的"高 SOL"是自评的还是计算的？</summary>
+
+**计算的。** `flag_high_sol` 用的是 `sol_h = self_diffcalc_sol_minutes / 60`，其中 `self_diffcalc_sol_minutes` 是修正后的入睡时间减去修正后的上床时间（分钟）。参与者自己填的 SOL（`duration_totalmin_sol_estimate_am_mincalc`）**不**用于这个标记，只通过 `sleep_calculation_issue` 进入这张图，该标记比较的就是两者。相反，`flag_high_waso` 用的是自评的 WASO 估计值。
+
+不要把它和第 8 步的 `SELF_REPORTED_FLAG`（文件 `flagged_records_self_reported.csv`）混淆。那是另一个标记：标出自评数值看起来不合理的记录，例如自评 SOL 超过 120 分钟（或 TST/TIB 比值很低）。它不属于这张图。
+
+</details>
+
+<a id="fig11-q-calc"></a>
+
+<details>
+<summary>sleep_calculation_issue 是什么意思？</summary>
+
+当计算 SOL 与自评 SOL 相差超过 30 分钟时，`flag_sleep_calculation_issue` 为 TRUE。它只看 SOL，不看 WASO 或总睡眠时间。尽管名字里有"calculation"，它**不**表示计算有 bug；它的意思是关于"花了多久才睡着"的两种说法对不上。常见原因有：时间戳错误、SOL 填错（例如在分钟栏里填了钟点），或一般的感知偏差。
+
+还有两点要知道：任何一个值缺失时该标记为 FALSE（不是 NA），所以"没有被标记"并不表示两者一致。另外，30 分钟的界限写死在代码里（`sleep_visualization.R` 的 `add_quality_flags()`），不是配置项，也没有出现在阈值页面上。
+
+</details>
+
+<details>
+<summary>high_sol 的格子很深，是不是说明参与者真的入睡很慢？</summary>
+
+不一定。在验证数据里，计算 SOL 与自评 SOL 最多可相差约 75 分钟（见[验证方法学](validation-methodology-zh.html)），所以高 SOL 标记分不清是真的入睡很久，还是两种来源之间的一般性分歧。这些标记是供人工复核的描述性指示，不是自动的错误信号。
+
+</details>
+
+<details>
+<summary>为什么有些组合没有画出来？</summary>
+
+它们在这次运行中的计数为 0。从未同时出现的组合不画。
+
+</details>
+
+<details>
+<summary>为什么我的输出里没有这张图？</summary>
+
+要么完整数据的标记列少于两列，要么没有任何一对标记同时出现。原因会写在 `figure_index.png` 顶部的红色区块里。
+
+</details>
+
+**论文图注**
+
+> **Figure 11.** 最终修正数据中数据质量标记的共现情况。每个格子给出两个标记同时出现的记录数（低效率：SE < 70%；高 SOL：计算 SOL > 1 h；高 WASO：自评 WASO > 1.5 h；睡眠计算问题：计算 SOL 与自评 SOL 相差超过 30 min）。只统计四个标记都有完整值的记录；从未同时出现的组合不画。颜色为平方根刻度。这些标记是供复核的描述性指示，不是错误分类。
+
 <a id="c-13"></a>
 
 #### 13 · 错误类别分布
@@ -882,12 +986,18 @@ awake→getup）之间的间隔小时数直方图，用的是**修正前的原�
 
 **异常 →** 负间隔占很大比例，说明普遍存在顺序错误，规整步骤会把它们翻转过来；在 ±12 小时附近出现两个堆，则指向 12 小时钟面的 AM/PM 习惯。
 
+**用文字举例怎么读** Sleep -> Awake 面板里红色带的计数很高，说明很多原始行里的入睡时间和醒来时间看起来互换了或 AM/PM 反了；规整步骤和人工复核随后会处理它们。某个面板的计数接近零，说明这对事件上这种模式很少见。这个数字说的是原始填写中这种模式出现的频率，不是现在还有多少没解决（见下面的常见问题）。
+
 <details>
 <summary><strong>精确规则</strong></summary>
 
 - **间隔是什么。** 对相邻的三对时间——bed 到 sleep、sleep 到 awake、awake 到 getup——间隔是后一个时间减前一个时间，单位小时，在原始（已解码）时间上计算，还没有做任何修正。
 - **负间隔** 表示后一个事件的钟点比前一个事件还早（比如同一行里醒来是 01:00，入睡却是 23:00）。这是顺序错误或 12 小时制 AM/PM 弄反的原始特征。
 - **红色色带** 标出 −3 到 −6 小时的间隔，这个范围定义了验证工作里的"AM/PM 解码或字段互换候选"；带内的数量印在带上。
+- **红色 `n=` 标签是什么。** 每个面板（Bed -> Sleep、Sleep -> Awake (TST)、Awake -> Getup）各有一个标签。它是该面板中原始（修正前）间隔为负、且大小在 3 到 6 小时之间（两端都含）的记录数。它由当前这次运行的数据实时统计，不是手写的数字，所以会随每次运行、每个数据集而变；这是有意为之，保证标签不会和真实数量脱节。
+- **这个带从哪来。** 3 到 6 小时的范围是验证工作里固定下来的定义（`validation/derive_timegap_candidates.R`）：这种大小的反向间隔，是 AM/PM 解码错误或字段互换的典型特征。它是用来找候选的定义，不是测得的错误率。
+- **带外的是什么。** 反向不到 3 小时（小幅互换）或超过 6 小时的间隔，不计入 `n=`，由其他规则处理（上面的形状说明写了哪种修复对应哪种模式）。
+- **加总。** 各面板的数字加起来是候选总数，同一条记录可以出现在不止一个面板里。
 - **怎么读形状。** 大约 −1 到 −3 小时的负值堆，指向顺序互换（由互换步骤修复）；在 ±12 小时附近出现两个堆，指向把 PM 时间填成了 AM（由 12 小时翻转步骤修复）。
 
 </details>
@@ -911,7 +1021,9 @@ awake→getup）之间的间隔小时数直方图，用的是**修正前的原�
 <details>
 <summary>红色带里的数字，说明有这么多记录是错的吗？</summary>
 
-不完全是。它数的是原始间隔落在这个范围、因此看起来像 AM/PM 或互换候选的记录。其中有些是真实的长间隔，是不是错误，要由规则和审查来决定。
+不是。这个数字数的是*候选*，只按原始间隔的大小（为负、3 到 6 小时）筛选。其中有些是真实的长间隔，或是习惯性按"反方向"填写的记录；哪些是错误，由清洗规则和人工复核决定，不由这个标签决定。
+
+它也只是历史的一张快照：原始填写中这种模式出现得有多频繁。它不显示修正和复核之后还有什么没解决。要看这个，请见[人工复核循环](#s-3)里的复核状态表，以及[运行汇总](#s-4)里的最终记录分类。
 
 </details>
 
@@ -1360,6 +1472,15 @@ Corrected 是数据被改动过的记录数。Suppressed 是经人看过并接�
 
 **异常 →** 名单很长，说明是影响许多参与者的系统性问题，而不是个别人的行为。
 
+**怎么用这份名单** 不，不需要把所有东西都重新检查一遍。这张表只告诉你先看谁。它不改任何数据，也不是完成标准：复核是否结束，由错误和异常两份工作表的复核状态表决定（见[人工复核循环](#s-3)），而不是由这张表决定。出现以下情况值得看一眼：有些行被染成橙色（标记率 20% 及以上）或红色（50% 及以上）；名单很长；或者在把结果当作最终版本之前，抽查排在最前面的几行。
+
+检查名单上的某个参与者：
+
+1. **看是哪个标记拉高了比例：** 睡眠效率低、SOL 高，还是 WASO 高。默认阈值是效率低于 70%、SOL 超过 1 小时、WASO 超过 1.5 小时（`classification.flag_severity.poor_efficiency_threshold_pct`、`high_sol_threshold_hours`、`high_waso_threshold_hours`）。它们来自配置，所以你这次运行可能用了别的值；图的副标题会写出实际生效的值。
+2. **如果主要是 SOL：** 记住高 SOL 是由修正后的上床时间和入睡时间计算出来的，不是参与者自己填的 SOL。把两者对比一下（[图 11 的卡片](#c-11)解释了 `flag_sleep_calculation_issue`）。两者差距大通常是描述性的差异，不是错误；保留即可。
+3. **看这些记录是否已经有人处理过：** 输出里的 `human_review` 和 `has_correction` 列，以及 `cleaned_data_prepostcorrection.csv` 里的 `audit_disposition`。已经处理过的记录不需要再过一遍。
+4. **如果时间戳本身看起来不对**（上床时间晚于入睡时间，或跨午夜后顺序错乱），通过人工复核循环把这条记录送去复核。否则保持原样，并记下你的决定。
+
 <details>
 <summary><strong>精确规则</strong></summary>
 
@@ -1375,6 +1496,13 @@ Corrected 是数据被改动过的记录数。Suppressed 是经人看过并接�
 <summary>某位参与者标记率很高，他的数据是错的吗？</summary>
 
 不一定。这张表说的是先检查谁的记录；结论要看记录本身，而不是这张表。
+
+</details>
+
+<details>
+<summary>标记率高，是不是说明要重做清洗？</summary>
+
+不是。标记率高只表示这些参与者的记录值得先看，并不表示清洗失败。这些标记是描述性的：其中包括管线有意保留的自评与计算值之间的分歧，而入睡潜伏期一直偏长的人，即使每条记录都正确，也会出现在名单里。另外，高 SOL 标记分不清是真的入睡很久，还是一般的报告分歧（见[图 11](#c-11) 和[验证方法学](validation-methodology-zh.html)）。
 
 </details>
 
