@@ -32,8 +32,8 @@ derive → disambiguate → promote → rebuild 全链，每步写 `*.provenance
 ## query_pid.R 用法
 
 ```bash
-Rscript validation/query_pid.R 10989          # 看这个人全部天数
-Rscript validation/query_pid.R 10989 4        # 只看第4天
+Rscript validation/query_pid.R <PID>          # 看这个人全部天数
+Rscript validation/query_pid.R <PID> 4        # 只看第4天
 Rscript validation/query_pid.R --interactive  # 交互模式，反复输入pid查
 ```
 

@@ -34,7 +34,7 @@ test_that("recode annotates the corrections log only on converted rows", {
   expect_false(grepl("MM:SS threshold conversion", cc[2]))
 })
 
-test_that("WASO MM:SS tail follows the same rule (the 3200/6374 shape)", {
+test_that("WASO MM:SS tail follows the same rule (the study-data shape)", {
   v <- "duration_totalmin_waso_estimate_am"
   # 05:00 as HH:MM = 300 min (>= 240) -> recode to 5 min; plain 1:30 stays 90
   out <- process_interval(.interval_df(v, c("05:00", "1:30")), v, format = "interval_hhmm")

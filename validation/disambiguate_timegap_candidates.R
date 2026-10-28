@@ -160,8 +160,8 @@
 #   applies broadly to the 26 needs-review rows. Across all 75 confirmed
 #   error rows, corrections split almost evenly: 38 touch the bed/sleep side
 #   (AM/PM decode), 37 touch the awake/getup side (of which several are
-#   exactly the WASO-misread pattern flagged -- e.g. PID 6985 x7 rows, PID
-#   10516 day 12, PID 10599 day 4, PID 8876 x3 -- "problem" notes literally
+#   exactly the WASO-misread pattern flagged -- several participants in the
+#   study data (up to 7 rows for one participant) -- "problem" notes literally
 #   say things like "this person probably put 0:00 because they did not
 #   wake up at night" or "awake time is likely WASO time, not final awake").
 #   But cross-tabulated against field_pair specifically: of the 13

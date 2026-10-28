@@ -51,7 +51,7 @@
   the Thresholds page are absolute (the relative link broke inside the CRAN
   tarball).
 * New CI job: `R CMD check --as-cran` (offline incoming-feasibility mode).
-# sleepcleanr (development version)
+# sleepcleanr 1.7.0
 
 ## Added
 * `review_status.csv` (project root): one status table for both Step 5 worksheets and for
