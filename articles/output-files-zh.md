@@ -14,18 +14,19 @@
 | **B** `output/cleaned_data_prepostcorrection.csv` | 13,990 × 16        | 看改了什么：四个时间的修正前后、`correction_type`、`audit_disposition` |
 | 全量 `output/cleaned_data_full.rds`               | 13,990 × 135       | 流水线算出的全部内容，一列不删                                         |
 
-| 我想知道…                                         | 打开                                                                               | 列                                                                                                |
-|---------------------------------------------------|------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|
-| 这条记录被改过吗，被谁改的？                      | A 或 B                                                                             | `has_correction`：`none`、`algorithmic`、`manual` 或 `both`。B 另有 `correction_type`（哪条规则） |
-| 参与者填了什么，现在是什么？                      | B                                                                                  | `bedtime_precorrection` / `bedtime_postcorrection`，入睡、醒来、起床同理                          |
-| 它是干净、错误、异常，还是未填写？                | A                                                                                  | `record_status`、`flag_severity`（以及 `error_type`、`unusual_type`）                             |
-| 有人看过吗，结果怎样？                            | A                                                                                  | `human_review`：`none`、`corrected`、`accepted` 或 `waiting`（见下）                              |
-| 这次运行后，Step 5 清单里的各行处于哪种审核状态？ | 项目文件夹的 `[NEW]manual_error_correction_review.csv`                             | `status_after_corrections`、`in_manual_file`                                                      |
-| 谁处理的这一行，什么时候？                        | 你们自己维护的审核文件                                                             | `review_resolution`、`resolved_by`、`resolved_at`                                                 |
-| 为什么某条人工修正没被用上？                      | `output/manual_corrections_not_applied.csv`                                        | `reason`                                                                                          |
-| 这次运行用了哪些规则？                            | `output/effective_rules.csv`                                                       |                                                                                                   |
-| `output/review_status.csv`                        | 每条被标记记录一行：needs_review / not_incorporated / incorporated 及原因（1.7.0） |                                                                                                   |
-| `output/review_runs.csv`                          | 追加式运行日志，含输入/配置/结果哈希并与上一轮自动比对（1.7.0）                    | `value`、`source`                                                                                 |
+| 我想知道…                                                        | 打开                                                                                       | 列                                                                                                |
+|------------------------------------------------------------------|--------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|
+| 这条记录被改过吗，被谁改的？                                     | A 或 B                                                                                     | `has_correction`：`none`、`algorithmic`、`manual` 或 `both`。B 另有 `correction_type`（哪条规则） |
+| 参与者填了什么，现在是什么？                                     | B                                                                                          | `bedtime_precorrection` / `bedtime_postcorrection`，入睡、醒来、起床同理                          |
+| 它是干净、错误、异常，还是未填写？                               | A                                                                                          | `record_status`、`flag_severity`（以及 `error_type`、`unusual_type`）                             |
+| 有人看过吗，结果怎样？                                           | A                                                                                          | `human_review`：`none`、`corrected`、`accepted` 或 `waiting`（见下）                              |
+| 这次运行后，Step 5 清单里的各行处于哪种审核状态？                | 项目文件夹的 `[NEW]manual_error_correction_review.csv`                                     | `status_after_corrections`、`in_manual_file`                                                      |
+| 谁处理的这一行，什么时候？                                       | 你们自己维护的审核文件                                                                     | `review_resolution`、`resolved_by`、`resolved_at`                                                 |
+| 为什么某条人工修正没被用上？                                     | `output/manual_corrections_not_applied.csv`                                                | `reason`                                                                                          |
+| 这次运行用了哪些规则？                                           | `output/effective_rules.csv`                                                               |                                                                                                   |
+| 这次运行后，各被标记记录处于哪种审核状态？                       | `output/review_status.csv`（needs_review / not_incorporated / incorporated 及原因，1.7.0） |                                                                                                   |
+| 这次运行和上一次的输入/输出一致吗？                              | `output/review_runs.csv`（追加式日志，含输入/配置/结果哈希并自动比对，1.7.0）              |                                                                                                   |
+| 自报时长的原文有歧义吗（如 `12:05` 是 12 小时还是 12 分 5 秒）？ | A                                                                                          | `sol_selfreport_raw` / `sol_selfreport_ambiguous`（及 WASO 同名列，1.7.1）                        |
 
 `human_review` 每行一个值，取第一个适用的：
 

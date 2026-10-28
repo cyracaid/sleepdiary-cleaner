@@ -209,17 +209,25 @@
 <td></td>
 </tr>
 <tr class="odd">
-<td><code>output/review_status.csv</code></td>
-<td>每条被标记记录一行：needs_review / not_incorporated / incorporated
-及原因（1.7.0）</td>
+<td>这次运行后，各被标记记录处于哪种审核状态？</td>
+<td>
+<code>output/review_status.csv</code>（needs_review /
+not_incorporated / incorporated 及原因，1.7.0）</td>
 <td></td>
 </tr>
 <tr class="even">
-<td><code>output/review_runs.csv</code></td>
-<td>追加式运行日志，含输入/配置/结果哈希并与上一轮自动比对（1.7.0）</td>
+<td>这次运行和上一次的输入/输出一致吗？</td>
 <td>
-<code>value</code>、<code>source</code>
-</td>
+<code>output/review_runs.csv</code>（追加式日志，含输入/配置/结果哈希并自动比对，1.7.0）</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>自报时长的原文有歧义吗（如 <code>12:05</code> 是 12 小时还是 12 分 5
+秒）？</td>
+<td>A</td>
+<td>
+<code>sol_selfreport_raw</code> /
+<code>sol_selfreport_ambiguous</code>（及 WASO 同名列，1.7.1）</td>
 </tr>
 </tbody>
 </table>
