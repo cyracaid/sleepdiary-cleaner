@@ -256,7 +256,16 @@ save_png <- function(plot, name, w = NULL, h = NULL, subdir = NULL) {
     if (is.character(lb$subtitle)) plot <- plot + ggplot2::labs(subtitle = .wrap_txt(lb$subtitle))
     if (is.character(lb$caption))  plot <- plot + ggplot2::labs(caption  = .wrap_txt(lb$caption))
   }
-  ggsave(path, plot, width = w, height = h, dpi = dpi, limitsize = FALSE)
+  # The dropped rows are the skipped_na population (records with no computable
+  # duration) -- structural, not a defect. Muffle exactly that notice so real
+  # warnings still surface.
+  withCallingHandlers(
+    ggsave(path, plot, width = w, height = h, dpi = dpi, limitsize = FALSE),
+    warning = function(w) {
+      if (grepl("^Removed .* rows containing", conditionMessage(w)))
+        invokeRestart("muffleWarning")
+    }
+  )
 }
 
 # ============================================================================
@@ -1072,8 +1081,8 @@ if(length(vars_to_plot) > 0) {
     filter(!is.na(value))
   
   p2 <- ggplot(long_df, aes(x = value)) +
-    geom_histogram(aes(y = after_stat(density)), bins = 40, fill = "#2E7D32", alpha = 0.5) +
-    geom_density(color = "#D32F2F", size = 1) +
+    geom_histogram(na.rm = TRUE, aes(y = after_stat(density)), bins = 40, fill = "#2E7D32", alpha = 0.5) +
+    geom_density(na.rm = TRUE, color = "#D32F2F", linewidth = 1) +
     facet_wrap(~variable, scales = "free") +
     labs(title = "Figure 18: Distribution of Sleep Variables",
          subtitle = "Histograms with density curves for key sleep metrics (based on final corrected data)",
@@ -1113,8 +1122,8 @@ if("sleep_duration_h" %in% names(clean_df)) {
     stringsAsFactors = FALSE
   )
   p3 <- ggplot(clean_df, aes(x = sleep_duration_h)) +
-    geom_histogram(aes(y = after_stat(density)), bins = 40, fill = "#2E7D32", alpha = 0.5) +
-    geom_density(aes(color = "Density curve (red, smoothed)"), size = 1, show.legend = TRUE) +
+    geom_histogram(na.rm = TRUE, aes(y = after_stat(density)), bins = 40, fill = "#2E7D32", alpha = 0.5) +
+    geom_density(na.rm = TRUE, aes(color = "Density curve (red, smoothed)"), linewidth = 1, show.legend = TRUE) +
     geom_vline(data = .reflines, aes(xintercept = x, color = lab,
                                      linetype = ifelse(grepl("Median", lab), "dashed", "solid")),
                size = 1, show.legend = TRUE) +
@@ -1171,7 +1180,7 @@ if(all(c("time_in_bed_h", "sleep_duration_h", "flag_severity") %in% names(clean_
     p4 <- ggplot(plot_df_4, aes(x = time_in_bed_h, y = sleep_duration_h,
                                 color = flag_severity)) +
       geom_point(alpha = 0.25, size = 2) +
-      geom_smooth(aes(group = 1), method = "lm", se = TRUE, color = "black", size = 0.8) +
+      geom_smooth(aes(group = 1), method = "lm", se = TRUE, color = "black", linewidth = 0.8) +
       geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "gray50", alpha = 0.5) +
       scale_color_manual(values = c("Clean" = "#2E7D32",
                                     "Minor issues (1 flag)" = "#FF8C00",
@@ -1222,7 +1231,7 @@ if(all(c("sol_h", "sleep_duration_h", "flag_severity") %in% names(clean_df))) {
     p4b <- ggplot(plot_df_4b, aes(x = sol_h, y = sleep_duration_h, 
                                   color = flag_severity)) +
       geom_point(alpha = 0.25, size = 2) +
-      geom_smooth(aes(group = 1), method = "lm", se = TRUE, color = "black", size = 0.8) +
+      geom_smooth(aes(group = 1), method = "lm", se = TRUE, color = "black", linewidth = 0.8) +
       scale_color_manual(values = c("Clean" = "#2E7D32", 
                                     "Minor issues (1 flag)" = "#FF8C00",
                                     "Major issues (2+ flags)" = "#D32F2F"),
@@ -1349,7 +1358,7 @@ if (exists("clean_df") && exists("corrected_ema_data") &&
     )
     
     p6 <- ggplot(p6_data, aes(x = sleep_duration_h, fill = status, color = status)) +
-      geom_density(alpha = 0.3, size = 0.8) +
+      geom_density(na.rm = TRUE, alpha = 0.3, linewidth = 0.8) +
       scale_fill_manual(values = color_map, name = "Final Classification") +
       scale_color_manual(values = color_map, name = "Final Classification") +
       labs(title = "Figure 6: Sleep Duration Distribution (Post-Manual-Correction)",
@@ -1414,7 +1423,7 @@ if(all(c("sleep_duration_h", "flag_severity") %in% names(clean_df))) {
     )
 
     p7 <- ggplot(plot_df_7, aes(x = sleep_duration_h, fill = flag_severity)) +
-      geom_histogram(bins = 50, alpha = 0.7, position = "stack") +
+      geom_histogram(na.rm = TRUE, bins = 50, alpha = 0.7, position = "stack") +
       scale_fill_manual(values = c("Clean" = "#2E7D32", 
                                    "Minor issues (1 flag)" = "#FF8C00",
                                    "Major issues (2+ flags)" = "#D32F2F"),
@@ -1426,7 +1435,7 @@ if(all(c("sleep_duration_h", "flag_severity") %in% names(clean_df))) {
       scale_y_continuous(expand = expansion(mult = c(0, 0.35))) +
       annotate("label", x = 15, y = Inf, label = flag_text,
                hjust = 1, vjust = 1, size = 3, fill = "white", alpha = 0.9,
-               label.r = unit(0.15, "lines"), label.size = 0.3) +
+               label.r = unit(0.15, "lines"), linewidth = 0.3) +
       theme(legend.position = "bottom")
     
     print(p7)
@@ -1476,8 +1485,8 @@ if(all(c("time_bed_corrected", "time_getup_corrected") %in% names(clean_df))) {
     )
   
   p9 <- ggplot(clean_df_timing) +
-    geom_density(aes(x = bedtime_hour, fill = "Bedtime"), alpha = 0.4) +
-    geom_density(aes(x = getup_hour, fill = "Get-up Time"), alpha = 0.4) +
+    geom_density(na.rm = TRUE, aes(x = bedtime_hour, fill = "Bedtime"), alpha = 0.4) +
+    geom_density(na.rm = TRUE, aes(x = getup_hour, fill = "Get-up Time"), alpha = 0.4) +
     labs(title = "Figure 9: Bedtime vs Get-up Time Distribution",
          subtitle = "Circadian pattern of sleep timing (based on final corrected data)",
          x = "Hour of Day", y = "Density", fill = "Time") +
@@ -1700,7 +1709,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
   
   # Bar chart (without title — will use patchwork annotation)
   p13_bar <- ggplot(error_summary, aes(x = error_category, y = count, fill = error_category)) +
-    geom_bar(stat = "identity", alpha = 0.8) +
+    geom_bar(na.rm = TRUE, stat = "identity", alpha = 0.8) +
     geom_text(aes(label = paste0(format(count, big.mark=","), "\n(", round(percentage, 1), "%)")), 
               vjust = -0.3, size = 3) +
     scale_fill_brewer(palette = "Set2") +
@@ -1882,7 +1891,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
                  fill = flagged_color, alpha = 0.12) +
         geom_vline(xintercept = c(-6, -3), linetype = "dashed",
                    color = flagged_color, linewidth = 0.6) +
-        geom_histogram(binwidth = 0.25, fill = clean_color, alpha = 0.8, color = NA) +
+        geom_histogram(na.rm = TRUE, binwidth = 0.25, fill = clean_color, alpha = 0.8, color = NA) +
         geom_text(data = band_counts,
                   aes(x = -4.5, y = Inf, label = paste0("n=", n_candidates)),
                   inherit.aes = FALSE, color = flagged_color, vjust = 1.6,
@@ -1986,7 +1995,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
                                         levels = ba_df$threshold_name[order(ba_df$ratio_to_noise)])
         p13d <- ggplot(ba_df, aes(x = ratio_to_noise, y = threshold_name, fill = ratio_to_noise)) +
           geom_vline(xintercept = c(2, 3), linetype = "dashed", color = "grey40", linewidth = 0.5) +
-          geom_col(width = 0.6) +
+          geom_col(na.rm = TRUE, width = 0.6) +
           geom_text(aes(label = sprintf("%.1fx", ratio_to_noise)),
                     hjust = -0.15, size = 3.4, color = "grey20") +
           scale_fill_gradient2(low = "#D32F2F", mid = "grey85", high = "#1976D2",
@@ -2060,7 +2069,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
       flagged_count <- nrow(flagged_data)
       
       p14 <- ggplot(comparison_df, aes(x = sleep_duration_h, fill = status, color = status)) +
-        geom_density(alpha = 0.4, size = 0.8) +
+        geom_density(na.rm = TRUE, alpha = 0.4, linewidth = 0.8) +
         scale_fill_manual(values = c("No Issues (Clean) - No _checkforerrors flags" = "#2E7D32", 
                                      "Needs Review (Auto-detected) - Has _checkforerrors flags" = "#D32F2F")) +
         scale_color_manual(values = c("No Issues (Clean) - No _checkforerrors flags" = "#2E7D32", 
@@ -2150,7 +2159,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
 
     if (nrow(timeline_data) > 0) {
       p15 <- ggplot(timeline_data, aes(x = date, y = count, fill = pattern_type)) +
-        geom_col(position = "stack", alpha = 0.85, width = 25) +
+        geom_col(na.rm = TRUE, position = "stack", alpha = 0.85, width = 25) +
         scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
         scale_fill_brewer(palette = "Set2", name = "Pattern Type") +
         labs(title = "Figure 11: Timing of Flagged Temporal Patterns Over the Study Period",
@@ -2239,7 +2248,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
     
     if(any(pattern_summary$specific_pattern != "Other / unclassified")) {
       p16 <- ggplot(pattern_summary, aes(x = specific_pattern, y = count, fill = count)) +
-        geom_bar(stat = "identity", alpha = 0.8) +
+        geom_bar(na.rm = TRUE, stat = "identity", alpha = 0.8) +
         geom_text(aes(label = format(count, big.mark=",")), hjust = -0.1, size = 3.5) +
         scale_x_discrete(labels = function(x) {
           sapply(x, function(s) paste(strwrap(s, width = 35), collapse = "\n"))
@@ -2317,7 +2326,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
     if(nrow(participant_errors) > 0) {
       p17 <- ggplot(participant_errors,
                     aes(x = reorder(pid_label, -flag_rate_pct), y = flag_rate_pct, fill = flag_rate_pct)) +
-        geom_bar(stat = "identity", alpha = 0.7) +
+        geom_bar(na.rm = TRUE, stat = "identity", alpha = 0.7) +
         geom_text(aes(label = sprintf("%.0f%% (%d/%d)", flag_rate_pct, error_count, total_days)),
                   vjust = -0.3, size = 2.8) +
         scale_y_continuous(expand = expansion(mult = c(0, 0.10))) +
@@ -2401,7 +2410,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
               plot.subtitle = element_text(hjust = 0.5, size = 8, color = "gray50"))
       
       p18_right <- ggplot(review_classification, aes(x = "", y = percentage, fill = review_source)) +
-        geom_bar(stat = "identity", width = 1, alpha = 0.85) +
+        geom_bar(na.rm = TRUE, stat = "identity", width = 1, alpha = 0.85) +
         coord_polar("y", start = 0) +
         geom_text(aes(label = sprintf("%s\n%.1f%%", count, percentage)), 
                   position = position_stack(vjust = 0.5), size = 3) +
@@ -2646,7 +2655,7 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
         "mean =", round(mean(bias_sol), 2), "\n")
     
     p20 <- ggplot(bias_counts, aes(x = bias, y = count)) +
-      geom_col(fill = "#1976D2", alpha = 0.8, width = 1) +
+      geom_col(na.rm = TRUE, fill = "#1976D2", alpha = 0.8, width = 1) +
       geom_vline(xintercept = c(15, 60), linetype = "dashed", color = c("orange", "red"), linewidth = 1) +
       annotate("text", x = c(15, 60), y = Inf, vjust = 2, hjust = -0.05,
                color = c("orange", "red"), size = 3.1,
@@ -2703,7 +2712,7 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
         waso_df <- data.frame(bias = bias_waso)
         
         p20b <- ggplot(waso_df, aes(x = bias)) +
-          geom_histogram(binwidth = 5, fill = "#FF8C00", alpha = 0.7, boundary = 0) +
+          geom_histogram(na.rm = TRUE, binwidth = 5, fill = "#FF8C00", alpha = 0.7, boundary = 0) +
           geom_vline(xintercept = c(15, 60), linetype = "dashed", color = c("orange", "red"), linewidth = 1) +
           annotate("text", x = c(15, 60), y = Inf, vjust = 2, hjust = -0.05,
                    color = c("orange", "red"), size = 3.1,
@@ -2779,7 +2788,7 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
   }
   
   p21 <- ggplot(subst_summary, aes(x = reorder(substance, -n_non_na), y = pct, fill = substance)) +
-    geom_col(alpha = 0.8, width = 0.7) +
+    geom_col(na.rm = TRUE, alpha = 0.8, width = 0.7) +
     geom_text(aes(label = paste0(n_non_na, "/", total_n, " (", pct, "%)  range: ", range)),
               vjust = -0.3, size = 3.5) +
     labs(title = "Figure 26: Substance Use Data Availability",
@@ -2959,7 +2968,7 @@ if (exists("corrected_ema_data") && caf_col %in% names(corrected_ema_data)) {
 
     p23 <- ggplot(caf_summary, aes(x = factor(caffeine_cups), y = n)) +
       scale_x_discrete(labels = .frac_label) +
-      geom_col(alpha = 0.85, width = 0.7, fill = "#1976D2") +
+      geom_col(na.rm = TRUE, alpha = 0.85, width = 0.7, fill = "#1976D2") +
       geom_text(aes(label = paste0(n, " (", round(pct, 1), "%)")),
                 vjust = -0.3, size = 3) +
       labs(title = "Figure 28: Caffeine Consumption Distribution",
@@ -2994,7 +3003,7 @@ if (exists("corrected_ema_data") && alc_col %in% names(corrected_ema_data)) {
 
     p24 <- ggplot(alc_summary, aes(x = factor(alcohol_drinks), y = n)) +
       scale_x_discrete(labels = .frac_label) +
-      geom_col(alpha = 0.85, width = 0.7, fill = "#FF8C00") +
+      geom_col(na.rm = TRUE, alpha = 0.85, width = 0.7, fill = "#FF8C00") +
       geom_text(aes(label = paste0(n, " (", round(pct, 1), "%)")),
                 vjust = -0.3, size = 3) +
       labs(title = "Figure 29: Alcohol Consumption Distribution",
@@ -3107,7 +3116,7 @@ if (all(c("self_diffcalc_totalsleeptime_minutes", "self_diffcalc_sol_minutes",
   # Pie -> single stacked bar: the 5.6% / 3.0% slices' labels collided in the pie.
   avg_comp$component <- factor(avg_comp$component, levels = avg_comp$component)
   p_r26 <- ggplot(avg_comp, aes(x = pct, y = "TIB", fill = component)) +
-    geom_col(width = 0.35, alpha = 0.85, position = position_stack(reverse = TRUE)) +
+    geom_col(na.rm = TRUE, width = 0.35, alpha = 0.85, position = position_stack(reverse = TRUE)) +
     geom_text(aes(label = sprintf("%.1f%%", pct)), position = position_stack(vjust = 0.5, reverse = TRUE),
               size = 4.5, color = "white", fontface = "bold") +
     scale_x_continuous(limits = c(0, 100), expand = c(0, 0)) +
