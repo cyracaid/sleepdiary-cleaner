@@ -424,7 +424,10 @@ the column dictionary)</td>
 <td>Step 10</td>
 <td>
 <strong>Dataset B</strong>: before and after values with the audit
-disposition per row</td>
+disposition per row. The disposition comes from the optional private
+ledger named by <code>data.files.audit_dispositions</code> in the
+config; with no ledger named it is <code>"none"</code> for every row,
+and a named ledger that is missing stops the run</td>
 </tr>
 <tr class="even">
 <td><code>cleaned_data_full.rds</code></td>

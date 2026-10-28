@@ -174,10 +174,16 @@ Per-Step Flag Tracker (Open Second)</a>
 <ul>
 <li>
 <a href="#s-9-1">9.1 Figure Index</a>
+<ul>
+<li>
+<a href="#s-9-1-naming">How figures are named, and why some numbers are
+missing</a>
+</li>
+</ul>
 </li>
 <li>
 <details><summary><a href="#s-9-2">9.2 Pipeline-cleaning figure cards
-(<code>pipeline_cleaning/</code>) (15 figures)</a>
+(<code>pipeline_cleaning/</code>) (16 figures)</a>
 </summary><ul>
 <li>
 <a href="#01-pipeline-record-flow">01 · Pipeline Record Flow</a>
@@ -191,6 +197,10 @@ Post-Correction</a>
 </li>
 <li>
 <a href="#10-extreme-sleep-durations">10 · Extreme Sleep Durations</a>
+</li>
+<li>
+<a href="#11-flag-co-occurrence-heatmap">11 · Flag Co-occurrence
+Heatmap</a>
 </li>
 <li>
 <a href="#13-error-category-distribution">13 · Error Category
@@ -637,6 +647,14 @@ reversibility</td>
 </tr>
 </tbody>
 </table>
+<p><strong>Audit ledger path:</strong> the private audit ledger is
+optional. Name it in the config as
+<code>data.files.audit_dispositions</code> (empty by default: inactive,
+and <code>audit_disposition</code> is <code>"none"</code> for every
+row). If you name a file that does not exist, the run stops rather than
+silently writing <code>"none"</code>. The consistency check against the
+manual metric-duration corrections uses the same file the run applied
+(<code>data.files.manual_metric_duration</code>).</p>
 <p><strong>Format:</strong> each file is a plain CSV; the error/unusual
 files carry
 <code>pid, day_num, row_id, variable, old_value_hhmm, old_value_ampm, new_value_hhmm, new_value_ampm, correction_type, confidence, reviewer_notes</code>
@@ -1669,7 +1687,7 @@ or share it.</p>
 <tbody>
 <tr class="odd">
 <td><code>pipeline_cleaning/</code></td>
-<td>14 diagnostic figures: what the pipeline found and changed (cards in
+<td>16 diagnostic figures: what the pipeline found and changed (cards in
 §9.2)</td>
 <td>Checking that cleaning behaved; the audit trail for a
 supplement</td>
@@ -1894,6 +1912,15 @@ Durations</a></td>
 <td>2026-09-25</td>
 </tr>
 <tr class="even">
+<td><strong>11</strong></td>
+<td><code>pipeline_cleaning/11_Flag_Cooccurrence_Heatmap.png</code></td>
+<td>Supplement</td>
+<td><code>sleep_visualization.R:1571</code></td>
+<td><a href="#id_11-flag-co-occurrence-heatmap">§9.2 · Flag
+Co-occurrence Heatmap</a></td>
+<td>2026-10-23</td>
+</tr>
+<tr class="odd">
 <td><strong>13</strong></td>
 <td><code>pipeline_cleaning/13_Error_Category_Distribution.png</code></td>
 <td>Supplement</td>
@@ -1902,7 +1929,7 @@ Durations</a></td>
 Distribution</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>13B</strong></td>
 <td><code>pipeline_cleaning/13B_Adjacent_Timestamp_Gaps.png</code></td>
 <td>Supplement</td>
@@ -1911,7 +1938,7 @@ Distribution</a></td>
 Gaps</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong>13C</strong></td>
 <td><code>pipeline_cleaning/13C_Detection_Outcomes_Heatmap.png</code></td>
 <td>Supplement</td>
@@ -1920,7 +1947,7 @@ Gaps</a></td>
 Outcomes Heatmap</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>13D</strong></td>
 <td><code>pipeline_cleaning/13D_Threshold_vs_Noise_Ratio.png</code></td>
 <td>Supplement</td>
@@ -1929,7 +1956,7 @@ Outcomes Heatmap</a></td>
 Measurement Noise</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong>14</strong></td>
 <td><code>pipeline_cleaning/14_Sleep_Duration_Pre_Correction.png</code></td>
 <td>Supplement</td>
@@ -1938,7 +1965,7 @@ Measurement Noise</a></td>
 Pre-Correction</a></td>
 <td>2026-09-30</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>15</strong></td>
 <td><code>pipeline_cleaning/15_Error_Timeline.png</code></td>
 <td>Supplement</td>
@@ -1946,7 +1973,7 @@ Pre-Correction</a></td>
 <td><a href="#id_15-error-timeline">§9.2 · Error Timeline</a></td>
 <td>2026-09-30</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong>16</strong></td>
 <td><code>pipeline_cleaning/16_Common_Error_Patterns.png</code></td>
 <td>Supplement</td>
@@ -1955,7 +1982,7 @@ Pre-Correction</a></td>
 Patterns</a></td>
 <td>2026-09-30</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>17</strong></td>
 <td><code>pipeline_cleaning/17_Top_Participants_Flags.png</code></td>
 <td>Supplement</td>
@@ -1964,7 +1991,7 @@ Patterns</a></td>
 Participants by Flag Rate</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong>18</strong></td>
 <td><code>pipeline_cleaning/18_Auto_Detected_Dashboard.png</code></td>
 <td>Supplement</td>
@@ -1973,7 +2000,7 @@ Participants by Flag Rate</a></td>
 Dashboard</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>20</strong></td>
 <td><code>research_ready/20_SOL_Perception_Bias.png</code></td>
 <td>Results</td>
@@ -1982,7 +2009,7 @@ Dashboard</a></td>
 Bias</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong>20B</strong></td>
 <td><code>research_ready/20B_WASO_Perception_Bias.png</code></td>
 <td>Results</td>
@@ -1991,7 +2018,7 @@ Bias</a></td>
 Bias</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>21</strong></td>
 <td><code>research_ready/21_Substance_Use_Availability.png</code></td>
 <td>Supplement</td>
@@ -2000,7 +2027,7 @@ Bias</a></td>
 Availability</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong>22</strong></td>
 <td><code>research_ready/22_Substance_Use_Distribution.png</code></td>
 <td>Supplement</td>
@@ -2009,7 +2036,7 @@ Availability</a></td>
 Use Value Distribution</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>23</strong></td>
 <td><code>research_ready/23_Caffeine_Consumption.png</code></td>
 <td>Supplement</td>
@@ -2018,7 +2045,7 @@ Use Value Distribution</a></td>
 Consumption</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong>24</strong></td>
 <td><code>research_ready/24_Alcohol_Consumption.png</code></td>
 <td>Supplement</td>
@@ -2027,7 +2054,7 @@ Consumption</a></td>
 Consumption</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>A1</strong></td>
 <td><code>pipeline_cleaning/A1_Step_Flag_Ledger.png</code></td>
 <td>Supplement</td>
@@ -2035,7 +2062,7 @@ Consumption</a></td>
 <td><a href="#a1-step-flag-ledger">§9.2 · Step Flag Ledger</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong>P26</strong></td>
 <td><code>pipeline_cleaning/P26_PerParticipant_Flag_Rate.png</code></td>
 <td>Supplement</td>
@@ -2044,7 +2071,7 @@ Consumption</a></td>
 Worth a Second Look</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>R25</strong></td>
 <td><code>research_ready/R25_Sleep_Regularity_Weekday_Weekend.png</code></td>
 <td>Results</td>
@@ -2053,7 +2080,7 @@ Worth a Second Look</a></td>
 Regularity — Weekday vs Weekend</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong>R26</strong></td>
 <td><code>research_ready/R26_Sleep_Composition_TIB_Breakdown.png</code></td>
 <td>Results</td>
@@ -2062,7 +2089,7 @@ Regularity — Weekday vs Weekend</a></td>
 Composition — TIB Breakdown</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>R27</strong></td>
 <td><code>research_ready/R27_Sleep_Metrics_Correlation_Matrix.png</code></td>
 <td>Results</td>
@@ -2073,13 +2100,61 @@ Correlation Matrix</a></td>
 </tr>
 </tbody>
 </table>
-<p><code>11</code> (flag co-occurrence) is skipped whenever fewer than
-two flag columns have complete data, and the reason is printed on the
-red block at the top of <code>figure_index.png</code>. <code>14</code>,
-<code>15</code> and <code>16</code> are generated whenever there is
-something to plot (cards below); when a run has nothing to show
-(e.g. the review queue is empty because everything was already
-reviewed), the skip reason says so explicitly.</p>
+<p><code>11</code> (flag co-occurrence, <a href="#id_11-flag-co-occurrence-heatmap">card below</a>) is skipped
+whenever fewer than two flag columns have complete data or no pair of
+flags co-occurs, and the reason is printed on the red block at the top
+of <code>figure_index.png</code>. <code>14</code>, <code>15</code> and
+<code>16</code> are generated whenever there is something to plot (cards
+below); when a run has nothing to show (e.g. the review queue is empty
+because everything was already reviewed), the skip reason says so
+explicitly.</p>
+<p><a id="s-9-1-naming"></a></p>
+<div class="section level4">
+<h4 id="how-figures-are-named-and-why-some-numbers-are-missing">How figures are named, and why some numbers are missing<a class="anchor" aria-label="anchor" href="#how-figures-are-named-and-why-some-numbers-are-missing"></a>
+</h4>
+<ul>
+<li>
+<strong>The numbers follow the data source, not the folder.</strong>
+Numbers 01 to 24 come from the original single visualization script,
+whose header groups them by data: 1 to 12 use the post-correction data,
+13 to 18 use the pre-correction auto-detection results, and 19 to 24 use
+the detection summary plus the corrected data. They do not match the
+output folders: 02 and 03 are in <code>research_ready/</code>, while 06
+and 07 are in <code>pipeline_cleaning/</code>.</li>
+<li>
+<strong>A letter after a number (02B, 04B, 13B, 13C, 13D, 20B) marks
+a companion figure</strong> that sits next to the figure with that
+number, so the later numbers did not move. 04B and 20B are in the first
+release (2026-07-15); 13B, 13C and 13D were added on 2026-09-07; 02B was
+relabelled from a second “Figure 2” on 2026-09-15 to remove a duplicate
+title.</li>
+<li>
+<strong>A1, P26, R25, R26 and R27 are legacy identifiers</strong>
+kept as they are so the code does not have to change; they do not follow
+the numeric sequence. The project’s figure-tree proposal
+(<code>VISUALIZATION_TREE_PROPOSAL.md</code>) records the decision not
+to rename them. What the letters stand for is not documented, so this
+page does not guess. What is certain: R25 to R27 are in
+<code>research_ready/</code>, and A1 and P26 are in
+<code>pipeline_cleaning/</code>.</li>
+<li>
+<strong>Missing numbers are not omissions.</strong> 08 was removed
+(the code comment says it fell back to a single violin whenever the
+categories were unbalanced). 12 was merged into A1, the Step Flag
+Ledger. 19 was folded into 13, whose table already shows the same split.
+The code comments are in
+<code>inst/scripts/sleep_visualization.R</code>, near “Figure 8:
+REMOVED”, “Figure 12 MERGED INTO STEP FLAG LEDGER” and “Figure 19 FOLDED
+INTO FIGURE 13”. There is no 08, 12 or 19 file.</li>
+<li>
+<strong>File names are kept as they are.</strong> Renaming touches
+the code, the figure index registry and any script of yours that reads
+these files. The proposal also suggests a hierarchical display numbering
+(for example “1.2-13”) as a caption prefix; that is only a proposal. It
+is not implemented: <code>figure_index.png</code> labels each thumbnail
+with its file name and a short caption, and the numbers above are the
+only numbering in use.</li>
+</ul>
 <blockquote>
 <p><strong>For reference only.</strong> The suggestions below are a
 starting point, not a rule; which figures to use depends on your paper’s
@@ -2108,9 +2183,9 @@ rest reads better as supplement.</li>
 <li>
 <strong>Supplement (everything else).</strong> All
 <code>pipeline_cleaning/</code> figures (13, 13B, 13C, 13D, 17, 18, A1,
-P26, 06, 07, 10) form the audit trail: put them in a supplement titled
-“Data quality and cleaning audit” and cite the set collectively from
-Methods with one sentence (“see Supplement S1 for the full audit
+P26, 06, 07, 10, 11) form the audit trail: put them in a supplement
+titled “Data quality and cleaning audit” and cite the set collectively
+from Methods with one sentence (“see Supplement S1 for the full audit
 trail”). The substance figures (21–24) belong with whatever
 substance-use analysis the paper reports, or supplement if none.</li>
 </ul>
@@ -2119,6 +2194,7 @@ Methods, 03 + 20 + R27 in Results, the supplement section for the audit
 trail.</strong> Captions for every one of these are ready in §9.2 and
 §9.3 below, at the end of each figure’s card.</p>
 <p><a id="s-9-2"></a></p>
+</div>
 </div>
 <div class="section level3">
 <h3 id="pipeline-cleaning-figure-cards-pipeline_cleaning">9.2 Pipeline-cleaning figure cards
@@ -2490,6 +2566,192 @@ h short, &gt; 10 h long). Point shape encodes short vs long sleep; point
 color encodes record quality. The horizontal line marks the SE = 85%
 poor-efficiency threshold.</p>
 </blockquote>
+<p><a id="11-flag-co-occurrence-heatmap"></a></p>
+</div>
+<div class="section level4">
+<h4 id="flag-co-occurrence-heatmap">11 · Flag Co-occurrence Heatmap<a class="anchor" aria-label="anchor" href="#flag-co-occurrence-heatmap"></a>
+</h4>
+<p><strong>File</strong>
+<code>pipeline_cleaning/11_Flag_Cooccurrence_Heatmap.png</code> —
+generated at <code>sleep_visualization.R:1571</code></p>
+<p><strong>Paper use</strong> Supplement</p>
+<p><strong>What each part means</strong> Heatmap of how often two
+quality flags are raised on the same record, based on the final
+corrected data. Each axis lists the same four flags; each cell is the
+number of records on which both flags are TRUE, printed in the cell,
+with the colour running from pale to red as the count grows (square-root
+scale, legend “Co-occurrence Count”).</p>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th>Axis label</th>
+<th>Flag</th>
+<th>Raised when</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>poor_efficiency</code></td>
+<td><code>flag_poor_efficiency</code></td>
+<td>Sleep efficiency is below
+<code>classification.flag_severity.poor_efficiency_threshold_pct</code>
+(default 70%)</td>
+</tr>
+<tr class="even">
+<td><code>high_sol</code></td>
+<td><code>flag_high_sol</code></td>
+<td>Sleep onset latency is above
+<code>classification.flag_severity.high_sol_threshold_hours</code>
+(default 1 h)</td>
+</tr>
+<tr class="odd">
+<td><code>high_waso</code></td>
+<td><code>flag_high_waso</code></td>
+<td>Wake after sleep onset is above
+<code>classification.flag_severity.high_waso_threshold_hours</code>
+(default 1.5 h)</td>
+</tr>
+<tr class="even">
+<td><code>sleep_calculation_issue</code></td>
+<td><code>flag_sleep_calculation_issue</code></td>
+<td>Calculated and self-reported sleep onset latency differ by more than
+30 minutes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Where the numbers come from</strong> Not every flag rests on
+the same kind of value, which matters when you read the figure:</p>
+<ul>
+<li>
+<code>high_sol</code> uses the <strong>calculated</strong> SOL, not
+the self-reported one: the corrected bedtime and corrected sleep-onset
+time, <code>time_sleep_corrected − time_bed_corrected</code>, in minutes
+divided by 60.</li>
+<li>
+<code>high_waso</code> uses the <strong>self-reported</strong> WASO
+estimate (the minutes the participant gave, divided by 60).</li>
+<li>
+<code>sleep_calculation_issue</code> compares the calculated SOL
+with the self-reported SOL; it is the only flag that looks at the gap
+between the two.</li>
+</ul>
+<p><strong>How to read a cell</strong> Find the two flags on the axes
+and read the number in the cell. For example, the cell pairing
+<code>high_sol</code> with <code>sleep_calculation_issue</code> counts
+the records that have a long calculated SOL <em>and</em> disagree with
+the participant’s own SOL answer. Those are the first records to look
+at, because the long SOL may come from a timestamp problem rather than
+from slow sleep onset. Each pair appears twice (see the precise rules),
+so read either copy.</p>
+<p>Two questions come up often; the FAQ below answers them in full: <a href="#fig11-q-sol">is high SOL self-reported or calculated?</a> and <a href="#fig11-q-calc">what does <code>sleep_calculation_issue</code>
+mean?</a></p>
+<p><strong>Healthy look</strong> Most cells are pale or absent, and no
+pair dominates. A few moderate cells are normal: a long calculated onset
+latency lowers sleep efficiency, and a large gap between calculated and
+reported SOL goes naturally with a high-SOL flag.</p>
+<p><strong>Anomaly →</strong> One cell far darker than the rest, or most
+pairs dark together, means one cause is setting off several flags at
+once (often a timestamp problem shared by many records, or thresholds
+that overlap by design). Check the records behind the dark cells,
+starting with <code>high_sol</code> ×
+<code>sleep_calculation_issue</code>.</p>
+<details><summary><strong>Precise rules</strong>
+</summary><ul>
+<li>
+<strong>What is counted.</strong> Only records with a non-missing
+value in all four flag columns are used (<code>complete.cases</code>). A
+cell is the number of those records where both flags are TRUE.</li>
+<li>
+<strong>Symmetric matrix.</strong> The count of A with B equals the
+count of B with A, so every pair is drawn twice (once on each side of
+the diagonal). Read one triangle. The diagonal (a flag with itself) is
+not drawn.</li>
+<li>
+<strong>Empty cells.</strong> Pairs whose count is 0 are left out,
+not drawn as a zero cell. A blank cell means “never together”, not
+“missing”.</li>
+<li>
+<strong>Colour scale.</strong> Square-root, so that a few large
+counts do not flatten the small ones. Compare colours roughly; read the
+printed number for the exact count.</li>
+<li>
+<strong>Data source.</strong> The final corrected data
+(<code>clean_df</code>), the same data as Figures 07 and 10.</li>
+<li>
+<strong>Flags not used.</strong> <code>flag_duration_extreme</code>
+and the three-level <code>flag_severity</code> label (Clean/Minor/Major,
+Figure 07) are not part of this figure: neither is a plain TRUE/FALSE
+flag that can be counted in pairs.</li>
+<li>
+<strong>When it is skipped.</strong> If fewer than two of the four
+flag columns have complete data, or if no pair co-occurs on any record,
+the figure is not drawn and the reason is printed on the red block of
+<code>figure_index.png</code>.</li>
+</ul></details><p><strong>FAQ</strong></p>
+<p><a id="fig11-q-sol"></a></p>
+<details><summary>
+Is a “high SOL” here self-reported or calculated?
+</summary><p><strong>Calculated.</strong> <code>flag_high_sol</code> uses
+<code>sol_h = self_diffcalc_sol_minutes / 60</code>, where
+<code>self_diffcalc_sol_minutes</code> is the corrected sleep-onset time
+minus the corrected bedtime, in minutes. The SOL the participant typed
+(<code>duration_totalmin_sol_estimate_am_mincalc</code>) is
+<strong>not</strong> used for this flag. It enters the figure only
+through <code>sleep_calculation_issue</code>, which compares the two. By
+contrast, <code>flag_high_waso</code> uses the self-reported WASO
+estimate.</p>
+<p>Do not confuse it with <code>SELF_REPORTED_FLAG</code> from Step 8
+(the file <code>flagged_records_self_reported.csv</code>). That is a
+different flag: it marks records whose self-reported values look
+implausible, for example a self-reported SOL over 120 min (or a very low
+TST/TIB ratio). It is not part of this figure.</p>
+</details><p><a id="fig11-q-calc"></a></p>
+<details><summary>
+What does sleep_calculation_issue mean?
+</summary><p><code>flag_sleep_calculation_issue</code> is TRUE when the calculated
+SOL and the self-reported SOL differ by more than 30 minutes. It looks
+at SOL only, not WASO or total sleep time. Despite the name it does
+<strong>not</strong> mean a calculation bug; it means the two accounts
+of how long it took to fall asleep do not match. Typical causes are a
+timestamp error, a mistyped SOL (for instance a clock time entered in
+the minutes field), or ordinary perception bias.</p>
+<p>Two things to know: if either value is missing the flag is FALSE (not
+NA), so “not flagged” does not mean the two agree. And the 30-minute
+cutoff is fixed in the code (<code>sleep_visualization.R</code>,
+<code>add_quality_flags()</code>); it is not a config key and does not
+appear on the Thresholds page.</p>
+</details><details><summary>
+Does a dark high_sol cell mean the participants really took a long time
+to fall asleep?
+</summary><p>Not necessarily. In the validation data the calculated and the
+self-reported SOL can differ by up to about 75 minutes (see <a href="validation-methodology.html">Validation Methodology</a>), so a
+high-SOL flag cannot tell a truly long onset from ordinary disagreement
+between the two sources. These flags are descriptive indicators for
+human review, not automated error signals.</p>
+</details><details><summary>
+Why are some pairs missing?
+</summary><p>Their count is 0 in this run. Pairs with no co-occurrence are not
+drawn.</p>
+</details><details><summary>
+Why does the figure not appear in my output?
+</summary><p>Either fewer than two flag columns had complete data, or no pair of
+flags occurred together. The reason is printed on the red block at the
+top of <code>figure_index.png</code>.</p>
+</details><p><strong>Paper caption</strong></p>
+<blockquote>
+<p><strong>Figure 11.</strong> Co-occurrence of data quality flags in
+the final corrected data. Each cell gives the number of records on which
+both flags are present (poor efficiency: SE &lt; 70%; high SOL:
+calculated SOL &gt; 1 h; high WASO: self-reported WASO &gt; 1.5 h; sleep
+calculation issue: calculated and self-reported SOL differ by more than
+30 min). Only records with complete values on all four flags are
+counted; pairs that never co-occur are not drawn. Colour is on a
+square-root scale. Flags are descriptive indicators for review, not
+error classifications.</p>
+</blockquote>
 <p><a id="13-error-category-distribution"></a></p>
 </div>
 <div class="section level4">
@@ -2583,6 +2845,13 @@ slip.</p>
 <p><strong>Anomaly →</strong> A large negative mass means widespread
 order errors that the normalizer will flip; two clusters near ±12 h
 point to a 12-hour-dial AM/PM habit.</p>
+<p><strong>How to read it, in words</strong> A tall red-band count in
+the Sleep -&gt; Awake panel means many raw rows have sleep and awake
+times that look swapped or AM/PM-flipped; the normaliser and the review
+then deal with them. A count near zero in a panel means the pattern is
+rare in that pair of events. The number is about how often the pattern
+occurred in the raw entries, not about what is still open (see the FAQ
+below).</p>
 <details><summary><strong>Precise rules</strong>
 </summary><ul>
 <li>
@@ -2599,6 +2868,30 @@ or a 12-hour AM/PM slip.</li>
 <strong>The red band</strong> marks gaps of −3 to −6 h, the range
 that defines the “AM/PM decode or field-swap candidate” definition used
 in the validation work; the count in the band is printed on it.</li>
+<li>
+<strong>What the red <code>n=</code> label is.</strong> There is one
+label per panel (Bed -&gt; Sleep, Sleep -&gt; Awake (TST), Awake -&gt;
+Getup). It is the number of records in that panel whose raw,
+pre-correction gap is negative and between 3 and 6 hours in size (both
+ends included). It is counted live from the current run’s data, never
+typed in, so it changes from run to run and from dataset to dataset;
+this is on purpose, so the label cannot drift from the real count.</li>
+<li>
+<strong>Where the band comes from.</strong> The 3 to 6 hour range is
+a definition fixed in the validation work
+(<code>validation/derive_timegap_candidates.R</code>): a reversal of
+that size is a typical signature of an AM/PM decode error or swapped
+fields. It is a definition for finding candidates, not a measured error
+rate.</li>
+<li>
+<strong>What is outside the band.</strong> Gaps reversed by less
+than 3 hours (small swaps) or by more than 6 hours are not counted in
+<code>n=</code>; other rules cover them (the shape notes above say which
+repair fits which pattern).</li>
+<li>
+<strong>Adding up.</strong> The per-panel numbers add up to the
+total number of candidates, and one record can appear in more than one
+panel.</li>
 <li>
 <strong>How to read the shape.</strong> A negative mass of roughly
 −1 to −3 h points to order swaps (repaired by the swap step); two
@@ -2617,9 +2910,15 @@ are usually under an hour or two, while sleep→awake is a whole night
 (about 6–10 h). Each panel is scaled to its own data.</p>
 </details><details><summary>
 Does a count in the red band mean that many records are wrong?
-</summary><p>Not exactly. It counts records whose raw gap falls in that range and
-therefore look like AM/PM or swap candidates. Some are real long gaps;
-the rules and the review decide which are errors.</p>
+</summary><p>No. The number counts <em>candidates</em>, selected only by the size
+of the raw gap (negative, 3 to 6 hours). Some of them are real long
+gaps, or entries that run in the “wrong” direction out of habit; which
+ones are errors is decided by the cleaning rules and by review, not by
+this label.</p>
+<p>It is also a picture of history: how often the pattern occurred in
+the raw entries. It does not show what is still unresolved after
+correction and review. For that, see the review status tables in <a href="#s-3">the manual-review cycle</a> and the final record
+classification in <a href="#s-4">the run summary</a>.</p>
 </details><p><strong>Paper caption</strong></p>
 <blockquote>
 <p><strong>Figure 13B.</strong> Histogram of the time gap (hours)
@@ -3174,6 +3473,45 @@ and Major (2+ flags) with the current thresholds.</p>
 above the rest.</p>
 <p><strong>Anomaly →</strong> A long list means a systemic issue
 affecting many participants, not individual behavior.</p>
+<p><strong>What to do with this list</strong> No, you do not have to
+re-check everything. The table only says whom to look at first. It
+changes no data and is not a completion criterion: whether the review is
+finished is decided by the review status tables for the error and
+unusual worksheets (see <a href="#s-3">the manual-review cycle</a>), not
+by this table. It is worth a look when some rows are tinted orange (20%
+flagged or more) or red (50% or more), when the list is long, or before
+you treat the results as final, when it is a good idea to spot-check the
+top few rows.</p>
+<p>To check one listed participant:</p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>See which flag drives the rate:</strong> poor sleep
+efficiency, high SOL or high WASO. The defaults are efficiency below
+70%, SOL above 1 hour and WASO above 1.5 hours
+(<code>classification.flag_severity.poor_efficiency_threshold_pct</code>,
+<code>high_sol_threshold_hours</code>,
+<code>high_waso_threshold_hours</code>). They come from the
+configuration, so your run may use other values; the figure’s subtitle
+shows the ones in force.</li>
+<li>
+<strong>If it is mostly SOL,</strong> remember that high SOL is
+calculated from the corrected bed and sleep times, not from the SOL the
+participant typed. Compare the two (the <a href="#id_11-flag-co-occurrence-heatmap">Figure 11 card</a> explains
+<code>flag_sleep_calculation_issue</code>). A large gap between them is
+usually a descriptive difference, not an error; keep it.</li>
+<li>
+<strong>Check whether those records were already handled by a
+person:</strong> the <code>human_review</code> and
+<code>has_correction</code> columns of the output, and
+<code>audit_disposition</code> in
+<code>cleaned_data_prepostcorrection.csv</code>. Records already handled
+do not need a second pass.</li>
+<li>
+<strong>If the timestamps themselves look wrong</strong> (bedtime
+after sleep onset, or the order broken across midnight), send the record
+to review through the manual-review cycle. Otherwise leave it as it is
+and note your decision.</li>
+</ol>
 <details><summary><strong>Precise rules</strong>
 </summary><ul>
 <li>
@@ -3194,6 +3532,17 @@ A participant has a high flag rate. Is their data wrong?
 </summary><p>Not necessarily. The list says whose records are worth checking
 first; the verdict comes from looking at the records, not from this
 table.</p>
+</details><details><summary>
+Does a high rate mean we have to redo the cleaning?
+</summary><p>No. A high rate means these participants’ records are worth a look
+first; it does not mean the cleaning failed. The flags are descriptive:
+they include self-report-versus-computed disagreements that the pipeline
+keeps on purpose, and a person whose sleep latency is persistently long
+will appear in the list even when every entry is correct. Also, the
+high-SOL flag cannot tell a truly long SOL from ordinary reporting
+disagreement (see <a href="#id_11-flag-co-occurrence-heatmap">Figure
+11</a> and <a href="validation-methodology.html">Validation
+Methodology</a>).</p>
 </details><details><summary>
 Why is nobody coloured in my figure?
 </summary><p>Colours start at 20% flagged. If every participant is below that, the

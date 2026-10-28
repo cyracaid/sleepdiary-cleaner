@@ -217,9 +217,44 @@ CSV，但这些行无法确定是哪条记录</td>
 <tr class="odd">
 <td>加了修正之后，审核文件的行数还是一样</td>
 <td>1.5.1 及更早版本里它列的是<strong>修正之前</strong>发现的错误。从
-1.5.2 起它是状态表：看 <code>status_after_corrections</code>
+1.5.2 起 <code>[NEW]manual_error_correction_review.csv</code>
+是状态表：看
+<code>status_after_corrections</code>。<code>[NEW]manual_unusual_review.csv</code>
+始终列出<strong>所有</strong> <code>unusual</code>
+记录，每次运行都会重写，审核列为空；你的决定保存在你自己的
+<code>manual_unusual_corrections.csv</code> 里，不在审核文件里</td>
+<td>读 <code>status_after_corrections</code>。对 unusual
+记录，请看你自己的 <code>manual_unusual_corrections.csv</code>，不要看
+<code>[NEW]</code> 文件</td>
+</tr>
+<tr class="even">
+<td>
+<code>[NEW]manual_error_correction_review.csv</code> 里某行是
+<code>in_manual_file_still_fails</code>，且
+<code>category_after_corrections</code> 是 <code>error</code> 或
+<code>skipped_na</code>
 </td>
-<td>读 <code>status_after_corrections</code>
+<td>这一行在你的人工错误文件里，但修正之后仍然不干净。<code>error</code>：顺序或合理性检查仍不通过。<code>skipped_na</code>：四个修正后的时间（bed、sleep、awake、getup）中仍缺一个，所以这一行不参加顺序检查。Step
+6 日志里写着 “Undo correction”
+的修正行会让这一行回到原始填写值，而原始值是错误的，所以仍是
+<code>error</code>
+</td>
+<td>打开这一行，把四个修正后的时间和你的人工文件对照。补上缺失的时间或改正顺序，再重跑。各状态的含义见<a href="interpreting-output-zh.html#s-3">状态表</a>。这张表在 Step 8.5
+之后才重写，所以更早停下的运行留下的是上一次运行的文件</td>
+</tr>
+<tr class="odd">
+<td>运行停在 <code>7. Updating correction status...</code>，报
+<code>Error: (converted from warning) Unknown or uninitialised column: manually_corrected</code>
+</td>
+<td>Step 7 要在你的人工错误修正文件上设置
+<code>manually_corrected</code>，而文件里没有这一列。通常这只是警告；当
+R 的 <code>warn</code> 选项为 2 时才变成错误，例如你的脚本或
+<code>.Rprofile</code> 里有
+<code>options(warn = 2)</code>（包本身不会设置它）。用 Excel 保存 CSV
+可能丢掉或改名列，也可能改变格式</td>
+<td>在 CSV 里加一列 <code>manually_corrected</code>，全部填
+<code>FALSE</code>，存成普通 CSV（UTF-8）再重跑。或者去掉
+<code>options(warn = 2)</code>
 </td>
 </tr>
 <tr class="even">

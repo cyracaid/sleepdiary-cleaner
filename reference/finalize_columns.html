@@ -81,7 +81,9 @@ archive, driven entirely by `inst/extdata/column_dictionary.csv`.</p>
 <span>  dict_path <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  output_dir <span class="op">=</span> <span class="st">"output"</span>,</span>
 <span>  write <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  audit_ledger <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  manual_metric_duration <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -117,6 +119,23 @@ value without touching the filesystem.</p></dd>
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
 <dd><p>Print a summary.</p></dd>
+
+
+<dt id="arg-audit-ledger">audit_ledger<a class="anchor" aria-label="anchor" href="#arg-audit-ledger"></a></dt>
+<dd><p>Optional path to the private audit ledger
+(`audit_dispositions.csv`). `run_pipeline()` passes
+`data.files.audit_dispositions` from the config. When given it must
+exist (a missing named ledger stops). `NULL` or blank falls back to the
+`sleepcleanr.audit_ledger` option, then the working directory; with no
+ledger `audit_disposition` is `"none"` for every row.</p></dd>
+
+
+<dt id="arg-manual-metric-duration">manual_metric_duration<a class="anchor" aria-label="anchor" href="#arg-manual-metric-duration"></a></dt>
+<dd><p>Optional path to the manual metric-duration
+corrections file the run used, for the ledger consistency check.
+`run_pipeline()` passes the resolved config value (blank for an
+algorithmic-only run). `NULL` falls back to the
+`sleepcleanr.audit_manual_corrections` option, then the working directory.</p></dd>
 
 </dl></div>
     <div class="section level2">

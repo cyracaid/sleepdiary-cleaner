@@ -227,10 +227,49 @@ is a character class</td>
 <td>The review file still has the same number of rows after you added
 corrections</td>
 <td>In versions up to 1.5.1 it lists the errors found
-<strong>before</strong> correction. From 1.5.2 it is a status table:
-look at <code>status_after_corrections</code>
+<strong>before</strong> correction. From 1.5.2
+<code>[NEW]manual_error_correction_review.csv</code> is a status table:
+look at <code>status_after_corrections</code>.
+<code>[NEW]manual_unusual_review.csv</code> always lists
+<strong>all</strong> <code>unusual</code> records and is rewritten each
+run with blank reviewer columns; your decisions are kept in your own
+<code>manual_unusual_corrections.csv</code>, not in the review file</td>
+<td>Read <code>status_after_corrections</code>. For unusual records,
+check your own <code>manual_unusual_corrections.csv</code>, not the
+<code>[NEW]</code> file</td>
+</tr>
+<tr class="even">
+<td>A row in <code>[NEW]manual_error_correction_review.csv</code> has
+<code>in_manual_file_still_fails</code> and
+<code>category_after_corrections</code> is <code>error</code> or
+<code>skipped_na</code>
 </td>
-<td>Read <code>status_after_corrections</code>
+<td>The row is in your manual error file but is still not clean after
+the corrections. <code>error</code>: the order or plausibility checks
+still fail. <code>skipped_na</code>: one of the four corrected times
+(bed, sleep, awake, getup) is still missing, so the row is left out of
+the order checks. A correction line that says “Undo correction” in the
+Step 6 log returns the row to its original entries, which are an error,
+so it stays an error</td>
+<td>Open the row and compare its four corrected times with your manual
+file. Fill the missing time or fix the order, then rerun. The status
+values are explained in <a href="interpreting-output.html#s-3">the
+status table</a>. The table is rewritten after Step 8.5, so a run that
+stops earlier leaves the file from the previous run</td>
+</tr>
+<tr class="odd">
+<td>The run stops at <code>7. Updating correction status...</code> with
+<code>Error: (converted from warning) Unknown or uninitialised column: manually_corrected</code>
+</td>
+<td>Step 7 sets <code>manually_corrected</code> on your manual error
+corrections file, and the file has no such column. Normally this is only
+a warning. It becomes an error when R’s <code>warn</code> option is 2,
+for example <code>options(warn = 2)</code> in your script or
+<code>.Rprofile</code> (the package does not set it). Saving the CSV
+from Excel can drop or rename columns and change formats</td>
+<td>Add a column named <code>manually_corrected</code> filled with
+<code>FALSE</code> to the CSV, save it as plain CSV (UTF-8) and rerun.
+Or remove <code>options(warn = 2)</code>
 </td>
 </tr>
 <tr class="even">

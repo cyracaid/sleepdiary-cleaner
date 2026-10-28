@@ -168,10 +168,15 @@ CSV、回归检查和快速检查卡；第 8–9 节讲怎么看图。</p>
 <ul>
 <li>
 <a href="#s-9-1">9.1 图索引</a>
+<ul>
+<li>
+<a href="#s-9-1-naming">图是怎么编号的，为什么有些编号缺失</a>
+</li>
+</ul>
 </li>
 <li>
 <details><summary><a href="#s-9-2">9.2
-管线清洗图卡片（<code>pipeline_cleaning/</code>）（15 张）</a>
+管线清洗图卡片（<code>pipeline_cleaning/</code>）（16 张）</a>
 </summary><ul>
 <li>
 <a href="#c-01">01 · 管线记录流</a>
@@ -184,6 +189,9 @@ CSV、回归检查和快速检查卡；第 8–9 节讲怎么看图。</p>
 </li>
 <li>
 <a href="#c-10">10 · 极端睡眠时长</a>
+</li>
+<li>
+<a href="#c-11">11 · 标记共现图</a>
 </li>
 <li>
 <a href="#c-13">13 · 错误类别分布</a>
@@ -573,6 +581,12 @@ git 和发布构建之外（<code>.gitignore</code> + <code>.Rbuildignore</code>
 </tr>
 </tbody>
 </table>
+<p><strong>审计账本路径：</strong> 私有审计账本为可选项，在配置中以
+<code>data.files.audit_dispositions</code>
+指定（默认为空：不启用，<code>audit_disposition</code> 全部为
+<code>"none"</code>）。若指定的文件不存在，运行会报错停止，而不是静默写入
+<code>"none"</code>。与人工修正文件的一致性检查使用本次运行实际采用的
+<code>data.files.manual_metric_duration</code>。</p>
 <p><strong>格式：</strong> 每个文件都是纯 CSV；error/unusual 文件包含
 <code>pid, day_num, row_id, variable, old_value_hhmm, old_value_ampm, new_value_hhmm, new_value_ampm, correction_type, confidence, reviewer_notes</code>（Step
 5 写出的 <code>[NEW]</code> 审查文件已经预填了诊断信息—— 只需填写
@@ -1497,7 +1511,7 @@ gitignore，不要提交或外传。</p>
 <tbody>
 <tr class="odd">
 <td><code>pipeline_cleaning/</code></td>
-<td>14 张诊断图：流水线发现了什么、改了什么（卡片见 §9.2）</td>
+<td>16 张诊断图：流水线发现了什么、改了什么（卡片见 §9.2）</td>
 <td>检查清洗是否正常；补充材料的审计链</td>
 </tr>
 <tr class="even">
@@ -1694,6 +1708,14 @@ gitignore，不要提交或外传。</p>
 <td>2026-09-25</td>
 </tr>
 <tr class="even">
+<td><strong>11</strong></td>
+<td><code>pipeline_cleaning/11_Flag_Cooccurrence_Heatmap.png</code></td>
+<td>Supplement</td>
+<td><code>sleep_visualization.R:1571</code></td>
+<td><a href="#c-11">§9.2 · 标记共现图</a></td>
+<td>2026-10-23</td>
+</tr>
+<tr class="odd">
 <td><strong>13</strong></td>
 <td><code>pipeline_cleaning/13_Error_Category_Distribution.png</code></td>
 <td>Supplement</td>
@@ -1701,7 +1723,7 @@ gitignore，不要提交或外传。</p>
 <td><a href="#c-13">§9.2 · 错误类别分布</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>13B</strong></td>
 <td><code>pipeline_cleaning/13B_Adjacent_Timestamp_Gaps.png</code></td>
 <td>Supplement</td>
@@ -1709,7 +1731,7 @@ gitignore，不要提交或外传。</p>
 <td><a href="#c-13b">§9.2 · 相邻时间戳间隔</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong>13C</strong></td>
 <td><code>pipeline_cleaning/13C_Detection_Outcomes_Heatmap.png</code></td>
 <td>Supplement</td>
@@ -1717,7 +1739,7 @@ gitignore，不要提交或外传。</p>
 <td><a href="#c-13c">§9.2 · 检测结果热力图</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>13D</strong></td>
 <td><code>pipeline_cleaning/13D_Threshold_vs_Noise_Ratio.png</code></td>
 <td>Supplement</td>
@@ -1725,7 +1747,7 @@ gitignore，不要提交或外传。</p>
 <td><a href="#c-13d">§9.2 · 阈值 vs 测量噪声</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong>14</strong></td>
 <td><code>pipeline_cleaning/14_Sleep_Duration_Pre_Correction.png</code></td>
 <td>Supplement</td>
@@ -1733,7 +1755,7 @@ gitignore，不要提交或外传。</p>
 <td><a href="#c-14">§9.2 · 修正前睡眠时长</a></td>
 <td>2026-09-30</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>15</strong></td>
 <td><code>pipeline_cleaning/15_Error_Timeline.png</code></td>
 <td>Supplement</td>
@@ -1741,7 +1763,7 @@ gitignore，不要提交或外传。</p>
 <td><a href="#c-15">§9.2 · 错误时间线</a></td>
 <td>2026-09-30</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong>16</strong></td>
 <td><code>pipeline_cleaning/16_Common_Error_Patterns.png</code></td>
 <td>Supplement</td>
@@ -1749,7 +1771,7 @@ gitignore，不要提交或外传。</p>
 <td><a href="#c-16">§9.2 · 常见错误模式</a></td>
 <td>2026-09-30</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>17</strong></td>
 <td><code>pipeline_cleaning/17_Top_Participants_Flags.png</code></td>
 <td>Supplement</td>
@@ -1757,7 +1779,7 @@ gitignore，不要提交或外传。</p>
 <td><a href="#c-17">§9.2 · 标记率最高的参与者</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong>18</strong></td>
 <td><code>pipeline_cleaning/18_Auto_Detected_Dashboard.png</code></td>
 <td>Supplement</td>
@@ -1765,7 +1787,7 @@ gitignore，不要提交或外传。</p>
 <td><a href="#c-18">§9.2 · 自动检测仪表板</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>20</strong></td>
 <td><code>research_ready/20_SOL_Perception_Bias.png</code></td>
 <td>Results</td>
@@ -1773,7 +1795,7 @@ gitignore，不要提交或外传。</p>
 <td><a href="#c-20">§9.3 · SOL 感知偏差</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong>20B</strong></td>
 <td><code>research_ready/20B_WASO_Perception_Bias.png</code></td>
 <td>Results</td>
@@ -1781,7 +1803,7 @@ gitignore，不要提交或外传。</p>
 <td><a href="#c-20b">§9.3 · WASO 感知偏差</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>21</strong></td>
 <td><code>research_ready/21_Substance_Use_Availability.png</code></td>
 <td>Supplement</td>
@@ -1789,7 +1811,7 @@ gitignore，不要提交或外传。</p>
 <td><a href="#c-21">§9.3 · 物质使用数据可得性</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong>22</strong></td>
 <td><code>research_ready/22_Substance_Use_Distribution.png</code></td>
 <td>Supplement</td>
@@ -1797,7 +1819,7 @@ gitignore，不要提交或外传。</p>
 <td><a href="#c-22">§9.3 · 物质使用数值分布</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>23</strong></td>
 <td><code>research_ready/23_Caffeine_Consumption.png</code></td>
 <td>Supplement</td>
@@ -1805,7 +1827,7 @@ gitignore，不要提交或外传。</p>
 <td><a href="#c-23">§9.3 · 咖啡因摄入</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong>24</strong></td>
 <td><code>research_ready/24_Alcohol_Consumption.png</code></td>
 <td>Supplement</td>
@@ -1813,7 +1835,7 @@ gitignore，不要提交或外传。</p>
 <td><a href="#c-24">§9.3 · 酒精摄入</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>A1</strong></td>
 <td><code>pipeline_cleaning/A1_Step_Flag_Ledger.png</code></td>
 <td>Supplement</td>
@@ -1821,7 +1843,7 @@ gitignore，不要提交或外传。</p>
 <td><a href="#c-a1">§9.2 · 逐步标记账本</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong>P26</strong></td>
 <td><code>pipeline_cleaning/P26_PerParticipant_Flag_Rate.png</code></td>
 <td>Supplement</td>
@@ -1829,7 +1851,7 @@ gitignore，不要提交或外传。</p>
 <td><a href="#c-p26">§9.2 · 值得二次检查的参与者</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>R25</strong></td>
 <td><code>research_ready/R25_Sleep_Regularity_Weekday_Weekend.png</code></td>
 <td>Results</td>
@@ -1837,7 +1859,7 @@ gitignore，不要提交或外传。</p>
 <td><a href="#c-r25">§9.3 · 睡眠规律性——工作日 vs 周末</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong>R26</strong></td>
 <td><code>research_ready/R26_Sleep_Composition_TIB_Breakdown.png</code></td>
 <td>Results</td>
@@ -1845,7 +1867,7 @@ gitignore，不要提交或外传。</p>
 <td><a href="#c-r26">§9.3 · 睡眠构成——TIB 拆分</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>R27</strong></td>
 <td><code>research_ready/R27_Sleep_Metrics_Correlation_Matrix.png</code></td>
 <td>Results</td>
@@ -1855,10 +1877,45 @@ gitignore，不要提交或外传。</p>
 </tr>
 </tbody>
 </table>
-<p><code>11</code>（标记共现图）在完整数据的标记列少于两列时跳过，原因会写在
+<p><code>11</code>（标记共现图，见<a href="#c-11">下方卡片</a>）在完整数据的标记列少于两列、或没有任何一对标记同时出现时跳过，原因会写在
 <code>figure_index.png</code>
 顶部的红色区块里。<code>14</code>、<code>15</code>、<code>16</code>
 在有东西可画时都会生成（见下面的卡片）；某次运行确实没东西可展示时（例如待审队列已清空，因为一切都已审查过），跳过原因会明确说明。</p>
+<p><a id="s-9-1-naming"></a></p>
+<div class="section level4">
+<h4 id="图是怎么编号的为什么有些编号缺失">图是怎么编号的，为什么有些编号缺失<a class="anchor" aria-label="anchor" href="#%E5%9B%BE%E6%98%AF%E6%80%8E%E4%B9%88%E7%BC%96%E5%8F%B7%E7%9A%84%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9C%89%E4%BA%9B%E7%BC%96%E5%8F%B7%E7%BC%BA%E5%A4%B1"></a>
+</h4>
+<ul>
+<li>
+<strong>编号跟着数据来源走，不跟文件夹走。</strong> 01 到 24
+的编号来自最初那一个可视化脚本，脚本开头按数据来源把它们分组：1 到 12
+用修正后的数据，13 到 18 用修正前的自动检测结果，19 到 24
+用检测汇总加修正后的数据。它们和输出文件夹对不上：02 和 03 在
+<code>research_ready/</code>，06 和 07 在
+<code>pipeline_cleaning/</code>。</li>
+<li>
+<strong>编号后面的字母（02B、04B、13B、13C、13D、20B）表示伴随图</strong>，放在同编号的图旁边，这样后面的编号不用挪动。04B
+和 20B 在首个版本（2026-07-15）里就有；13B、13C、13D 于 2026-09-07
+加入；02B 于 2026-09-15 从重复的第二个”Figure
+2”改标而来，以消除重复标题。</li>
+<li>
+<strong>A1、P26、R25、R26、R27
+是遗留标识</strong>，原样保留，免得改代码；它们不按数字顺序排。项目的图树提案（<code>VISUALIZATION_TREE_PROPOSAL.md</code>）记录了不重命名它们的决定。这些字母代表什么没有文档记载，所以本页不去猜。可以确定的是：R25
+到 R27 在 <code>research_ready/</code>，A1 和 P26 在
+<code>pipeline_cleaning/</code>。</li>
+<li>
+<strong>缺失的编号不是遗漏。</strong> 08
+被移除了（代码注释说，类别不均衡时它会退化成一把小提琴）。12 并入了 A1
+逐步标记账本。19 并入了 13，13 的表格已经显示同样的划分。相关代码注释在
+<code>inst/scripts/sleep_visualization.R</code> 中，位于 “Figure 8:
+REMOVED”、“Figure 12 MERGED INTO STEP FLAG LEDGER” 和 “Figure 19 FOLDED
+INTO FIGURE 13” 附近。08、12、19 都没有对应的文件。</li>
+<li>
+<strong>文件名保持不变。</strong>
+重命名会牵动代码、图索引的登记表，以及你自己读取这些文件的脚本。提案还建议用分层的显示编号（例如
+“1.2-13”）作为图注前缀；那只是提案，没有实现：<code>figure_index.png</code>
+给每张缩略图标的是文件名加一句简短说明，上面这些编号是唯一在用的编号。</li>
+</ul>
 <blockquote>
 <p><strong>仅供参考。</strong>
 下面的建议只是一个起点，不是规定；具体选哪些图取决于你论文要讲的内容和期刊的限制。</p>
@@ -1880,7 +1937,7 @@ vs 周末）或 R26（TIB 构成）如果时间规律性/构成很重要；R27
 <li>
 <strong>补充材料（其余全部）。</strong> 所有
 <code>pipeline_cleaning/</code> 图（13、13B、
-13C、13D、17、18、A1、P26、06、07、10）构成审计轨迹：把它们放进一个标题为”数据质量与清洗审计”的补充材料里，在
+13C、13D、17、18、A1、P26、06、07、10、11）构成审计轨迹：把它们放进一个标题为”数据质量与清洗审计”的补充材料里，在
 Methods 里用一句话统一引用（“完整审计轨迹见补充材料
 S1”）。物质使用相关的图（21–24）跟着论文报告的物质使用分析走，没有的话也放补充材料。</li>
 </ul>
@@ -1888,6 +1945,7 @@ S1”）。物质使用相关的图（21–24）跟着论文报告的物质使�
 20 + R27，其余进补充材料的审计轨迹部分。</strong>
 每一张的图注都已经写好，在下面 §9.2 和 §9.3 每张卡片的末尾。</p>
 <p><a id="s-9-2"></a></p>
+</div>
 </div>
 <div class="section level3">
 <h3 id="管线清洗图卡片pipeline_cleaning">9.2 管线清洗图卡片（<code>pipeline_cleaning/</code>）<a class="anchor" aria-label="anchor" href="#%E7%AE%A1%E7%BA%BF%E6%B8%85%E6%B4%97%E5%9B%BE%E5%8D%A1%E7%89%87pipeline_cleaning"></a>
@@ -2201,6 +2259,160 @@ TST = 0 或 24 小时的点，则指向解析失败。</p>
 长）。点的形状编码短/长睡眠；点的颜色编码记录质量。水平线标出 SE = 85%
 的低效率阈值。</p>
 </blockquote>
+<p><a id="c-11"></a></p>
+</div>
+<div class="section level4">
+<h4 id="标记共现图">11 · 标记共现图<a class="anchor" aria-label="anchor" href="#%E6%A0%87%E8%AE%B0%E5%85%B1%E7%8E%B0%E5%9B%BE"></a>
+</h4>
+<p><strong>文件</strong>
+<code>pipeline_cleaning/11_Flag_Cooccurrence_Heatmap.png</code> — 生成于
+<code>sleep_visualization.R:1571</code></p>
+<p><strong>论文用途</strong> Supplement</p>
+<p><strong>每部分是什么意思</strong>
+热力图，显示两个质量标记在同一条记录上同时出现的频率，基于最终修正后的数据。两条轴列出同样的四个标记；每个格子是两个标记都为
+TRUE
+的记录数，数字写在格子里，颜色随计数增大由浅变红（平方根刻度，图例为”Co-occurrence
+Count”）。</p>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th>轴标签</th>
+<th>标记</th>
+<th>触发条件</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>poor_efficiency</code></td>
+<td><code>flag_poor_efficiency</code></td>
+<td>睡眠效率低于
+<code>classification.flag_severity.poor_efficiency_threshold_pct</code>（默认
+70%）</td>
+</tr>
+<tr class="even">
+<td><code>high_sol</code></td>
+<td><code>flag_high_sol</code></td>
+<td>入睡潜伏期高于
+<code>classification.flag_severity.high_sol_threshold_hours</code>（默认
+1 小时）</td>
+</tr>
+<tr class="odd">
+<td><code>high_waso</code></td>
+<td><code>flag_high_waso</code></td>
+<td>睡后觉醒高于
+<code>classification.flag_severity.high_waso_threshold_hours</code>（默认
+1.5 小时）</td>
+</tr>
+<tr class="even">
+<td><code>sleep_calculation_issue</code></td>
+<td><code>flag_sleep_calculation_issue</code></td>
+<td>计算得到的入睡潜伏期与自评的入睡潜伏期相差超过 30 分钟</td>
+</tr>
+</tbody>
+</table>
+<p><strong>数字从哪来</strong>
+并不是每个标记都基于同一类数值，读图时要注意：</p>
+<ul>
+<li>
+<code>high_sol</code> 用的是<strong>计算得到的</strong>
+SOL，不是自评的：用修正后的上床时间和修正后的入睡时间，<code>time_sleep_corrected − time_bed_corrected</code>，换算成分钟后再除以
+60。</li>
+<li>
+<code>high_waso</code> 用的是<strong>自评的</strong> WASO
+估计值（参与者填写的分钟数，除以 60）。</li>
+<li>
+<code>sleep_calculation_issue</code> 比较计算 SOL 与自评
+SOL，是唯一看两者差距的标记。</li>
+</ul>
+<p><strong>怎么读一个格子</strong>
+在两条轴上找到两个标记，读格子里的数字。例如 <code>high_sol</code> 与
+<code>sleep_calculation_issue</code> 交叉的格子，数的是既有较长的计算
+SOL、又与参与者自己填的 SOL 对不上的记录。这些记录最值得先看，因为长 SOL
+可能来自时间戳问题，而不是真的入睡慢。每一对都出现两次（见精确规则），读哪一份都行。</p>
+<p>有两个问题常被问到，下面的常见问题有完整回答：<a href="#fig11-q-sol">高 SOL 是自评的还是计算的？</a>以及 <a href="#fig11-q-calc"><code>sleep_calculation_issue</code>
+是什么意思？</a></p>
+<p><strong>健康外观</strong>
+大多数格子颜色很浅或没有，也没有哪一对特别突出。出现少数中等深度的格子是正常的：计算出的入睡潜伏期很长会拉低睡眠效率，计算
+SOL 与自评 SOL 差距很大，也自然会伴随高 SOL 标记。</p>
+<p><strong>异常 →</strong>
+某一格明显比其他格深得多，或多数组合同时偏深，说明同一个原因同时触发了多个标记（常见于许多记录共有的时间戳问题，或阈值本身就互相重叠）。去看深色格子背后的记录，先从
+<code>high_sol</code> × <code>sleep_calculation_issue</code> 看起。</p>
+<details><summary><strong>精确规则</strong>
+</summary><ul>
+<li>
+<strong>数的是什么。</strong>
+只使用四个标记列都有非缺失值的记录（<code>complete.cases</code>）。每个格子是这些记录中两个标记都为
+TRUE 的条数。</li>
+<li>
+<strong>对称矩阵。</strong> A 与 B 的计数等于 B 与 A
+的计数，所以每一对都画了两次（对角线两侧各一次），读一侧即可。对角线（标记与自己）不画。</li>
+<li>
+<strong>空白格子。</strong> 计数为 0 的组合不画，而不是画成一个 0
+的格子。空白表示”从未同时出现”，不是”缺失”。</li>
+<li>
+<strong>颜色刻度。</strong>
+平方根刻度，避免少数很大的计数把小计数压平。颜色只能粗略比较；确切数量请读格子里的数字。</li>
+<li>
+<strong>数据来源。</strong>
+最终修正后的数据（<code>clean_df</code>），与图 07、图 10 同源。</li>
+<li>
+<strong>没有使用的标记。</strong> <code>flag_duration_extreme</code>
+和三级的 <code>flag_severity</code> 标签（Clean/Minor/Major，见图
+07）不在这张图里：它们都不是可以两两计数的普通 TRUE/FALSE 标记。</li>
+<li>
+<strong>何时跳过。</strong>
+四个标记列中完整数据少于两列，或没有任何一对标记在同一条记录上同时出现，这张图就不画，原因会写在
+<code>figure_index.png</code> 的红色区块里。</li>
+</ul></details><p><strong>常见问题</strong></p>
+<p><a id="fig11-q-sol"></a></p>
+<details><summary>
+这里的”高 SOL”是自评的还是计算的？
+</summary><p><strong>计算的。</strong> <code>flag_high_sol</code> 用的是
+<code>sol_h = self_diffcalc_sol_minutes / 60</code>，其中
+<code>self_diffcalc_sol_minutes</code>
+是修正后的入睡时间减去修正后的上床时间（分钟）。参与者自己填的
+SOL（<code>duration_totalmin_sol_estimate_am_mincalc</code>）<strong>不</strong>用于这个标记，只通过
+<code>sleep_calculation_issue</code>
+进入这张图，该标记比较的就是两者。相反，<code>flag_high_waso</code>
+用的是自评的 WASO 估计值。</p>
+<p>不要把它和第 8 步的 <code>SELF_REPORTED_FLAG</code>（文件
+<code>flagged_records_self_reported.csv</code>）混淆。那是另一个标记：标出自评数值看起来不合理的记录，例如自评
+SOL 超过 120 分钟（或 TST/TIB 比值很低）。它不属于这张图。</p>
+</details><p><a id="fig11-q-calc"></a></p>
+<details><summary>
+sleep_calculation_issue 是什么意思？
+</summary><p>当计算 SOL 与自评 SOL 相差超过 30
+分钟时，<code>flag_sleep_calculation_issue</code> 为 TRUE。它只看
+SOL，不看 WASO
+或总睡眠时间。尽管名字里有”calculation”，它<strong>不</strong>表示计算有
+bug；它的意思是关于”花了多久才睡着”的两种说法对不上。常见原因有：时间戳错误、SOL
+填错（例如在分钟栏里填了钟点），或一般的感知偏差。</p>
+<p>还有两点要知道：任何一个值缺失时该标记为 FALSE（不是
+NA），所以”没有被标记”并不表示两者一致。另外，30
+分钟的界限写死在代码里（<code>sleep_visualization.R</code> 的
+<code>add_quality_flags()</code>），不是配置项，也没有出现在阈值页面上。</p>
+</details><details><summary>
+high_sol 的格子很深，是不是说明参与者真的入睡很慢？
+</summary><p>不一定。在验证数据里，计算 SOL 与自评 SOL 最多可相差约 75 分钟（见<a href="validation-methodology-zh.html">验证方法学</a>），所以高 SOL
+标记分不清是真的入睡很久，还是两种来源之间的一般性分歧。这些标记是供人工复核的描述性指示，不是自动的错误信号。</p>
+</details><details><summary>
+为什么有些组合没有画出来？
+</summary><p>它们在这次运行中的计数为 0。从未同时出现的组合不画。</p>
+</details><details><summary>
+为什么我的输出里没有这张图？
+</summary><p>要么完整数据的标记列少于两列，要么没有任何一对标记同时出现。原因会写在
+<code>figure_index.png</code> 顶部的红色区块里。</p>
+</details><p><strong>论文图注</strong></p>
+<blockquote>
+<p><strong>Figure 11.</strong>
+最终修正数据中数据质量标记的共现情况。每个格子给出两个标记同时出现的记录数（低效率：SE
+&lt; 70%；高 SOL：计算 SOL &gt; 1 h；高 WASO：自评 WASO &gt; 1.5
+h；睡眠计算问题：计算 SOL 与自评 SOL 相差超过 30
+min）。只统计四个标记都有完整值的记录；从未同时出现的组合不画。颜色为平方根刻度。这些标记是供复核的描述性指示，不是错误分类。</p>
+</blockquote>
 <p><a id="c-13"></a></p>
 </div>
 <div class="section level4">
@@ -2275,6 +2487,10 @@ awake→getup）之间的间隔小时数直方图，用的是<strong>修正前�
 <p><strong>异常 →</strong>
 负间隔占很大比例，说明普遍存在顺序错误，规整步骤会把它们翻转过来；在 ±12
 小时附近出现两个堆，则指向 12 小时钟面的 AM/PM 习惯。</p>
+<p><strong>用文字举例怎么读</strong> Sleep -&gt; Awake
+面板里红色带的计数很高，说明很多原始行里的入睡时间和醒来时间看起来互换了或
+AM/PM
+反了；规整步骤和人工复核随后会处理它们。某个面板的计数接近零，说明这对事件上这种模式很少见。这个数字说的是原始填写中这种模式出现的频率，不是现在还有多少没解决（见下面的常见问题）。</p>
 <details><summary><strong>精确规则</strong>
 </summary><ul>
 <li>
@@ -2289,6 +2505,23 @@ getup——间隔是后一个时间减前一个时间，单位小时，在原始
 <strong>红色色带</strong> 标出 −3 到 −6
 小时的间隔，这个范围定义了验证工作里的”AM/PM
 解码或字段互换候选”；带内的数量印在带上。</li>
+<li>
+<strong>红色 <code>n=</code> 标签是什么。</strong> 每个面板（Bed
+-&gt; Sleep、Sleep -&gt; Awake (TST)、Awake -&gt;
+Getup）各有一个标签。它是该面板中原始（修正前）间隔为负、且大小在 3 到 6
+小时之间（两端都含）的记录数。它由当前这次运行的数据实时统计，不是手写的数字，所以会随每次运行、每个数据集而变；这是有意为之，保证标签不会和真实数量脱节。</li>
+<li>
+<strong>这个带从哪来。</strong> 3 到 6
+小时的范围是验证工作里固定下来的定义（<code>validation/derive_timegap_candidates.R</code>）：这种大小的反向间隔，是
+AM/PM
+解码错误或字段互换的典型特征。它是用来找候选的定义，不是测得的错误率。</li>
+<li>
+<strong>带外的是什么。</strong> 反向不到 3 小时（小幅互换）或超过 6
+小时的间隔，不计入
+<code>n=</code>，由其他规则处理（上面的形状说明写了哪种修复对应哪种模式）。</li>
+<li>
+<strong>加总。</strong>
+各面板的数字加起来是候选总数，同一条记录可以出现在不止一个面板里。</li>
 <li>
 <strong>怎么读形状。</strong> 大约 −1 到 −3
 小时的负值堆，指向顺序互换（由互换步骤修复）；在 ±12
@@ -2305,8 +2538,9 @@ getup——间隔是后一个时间减前一个时间，单位小时，在原始
 小时）。每个面板按自己的数据缩放。</p>
 </details><details><summary>
 红色带里的数字，说明有这么多记录是错的吗？
-</summary><p>不完全是。它数的是原始间隔落在这个范围、因此看起来像 AM/PM
-或互换候选的记录。其中有些是真实的长间隔，是不是错误，要由规则和审查来决定。</p>
+</summary><p>不是。这个数字数的是<em>候选</em>，只按原始间隔的大小（为负、3 到 6
+小时）筛选。其中有些是真实的长间隔，或是习惯性按”反方向”填写的记录；哪些是错误，由清洗规则和人工复核决定，不由这个标签决定。</p>
+<p>它也只是历史的一张快照：原始填写中这种模式出现得有多频繁。它不显示修正和复核之后还有什么没解决。要看这个，请见<a href="#s-3">人工复核循环</a>里的复核状态表，以及<a href="#s-4">运行汇总</a>里的最终记录分类。</p>
 </details><p><strong>论文图注</strong></p>
 <blockquote>
 <p><strong>Figure 13B.</strong> 相邻日记事件（bed→sleep、sleep→awake、
@@ -2751,6 +2985,29 @@ ID、总记录数，以及 Clean / Minor / Major
 名单很短，也没有哪位参与者远高于其他人。</p>
 <p><strong>异常 →</strong>
 名单很长，说明是影响许多参与者的系统性问题，而不是个别人的行为。</p>
+<p><strong>怎么用这份名单</strong>
+不，不需要把所有东西都重新检查一遍。这张表只告诉你先看谁。它不改任何数据，也不是完成标准：复核是否结束，由错误和异常两份工作表的复核状态表决定（见<a href="#s-3">人工复核循环</a>），而不是由这张表决定。出现以下情况值得看一眼：有些行被染成橙色（标记率
+20% 及以上）或红色（50%
+及以上）；名单很长；或者在把结果当作最终版本之前，抽查排在最前面的几行。</p>
+<p>检查名单上的某个参与者：</p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>看是哪个标记拉高了比例：</strong> 睡眠效率低、SOL 高，还是
+WASO 高。默认阈值是效率低于 70%、SOL 超过 1 小时、WASO 超过 1.5
+小时（<code>classification.flag_severity.poor_efficiency_threshold_pct</code>、<code>high_sol_threshold_hours</code>、<code>high_waso_threshold_hours</code>）。它们来自配置，所以你这次运行可能用了别的值；图的副标题会写出实际生效的值。</li>
+<li>
+<strong>如果主要是 SOL：</strong> 记住高 SOL
+是由修正后的上床时间和入睡时间计算出来的，不是参与者自己填的
+SOL。把两者对比一下（<a href="#c-11">图 11 的卡片</a>解释了
+<code>flag_sleep_calculation_issue</code>）。两者差距大通常是描述性的差异，不是错误；保留即可。</li>
+<li>
+<strong>看这些记录是否已经有人处理过：</strong> 输出里的
+<code>human_review</code> 和 <code>has_correction</code> 列，以及
+<code>cleaned_data_prepostcorrection.csv</code> 里的
+<code>audit_disposition</code>。已经处理过的记录不需要再过一遍。</li>
+<li>
+<strong>如果时间戳本身看起来不对</strong>（上床时间晚于入睡时间，或跨午夜后顺序错乱），通过人工复核循环把这条记录送去复核。否则保持原样，并记下你的决定。</li>
+</ol>
 <details><summary><strong>精确规则</strong>
 </summary><ul>
 <li>
@@ -2767,6 +3024,11 @@ ID、总记录数，以及 Clean / Minor / Major
 <details><summary>
 某位参与者标记率很高，他的数据是错的吗？
 </summary><p>不一定。这张表说的是先检查谁的记录；结论要看记录本身，而不是这张表。</p>
+</details><details><summary>
+标记率高，是不是说明要重做清洗？
+</summary><p>不是。标记率高只表示这些参与者的记录值得先看，并不表示清洗失败。这些标记是描述性的：其中包括管线有意保留的自评与计算值之间的分歧，而入睡潜伏期一直偏长的人，即使每条记录都正确，也会出现在名单里。另外，高
+SOL 标记分不清是真的入睡很久，还是一般的报告分歧（见<a href="#c-11">图
+11</a> 和<a href="validation-methodology-zh.html">验证方法学</a>）。</p>
 </details><details><summary>
 为什么我的图里没有人被染色？
 </summary><p>颜色从 20%

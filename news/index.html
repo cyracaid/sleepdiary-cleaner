@@ -66,6 +66,15 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="development version" id="sleepcleanr-development-version">sleepcleanr (development version)<a class="anchor" aria-label="anchor" href="#sleepcleanr-development-version"></a></h2>
+<div class="section level3">
+<h3 id="changed-development-version">Changed<a class="anchor" aria-label="anchor" href="#changed-development-version"></a></h3>
+<ul><li>The silent-error audit ledger path is now configurable: set <code>data.files.audit_dispositions</code> in the YAML config (empty by default, so the ledger stays inactive and Dataset B’s <code>audit_disposition</code> stays “none”). <code><a href="../reference/run_pipeline.html">run_pipeline()</a></code> passes it, and the manual metric-duration path it actually used, to <code><a href="../reference/finalize_columns.html">finalize_columns()</a></code> (new arguments <code>audit_ledger</code> and <code>manual_metric_duration</code>). Precedence: argument, then YAML, then the <code>sleepcleanr.audit_ledger</code> / <code>sleepcleanr.audit_manual_corrections</code> options, then the working-directory default.</li>
+<li>A ledger named in the config that does not exist now stops the run instead of silently writing “none”. With no ledger named, behaviour is unchanged.</li>
+<li>The ledger/manual-corrections consistency check now uses the manual file the run used. An algorithmic-only run (manual paths blanked) with a ledger that declares <code>corrected_manual</code> / <code>set_na</code> rows therefore stops, since no manual correction was applied. No values move; the delivered column dictionary is unchanged.</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.6.2" id="sleepcleanr-162">sleepcleanr 1.6.2<a class="anchor" aria-label="anchor" href="#sleepcleanr-162"></a></h2>
 <div class="section level3">
 <h3 id="fixed-1-6-2">Fixed<a class="anchor" aria-label="anchor" href="#fixed-1-6-2"></a></h3>
