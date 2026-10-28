@@ -33,7 +33,8 @@ you need a column that A and B leave out.
 | Why was a manual correction not used? | `output/manual_corrections_not_applied.csv` | `reason` |
 | Which rules did this run use? | `output/effective_rules.csv` |
 | `output/review_status.csv` | One row per flagged record: needs_review / not_incorporated / incorporated, with the reason (1.7.0) |
-| `output/review_runs.csv` | Append-only run log with input/config/result hashes, auto-compared to the previous run (1.7.0) | `value`, `source` |
+| `output/review_runs.csv` | Append-only run log with input/config/result hashes, auto-compared to the previous run (1.7.0) |
+| Is a self-reported duration ambiguous (is `12:05` 12 hours or 12 min 5 s)? | A | `sol_selfreport_raw` / `sol_selfreport_ambiguous` (and the WASO counterparts, 1.7.1) | `value`, `source` |
 
 `human_review` has one value per row, the first that applies:
 
