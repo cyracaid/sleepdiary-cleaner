@@ -405,15 +405,25 @@ Contents
       `Rscript validation/reproducibility.R` checks that the same input
       gives identical outputs in new directories and new R processes.
 
-      **Where the validated numbers come from:** a controlled re-run
-      (2026-09-29) showed exactly what the manual corrections do to the
-      final dataset: without them, 1,719 records have computable total
-      sleep time and 61 remain in the `error` class; with them, 1,729
-      records are valid (+10 net), 85 records carry a manual correction,
-      and only 3 records remain errors. The 11 unlocked records were
-      `error`-class rows whose corrected timestamps made TST computable
-      (293–590 min); one extreme record (TST = 10 min) was correctly
-      retired by its correction.
+      **Where the validated numbers come from (historical, 1.6.x era):**
+      a controlled re-run (2026-09-29) showed exactly what the manual
+      corrections do to the final dataset: without them, 1,719 records
+      have computable total sleep time and 61 remain in the `error`
+      class; with them, 1,729 records are valid (+10 net), 85 records
+      carry a manual correction, and only 3 records remain errors. The
+      11 unlocked records were `error`-class rows whose corrected
+      timestamps made TST computable (293–590 min); one extreme record
+      (TST = 10 min) was correctly retired by its correction.
+
+      **Current as of 1.7.1** (records confirmed 2026-10-29): the
+      delivered error count is **0** – the three records whose reviewers
+      wrote undo-then-reapply instructions (2854/13, 6985/7, 6985/12)
+      now have both steps executed and pass; the review loop converges
+      (Review DONE: 100/100 incorporated, 0 needs_review); 85 records
+      carry human corrections; 46 ambiguous self-reported durations are
+      delivered with their raw text and a flag
+      (`sol/waso_selfreport_ambiguous/raw`, see the question table in
+      the output-files article).
 
       ## 4. `output/correction_status_final.csv` — The Run Summary (Open This First)
 
@@ -1878,11 +1888,12 @@ Contents
       automatic check’s summary (for example SELF_REPORTED_FLAG), which
       is the same table behind `correction_status_final.csv`. That
       summary is built before a person’s accepted rows are withdrawn, so
-      it still counts them (85 in the real run), and it classifies the
+      it still counts them (85 in a real run), and it classifies the
       duration-reinterpretation flags as clean (39). Figure 6 counts the
-      open queue instead, which is why it shows 226 where this column
-      shows 272. Steps before 8 show a dash because the check has not
-      run yet.
+      open queue instead – the example numbers are from a 2026-09 run
+      (226 vs 272); check your own run’s console summary for current
+      counts. Steps before 8 show a dash because the check has not run
+      yet.
 
       Where is the same information as a file?
       `output/step_flag_ledger.csv` (see §5). This figure is that table
