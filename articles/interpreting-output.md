@@ -692,7 +692,7 @@ Contents
       to show (e.g. the review queue is empty because everything was
       already reviewed), the skip reason says so explicitly.
 
-      #### How figures are named, and why some numbers are missing
+      #### How figures are named (F01-F32, continuous since 1.7.1)
 
       - **The numbers follow the data source, not the folder.** Numbers
         01 to 24 come from the original single visualization script,
