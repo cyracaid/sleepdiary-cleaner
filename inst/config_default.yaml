@@ -46,6 +46,11 @@ data:
     manual_metric_accept: "manual_metric_review_acceptances.csv"
     second_review: "second_review_checklist.csv"
 
+    # Private silent-error audit ledger (per pid/day/field decisions). Empty
+    # (default) = ledger inactive and Dataset B's audit_disposition is "none".
+    # When set, the file must exist or the run stops. Gitignored; never ship it.
+    audit_dispositions: ""
+
 # =============================================================================
 # COLUMN MAPPING
 # =============================================================================

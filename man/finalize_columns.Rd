@@ -10,7 +10,9 @@ finalize_columns(
   dict_path = NULL,
   output_dir = "output",
   write = TRUE,
-  verbose = TRUE
+  verbose = TRUE,
+  audit_ledger = NULL,
+  manual_metric_duration = NULL
 )
 }
 \arguments{
@@ -31,6 +33,19 @@ shipped in `inst/extdata`.}
 value without touching the filesystem.}
 
 \item{verbose}{Print a summary.}
+
+\item{audit_ledger}{Optional path to the private audit ledger
+(`audit_dispositions.csv`). `run_pipeline()` passes
+`data.files.audit_dispositions` from the config. When given it must
+exist (a missing named ledger stops). `NULL` or blank falls back to the
+`sleepcleanr.audit_ledger` option, then the working directory; with no
+ledger `audit_disposition` is `"none"` for every row.}
+
+\item{manual_metric_duration}{Optional path to the manual metric-duration
+corrections file the run used, for the ledger consistency check.
+`run_pipeline()` passes the resolved config value (blank for an
+algorithmic-only run). `NULL` falls back to the
+`sleepcleanr.audit_manual_corrections` option, then the working directory.}
 }
 \value{
 Invisibly, a list with `final` (Dataset A), `prepost` (Dataset B)

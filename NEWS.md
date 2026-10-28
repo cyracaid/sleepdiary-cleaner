@@ -1,3 +1,22 @@
+# sleepcleanr (development version)
+
+## Changed
+* The silent-error audit ledger path is now configurable: set
+  `data.files.audit_dispositions` in the YAML config (empty by default, so the
+  ledger stays inactive and Dataset B's `audit_disposition` stays "none").
+  `run_pipeline()` passes it, and the manual metric-duration path it actually
+  used, to `finalize_columns()` (new arguments `audit_ledger` and
+  `manual_metric_duration`). Precedence: argument, then YAML, then the
+  `sleepcleanr.audit_ledger` / `sleepcleanr.audit_manual_corrections` options,
+  then the working-directory default.
+* A ledger named in the config that does not exist now stops the run instead
+  of silently writing "none". With no ledger named, behaviour is unchanged.
+* The ledger/manual-corrections consistency check now uses the manual file the
+  run used. An algorithmic-only run (manual paths blanked) with a ledger that
+  declares `corrected_manual` / `set_na` rows therefore stops, since no manual
+  correction was applied. No values move; the delivered column dictionary is
+  unchanged.
+
 # sleepcleanr 1.6.2
 
 ## Fixed

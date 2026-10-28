@@ -75,7 +75,7 @@ listed in the order they are written.
 | `audit_integrity_report.csv` | After Step 9 | Integrity check of the corrected data against the input: rows, columns, untouched variables, duplicates |
 | `appendix_step_ledger.csv` | Step 9 | The full per-step ledger drawn in figure A1 |
 | `cleaned_data_final.csv` / `.rds` | Step 10 | **Dataset A**, the analysis-facing columns (driven by the column dictionary) |
-| `cleaned_data_prepostcorrection.csv` / `.rds` | Step 10 | **Dataset B**: before and after values with the audit disposition per row |
+| `cleaned_data_prepostcorrection.csv` / `.rds` | Step 10 | **Dataset B**: before and after values with the audit disposition per row. The disposition comes from the optional private ledger named by `data.files.audit_dispositions` in the config; with no ledger named it is `"none"` for every row, and a named ledger that is missing stops the run |
 | `cleaned_data_full.rds` | Step 10 | Everything, unchanged |
 | `column_dictionary_gaps.csv` | Step 10 | Columns in the data that the column dictionary does not describe |
 | `correction_status_final.csv` | End | **The run summary.** One row per run (appended). See [Reading the output and the review loop](interpreting-output.html#s-4) |

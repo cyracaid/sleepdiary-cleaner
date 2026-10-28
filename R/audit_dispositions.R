@@ -26,18 +26,23 @@
 .ALLOWED_DISPOSITIONS <- c("none", "keep", "keep_flagged",
                            "corrected_manual", "set_na", "mixed")
 
-.audit_ledger_path <- function() {
+# Path precedence for both files: explicit argument (what the pipeline passes
+# from the YAML config), then the R option, then the working-directory default.
+# A blank string is an explicit "no file" and is returned as-is.
+.audit_ledger_path <- function(path = NULL) {
+  if (!is.null(path)) return(path)
   getOption("sleepcleanr.audit_ledger",
             file.path(getwd(), "audit_dispositions.csv"))
 }
 
-.manual_corrections_path <- function() {
+.manual_corrections_path <- function(path = NULL) {
+  if (!is.null(path)) return(path)
   getOption("sleepcleanr.audit_manual_corrections",
             file.path(getwd(), "manual_sleep_metric_duration_corrections.csv"))
 }
 
 audit_dispositions_read <- function(path = .audit_ledger_path()) {
-  if (!file.exists(path)) return(NULL)
+  if (is.na(path) || !nzchar(path) || !file.exists(path)) return(NULL)
   led <- utils::read.csv(path, stringsAsFactors = FALSE,
                          colClasses = "character", na.strings = c("", "NA"))
   required <- c("pid", "day_num", "row_id", "field", "disposition",
@@ -57,7 +62,7 @@ audit_dispositions_read <- function(path = .audit_ledger_path()) {
 }
 
 manual_dispositions_read <- function(path = .manual_corrections_path()) {
-  if (!file.exists(path)) return(NULL)
+  if (is.na(path) || !nzchar(path) || !file.exists(path)) return(NULL)
   utils::read.csv(path, stringsAsFactors = FALSE,
                   colClasses = "character", na.strings = c("", "NA"))
 }
@@ -111,10 +116,25 @@ check_ledger_manual_consistency <- function(ledger, manual) {
 # Attach `audit_disposition` to corrected_ema_data before finalize_columns().
 # No ledger -> column all "none". Ledger present -> per-row roll-up; a row
 # whose ledger fields disagree (e.g. SOL=keep, WASO=set_na) becomes "mixed".
+#
+# `ledger_path` / `manual_path`: NULL falls back to the R option, then the
+# working-directory default. A ledger path that is passed explicitly (the
+# pipeline does this when data.files.audit_dispositions is set) must exist;
+# a missing named ledger stops instead of silently writing "none". A blank
+# `manual_path` means the run used no manual-correction file.
 audit_dispositions_attach <- function(data,
-                                     ledger_path = .audit_ledger_path(),
-                                     manual_path = .manual_corrections_path()) {
-  ledger <- audit_dispositions_read(ledger_path)
+                                     ledger_path = NULL,
+                                     manual_path = NULL) {
+  ledger_named <- !is.null(ledger_path) && !is.na(ledger_path) &&
+    nzchar(ledger_path)
+  if (ledger_named && !file.exists(ledger_path)) {
+    stop("Audit ledger named in the config (data.files.audit_dispositions) ",
+         "was not found: ", ledger_path, ". Place the file there, or leave ",
+         "the key empty to run without the audit ledger.", call. = FALSE)
+  }
+  if (!is.null(ledger_path) && !ledger_named) ledger_path <- NULL
+  ledger <- audit_dispositions_read(.audit_ledger_path(ledger_path))
+  manual_path <- .manual_corrections_path(manual_path)
 
   # No ledger -> nothing to attach; fill "none" unconditionally so Dataset B
   # always carries the column. A data frame without a row_id (unit-test fakes)

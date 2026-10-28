@@ -77,3 +77,52 @@ test_that("ledger row_id must exist in the pipeline data", {
   dat <- data.frame(row_id = as.character(1:3), stringsAsFactors = FALSE)
   expect_error(audit_dispositions_attach(dat), "not present in pipeline data")
 })
+
+test_that("a ledger path passed from the config is used over the option", {
+  d <- withr::local_tempdir()
+  cfg_ledger <- file.path(d, "my_ledger.csv")
+  led <- data.frame(pid = "1", day_num = 1, row_id = 10L, field = "SOL",
+    disposition = "keep_flagged", decided_by = "audit_20260820", annotators = "",
+    decision_date = "2026-08-20", evidence_note = "", stringsAsFactors = FALSE)
+  write.csv(led, cfg_ledger, row.names = FALSE)
+  dat <- data.frame(row_id = as.character(10:11), stringsAsFactors = FALSE)
+  out <- audit_dispositions_attach(dat, ledger_path = cfg_ledger)
+  expect_identical(out$audit_disposition, c("keep_flagged", "none"))
+})
+
+test_that("a named ledger that does not exist stops instead of writing none", {
+  dat <- data.frame(row_id = as.character(1:3), stringsAsFactors = FALSE)
+  missing <- file.path(withr::local_tempdir(), "nope.csv")
+  expect_error(audit_dispositions_attach(dat, ledger_path = missing),
+               "data.files.audit_dispositions.*not found")
+})
+
+test_that("a blank configured ledger path falls back to the option (inactive here)", {
+  unlink(getOption("sleepcleanr.audit_ledger"))
+  dat <- data.frame(row_id = as.character(1:3), stringsAsFactors = FALSE)
+  out <- audit_dispositions_attach(dat, ledger_path = "")
+  expect_identical(out$audit_disposition, rep("none", 3))
+})
+
+test_that("consistency check reads the configured manual file, not the option", {
+  d <- withr::local_tempdir()
+  led <- data.frame(pid = "1", day_num = 1, row_id = 7L, field = "SOL",
+    disposition = "set_na", decided_by = "audit_20260820", annotators = "",
+    decision_date = "2026-08-20", evidence_note = "", stringsAsFactors = FALSE)
+  write.csv(led, file.path(d, "ledger.csv"), row.names = FALSE)
+  manual <- data.frame(pid = "1", day_num = 1, row_id = 7L,
+    variable = "duration_totalmin_sol_estimate_am", corrected_mincalc = "NA",
+    stringsAsFactors = FALSE)
+  write.csv(manual, file.path(d, "renamed_manual.csv"), row.names = FALSE)
+  dat <- data.frame(row_id = "7", stringsAsFactors = FALSE)
+
+  # option points at a nonexistent file; the configured path must win
+  out <- audit_dispositions_attach(dat, ledger_path = file.path(d, "ledger.csv"),
+                                   manual_path = file.path(d, "renamed_manual.csv"))
+  expect_identical(out$audit_disposition, "set_na")
+
+  # blank manual path (algorithmic-only run) -> the ledger claim is unverifiable
+  expect_error(audit_dispositions_attach(dat, ledger_path = file.path(d, "ledger.csv"),
+                                         manual_path = ""),
+               "manual_sleep_metric_duration_corrections.csv is missing")
+})

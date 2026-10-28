@@ -163,6 +163,13 @@ and out of release builds (`.gitignore` + `.Rbuildignore` cover them all).
 | `manual_metric_review_acceptances.csv` | Step 6.5 (`apply_metric_review_acceptances`) | Manual accept/reject decisions for computed sleep metrics (TST, SOL, WASO, SE) | Hand-created; `apply_second_review` may append |
 | `audit_dispositions.csv` | After Step 9 (`audit_data_integrity`) | Audit ledger recording the disposition of every changed record, for reversibility | Written by the pipeline itself |
 
+**Audit ledger path:** the private audit ledger is optional. Name it in the
+config as `data.files.audit_dispositions` (empty by default: inactive, and
+`audit_disposition` is `"none"` for every row). If you name a file that does
+not exist, the run stops rather than silently writing `"none"`. The
+consistency check against the manual metric-duration corrections uses the same
+file the run applied (`data.files.manual_metric_duration`).
+
 **Format:** each file is a plain CSV; the error/unusual files carry
 `pid, day_num, row_id, variable, old_value_hhmm, old_value_ampm,
 new_value_hhmm, new_value_ampm, correction_type, confidence, reviewer_notes`
