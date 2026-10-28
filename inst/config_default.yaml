@@ -14,6 +14,12 @@ pipeline:
 # DATA FILES
 # =============================================================================
 data:
+  # What kind of data this is: "real" (participant data; figures go under
+  # output/, which is gitignored), "synth" (synthetic or test data) or
+  # "unknown". It is never guessed: when empty, an interactive run asks
+  # (r / s / n) and a non-interactive run that makes figures stops with an
+  # error. Runs with skip_visualization = TRUE do not need it.
+  tag: ""
   files:
     main: "your_data.rds"
     # -- Your main sleep diary file. Accepts .rds (R data) or .csv (plain text).
@@ -176,13 +182,55 @@ timestamp:
     max_exercise_minutes: 360  # 6 hours
 
 # =============================================================================
-# REVIEW SETTINGS
+# REVIEW RULES (user-defined)
 # =============================================================================
+# These rules, and only these, decide what the review status table and the
+# review verdict say. The pipeline applies them; it never changes them.
+#
+# Every row of review_status.csv gets one review_state:
+#   needs_review      a person still has to look (fails the re-check after
+#                     corrections, became an error after corrections, marked
+#                     pending in the manual file, or a Step 8 flag when
+#                     step8_flags_need_review is true)
+#   incorporated      a manual decision was applied and the record passes
+#   not_incorporated  no manual decision changed the record and it passes
 review:
   # Final data_category values that mean "no longer needs a person". The review
   # status table reports a row as "now passes" when its final category is in
   # this list. You define it; the pipeline only applies it.
   clean_categories: ["clean", "equal_time_ok", "reasonable_unusual"]
+  done_when:
+    # The review is DONE when at most this many rows are needs_review.
+    max_needs_review: 0
+  # true: a record that passes the re-check but carries a Step 8 flag is
+  # needs_review. false: the flag is reported in its own column only.
+  step8_flags_need_review: false
+  # true: a record that is in a manual file but still has a time missing after
+  # corrections (bed / sleep / wake / get-up left blank, so the order cannot be
+  # re-checked) counts as incorporated. false: it stays needs_review.
+  missing_times_ok_after_manual: false
+  # true: stop the run with an error (after every output is written) when the
+  # review is NOT DONE. Use this to make "done" a hard end point, e.g. in CI.
+  fail_if_not_done: false
+  # Suggested labels for metric flags (inst/scripts/generate_ai_review_csvs.R).
+  # First matching rule wins. "<column>_matches" is a regular expression; any
+  # other key lists the allowed values of that column. A suggestion is never a
+  # decision: a row stays open until a person fills in human_decision.
+  # "suggestions: []" turns suggestions off (every row gets suggestion_default).
+  suggestions:
+    - label: "likely_real_issue"
+      when:
+        auto_error_desc_matches: "SE:negative|TST/TIB:exceeds_1|SOL:negative"
+      reason: "Mathematically impossible sleep metric (negative SE, TST/TIB > 1, or negative SOL); likely needs timestamp or WASO/TST review."
+    - label: "likely_false_positive"
+      when:
+        sol_category: ["excessive"]
+        se_category: ["valid"]
+        tst_tib_ratio_category: ["normal", "normal_low"]
+      reason: "SOL exceeds 120 min, but other sleep metrics are internally plausible; likely real long sleep latency rather than input error."
+  suggestion_default:
+    label: "needs_human"
+    reason: "Metric flag needs human review because the values are unusual but not automatically classifiable from available fields."
 
 # =============================================================================
 # SECOND REVIEW
@@ -317,6 +365,8 @@ classification:
     self_reported_flag: "SELF_REPORTED_FLAG"
     clean: "CLEAN"
     clean_manually_fixed: "CLEAN (Manually Fixed)"
+    still_fails_manually_corrected: "STILL FAILS (Manually Corrected)"
+    not_checkable_manually_corrected: "NOT CHECKABLE (Manually Corrected)"
 
 # =============================================================================
 # OUTPUT SETTINGS
@@ -352,6 +402,11 @@ output:
     correction_status: "correction_status.csv"
     correction_status_final: "correction_status_final.csv"
     flagged_self_reported: "flagged_records_self_reported.csv"
+  review:
+    # One status table for both Step 5 worksheets (project root, overwritten
+    # every run) and one run log that gets one line per run (never a new file).
+    status_file: "review_status.csv"
+    run_log: "review_runs.csv"     # written under output.report.dir
 
 # =============================================================================
 # VISUALIZATION OPTIONS

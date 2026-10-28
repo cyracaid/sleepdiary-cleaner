@@ -39,6 +39,7 @@ Imports:
     rlang,
     stringr,
     tidyr,
+    tools,
     utils,
     yaml
 Suggests:

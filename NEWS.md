@@ -51,6 +51,110 @@
   the Thresholds page are absolute (the relative link broke inside the CRAN
   tarball).
 * New CI job: `R CMD check --as-cran` (offline incoming-feasibility mode).
+# sleepcleanr (development version)
+
+## Added
+* `review_status.csv` (project root): one status table for both Step 5 worksheets and for
+  every record that became an error after the corrections. Each row has one `review_state`,
+  `needs_review`, `not_incorporated` or `incorporated`, and a `review_state_reason` naming
+  the rule that put it there. Rows are ordered needs_review first, in a locale-independent
+  order, so the same input gives the same file byte for byte.
+* User-defined review rules in a new `review:` config block (defaults in
+  `inst/config_default.yaml` are the previous behaviour): `done_when.max_needs_review`
+  (default `0`), `step8_flags_need_review` (default `false`), `fail_if_not_done` (default
+  `false`) and the suggestion rules `suggestions` / `suggestion_default`.
+* `review_verdict()`: DONE / NOT DONE by `review.done_when`, with the three counts. Every run
+  prints it; `pipeline_results()` now also returns `review_status` and `review_verdict`.
+  With `review.fail_if_not_done: true` a run that is NOT DONE stops with an error after all
+  outputs are written.
+* `output/review_runs.csv`: one line per run in one file (content hashes of the data, the
+  manual files and the config without file paths; hash of `review_status.csv`; counts;
+  verdict). The run prints whether inputs and result match the previous line, and warns if
+  the same inputs gave a different table.
+* `review_rules()` and `suggest_review_labels()`.
+* `validation/reproducibility.R`: builds an error-injected synthetic diary twice from a fixed
+  seed, runs the pipeline in new R processes and new directories, then again in a
+  directory with old outputs left in place, then twice with a fixed manual
+  error-correction file applied, and compares every output file.
+* Works with the 1.5.3 / 1.6.0 rules: the review status table, the verdict and Step 8 use
+  `review.clean_categories` for "passes the re-check" (one `review:` block in the config holds
+  both), and `effective_rules.csv` lists `review.done_when.max_needs_review`,
+  `review.missing_times_ok_after_manual`, `review.step8_flags_need_review` and
+  `review.fail_if_not_done`.
+
+* Manual-file instructions the correction engine cannot read (a short column name such as
+  `time_bed`, free text in `correct_value`, a `solution_humanidentified` with no known
+  phrase) are no longer skipped in silence: Step 6 prints each one as a WARNING, and its
+  record is `needs_review` in `review_status.csv` with the reason. A full date-time
+  (`2022-01-15 06:00:00`) is now a valid `correct_value`.
+* `include_manual_corrections = "ask"` asks y / n when the run starts. It used to apply the
+  manual files without asking; a non-interactive session now stops with an error instead.
+
+## Changed
+* `inst/scripts/generate_ai_review_csvs.R` takes its suggested labels (`ai_label`,
+  `ai_reason`, new `ai_rule`) from `review.suggestions` instead of rules written in the
+  script, and recomputes them every run, so a rule change always takes effect. Only the
+  human columns (`human_decision`, `corrected_value`, `notes`) are carried over from the
+  previous file.
+* `[NEW]manual_error_correction_review.csv` keeps its 1.5.2 content for this release;
+  `review_status.csv` supersedes it as the table to read.
+
+## Fixed
+* A record whose `correction_type` names a swap was marked as manually corrected even when no
+  manual instruction changed it. `correction_type` is written by the algorithm (Step 4), so
+  this recorded an automatic swap as a human correction. Such a record is now only reported
+  on the console.
+* Step 8 labelled every manually corrected row `CLEAN (Manually Fixed)`, even when its
+  corrected times still failed the re-check. Step 8's own checks look at formats and
+  metric values, not at the order of the corrected times, so those rows also looked clean
+  there. Now a manually corrected row is `CLEAN (Manually Fixed)` only when the Step 8
+  checks and its `data_category` after corrections both pass; with a Step 8 flag it keeps
+  that flag; otherwise it is the new `STILL FAILS (Manually Corrected)`. Example: a plain
+  "sleep-awake switch" on a PM sleep time swaps the clock times but not the dates, so the
+  row stays out of order and is now reported as still failing.
+* The Step 8 flag report and the count table in Figure 13 now count each row once, by its
+  final status, so the lines add up to the total. Before, a manually fixed row was counted
+  both as `CLEAN` and as `CLEAN (Manually Fixed)`.
+* `flag_distribution.csv` has a new column `data_category_after_corrections`.
+* A manually corrected row with a time still missing after the corrections (for example a
+  bed time the participant never entered) was reported by Step 8 as `STILL FAILS`, although
+  its order cannot be checked at all. It is now `NOT CHECKABLE (Manually Corrected)`, and in
+  `review_status.csv` it is `needs_review` with the reason "a time is missing ... cannot be
+  re-checked". New rule `review.missing_times_ok_after_manual` (default `false`): when `true`,
+  such a row that is in a manual file counts as `incorporated` (Step 8: `CLEAN (Manually
+  Fixed)`).
+* A manual correction row whose `solution_humanidentified` says "Undo correction" and
+  that also has column/value instructions (`column_to_correct` / `correct_value`,
+  `column_to_correct_2` / `correct_value_2`, or `column_to_adjust` / `correction_value` in
+  the unusual file) now gets both: the raw times are restored, then the instructions are
+  applied. Before, the case3 and unusual handlers stopped right after the undo and ignored
+  the rest of the row without saying so (the solution-text handler already did both).
+  **This can change results:** where a manual file repeated an undo row's instruction in a
+  second row for the same day (a workaround for this bug), the instruction is now applied
+  twice. Check days that have more than one row in a manual file.
+* Test data could be tagged `real` and have its figures written under `output/` (the
+  real-data area): the tag was guessed from the input file name, and any name without
+  synthetic/synth/stub/demo/example counted as real (for example the benchmark's
+  `main.rds` or an injected `corrupted.rds`). The tag is no longer guessed. It is
+  `data.tag` in the config (`real` / `synth` / `unknown`; an invalid value is an error).
+  When it is not set and the run makes figures, an interactive session asks once when the
+  run starts (r / s / n), for that run only, and a non-interactive run stops with an error
+  that says what to add; runs with `skip_visualization = TRUE` do not need it.
+  `RUN_INFO.txt` and `output/review_runs.csv` (new columns `data_tag`, `data_tag_source`)
+  record the tag and where it came from. **Action needed:** a config without `data.tag`
+  that is run non-interactively with figures now stops; add `data.tag: real` (or `synth`).
+  The bundled synthetic config, `validation/synthetic/run_one.R`, `spec_cache.R`,
+  `operating_point_sweep.R`, `run_ppv/config.yaml` and `validation/reproducibility.R` state
+  `synth`; the config template states `real`. New `resolve_data_tag()`.
+
+## Known
+* The bundled demo data (`data-raw/generate_synthetic_data.R`) set wake time equal to
+  get-up time on every row, so every complete demo row is `equal_time_ok`; the demo never
+  produces review rows. `validation/reproducibility.R` uses error-injected data instead.
+* `output/correction_status*.csv` and the `calculation_timestamp` attribute of the `.rds`
+  outputs record wall-clock time, so those files differ between runs in exactly those
+  fields; `validation/reproducibility.R` compares them without those fields.
+claude/stable-repeatable-ai-review-f08cf9
 
 # sleepcleanr 1.6.0
 
@@ -111,7 +215,6 @@ Delivered data change in this release: Dataset A has 35 columns (one new, `human
 * Two articles were renamed: "Input Data and Configuration" (was "Column Mapping, Config &
   Data Format") and "Reading the Output and the Review Loop" (was "Interpreting the Pipeline
   Output"). The file names, and so the web addresses, are unchanged.
-
 # sleepcleanr 1.5.2
 
 ## Changed

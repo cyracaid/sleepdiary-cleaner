@@ -57,7 +57,9 @@
 #'
 #' @return A named list with \code{corrected_ema_data} (the data after
 #'   corrections and metrics), \code{review_output} (the review queue and the
-#'   flagged data), \code{checkforerrors_summary} and \code{pipeline_config};
+#'   flagged data), \code{checkforerrors_summary}, \code{pipeline_config},
+#'   \code{review_status} (the review status table) and \code{review_verdict}
+#'   (see \code{review_verdict()});
 #'   elements not available for the last run are \code{NULL}.
 #' @export
 #' @examples
@@ -68,6 +70,6 @@
 #' }
 pipeline_results <- function() {
   nm <- c("corrected_ema_data", "review_output", "checkforerrors_summary",
-          "pipeline_config")
+          "pipeline_config", "review_status", "review_verdict")
   stats::setNames(lapply(nm, .sc_get), nm)
 }

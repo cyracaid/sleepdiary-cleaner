@@ -96,19 +96,15 @@ if (!exists("ema_data_release_timecalc")) {
 .n_records <- if (exists("corrected_ema_data"))
   nrow(get("corrected_ema_data")) else NA_integer_
 
-# Derive the tag from the configured input file. "unknown" when it cannot be
-# determined -- an honest label beats a confidently wrong one.
+# The tag is data.tag from the config, or the answer the person gave when the
+# run started (see resolve_data_tag() in R/config.R). It is never guessed.
 .rds_name <- tryCatch(
   basename(cfg_get("data.files.main", "", cfg = pipeline_config)),
   error = function(e) ""
 )
-.data_tag <- if (!nzchar(.rds_name)) {
-  "unknown"
-} else if (grepl("synthetic|synth|stub|demo|example", .rds_name, ignore.case = TRUE)) {
-  "synth"
-} else {
-  "real"
-}
+.data_tag_info <- .sc_get("data_tag_info")
+if (is.null(.data_tag_info)) .data_tag_info <- resolve_data_tag(pipeline_config)
+.data_tag <- .data_tag_info$tag
 
 output_dir <- figure_run_dir(cfg = pipeline_config, data_tag = .data_tag,
                              n_records = .n_records)
@@ -1771,17 +1767,8 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
   if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
       "review_summary" %in% names(checkforerrors_summary)) {
     rs <- checkforerrors_summary$review_summary
-    flag_dist_df <- data.frame(
-      Category = c("TIMESTAMP_ISSUE", "DURATION_ISSUE", "AMOUNT_FLAG", "SELF-REPORTED FLAG", "CLEAN", "CLEAN (Manually Fixed)"),
-      Count = c(
-        sum(rs$raw_category == "TIMESTAMP_ISSUE", na.rm = TRUE),
-        sum(rs$raw_category == "DURATION_ISSUE", na.rm = TRUE),
-        sum(rs$raw_category == "AMOUNT_FLAG", na.rm = TRUE),
-        sum(rs$raw_category == "SELF_REPORTED_FLAG", na.rm = TRUE),
-        sum(rs$raw_category == "CLEAN", na.rm = TRUE),
-        sum(rs$final_status == "CLEAN (Manually Fixed)", na.rm = TRUE)
-      )
-    )
+    # One row per final status; the counts add up to the number of rows.
+    flag_dist_df <- step8_status_counts(rs)
   }
   
   # Bar-chart and spacer panel heights are also fixed inches (not relative
@@ -3307,7 +3294,9 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) && "revi
   "sleepcleanr figure output",
   "========================================",
   sprintf("Run time    : %s", format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z")),
-  sprintf("Dataset tag : %s", .data_tag),
+  sprintf("Dataset tag : %s (%s)", .data_tag,
+          if (identical(.data_tag_info$source, "config")) "data.tag in the config"
+          else "answered at the prompt when the run started; not in the config"),
   sprintf("Records in  : %s", if (is.na(.n_records)) "unknown" else format(.n_records, big.mark = ",")),
   sprintf("Input RDS   : %s", if (nzchar(.rds_name)) .rds_name else "unknown"),
   sprintf("Input CSV   : %s",

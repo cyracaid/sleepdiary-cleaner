@@ -177,7 +177,8 @@ equal_time_type:
 | `AMOUNT_FLAG` | Substance input structural anomaly | Step 8 sections 1a-1c |
 | `SELF_REPORTED_FLAG` | Diary-based metric anomaly (manual inspection) | Step 8 Part C (SOL, SE, TST/TIB) |
 | `CLEAN` | No issues | — |
-| `CLEAN (Manually Fixed)` | Corrected in step 6 | — |
+| `CLEAN (Manually Fixed)` | Corrected in step 6; Step 8 checks and the re-check of the corrected times (`data_category`) both pass | — |
+| `STILL FAILS (Manually Corrected)` | Corrected in step 6; Step 8 checks pass but the corrected times still fail the re-check | `data_category` |
 
 Note: `SELF_REPORTED_FLAG` was previously named `NEEDS_REVIEW`; relabeled 2026-07-14 to clarify these are diary-based metric anomalies, not data errors.
 

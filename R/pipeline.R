@@ -99,9 +99,10 @@ utils::globalVariables(c(
 #'   prominent banner states that no human corrections were applied. TRUE:
 #'   apply the manual-correction files configured in the config YAML
 #'   (the pre-2026-09-29 behaviour). The strings "ask" / "y" / "n" / "yes" /
-#'   "no" are also accepted: "ask" prompts interactively (in an interactive
-#'   session only; in a non-interactive session it degrades to FALSE with a
-#'   notice). The point of the default-off switch: a package user must
+#'   "no" are also accepted: "ask" asks y / n once when the run starts, before
+#'   any data is read; a non-interactive session cannot answer, so "ask" stops
+#'   the run there with an error (use TRUE or FALSE). The point of the
+#'   default-off switch: a package user must
 #'   OPT IN to human corrections so that a dataset can never be silently
 #'   modified by review files left over in the working directory.
 #'
@@ -123,6 +124,13 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   # Fail fast: an invalid step-5 rule value stops the run before data is read
   # or anything is written (the same validator Step 5 uses downstream).
   .sc_step5_thresholds(cfg)
+  review_rules(cfg)   # same for the review: block
+  # The data tag only decides where figures go, so it is needed only when
+  # figures are made. Settled here, before anything is written, so a question
+  # is asked while the person is still at the keyboard (see resolve_data_tag()).
+  if (!skip_visualization) .sc_set("data_tag_info", resolve_data_tag(cfg))
+  # "ask" is answered here too, before anything is read or written.
+  include_manual_corrections <- .resolve_include_manual(include_manual_corrections)
   report_effective_rules(cfg, include_manual_corrections, verbose)
   sdir <- env$sdir
   # Seen by the sourced step scripts (they run in this frame); not the global environment.
@@ -476,6 +484,13 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
     error = function(e) if (verbose) cat("  [review status] skipped:", conditionMessage(e), "\n")
   )
 
+  # One status table for both worksheets: each row is needs_review,
+  # not_incorporated or incorporated, by the rules in the config's review:
+  # block, followed by the verdict "done / not done". Not wrapped in tryCatch:
+  # a run that cannot say where the review stands must not report success.
+  .review_out <- write_unified_review_status(.review_ws, corrected_ema_data,
+    review_output$data_with_flags, cfg, applied = .include_manual, verbose = verbose)
+
   # -- Step 9: Visualization -------------------------------------------
   if (!skip_visualization) {
     if (verbose) cat("\n=== Step 9: Generating visualizations ===\n")
@@ -533,8 +548,42 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
     res <- Filter(Negate(is.null), pipeline_results())
     list2env(res, envir = export_env)
   }
+  append_review_run_log(cfg, .review_out$file, .review_out$verdict,
+                        applied = .include_manual, verbose = verbose)
+  if (review_rules(cfg)$fail_if_not_done && !.review_out$verdict$done) {
+    stop(sprintf(paste0("Review NOT DONE: %d row(s) need review (%s). All outputs ",
+                        "were written; see %s. Set review.fail_if_not_done: false ",
+                        "to finish without this stop."),
+                 .review_out$verdict$counts[["needs_review"]], .review_out$verdict$rule,
+                 .review_out$file), call. = FALSE)
+  }
   if (verbose) cat("\n[OK] Pipeline complete!\n")
   invisible(TRUE)
+}
+
+# include_manual_corrections as TRUE / FALSE. "ask" asks y / n in an interactive
+# session; a non-interactive session cannot answer, so it stops instead of
+# deciding for the user.
+.resolve_include_manual <- function(x, ask = interactive(), read = readline) {
+  v <- if (is.character(x)) tolower(trimws(x)) else x
+  if (identical(v, "ask")) {
+    if (!isTRUE(ask))
+      stop('include_manual_corrections = "ask" needs someone to answer, and this ',
+           "session is not interactive. Use include_manual_corrections = TRUE (apply ",
+           "the human-review files named in the config) or FALSE (algorithmic only).",
+           call. = FALSE)
+    cat("\nApply the human-review files named in the config",
+        "(data.files.manual_*, second_review) in this run?\n")
+    repeat {
+      a <- tolower(trimws(read("Type y / n: ")))
+      if (a %in% c("y", "yes")) return(TRUE)
+      if (a %in% c("n", "no")) return(FALSE)
+      cat("  Please type y or n.\n")
+    }
+  }
+  if (is.character(v) && v %in% c("y", "yes")) return(TRUE)
+  if (is.character(v) && v %in% c("n", "no")) return(FALSE)
+  isTRUE(v)
 }
 
 # -- Sub-pipeline entry points (unchanged behaviour) -------------------------
@@ -572,6 +621,7 @@ run_visualization <- function(config = NULL, project_dir = ".") {
   env  <- .pipeline_init(config, project_dir, verbose = TRUE)
   on.exit(.pipeline_cleanup(env$old_wd), add = TRUE)
   pipeline_config <- env$cfg
+  .sc_set("data_tag_info", resolve_data_tag(env$cfg))
   .sc_restore(environment())
   source(file.path(env$sdir, "sleep_visualization.R"), local = TRUE)
   invisible(TRUE)

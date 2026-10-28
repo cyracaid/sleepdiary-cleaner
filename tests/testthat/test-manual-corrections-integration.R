@@ -111,7 +111,7 @@ test_that("unrecognized instruction formats are recorded, not silently skipped",
   corr <- data.frame(
     pid = 1, day_num = 1, row_id = 10,
     column_to_correct = "time_sleep_corrected",
-    correct_value = "2022-01-15 06:00:00",   # legacy absolute datetime: unrecognized
+    correct_value = "tomorrow morning",   # genuinely unrecognized by any parser branch
     column_to_correct_2 = NA, correct_value_2 = NA,
     solution_humanidentified = "legacy absolute-datetime format",
     stringsAsFactors = FALSE)
@@ -123,8 +123,8 @@ test_that("unrecognized instruction formats are recorded, not silently skipped",
   # ...and it was recorded for the not-applied ledger instead of vanishing
   na <- .sc_get("manual_corrections_not_applied_error")
   expect_true(!is.null(na) && nrow(na) == 1)
-  expect_equal(na$reason, "unrecognized_instruction_format")
+  expect_match(na$reason, "not understood")
   expect_equal(na$pid, "1")
-  expect_equal(na$variable, "time_sleep_corrected")
+  expect_equal(na$variable, "correct_value")
   .sc_clear()
 })

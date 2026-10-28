@@ -768,39 +768,114 @@ apply_time_instruction_case3 <- function(current_time, instruction) {
     return(handle_time_only_instruction(current_time, instruction))
   }
   
+  # Type 5: a full date and time, "YYYY-MM-DD HH:MM" or "YYYY-MM-DD HH:MM:SS"
+  if (str_detect(instruction, "^\\d{4}-\\d{2}-\\d{2}[ T]\\d{1,2}:\\d{2}(:\\d{2})?$")) {
+    parsed <- ymd_hms(instruction, tz = tz(current_time), truncated = 1, quiet = TRUE)
+    if (!is.na(parsed)) return(parsed)
+  }
+  
   return(current_time)
 }
 
+# ============================================
+# Which instructions the engine understands
+# ============================================
+# Each returns "" when the engine understands the input, otherwise the reason it
+# would be skipped. They mirror apply_time_instruction_case3(),
+# corrected_to_manual_col() and the text operations below; a row the engine
+# cannot read must be reported, never skipped in silence.
 
-# TRUE when the instruction matches one of the formats implemented by
-# apply_time_instruction_case3. Reviewers writing anything else must get a row
-# in manual_corrections_not_applied.csv (same contract as the duration applier)
-# instead of a silent no-op. Keep the four patterns in sync with
-# apply_time_instruction_case3 above.
-instruction_recognized <- function(instruction) {
-  if (is.na(instruction) || instruction == "") return(FALSE)
-  instruction_lower <- tolower(instruction)
-  if (str_detect(instruction_lower, "^same day")) return(TRUE)
-  if (str_detect(instruction_lower, "minus 12 hours")) return(TRUE)
-  if (str_detect(instruction_lower, "plus 12 hours")) return(TRUE)
-  if (str_detect(instruction, "^\\d{1,2}:\\d{2}(:\\d{2})?$")) return(TRUE)
-  FALSE
+manual_value_problem <- function(instruction) {
+  if (is.na(instruction) || trimws(instruction) == "") return("")
+  x <- tolower(trimws(instruction))
+  ok <- str_detect(x, "^same day") ||
+    str_detect(x, "minus 12 hours") || str_detect(x, "plus 12 hours") ||
+    str_detect(x, "^\\d{1,2}:\\d{2}(:\\d{2})?$") ||
+    str_detect(x, "^\\d{4}-\\d{2}-\\d{2}[ t]\\d{1,2}:\\d{2}(:\\d{2})?$")
+  if (ok) "" else sprintf("value not understood: '%s'", instruction)
 }
 
-# Accumulate error-correction rows whose instruction format is unrecognized;
-# the sleep-metric-duration applier merges these into
-# output/manual_corrections_not_applied.csv (it runs after this step and is
-# the single writer of that file).
-.sc_record_not_applied_error <- function(pid, day_num, row_id, variable) {
-  cur <- .sc_get("manual_corrections_not_applied_error")
-  new_row <- data.frame(pid = as.character(pid), day_num = as.character(day_num),
-                        row_id = as.character(row_id), variable = as.character(variable),
-                        reason = "unrecognized_instruction_format", stringsAsFactors = FALSE)
-  .sc_set("manual_corrections_not_applied_error",
-          if (is.null(cur)) new_row else rbind(cur, new_row))
-  cat(sprintf("  [not applied] pid=%s day=%s: unrecognized instruction format for %s (listed in manual_corrections_not_applied.csv)\n",
-              pid, day_num, variable))
-  invisible(NULL)
+manual_column_problem <- function(column_string) {
+  cols <- parse_columns(column_string)
+  if (length(cols) == 0) return("")
+  bad <- cols[is.na(vapply(cols, corrected_to_manual_col, character(1)))]
+  if (length(bad) == 0) return("")
+  sprintf("column name not understood: %s (write time_bed_corrected, time_sleep_corrected, time_awake_corrected or time_getup_corrected)",
+          paste(bad, collapse = ", "))
+}
+
+manual_text_problem <- function(solution_text) {
+  if (is.na(solution_text) || trimws(solution_text) == "") return("")
+  x <- tolower(solution_text)
+  pairs <- c("bed-sleep", "awake-getup", "sleep-awake", "bed/sleep", "awake/getup", "sleep/awake")
+  ok <- str_detect(x, "undo correction") ||
+    str_detect(x, "(awake|bed|getup|sleep)\\s+time\\s+am/pm\\s+conversion") ||
+    str_detect(x, "align\\s+(\\w+)\\s+time['\\s]s hour to\\s+(\\w+)\\s+time['\\s]s hour") ||
+    str_detect(x, "change\\s+(\\w+)\\s+time into\\s+(\\d{1,2}:\\d{2}(:\\d{2})?)") ||
+    str_detect(x, "minus 12 hours") || str_detect(x, "plus 12 hours") ||
+    any(vapply(pairs, function(p) str_detect(x, fixed(paste(p, "switch"))) ||
+                 str_detect(x, fixed(paste(p, "swap"))), logical(1)))
+  if (ok) "" else sprintf("no instruction recognised in solution_humanidentified: '%s'", solution_text)
+}
+
+# Every value, column name or text instruction in the manual files that the
+# engine cannot read, one row each (file, pid, day_num, row_id, field, value,
+# problem). Rows are read the way apply_manual_corrections_and_recalculate()
+# reads them: a row with column_to_correct and correct_value is a column/value
+# row; otherwise its solution_humanidentified text is read.
+manual_instruction_problems <- function(corrections_df, manual_unusual_df = NULL) {
+  out <- list()
+  get <- function(corr, nm) if (nm %in% names(corr)) as.character(corr[[nm]]) else NA_character_
+  blank <- function(x) is.na(x) || trimws(x) == ""
+  add <- function(file, corr, field, value, problem) {
+    out[[length(out) + 1L]] <<- data.frame(
+      file = file, pid = get(corr, "pid"), day_num = get(corr, "day_num"),
+      row_id = get(corr, "row_id"), field = field, value = value, problem = problem,
+      stringsAsFactors = FALSE)
+  }
+  check_pairs <- function(file, corr, pairs) {
+    for (pr in pairs) {
+      cc <- get(corr, pr[1]); vv <- get(corr, pr[2])
+      if (blank(cc) && blank(vv)) next
+      if (blank(cc)) { add(file, corr, pr[2], vv, sprintf("%s is given without %s; it is ignored", pr[2], pr[1])); next }
+      if (blank(vv)) { add(file, corr, pr[1], cc, sprintf("%s is given without %s; it is ignored", pr[1], pr[2])); next }
+      p <- manual_column_problem(cc); if (nzchar(p)) add(file, corr, pr[1], cc, p)
+      p <- manual_value_problem(vv);  if (nzchar(p)) add(file, corr, pr[2], vv, p)
+    }
+  }
+  if (!is.null(corrections_df) && nrow(corrections_df) > 0) {
+    for (i in seq_len(nrow(corrections_df))) {
+      corr <- corrections_df[i, , drop = FALSE]
+      sol <- get(corr, "solution_humanidentified")
+      if (!blank(get(corr, "column_to_correct")) && !blank(get(corr, "correct_value"))) {
+        check_pairs("manual_error_corrections", corr,
+                    list(c("column_to_correct", "correct_value"),
+                         c("column_to_correct_2", "correct_value_2")))
+      } else if (!blank(sol)) {
+        p <- manual_text_problem(sol)
+        if (nzchar(p)) add("manual_error_corrections", corr, "solution_humanidentified", sol, p)
+      } else {
+        check_pairs("manual_error_corrections", corr,
+                    list(c("column_to_correct", "correct_value")))
+      }
+    }
+  }
+  if (!is.null(manual_unusual_df) && nrow(manual_unusual_df) > 0 &&
+      "problem_humanidentified" %in% names(manual_unusual_df)) {
+    mu <- manual_unusual_df[!is.na(manual_unusual_df$problem_humanidentified) &
+                              str_detect(tolower(manual_unusual_df$problem_humanidentified), "manual unusual"), ,
+                            drop = FALSE]
+    for (i in seq_len(nrow(mu))) {
+      check_pairs("manual_unusual_corrections", mu[i, , drop = FALSE],
+                  list(c("column_to_adjust", "correction_value"),
+                       c("column_to_adjust_2", "correction_value_2")))
+    }
+  }
+  if (length(out) == 0)
+    return(data.frame(file = character(0), pid = character(0), day_num = character(0),
+                      row_id = character(0), field = character(0), value = character(0),
+                      problem = character(0), stringsAsFactors = FALSE))
+  do.call(rbind, out)
 }
 
 # Handle 'Same day' instruction
@@ -1087,7 +1162,9 @@ corrected_to_manual_col <- function(col) {
 # Utility Functions
 # ============================================
 
-# Check and mark swap corrections
+# correction_type is written by the algorithm (Step 4, e.g. "bed_sleep_swap_3h"),
+# not by a person. A row it names is only reported here when no manual
+# instruction changed it; it is not marked as manually corrected.
 check_swap_corrections <- function(data, corrections_df) {
   
   cat("  Checking swap operation handling...\n")
@@ -1107,8 +1184,9 @@ check_swap_corrections <- function(data, corrections_df) {
     if (length(target_idx) > 0) {
       row_idx <- target_idx[1]
       if (!is.na(data$manually_corrected[row_idx]) && !data$manually_corrected[row_idx]) {
-        data$manually_corrected[row_idx] <- TRUE
-        cat(sprintf("    Marked swap as corrected: pid=%s, day=%d\n", corr$pid, corr$day_num))
+        cat(sprintf(paste0("    pid=%s, day=%d: correction_type says swap (an automatic step), ",
+                           "but no manual instruction changed this record; not marked as manually corrected\n"),
+                    corr$pid, corr$day_num))
       }
     }
   }
@@ -1208,9 +1286,9 @@ process_manual_unusual_correction <- function(data, correction,
     
     operations_applied <- TRUE
     cat(sprintf("  [OK] Undo correction: pid=%s, day=%d\n", pid, day_num))
-    
-    if (operations_applied) data$manually_corrected[row_idx] <- TRUE
-    return(data)
+    # No return here: the row's other instructions (column/value pairs,
+    # swaps) are applied next, on top of the restored raw times -- the
+    # same as process_case2_correction() does.
   }
   
   # Step 2: Process column_to_adjust and correction_value
@@ -1315,9 +1393,9 @@ process_case3_correction <- function(data, correction,
     
     operations_applied <- TRUE
     cat(sprintf("  [OK] Undo correction: pid=%s, day=%d\n", pid, day_num))
-    
-    if (operations_applied) data$manually_corrected[row_idx] <- TRUE
-    return(data)
+    # No return here: the row's other instructions (column/value pairs,
+    # swaps) are applied next, on top of the restored raw times -- the
+    # same as process_case2_correction() does.
   }
   
   # Step 2: Process column_to_correct and correct_value
@@ -1333,12 +1411,6 @@ process_case3_correction <- function(data, correction,
       
       current_time <- data[[target_col]][row_idx]
       if (is.na(current_time)) next
-      
-      if (!instruction_recognized(correct_value)) {
-        rid <- if ("row_id" %in% names(correction)) as.character(correction$row_id) else ""
-        .sc_record_not_applied_error(pid, day_num, rid, col)
-        next
-      }
       
       corrected_time <- apply_time_instruction_case3(current_time, correct_value)
       
@@ -1363,12 +1435,6 @@ process_case3_correction <- function(data, correction,
       
       current_time <- data[[target_col]][row_idx]
       if (is.na(current_time)) next
-      
-      if (!instruction_recognized(correct_value_2)) {
-        rid <- if ("row_id" %in% names(correction)) as.character(correction$row_id) else ""
-        .sc_record_not_applied_error(pid, day_num, rid, col)
-        next
-      }
       
       corrected_time <- apply_time_instruction_case3(current_time, correct_value_2)
       
@@ -2021,6 +2087,15 @@ apply_manual_corrections_and_recalculate <- function(ema_data, corrections_df, m
                 i, corr$pid, corr$day_num))
   }
   
+  problems <- manual_instruction_problems(corrections_df, manual_unusual_df)
+  if (nrow(problems) > 0) {
+    cat(sprintf("\n  WARNING: %d instruction(s) in the manual files could not be read and were skipped:\n",
+                nrow(problems)))
+    for (k in seq_len(nrow(problems)))
+      cat(sprintf("    %s pid=%s day=%s %s: %s\n", problems$file[k], problems$pid[k],
+                  problems$day_num[k], problems$field[k], problems$problem[k]))
+  }
+
   # ============================================
   # Step 4: Update corrected columns
   # ============================================

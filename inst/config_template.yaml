@@ -12,6 +12,11 @@ pipeline:
 # YOUR DATA
 # =============================================================================
 data:
+  # -- What kind of data this is: real (participant data), synth (synthetic
+  #    or test data) or unknown. Decides where figures go (only real goes
+  #    under output/). If empty, an interactive run asks you and a
+  #    non-interactive run stops with an error.
+  tag: "real"
   files:
     # -- Your main data file --
     main: "your_data.rds"
@@ -74,7 +79,7 @@ data:
 # =============================================================================
 # OUTPUT SETTINGS (optional -- defaults are correct for most studies)
 # =============================================================================
-# Only a run whose data_tag resolves to "real" is written to
+# Only a run whose data.tag is "real" is written to
 # output/latest_visualization_real_n<rows>/. Synthetic/test runs AND runs
 # whose data_tag could not be determined ("unknown") both go to
 # latest_visualization_<tag>_n<rows>/ in the project root (never inside
@@ -160,3 +165,12 @@ data:
 #   metrics:
 #     subjective_sol:
 #       spike_abs_threshold: 120
+#
+# # Review rules (what counts as done; see config_default.yaml for every key).
+# # Omit to use the defaults: done when no row is needs_review.
+# review:
+#   done_when:
+#     max_needs_review: 0
+#   step8_flags_need_review: false
+#   missing_times_ok_after_manual: false
+#   fail_if_not_done: false

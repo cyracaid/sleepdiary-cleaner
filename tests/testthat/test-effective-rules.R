@@ -38,3 +38,21 @@ test_that("the closing line says where changed rules come from", {
   expect_true(any(grepl("1 rule\\(s\\) set in your config, 0 set by the call", out2)))
   unlink(d, recursive = TRUE)
 })
+
+test_that("the review rules are listed, and a changed one is reported as the user's", {
+  cfg <- sleepcleanr::load_config(NULL)
+  keys <- c("review.done_when.max_needs_review", "review.missing_times_ok_after_manual",
+            "review.step8_flags_need_review", "review.fail_if_not_done")
+  r <- sleepcleanr:::effective_rules(cfg, FALSE)
+  expect_true(all(keys %in% r$key))
+  expect_equal(r$value[r$key == "review.missing_times_ok_after_manual"], "FALSE")
+  cfg$review$missing_times_ok_after_manual <- TRUE
+  r2 <- sleepcleanr:::effective_rules(cfg, FALSE)
+  row <- r2[r2$key == "review.missing_times_ok_after_manual", ]
+  expect_equal(row$value, "TRUE")
+  expect_equal(row$source, "your config")
+  # a config without a review block reports the defaults
+  cfg$review <- NULL
+  r3 <- sleepcleanr:::effective_rules(cfg, FALSE)
+  expect_true(all(r3$source[r3$key %in% keys] == "default"))
+})

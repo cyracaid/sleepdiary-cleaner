@@ -125,6 +125,7 @@ run_point <- function(swap, flip, run_dir) {
   cfg$normalize$swap_threshold_hours <- swap
   cfg$timestamp$sequence$max_gap_hours <- flip
   cfg$data$files$main <- "main.rds"
+  cfg$data$tag <- "synth"
   cfg$data$files$extra <- NULL
   yaml::write_yaml(cfg, file.path(run_dir, "config.yaml"))
 
