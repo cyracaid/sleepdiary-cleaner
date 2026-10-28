@@ -461,6 +461,9 @@ corrected_to_manual_col <- function(col) {
 # instruction changed it; it is not marked as manually corrected.
 check_swap_corrections <- function(data, corrections_df) {
   
+# The column is created lazily by the first manual marking; rows reached
+  # only through this swap check may not have triggered one yet.
+  if (!"manually_corrected" %in% names(data)) data$manually_corrected <- FALSE
   cat("  Checking swap operation handling...\n")
   
   if (nrow(corrections_df) == 0 || !("correction_type" %in% names(corrections_df))) {
@@ -1158,7 +1161,7 @@ create_classified_dataframes <- function(data,
     reasonable_count <- ifelse(!is.null(reasonable_unusual_records), 
                                nrow(reasonable_unusual_records), 0)
     clean_count <- sum(data$data_category == "clean", na.rm = TRUE)
-    corrected_count <- sum(data$manually_corrected, na.rm = TRUE)
+    corrected_count <- if ("manually_corrected" %in% names(data)) sum(data$manually_corrected, na.rm = TRUE) else 0L
   } else {
     equal_time_count <- error_count <- unusual_count <- 
       clean_count <- corrected_count <- reasonable_count <- 0
@@ -1244,6 +1247,12 @@ apply_manual_corrections_and_recalculate <- function(ema_data, corrections_df, m
     stop(sprintf("EMA data missing required columns: %s", 
                  paste(missing_in_ema, collapse=", ")))
   }
+
+  # Create the marking column up front: it was created lazily by the first
+  # per-record assignment, and that assignment's replacement read warned
+  # "Unknown or uninitialised column: manually_corrected" on inputs that
+  # arrive without it (real-data path).
+  if (!"manually_corrected" %in% names(ema_data)) ema_data$manually_corrected <- FALSE
   
   # Fixed column names - using exact patterns
   time_bed_am_col <- "time_bed_am_hhmm_ampm"
@@ -1430,6 +1439,13 @@ apply_manual_corrections_and_recalculate <- function(ema_data, corrections_df, m
   # Step 7: Update correction status
   # ============================================
   cat("\n7. Updating correction status...\n")
+
+  # The column can be dropped by an intermediate rebuild; the filters below
+  # read it and would warn "Unknown or uninitialised column".
+  if (!"manually_corrected" %in% names(ema_data)) ema_data$manually_corrected <- FALSE
+  # The corrections file carries manually_corrected_mtb, not this name; the
+  # write-back below marks it and would otherwise read a missing column.
+  if (!"manually_corrected" %in% names(corrections_df)) corrections_df$manually_corrected <- FALSE
   
   corrected_pids <- ema_data %>% 
     filter(manually_corrected == TRUE) %>% 
@@ -1460,7 +1476,7 @@ apply_manual_corrections_and_recalculate <- function(ema_data, corrections_df, m
   cat(sprintf("Case3 (Column/Value-based): %d\n", case3_count))
   cat(sprintf("Case4 (Unprocessable): %d\n", case4_count))
   
-  total_corrected <- sum(ema_data$manually_corrected, na.rm = TRUE)
+  total_corrected <- if ("manually_corrected" %in% names(ema_data)) sum(ema_data$manually_corrected, na.rm = TRUE) else 0L
   total_records <- nrow(ema_data)
   cat(sprintf("\nEMA Data Correction Statistics:\n"))
   cat(sprintf("  Total records: %d\n", total_records))
