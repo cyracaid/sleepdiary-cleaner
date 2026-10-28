@@ -121,7 +121,7 @@
 <td>
 <strong>A</strong> <code>output/cleaned_data_final.csv</code>
 </td>
-<td>13,990 行 × 35 列</td>
+<td>13,990 行 × 39 列</td>
 <td>分析：时间、睡眠指标，以及下面的状态列</td>
 </tr>
 <tr class="even">
@@ -206,6 +206,17 @@
 <tr class="even">
 <td>这次运行用了哪些规则？</td>
 <td><code>output/effective_rules.csv</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>output/review_status.csv</code></td>
+<td>每条被标记记录一行：needs_review / not_incorporated / incorporated
+及原因（1.7.0）</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>output/review_runs.csv</code></td>
+<td>追加式运行日志，含输入/配置/结果哈希并与上一轮自动比对（1.7.0）</td>
 <td>
 <code>value</code>、<code>source</code>
 </td>

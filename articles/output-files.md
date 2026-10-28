@@ -11,20 +11,22 @@ leave out.
 
 | File                                              | Size in the study run    | Use it for                                                                                       |
 |---------------------------------------------------|--------------------------|--------------------------------------------------------------------------------------------------|
-| **A** `output/cleaned_data_final.csv`             | 13,990 rows × 35 columns | Analysis: times, sleep metrics, and the status columns below                                     |
+| **A** `output/cleaned_data_final.csv`             | 13,990 rows × 39 columns | Analysis: times, sleep metrics, and the status columns below                                     |
 | **B** `output/cleaned_data_prepostcorrection.csv` | 13,990 × 16              | What changed: the four times before and after correction, `correction_type`, `audit_disposition` |
 | Full `output/cleaned_data_full.rds`               | 13,990 × 135             | Everything the pipeline computed, nothing dropped                                                |
 
-| I want to know…                                             | Open                                                       | Column                                                                                                 |
-|-------------------------------------------------------------|------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
-| Was this entry changed, and by what?                        | A or B                                                     | `has_correction`: `none`, `algorithmic`, `manual` or `both`. B also has `correction_type` (which rule) |
-| What was typed, and what is it now?                         | B                                                          | `bedtime_precorrection` / `bedtime_postcorrection`, and the same for sleep onset, awakening, get-up    |
-| Is it clean, an error, unusual, or not reported?            | A                                                          | `record_status`, `flag_severity` (with `error_type`, `unusual_type`)                                   |
-| Did a person look at it, and what came of it?               | A                                                          | `human_review`: `none`, `corrected`, `accepted` or `waiting` (explained below)                         |
-| Which Step 5 rows are in which review state after this run? | `[NEW]manual_error_correction_review.csv` (project folder) | `status_after_corrections`, `in_manual_file`                                                           |
-| Who resolved a row, and when?                               | The review files you keep                                  | `review_resolution`, `resolved_by`, `resolved_at`                                                      |
-| Why was a manual correction not used?                       | `output/manual_corrections_not_applied.csv`                | `reason`                                                                                               |
-| Which rules did this run use?                               | `output/effective_rules.csv`                               | `value`, `source`                                                                                      |
+| I want to know…                                             | Open                                                                                                | Column                                                                                                 |
+|-------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
+| Was this entry changed, and by what?                        | A or B                                                                                              | `has_correction`: `none`, `algorithmic`, `manual` or `both`. B also has `correction_type` (which rule) |
+| What was typed, and what is it now?                         | B                                                                                                   | `bedtime_precorrection` / `bedtime_postcorrection`, and the same for sleep onset, awakening, get-up    |
+| Is it clean, an error, unusual, or not reported?            | A                                                                                                   | `record_status`, `flag_severity` (with `error_type`, `unusual_type`)                                   |
+| Did a person look at it, and what came of it?               | A                                                                                                   | `human_review`: `none`, `corrected`, `accepted` or `waiting` (explained below)                         |
+| Which Step 5 rows are in which review state after this run? | `[NEW]manual_error_correction_review.csv` (project folder)                                          | `status_after_corrections`, `in_manual_file`                                                           |
+| Who resolved a row, and when?                               | The review files you keep                                                                           | `review_resolution`, `resolved_by`, `resolved_at`                                                      |
+| Why was a manual correction not used?                       | `output/manual_corrections_not_applied.csv`                                                         | `reason`                                                                                               |
+| Which rules did this run use?                               | `output/effective_rules.csv`                                                                        |                                                                                                        |
+| `output/review_status.csv`                                  | One row per flagged record: needs_review / not_incorporated / incorporated, with the reason (1.7.0) |                                                                                                        |
+| `output/review_runs.csv`                                    | Append-only run log with input/config/result hashes, auto-compared to the previous run (1.7.0)      | `value`, `source`                                                                                      |
 
 `human_review` has one value per row, the first that applies:
 

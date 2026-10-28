@@ -31,39 +31,39 @@ CSV、回归检查和快速检查卡；第 8–9 节讲怎么看图。
   - [9.1 图索引](#s-9-1)
     - [图是怎么编号的，为什么有些编号缺失](#s-9-1-naming)
   - [9.2 管线清洗图卡片（`pipeline_cleaning/`）（16 张）](#s-9-2)
-    - [01 · 管线记录流](#c-01)
-    - [06 · 修正后睡眠时长](#c-06)
-    - [07 · 标记构成堆叠图](#c-07)
-    - [10 · 极端睡眠时长](#c-10)
-    - [11 · 标记共现图](#c-11)
-    - [13 · 错误类别分布](#c-13)
-    - [13B · 相邻时间戳间隔](#c-13b)
-    - [13C · 检测结果热力图](#c-13c)
-    - [13D · 阈值 vs 测量噪声](#c-13d)
-    - [14 · 修正前睡眠时长](#c-14)
-    - [15 · 错误时间线](#c-15)
-    - [16 · 常见错误模式](#c-16)
-    - [17 · 标记率最高的参与者](#c-17)
-    - [18 · 自动检测仪表板](#c-18)
-    - [A1 · 逐步标记账本](#c-a1)
-    - [P26 · 值得二次检查的参与者](#c-p26)
+    - [F01 · 管线记录流](#c-01)
+    - [F02 · 修正后睡眠时长](#c-06)
+    - [F03 · 标记构成堆叠图](#c-07)
+    - [F04 · 极端睡眠时长](#c-10)
+    - [F05 · 标记共现图](#c-11)
+    - [F06 · 错误类别分布](#c-13)
+    - [F07 · 相邻时间戳间隔](#c-13b)
+    - [F08 · 检测结果热力图](#c-13c)
+    - [F09 · 阈值 vs 测量噪声](#c-13d)
+    - [F10 · 修正前睡眠时长](#c-14)
+    - [F11 · 错误时间线](#c-15)
+    - [F12 · 常见错误模式](#c-16)
+    - [F13 · 标记率最高的参与者](#c-17)
+    - [F14 · 自动检测仪表板](#c-18)
+    - [F15 · 逐步标记账本](#c-a1)
+    - [F16 · 值得二次检查的参与者](#c-p26)
   - [9.3 研究结果图卡片（`research_ready/`）（16 张）](#s-9-3)
-    - [02 · 修正影响](#c-02)
-    - [02B · 睡眠变量分布](#c-02b)
-    - [03 · TST 分布](#c-03)
-    - [04 · 睡眠时长 vs 卧床时间](#c-04)
-    - [04B · SOL vs 睡眠时长](#c-04b)
-    - [05 · 睡眠变量的变异性](#c-05)
-    - [09 · 就寝 vs 起床时间分布](#c-09)
-    - [20 · SOL 感知偏差](#c-20)
-    - [20B · WASO 感知偏差](#c-20b)
-    - [21 · 物质使用数据可得性](#c-21)
-    - [22 · 物质使用数值分布](#c-22)
-    - [23 · 咖啡因摄入](#c-23)
-    - [24 · 酒精摄入](#c-24)
-    - [R25 · 睡眠规律性——工作日 vs 周末](#c-r25)
-    - [R26 · 睡眠构成——TIB 拆分](#c-r26)
-    - [R27 · 睡眠指标相关矩阵](#c-r27)
+    - [F17 · 修正影响](#c-02)
+    - [F18 · 睡眠变量分布](#c-02b)
+    - [F19 · TST 分布](#c-03)
+    - [F20 · 睡眠时长 vs 卧床时间](#c-04)
+    - [F21 · SOL vs 睡眠时长](#c-04b)
+    - [F22 · 睡眠变量的变异性](#c-05)
+    - [F23 · 就寝 vs 起床时间分布](#c-09)
+    - [F24 · SOL 感知偏差](#c-20)
+    - [F25 · WASO 感知偏差](#c-20b)
+    - [F26 · 物质使用数据可得性](#c-21)
+    - [F27 · 物质使用数值分布](#c-22)
+    - [F28 · 咖啡因摄入](#c-23)
+    - [F29 · 酒精摄入](#c-24)
+    - [F30 · 睡眠规律性——工作日 vs 周末](#c-r25)
+    - [F31 · 睡眠构成——TIB 拆分](#c-r26)
+    - [F32 · 睡眠指标相关矩阵](#c-r27)
 
 ## 术语与定义
 
@@ -534,9 +534,9 @@ QC。这里出现的每个图号（比如 “01”、“13D”）都对应 §9.2
 | 步骤 | 图（卡片）                   | 应该长这样                                                | 若不是？                                                  |
 |:----:|------------------------------|-----------------------------------------------------------|-----------------------------------------------------------|
 |  1   | **01 管线记录流** (§9.2)     | 流程平缓收窄；Clean 占主导；Error + Unusual 很小（\< 5%） | 0 处有尖峰或 Error/Unusual 占比巨大 → 上游解析/AM-PM 失败 |
-|  2   | **A1 逐步标记账本** (§9.2)   | Corrected 柱只在 Step 6.5 出现，之后持平                  | Step 6.5 之后再变化 = 不稳定                              |
+|  2   | **F15 逐步标记账本** (§9.2)  | Corrected 柱只在 Step 6.5 出现，之后持平                  | Step 6.5 之后再变化 = 不稳定                              |
 |  3   | **18 自动检测仪表板** (§9.2) | 标记计数与 `correction_status_final.csv` 一致             | 不一致 = 错位                                             |
-|  4   | **02B 睡眠变量分布** (§9.3)  | TST 峰值在 6–8 h，SOL 右偏，WASO \< 60，SE \> 85%         | SOL 平/双峰 = AM/PM 混淆未修正                            |
+|  4   | **F18 睡眠变量分布** (§9.3)  | TST 峰值在 6–8 h，SOL 右偏，WASO \< 60，SE \> 85%         | SOL 平/双峰 = AM/PM 混淆未修正                            |
 |  5   | **13 错误类别分布** (§9.2)   | 多数记录 Clean/Minor；Error+Unusual \< 5%                 | 偏高 → 审查人工 CSV                                       |
 
 ## 9. 逐图参考
@@ -579,38 +579,38 @@ QC。这里出现的每个图号（比如 “01”、“13D”）都对应 §9.2
 
 | \#      | 文件                        | 论文用途    | 代码来源                        | 卡片                                        | 最后核对   |
 |---------|-----------------------------|-------------|---------------------------------|---------------------------------------------|------------|
-| **01**  | `pipeline_cleaning/F01.png` | Methods 图1 | `sleep_visualization.R:862`     | [§9.2 · 管线记录流](#c-01)                  | 2026-09-25 |
-| **02**  | `research_ready/F17.png`    | Methods 图2 | `sleep_visualization.R:1013`    | [§9.3 · 修正影响](#c-02)                    | 2026-09-25 |
-| **02B** | `research_ready/F18.png`    | Results     | `sleep_visualization.R:1057`    | [§9.3 · 睡眠变量分布](#c-02b)               | 2026-09-25 |
-| **03**  | `research_ready/F19.png`    | Results     | `sleep_visualization.R:1108`    | [§9.3 · TST 分布](#c-03)                    | 2026-09-25 |
-| **04**  | `research_ready/F20.png`    | Results     | `sleep_visualization.R:1163`    | [§9.3 · 睡眠时长 vs 卧床时间](#c-04)        | 2026-09-25 |
-| **04B** | `research_ready/F21.png`    | Results     | `sleep_visualization.R:1215`    | [§9.3 · SOL vs 睡眠时长](#c-04b)            | 2026-09-25 |
-| **05**  | `research_ready/F22.png`    | Results     | `sleep_visualization.R:1265`    | [§9.3 · 睡眠变量的变异性](#c-05)            | 2026-09-25 |
-| **06**  | `pipeline_cleaning/F02.png` | Supplement  | `sleep_visualization.R:1339`    | [§9.2 · 修正后睡眠时长](#c-06)              | 2026-09-25 |
-| **07**  | `pipeline_cleaning/F03.png` | Supplement  | `sleep_visualization.R:1404`    | [§9.2 · 标记构成堆叠图](#c-07)              | 2026-09-25 |
-| **09**  | `research_ready/F23.png`    | Results     | `sleep_visualization.R:1458`    | [§9.3 · 就寝 vs 起床时间分布](#c-09)        | 2026-09-25 |
-| **10**  | `pipeline_cleaning/F04.png` | Supplement  | `sleep_visualization.R:1514`    | [§9.2 · 极端睡眠时长](#c-10)                | 2026-09-25 |
-| **11**  | `pipeline_cleaning/F05.png` | Supplement  | `sleep_visualization.R:1571`    | [§9.2 · 标记共现图](#c-11)                  | 2026-10-23 |
-| **13**  | `pipeline_cleaning/F06.png` | Supplement  | `sleep_visualization.R:1794`    | [§9.2 · 错误类别分布](#c-13)                | 2026-09-25 |
-| **13B** | `pipeline_cleaning/F07.png` | Supplement  | `sleep_visualization.R:1877`    | [§9.2 · 相邻时间戳间隔](#c-13b)             | 2026-09-25 |
-| **13C** | `pipeline_cleaning/F08.png` | Supplement  | `sleep_visualization.R:1936`    | [§9.2 · 检测结果热力图](#c-13c)             | 2026-09-25 |
-| **13D** | `pipeline_cleaning/F09.png` | Supplement  | `sleep_visualization.R:1980`    | [§9.2 · 阈值 vs 测量噪声](#c-13d)           | 2026-09-25 |
-| **14**  | `pipeline_cleaning/F10.png` | Supplement  | `sleep_visualization.R:2051`    | [§9.2 · 修正前睡眠时长](#c-14)              | 2026-09-30 |
-| **15**  | `pipeline_cleaning/F11.png` | Supplement  | `sleep_visualization.R:2137`    | [§9.2 · 错误时间线](#c-15)                  | 2026-09-30 |
-| **16**  | `pipeline_cleaning/F12.png` | Supplement  | `sleep_visualization.R:2228`    | [§9.2 · 常见错误模式](#c-16)                | 2026-09-30 |
-| **17**  | `pipeline_cleaning/F13.png` | Supplement  | `sleep_visualization.R:2307`    | [§9.2 · 标记率最高的参与者](#c-17)          | 2026-09-25 |
-| **18**  | `pipeline_cleaning/F14.png` | Supplement  | `sleep_visualization.R:2409`    | [§9.2 · 自动检测仪表板](#c-18)              | 2026-09-25 |
-| **20**  | `research_ready/F24.png`    | Results     | `sleep_visualization.R:2637`    | [§9.3 · SOL 感知偏差](#c-20)                | 2026-09-25 |
-| **20B** | `research_ready/F25.png`    | Results     | `sleep_visualization.R:2695`    | [§9.3 · WASO 感知偏差](#c-20b)              | 2026-09-25 |
-| **21**  | `research_ready/F26.png`    | Supplement  | `sleep_visualization.R:2767`    | [§9.3 · 物质使用数据可得性](#c-21)          | 2026-09-25 |
-| **22**  | `research_ready/F27.png`    | Supplement  | `sleep_visualization.R:2870`    | [§9.3 · 物质使用数值分布](#c-22)            | 2026-09-25 |
-| **23**  | `research_ready/F28.png`    | Supplement  | `sleep_visualization.R:2944`    | [§9.3 · 咖啡因摄入](#c-23)                  | 2026-09-25 |
-| **24**  | `research_ready/F29.png`    | Supplement  | `sleep_visualization.R:2979`    | [§9.3 · 酒精摄入](#c-24)                    | 2026-09-25 |
-| **A1**  | `pipeline_cleaning/F15.png` | Supplement  | `figure12_step_flag_table.R:15` | [§9.2 · 逐步标记账本](#c-a1)                | 2026-09-25 |
-| **P26** | `pipeline_cleaning/F16.png` | Supplement  | `sleep_visualization.R:2579`    | [§9.2 · 值得二次检查的参与者](#c-p26)       | 2026-09-25 |
-| **R25** | `research_ready/F30.png`    | Results     | `sleep_visualization.R:3043`    | [§9.3 · 睡眠规律性——工作日 vs 周末](#c-r25) | 2026-09-25 |
-| **R26** | `research_ready/F31.png`    | Results     | `sleep_visualization.R:3096`    | [§9.3 · 睡眠构成——TIB 拆分](#c-r26)         | 2026-09-25 |
-| **R27** | `research_ready/F32.png`    | Results     | `sleep_visualization.R:3125`    | [§9.3 · 睡眠指标相关矩阵](#c-r27)           | 2026-09-25 |
+| **F01** | `pipeline_cleaning/F01.png` | Methods 图1 | `sleep_visualization.R:862`     | [§9.2 · 管线记录流](#c-01)                  | 2026-09-25 |
+| **F17** | `research_ready/F17.png`    | Methods 图2 | `sleep_visualization.R:1013`    | [§9.3 · 修正影响](#c-02)                    | 2026-09-25 |
+| **F18** | `research_ready/F18.png`    | Results     | `sleep_visualization.R:1057`    | [§9.3 · 睡眠变量分布](#c-02b)               | 2026-09-25 |
+| **F19** | `research_ready/F19.png`    | Results     | `sleep_visualization.R:1108`    | [§9.3 · TST 分布](#c-03)                    | 2026-09-25 |
+| **F20** | `research_ready/F20.png`    | Results     | `sleep_visualization.R:1163`    | [§9.3 · 睡眠时长 vs 卧床时间](#c-04)        | 2026-09-25 |
+| **F21** | `research_ready/F21.png`    | Results     | `sleep_visualization.R:1215`    | [§9.3 · SOL vs 睡眠时长](#c-04b)            | 2026-09-25 |
+| **F22** | `research_ready/F22.png`    | Results     | `sleep_visualization.R:1265`    | [§9.3 · 睡眠变量的变异性](#c-05)            | 2026-09-25 |
+| **F02** | `pipeline_cleaning/F02.png` | Supplement  | `sleep_visualization.R:1339`    | [§9.2 · 修正后睡眠时长](#c-06)              | 2026-09-25 |
+| **F03** | `pipeline_cleaning/F03.png` | Supplement  | `sleep_visualization.R:1404`    | [§9.2 · 标记构成堆叠图](#c-07)              | 2026-09-25 |
+| **F23** | `research_ready/F23.png`    | Results     | `sleep_visualization.R:1458`    | [§9.3 · 就寝 vs 起床时间分布](#c-09)        | 2026-09-25 |
+| **F04** | `pipeline_cleaning/F04.png` | Supplement  | `sleep_visualization.R:1514`    | [§9.2 · 极端睡眠时长](#c-10)                | 2026-09-25 |
+| **F05** | `pipeline_cleaning/F05.png` | Supplement  | `sleep_visualization.R:1571`    | [§9.2 · 标记共现图](#c-11)                  | 2026-10-23 |
+| **F06** | `pipeline_cleaning/F06.png` | Supplement  | `sleep_visualization.R:1794`    | [§9.2 · 错误类别分布](#c-13)                | 2026-09-25 |
+| **F07** | `pipeline_cleaning/F07.png` | Supplement  | `sleep_visualization.R:1877`    | [§9.2 · 相邻时间戳间隔](#c-13b)             | 2026-09-25 |
+| **F08** | `pipeline_cleaning/F08.png` | Supplement  | `sleep_visualization.R:1936`    | [§9.2 · 检测结果热力图](#c-13c)             | 2026-09-25 |
+| **F09** | `pipeline_cleaning/F09.png` | Supplement  | `sleep_visualization.R:1980`    | [§9.2 · 阈值 vs 测量噪声](#c-13d)           | 2026-09-25 |
+| **F10** | `pipeline_cleaning/F10.png` | Supplement  | `sleep_visualization.R:2051`    | [§9.2 · 修正前睡眠时长](#c-14)              | 2026-09-30 |
+| **F11** | `pipeline_cleaning/F11.png` | Supplement  | `sleep_visualization.R:2137`    | [§9.2 · 错误时间线](#c-15)                  | 2026-09-30 |
+| **F12** | `pipeline_cleaning/F12.png` | Supplement  | `sleep_visualization.R:2228`    | [§9.2 · 常见错误模式](#c-16)                | 2026-09-30 |
+| **F13** | `pipeline_cleaning/F13.png` | Supplement  | `sleep_visualization.R:2307`    | [§9.2 · 标记率最高的参与者](#c-17)          | 2026-09-25 |
+| **F14** | `pipeline_cleaning/F14.png` | Supplement  | `sleep_visualization.R:2409`    | [§9.2 · 自动检测仪表板](#c-18)              | 2026-09-25 |
+| **F24** | `research_ready/F24.png`    | Results     | `sleep_visualization.R:2637`    | [§9.3 · SOL 感知偏差](#c-20)                | 2026-09-25 |
+| **F25** | `research_ready/F25.png`    | Results     | `sleep_visualization.R:2695`    | [§9.3 · WASO 感知偏差](#c-20b)              | 2026-09-25 |
+| **F26** | `research_ready/F26.png`    | Supplement  | `sleep_visualization.R:2767`    | [§9.3 · 物质使用数据可得性](#c-21)          | 2026-09-25 |
+| **F27** | `research_ready/F27.png`    | Supplement  | `sleep_visualization.R:2870`    | [§9.3 · 物质使用数值分布](#c-22)            | 2026-09-25 |
+| **F28** | `research_ready/F28.png`    | Supplement  | `sleep_visualization.R:2944`    | [§9.3 · 咖啡因摄入](#c-23)                  | 2026-09-25 |
+| **F29** | `research_ready/F29.png`    | Supplement  | `sleep_visualization.R:2979`    | [§9.3 · 酒精摄入](#c-24)                    | 2026-09-25 |
+| **F15** | `pipeline_cleaning/F15.png` | Supplement  | `figure12_step_flag_table.R:15` | [§9.2 · 逐步标记账本](#c-a1)                | 2026-09-25 |
+| **F16** | `pipeline_cleaning/F16.png` | Supplement  | `sleep_visualization.R:2579`    | [§9.2 · 值得二次检查的参与者](#c-p26)       | 2026-09-25 |
+| **F30** | `research_ready/F30.png`    | Results     | `sleep_visualization.R:3043`    | [§9.3 · 睡眠规律性——工作日 vs 周末](#c-r25) | 2026-09-25 |
+| **F31** | `research_ready/F31.png`    | Results     | `sleep_visualization.R:3096`    | [§9.3 · 睡眠构成——TIB 拆分](#c-r26)         | 2026-09-25 |
+| **F32** | `research_ready/F32.png`    | Results     | `sleep_visualization.R:3125`    | [§9.3 · 睡眠指标相关矩阵](#c-r27)           | 2026-09-25 |
 
 `11`（标记共现图，见[下方卡片](#c-11)）在完整数据的标记列少于两列、或没有任何一对标记同时出现时跳过，原因会写在
 `figure_index.png` 顶部的红色区块里。`14`、`15`、`16`
@@ -623,20 +623,12 @@ QC。这里出现的每个图号（比如 “01”、“13D”）都对应 §9.2
   用修正后的数据，13 到 18 用修正前的自动检测结果，19 到 24
   用检测汇总加修正后的数据。它们和输出文件夹对不上：02 和 03 在
   `research_ready/`，06 和 07 在 `pipeline_cleaning/`。
-- **编号后面的字母（02B、04B、13B、13C、13D、20B）表示伴随图**，放在同编号的图旁边，这样后面的编号不用挪动。04B
-  和 20B 在首个版本（2026-07-15）里就有；13B、13C、13D 于 2026-09-07
-  加入；02B 于 2026-09-15 从重复的第二个”Figure
-  2”改标而来，以消除重复标题。
-- **A1、P26、R25、R26、R27
-  是遗留标识**，原样保留，免得改代码；它们不按数字顺序排。项目的图树提案（`VISUALIZATION_TREE_PROPOSAL.md`）记录了不重命名它们的决定。这些字母代表什么没有文档记载，所以本页不去猜。可以确定的是：R25
-  到 R27 在 `research_ready/`，A1 和 P26 在 `pipeline_cleaning/`。
-- **缺失的编号不是遗漏。** 08
-  被移除了（代码注释说，类别不均衡时它会退化成一把小提琴）。12 并入了 A1
-  逐步标记账本。19 并入了 13，13
-  的表格已经显示同样的划分。相关代码注释在
-  `inst/scripts/sleep_visualization.R` 中，位于 “Figure 8:
-  REMOVED”、“Figure 12 MERGED INTO STEP FLAG LEDGER” 和 “Figure 19
-  FOLDED INTO FIGURE 13” 附近。08、12、19 都没有对应的文件。
+- **自 1.7.1 起编号连续：`F01`-`F32`。**
+  编号就是文件名、图内标题和本页的引用。
+  没有字母后缀、没有缺号：早期调整退役的旧号（08、12、19）已重新分配，而不是留空。
+- **按文件夹分族：** `pipeline_cleaning/` 为
+  F01-F16（管线图与检测图按生成顺序交错）； `research_ready/` 为
+  F17-F32。检测图（F06-F14）编号高于部分管线图，就是交错所致。
 - **文件名保持不变。**
   重命名会牵动代码、图索引的登记表，以及你自己读取这些文件的脚本。提案还建议用分层的显示编号（例如
   “1.2-13”）作为图注前缀；那只是提案，没有实现：`figure_index.png`
@@ -653,7 +645,7 @@ QC。这里出现的每个图号（比如 “01”、“13D”）都对应 §9.2
   01（管线记录流）——展示管线*是什么*：各阶段、计数、最终分类构成。02（修正影响）——展示清洗*做了什么*：非破坏性，只改动了确认的输入错误。这两张图正好回答审稿人最先问的两个问题（“你做了什么？”和”改动有多大？“），不带多余信息。
 - **Results 正文（挑 3–5 张）。** 03（TST 分布）作为数据质量的锚点；
   20/20B（感知偏差）如果自报值与计算值的一致性是故事的一部分；R25
-  （工作日 vs 周末）或 R26（TIB 构成）如果时间规律性/构成很重要；R27
+  （工作日 vs 周末）或 F31（TIB 构成）如果时间规律性/构成很重要；R27
   （相关矩阵）如果你引用了指标之间的相互关系。正文里最好不要超过五张——
   其余的放进补充材料里读起来更舒服。
 - **补充材料（其余全部）。** 所有 `pipeline_cleaning/` 图（13、13B、
@@ -667,7 +659,7 @@ R27，其余进补充材料的审计轨迹部分。** 每一张的图注都已�
 
 ### 9.2 管线清洗图卡片（`pipeline_cleaning/`）
 
-#### 01 · 管线记录流
+#### F01 · 管线记录流
 
 **文件** `pipeline_cleaning/F01.png` — 生成于
 `sleep_visualization.R:862`
@@ -739,13 +731,13 @@ Load（全部日记条目）→ Parsed（有时间戳的条目）→ Auto-Correc
 
 **论文图注**
 
-> **Figure 01.**
+> **Figure 1.**
 > 追踪所有原始日记条目经过五个管线阶段（原始载入、时间戳解析、算法修正、人工修正、最终有效输出）的流程图，每个阶段标注记录数和百分比。侧边注释报告最终记录分类（clean、unusual
 > accepted、error reviewed、equal-time
 > benign、not-reported）以及至少接受过一次修正的参与者比例。TST =
 > 总睡眠时间；SOL = 入睡潜伏期。
 
-#### 06 · 修正后睡眠时长
+#### F02 · 修正后睡眠时长
 
 **文件** `pipeline_cleaning/F02.png` — 生成于
 `sleep_visualization.R:1339`
@@ -797,12 +789,12 @@ Clean，不一样也不代表它们是错的。
 
 **论文图注**
 
-> **Figure 06.**
+> **Figure 2.**
 > 应用全部人工修正之后，最终总睡眠时间（TST，小时）的密度图。以 6–8 h
 > 为中心的单峰分布表示健康的睡眠时长；0 或 \> 12 h
 > 处的尖峰表示残留的解析artifact。
 
-#### 07 · 标记构成堆叠图
+#### F03 · 标记构成堆叠图
 
 **文件** `pipeline_cleaning/F03.png` — 生成于
 `sleep_visualization.R:1404`
@@ -863,12 +855,12 @@ Quality”。展示质量问题是否集中在极端时长处。
 
 **论文图注**
 
-> **Figure 07.** 最终睡眠时长（小时）的堆叠直方图，柱子按 flag severity
+> **Figure 3.** 最终睡眠时长（小时）的堆叠直方图，柱子按 flag severity
 > 着色：Clean（无指标标记）、Minor（一个标记）、Major （两个或更多，来自
 > {SE \< 70%, SOL \> 1 h, WASO \> 1.5
 > h}）。展示质量问题是否集中在极端时长处。
 
-#### 10 · 极端睡眠时长
+#### F04 · 极端睡眠时长
 
 **文件** `pipeline_cleaning/F04.png` — 生成于
 `sleep_visualization.R:1514`
@@ -923,13 +915,13 @@ TST = 0 或 24 小时的点，则指向解析失败。
 
 **论文图注**
 
-> **Figure 10.**
+> **Figure 4.**
 > 总睡眠时间（TST，小时）对睡眠效率（SE，%）的散点图，限制在极端时长（\<
 > 4 h 短，\> 10 h
 > 长）。点的形状编码短/长睡眠；点的颜色编码记录质量。水平线标出 SE = 85%
 > 的低效率阈值。
 
-#### 11 · 标记共现图
+#### F05 · 标记共现图
 
 **文件** `pipeline_cleaning/F05.png` — 生成于
 `sleep_visualization.R:1571`
@@ -1043,13 +1035,13 @@ SOL
 
 **论文图注**
 
-> **Figure 11.**
+> **Figure 5.**
 > 最终修正数据中数据质量标记的共现情况。每个格子给出两个标记同时出现的记录数（低效率：SE
 > \< 70%；高 SOL：计算 SOL \> 1 h；高 WASO：自评 WASO \> 1.5
 > h；睡眠计算问题：计算 SOL 与自评 SOL 相差超过 30
 > min）。只统计四个标记都有完整值的记录；从未同时出现的组合不画。颜色为平方根刻度。这些标记是供复核的描述性指示，不是错误分类。
 
-#### 13 · 错误类别分布
+#### F06 · 错误类别分布
 
 **文件** `pipeline_cleaning/F06.png` — 生成于
 `sleep_visualization.R:1794`
@@ -1102,10 +1094,10 @@ Temporal），而且每个类别的绝对数量都不大——待审队列很短
 
 **论文图注**
 
-> **Figure 13.**
+> **Figure 6.**
 > 修正后自动检测流程标记的记录柱状图，按标记描述派生的六个审查类别分组：时序问题、指标问题、数量/录入标记、区间格式错误、时间戳格式错误、其他。计数是修正前的——展示的是管线要承担的负担。
 
-#### 13B · 相邻时间戳间隔
+#### F07 · 相邻时间戳间隔
 
 **文件** `pipeline_cleaning/F07.png` — 生成于
 `sleep_visualization.R:1877`
@@ -1180,11 +1172,11 @@ AM/PM
 
 **论文图注**
 
-> **Figure 13B.** 相邻日记事件（bed→sleep、sleep→awake、
+> **Figure 7.** 相邻日记事件（bed→sleep、sleep→awake、
 > awake→getup）之间时间间隔（小时）的直方图，基于修正前的原始时间戳计算。负间隔表示后一个事件的时钟时间早于前一个，是顺序错误和
 > 12 小时 AM/PM 表盘习惯的信号。
 
-#### 13C · 检测结果热力图
+#### F08 · 检测结果热力图
 
 **文件** `pipeline_cleaning/F08.png` — 生成于
 `sleep_visualization.R:1936`
@@ -1235,10 +1227,10 @@ MISSED：错误留在数据里没被发现。
 
 **论文图注**
 
-> **Figure 13C.**
+> **Figure 8.**
 > 来自合成基准的热力图，已知错误被注入干净记录。行是被注入的错误类型，列是管线的处理结果（修对、标记待审、修错、漏检），每个格子是该错误类型的记录中出现该结果的百分比。
 
-#### 13D · 阈值 vs 测量噪声
+#### F09 · 阈值 vs 测量噪声
 
 **文件** `pipeline_cleaning/F09.png` — 生成于
 `sleep_visualization.R:1980`
@@ -1287,11 +1279,11 @@ Bland-Altman 95% 一致性界限的半宽。虚线标出 2×（临界）和 3×�
 
 **论文图注**
 
-> **Figure 13D.** 每个清洗阈值除以 Bland-Altman
+> **Figure 9.** 每个清洗阈值除以 Bland-Altman
 > 测量噪声（自报值与计算值之间 95% 一致性界限的半宽）。虚线标出
 > 2×（临界）和 3×（安全）。
 
-#### 14 · 修正前睡眠时长
+#### F10 · 修正前睡眠时长
 
 **文件** `pipeline_cleaning/F10.png` — 生成于
 `sleep_visualization.R:2051`
@@ -1333,10 +1325,10 @@ Bland-Altman 95% 一致性界限的半宽。虚线标出 2×（临界）和 3×�
 
 **论文图注**
 
-> **Figure 14.** 没有自动检测标记的记录（绿色，最多随机抽样 5,000
+> **Figure 10.** 没有自动检测标记的记录（绿色，最多随机抽样 5,000
 > 条）与被标记待审的记录（红色）在任何人工修正之前的睡眠时长（小时）密度。
 
-#### 15 · 错误时间线
+#### F11 · 错误时间线
 
 **文件** `pipeline_cleaning/F11.png` — 生成于
 `sleep_visualization.R:2137`
@@ -1378,10 +1370,10 @@ Bland-Altman 95% 一致性界限的半宽。虚线标出 2×（临界）和 3×�
 
 **论文图注**
 
-> **Figure 15.** 每月带有时间顺序错误或可疑间隔模式（Step 6
+> **Figure 11.** 每月带有时间顺序错误或可疑间隔模式（Step 6
 > 分类）的记录数，按模式类型区分。
 
-#### 16 · 常见错误模式
+#### F12 · 常见错误模式
 
 **文件** `pipeline_cleaning/F12.png` — 生成于
 `sleep_visualization.R:2228`
@@ -1430,10 +1422,10 @@ unclassified” 很小——说明检测原因都描述得清楚。
 
 **论文图注**
 
-> **Figure 16.**
+> **Figure 12.**
 > 待审队列中自动检测到的最常见模式；最后一根柱汇总了不匹配任何已命名模式的记录。
 
-#### 17 · 标记率最高的参与者
+#### F13 · 标记率最高的参与者
 
 **文件** `pipeline_cleaning/F13.png` — 生成于
 `sleep_visualization.R:2307`
@@ -1477,11 +1469,11 @@ unclassified” 很小——说明检测原因都描述得清楚。
 
 **论文图注**
 
-> **Figure 17.**
+> **Figure 13.**
 > 按自动检测标记率（每个观测日记天的标记数，而非原始标记计数）排名前 15
 > 的参与者，因此日记天数少的参与者不会被过度呈现。
 
-#### 18 · 自动检测仪表板
+#### F14 · 自动检测仪表板
 
 **文件** `pipeline_cleaning/F14.png` — 生成于
 `sleep_visualization.R:2409`
@@ -1528,11 +1520,11 @@ Metrics 问题；数字与 `correction_status_final.csv` 一致。
 
 **论文图注**
 
-> **Figure 18.** Key metrics
+> **Figure 14.** Key metrics
 > 面板（总记录数、被标记记录数、人工修正记录数）搭配六个 review-source
 > 类别的堆叠柱状图。计数必须与 `correction_status_final.csv` 一致。
 
-#### A1 · 逐步标记账本
+#### F15 · 逐步标记账本
 
 **文件** `pipeline_cleaning/F15.png` — 生成于
 `figure12_step_flag_table.R:15`
@@ -1595,12 +1587,12 @@ SELF_REPORTED_FLAG）给记录计数，这张汇总表也是
 
 **论文图注**
 
-> **Figure A1.**
+> **Figure 11.**
 > 五个评估系统（字段误填、数据类别、标记严重度、极端时长、错误检查）按步骤
 > × 标准 ×
 > 类别的记录计数。每个标准在固定管线步骤计算一次；之后计数必须保持不变。
 
-#### P26 · 值得二次检查的参与者
+#### F16 · 值得二次检查的参与者
 
 **文件** `pipeline_cleaning/F16.png` — 生成于
 `sleep_visualization.R:2579`
@@ -1671,12 +1663,12 @@ SOL 标记分不清是真的入睡很久，还是一般的报告分歧（见[图
 
 **论文图注**
 
-> **Figure P26.**
+> **Figure 12.**
 > 按标记记录比率排序的参与者表格，供人工审查优先级参考。高比率标记出值得人工核查的记录；这不是数据有问题的结论。
 
 ### 9.3 研究结果图卡片（`research_ready/`）
 
-#### 02 · 修正影响
+#### F17 · 修正影响
 
 **文件** `research_ready/F17.png` — 生成于 `sleep_visualization.R:1013`
 
@@ -1752,14 +1744,14 @@ run（本次运行没有记录被修正；无需修正，或人工修正文件�
 
 **论文图注**
 
-> **Figure 02.** (A)
+> **Figure 13.** (A)
 > 每条被修正记录的总睡眠时间变化量（ΔTST，分钟）棒棒糖图，按修正类型着色（橙色
 > = 算法，蓝色 = 人工）。(B) 入睡潜伏期同样画法（ΔSOL）。(C) 修正前后
 > TST 的一致性散点图；未改动记录以 3% 不透明度画作灰色背景。(D) 修正前后
 > TST 和 SOL 均值（±
 > 标准差）汇总表。修正是非破坏性的：只改动了确认的输入错误。
 
-#### 02B · 睡眠变量分布
+#### F18 · 睡眠变量分布
 
 **文件** `research_ready/F18.png` — 生成于 `sleep_visualization.R:1057`
 
@@ -1809,10 +1801,10 @@ SOL
 
 **论文图注**
 
-> **Figure 02B.**
+> **Figure 14.**
 > 最终修正后数据上，总睡眠时间（TST）、入睡潜伏期（SOL）、睡后觉醒（WASO）和睡眠效率（SE）的直方图与密度曲线。
 
-#### 03 · TST 分布
+#### F19 · TST 分布
 
 **文件** `research_ready/F19.png` — 生成于 `sleep_visualization.R:1108`
 
@@ -1872,11 +1864,11 @@ SOL
 
 **论文图注**
 
-> **Figure 03.**
+> **Figure 19.**
 > TST（小时）的直方图与密度图，标出均值（蓝）与中位数（橙）。TST
 > 计算为睡眠时段减去 WASO（TST = TIB − SOL − WASO）。
 
-#### 04 · 睡眠时长 vs 卧床时间
+#### F20 · 睡眠时长 vs 卧床时间
 
 **文件** `research_ready/F20.png` — 生成于 `sleep_visualization.R:1163`
 
@@ -1926,11 +1918,11 @@ WASO。健康的数据里不应该有这样的点。
 
 **论文图注**
 
-> **Figure 04.**
+> **Figure 29.**
 > TST（小时）对卧床时间（TIB，小时）的散点图，带平滑趋势线和恒等参考线。由于构造上
 > TST ≤ TIB，落在恒等线上方的点在物理上不可能。
 
-#### 04B · SOL vs 睡眠时长
+#### F21 · SOL vs 睡眠时长
 
 **文件** `research_ready/F21.png` — 生成于 `sleep_visualization.R:1215`
 
@@ -1973,11 +1965,11 @@ SOL = 0 处的那条竖线是什么？
 
 **论文图注**
 
-> **Figure 04B.** SOL（小时，为了可读性限制在 ≤ 3 小时）对
+> **Figure 26.** SOL（小时，为了可读性限制在 ≤ 3 小时）对
 > TST（小时）的散点图，按 flag severity
 > 着色。负相关（入睡潜伏期越长，睡眠越短）是预期的临床模式。
 
-#### 05 · 睡眠变量的变异性
+#### F22 · 睡眠变量的变异性
 
 **文件** `research_ready/F22.png` — 生成于 `sleep_visualization.R:1265`
 
@@ -2018,10 +2010,10 @@ SOL = 0 处的那条竖线是什么？
 
 **论文图注**
 
-> **Figure 05.** 每个睡眠变量的小提琴图叠加箱线图；每个面板使用自己的 y
+> **Figure 27.** 每个睡眠变量的小提琴图叠加箱线图；每个面板使用自己的 y
 > 轴刻度，因此面板之间比较的是分布形状，而非绝对数值。
 
-#### 09 · 就寝 vs 起床时间分布
+#### F23 · 就寝 vs 起床时间分布
 
 **文件** `research_ready/F23.png` — 生成于 `sleep_visualization.R:1458`
 
@@ -2063,10 +2055,10 @@ SOL = 0 处的那条竖线是什么？
 
 **论文图注**
 
-> **Figure 09.**
+> **Figure 28.**
 > 就寝和起床时钟小时（修正后时间）在一天中的密度分布。峰值分离（傍晚就寝、清晨起床）是健康的昼夜节律信号。
 
-#### 20 · SOL 感知偏差
+#### F24 · SOL 感知偏差
 
 **文件** `research_ready/F24.png` — 生成于 `sleep_visualization.R:2637`
 
@@ -2124,10 +2116,10 @@ SOL = 0 处的那条竖线是什么？
 
 **论文图注**
 
-> **Figure 20.** 客观 SOL（由修正后的就寝与入睡时间戳推导）与主观
+> **Figure 29.** 客观 SOL（由修正后的就寝与入睡时间戳推导）与主观
 > SOL（参与者自报的入睡潜伏期）之间绝对差值（分钟）的直方图。
 
-#### 20B · WASO 感知偏差
+#### F25 · WASO 感知偏差
 
 **文件** `research_ready/F25.png` — 生成于 `sleep_visualization.R:2695`
 
@@ -2170,10 +2162,10 @@ WASO 时长的修正。
 
 **论文图注**
 
-> **Figure 20B.**
+> **Figure 25.**
 > 计算得到的睡后觉醒与参与者自报的夜间觉醒之间绝对差值（分钟）的直方图。
 
-#### 21 · 物质使用数据可得性
+#### F26 · 物质使用数据可得性
 
 **文件** `research_ready/F26.png` — 生成于 `sleep_visualization.R:2767`
 
@@ -2211,10 +2203,10 @@ WASO 时长的修正。
 
 **论文图注**
 
-> **Figure 21.**
+> **Figure 26.**
 > 每种物质（咖啡因、酒精、尼古丁、大麻）含有数据的记录百分比，展示每个物质域被报告的完整程度。
 
-#### 22 · 物质使用数值分布
+#### F27 · 物质使用数值分布
 
 **文件** `research_ready/F27.png` — 生成于 `sleep_visualization.R:2870`
 
@@ -2255,10 +2247,10 @@ WASO 时长的修正。
 
 **论文图注**
 
-> **Figure 22.** 每种物质报告值的箱线图叠加抖动点。单位：咖啡因 =
+> **Figure 27.** 每种物质报告值的箱线图叠加抖动点。单位：咖啡因 =
 > 杯，酒精 = 标准杯，尼古丁和大麻 = 剂。
 
-#### 23 · 咖啡因摄入
+#### F28 · 咖啡因摄入
 
 **文件** `research_ready/F28.png` — 生成于 `sleep_visualization.R:2944`
 
@@ -2307,10 +2299,10 @@ WASO 时长的修正。
 
 **论文图注**
 
-> **Figure 23.** 按自报咖啡因摄入量（杯/天）分组的记录计数。右偏、众数在
+> **Figure 28.** 按自报咖啡因摄入量（杯/天）分组的记录计数。右偏、众数在
 > 0–1 杯是预期的；在不合理值处出现尖峰表示单位混淆。
 
-#### 24 · 酒精摄入
+#### F29 · 酒精摄入
 
 **文件** `research_ready/F29.png` — 生成于 `sleep_visualization.R:2979`
 
@@ -2351,9 +2343,9 @@ WASO 时长的修正。
 
 **论文图注**
 
-> **Figure 24.** 按自报酒精摄入量（标准杯/天）分组的记录计数。
+> **Figure 29.** 按自报酒精摄入量（标准杯/天）分组的记录计数。
 
-#### R25 · 睡眠规律性——工作日 vs 周末
+#### F30 · 睡眠规律性——工作日 vs 周末
 
 **文件** `research_ready/F30.png` — 生成于 `sleep_visualization.R:3043`
 
@@ -2409,11 +2401,11 @@ WASO 时长的修正。
 
 **论文图注**
 
-> **Figure R25.**
+> **Figure 30.**
 > 就寝和起床时钟小时的小提琴图叠加箱线图，按日型拆分（工作日：周一至周五；周末：周六至周日，由修正后的就寝日期派生）。一个适度（≤
 > 1 小时）的周末延迟是预期的；较大的偏移表示社交时差。
 
-#### R26 · 睡眠构成——TIB 拆分
+#### F31 · 睡眠构成——TIB 拆分
 
 **文件** `research_ready/F31.png` — 生成于 `sleep_visualization.R:3096`
 
@@ -2457,11 +2449,11 @@ WASO 那段很大，说明那些记录睡眠碎片化或入睡很慢。
 
 **论文图注**
 
-> **Figure R26.**
+> **Figure 31.**
 > 将卧床时间（TIB）拆分为其组成部分的堆叠柱状图：总睡眠时间（TST）、入睡潜伏期（SOL）、睡后觉醒（WASO），构造上
 > TIB = TST + SOL + WASO。健康构成中 TST 占 TIB 的 80–90%。
 
-#### R27 · 睡眠指标相关矩阵
+#### F32 · 睡眠指标相关矩阵
 
 **文件** `research_ready/F32.png` — 生成于 `sleep_visualization.R:3125`
 
@@ -2515,7 +2507,7 @@ WASO 和 SE 几乎是 −1，这可疑吗？
 
 **论文图注**
 
-> **Figure R27.** 最终修正后数据上 TST、SOL、WASO、SE、TIB 两两 Pearson
+> **Figure 32.** 最终修正后数据上 TST、SOL、WASO、SE、TIB 两两 Pearson
 > 相关系数的上三角相关图（红 = 负，绿 =
 > 正，每格标注系数）。预期符号：TST–SE 正相关，SOL–SE 负相关，TST–TIB
 > 正相关，WASO–SE 负相关。

@@ -122,7 +122,7 @@ you need a column that A and B leave out.</p>
 <td>
 <strong>A</strong> <code>output/cleaned_data_final.csv</code>
 </td>
-<td>13,990 rows × 35 columns</td>
+<td>13,990 rows × 39 columns</td>
 <td>Analysis: times, sleep metrics, and the status columns below</td>
 </tr>
 <tr class="even">
@@ -212,6 +212,18 @@ folder)</td>
 <tr class="even">
 <td>Which rules did this run use?</td>
 <td><code>output/effective_rules.csv</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>output/review_status.csv</code></td>
+<td>One row per flagged record: needs_review / not_incorporated /
+incorporated, with the reason (1.7.0)</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>output/review_runs.csv</code></td>
+<td>Append-only run log with input/config/result hashes, auto-compared
+to the previous run (1.7.0)</td>
 <td>
 <code>value</code>, <code>source</code>
 </td>
