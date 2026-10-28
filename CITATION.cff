@@ -47,6 +47,9 @@ identifiers:
     value: 10.5281/zenodo.23524705
     description: "Archived version 1.5.3"
   - type: doi
+    value: 10.5281/zenodo.23736343
+    description: "Archived version 1.5.1 (archived retrospectively on 2026-10-28; the release webhook missed it at the time)"
+  - type: doi
     value: 10.5281/zenodo.23463490
     description: "Archived version 1.5.2"
   - type: doi
