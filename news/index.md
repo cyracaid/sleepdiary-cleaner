@@ -1,5 +1,16 @@
 # Changelog
 
+## sleepcleanr (development version)
+
+### Changed
+
+- A full pipeline run no longer emits the fourteen cosmetic warnings:
+  line geoms use (ggplot2 3.4 spelling), the label border follows suit,
+  and the four geom families that plot duration data declare – the
+  dropped rows are the skipped_na population, which is structural, and
+  also muffles exactly that notice on the save path. Real warnings still
+  surface.
+
 ## sleepcleanr 1.7.1
 
 ### Changed
