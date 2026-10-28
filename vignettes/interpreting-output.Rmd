@@ -609,7 +609,7 @@ for the paper:
 
 <a id="s-9-1-naming"></a>
 
-#### How figures are named, and why some numbers are missing
+#### How figures are named (F01-F32, continuous since 1.7.1)
 
 - **The numbers follow the data source, not the folder.** Numbers 01 to 24 come from the original single visualization script, whose header groups them by data: 1 to 12 use the post-correction data, 13 to 18 use the pre-correction auto-detection results, and 19 to 24 use the detection summary plus the corrected data. They do not match the output folders: 02 and 03 are in `research_ready/`, while 06 and 07 are in `pipeline_cleaning/`.
 - **Since 1.7.1 the scheme is continuous: `F01`-`F32`.** The number is the file
