@@ -14,8 +14,10 @@ pipeline_results()
 
 A named list with `corrected_ema_data` (the data after corrections and
 metrics), `review_output` (the review queue and the flagged data),
-`checkforerrors_summary` and `pipeline_config`; elements not available
-for the last run are `NULL`.
+`checkforerrors_summary`, `pipeline_config`, `review_status` (the review
+status table) and `review_verdict` (see
+[`review_verdict()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/review_verdict.md));
+elements not available for the last run are `NULL`.
 
 ## Examples
 

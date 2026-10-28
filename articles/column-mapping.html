@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.7.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -435,30 +435,37 @@ category before/after and Step 8 flags</td>
 <code>unusual</code> records for a person to fill in</td>
 </tr>
 <tr class="odd">
+<td><code>review_status.csv</code></td>
+<td>After Step 8.5</td>
+<td>Both worksheets in one table, each row <code>needs_review</code> /
+<code>not_incorporated</code> / <code>incorporated</code> by the
+config’s <code>review:</code> rules</td>
+</tr>
+<tr class="even">
 <td><code>manual_error_correction_updated.csv</code></td>
 <td>Step 6</td>
 <td>Record of the corrections applied: your
 <code>manual_error_corrections.csv</code> as the pipeline incorporated
 it, <code>manually_corrected</code> marks the rows actually used</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>reasonable_unusual_records.csv</code></td>
 <td>Step 6</td>
 <td>
 <code>unusual</code> rows accepted as “reasonable unusual
 record”</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>cross_participant_flagged_rows.csv</code></td>
 <td>Step 8.5</td>
 <td>Days far from the participant’s own median SOL/WASO</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>cross_participant_suspicious_slices.csv</code></td>
 <td>Step 8.5</td>
 <td>All days of the participants in the file above, for context</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>cross_participant_field_misentries.csv</code></td>
 <td>Step 8.5</td>
 <td>Rows where SOL/WASO looks typed into another time field</td>

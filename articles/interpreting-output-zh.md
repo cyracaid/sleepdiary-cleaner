@@ -135,6 +135,14 @@ run_pipeline(config = "my_study.yaml", skip_visualization = TRUE)          # 只
 | `skip_visualization`         | 设为 `TRUE` 跳过出图（Step 9 和 Step 11）。                                                                                                                                                                               |
 | `finalize`                   | 默认 `TRUE`：写出交付数据集（Step 10）。设为 `FALSE` 则清洗完就停。                                                                                                                                                       |
 
+**在配置里写明数据是什么：`data.tag`。** `real`（被试真实数据，图写进
+`output/`，不会上传 GitHub）或 `synth`（合成或测试数据，图写在 `output/`
+外面）。管线从不猜测。没写、而这次运行要出图时：交互运行会在一开始问一次（`r`
+/ `s` / `n`
+停止），只对这一次运行有效；非交互运行（`Rscript`、CI、编译文档）会报错停止，并说明要加什么。`skip_visualization = TRUE`
+的运行不需要它。`RUN_INFO.txt` 和 `output/review_runs.csv`
+会记录标记，以及它来自配置还是来自询问。
+
 **`include_manual_corrections` 是函数参数，不是 YAML 设置。**
 写进配置文件不会生效，必须写在调用里。YAML
 只说明每个人工审查文件**在哪里**（`data.files.manual_error`
@@ -222,6 +230,7 @@ system.file("extdata", "stub_error_corrections.csv", package = "sleepcleanr")
 |-------------------------------------------|------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
 | `[NEW]manual_error_correction_review.csv` | Step 5 写出，**Step 8.5 之后重写** | 一张状态表：Step 5 的每条 `error` 记录（与 `error_df_pre` 同一批行），加上修正之后才变成错误的记录。每行说明发生了什么（`status_after_corrections`）、是否在人工文件里（`in_manual_file`）、修正前后的类别，以及 Step 8 的标记。仍需人处理的行排在最前。审核列为空 | 读 `status_after_corrections`；处理 `..._still_fails` 和 `new_after_corrections` 的行    |
 | `[NEW]manual_unusual_review.csv`          | Step 5                             | 同上，针对 `unusual` 记录                                                                                                                                                                                                                                          | 填写后另存为 `manual_unusual_corrections.csv`                                            |
+| `review_status.csv`                       | Step 8.5 之后，每次运行覆盖        | **只需要看这一张表。** 两张 Step 5 待审表的每一行，加上修正之后才变成错误的记录；每行有一个 `review_state`（`needs_review`、`not_incorporated`、`incorporated`）和判定它的规则（`review_state_reason`）。`needs_review` 排在最前                                   | 处理 `needs_review` 的行；运行结束时会按你的规则打印审查是否完成                         |
 | `manual_error_correction_updated.csv`     | Step 6                             | 已应用修正的记录：**你填的** `manual_error_corrections.csv` 被流水线纳入之后的副本，`manually_corrected` 列标明哪些行真的被用上了。你自己的文件不会被改动，这是流水线的副本                                                                                        | 与你的输入对照。你填了但没标 `TRUE` 的行就是没生效，要查原因。它是记录，不是新的待办清单 |
 | `reasonable_unusual_records.csv`          | Step 6                             | 你标为”reasonable unusual record”（异常但合理，保持原样）的 `unusual` 行                                                                                                                                                                                           | 留档：哪些被接受了                                                                       |
 | `cross_participant_flagged_rows.csv`      | Step 8.5                           | SOL 或 WASO 明显偏离**此人自己**中位数的日子（例如多数天 5–30 分钟，某天 400 分钟）                                                                                                                                                                                | 当作可能的录入错误来审                                                                   |
@@ -319,8 +328,31 @@ Equal-time
 | `flagged_unresolved`，或 `resolved_by` 为 `pending` | 等待确认                                     |
 
 每次运行结束时，管线会打印每张待审表里各状态的行数，以及有多少条**已处理的行在自动复查之后仍然有问题**（仍是
-error，或仍被标记）。改过的记录仍可能通不过复查，所以最后这个数很重要。当没有未处理或待确认的行、也没有仍有问题的行时，就做完了。在真实研究数据上，最终产出了
+error，或仍被标记）。改过的记录仍可能通不过复查，所以最后这个数很重要。什么时候算审查完成，由**你**在配置里写的规则决定，不由管线决定（见下面“审查状态与完成规则”）。在真实研究数据上，最终产出了
 75 条 error + 37 条 unusual 的人工确认修正（见 Methods 部分 Stage 5）。
+
+**审查状态与完成规则。**
+`review_status.csv`（项目根目录）把*两张*待审表的每一行，加上修正之后才变成错误的记录，都归入且只归入一个
+`review_state`。每行归入哪个状态，只由下表的规则和你配置里的 `review:`
+块决定；管线只执行这些规则，运行中从不修改它们。
+
+| `review_state`     | 规则（按顺序，第一条成立的生效）                                                                                                                                                                                                                                                                                   |
+|--------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `needs_review`     | 修正之后才变成错误；或在人工文件里标为待确认（`flagged_unresolved` / `resolved_by` = `pending`）；或复查仍不通过；或修正后仍缺某个时间、无法复查顺序（若它在人工文件里且 `review.missing_times_ok_after_manual: true`，则算 `incorporated`）；或——仅当 `review.step8_flags_need_review: true` 时——带有 Step 8 标记 |
+| `incorporated`     | 本次运行应用了针对它的人工决定，且复查通过                                                                                                                                                                                                                                                                         |
+| `not_incorporated` | 本次运行没有人工决定改动它，且复查通过（规则修好了它，或本次没有应用人工修正）                                                                                                                                                                                                                                     |
+
+`review_state_reason` 写明每行用的是哪条规则。当 `needs_review`
+的行数不超过 `review.done_when.max_needs_review`（默认
+`0`）时，审查**完成**。每次运行都会打印结论；[`review_verdict()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/review_verdict.md)
+返回同一结论；设 `review.fail_if_not_done: true`
+时，若未完成，管线会在写完全部输出后报错停止（适合
+CI）。纯算法运行里不可能有 `incorporated`，打印结果会说明这一点。
+
+每次运行还会在 `output/review_runs.csv`
+里追加一行（所有运行共用一个文件，不会每次新建文件）：数据、人工文件和配置的内容哈希，`review_status.csv`
+的哈希，三类计数和结论。删除并重建环境之后，比较最后两行就知道输入或结果有没有变；运行时也会打印这项比较。`Rscript validation/reproducibility.R`
+会检查同一输入在新目录、新 R 进程里是否得到完全相同的输出。
 
 **已验证数字的来源：**
 一次受控重跑（2026-09-29）精确量化了人工修正对最终数据集的影响：不含人工修正时，1,719
@@ -512,16 +544,16 @@ QC。这里出现的每个图号（比如 “01”、“13D”）都对应 §9.2
 条记录的一次运行）。每次可视化运行都会**从头重建**，是”最新”而不是”历史”，想保留的东西请在重跑前复制走。标签是
 `real` 时里面是由参与者数据生成的图：已被 gitignore，不要提交或外传。
 
-| 项目                         | 是什么                                                                                                                                                                                                     | 什么时候看                                                       |
-|------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------|
-| `pipeline_cleaning/`         | 14 张诊断图：流水线发现了什么、改了什么（卡片见 §9.2）                                                                                                                                                     | 检查清洗是否正常；补充材料的审计链                               |
-| `research_ready/`            | 16 张面向论文的图：睡眠指标、感知偏差、物质使用（卡片见 §9.3）                                                                                                                                             | 为 Results 选图                                                  |
-| `figure_index.png`           | 全部图的总览。顶部红色块列出被跳过的图及原因                                                                                                                                                               | 运行后先看这个                                                   |
-| `all_figures_review.pdf`     | 每页一张图，按生成顺序，与 PNG 同尺寸                                                                                                                                                                      | 快速翻看全部图，或发给研究团队内的合作者                         |
-| `figures_not_generated.csv`  | `file`、`reason`：**没有**生成的图及原因（如”完整数据的标记列不足 2 列”、或缺少某个验证文件）。与红色块同一份清单                                                                                          | 少了某张 PNG：先看这里，不要先怀疑有 bug                         |
-| `flag_distribution.csv`      | 每条日记一行（`pid`、`day_num`、`row_id`），含各类标记数（`timestamp_flags`、`duration_flags`、`amount_flags`、`review_flags`）、`flag_details`、`raw_category`、`final_status`、是否 `manually_corrected` | 标记类图（07、13、17、18）背后的表；筛选它找到某根柱子对应的条目 |
-| `classification_summary.csv` | 各最终分类（clean / error / unusual …）的数量。仅当本次运行产生了最终分类才写出                                                                                                                            | 与 `correction_status_final.csv`（§4）对照                       |
-| `RUN_INFO.txt`               | 运行时间、数据集标签、记录数、输入文件名、包版本、验证文件位置                                                                                                                                             | 记录这批图来自哪次运行                                           |
+| 项目                         | 是什么                                                                                                                                                                                                                                                                                                                                                                                                                                      | 什么时候看                                                       |
+|------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------|
+| `pipeline_cleaning/`         | 14 张诊断图：流水线发现了什么、改了什么（卡片见 §9.2）                                                                                                                                                                                                                                                                                                                                                                                      | 检查清洗是否正常；补充材料的审计链                               |
+| `research_ready/`            | 16 张面向论文的图：睡眠指标、感知偏差、物质使用（卡片见 §9.3）                                                                                                                                                                                                                                                                                                                                                                              | 为 Results 选图                                                  |
+| `figure_index.png`           | 全部图的总览。顶部红色块列出被跳过的图及原因                                                                                                                                                                                                                                                                                                                                                                                                | 运行后先看这个                                                   |
+| `all_figures_review.pdf`     | 每页一张图，按生成顺序，与 PNG 同尺寸                                                                                                                                                                                                                                                                                                                                                                                                       | 快速翻看全部图，或发给研究团队内的合作者                         |
+| `figures_not_generated.csv`  | `file`、`reason`：**没有**生成的图及原因（如”完整数据的标记列不足 2 列”、或缺少某个验证文件）。与红色块同一份清单                                                                                                                                                                                                                                                                                                                           | 少了某张 PNG：先看这里，不要先怀疑有 bug                         |
+| `flag_distribution.csv`      | 每条日记一行（`pid`、`day_num`、`row_id`），含各类标记数（`timestamp_flags`、`duration_flags`、`amount_flags`、`review_flags`）、`flag_details`、`raw_category`、`final_status`、是否 `manually_corrected`，以及 `data_category_after_corrections`。人工修正过的行只有在 Step 8 检查和 `data_category` 都通过时才是 `CLEAN (Manually Fixed)`；带 Step 8 标记的保留该标记；`data_category` 仍不通过的标为 `STILL FAILS (Manually Corrected)` | 标记类图（07、13、17、18）背后的表；筛选它找到某根柱子对应的条目 |
+| `classification_summary.csv` | 各最终分类（clean / error / unusual …）的数量。仅当本次运行产生了最终分类才写出                                                                                                                                                                                                                                                                                                                                                             | 与 `correction_status_final.csv`（§4）对照                       |
+| `RUN_INFO.txt`               | 运行时间、数据集标签、记录数、输入文件名、包版本、验证文件位置                                                                                                                                                                                                                                                                                                                                                                              | 记录这批图来自哪次运行                                           |
 
 **同级的 `verification/<tag>_n<rows>/`**（与本文件夹并列，真实数据时在
 `output/`

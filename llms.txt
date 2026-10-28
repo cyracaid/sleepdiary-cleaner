@@ -372,9 +372,10 @@ Contribution guidelines are in
 ## For developers / AI assistants
 
 The repository ships an agent skill at
-`.opencode/skills/sleepcleanr-pipeline/SKILL.md` that documents how to
-run the pipeline, interpret checkpoint reports, add manual corrections,
-and diagnose issues.
+`.claude/skills/sleepcleanr-pipeline/SKILL.md` (also linked from
+`.agents/skills/`, so Claude Code, Codex and opencode all find it) that
+documents how to run the pipeline, interpret checkpoint reports, add
+manual corrections, and diagnose issues.
 
 ### Pipeline steps
 
@@ -608,7 +609,8 @@ Bug、问题和功能建议：请开
 ## 开发/AI 助手
 
 仓库自带 agent
-skill：`.opencode/skills/sleepcleanr-pipeline/SKILL.md`，说明如何
+skill：`.claude/skills/sleepcleanr-pipeline/SKILL.md`（`.agents/skills/`
+下有指向它的链接，Claude Code、Codex 和 opencode 都能读到），说明如何
 运行管线、解读检查点报告、添加人工修正与诊断问题。
 
 ### 管线步骤
@@ -723,6 +725,12 @@ skill：`.opencode/skills/sleepcleanr-pipeline/SKILL.md`，说明如何
   : Print a sleep_diary summary
 - [`print(`*`<threshold_validation>`*`)`](https://cyracaid.github.io/sleepdiary-cleaner/reference/print.threshold_validation.md)
   : Print a threshold validation report
+- [`resolve_data_tag()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/resolve_data_tag.md)
+  : Which kind of data a run is on: "real", "synth" or "unknown"
+- [`review_rules()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/review_rules.md)
+  : The review rules in force for a config
+- [`review_verdict()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/review_verdict.md)
+  : Is the review done, by the user's rule?
 - [`run_cleaning_chain()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_cleaning_chain.md)
   : The S3 cleaning chain
 - [`run_figure_index()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_figure_index.md)
@@ -751,6 +759,8 @@ skill：`.opencode/skills/sleepcleanr-pipeline/SKILL.md`，说明如何
   : Step 3 – parse interval durations
 - [`step_process_timestamps()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/step_process_timestamps.md)
   : Step 2 – parse timestamps
+- [`suggest_review_labels()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/suggest_review_labels.md)
+  : Label rows with the first user-defined suggestion rule they match
 - [`summarise_missing()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/summarise_missing.md)
   : Summarise missing-data patterns per participant
 - [`summarise_outliers()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/summarise_outliers.md)

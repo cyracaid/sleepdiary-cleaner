@@ -93,6 +93,12 @@
   : Print a sleep_diary summary
 - [`print(`*`<threshold_validation>`*`)`](https://cyracaid.github.io/sleepdiary-cleaner/reference/print.threshold_validation.md)
   : Print a threshold validation report
+- [`resolve_data_tag()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/resolve_data_tag.md)
+  : Which kind of data a run is on: "real", "synth" or "unknown"
+- [`review_rules()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/review_rules.md)
+  : The review rules in force for a config
+- [`review_verdict()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/review_verdict.md)
+  : Is the review done, by the user's rule?
 - [`run_cleaning_chain()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_cleaning_chain.md)
   : The S3 cleaning chain
 - [`run_figure_index()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_figure_index.md)
@@ -121,6 +127,8 @@
   : Step 3 – parse interval durations
 - [`step_process_timestamps()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/step_process_timestamps.md)
   : Step 2 – parse timestamps
+- [`suggest_review_labels()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/suggest_review_labels.md)
+  : Label rows with the first user-defined suggestion rule they match
 - [`summarise_missing()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/summarise_missing.md)
   : Summarise missing-data patterns per participant
 - [`summarise_outliers()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/summarise_outliers.md)

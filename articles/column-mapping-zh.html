@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.7.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -410,28 +410,36 @@ Step 8 标记</td>
 <td>给人填写的 <code>unusual</code> 记录</td>
 </tr>
 <tr class="odd">
+<td><code>review_status.csv</code></td>
+<td>Step 8.5 之后</td>
+<td>两张待审表合成一张，每行按配置里的 <code>review:</code> 规则标为
+<code>needs_review</code> / <code>not_incorporated</code> /
+<code>incorporated</code>
+</td>
+</tr>
+<tr class="even">
 <td><code>manual_error_correction_updated.csv</code></td>
 <td>Step 6</td>
 <td>已应用修正的记录：你的 <code>manual_error_corrections.csv</code>
 被流水线纳入后的副本，<code>manually_corrected</code>
 标明实际用上的行</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>reasonable_unusual_records.csv</code></td>
 <td>Step 6</td>
 <td>被接受为”reasonable unusual record”的 <code>unusual</code> 行</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>cross_participant_flagged_rows.csv</code></td>
 <td>Step 8.5</td>
 <td>SOL/WASO 偏离此人自己中位数的日子</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>cross_participant_suspicious_slices.csv</code></td>
 <td>Step 8.5</td>
 <td>上一个文件中参与者的全部天数，作上下文</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>cross_participant_field_misentries.csv</code></td>
 <td>Step 8.5</td>
 <td>SOL/WASO 数字像填进别的时间栏的行</td>

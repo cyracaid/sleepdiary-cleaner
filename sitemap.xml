@@ -1,5 +1,7 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/404.html</loc></url>
+<url><loc>https://cyracaid.github.io/sleepdiary-cleaner/AGENTS.html</loc></url>
+<url><loc>https://cyracaid.github.io/sleepdiary-cleaner/CLAUDE.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/CODE_OF_CONDUCT.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/CONTRIBUTING.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/LICENSE-text.html</loc></url>
@@ -78,6 +80,9 @@
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/print.sleep_diary.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/print.summary.sleep_diary.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/print.threshold_validation.html</loc></url>
+<url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/resolve_data_tag.html</loc></url>
+<url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/review_rules.html</loc></url>
+<url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/review_verdict.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/run_cleaning_chain.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/run_figure_index.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/run_pipeline.html</loc></url>
@@ -92,6 +97,7 @@
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/step_normalize_sequence.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/step_process_intervals.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/step_process_timestamps.html</loc></url>
+<url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/suggest_review_labels.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/summarise_missing.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/summarise_outliers.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/summary.sleep_diary.html</loc></url>

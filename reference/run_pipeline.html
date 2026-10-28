@@ -15,7 +15,7 @@ source() calls for backward compatibility."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.7.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -145,9 +145,10 @@ still generates the [NEW] review worksheets for inspection, and a
 prominent banner states that no human corrections were applied. TRUE:
 apply the manual-correction files configured in the config YAML
 (the pre-2026-09-29 behaviour). The strings "ask" / "y" / "n" / "yes" /
-"no" are also accepted: "ask" prompts interactively (in an interactive
-session only; in a non-interactive session it degrades to FALSE with a
-notice). The point of the default-off switch: a package user must
+"no" are also accepted: "ask" asks y / n once when the run starts, before
+any data is read; a non-interactive session cannot answer, so "ask" stops
+the run there with an error (use TRUE or FALSE). The point of the
+default-off switch: a package user must
 OPT IN to human corrections so that a dataset can never be silently
 modified by review files left over in the working directory.</p></dd>
 

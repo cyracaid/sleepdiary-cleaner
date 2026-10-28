@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.7.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -505,6 +505,18 @@ by review files left in the working directory.</td>
 </tr>
 </tbody>
 </table>
+<p><strong>Say what the data is: <code>data.tag</code> in the
+config.</strong> <code>real</code> (participant data; figures go under
+<code>output/</code>, which is gitignored) or <code>synth</code>
+(synthetic or test data; figures go outside <code>output/</code>). The
+pipeline never guesses it. If it is not set and the run makes figures,
+an interactive session asks once when the run starts (<code>r</code> /
+<code>s</code> / <code>n</code> to stop), for that run only; a
+non-interactive run (<code>Rscript</code>, CI, knitting) stops with an
+error that says what to add. Runs with
+<code>skip_visualization = TRUE</code> do not need it.
+<code>RUN_INFO.txt</code> and <code>output/review_runs.csv</code> record
+the tag and whether it came from the config or from the prompt.</p>
 <p><strong><code>include_manual_corrections</code> is an argument, not a
 YAML setting.</strong> Writing it in the config file has no effect; it
 must be in the call. The YAML only says <em>where</em> each human-review
@@ -749,6 +761,21 @@ rows</td>
 </td>
 </tr>
 <tr class="odd">
+<td><code>review_status.csv</code></td>
+<td>After Step 8.5, overwritten every run</td>
+<td>
+<strong>The one table to read.</strong> Every row of both Step 5
+worksheets, plus every record that became an error after the
+corrections, with one <code>review_state</code>
+(<code>needs_review</code>, <code>not_incorporated</code>,
+<code>incorporated</code>) and the rule that put it there
+(<code>review_state_reason</code>). <code>needs_review</code> rows come
+first</td>
+<td>Act on the <code>needs_review</code> rows; the run prints whether
+the review is DONE by your rule (“Review states and the done rule”
+below)</td>
+</tr>
+<tr class="even">
 <td><code>manual_error_correction_updated.csv</code></td>
 <td>Step 6</td>
 <td>The record of the corrections applied: <strong>your</strong>
@@ -760,14 +787,14 @@ pipeline’s copy</td>
 <code>TRUE</code> was not applied — find out why. It is a record, not a
 new worklist</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>reasonable_unusual_records.csv</code></td>
 <td>Step 6</td>
 <td>The <code>unusual</code> rows you marked “reasonable unusual record”
 (odd but plausible, left as is)</td>
 <td>A record of what was accepted</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>cross_participant_flagged_rows.csv</code></td>
 <td>Step 8.5</td>
 <td>Days whose SOL or WASO is far from that participant’s
@@ -775,14 +802,14 @@ new worklist</td>
 on one)</td>
 <td>Review as a possible entry error</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>cross_participant_suspicious_slices.csv</code></td>
 <td>Step 8.5</td>
 <td>All days of the participants in the file above</td>
 <td>Context: is the day a one-off or the participant’s usual
 pattern?</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>cross_participant_field_misentries.csv</code></td>
 <td>Step 8.5</td>
 <td>Rows where the SOL or WASO number looks like it was typed into
@@ -1024,10 +1051,70 @@ was handled:</p>
 worksheet are in each state, and how many handled rows are <strong>still
 a problem after the automatic re-check</strong> (still an error, or
 still flagged). Corrected records can still fail that re-check, so that
-last number matters. You are done when no row is unhandled or pending
-and none is still a problem. On the real study data this ended with 75
-error + 37 unusual human-verified corrections (see the Methods section,
-Stage 5).</p>
+last number matters. When the review counts as done is
+<strong>your</strong> rule, written in the config, not something the
+pipeline decides (see “Review states and the done rule” below). On the
+real study data this ended with 75 error + 37 unusual human-verified
+corrections (see the Methods section, Stage 5).</p>
+<p><strong>Review states and the done rule.</strong>
+<code>review_status.csv</code> (project root) puts every row of
+<em>both</em> worksheets, plus every record that became an error after
+the corrections, into exactly one <code>review_state</code>. Which state
+a row gets is decided only by the rules below and by the
+<code>review:</code> block of your config; the pipeline applies them and
+never changes them during a run.</p>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th><code>review_state</code></th>
+<th>Rule (first that applies)</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>needs_review</code></td>
+<td>became an error after the corrections; or marked pending
+(<code>flagged_unresolved</code> / <code>resolved_by</code> =
+<code>pending</code>) in the manual file; or still fails the re-check;
+or has a time missing after the corrections, so the order cannot be
+re-checked (unless it is in a manual file and
+<code>review.missing_times_ok_after_manual: true</code>); or — only if
+<code>review.step8_flags_need_review: true</code> — has a Step 8
+flag</td>
+</tr>
+<tr class="even">
+<td><code>incorporated</code></td>
+<td>a manual decision for it was applied in this run, and it passes the
+re-check</td>
+</tr>
+<tr class="odd">
+<td><code>not_incorporated</code></td>
+<td>no manual decision changed it in this run, and it passes the
+re-check (the rules fixed it, or manual corrections were not
+applied)</td>
+</tr>
+</tbody>
+</table>
+<p><code>review_state_reason</code> names the rule for each row. The
+review is <strong>DONE</strong> when the number of
+<code>needs_review</code> rows is at most
+<code>review.done_when.max_needs_review</code> (default <code>0</code>).
+Every run prints the verdict; <code><a href="../reference/review_verdict.html">review_verdict()</a></code> returns it,
+and <code>review.fail_if_not_done: true</code> stops the run with an
+error, after every output is written, when it is NOT DONE (useful in
+CI). In an algorithmic-only run nothing can be
+<code>incorporated</code>, and the printout says so.</p>
+<p>Each run also adds one line to <code>output/review_runs.csv</code>
+(one file for all runs; no new file per run): content hashes of the
+data, the manual files and the config, the hash of
+<code>review_status.csv</code>, the three counts and the verdict. After
+deleting and rebuilding an environment, compare the last two lines to
+see whether the inputs or the result changed; the run prints that
+comparison. <code>Rscript validation/reproducibility.R</code> checks
+that the same input gives identical outputs in new directories and new R
+processes.</p>
 <p><strong>Where the validated numbers come from:</strong> a controlled
 re-run (2026-09-29) showed exactly what the manual corrections do to the
 final dataset: without them, 1,719 records have computable total sleep
@@ -1621,8 +1708,13 @@ Same list as the red block</td>
 <code>row_id</code>) with its flag counts (<code>timestamp_flags</code>,
 <code>duration_flags</code>, <code>amount_flags</code>,
 <code>review_flags</code>), <code>flag_details</code>,
-<code>raw_category</code> and <code>final_status</code>, and whether it
-was <code>manually_corrected</code>
+<code>raw_category</code> and <code>final_status</code>, whether it was
+<code>manually_corrected</code>, and
+<code>data_category_after_corrections</code>. A manually corrected row
+is <code>CLEAN (Manually Fixed)</code> only when its Step 8 checks and
+its <code>data_category</code> both pass; with a Step 8 flag it keeps
+that flag, and with a failing <code>data_category</code> it is
+<code>STILL FAILS (Manually Corrected)</code>
 </td>
 <td>The table behind the flag figures (07, 13, 17, 18); filter it to
 find the entries behind a bar</td>

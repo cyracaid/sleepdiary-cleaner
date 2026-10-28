@@ -1,0 +1,30 @@
+# Label rows with the first user-defined suggestion rule they match
+
+Applies \`review.suggestions\` from the config, in the order written
+there. Each rule's \`when\` is a set of conditions that must all hold:
+\`\<column\>\_matches\` is a regular expression on that column; any
+other key is a column whose value must be one of the listed values. A
+row that matches no rule gets \`review.suggestion_default\`. A
+suggestion is never a decision: the row stays open until a person fills
+in \`human_decision\`.
+
+## Usage
+
+``` r
+suggest_review_labels(df, rules = review_rules(NULL))
+```
+
+## Arguments
+
+- df:
+
+  A data frame.
+
+- rules:
+
+  Output of \[review_rules()\]; defaults to the bundled rules.
+
+## Value
+
+\`df\` with \`ai_label\`, \`ai_reason\` and \`ai_rule\` (the rule's
+position in \`review.suggestions\`, or "default").
