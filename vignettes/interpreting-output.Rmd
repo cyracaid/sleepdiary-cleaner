@@ -35,13 +35,16 @@ Sections 1–3 cover running the pipeline and the manual input files; 4–7 cove
 <li><a href="#s-6">6. Regression Check (compare against a previous run)</a></li>
 <li><a href="#s-7">7. Quick Reference Card</a></li>
 <li><a href="#s-8">8. How to Read the Figures</a></li>
-<li><a href="#s-9">9. Figure-by-Figure Reference</a><ul><li><a href="#s-9-1">9.1 Figure Index</a><ul><li><a href="#s-9-1-naming">How figures are named, and why some numbers are missing</a></li></ul></li><li><details><summary><a href="#s-9-2">9.2 Pipeline-cleaning figure cards (<code>pipeline_cleaning/</code>) (16 figures)</a></summary><ul><li><a href="#01-pipeline-record-flow">01 · Pipeline Record Flow</a></li><li><a href="#06-sleep-duration-post-correction">06 · Sleep Duration Post-Correction</a></li><li><a href="#07-flag-composition-stacked">07 · Flag Composition Stacked</a></li><li><a href="#10-extreme-sleep-durations">10 · Extreme Sleep Durations</a></li><li><a href="#11-flag-co-occurrence-heatmap">11 · Flag Co-occurrence Heatmap</a></li><li><a href="#13-error-category-distribution">13 · Error Category Distribution</a></li><li><a href="#13b-adjacent-timestamp-gaps">13B · Adjacent Timestamp Gaps</a></li><li><a href="#13c-detection-outcomes-heatmap">13C · Detection Outcomes Heatmap</a></li><li><a href="#13d-threshold-vs-measurement-noise">13D · Threshold vs Measurement Noise</a></li><li><a href="#14-sleep-duration-pre-correction">14 · Sleep Duration Pre-Correction</a></li><li><a href="#15-error-timeline">15 · Error Timeline</a></li><li><a href="#16-common-error-patterns">16 · Common Error Patterns</a></li><li><a href="#17-top-participants-by-flag-rate">17 · Top Participants by Flag Rate</a></li><li><a href="#18-auto-detected-dashboard">18 · Auto-Detected Dashboard</a></li><li><a href="#a1-step-flag-ledger">A1 · Step Flag Ledger</a></li><li><a href="#p26-participants-worth-a-second-look">P26 · Participants Worth a Second Look</a></li></ul></details></li><li><details><summary><a href="#s-9-3">9.3 Research-ready figure cards (<code>research_ready/</code>) (16 figures)</a></summary><ul><li><a href="#02-correction-impact">02 · Correction Impact</a></li><li><a href="#02b-distribution-of-sleep-variables">02B · Distribution of Sleep Variables</a></li><li><a href="#03-tst-distribution">03 · TST Distribution</a></li><li><a href="#04-sleep-duration-vs-time-in-bed">04 · Sleep Duration vs Time in Bed</a></li><li><a href="#04b-sol-vs-sleep-duration">04B · SOL vs Sleep Duration</a></li><li><a href="#05-variability-of-sleep-variables">05 · Variability of Sleep Variables</a></li><li><a href="#09-bedtime-vs-get-up-distribution">09 · Bedtime vs Get-up Distribution</a></li><li><a href="#20-sol-perception-bias">20 · SOL Perception Bias</a></li><li><a href="#20b-waso-perception-bias">20B · WASO Perception Bias</a></li><li><a href="#21-substance-use-availability">21 · Substance Use Availability</a></li><li><a href="#22-substance-use-value-distribution">22 · Substance Use Value Distribution</a></li><li><a href="#23-caffeine-consumption">23 · Caffeine Consumption</a></li><li><a href="#24-alcohol-consumption">24 · Alcohol Consumption</a></li><li><a href="#r25-sleep-regularity--weekday-vs-weekend">R25 · Sleep Regularity — Weekday vs Weekend</a></li><li><a href="#r26-sleep-composition--tib-breakdown">R26 · Sleep Composition — TIB Breakdown</a></li><li><a href="#r27-sleep-metrics-correlation-matrix">R27 · Sleep Metrics Correlation Matrix</a></li></ul></details></li></ul></li>
-</ul>
-</nav>
+<li><a href="#s-9">9. Figure-by-Figure Reference</a><ul><li><a href="#s-9-1">9.1 Figure Index</a><ul><li><a href="#s-9-1-naming">How figures are named
 
-<a id="s-terms"></a>
+Since 1.7.1 every figure uses one continuous scheme: `F01`-`F32`. The number
+matches the file name (`pipeline_cleaning/F07.png`), the in-figure title, and
+this reference. Ranges by family: F01-F16 live in `pipeline_cleaning/`
+(the pipeline and detection families interleave by build order), F17-F32 in
+`research_ready/`. Numbers retired by the 1.6.0 reclassification were
+reassigned -- there are no gaps and no lettered suffixes.
 
-## Terminology and definitions
+Terminology and definitions
 
 Every term the tables and figures use is defined here once.
 
@@ -109,7 +112,7 @@ run_pipeline(config = "my_study.yaml", skip_visualization = TRUE)          # cle
 |---|---|
 | `config` | Path to your config YAML (copy `inst/config_template.yaml` and edit the `data` section). |
 | `include_manual_corrections` | **Default `FALSE`.** With `FALSE` the run is algorithmic-only: every human-review CSV is treated as absent, and a banner says no human corrections were applied. Set `TRUE` to apply the manual-correction files named in the config. It is off by default so a dataset can never be modified silently by review files left in the working directory. |
-| `skip_visualization` | `TRUE` skips the figures (Steps 9 and 11). |
+| `skip_visualization` | `TRUE` skips the figures (Steps 9 and F05). |
 | `finalize` | Default `TRUE`: writes the delivered datasets (Step 10). `FALSE` stops after cleaning. |
 
 **Say what the data is: `data.tag` in the config.** `real` (participant data; figures go under `output/`, which is gitignored) or `synth` (synthetic or test data; figures go outside `output/`). The pipeline never guesses it. If it is not set and the run makes figures, an interactive session asks once when the run starts (`r` / `s` / `n` to stop), for that run only; a non-interactive run (`Rscript`, CI, knitting) stops with an error that says what to add. Runs with `skip_visualization = TRUE` do not need it. `RUN_INFO.txt` and `output/review_runs.csv` record the tag and whether it came from the config or from the prompt.
@@ -499,7 +502,7 @@ threshold validation) live separately in `output/verification/<tag>/`.
 **New to these figures?** Start with the `figure_index.png` contact sheet
 for an overview, then work through the five "must-check" figures below in
 order — together they are a sleep-quality QC pass in miniature. Every figure
-number here (e.g. "01", "13D") matches a heading in §9.2 or §9.3 you can jump to
+number here (e.g. "F01", "F09") matches a heading in §9.2 or §9.3 you can jump to
 directly for the full explanation. The folder split
 (`pipeline_cleaning/` = QC/audit figures, `research_ready/` = built for a
 paper) only matters once you're deciding what to put in a manuscript — for
@@ -517,9 +520,9 @@ just checking your data, ignore it and go by figure number.
 | Step | Figure (card) | Should look like | If not? |
 |:----:|--------|------------------|---------|
 | 1 | **01 Pipeline Record Flow** (§9.2) | Flow narrows gently; Clean dominates; Error + Unusual small (< 5%) | Spike at 0 or huge Error/Unusual share → parsing/AM-PM failure upstream |
-| 2 | **A1 Step Flag Ledger** (§9.2) | Corrected bar appears ONLY at Step 6.5, flat after | Change after Step 6.5 = instability
+| 2 | **F15 Step Flag Ledger** (§9.2) | Corrected bar appears ONLY at Step 6.5, flat after | Change after Step 6.5 = instability
 | 3 | **18 Auto-Detected Dashboard** (§9.2) | Flag counts match `correction_status_final.csv` | Mismatch = misalignment
-| 4 | **02B Distribution of Sleep Variables** (§9.3) | TST peaks 6–8 h, SOL right-skewed, WASO < 60, SE > 85% | SOL flat/bimodal = AM/PM confusion
+| 4 | **F18 Distribution of Sleep Variables** (§9.3) | TST peaks 6–8 h, SOL right-skewed, WASO < 60, SE > 85% | SOL flat/bimodal = AM/PM confusion
 | 5 | **13 Error Category Distribution** (§9.2) | Most records Clean/Minor; Error+Unusual < 5% | High = review manual CSVs
 
 <a id="s-9"></a>
@@ -569,49 +572,54 @@ for the paper:
 
 | # | File | Paper use | Code source | Card | Last checked |
 |---|------|-----------|-------------|------|--------------|
-| **01** | `pipeline_cleaning/F01.png` | Methods Fig 1 | `sleep_visualization.R:862` | [§9.2 · Pipeline Record Flow](#01-pipeline-record-flow) | 2026-09-25 |
-| **02** | `research_ready/F17.png` | Methods Fig 2 | `sleep_visualization.R:1013` | [§9.3 · Correction Impact](#02-correction-impact) | 2026-09-25 |
-| **02B** | `research_ready/F18.png` | Results | `sleep_visualization.R:1057` | [§9.3 · Distribution of Sleep Variables](#02b-distribution-of-sleep-variables) | 2026-09-25 |
-| **03** | `research_ready/F19.png` | Results | `sleep_visualization.R:1108` | [§9.3 · TST Distribution](#03-tst-distribution) | 2026-09-25 |
-| **04** | `research_ready/F20.png` | Results | `sleep_visualization.R:1163` | [§9.3 · Sleep Duration vs Time in Bed](#04-sleep-duration-vs-time-in-bed) | 2026-09-25 |
-| **04B** | `research_ready/F21.png` | Results | `sleep_visualization.R:1215` | [§9.3 · SOL vs Sleep Duration](#04b-sol-vs-sleep-duration) | 2026-09-25 |
-| **05** | `research_ready/F22.png` | Results | `sleep_visualization.R:1265` | [§9.3 · Variability of Sleep Variables](#05-variability-of-sleep-variables) | 2026-09-25 |
-| **06** | `pipeline_cleaning/F02.png` | Supplement | `sleep_visualization.R:1339` | [§9.2 · Sleep Duration Post-Correction](#06-sleep-duration-post-correction) | 2026-09-25 |
-| **07** | `pipeline_cleaning/F03.png` | Supplement | `sleep_visualization.R:1404` | [§9.2 · Flag Composition Stacked](#07-flag-composition-stacked) | 2026-09-25 |
-| **09** | `research_ready/F23.png` | Results | `sleep_visualization.R:1458` | [§9.3 · Bedtime vs Get-up Distribution](#09-bedtime-vs-get-up-distribution) | 2026-09-25 |
-| **10** | `pipeline_cleaning/F04.png` | Supplement | `sleep_visualization.R:1514` | [§9.2 · Extreme Sleep Durations](#10-extreme-sleep-durations) | 2026-09-25 |
-| **11** | `pipeline_cleaning/F05.png` | Supplement | `sleep_visualization.R:1571` | [§9.2 · Flag Co-occurrence Heatmap](#11-flag-co-occurrence-heatmap) | 2026-10-23 |
-| **13** | `pipeline_cleaning/F06.png` | Supplement | `sleep_visualization.R:1794` | [§9.2 · Error Category Distribution](#13-error-category-distribution) | 2026-09-25 |
-| **13B** | `pipeline_cleaning/F07.png` | Supplement | `sleep_visualization.R:1877` | [§9.2 · Adjacent Timestamp Gaps](#13b-adjacent-timestamp-gaps) | 2026-09-25 |
-| **13C** | `pipeline_cleaning/F08.png` | Supplement | `sleep_visualization.R:1936` | [§9.2 · Detection Outcomes Heatmap](#13c-detection-outcomes-heatmap) | 2026-09-25 |
-| **13D** | `pipeline_cleaning/F09.png` | Supplement | `sleep_visualization.R:1980` | [§9.2 · Threshold vs Measurement Noise](#13d-threshold-vs-measurement-noise) | 2026-09-25 |
-| **14** | `pipeline_cleaning/F10.png` | Supplement | `sleep_visualization.R:2051` | [§9.2 · Sleep Duration Pre-Correction](#14-sleep-duration-pre-correction) | 2026-09-30 |
-| **15** | `pipeline_cleaning/F11.png` | Supplement | `sleep_visualization.R:2137` | [§9.2 · Error Timeline](#15-error-timeline) | 2026-09-30 |
-| **16** | `pipeline_cleaning/F12.png` | Supplement | `sleep_visualization.R:2228` | [§9.2 · Common Error Patterns](#16-common-error-patterns) | 2026-09-30 |
-| **17** | `pipeline_cleaning/F13.png` | Supplement | `sleep_visualization.R:2307` | [§9.2 · Top Participants by Flag Rate](#17-top-participants-by-flag-rate) | 2026-09-25 |
-| **18** | `pipeline_cleaning/F14.png` | Supplement | `sleep_visualization.R:2409` | [§9.2 · Auto-Detected Dashboard](#18-auto-detected-dashboard) | 2026-09-25 |
-| **20** | `research_ready/F24.png` | Results | `sleep_visualization.R:2637` | [§9.3 · SOL Perception Bias](#20-sol-perception-bias) | 2026-09-25 |
-| **20B** | `research_ready/F25.png` | Results | `sleep_visualization.R:2695` | [§9.3 · WASO Perception Bias](#20b-waso-perception-bias) | 2026-09-25 |
-| **21** | `research_ready/F26.png` | Supplement | `sleep_visualization.R:2767` | [§9.3 · Substance Use Availability](#21-substance-use-availability) | 2026-09-25 |
-| **22** | `research_ready/F27.png` | Supplement | `sleep_visualization.R:2870` | [§9.3 · Substance Use Value Distribution](#22-substance-use-value-distribution) | 2026-09-25 |
-| **23** | `research_ready/F28.png` | Supplement | `sleep_visualization.R:2944` | [§9.3 · Caffeine Consumption](#23-caffeine-consumption) | 2026-09-25 |
-| **24** | `research_ready/F29.png` | Supplement | `sleep_visualization.R:2979` | [§9.3 · Alcohol Consumption](#24-alcohol-consumption) | 2026-09-25 |
-| **A1** | `pipeline_cleaning/F15.png` | Supplement | `figure12_step_flag_table.R:15` | [§9.2 · Step Flag Ledger](#a1-step-flag-ledger) | 2026-09-25 |
-| **P26** | `pipeline_cleaning/F16.png` | Supplement | `sleep_visualization.R:2579` | [§9.2 · Participants Worth a Second Look](#p26-participants-worth-a-second-look) | 2026-09-25 |
-| **R25** | `research_ready/F30.png` | Results | `sleep_visualization.R:3043` | [§9.3 · Sleep Regularity — Weekday vs Weekend](#r25-sleep-regularity--weekday-vs-weekend) | 2026-09-25 |
-| **R26** | `research_ready/F31.png` | Results | `sleep_visualization.R:3096` | [§9.3 · Sleep Composition — TIB Breakdown](#r26-sleep-composition--tib-breakdown) | 2026-09-25 |
-| **R27** | `research_ready/F32.png` | Results | `sleep_visualization.R:3125` | [§9.3 · Sleep Metrics Correlation Matrix](#r27-sleep-metrics-correlation-matrix) | 2026-09-25 |
+| **F01** | `pipeline_cleaning/F01.png` | Methods Fig 1 | `sleep_visualization.R:862` | [§9.2 · Pipeline Record Flow](#f01-pipeline-record-flow) | 2026-09-25 |
+| **F17** | `research_ready/F17.png` | Methods Fig 2 | `sleep_visualization.R:1013` | [§9.3 · Correction Impact](#f17-correction-impact) | 2026-09-25 |
+| **F18** | `research_ready/F18.png` | Results | `sleep_visualization.R:1057` | [§9.3 · Distribution of Sleep Variables](#f18-distribution-of-sleep-variables) | 2026-09-25 |
+| **F19** | `research_ready/F19.png` | Results | `sleep_visualization.R:1108` | [§9.3 · TST Distribution](#f19-tst-distribution) | 2026-09-25 |
+| **F20** | `research_ready/F20.png` | Results | `sleep_visualization.R:1163` | [§9.3 · Sleep Duration vs Time in Bed](#f20-sleep-duration-vs-time-in-bed) | 2026-09-25 |
+| **F21** | `research_ready/F21.png` | Results | `sleep_visualization.R:1215` | [§9.3 · SOL vs Sleep Duration](#f21-sol-vs-sleep-duration) | 2026-09-25 |
+| **F22** | `research_ready/F22.png` | Results | `sleep_visualization.R:1265` | [§9.3 · Variability of Sleep Variables](#f22-variability-of-sleep-variables) | 2026-09-25 |
+| **F02** | `pipeline_cleaning/F02.png` | Supplement | `sleep_visualization.R:1339` | [§9.2 · Sleep Duration Post-Correction](#f02-sleep-duration-post-correction) | 2026-09-25 |
+| **F03** | `pipeline_cleaning/F03.png` | Supplement | `sleep_visualization.R:1404` | [§9.2 · Flag Composition Stacked](#f03-flag-composition-stacked) | 2026-09-25 |
+| **F23** | `research_ready/F23.png` | Results | `sleep_visualization.R:1458` | [§9.3 · Bedtime vs Get-up Distribution](#f23-bedtime-vs-get-up-distribution) | 2026-09-25 |
+| **F04** | `pipeline_cleaning/F04.png` | Supplement | `sleep_visualization.R:1514` | [§9.2 · Extreme Sleep Durations](#f04-extreme-sleep-durations) | 2026-09-25 |
+| **F05** | `pipeline_cleaning/F05.png` | Supplement | `sleep_visualization.R:1571` | [§9.2 · Flag Co-occurrence Heatmap](#f05-flag-co-occurrence-heatmap) | 2026-10-23 |
+| **F06** | `pipeline_cleaning/F06.png` | Supplement | `sleep_visualization.R:1794` | [§9.2 · Error Category Distribution](#f06-error-category-distribution) | 2026-09-25 |
+| **F07** | `pipeline_cleaning/F07.png` | Supplement | `sleep_visualization.R:1877` | [§9.2 · Adjacent Timestamp Gaps](#f07-adjacent-timestamp-gaps) | 2026-09-25 |
+| **F08** | `pipeline_cleaning/F08.png` | Supplement | `sleep_visualization.R:1936` | [§9.2 · Detection Outcomes Heatmap](#f08-detection-outcomes-heatmap) | 2026-09-25 |
+| **F09** | `pipeline_cleaning/F09.png` | Supplement | `sleep_visualization.R:1980` | [§9.2 · Threshold vs Measurement Noise](#f09-threshold-vs-measurement-noise) | 2026-09-25 |
+| **F10** | `pipeline_cleaning/F10.png` | Supplement | `sleep_visualization.R:2051` | [§9.2 · Sleep Duration Pre-Correction](#f10-sleep-duration-pre-correction) | 2026-09-30 |
+| **F11** | `pipeline_cleaning/F11.png` | Supplement | `sleep_visualization.R:2137` | [§9.2 · Error Timeline](#f11-error-timeline) | 2026-09-30 |
+| **F12** | `pipeline_cleaning/F12.png` | Supplement | `sleep_visualization.R:2228` | [§9.2 · Common Error Patterns](#f12-common-error-patterns) | 2026-09-30 |
+| **F13** | `pipeline_cleaning/F13.png` | Supplement | `sleep_visualization.R:2307` | [§9.2 · Top Participants by Flag Rate](#f13-top-participants-by-flag-rate) | 2026-09-25 |
+| **F14** | `pipeline_cleaning/F14.png` | Supplement | `sleep_visualization.R:2409` | [§9.2 · Auto-Detected Dashboard](#f14-auto-detected-dashboard) | 2026-09-25 |
+| **F24** | `research_ready/F24.png` | Results | `sleep_visualization.R:2637` | [§9.3 · SOL Perception Bias](#f24-sol-perception-bias) | 2026-09-25 |
+| **F25** | `research_ready/F25.png` | Results | `sleep_visualization.R:2695` | [§9.3 · WASO Perception Bias](#f25-waso-perception-bias) | 2026-09-25 |
+| **F26** | `research_ready/F26.png` | Supplement | `sleep_visualization.R:2767` | [§9.3 · Substance Use Availability](#f26-substance-use-availability) | 2026-09-25 |
+| **F27** | `research_ready/F27.png` | Supplement | `sleep_visualization.R:2870` | [§9.3 · Substance Use Value Distribution](#f27-substance-use-value-distribution) | 2026-09-25 |
+| **F28** | `research_ready/F28.png` | Supplement | `sleep_visualization.R:2944` | [§9.3 · Caffeine Consumption](#f28-caffeine-consumption) | 2026-09-25 |
+| **F29** | `research_ready/F29.png` | Supplement | `sleep_visualization.R:2979` | [§9.3 · Alcohol Consumption](#f29-alcohol-consumption) | 2026-09-25 |
+| **F15** | `pipeline_cleaning/F15.png` | Supplement | `figure12_step_flag_table.R:15` | [§9.2 · Step Flag Ledger](#f15-step-flag-ledger) | 2026-09-25 |
+| **F16** | `pipeline_cleaning/F16.png` | Supplement | `sleep_visualization.R:2579` | [§9.2 · Participants Worth a Second Look](#f16-participants-worth-a-second-look) | 2026-09-25 |
+| **F30** | `research_ready/F30.png` | Results | `sleep_visualization.R:3043` | [§9.3 · Sleep Regularity — Weekday vs Weekend](#f30-sleep-regularity--weekday-vs-weekend) | 2026-09-25 |
+| **F31** | `research_ready/F31.png` | Results | `sleep_visualization.R:3096` | [§9.3 · Sleep Composition — TIB Breakdown](#f31-sleep-composition--tib-breakdown) | 2026-09-25 |
+| **F32** | `research_ready/F32.png` | Results | `sleep_visualization.R:3125` | [§9.3 · Sleep Metrics Correlation Matrix](#f32-sleep-metrics-correlation-matrix) | 2026-09-25 |
 
-`11` (flag co-occurrence, [card below](#11-flag-co-occurrence-heatmap)) is skipped whenever fewer than two flag columns have complete data or no pair of flags co-occurs, and the reason is printed on the red block at the top of `figure_index.png`. `14`, `15` and `16` are generated whenever there is something to plot (cards below); when a run has nothing to show (e.g. the review queue is empty because everything was already reviewed), the skip reason says so explicitly.
+`11` (flag co-occurrence, [card below](#f05-flag-co-occurrence-heatmap)) is skipped whenever fewer than two flag columns have complete data or no pair of flags co-occurs, and the reason is printed on the red block at the top of `figure_index.png`. `14`, `15` and `16` are generated whenever there is something to plot (cards below); when a run has nothing to show (e.g. the review queue is empty because everything was already reviewed), the skip reason says so explicitly.
 
 <a id="s-9-1-naming"></a>
 
 #### How figures are named, and why some numbers are missing
 
 - **The numbers follow the data source, not the folder.** Numbers 01 to 24 come from the original single visualization script, whose header groups them by data: 1 to 12 use the post-correction data, 13 to 18 use the pre-correction auto-detection results, and 19 to 24 use the detection summary plus the corrected data. They do not match the output folders: 02 and 03 are in `research_ready/`, while 06 and 07 are in `pipeline_cleaning/`.
-- **A letter after a number (02B, 04B, 13B, 13C, 13D, 20B) marks a companion figure** that sits next to the figure with that number, so the later numbers did not move. 04B and 20B are in the first release (2026-07-15); 13B, 13C and 13D were added on 2026-09-07; 02B was relabelled from a second "Figure 2" on 2026-09-15 to remove a duplicate title.
-- **A1, P26, R25, R26 and R27 are legacy identifiers** kept as they are so the code does not have to change; they do not follow the numeric sequence. The project's figure-tree proposal (`VISUALIZATION_TREE_PROPOSAL.md`) records the decision not to rename them. What the letters stand for is not documented, so this page does not guess. What is certain: R25 to R27 are in `research_ready/`, and A1 and P26 are in `pipeline_cleaning/`.
-- **Missing numbers are not omissions.** 08 was removed (the code comment says it fell back to a single violin whenever the categories were unbalanced). 12 was merged into A1, the Step Flag Ledger. 19 was folded into 13, whose table already shows the same split. The code comments are in `inst/scripts/sleep_visualization.R`, near "Figure 8: REMOVED", "Figure 12 MERGED INTO STEP FLAG LEDGER" and "Figure 19 FOLDED INTO FIGURE 13". There is no 08, 12 or 19 file.
+- **Since 1.7.1 the scheme is continuous: `F01`-`F32`.** The number is the file
+  name, the in-figure title and this reference. There are no lettered suffixes
+  and no gaps: the numbers retired by earlier reorganisations (the old 08, 12
+  and 19) were reassigned rather than left empty.
+- **Families by folder:** `pipeline_cleaning/` holds F01-F16 (pipeline and
+  detection figures interleaved in build order); `research_ready/` holds
+  F17-F32. Build-order interleaving within `pipeline_cleaning/` is why a
+  detection figure (F06-F14) can carry a higher number than a pipeline one.
 - **File names are kept as they are.** Renaming touches the code, the figure index registry and any script of yours that reads these files. The proposal also suggests a hierarchical display numbering (for example "1.2-13") as a caption prefix; that is only a proposal. It is not implemented: `figure_index.png` labels each thumbnail with its file name and a short caption, and the numbers above are the only numbering in use.
 
 > **For reference only.** The suggestions below are a starting point, not a rule; which figures to use depends on your paper's story and the journal's limits.
@@ -626,20 +634,20 @@ structure the pipeline supports, this split works well:
   confirmed input errors modified. These two answer the reviewer's first two
   questions ("what did you do?" and "how invasive was it?") with no clutter.
 - **Results, main text (pick 3–5).** 03 (TST distribution) as the data-quality
-  anchor; 20/20B (perception bias) if subjective-vs-computed agreement is part
-  of your story; R25 (weekday vs weekend) or R26 (TIB composition) if timing
-  regularity / composition matters; R27 (correlation matrix) if you reference
+  anchor; F24/F25 (perception bias) if subjective-vs-computed agreement is part
+  of your story; F30 (weekday vs weekend) or F31 (TIB composition) if timing
+  regularity / composition matters; F32 (correlation matrix) if you reference
   metric interrelationships. Resist putting more than five in the main text —
   the rest reads better as supplement.
 - **Supplement (everything else).** All `pipeline_cleaning/` figures (13,
-  13B, 13C, 13D, 17, 18, A1, P26, 06, 07, 10, 11) form the audit trail: put them
+  F05-F09, F13, F14, F15, F16, F02, F03, F04, F05) form the audit trail: put them
   in a supplement titled "Data quality and cleaning audit" and cite the set
   collectively from Methods with one sentence ("see Supplement S1 for the
   full audit trail"). The substance figures (21–24) belong with whatever
   substance-use analysis the paper reports, or supplement if none.
 
 A minimal working set if page limits are tight: **01 + 02 in Methods, 03 +
-20 + R27 in Results, the supplement section for the audit trail.** Captions
+F24 + F32 in Results, the supplement section for the audit trail.** Captions
 for every one of these are ready in §9.2 and §9.3 below, at the end of each figure's
 card.
 
@@ -648,9 +656,9 @@ card.
 ### 9.2 Pipeline-cleaning figure cards (`pipeline_cleaning/`)
 
 
-<a id="01-pipeline-record-flow"></a>
+<a id="f01-pipeline-record-flow"></a>
 
-#### 01 · Pipeline Record Flow
+#### F01 · Pipeline Record Flow
 
 **File** `pipeline_cleaning/F01.png` — generated at `sleep_visualization.R:862`
 
@@ -723,11 +731,11 @@ Both. Figure 1 classifies the FINAL data: errors that were fixed are no longer e
 
 **Paper caption**
 
-> **Figure 01.** Flow diagram tracing all raw diary entries through the five pipeline stages (raw load, timestamp parsing, algorithmic correction, manual correction, final valid output), with record counts and percentages at each stage. The side annotation reports the final record classification (clean, unusual accepted, error reviewed, equal-time benign, not-reported) and the proportion of participants who received at least one correction. TST = total sleep time; SOL = sleep onset latency.
+> **Figure 1.** Flow diagram tracing all raw diary entries through the five pipeline stages (raw load, timestamp parsing, algorithmic correction, manual correction, final valid output), with record counts and percentages at each stage. The side annotation reports the final record classification (clean, unusual accepted, error reviewed, equal-time benign, not-reported) and the proportion of participants who received at least one correction. TST = total sleep time; SOL = sleep onset latency.
 
-<a id="06-sleep-duration-post-correction"></a>
+<a id="f02-sleep-duration-post-correction"></a>
 
-#### 06 · Sleep Duration Post-Correction
+#### F02 · Sleep Duration Post-Correction
 
 **File** `pipeline_cleaning/F02.png` — generated at `sleep_visualization.R:1339`
 
@@ -773,11 +781,11 @@ Manually corrected records were chosen because they were broken, so extreme dura
 
 **Paper caption**
 
-> **Figure 06.** Density of final total sleep time (TST, hours) after all manual corrections were applied. Unimodal distributions centered on 6–8 h indicate healthy sleep durations; spikes at zero or > 12 h indicate residual parsing artifacts.
+> **Figure 2.** Density of final total sleep time (TST, hours) after all manual corrections were applied. Unimodal distributions centered on 6–8 h indicate healthy sleep durations; spikes at zero or > 12 h indicate residual parsing artifacts.
 
-<a id="07-flag-composition-stacked"></a>
+<a id="f03-flag-composition-stacked"></a>
 
-#### 07 · Flag Composition Stacked
+#### F03 · Flag Composition Stacked
 
 **File** `pipeline_cleaning/F03.png` — generated at `sleep_visualization.R:1404`
 
@@ -832,11 +840,11 @@ Yes, under `classification.flag_severity.*` in the config. The figure's corner b
 
 **Paper caption**
 
-> **Figure 07.** Stacked histogram of final sleep duration (hours), with bars colored by flag severity: Clean (no metric flags), Minor (one flag), Major (two or more flags from {SE < 70%, SOL > 1 h, WASO > 1.5 h}). Shows whether quality problems concentrate at extreme durations.
+> **Figure 3.** Stacked histogram of final sleep duration (hours), with bars colored by flag severity: Clean (no metric flags), Minor (one flag), Major (two or more flags from {SE < 70%, SOL > 1 h, WASO > 1.5 h}). Shows whether quality problems concentrate at extreme durations.
 
-<a id="10-extreme-sleep-durations"></a>
+<a id="f04-extreme-sleep-durations"></a>
 
-#### 10 · Extreme Sleep Durations
+#### F04 · Extreme Sleep Durations
 
 **File** `pipeline_cleaning/F04.png` — generated at `sleep_visualization.R:1514`
 
@@ -888,11 +896,11 @@ Only records outside the 4–10 h range are drawn, and most nights fall inside i
 
 **Paper caption**
 
-> **Figure 10.** Scatter of total sleep time (TST, hours) versus sleep efficiency (SE, %) restricted to extreme durations (< 4 h short, > 10 h long). Point shape encodes short vs long sleep; point color encodes record quality. The horizontal line marks the SE = 85% poor-efficiency threshold.
+> **Figure 4.** Scatter of total sleep time (TST, hours) versus sleep efficiency (SE, %) restricted to extreme durations (< 4 h short, > 10 h long). Point shape encodes short vs long sleep; point color encodes record quality. The horizontal line marks the SE = 85% poor-efficiency threshold.
 
-<a id="11-flag-co-occurrence-heatmap"></a>
+<a id="f05-flag-co-occurrence-heatmap"></a>
 
-#### 11 · Flag Co-occurrence Heatmap
+#### F05 · Flag Co-occurrence Heatmap
 
 **File** `pipeline_cleaning/F05.png` — generated at `sleep_visualization.R:1571`
 
@@ -981,11 +989,11 @@ Either fewer than two flag columns had complete data, or no pair of flags occurr
 
 **Paper caption**
 
-> **Figure 11.** Co-occurrence of data quality flags in the final corrected data. Each cell gives the number of records on which both flags are present (poor efficiency: SE < 70%; high SOL: calculated SOL > 1 h; high WASO: self-reported WASO > 1.5 h; sleep calculation issue: calculated and self-reported SOL differ by more than 30 min). Only records with complete values on all four flags are counted; pairs that never co-occur are not drawn. Colour is on a square-root scale. Flags are descriptive indicators for review, not error classifications.
+> **Figure 5.** Co-occurrence of data quality flags in the final corrected data. Each cell gives the number of records on which both flags are present (poor efficiency: SE < 70%; high SOL: calculated SOL > 1 h; high WASO: self-reported WASO > 1.5 h; sleep calculation issue: calculated and self-reported SOL differ by more than 30 min). Only records with complete values on all four flags are counted; pairs that never co-occur are not drawn. Colour is on a square-root scale. Flags are descriptive indicators for review, not error classifications.
 
-<a id="13-error-category-distribution"></a>
+<a id="f06-error-category-distribution"></a>
 
-#### 13 · Error Category Distribution
+#### F06 · Error Category Distribution
 
 **File** `pipeline_cleaning/F06.png` — generated at `sleep_visualization.R:1794`
 
@@ -1011,7 +1019,7 @@ Either fewer than two flag columns had complete data, or no pair of flags occurr
 <details>
 <summary>Why is it called "pre-correction"?</summary>
 
-It answers "what did the raw data contain that needed attention?" — the load the pipeline had to absorb. Figure 14 shows what is still flagged afterwards.
+It answers "what did the raw data contain that needed attention?" — the load the pipeline had to absorb. Figure F10 shows what is still flagged afterwards.
 
 </details>
 
@@ -1038,11 +1046,11 @@ It collects flagged records whose check message does not begin with one of the f
 
 **Paper caption**
 
-> **Figure 13.** Bar chart of records flagged by the post-correction auto-detection pass, grouped into six review classes derived from the flag description: temporal issues, metric issues, amount/input flags, interval format errors, timestamp format errors, and other. Counts are pre-correction — they show the burden the pipeline had to absorb.
+> **Figure 6.** Bar chart of records flagged by the post-correction auto-detection pass, grouped into six review classes derived from the flag description: temporal issues, metric issues, amount/input flags, interval format errors, timestamp format errors, and other. Counts are pre-correction — they show the burden the pipeline had to absorb.
 
-<a id="13b-adjacent-timestamp-gaps"></a>
+<a id="f07-adjacent-timestamp-gaps"></a>
 
-#### 13B · Adjacent Timestamp Gaps
+#### F07 · Adjacent Timestamp Gaps
 
 **File** `pipeline_cleaning/F07.png` — generated at `sleep_visualization.R:1877`
 
@@ -1097,11 +1105,11 @@ It is also a picture of history: how often the pattern occurred in the raw entri
 
 **Paper caption**
 
-> **Figure 13B.** Histogram of the time gap (hours) between adjacent diary events (bed→sleep, sleep→awake, awake→getup) computed from raw, pre-correction timestamps. Negative gaps indicate the later event's clock time precedes the earlier one, the signature of order errors and 12 h AM/PM dial habits.
+> **Figure 7.** Histogram of the time gap (hours) between adjacent diary events (bed→sleep, sleep→awake, awake→getup) computed from raw, pre-correction timestamps. Negative gaps indicate the later event's clock time precedes the earlier one, the signature of order errors and 12 h AM/PM dial habits.
 
-<a id="13c-detection-outcomes-heatmap"></a>
+<a id="f08-detection-outcomes-heatmap"></a>
 
-#### 13C · Detection Outcomes Heatmap
+#### F08 · Detection Outcomes Heatmap
 
 **File** `pipeline_cleaning/F08.png` — generated at `sleep_visualization.R:1936`
 
@@ -1155,11 +1163,11 @@ No. It is a test on synthetic data with errors put in on purpose. It tells you h
 
 **Paper caption**
 
-> **Figure 13C.** Heatmap from the synthetic benchmark in which known errors were injected into clean records. Rows are injected error types; columns are pipeline outcomes (correctly fixed, flagged for review, misrepaired, missed); each cell is the percentage of that error type's rows with that outcome.
+> **Figure 8.** Heatmap from the synthetic benchmark in which known errors were injected into clean records. Rows are injected error types; columns are pipeline outcomes (correctly fixed, flagged for review, misrepaired, missed); each cell is the percentage of that error type's rows with that outcome.
 
-<a id="13d-threshold-vs-measurement-noise"></a>
+<a id="f09-threshold-vs-measurement-noise"></a>
 
-#### 13D · Threshold vs Measurement Noise
+#### F09 · Threshold vs Measurement Noise
 
 **File** `pipeline_cleaning/F09.png` — generated at `sleep_visualization.R:1980`
 
@@ -1206,11 +1214,11 @@ They have no self-reported counterpart to compare with, so the noise cannot be e
 
 **Paper caption**
 
-> **Figure 13D.** Each cleaning threshold divided by the Bland-Altman measurement noise (half-width of the 95% limits of agreement between self-reported and computed values). Dashed lines mark 2× (borderline) and 3× (safe).
+> **Figure 9.** Each cleaning threshold divided by the Bland-Altman measurement noise (half-width of the 95% limits of agreement between self-reported and computed values). Dashed lines mark 2× (borderline) and 3× (safe).
 
-<a id="14-sleep-duration-pre-correction"></a>
+<a id="f10-sleep-duration-pre-correction"></a>
 
-#### 14 · Sleep Duration Pre-Correction
+#### F10 · Sleep Duration Pre-Correction
 
 **File** `pipeline_cleaning/F10.png` — generated at `sleep_visualization.R:2051`
 
@@ -1256,11 +1264,11 @@ When no flagged record has a usable sleep duration. The top of the figure index 
 
 **Paper caption**
 
-> **Figure 14.** Density of sleep duration (hours) for records without auto-detection flags (green, random sample of up to 5,000) and records flagged for review (red), before any manual correction.
+> **Figure 10.** Density of sleep duration (hours) for records without auto-detection flags (green, random sample of up to 5,000) and records flagged for review (red), before any manual correction.
 
-<a id="15-error-timeline"></a>
+<a id="f11-error-timeline"></a>
 
-#### 15 · Error Timeline
+#### F11 · Error Timeline
 
 **File** `pipeline_cleaning/F11.png` — generated at `sleep_visualization.R:2137`
 
@@ -1307,11 +1315,11 @@ Yes. A record without a bed timestamp cannot be placed on the calendar, so it is
 
 **Paper caption**
 
-> **Figure 15.** Number of records per month with a temporal-order error or a suspicious-gap pattern (Step 6 classification), by pattern type.
+> **Figure 11.** Number of records per month with a temporal-order error or a suspicious-gap pattern (Step 6 classification), by pattern type.
 
-<a id="16-common-error-patterns"></a>
+<a id="f12-common-error-patterns"></a>
 
-#### 16 · Common Error Patterns
+#### F12 · Common Error Patterns
 
 **File** `pipeline_cleaning/F12.png` — generated at `sleep_visualization.R:2228`
 
@@ -1349,7 +1357,7 @@ It is a signal about this figure, not about your data: the detector raised reaso
 </details>
 
 <details>
-<summary>Is this the same as Figure 13?</summary>
+<summary>Is this the same as Figure 6?</summary>
 
 They draw on the same flagged records but group them differently. Figure 6 groups by the kind of check; Figure 12 names the specific pattern inside each message.
 
@@ -1357,11 +1365,11 @@ They draw on the same flagged records but group them differently. Figure 6 group
 
 **Paper caption**
 
-> **Figure 16.** Most common automatically detected patterns among records in the review queue; the last bar collects records that match no named pattern.
+> **Figure 12.** Most common automatically detected patterns among records in the review queue; the last bar collects records that match no named pattern.
 
-<a id="17-top-participants-by-flag-rate"></a>
+<a id="f13-top-participants-by-flag-rate"></a>
 
-#### 17 · Top Participants by Flag Rate
+#### F13 · Top Participants by Flag Rate
 
 **File** `pipeline_cleaning/F13.png` — generated at `sleep_visualization.R:2307`
 
@@ -1399,19 +1407,19 @@ Not automatically. A high rate usually means a habit (for example always enterin
 </details>
 
 <details>
-<summary>How is this different from Figure P26?</summary>
+<summary>How is this different from Figure 12?</summary>
 
-Figure 13 ranks by automatic-check flags (algorithm only, before manual review). Figure 12 ranks by the final metric flags (`flag_severity`) of the corrected data.
+Figure F06 ranks by automatic-check flags (algorithm only, before manual review). Figure 12 ranks by the final metric flags (`flag_severity`) of the corrected data.
 
 </details>
 
 **Paper caption**
 
-> **Figure 17.** The 15 participants with the highest auto-detected flag rate (flags per observed diary day), not raw flag counts, so participants with few diary days are not overrepresented.
+> **Figure 13.** The 15 participants with the highest auto-detected flag rate (flags per observed diary day), not raw flag counts, so participants with few diary days are not overrepresented.
 
-<a id="18-auto-detected-dashboard"></a>
+<a id="f14-auto-detected-dashboard"></a>
 
-#### 18 · Auto-Detected Dashboard
+#### F14 · Auto-Detected Dashboard
 
 **File** `pipeline_cleaning/F14.png` — generated at `sleep_visualization.R:2409`
 
@@ -1444,24 +1452,24 @@ The flagged number is the open queue: records the automatic check flagged that h
 <details>
 <summary>What should I do if a slice is large?</summary>
 
-Open the matching card: a large Metrics slice points to Figure 9 (are the thresholds above the noise?), a large Amount/Input slice points to the substance-use coding (Figures 22–24), a large Temporal slice points to Figures 13B and 15.
+Open the matching card: a large Metrics slice points to Figure 9 (are the thresholds above the noise?), a large Amount/Input slice points to the substance-use coding (Figures 27–29), a large Temporal slice points to Figures 7 and 11.
 
 </details>
 
 <details>
 <summary>Why is there a pie when pies are hard to read?</summary>
 
-It has only a handful of slices and its job is to show one dominant source at a glance. For exact numbers use the counts printed on the slices or Figure 13.
+It has only a handful of slices and its job is to show one dominant source at a glance. For exact numbers use the counts printed on the slices or Figure 6.
 
 </details>
 
 **Paper caption**
 
-> **Figure 18.** Key metrics panel (total records, flagged records, manually corrected records) alongside a stacked bar of the six review-source classes. Counts must match `correction_status_final.csv`.
+> **Figure 14.** Key metrics panel (total records, flagged records, manually corrected records) alongside a stacked bar of the six review-source classes. Counts must match `correction_status_final.csv`.
 
-<a id="a1-step-flag-ledger"></a>
+<a id="f15-step-flag-ledger"></a>
 
-#### A1 · Step Flag Ledger
+#### F15 · Step Flag Ledger
 
 **File** `pipeline_cleaning/F15.png` — generated at `figure12_step_flag_table.R:15`
 
@@ -1499,7 +1507,7 @@ Corrected counts records whose data were changed. Suppressed counts flags a huma
 </details>
 
 <details>
-<summary>What does the CFE:flag column count, and why is it not the same as Figure 13?</summary>
+<summary>What does the CFE:flag column count, and why is it not the same as Figure 6?</summary>
 
 From Step 8 on it counts the records in each outcome of the automatic check's summary (for example SELF_REPORTED_FLAG), which is the same table behind `correction_status_final.csv`. That summary is built before a person's accepted rows are withdrawn, so it still counts them (85 in the real run), and it classifies the duration-reinterpretation flags as clean (39). Figure 6 counts the open queue instead, which is why it shows 226 where this column shows 272. Steps before 8 show a dash because the check has not run yet.
 
@@ -1514,11 +1522,11 @@ From Step 8 on it counts the records in each outcome of the automatic check's su
 
 **Paper caption**
 
-> **Figure A1.** Per-step × per-standard × per-category record counts for the five evaluation systems (field mis-entry, data category, flag severity, duration extreme, check-for-errors). Each standard is computed once at a fixed pipeline step; counts must remain constant thereafter.
+> **Figure 11.** Per-step × per-standard × per-category record counts for the five evaluation systems (field mis-entry, data category, flag severity, duration extreme, check-for-errors). Each standard is computed once at a fixed pipeline step; counts must remain constant thereafter.
 
-<a id="p26-participants-worth-a-second-look"></a>
+<a id="f16-participants-worth-a-second-look"></a>
 
-#### P26 · Participants Worth a Second Look
+#### F16 · Participants Worth a Second Look
 
 **File** `pipeline_cleaning/F16.png` — generated at `sleep_visualization.R:2579`
 
@@ -1535,7 +1543,7 @@ From Step 8 on it counts the records in each outcome of the automatic check's su
 To check one listed participant:
 
 1. **See which flag drives the rate:** poor sleep efficiency, high SOL or high WASO. The defaults are efficiency below 70%, SOL above 1 hour and WASO above 1.5 hours (`classification.flag_severity.poor_efficiency_threshold_pct`, `high_sol_threshold_hours`, `high_waso_threshold_hours`). They come from the configuration, so your run may use other values; the figure's subtitle shows the ones in force.
-2. **If it is mostly SOL,** remember that high SOL is calculated from the corrected bed and sleep times, not from the SOL the participant typed. Compare the two (the [Figure 5 card](#11-flag-co-occurrence-heatmap) explains `flag_sleep_calculation_issue`). A large gap between them is usually a descriptive difference, not an error; keep it.
+2. **If it is mostly SOL,** remember that high SOL is calculated from the corrected bed and sleep times, not from the SOL the participant typed. Compare the two (the [Figure 5 card](#f05-flag-co-occurrence-heatmap) explains `flag_sleep_calculation_issue`). A large gap between them is usually a descriptive difference, not an error; keep it.
 3. **Check whether those records were already handled by a person:** the `human_review` and `has_correction` columns of the output, and `audit_disposition` in `cleaned_data_prepostcorrection.csv`. Records already handled do not need a second pass.
 4. **If the timestamps themselves look wrong** (bedtime after sleep onset, or the order broken across midnight), send the record to review through the manual-review cycle. Otherwise leave it as it is and note your decision.
 
@@ -1560,7 +1568,7 @@ Not necessarily. The list says whose records are worth checking first; the verdi
 <details>
 <summary>Does a high rate mean we have to redo the cleaning?</summary>
 
-No. A high rate means these participants' records are worth a look first; it does not mean the cleaning failed. The flags are descriptive: they include self-report-versus-computed disagreements that the pipeline keeps on purpose, and a person whose sleep latency is persistently long will appear in the list even when every entry is correct. Also, the high-SOL flag cannot tell a truly long SOL from ordinary reporting disagreement (see [Figure 11](#11-flag-co-occurrence-heatmap) and [Validation Methodology](validation-methodology.html)).
+No. A high rate means these participants' records are worth a look first; it does not mean the cleaning failed. The flags are descriptive: they include self-report-versus-computed disagreements that the pipeline keeps on purpose, and a person whose sleep latency is persistently long will appear in the list even when every entry is correct. Also, the high-SOL flag cannot tell a truly long SOL from ordinary reporting disagreement (see [Figure 11](#f05-flag-co-occurrence-heatmap) and [Validation Methodology](validation-methodology.html)).
 
 </details>
 
@@ -1572,23 +1580,23 @@ Colours start at 20% flagged. If every participant is below that, the table is w
 </details>
 
 <details>
-<summary>How is this different from Figure 17?</summary>
+<summary>How is this different from Figure 13?</summary>
 
-Figure 13 ranks by the automatic check's flags before manual review; this table ranks by the final metric flags (`flag_severity`) of the corrected data.
+Figure F06 ranks by the automatic check's flags before manual review; this table ranks by the final metric flags (`flag_severity`) of the corrected data.
 
 </details>
 
 **Paper caption**
 
-> **Figure P26.** Ranked table of participants by flagged-record rate, for manual review prioritization. A high rate flags records worth hand-checking; it is not a verdict that the data are wrong.
+> **Figure 12.** Ranked table of participants by flagged-record rate, for manual review prioritization. A high rate flags records worth hand-checking; it is not a verdict that the data are wrong.
 
 <a id="s-9-3"></a>
 
 ### 9.3 Research-ready figure cards (`research_ready/`)
 
-<a id="02-correction-impact"></a>
+<a id="f17-correction-impact"></a>
 
-#### 02 · Correction Impact
+#### F17 · Correction Impact
 
 **File** `research_ready/F17.png` — generated at `sleep_visualization.R:1013`
 
@@ -1661,11 +1669,11 @@ It gives a one-glance answer to "did the averages move?". If the before and afte
 
 **Paper caption**
 
-> **Figure 02.** (A) Lollipop plot of the change in total sleep time (ΔTST, minutes) for each modified record, colored by correction type (orange = algorithmic, blue = manual). (B) Same for sleep onset latency (ΔSOL). (C) Identity scatter of TST before vs after correction; unchanged records are shown at 3% opacity as a gray backdrop. (D) Summary table of TST and SOL means (± SD) before and after correction. Corrections are non-destructive: only confirmed input errors were modified.
+> **Figure 13.** (A) Lollipop plot of the change in total sleep time (ΔTST, minutes) for each modified record, colored by correction type (orange = algorithmic, blue = manual). (B) Same for sleep onset latency (ΔSOL). (C) Identity scatter of TST before vs after correction; unchanged records are shown at 3% opacity as a gray backdrop. (D) Summary table of TST and SOL means (± SD) before and after correction. Corrections are non-destructive: only confirmed input errors were modified.
 
-<a id="02b-distribution-of-sleep-variables"></a>
+<a id="f18-distribution-of-sleep-variables"></a>
 
-#### 02B · Distribution of Sleep Variables
+#### F18 · Distribution of Sleep Variables
 
 **File** `research_ready/F18.png` — generated at `sleep_visualization.R:1057`
 
@@ -1718,11 +1726,11 @@ Figure 2B shows the shape of each distribution (how common each value is). Figur
 
 **Paper caption**
 
-> **Figure 02B.** Histograms with density curves for total sleep time (TST), sleep onset latency (SOL), wake after sleep onset (WASO), and sleep efficiency (SE) on the final corrected data.
+> **Figure 14.** Histograms with density curves for total sleep time (TST), sleep onset latency (SOL), wake after sleep onset (WASO), and sleep efficiency (SE) on the final corrected data.
 
-<a id="03-tst-distribution"></a>
+<a id="f19-tst-distribution"></a>
 
-#### 03 · TST Distribution
+#### F19 · TST Distribution
 
 **File** `research_ready/F19.png` — generated at `sleep_visualization.R:1108`
 
@@ -1757,9 +1765,9 @@ TST here is the *enhanced* definition: `TST = TIB − SOL − WASO` — not the 
 **FAQ**
 
 <details>
-<summary>Why two distribution figures (02B and 03)?</summary>
+<summary>Why two distribution figures (F18 and F19)?</summary>
 
-02B is a five-metric dashboard in small panels. Figure 19 isolates TST and marks the mean and median, which is the usual first figure for a paper.
+F18 is a five-metric dashboard in small panels. Figure 19 isolates TST and marks the mean and median, which is the usual first figure for a paper.
 
 </details>
 
@@ -1786,11 +1794,11 @@ Yes. This is the final corrected data, so corrected records count at their corre
 
 **Paper caption**
 
-> **Figure 03.** Histogram and density of TST (hours) with the mean (blue) and median (orange) marked. TST is computed as the sleep period minus WASO (TST = TIB − SOL − WASO).
+> **Figure 19.** Histogram and density of TST (hours) with the mean (blue) and median (orange) marked. TST is computed as the sleep period minus WASO (TST = TIB − SOL − WASO).
 
-<a id="04-sleep-duration-vs-time-in-bed"></a>
+<a id="f20-sleep-duration-vs-time-in-bed"></a>
 
-#### 04 · Sleep Duration vs Time in Bed
+#### F20 · Sleep Duration vs Time in Bed
 
 **File** `research_ready/F20.png` — generated at `sleep_visualization.R:1163`
 
@@ -1844,11 +1852,11 @@ To keep the plot readable. A few extreme points lie beyond the view but are stil
 
 **Paper caption**
 
-> **Figure 04.** Scatter of TST (hours) by time in bed (TIB, hours) with a smoothed trend and identity reference line. Because TST ≤ TIB by construction, points above the identity line are physically impossible.
+> **Figure 29.** Scatter of TST (hours) by time in bed (TIB, hours) with a smoothed trend and identity reference line. Because TST ≤ TIB by construction, points above the identity line are physically impossible.
 
-<a id="04b-sol-vs-sleep-duration"></a>
+<a id="f21-sol-vs-sleep-duration"></a>
 
-#### 04B · SOL vs Sleep Duration
+#### F21 · SOL vs Sleep Duration
 
 **File** `research_ready/F21.png` — generated at `sleep_visualization.R:1215`
 
@@ -1895,11 +1903,11 @@ Not necessarily. In many samples the link between how long it takes to fall asle
 
 **Paper caption**
 
-> **Figure 04B.** Scatter of SOL (hours, restricted to ≤ 3 h for readability) by TST (hours), colored by flag severity. The negative association (long onset latency, shorter sleep) is the expected clinical pattern.
+> **Figure 26.** Scatter of SOL (hours, restricted to ≤ 3 h for readability) by TST (hours), colored by flag severity. The negative association (long onset latency, shorter sleep) is the expected clinical pattern.
 
-<a id="05-variability-of-sleep-variables"></a>
+<a id="f22-variability-of-sleep-variables"></a>
 
-#### 05 · Variability of Sleep Variables
+#### F22 · Variability of Sleep Variables
 
 **File** `research_ready/F22.png` — generated at `sleep_visualization.R:1265`
 
@@ -1939,17 +1947,17 @@ Two groups of behaviour are mixed together — for example weekday versus weeken
 <details>
 <summary>Why is there a long thin line at the top or bottom?</summary>
 
-A few extreme records stretch the range. The thin line is those tails; they are worth checking in Figure 10.
+A few extreme records stretch the range. The thin line is those tails; they are worth checking in Figure 4.
 
 </details>
 
 **Paper caption**
 
-> **Figure 05.** Violin plots with overlaid boxplots for each sleep variable; each panel uses its own y-axis scale, so panels are compared by distribution shape, not absolute values.
+> **Figure 27.** Violin plots with overlaid boxplots for each sleep variable; each panel uses its own y-axis scale, so panels are compared by distribution shape, not absolute values.
 
-<a id="09-bedtime-vs-get-up-distribution"></a>
+<a id="f23-bedtime-vs-get-up-distribution"></a>
 
-#### 09 · Bedtime vs Get-up Distribution
+#### F23 · Bedtime vs Get-up Distribution
 
 **File** `research_ready/F23.png` — generated at `sleep_visualization.R:1458`
 
@@ -1982,7 +1990,7 @@ Because the axis is clock time from 0 to 24 h. A bedtime of 23:30 lies at the ri
 <details>
 <summary>What would a bedtime peak in the small hours mean?</summary>
 
-Either a genuinely delayed sleep group, or an AM/PM decoding error that turned an evening time into a morning time. Compare with Figure 13B.
+Either a genuinely delayed sleep group, or an AM/PM decoding error that turned an evening time into a morning time. Compare with Figure 7.
 
 </details>
 
@@ -1995,11 +2003,11 @@ No. This figure pools all days; Figure 30 splits by weekday and weekend.
 
 **Paper caption**
 
-> **Figure 09.** Density of bedtime and get-up clock hours (corrected times) across the day. Peak separation (evening bedtimes, morning get-ups) is the healthy circadian signature.
+> **Figure 28.** Density of bedtime and get-up clock hours (corrected times) across the day. Peak separation (evening bedtimes, morning get-ups) is the healthy circadian signature.
 
-<a id="20-sol-perception-bias"></a>
+<a id="f24-sol-perception-bias"></a>
 
-#### 20 · SOL Perception Bias
+#### F24 · SOL Perception Bias
 
 **File** `research_ready/F24.png` — generated at `sleep_visualization.R:2637`
 
@@ -2055,17 +2063,17 @@ The figure shows the absolute difference, so it cannot say whether people over- 
 
 **Paper caption**
 
-> **Figure 20.** Histogram of the absolute difference between objective SOL (derived from corrected bed and sleep timestamps) and subjective SOL (participant's reported onset latency), in minutes.
+> **Figure 29.** Histogram of the absolute difference between objective SOL (derived from corrected bed and sleep timestamps) and subjective SOL (participant's reported onset latency), in minutes.
 
-<a id="20b-waso-perception-bias"></a>
+<a id="f25-waso-perception-bias"></a>
 
-#### 20B · WASO Perception Bias
+#### F25 · WASO Perception Bias
 
 **File** `research_ready/F25.png` — generated at `sleep_visualization.R:2695`
 
 **Paper use** Results
 
-**What each part means** Histogram of the absolute difference between two different quantities: the self-reported nighttime wakefulness (WASO) and the time the diary shows between the final awakening and getting up (`getup − awake`). The figure's caption prints `bias = |computed − self-reported|` (minutes), with the same 15 min / 60 min reference lines as Figure 20.
+**What each part means** Histogram of the absolute difference between two different quantities: the self-reported nighttime wakefulness (WASO) and the time the diary shows between the final awakening and getting up (`getup − awake`). The figure's caption prints `bias = |computed − self-reported|` (minutes), with the same 15 min / 60 min reference lines as Figure 29.
 
 **Healthy look** Most of the mass is near 0 with a small tail. Because the two quantities are different windows, this mostly tells you how large the gap is between night wakefulness and lingering in bed, not how well people report.
 
@@ -2076,7 +2084,7 @@ The figure shows the absolute difference, so it cannot say whether people over- 
 
 - **The two values are different things.** Objective here is `time_getup_corrected − time_awake_corrected` in minutes — the time spent in bed after the final awakening. Subjective is the participant's reported nighttime wakefulness (`duration_totalmin_waso_estimate_am`, read when written as hours:minutes).
 - **So the gap is not a pure reporting error.** The two numbers cover different time windows; the figure's subtitle says so. The mismatch is informative, not something to fix.
-- **Same construction as Figure 20.** `bias = |objective − subjective|`, records with both values, x axis 0–200 min, dashed references at 15 and 60 min.
+- **Same construction as Figure 29.** `bias = |objective − subjective|`, records with both values, x axis 0–200 min, dashed references at 15 and 60 min.
 
 </details>
 
@@ -2097,7 +2105,7 @@ No. A participant can be awake for long stretches at night and still get up quic
 </details>
 
 <details>
-<summary>Why are fewer records used than in Figure 20?</summary>
+<summary>Why are fewer records used than in Figure 29?</summary>
 
 Only rows where the self-reported WASO is written as hours:minutes can be read, so some rows drop out.
 
@@ -2105,11 +2113,11 @@ Only rows where the self-reported WASO is written as hours:minutes can be read, 
 
 **Paper caption**
 
-> **Figure 20B.** Histogram of the absolute difference between computed wake-after-sleep-onset and the participant's self-reported nighttime wakefulness, in minutes.
+> **Figure 25.** Histogram of the absolute difference between computed wake-after-sleep-onset and the participant's self-reported nighttime wakefulness, in minutes.
 
-<a id="21-substance-use-availability"></a>
+<a id="f26-substance-use-availability"></a>
 
-#### 21 · Substance Use Availability
+#### F26 · Substance Use Availability
 
 **File** `research_ready/F26.png` — generated at `sleep_visualization.R:2767`
 
@@ -2155,11 +2163,11 @@ The smallest and largest reported values. A very large maximum suggests a units 
 
 **Paper caption**
 
-> **Figure 21.** Percentage of records containing data for each substance (caffeine, alcohol, nicotine, cannabis), indicating how completely each substance domain was reported.
+> **Figure 26.** Percentage of records containing data for each substance (caffeine, alcohol, nicotine, cannabis), indicating how completely each substance domain was reported.
 
-<a id="22-substance-use-value-distribution"></a>
+<a id="f27-substance-use-value-distribution"></a>
 
-#### 22 · Substance Use Value Distribution
+#### F27 · Substance Use Value Distribution
 
 **File** `research_ready/F27.png` — generated at `sleep_visualization.R:2870`
 
@@ -2206,11 +2214,11 @@ It is a candidate. A very large value often means a units mix-up (drinks versus 
 
 **Paper caption**
 
-> **Figure 22.** Boxplots with jittered points of reported values per substance. Units: caffeine = cups, alcohol = standard drinks, nicotine and cannabis = doses.
+> **Figure 27.** Boxplots with jittered points of reported values per substance. Units: caffeine = cups, alcohol = standard drinks, nicotine and cannabis = doses.
 
-<a id="23-caffeine-consumption"></a>
+<a id="f28-caffeine-consumption"></a>
 
-#### 23 · Caffeine Consumption
+#### F28 · Caffeine Consumption
 
 **File** `research_ready/F28.png` — generated at `sleep_visualization.R:2944`
 
@@ -2264,11 +2272,11 @@ Anything very large, such as 10 or more cups. It usually means cans or servings 
 
 **Paper caption**
 
-> **Figure 23.** Count of records by reported caffeine consumption (cups/day). Right-skewed with a mode of 0–1 cups is expected; spikes at implausible values indicate unit confusion.
+> **Figure 28.** Count of records by reported caffeine consumption (cups/day). Right-skewed with a mode of 0–1 cups is expected; spikes at implausible values indicate unit confusion.
 
-<a id="24-alcohol-consumption"></a>
+<a id="f29-alcohol-consumption"></a>
 
-#### 24 · Alcohol Consumption
+#### F29 · Alcohol Consumption
 
 **File** `research_ready/F29.png` — generated at `sleep_visualization.R:2979`
 
@@ -2283,7 +2291,7 @@ Anything very large, such as 10 or more cups. It usually means cans or servings 
 <details>
 <summary><strong>Precise rules</strong></summary>
 
-- **Same construction as Figure 23.** One bar per distinct reported value on a discrete axis, in numeric order; fractional answers are kept and labelled as fractions.
+- **Same construction as Figure 28.** One bar per distinct reported value on a discrete axis, in numeric order; fractional answers are kept and labelled as fractions.
 - **Unit and column.** Standard drinks per day, from `alcoholtoday_PM_NumAlcoholicDrinks_1`.
 - **Labels.** Each bar shows its count and its share of the non-missing reports.
 - **High values** feed `AMOUNT_FLAG` in Step 8; check how the column was coded before treating them as real consumption.
@@ -2315,11 +2323,11 @@ A fixed amount of alcohol used as a unit, so beer, wine and spirits can be compa
 
 **Paper caption**
 
-> **Figure 24.** Count of records by reported alcohol consumption (standard drinks/day).
+> **Figure 29.** Count of records by reported alcohol consumption (standard drinks/day).
 
-<a id="r25-sleep-regularity--weekday-vs-weekend"></a>
+<a id="f30-sleep-regularity--weekday-vs-weekend"></a>
 
-#### R25 · Sleep Regularity — Weekday vs Weekend
+#### F30 · Sleep Regularity — Weekday vs Weekend
 
 **File** `research_ready/F30.png` — generated at `sleep_visualization.R:3043`
 
@@ -2375,11 +2383,11 @@ A small shift — up to about one hour later at the weekend — is the usual pat
 
 **Paper caption**
 
-> **Figure R25.** Violin plots with boxplots of bedtime and get-up clock hours, split by day type (weekday, Monday–Friday; weekend, Saturday–Sunday, derived from the corrected bedtime date). A modest (≤ 1 h) weekend delay is expected; a large shift indicates social jetlag.
+> **Figure 30.** Violin plots with boxplots of bedtime and get-up clock hours, split by day type (weekday, Monday–Friday; weekend, Saturday–Sunday, derived from the corrected bedtime date). A modest (≤ 1 h) weekend delay is expected; a large shift indicates social jetlag.
 
-<a id="r26-sleep-composition--tib-breakdown"></a>
+<a id="f31-sleep-composition--tib-breakdown"></a>
 
-#### R26 · Sleep Composition — TIB Breakdown
+#### F31 · Sleep Composition — TIB Breakdown
 
 **File** `research_ready/F31.png` — generated at `sleep_visualization.R:3096`
 
@@ -2425,11 +2433,11 @@ A bar makes it easy to compare the segments side by side, and small slices stay 
 
 **Paper caption**
 
-> **Figure R26.** Stacked bars decomposing time in bed (TIB) into its components: total sleep time (TST), sleep onset latency (SOL), and wake after sleep onset (WASO), with TIB = TST + SOL + WASO by construction. Healthy composition places TST at 80–90% of TIB.
+> **Figure 31.** Stacked bars decomposing time in bed (TIB) into its components: total sleep time (TST), sleep onset latency (SOL), and wake after sleep onset (WASO), with TIB = TST + SOL + WASO by construction. Healthy composition places TST at 80–90% of TIB.
 
-<a id="r27-sleep-metrics-correlation-matrix"></a>
+<a id="f32-sleep-metrics-correlation-matrix"></a>
 
-#### R27 · Sleep Metrics Correlation Matrix
+#### F32 · Sleep Metrics Correlation Matrix
 
 **File** `research_ready/F32.png` — generated at `sleep_visualization.R:3125`
 
@@ -2487,4 +2495,4 @@ No. It only says that two metrics move together in these records. It cannot say 
 
 **Paper caption**
 
-> **Figure R27.** Upper-triangle corrplot of pairwise Pearson correlations among TST, SOL, WASO, SE, and TIB on the final corrected data (red = negative, green = positive, coefficient per cell). Expected signs: TST–SE positive, SOL–SE negative, TST–TIB positive, WASO–SE negative.
+> **Figure 32.** Upper-triangle corrplot of pairwise Pearson correlations among TST, SOL, WASO, SE, and TIB on the final corrected data (red = negative, green = positive, coefficient per cell). Expected signs: TST–SE positive, SOL–SE negative, TST–TIB positive, WASO–SE negative.

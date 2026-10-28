@@ -61,7 +61,7 @@ library(sleepcleanr)
 | 6-7 | 修正与计算指标（S3 链）| 人工 + 时长修正；TST/SOL/WASO/SE 指标；has_correction 枚举 |
 | 8 | 自动检测剩余问题 | TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED flag 分类 |
 | 8.5 | 跨被试一致性检查 | 全局一致性审计 |
-| 9 | 生成诊断图表 | 24 张图 + figure_index.png 总览 + RUN_INFO.txt |
+| 9 | 生成诊断图表 | 32 张图（16 QC + 16 research） + figure_index.png 总览 + RUN_INFO.txt |
 | 10 | 构建交付数据集 | finalize_columns() 按列字典选择/重命名到 Dataset A/B |
 
 ## 检测规则族
