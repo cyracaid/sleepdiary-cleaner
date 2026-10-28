@@ -22,12 +22,15 @@ authors:
   - family-names: ten Brink
     given-names: Maia
     orcid: "https://orcid.org/0000-0001-6987-1339"
-version: 1.7.0
-date-released: "2026-10-28"
+version: 1.7.1
+date-released: "2026-10-29"
 license: MIT
 url: "https://github.com/cyracaid/sleepdiary-cleaner"
 doi: 10.5281/zenodo.23077702
 identifiers:
+  - type: doi
+    value: 10.5281/zenodo.23735330
+    description: "Archived version 1.7.1"
   - type: doi
     value: 10.5281/zenodo.23733076
     description: "Archived version 1.7.0"
