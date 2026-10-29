@@ -19,14 +19,14 @@ sleepcleanr 检测并修正睡眠日记中时间和时长的录入错误，并�
 
 ```r
 install.packages("remotes")
-remotes::install_github("cyracaid/sleepdiary-cleaner@v1.5.2", upgrade = "never", force = TRUE)
+remotes::install_github("cyracaid/sleepdiary-cleaner@v1.7.2", upgrade = "never", force = TRUE)
 ```
 
 然后**重启 R**，再检查加载的是哪个版本：
 
 ```r
 library(sleepcleanr)
-getNamespaceVersion("sleepcleanr")      # "1.5.2"
+getNamespaceVersion("sleepcleanr")      # "1.7.2"
 ```
 
 如果包在另一个 R 窗口里处于加载状态时被重装，安装可能损坏（`lazy-load database ... is corrupt`）。先关掉所有 R 会话，再安装，再重启。
