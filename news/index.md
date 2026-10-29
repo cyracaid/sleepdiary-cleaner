@@ -1,15 +1,26 @@
 # Changelog
 
-## sleepcleanr (development version)
+## sleepcleanr 1.7.2
+
+### Fixed
+
+- An algorithmic-only run (`include_manual_corrections = FALSE`) no
+  longer stops at Step 10 when an audit ledger with
+  `corrected_manual`/`set_na` rows is configured or on disk. A blank
+  manual path now means the run deliberately used no human-review file,
+  so the audit layer is inactive for that run (`audit_disposition` is
+  `"none"`) and the build continues. The consistency guard still stops
+  any run that named a manual file whose records cannot corroborate the
+  ledger’s movement rows.
 
 ### Changed
 
 - A full pipeline run no longer emits the fourteen cosmetic warnings:
-  line geoms use (ggplot2 3.4 spelling), the label border follows suit,
-  and the four geom families that plot duration data declare – the
-  dropped rows are the skipped_na population, which is structural, and
-  also muffles exactly that notice on the save path. Real warnings still
-  surface.
+  line geoms use `linewidth` (ggplot2 3.4 spelling), the label border
+  follows suit, and the four geom families that plot duration data
+  declare `na.rm = TRUE` – the dropped rows are the skipped_na
+  population, which is structural, and `save_png()` also muffles exactly
+  that notice on the save path. Real warnings still surface.
 
 ## sleepcleanr 1.7.1
 

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.7.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.7.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,10 +66,14 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="sleepcleanr-development-version">sleepcleanr (development version)<a class="anchor" aria-label="anchor" href="#sleepcleanr-development-version"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.7.2" id="sleepcleanr-172">sleepcleanr 1.7.2<a class="anchor" aria-label="anchor" href="#sleepcleanr-172"></a></h2>
 <div class="section level3">
-<h3 id="changed-development-version">Changed<a class="anchor" aria-label="anchor" href="#changed-development-version"></a></h3>
-<ul><li>A full pipeline run no longer emits the fourteen cosmetic warnings: line geoms use (ggplot2 3.4 spelling), the label border follows suit, and the four geom families that plot duration data declare – the dropped rows are the skipped_na population, which is structural, and also muffles exactly that notice on the save path. Real warnings still surface.</li>
+<h3 id="fixed-1-7-2">Fixed<a class="anchor" aria-label="anchor" href="#fixed-1-7-2"></a></h3>
+<ul><li>An algorithmic-only run (<code>include_manual_corrections = FALSE</code>) no longer stops at Step 10 when an audit ledger with <code>corrected_manual</code>/<code>set_na</code> rows is configured or on disk. A blank manual path now means the run deliberately used no human-review file, so the audit layer is inactive for that run (<code>audit_disposition</code> is <code>"none"</code>) and the build continues. The consistency guard still stops any run that named a manual file whose records cannot corroborate the ledger’s movement rows.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="changed-1-7-2">Changed<a class="anchor" aria-label="anchor" href="#changed-1-7-2"></a></h3>
+<ul><li>A full pipeline run no longer emits the fourteen cosmetic warnings: line geoms use <code>linewidth</code> (ggplot2 3.4 spelling), the label border follows suit, and the four geom families that plot duration data declare <code>na.rm = TRUE</code> – the dropped rows are the skipped_na population, which is structural, and <code>save_png()</code> also muffles exactly that notice on the save path. Real warnings still surface.</li>
 </ul></div>
 </div>
     <div class="section level2">
