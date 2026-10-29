@@ -267,3 +267,14 @@ categories:
       SOL-vs-window contradiction or passes it silently.
     fields_affected: [duration_totalmin_sol_estimate_am, time_bed, time_sleep]
     rate_anchor_pct: 6.6    # 922/13990 in the one real audit run (2026-08-17)
+
+  awake_is_getup:
+    provenance: [literature]
+    description: >
+      The rise time is typed in the wake-time field, so wake and rise agree. RESTING (2024)
+      reports confusing wake time with rise time as its commonest entry error; the
+      abstract does not say what the confusion looks like, so this is one of two forms. The
+      other is adjacent_swap_awake_getup. Opt-in: injected only when enrichment_target is set,
+      so the committed benchmark is unchanged.
+    fields_affected: [time_awake]
+    rate_anchor_pct: 4.4   # 150 / 3,382 diary-days (RESTING abstract); the form is unverified

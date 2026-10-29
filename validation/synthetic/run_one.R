@@ -4,7 +4,7 @@
 #   (1) manual-correction files created EMPTY (with headers), not omitted
 #   (2) after the run, checks flag distributions, doesn't just check "did it crash"
 #   (3) each dataset gets its OWN project_dir so output/ never gets overwritten
-#   (4) uses the installed sleepcleanr 1.4.0 (confirmed inst/scripts identical to
+#   (4) uses the installed sleepcleanr (confirmed inst/scripts identical to
 #       the uploads source tree, so the installed copy is current)
 #
 # Usage: Rscript run_one.R <input_rds> <project_dir> <label>

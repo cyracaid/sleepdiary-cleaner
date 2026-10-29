@@ -47,11 +47,24 @@ duration_types <- c("field_misentry_sol", "field_misentry_waso", "format_no_colo
 anchor <- vapply(types, function(t) {
   v <- catalog$categories[[t]]$rate_anchor_pct; if (is.null(v)) 0 else as.numeric(v)
 }, numeric(1))
+# awake_is_getup is opt-in and takes part only in the two external mixes
+types_all <- c(types, "awake_is_getup")
+pad <- function(w) { w <- c(w, awake_is_getup = 0); w[types_all] }
+# external mixes: only the types that have a rate in the literature. AM/PM 1.07% (SHUTi,
+# 487/45,598; RESTING 28/3,382 = 0.8% agrees) and wake-vs-rise confusion 4.4% (RESTING,
+# 150/3,382), once as the inverted form and once as the same-moment form. Every other
+# type has no external rate and is left at zero.
+ext <- function(wake_type) {
+  w <- setNames(rep(0, length(types_all)), types_all)
+  w["ampm_swap"] <- 1.07; w[wake_type] <- 4.4; w
+}
 weights <- list(
-  equal     = setNames(rep(1, length(types)), types),
-  anchored  = anchor,
-  timestamp = setNames(as.numeric(types %in% timestamp_types), types),
-  duration  = setNames(as.numeric(types %in% duration_types), types)
+  equal     = pad(setNames(rep(1, length(types)), types)),
+  anchored  = pad(anchor),
+  timestamp = pad(setNames(as.numeric(types %in% timestamp_types), types)),
+  duration  = pad(setNames(as.numeric(types %in% duration_types), types)),
+  external_inverted = ext("adjacent_swap_awake_getup"),
+  external_same     = ext("awake_is_getup")
 )
 
 # catalog copy with per-category targets inserted (a line after each category header)
@@ -69,7 +82,7 @@ rows <- list()
 for (mix in names(weights)) for (rate in rates) {
   w <- weights[[mix]] / sum(weights[[mix]])
   targets <- as.list(round(rate * n_rows * w))
-  names(targets) <- types
+  names(targets) <- types_all
   cell <- file.path(tmp, sprintf("%s_%g", mix, rate)); dir.create(cell)
   cat_path <- file.path(cell, "catalog.yaml"); writeLines(with_targets(targets), cat_path, useBytes = TRUE)
   corr_rds <- file.path(cell, "corrupted.rds"); truth_csv <- file.path(cell, "truth.csv")

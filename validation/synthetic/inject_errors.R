@@ -188,6 +188,27 @@ inject_adjacent_swap <- function(i, pair) {
   TRUE
 }
 
+# RESTING (Tully et al., SLEEP 2024, abstract 1107) reports confusing wake time with rise
+# time as the commonest diary entry error (150 of 348 errors). The abstract does not say how
+# the confusion looks, so two forms are modelled. adjacent_swap_awake_getup (above) is the
+# inverted form. This one is the "same moment" form: the rise time is typed in the wake
+# field, so the two entries agree and no ordering rule can see it. Opt-in: the category is
+# injected only when the catalog sets enrichment_target for it.
+inject_awake_is_getup <- function(i) {
+  hhmm_w <- "time_awake_am_hhmm"; ampm_w <- "time_awake_am_ampm"
+  orig_w_hhmm <- corrupted[[hhmm_w]][i]; orig_w_ampm <- corrupted[[ampm_w]][i]
+  g_hhmm <- corrupted[["time_getup_am_hhmm"]][i]; g_ampm <- corrupted[["time_getup_am_ampm"]][i]
+  if (is.na(orig_w_hhmm) || is.na(g_hhmm) ||
+      (orig_w_hhmm == g_hhmm && orig_w_ampm == g_ampm)) return(FALSE)
+  corrupted[[hhmm_w]][i] <<- g_hhmm; corrupted[[ampm_w]][i] <<- g_ampm
+  gt_add(i, "awake_is_getup", paste(hhmm_w, ampm_w, sep = "|"),
+         paste(orig_w_hhmm, orig_w_ampm, sep = "|"),
+         paste(g_hhmm, g_ampm, sep = "|"),
+         paste(orig_w_hhmm, orig_w_ampm, sep = "|"),
+         "literature")
+  TRUE
+}
+
 # raw-string renderers for duration fields (see schema note in header).
 # `corrupted`'s duration columns start numeric but silently coerce to
 # character the first time ANY element in that column is assigned a string
@@ -447,12 +468,17 @@ simple_categories <- list(
   list(name = "adjacent_swap_large_gap_left_clean",
        fn = function(i) inject_adjacent_swap_large_gap(i)),
   list(name = "sol_window_contradiction",
-       fn = function(i) inject_sol_window_contradiction(i))
+       fn = function(i) inject_sol_window_contradiction(i)),
+  list(name = "awake_is_getup", opt_in = TRUE,
+       fn = function(i) inject_awake_is_getup(i))
 )
 
 log_lines <- character(0)
 for (cat_spec in simple_categories) {
-  target <- cat_target(cat_spec$name)
+  target <- if (isTRUE(cat_spec$opt_in)) {
+    v <- catalog$categories[[cat_spec$name]]$enrichment_target
+    if (is.null(v)) 0L else as.integer(v)
+  } else cat_target(cat_spec$name)
   rows_i <- sample_rows_weighted(target)
   applied <- 0
   for (i in rows_i) {
