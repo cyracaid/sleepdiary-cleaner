@@ -1,5 +1,17 @@
 # Changelog
 
+## sleepcleanr (development version)
+
+### Fixed
+
+- The last two `size` deprecations in the figure script are gone: the
+  gap-distribution reference lines (`geom_vline`) and the flag
+  co-occurrence heatmap tiles (`geom_tile`) now use `linewidth`.
+- The data-tag and include-manual “ask” tests no longer depend on how
+  the session is run. Both ask sites read interactivity through a thin
+  `.is_interactive()` probe that the tests pin to FALSE, so an
+  interactive `devtools::test()` sees the same results as CI.
+
 ## sleepcleanr 1.7.2
 
 ### Fixed
