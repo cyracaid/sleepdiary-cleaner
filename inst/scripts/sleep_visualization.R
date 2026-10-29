@@ -2648,10 +2648,10 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
     bias_sol <- abs(obj_sol[valid_rows] - subj_sol[valid_rows])
     bias_counts <- data.frame(bias = bias_sol) %>% group_by(bias) %>% summarise(count = n(), .groups = "drop")
     
-    cat("  客观 SOL (time_sleep_corrected - time_bed_corrected) 非 NA 数:", sum(!is.na(obj_sol)), "\n")
-    cat("  主观 SOL 有效解析数:", sum(!is.na(subj_sol)), "\n")
-    cat("  两者都非 NA 的行数:", length(valid_rows), "\n")
-    cat("  偏差统计: min =", min(bias_sol), "max =", max(bias_sol), 
+    cat("  Objective SOL (time_sleep_corrected - time_bed_corrected), non-NA:", sum(!is.na(obj_sol)), "\n")
+    cat("  Subjective SOL, parsed:", sum(!is.na(subj_sol)), "\n")
+    cat("  Rows with both available:", length(valid_rows), "\n")
+    cat("  Absolute bias: min =", min(bias_sol), "max =", max(bias_sol),
         "mean =", round(mean(bias_sol), 2), "\n")
     
     p20 <- ggplot(bias_counts, aes(x = bias, y = count)) +
