@@ -7,6 +7,8 @@
 #   2. Default fill: no ledger file -> column all "none".
 #   3. Hard guard: corrected_manual/set_na disposition without a matching
 #      manual-correction record -> stop(), never a silent "mixed".
+#   4. Algorithmic-only run (blank manual path): the audit layer is inactive,
+#      nothing is attached and the run is not stopped.
 
 withr::local_options(
   sleepcleanr.audit_ledger = tempfile(fileext = ".csv"),
@@ -121,8 +123,42 @@ test_that("consistency check reads the configured manual file, not the option", 
                                    manual_path = file.path(d, "renamed_manual.csv"))
   expect_identical(out$audit_disposition, "set_na")
 
-  # blank manual path (algorithmic-only run) -> the ledger claim is unverifiable
-  expect_error(audit_dispositions_attach(dat, ledger_path = file.path(d, "ledger.csv"),
-                                         manual_path = ""),
-               "manual_sleep_metric_duration_corrections.csv is missing")
+  # blank manual path (algorithmic-only run) -> audit layer inactive: the
+  # ledger belongs to the review channel this run deliberately closed, so
+  # nothing is attached and the run is not stopped
+  expect_message(
+    out <- audit_dispositions_attach(dat, ledger_path = file.path(d, "ledger.csv"),
+                                     manual_path = ""),
+    "audit dispositions not attached")
+  expect_identical(out$audit_disposition, "none")
+})
+
+test_that("keep-only ledger is also not attached in an algorithmic-only run", {
+  d <- withr::local_tempdir()
+  led <- data.frame(pid = "1", day_num = 1, row_id = 10L, field = "SOL",
+    disposition = "keep", decided_by = "audit_20260820", annotators = "",
+    decision_date = "2026-08-20", evidence_note = "", stringsAsFactors = FALSE)
+  write.csv(led, file.path(d, "ledger.csv"), row.names = FALSE)
+  dat <- data.frame(row_id = "10", stringsAsFactors = FALSE)
+  expect_message(
+    out <- audit_dispositions_attach(dat, ledger_path = file.path(d, "ledger.csv"),
+                                     manual_path = ""),
+    "audit dispositions not attached")
+  expect_identical(out$audit_disposition, "none")
+})
+
+test_that("a named-but-missing manual file still stops the guard", {
+  d <- withr::local_tempdir()
+  led <- data.frame(pid = "1", day_num = 1, row_id = 7L, field = "SOL",
+    disposition = "set_na", decided_by = "audit_20260820", annotators = "",
+    decision_date = "2026-08-20", evidence_note = "", stringsAsFactors = FALSE)
+  write.csv(led, file.path(d, "ledger.csv"), row.names = FALSE)
+  # named path that does not exist: NOT the algorithmic-only blank path, so
+  # the hard guard fires -- a vanished file is an accident, not a choice
+  missing_manual <- file.path(d, "gone.csv")
+  dat <- data.frame(row_id = "7", stringsAsFactors = FALSE)
+  expect_error(
+    audit_dispositions_attach(dat, ledger_path = file.path(d, "ledger.csv"),
+                              manual_path = missing_manual),
+    "manual_sleep_metric_duration_corrections.csv is missing")
 })

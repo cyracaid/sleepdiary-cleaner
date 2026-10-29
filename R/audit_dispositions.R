@@ -144,6 +144,18 @@ audit_dispositions_attach <- function(data,
     return(data)
   }
 
+  # An explicitly blank manual path means this run deliberately used no
+  # human-review file (the pipeline blanks it when include_manual_corrections
+  # = FALSE). The audit ledger belongs to that review channel; attaching any
+  # of it would label rows with history this run did not exercise. The hard
+  # guard below still protects runs that DID name a manual file.
+  if (!is.na(manual_path) && !nzchar(manual_path)) {
+    message("[audit] no manual-correction file this run (blank path); ",
+            "audit dispositions not attached.")
+    data$audit_disposition <- "none"
+    return(data)
+  }
+
   if (!"row_id" %in% names(data)) {
     stop("audit_dispositions_attach needs a row_id column in the data.")
   }
