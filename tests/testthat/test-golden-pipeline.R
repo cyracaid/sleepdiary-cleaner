@@ -15,7 +15,7 @@
                    "flagged_records_self_reported.csv", "audit_integrity_report.csv",
                    "effective_rules.csv")
 # Columns that legitimately differ between two identical runs.
-.golden_volatile <- c("timestamp")
+.golden_volatile <- c("timestamp", "run_id")
 
 .golden_read <- function(path) {
   d <- utils::read.csv(path, colClasses = "character", na.strings = character(0),

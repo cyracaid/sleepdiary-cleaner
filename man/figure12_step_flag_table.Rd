@@ -8,7 +8,7 @@ figure12_step_flag_table(
   cfg = NULL,
   output_dir = ".",
   save_png = NULL,
-  filename = "A1_Step_Flag_Ledger"
+  filename = "F15"
 )
 }
 \arguments{

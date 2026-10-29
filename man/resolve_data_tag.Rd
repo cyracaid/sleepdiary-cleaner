@@ -4,12 +4,12 @@
 \alias{resolve_data_tag}
 \title{Which kind of data a run is on: "real", "synth" or "unknown"}
 \usage{
-resolve_data_tag(cfg, ask = interactive(), read = readline)
+resolve_data_tag(cfg, ask = .is_interactive(), read = readline)
 }
 \arguments{
 \item{cfg}{A configuration list.}
 
-\item{ask}{Ask when \code{data.tag} is not set? Default \code{interactive()}.}
+\item{ask}{Ask when \code{data.tag} is not set? Default \code{.is_interactive()}.}
 
 \item{read}{Function that shows a prompt and returns the typed answer
 (default \code{readline}); replaceable for testing.}

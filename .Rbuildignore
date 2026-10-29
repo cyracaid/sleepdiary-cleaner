@@ -153,3 +153,10 @@ Rplots\.pdf$
 ^\.claude$
 ^CLAUDE\.md$
 ^AGENTS\.md$
+# Paper workspace and working-directory artefacts. review_status.csv and the
+# .zip are gitignored but were still entering the tarball; both carry real
+# participant rows. splsleep_paper/ put a non-portable-filename WARNING in
+# R CMD check.
+^splsleep_paper$
+^review_status\.csv$
+^.*\.zip$

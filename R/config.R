@@ -100,7 +100,7 @@ cfg_get <- function(key, default = NULL, cfg = NULL) {
 #' config. The answer applies to this run only; the config file is not changed.
 #'
 #' @param cfg A configuration list.
-#' @param ask Ask when \code{data.tag} is not set? Default \code{interactive()}.
+#' @param ask Ask when \code{data.tag} is not set? Default \code{.is_interactive()}.
 #' @param read Function that shows a prompt and returns the typed answer
 #'   (default \code{readline}); replaceable for testing.
 #' @return A list with \code{tag} and \code{source} ("config" when stated in
