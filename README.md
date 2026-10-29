@@ -71,7 +71,7 @@ Full package in [VALIDATION_REPORT.md](VALIDATION_REPORT.md). Summary:
   [0.993, 0.997], specificity 1.0. "Detection" means the record was flagged, not
   that the corrected value was recovered — correction-level recall is lower and is
   reported per error category in the validation report.
-- **Real study data** (n = 13,990): in the study's run, the rules applied an
+- **Real study data** (13,990 rows from 237 participants): in the study's run, the rules applied an
   automatic order or format correction to 93 rows (10 of them were also corrected
   by a reviewer) and reviewers corrected 75 further rows. The review queue at the
   end of a run is 226 rows with the manual files applied and 307 without. Of the 13,990
@@ -160,7 +160,7 @@ Record flagged (needs_review_flag=TRUE)
 | **AMOUNT** | Substance input anomalies | negative, excessive digits, filler codes (888/999) |
 | **SELF_REPORTED** | SOL/WASO vs timestamp-window mismatch | SOL > bed→sleep window, SE>100%, etc. |
 
-**Flag statistics (snapshot at v1.4.5, n=13,990; each run prints the current review queue):** 1,048 records flagged (7.5%); 0 AUTO_FIX; 0 silent corrections. Breakdown: 922 TIMESTAMP (window violations), 140 DURATION (order violations), 1 SELF_REPORTED (extreme), 1 redundancy-confirmed worsening. See `VALIDATION_REPORT.md` for full breakdown.
+**Flag statistics (snapshot at v1.4.5, 13,990 rows; each run prints the current review queue):** 1,048 records flagged (7.5%); 0 AUTO_FIX; 0 silent corrections. Breakdown: 922 TIMESTAMP (window violations), 140 DURATION (order violations), 1 SELF_REPORTED (extreme), 1 redundancy-confirmed worsening. See `VALIDATION_REPORT.md` for full breakdown.
 
 ### Validation Map
 
@@ -172,7 +172,7 @@ Step 2  Injected-error benchmark ── detection recall 0.995 [0.993, 0.997]
 Step 3  Detection vs correctness ── L1 vs L3 gap → routes to human
 Step 4  Controls ── no_cleaning 0 / naive_rule 0.623 / pipeline 0.995
 
-REAL-DATA TIER (n = 13,990)
+REAL-DATA TIER (13,990 rows, 237 participants)
 ──────────────────────────────
 Step 5  Redundant-channel ── 80/81 corrections improve (98.8%)
 Step 5.5  Bland-Altman ── SOL ±75-min noise band; WASO 3.3× above noise
@@ -190,7 +190,7 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995
 > `library(sleepcleanr)`.
 
 
-> **Validation statistics source:** All validation statistics above (recall 0.995, 99% improvement, 0% silent misrepair for SOL/WASO, etc.) are derived from benchmarks run against the current `sleepcleanr` v1.4.5+ codebase (commit fd6bbd0). The synthetic benchmark (`validation/synthetic/results/detection_outcomes_v4_current.csv`, 5,391 injected rows) and real-data audit (n=13,990) were executed against the current codebase (commit fd6bbd0). These statistics reflect the current pipeline behavior and supersede any earlier pre-patch numbers cited in earlier documentation. See `VALIDATION_REPORT.md` and `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md` for the full evidence package.
+> **Validation statistics source:** All validation statistics above (recall 0.995, 99% improvement, 0% silent misrepair for SOL/WASO, etc.) are derived from benchmarks run against the current `sleepcleanr` v1.4.5+ codebase (commit fd6bbd0). The synthetic benchmark (`validation/synthetic/results/detection_outcomes_v4_current.csv`, 5,391 injected rows) and real-data audit (13,990 rows) were executed against the current codebase (commit fd6bbd0). These statistics reflect the current pipeline behavior and supersede any earlier pre-patch numbers cited in earlier documentation. See `VALIDATION_REPORT.md` and `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md` for the full evidence package.
 
 ## Status and data availability
 
