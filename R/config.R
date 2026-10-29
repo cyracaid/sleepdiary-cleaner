@@ -106,7 +106,7 @@ cfg_get <- function(key, default = NULL, cfg = NULL) {
 #' @return A list with \code{tag} and \code{source} ("config" when stated in
 #'   the config, "asked at run time" when answered at the prompt).
 #' @export
-resolve_data_tag <- function(cfg, ask = interactive(), read = readline) {
+resolve_data_tag <- function(cfg, ask = .is_interactive(), read = readline) {
   tags <- c("real", "synth", "unknown")
   stated <- config_get(cfg, "data.tag", NULL)
   if (!is.null(stated) && length(stated) == 1 && !is.na(stated) && nzchar(trimws(stated))) {

@@ -19,6 +19,10 @@ test_that("the other values keep their meaning", {
 })
 
 test_that('a run with "ask" in a non-interactive session stops before anything is written', {
+  # pin the package's interactivity probe so the test means the same thing in
+  # an interactive dev session and in non-interactive CI
+  testthat::local_mocked_bindings(.is_interactive = function() FALSE,
+                                  .package = "sleepcleanr")
   dir <- withr::local_tempdir()
   cfg <- list(data = list(files = list(main = "missing.rds")))
   expect_error(run_pipeline(cfg, project_dir = dir, skip_visualization = TRUE, verbose = FALSE,

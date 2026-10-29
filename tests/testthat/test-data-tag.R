@@ -37,6 +37,10 @@ test_that("the bundled synthetic config states synth", {
 })
 
 test_that("a run that makes figures without data.tag stops before any work", {
+  # pin the package's interactivity probe so the test means the same thing in
+  # an interactive dev session and in non-interactive CI
+  testthat::local_mocked_bindings(.is_interactive = function() FALSE,
+                                  .package = "sleepcleanr")
   dir <- withr::local_tempdir()
   cfg <- list(data = list(files = list(main = "missing.rds")))
   expect_error(run_pipeline(cfg, project_dir = dir, verbose = FALSE), "data.tag is not set")

@@ -568,10 +568,15 @@ run_pipeline <- function(config = NULL, project_dir = ".", skip_visualization = 
   invisible(TRUE)
 }
 
+# Thin probe for session interactivity, so tests can pin it without mocking
+# base::interactive() (it is read at call time in the defaults here and in
+# resolve_data_tag()).
+.is_interactive <- function() interactive()
+
 # include_manual_corrections as TRUE / FALSE. "ask" asks y / n in an interactive
 # session; a non-interactive session cannot answer, so it stops instead of
 # deciding for the user.
-.resolve_include_manual <- function(x, ask = interactive(), read = readline) {
+.resolve_include_manual <- function(x, ask = .is_interactive(), read = readline) {
   v <- if (is.character(x)) tolower(trimws(x)) else x
   if (identical(v, "ask")) {
     if (!isTRUE(ask))

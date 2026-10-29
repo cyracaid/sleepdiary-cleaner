@@ -1126,7 +1126,7 @@ if("sleep_duration_h" %in% names(clean_df)) {
     geom_density(na.rm = TRUE, aes(color = "Density curve (red, smoothed)"), linewidth = 1, show.legend = TRUE) +
     geom_vline(data = .reflines, aes(xintercept = x, color = lab,
                                      linetype = ifelse(grepl("Median", lab), "dashed", "solid")),
-               size = 1, show.legend = TRUE) +
+               linewidth = 1, show.legend = TRUE) +
     scale_color_manual(values = setNames(
       c("#D32F2F", "#1976D2", "#FF8C00"),
       c("Density curve (red, smoothed)", .reflines$lab[1], .reflines$lab[2])), name = "Line shown") +
@@ -1621,7 +1621,7 @@ if(length(flag_columns) >= 2) {
     
     if(nrow(heatmap_df) > 0) {
       p11_heatmap <- ggplot(heatmap_df, aes(x = Flag1, y = Flag2, fill = Count)) +
-        geom_tile(color = "white", size = 1) +
+        geom_tile(color = "white", linewidth = 1) +
         geom_text(aes(label = Count), size = 4, fontface = "bold") +
         scale_fill_gradient(low = "#FEE5D9", high = "#D32F2F", 
                             name = "Co-occurrence\nCount",
