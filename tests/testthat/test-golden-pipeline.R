@@ -23,6 +23,26 @@
   d[, setdiff(names(d), .golden_volatile), drop = FALSE]
 }
 
+# Text columns must match exactly; numeric columns match to 1e-9, because the
+# last printed digit of a double differs between platforms (macOS vs Linux vs
+# Windows write 93.4210526315789 vs 93.421052631579).
+.golden_compare <- function(actual, expected, info) {
+  expect_identical(names(actual), names(expected), info = info)
+  expect_identical(nrow(actual), nrow(expected), info = info)
+  for (col in names(expected)) {
+    a <- actual[[col]]; e <- expected[[col]]
+    e_blank <- e %in% c("", "NA")
+    en <- suppressWarnings(as.numeric(e[!e_blank]))
+    if (length(en) > 0 && !anyNA(en)) {
+      expect_identical(a %in% c("", "NA"), e_blank, info = paste(info, col))
+      expect_equal(suppressWarnings(as.numeric(a[!e_blank])), en, tolerance = 1e-9,
+                   info = paste(info, col))
+    } else {
+      expect_identical(a, e, info = paste(info, col))
+    }
+  }
+}
+
 test_that("synthetic algorithmic-only run reproduces the golden tables", {
   ext <- system.file("extdata", package = "sleepcleanr")
   if (!nzchar(ext)) ext <- file.path(getwd(), "inst", "extdata")
@@ -52,7 +72,7 @@ test_that("synthetic algorithmic-only run reproduces the golden tables", {
 
   for (f in .golden_files) {
     expect_true(file.exists(file.path(golden_dir, paste0("golden_synth_", f))), info = paste("missing golden", f))
-    expect_identical(.golden_read(file.path(sandbox, "output", f)),
-                     .golden_read(file.path(golden_dir, paste0("golden_synth_", f))), info = f)
+    .golden_compare(.golden_read(file.path(sandbox, "output", f)),
+                    .golden_read(file.path(golden_dir, paste0("golden_synth_", f))), f)
   }
 })
