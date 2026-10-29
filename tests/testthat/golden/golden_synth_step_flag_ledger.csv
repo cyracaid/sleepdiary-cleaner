@@ -1,0 +1,277 @@
+"step_id","label","n_total","standard","category","count","n_corrected","n_suppressed"
+"1","Load data",280,"data_category","clean",NA,NA,NA
+"1","Load data",280,"data_category","unusual",NA,NA,NA
+"1","Load data",280,"data_category","reasonable_unusual",NA,NA,NA
+"1","Load data",280,"data_category","equal_time_ok",NA,NA,NA
+"1","Load data",280,"data_category","error",NA,NA,NA
+"1","Load data",280,"data_category","skipped_na",NA,NA,NA
+"1","Load data",280,"flag_severity","Clean",NA,NA,NA
+"1","Load data",280,"flag_severity","Minor issues (1 flag)",NA,NA,NA
+"1","Load data",280,"flag_severity","Major issues (2+ flags)",NA,NA,NA
+"1","Load data",280,"duration_extreme","OK",NA,NA,NA
+"1","Load data",280,"duration_extreme","Too short (<3h)",NA,NA,NA
+"1","Load data",280,"duration_extreme","Too long (>12h)",NA,NA,NA
+"1","Load data",280,"checkforerrors","CLEAN",NA,NA,NA
+"1","Load data",280,"checkforerrors","NEEDS_REVIEW",NA,NA,NA
+"1","Load data",280,"checkforerrors","TIMESTAMP_ISSUE",NA,NA,NA
+"1","Load data",280,"checkforerrors","DURATION_ISSUE",NA,NA,NA
+"1","Load data",280,"checkforerrors","AMOUNT_FLAG",NA,NA,NA
+"1","Load data",280,"checkforerrors","SELF_REPORTED_FLAG",NA,NA,NA
+"1","Load data",280,"field_misentry","none",266,NA,NA
+"1","Load data",280,"field_misentry","SOL=time_sleep",0,NA,NA
+"1","Load data",280,"field_misentry","SOL=time_bed",0,NA,NA
+"1","Load data",280,"field_misentry","WASO=time_awake",0,NA,NA
+"1","Load data",280,"field_misentry","WASO=time_getup",0,NA,NA
+"1.5","Field-misentry check",280,"data_category","clean",NA,NA,NA
+"1.5","Field-misentry check",280,"data_category","unusual",NA,NA,NA
+"1.5","Field-misentry check",280,"data_category","reasonable_unusual",NA,NA,NA
+"1.5","Field-misentry check",280,"data_category","equal_time_ok",NA,NA,NA
+"1.5","Field-misentry check",280,"data_category","error",NA,NA,NA
+"1.5","Field-misentry check",280,"data_category","skipped_na",NA,NA,NA
+"1.5","Field-misentry check",280,"flag_severity","Clean",NA,NA,NA
+"1.5","Field-misentry check",280,"flag_severity","Minor issues (1 flag)",NA,NA,NA
+"1.5","Field-misentry check",280,"flag_severity","Major issues (2+ flags)",NA,NA,NA
+"1.5","Field-misentry check",280,"duration_extreme","OK",NA,NA,NA
+"1.5","Field-misentry check",280,"duration_extreme","Too short (<3h)",NA,NA,NA
+"1.5","Field-misentry check",280,"duration_extreme","Too long (>12h)",NA,NA,NA
+"1.5","Field-misentry check",280,"checkforerrors","CLEAN",NA,NA,NA
+"1.5","Field-misentry check",280,"checkforerrors","NEEDS_REVIEW",NA,NA,NA
+"1.5","Field-misentry check",280,"checkforerrors","TIMESTAMP_ISSUE",NA,NA,NA
+"1.5","Field-misentry check",280,"checkforerrors","DURATION_ISSUE",NA,NA,NA
+"1.5","Field-misentry check",280,"checkforerrors","AMOUNT_FLAG",NA,NA,NA
+"1.5","Field-misentry check",280,"checkforerrors","SELF_REPORTED_FLAG",NA,NA,NA
+"1.5","Field-misentry check",280,"field_misentry","none",266,NA,NA
+"1.5","Field-misentry check",280,"field_misentry","SOL=time_sleep",0,NA,NA
+"1.5","Field-misentry check",280,"field_misentry","SOL=time_bed",0,NA,NA
+"1.5","Field-misentry check",280,"field_misentry","WASO=time_awake",0,NA,NA
+"1.5","Field-misentry check",280,"field_misentry","WASO=time_getup",0,NA,NA
+"2","Process timestamps",280,"data_category","clean",NA,NA,NA
+"2","Process timestamps",280,"data_category","unusual",NA,NA,NA
+"2","Process timestamps",280,"data_category","reasonable_unusual",NA,NA,NA
+"2","Process timestamps",280,"data_category","equal_time_ok",NA,NA,NA
+"2","Process timestamps",280,"data_category","error",NA,NA,NA
+"2","Process timestamps",280,"data_category","skipped_na",NA,NA,NA
+"2","Process timestamps",280,"flag_severity","Clean",NA,NA,NA
+"2","Process timestamps",280,"flag_severity","Minor issues (1 flag)",NA,NA,NA
+"2","Process timestamps",280,"flag_severity","Major issues (2+ flags)",NA,NA,NA
+"2","Process timestamps",280,"duration_extreme","OK",NA,NA,NA
+"2","Process timestamps",280,"duration_extreme","Too short (<3h)",NA,NA,NA
+"2","Process timestamps",280,"duration_extreme","Too long (>12h)",NA,NA,NA
+"2","Process timestamps",280,"checkforerrors","CLEAN",NA,NA,NA
+"2","Process timestamps",280,"checkforerrors","NEEDS_REVIEW",NA,NA,NA
+"2","Process timestamps",280,"checkforerrors","TIMESTAMP_ISSUE",NA,NA,NA
+"2","Process timestamps",280,"checkforerrors","DURATION_ISSUE",NA,NA,NA
+"2","Process timestamps",280,"checkforerrors","AMOUNT_FLAG",NA,NA,NA
+"2","Process timestamps",280,"checkforerrors","SELF_REPORTED_FLAG",NA,NA,NA
+"2","Process timestamps",280,"field_misentry","none",266,NA,NA
+"2","Process timestamps",280,"field_misentry","SOL=time_sleep",0,NA,NA
+"2","Process timestamps",280,"field_misentry","SOL=time_bed",0,NA,NA
+"2","Process timestamps",280,"field_misentry","WASO=time_awake",0,NA,NA
+"2","Process timestamps",280,"field_misentry","WASO=time_getup",0,NA,NA
+"3","Process intervals",280,"data_category","clean",NA,NA,NA
+"3","Process intervals",280,"data_category","unusual",NA,NA,NA
+"3","Process intervals",280,"data_category","reasonable_unusual",NA,NA,NA
+"3","Process intervals",280,"data_category","equal_time_ok",NA,NA,NA
+"3","Process intervals",280,"data_category","error",NA,NA,NA
+"3","Process intervals",280,"data_category","skipped_na",NA,NA,NA
+"3","Process intervals",280,"flag_severity","Clean",NA,NA,NA
+"3","Process intervals",280,"flag_severity","Minor issues (1 flag)",NA,NA,NA
+"3","Process intervals",280,"flag_severity","Major issues (2+ flags)",NA,NA,NA
+"3","Process intervals",280,"duration_extreme","OK",NA,NA,NA
+"3","Process intervals",280,"duration_extreme","Too short (<3h)",NA,NA,NA
+"3","Process intervals",280,"duration_extreme","Too long (>12h)",NA,NA,NA
+"3","Process intervals",280,"checkforerrors","CLEAN",NA,NA,NA
+"3","Process intervals",280,"checkforerrors","NEEDS_REVIEW",NA,NA,NA
+"3","Process intervals",280,"checkforerrors","TIMESTAMP_ISSUE",NA,NA,NA
+"3","Process intervals",280,"checkforerrors","DURATION_ISSUE",NA,NA,NA
+"3","Process intervals",280,"checkforerrors","AMOUNT_FLAG",NA,NA,NA
+"3","Process intervals",280,"checkforerrors","SELF_REPORTED_FLAG",NA,NA,NA
+"3","Process intervals",280,"field_misentry","none",266,NA,NA
+"3","Process intervals",280,"field_misentry","SOL=time_sleep",0,NA,NA
+"3","Process intervals",280,"field_misentry","SOL=time_bed",0,NA,NA
+"3","Process intervals",280,"field_misentry","WASO=time_awake",0,NA,NA
+"3","Process intervals",280,"field_misentry","WASO=time_getup",0,NA,NA
+"4","Normalize sequence",280,"data_category","clean",0,NA,NA
+"4","Normalize sequence",280,"data_category","unusual",0,NA,NA
+"4","Normalize sequence",280,"data_category","reasonable_unusual",0,NA,NA
+"4","Normalize sequence",280,"data_category","equal_time_ok",0,NA,NA
+"4","Normalize sequence",280,"data_category","error",0,NA,NA
+"4","Normalize sequence",280,"data_category","skipped_na",14,NA,NA
+"4","Normalize sequence",280,"flag_severity","Clean",NA,NA,NA
+"4","Normalize sequence",280,"flag_severity","Minor issues (1 flag)",NA,NA,NA
+"4","Normalize sequence",280,"flag_severity","Major issues (2+ flags)",NA,NA,NA
+"4","Normalize sequence",280,"duration_extreme","OK",NA,NA,NA
+"4","Normalize sequence",280,"duration_extreme","Too short (<3h)",NA,NA,NA
+"4","Normalize sequence",280,"duration_extreme","Too long (>12h)",NA,NA,NA
+"4","Normalize sequence",280,"checkforerrors","CLEAN",NA,NA,NA
+"4","Normalize sequence",280,"checkforerrors","NEEDS_REVIEW",NA,NA,NA
+"4","Normalize sequence",280,"checkforerrors","TIMESTAMP_ISSUE",NA,NA,NA
+"4","Normalize sequence",280,"checkforerrors","DURATION_ISSUE",NA,NA,NA
+"4","Normalize sequence",280,"checkforerrors","AMOUNT_FLAG",NA,NA,NA
+"4","Normalize sequence",280,"checkforerrors","SELF_REPORTED_FLAG",NA,NA,NA
+"4","Normalize sequence",280,"field_misentry","none",266,NA,NA
+"4","Normalize sequence",280,"field_misentry","SOL=time_sleep",0,NA,NA
+"4","Normalize sequence",280,"field_misentry","SOL=time_bed",0,NA,NA
+"4","Normalize sequence",280,"field_misentry","WASO=time_awake",0,NA,NA
+"4","Normalize sequence",280,"field_misentry","WASO=time_getup",0,NA,NA
+"5","Classify records",280,"data_category","clean",0,NA,NA
+"5","Classify records",280,"data_category","unusual",0,NA,NA
+"5","Classify records",280,"data_category","reasonable_unusual",0,NA,NA
+"5","Classify records",280,"data_category","equal_time_ok",0,NA,NA
+"5","Classify records",280,"data_category","error",0,NA,NA
+"5","Classify records",280,"data_category","skipped_na",14,NA,NA
+"5","Classify records",280,"flag_severity","Clean",NA,NA,NA
+"5","Classify records",280,"flag_severity","Minor issues (1 flag)",NA,NA,NA
+"5","Classify records",280,"flag_severity","Major issues (2+ flags)",NA,NA,NA
+"5","Classify records",280,"duration_extreme","OK",NA,NA,NA
+"5","Classify records",280,"duration_extreme","Too short (<3h)",NA,NA,NA
+"5","Classify records",280,"duration_extreme","Too long (>12h)",NA,NA,NA
+"5","Classify records",280,"checkforerrors","CLEAN",NA,NA,NA
+"5","Classify records",280,"checkforerrors","NEEDS_REVIEW",NA,NA,NA
+"5","Classify records",280,"checkforerrors","TIMESTAMP_ISSUE",NA,NA,NA
+"5","Classify records",280,"checkforerrors","DURATION_ISSUE",NA,NA,NA
+"5","Classify records",280,"checkforerrors","AMOUNT_FLAG",NA,NA,NA
+"5","Classify records",280,"checkforerrors","SELF_REPORTED_FLAG",NA,NA,NA
+"5","Classify records",280,"field_misentry","none",266,NA,NA
+"5","Classify records",280,"field_misentry","SOL=time_sleep",0,NA,NA
+"5","Classify records",280,"field_misentry","SOL=time_bed",0,NA,NA
+"5","Classify records",280,"field_misentry","WASO=time_awake",0,NA,NA
+"5","Classify records",280,"field_misentry","WASO=time_getup",0,NA,NA
+"5.75","Second-review consensus",280,"data_category","clean",0,NA,NA
+"5.75","Second-review consensus",280,"data_category","unusual",0,NA,NA
+"5.75","Second-review consensus",280,"data_category","reasonable_unusual",0,NA,NA
+"5.75","Second-review consensus",280,"data_category","equal_time_ok",0,NA,NA
+"5.75","Second-review consensus",280,"data_category","error",0,NA,NA
+"5.75","Second-review consensus",280,"data_category","skipped_na",14,NA,NA
+"5.75","Second-review consensus",280,"flag_severity","Clean",NA,NA,NA
+"5.75","Second-review consensus",280,"flag_severity","Minor issues (1 flag)",NA,NA,NA
+"5.75","Second-review consensus",280,"flag_severity","Major issues (2+ flags)",NA,NA,NA
+"5.75","Second-review consensus",280,"duration_extreme","OK",NA,NA,NA
+"5.75","Second-review consensus",280,"duration_extreme","Too short (<3h)",NA,NA,NA
+"5.75","Second-review consensus",280,"duration_extreme","Too long (>12h)",NA,NA,NA
+"5.75","Second-review consensus",280,"checkforerrors","CLEAN",NA,NA,NA
+"5.75","Second-review consensus",280,"checkforerrors","NEEDS_REVIEW",NA,NA,NA
+"5.75","Second-review consensus",280,"checkforerrors","TIMESTAMP_ISSUE",NA,NA,NA
+"5.75","Second-review consensus",280,"checkforerrors","DURATION_ISSUE",NA,NA,NA
+"5.75","Second-review consensus",280,"checkforerrors","AMOUNT_FLAG",NA,NA,NA
+"5.75","Second-review consensus",280,"checkforerrors","SELF_REPORTED_FLAG",NA,NA,NA
+"5.75","Second-review consensus",280,"field_misentry","none",266,NA,NA
+"5.75","Second-review consensus",280,"field_misentry","SOL=time_sleep",0,NA,NA
+"5.75","Second-review consensus",280,"field_misentry","SOL=time_bed",0,NA,NA
+"5.75","Second-review consensus",280,"field_misentry","WASO=time_awake",0,NA,NA
+"5.75","Second-review consensus",280,"field_misentry","WASO=time_getup",0,NA,NA
+"6","Manual corrections",280,"data_category","clean",0,0,NA
+"6","Manual corrections",280,"data_category","unusual",0,0,NA
+"6","Manual corrections",280,"data_category","reasonable_unusual",0,0,NA
+"6","Manual corrections",280,"data_category","equal_time_ok",266,0,NA
+"6","Manual corrections",280,"data_category","error",0,0,NA
+"6","Manual corrections",280,"data_category","skipped_na",14,0,NA
+"6","Manual corrections",280,"flag_severity","Clean",NA,0,NA
+"6","Manual corrections",280,"flag_severity","Minor issues (1 flag)",NA,0,NA
+"6","Manual corrections",280,"flag_severity","Major issues (2+ flags)",NA,0,NA
+"6","Manual corrections",280,"duration_extreme","OK",NA,0,NA
+"6","Manual corrections",280,"duration_extreme","Too short (<3h)",NA,0,NA
+"6","Manual corrections",280,"duration_extreme","Too long (>12h)",NA,0,NA
+"6","Manual corrections",280,"checkforerrors","CLEAN",NA,0,NA
+"6","Manual corrections",280,"checkforerrors","NEEDS_REVIEW",NA,0,NA
+"6","Manual corrections",280,"checkforerrors","TIMESTAMP_ISSUE",NA,0,NA
+"6","Manual corrections",280,"checkforerrors","DURATION_ISSUE",NA,0,NA
+"6","Manual corrections",280,"checkforerrors","AMOUNT_FLAG",NA,0,NA
+"6","Manual corrections",280,"checkforerrors","SELF_REPORTED_FLAG",NA,0,NA
+"6","Manual corrections",280,"field_misentry","none",266,0,NA
+"6","Manual corrections",280,"field_misentry","SOL=time_sleep",0,0,NA
+"6","Manual corrections",280,"field_misentry","SOL=time_bed",0,0,NA
+"6","Manual corrections",280,"field_misentry","WASO=time_awake",0,0,NA
+"6","Manual corrections",280,"field_misentry","WASO=time_getup",0,0,NA
+"6.5","Duration corrections",280,"data_category","clean",0,0,NA
+"6.5","Duration corrections",280,"data_category","unusual",0,0,NA
+"6.5","Duration corrections",280,"data_category","reasonable_unusual",0,0,NA
+"6.5","Duration corrections",280,"data_category","equal_time_ok",266,0,NA
+"6.5","Duration corrections",280,"data_category","error",0,0,NA
+"6.5","Duration corrections",280,"data_category","skipped_na",14,0,NA
+"6.5","Duration corrections",280,"flag_severity","Clean",NA,0,NA
+"6.5","Duration corrections",280,"flag_severity","Minor issues (1 flag)",NA,0,NA
+"6.5","Duration corrections",280,"flag_severity","Major issues (2+ flags)",NA,0,NA
+"6.5","Duration corrections",280,"duration_extreme","OK",NA,0,NA
+"6.5","Duration corrections",280,"duration_extreme","Too short (<3h)",NA,0,NA
+"6.5","Duration corrections",280,"duration_extreme","Too long (>12h)",NA,0,NA
+"6.5","Duration corrections",280,"checkforerrors","CLEAN",NA,0,NA
+"6.5","Duration corrections",280,"checkforerrors","NEEDS_REVIEW",NA,0,NA
+"6.5","Duration corrections",280,"checkforerrors","TIMESTAMP_ISSUE",NA,0,NA
+"6.5","Duration corrections",280,"checkforerrors","DURATION_ISSUE",NA,0,NA
+"6.5","Duration corrections",280,"checkforerrors","AMOUNT_FLAG",NA,0,NA
+"6.5","Duration corrections",280,"checkforerrors","SELF_REPORTED_FLAG",NA,0,NA
+"6.5","Duration corrections",280,"field_misentry","none",266,0,NA
+"6.5","Duration corrections",280,"field_misentry","SOL=time_sleep",0,0,NA
+"6.5","Duration corrections",280,"field_misentry","SOL=time_bed",0,0,NA
+"6.5","Duration corrections",280,"field_misentry","WASO=time_awake",0,0,NA
+"6.5","Duration corrections",280,"field_misentry","WASO=time_getup",0,0,NA
+"7","Compute metrics",280,"data_category","clean",0,0,NA
+"7","Compute metrics",280,"data_category","unusual",0,0,NA
+"7","Compute metrics",280,"data_category","reasonable_unusual",0,0,NA
+"7","Compute metrics",280,"data_category","equal_time_ok",266,0,NA
+"7","Compute metrics",280,"data_category","error",0,0,NA
+"7","Compute metrics",280,"data_category","skipped_na",14,0,NA
+"7","Compute metrics",280,"flag_severity","Clean",251,0,NA
+"7","Compute metrics",280,"flag_severity","Minor issues (1 flag)",28,0,NA
+"7","Compute metrics",280,"flag_severity","Major issues (2+ flags)",1,0,NA
+"7","Compute metrics",280,"duration_extreme","OK",262,0,NA
+"7","Compute metrics",280,"duration_extreme","Too short (<3h)",1,0,NA
+"7","Compute metrics",280,"duration_extreme","Too long (>12h)",0,0,NA
+"7","Compute metrics",280,"checkforerrors","CLEAN",NA,0,NA
+"7","Compute metrics",280,"checkforerrors","NEEDS_REVIEW",NA,0,NA
+"7","Compute metrics",280,"checkforerrors","TIMESTAMP_ISSUE",NA,0,NA
+"7","Compute metrics",280,"checkforerrors","DURATION_ISSUE",NA,0,NA
+"7","Compute metrics",280,"checkforerrors","AMOUNT_FLAG",NA,0,NA
+"7","Compute metrics",280,"checkforerrors","SELF_REPORTED_FLAG",NA,0,NA
+"7","Compute metrics",280,"field_misentry","none",266,0,NA
+"7","Compute metrics",280,"field_misentry","SOL=time_sleep",0,0,NA
+"7","Compute metrics",280,"field_misentry","SOL=time_bed",0,0,NA
+"7","Compute metrics",280,"field_misentry","WASO=time_awake",0,0,NA
+"7","Compute metrics",280,"field_misentry","WASO=time_getup",0,0,NA
+"8","Auto-detect",280,"data_category","clean",0,0,NA
+"8","Auto-detect",280,"data_category","unusual",0,0,NA
+"8","Auto-detect",280,"data_category","reasonable_unusual",0,0,NA
+"8","Auto-detect",280,"data_category","equal_time_ok",266,0,NA
+"8","Auto-detect",280,"data_category","error",0,0,NA
+"8","Auto-detect",280,"data_category","skipped_na",14,0,NA
+"8","Auto-detect",280,"flag_severity","Clean",251,0,NA
+"8","Auto-detect",280,"flag_severity","Minor issues (1 flag)",28,0,NA
+"8","Auto-detect",280,"flag_severity","Major issues (2+ flags)",1,0,NA
+"8","Auto-detect",280,"duration_extreme","OK",262,0,NA
+"8","Auto-detect",280,"duration_extreme","Too short (<3h)",1,0,NA
+"8","Auto-detect",280,"duration_extreme","Too long (>12h)",0,0,NA
+"8","Auto-detect",280,"checkforerrors","CLEAN",257,0,NA
+"8","Auto-detect",280,"checkforerrors","NEEDS_REVIEW",0,0,NA
+"8","Auto-detect",280,"checkforerrors","TIMESTAMP_ISSUE",0,0,NA
+"8","Auto-detect",280,"checkforerrors","DURATION_ISSUE",10,0,NA
+"8","Auto-detect",280,"checkforerrors","AMOUNT_FLAG",0,0,NA
+"8","Auto-detect",280,"checkforerrors","SELF_REPORTED_FLAG",13,0,NA
+"8","Auto-detect",280,"field_misentry","none",266,0,NA
+"8","Auto-detect",280,"field_misentry","SOL=time_sleep",0,0,NA
+"8","Auto-detect",280,"field_misentry","SOL=time_bed",0,0,NA
+"8","Auto-detect",280,"field_misentry","WASO=time_awake",0,0,NA
+"8","Auto-detect",280,"field_misentry","WASO=time_getup",0,0,NA
+"8.5","Cross-participant check",280,"data_category","clean",0,0,NA
+"8.5","Cross-participant check",280,"data_category","unusual",0,0,NA
+"8.5","Cross-participant check",280,"data_category","reasonable_unusual",0,0,NA
+"8.5","Cross-participant check",280,"data_category","equal_time_ok",266,0,NA
+"8.5","Cross-participant check",280,"data_category","error",0,0,NA
+"8.5","Cross-participant check",280,"data_category","skipped_na",14,0,NA
+"8.5","Cross-participant check",280,"flag_severity","Clean",251,0,NA
+"8.5","Cross-participant check",280,"flag_severity","Minor issues (1 flag)",28,0,NA
+"8.5","Cross-participant check",280,"flag_severity","Major issues (2+ flags)",1,0,NA
+"8.5","Cross-participant check",280,"duration_extreme","OK",262,0,NA
+"8.5","Cross-participant check",280,"duration_extreme","Too short (<3h)",1,0,NA
+"8.5","Cross-participant check",280,"duration_extreme","Too long (>12h)",0,0,NA
+"8.5","Cross-participant check",280,"checkforerrors","CLEAN",257,0,NA
+"8.5","Cross-participant check",280,"checkforerrors","NEEDS_REVIEW",0,0,NA
+"8.5","Cross-participant check",280,"checkforerrors","TIMESTAMP_ISSUE",0,0,NA
+"8.5","Cross-participant check",280,"checkforerrors","DURATION_ISSUE",10,0,NA
+"8.5","Cross-participant check",280,"checkforerrors","AMOUNT_FLAG",0,0,NA
+"8.5","Cross-participant check",280,"checkforerrors","SELF_REPORTED_FLAG",13,0,NA
+"8.5","Cross-participant check",280,"field_misentry","none",266,0,NA
+"8.5","Cross-participant check",280,"field_misentry","SOL=time_sleep",0,0,NA
+"8.5","Cross-participant check",280,"field_misentry","SOL=time_bed",0,0,NA
+"8.5","Cross-participant check",280,"field_misentry","WASO=time_awake",0,0,NA
+"8.5","Cross-participant check",280,"field_misentry","WASO=time_getup",0,0,NA

@@ -1,0 +1,2 @@
+"run_id","timestamp","checkpoint_first","checkpoint_last","n_total","n_clean_first","n_clean_last","delta_clean","n_error_first","n_error_last","delta_error","n_corrected","timestamp_issue","duration_issue","amount_flag","self_reported_flag","tst_mean_h","sol_mean_min"
+"20261029_1241","2026-10-29 12:41:00","A","E",280,0,0,0,0,0,0,0,0,10,0,13,6.94,31.4

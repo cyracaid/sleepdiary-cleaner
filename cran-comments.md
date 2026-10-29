@@ -15,8 +15,9 @@ Psychophysiology Laboratory's intensive-longitudinal sleep study
 
 - Local: macOS (darwin), R 4.6.0 (2026-04-24), `R CMD check --as-cran`
   - Manual (PDF) build passes (TinyTeX/TeX available locally).
-  - Test suite: 254 testthat expectations pass, 0 fail (21 test files,
-    including the synthetic-fixture pipeline smoke test).
+  - Test suite: 751 testthat expectations pass, 0 fail, 1 skip (47 test
+    files, 289 `test_that()` blocks). The single skip is an end-to-end run
+    that needs real study deliverables, which are not in the tarball.
 - GitHub Actions, `R CMD check` (`--as-cran`):
   - ubuntu-latest
   - windows-latest
