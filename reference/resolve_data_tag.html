@@ -87,7 +87,7 @@ config. The answer applies to this run only; the config file is not changed.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">resolve_data_tag</span><span class="op">(</span><span class="va">cfg</span>, ask <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span>, read <span class="op">=</span> <span class="va">readline</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">resolve_data_tag</span><span class="op">(</span><span class="va">cfg</span>, ask <span class="op">=</span> <span class="fu">.is_interactive</span><span class="op">(</span><span class="op">)</span>, read <span class="op">=</span> <span class="va">readline</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -99,7 +99,7 @@ config. The answer applies to this run only; the config file is not changed.</p>
 
 
 <dt id="arg-ask">ask<a class="anchor" aria-label="anchor" href="#arg-ask"></a></dt>
-<dd><p>Ask when <code>data.tag</code> is not set? Default <code><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive()</a></code>.</p></dd>
+<dd><p>Ask when <code>data.tag</code> is not set? Default <code>.is_interactive()</code>.</p></dd>
 
 
 <dt id="arg-read">read<a class="anchor" aria-label="anchor" href="#arg-read"></a></dt>

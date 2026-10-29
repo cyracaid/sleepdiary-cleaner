@@ -10,7 +10,7 @@ The answer applies to this run only; the config file is not changed.
 ## Usage
 
 ``` r
-resolve_data_tag(cfg, ask = interactive(), read = readline)
+resolve_data_tag(cfg, ask = .is_interactive(), read = readline)
 ```
 
 ## Arguments
@@ -21,8 +21,7 @@ resolve_data_tag(cfg, ask = interactive(), read = readline)
 
 - ask:
 
-  Ask when `data.tag` is not set? Default
-  [`interactive()`](https://rdrr.io/r/base/interactive.html).
+  Ask when `data.tag` is not set? Default `.is_interactive()`.
 
 - read:
 
