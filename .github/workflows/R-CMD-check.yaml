@@ -45,15 +45,15 @@ jobs:
           # hangs after Step 4. Plain R CMD check is the acceptance gate
           # here (0 ERROR / 0 WARNING locally); this is not a CRAN
           # submission. See .github/workflows/R-CMD-check.yaml history.
-          # Do NOT pass --no-vignettes: with it, R CMD check still walks the
-          # vignettes/ dir but skips building, so inst/doc lacks the weave
-          # outputs it expects -> "Failed to locate weave output" WARNING per
-          # vignette. Build the vignettes during check instead (knitr/rmarkdown
-          # are in Suggests; --no-build-vignettes below prevents the build step
-          # from rebuilding them twice).
+          # Build the vignettes in the build step (do NOT pass --no-build-vignettes).
+          # With it the tarball has no inst/doc, and R CMD check then warns
+          # "Files in the 'vignettes' directory but no files in 'inst/doc'" and
+          # "Directory 'inst/doc' does not exist" even though the package is fine
+          # (seen in every job of run 40822693139). CRAN builds the tarball with
+          # vignettes, so CI should too. knitr/rmarkdown are in Suggests.
           args: 'c("--no-manual")'
           upload-snapshots: true
-          build_args: 'c("--no-build-vignettes", "--no-manual")'
+          build_args: 'c("--no-manual")'
 
       # R CMD check runs tests/testthat/ only -- it never touches the
       # standalone verify_*.R scripts. Until 2026-08-09 those four scripts had
