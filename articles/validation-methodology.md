@@ -61,7 +61,7 @@ a different way, and is deliberately independent of the others.
                          ▼
       Step 4: Controls ── no_cleaning 0 / naive_rule 0.623 / pipeline 0.995
 
-      REAL-DATA TIER (n = 13,990, no synthetic standard needed)
+      REAL-DATA TIER (13,990 rows, 237 participants, no synthetic standard needed)
       ────────────────────────────────────────────────────────────
       Step 5: Redundant-channel validation ── corrections move values
                toward self-report: 80/81 (98.8%) improved; 1 bad rule
@@ -231,7 +231,7 @@ value the rule families add.
 ways: self-reported duration, and derived from timestamps. Step 4’s
 correction logic never reads the duration columns (verified by source
 inspection), so comparing the two after correction is non-circular. Run
-on real production data (n = 13,990) — no injection needed.
+on real production data (13,990 rows) — no injection needed.
 
 **Result.** `bed_sleep_swap_3h` 39/39 improved (100% \[91–100%\]);
 `sleep_reduce_12h_loop` 39/39; all bed/sleep-relevant corrections 80/81
@@ -258,7 +258,7 @@ measures of the same construct disagree in the first place?” This is
 *measurement characterization* — it quantifies the noise floor that any
 threshold must be judged against. Three analyses, all from
 [`bland_altman()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/bland_altman.md)
-on real data (n = 13,990):
+on real data (13,990 rows):
 
 | \#  | Analysis                     | Inputs (reported vs computed)                                         | Output                                                                        |
 |-----|------------------------------|-----------------------------------------------------------------------|-------------------------------------------------------------------------------|
@@ -294,7 +294,7 @@ on real data (n = 13,990):
     **polysomnography (PSG, sleep-lab gold standard)**, which this
     **ecological momentary assessment (EMA)-only** dataset lacks).
 
-## Step 6 — What does the pipeline find in real data? (audit, n = 13,990)
+## Step 6 — What does the pipeline find in real data? (audit, 13,990 rows)
 
 **What we do.** Run the pipeline in report-only mode over all 13,990
 real records; count what each rule family flags. No data is changed.
