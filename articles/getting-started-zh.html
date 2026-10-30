@@ -111,11 +111,11 @@ CRAN。本页带你从安装走到第一次运行。如果你的数据还不是�
 <code>renv</code> 库，会看不到你系统里的包）。</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner@v1.5.2"</span>, upgrade <span class="op">=</span> <span class="st">"never"</span>, force <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner@v1.7.2"</span>, upgrade <span class="op">=</span> <span class="st">"never"</span>, force <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>然后<strong>重启 R</strong>，再检查加载的是哪个版本：</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/ns-reflect.html" class="external-link">getNamespaceVersion</a></span><span class="op">(</span><span class="st">"sleepcleanr"</span><span class="op">)</span>      <span class="co"># "1.5.2"</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/ns-reflect.html" class="external-link">getNamespaceVersion</a></span><span class="op">(</span><span class="st">"sleepcleanr"</span><span class="op">)</span>      <span class="co"># "1.7.2"</span></span></code></pre></div>
 <p>如果包在另一个 R
 窗口里处于加载状态时被重装，安装可能损坏（<code>lazy-load database ... is corrupt</code>）。先关掉所有
 R 会话，再安装，再重启。</p>

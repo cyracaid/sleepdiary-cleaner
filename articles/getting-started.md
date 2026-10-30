@@ -18,14 +18,14 @@ own `renv` library, which hides your system packages).
 
 ``` r
 install.packages("remotes")
-remotes::install_github("cyracaid/sleepdiary-cleaner@v1.5.2", upgrade = "never", force = TRUE)
+remotes::install_github("cyracaid/sleepdiary-cleaner@v1.7.2", upgrade = "never", force = TRUE)
 ```
 
 Then **restart R** and check what is loaded:
 
 ``` r
 library(sleepcleanr)
-getNamespaceVersion("sleepcleanr")      # "1.5.2"
+getNamespaceVersion("sleepcleanr")      # "1.7.2"
 ```
 
 Reinstalling while the package is loaded in another R window can leave a
