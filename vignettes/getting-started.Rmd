@@ -24,14 +24,14 @@ packages).
 
 ```r
 install.packages("remotes")
-remotes::install_github("cyracaid/sleepdiary-cleaner@v1.7.2", upgrade = "never", force = TRUE)
+remotes::install_github("cyracaid/sleepdiary-cleaner@v1.7.3", upgrade = "never", force = TRUE)
 ```
 
 Then **restart R** and check what is loaded:
 
 ```r
 library(sleepcleanr)
-getNamespaceVersion("sleepcleanr")      # "1.7.2"
+getNamespaceVersion("sleepcleanr")      # "1.7.3"
 ```
 
 Reinstalling while the package is loaded in another R window can leave a corrupted installation

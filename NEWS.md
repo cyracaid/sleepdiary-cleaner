@@ -1,4 +1,4 @@
-# sleepcleanr (development version)
+# sleepcleanr 1.7.3
 
 ## Fixed
 * The last two `size` deprecations in the figure script are gone: the
