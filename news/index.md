@@ -1,6 +1,6 @@
 # Changelog
 
-## sleepcleanr (development version)
+## sleepcleanr 1.7.3
 
 ### Fixed
 

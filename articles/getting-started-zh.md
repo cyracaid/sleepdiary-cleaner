@@ -15,14 +15,14 @@ CRAN。本页带你从安装走到第一次运行。如果你的数据还不是�
 
 ``` r
 install.packages("remotes")
-remotes::install_github("cyracaid/sleepdiary-cleaner@v1.7.2", upgrade = "never", force = TRUE)
+remotes::install_github("cyracaid/sleepdiary-cleaner@v1.7.3", upgrade = "never", force = TRUE)
 ```
 
 然后**重启 R**，再检查加载的是哪个版本：
 
 ``` r
 library(sleepcleanr)
-getNamespaceVersion("sleepcleanr")      # "1.7.2"
+getNamespaceVersion("sleepcleanr")      # "1.7.3"
 ```
 
 如果包在另一个 R
