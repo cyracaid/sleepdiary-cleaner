@@ -8,7 +8,7 @@
 # (its synthetic inputs would need the full derived column set to draw).
 
 test_that("bland_altman: computes and prints/plots without error", {
-  d <- data.frame(reported = c(10, 20, 15, 18), computed = c(9, 18, 16, 19))
+  d <- data.frame(reported = c(10, 20, 15, 18, 12), computed = c(9, 18, 16, 19, 13))
   ba <- bland_altman(d, "reported", "computed", label = "SOL")
   expect_s3_class(ba, "bland_altman")
   expect_invisible(print(ba))

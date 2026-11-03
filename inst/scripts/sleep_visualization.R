@@ -3406,8 +3406,10 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) && "revi
           tryCatch(as.character(utils::packageVersion("sleepcleanr")),
                    error = function(e) "unknown")),
   sprintf("Git commit  : %s",
-          tryCatch(substr(system("git rev-parse HEAD", intern = TRUE, ignore.stderr = TRUE), 1, 7),
-                   error = function(e) "unknown")),
+          tryCatch({
+            .head <- suppressWarnings(system("git rev-parse HEAD", intern = TRUE, ignore.stderr = TRUE))
+            if (length(.head) == 1 && nzchar(.head)) substr(.head, 1, 7) else "unknown"
+          }, error = function(e) "unknown")),
   "",
   "pipeline_cleaning/  cleaning progress and quality control",
   "research_ready/     sleep metrics, substance use, perception",
