@@ -13,6 +13,7 @@ step_apply_duration_corrections(x)
 A \code{sleep_diary} object.
 }
 \description{
-Chains the three v1.2.0 correction appliers in their original order:
-nap/exercise, then sleep-metric durations, then human metric acceptances.
+Chains the correction appliers: nap/exercise, then sleep-metric durations
+(manual file), then the clock-time rule for reinterpreted SOL / WASO text,
+then human metric acceptances.
 }

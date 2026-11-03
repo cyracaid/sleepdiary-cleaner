@@ -1378,10 +1378,14 @@ if (exists("clean_df") && exists("corrected_ema_data") &&
     cat("✓ Figure 6 completed\n\n")
   } else {
     cat("⚠ No valid data for Figure 6\n\n")
+    .mark_skip("pipeline_cleaning/F02.png",
+               "No record is classed Clean, Unusual, Reasonable Unusual, Manually Corrected or Error (for example, every record is Equal Time).")
   }
 } else {
   cat("⚠ clean_df or corrected_ema_data missing required columns\n")
   cat("  Make sure apply_sleep_metrics() was run on clean_df\n\n")
+  .mark_skip("pipeline_cleaning/F02.png",
+             "clean_df or corrected_ema_data is missing required columns; apply_sleep_metrics() must run on clean_df first.")
 }
 
 
@@ -3181,6 +3185,90 @@ if (requireNamespace("corrplot", quietly = TRUE) &&
   cat("⚠ corrplot package or required columns missing — skipping Figure 32\n\n")
 }
 
+# --------------------------------------------------------------------------
+# Figure 33: Nights whose self-reported times are out of order
+# --------------------------------------------------------------------------
+cat("Generating FIGURE F33 (Out-of-order nights, by mechanism)...\n")
+
+if (exists("corrected_ema_data") && nrow(corrected_ema_data) > 0) {
+  rev_tab <- try(classify_reversals(corrected_ema_data), silent = TRUE)
+  if (!inherits(rev_tab, "try-error") && nrow(rev_tab) > 0) {
+    sumr <- attr(rev_tab, "summary")
+    n_all <- sumr$counts[["all"]]
+    n_broken <- n_all - sumr$counts[["reported"]]
+    # One fixed row per mechanism, empty rows included; anything outside the
+    # catalogue is pooled in "Other forms".
+    f33_rows <- data.frame(
+      detail = c("swap:bed-sleep", "swap:awake-getup",
+                 "pm12h:sleep-12h", "pm12h:sleep+12h", "pm12h:getup+12h",
+                 "pm12h:awake+12h", "pm12h:bed-12h", "pm12h_x2:whole_night",
+                 "D2_awake_before_bed:awake", "D3_near_tie:clock",
+                 "D1_value_broken:getup", "E_unexplained:value"),
+      label = c("Bed and sleep-onset times swapped", "Wake and rise times swapped",
+                "Sleep-onset time 12 h early", "Sleep-onset time 12 h late",
+                "Rise time 12 h late", "Wake time 12 h late",
+                "Bed time 12 h early", "Whole night shifted 12 h",
+                "Wake time before bed time", "Gaps within rounding",
+                "Impossible rise value (reported apart)", "No simple explanation"),
+      group = c(rep("Two times exchanged", 2), rep("One time 12 h away", 5),
+                "Two times moved together", rep("Visibly wrong", 3), "Unexplained"),
+      stringsAsFactors = FALSE)
+    f33_rows$n <- as.integer(table(factor(rev_tab$detail, levels = f33_rows$detail)))
+    if (sum(f33_rows$n) < nrow(rev_tab)) {
+      f33_rows <- rbind(f33_rows, data.frame(
+        detail = "other", label = "Other forms", group = "Unexplained",
+        n = nrow(rev_tab) - sum(f33_rows$n), stringsAsFactors = FALSE))
+    }
+    pal <- c("Two times exchanged" = "#37474F", "One time 12 h away" = "#1E88E5",
+             "Two times moved together" = "#0D47A1", "Visibly wrong" = "#E65100",
+             "Unexplained" = "#90A4AE")
+    k <- nrow(f33_rows)
+    ys <- rev(seq_len(k))
+    xmax <- max(f33_rows$n, 1)
+    sub_txt <- sprintf("N = %d of %d complete nights (%.1f%%)",
+                       n_all, sumr$n_complete, sumr$rates[["all"]])
+    if (n_broken > 0) {
+      sub_txt <- paste0(sub_txt, sprintf("; %d of them an impossible get-up value, reported separately", n_broken))
+    }
+    png(file.path(output_dir, "pipeline_cleaning", "F33.png"),
+        width = 10, height = 6, units = "in", res = 150)
+    par(mar = c(1, 0.5, 4.6, 0.5))
+    plot(NA, xlim = c(-1.9, 1.3), ylim = c(0.4, k + 1.2), axes = FALSE, xlab = "", ylab = "")
+    text(-1.02, k + 0.95, "Form of the reversal", adj = 1, font = 2, cex = 0.85)
+    text(-0.5, k + 0.95, "Nights", font = 2, cex = 0.85)
+    text(0.08, k + 0.95, "Share of all", adj = 0, font = 2, cex = 0.85)
+    for (i in seq_len(k)) {
+      y <- ys[i]
+      rect(-1.0, y - 0.32, 0, y + 0.32, col = "grey92", border = NA)
+      if (f33_rows$n[i] > 0) {
+        rect(-1.0, y - 0.32, -1.0 + f33_rows$n[i] / xmax, y + 0.32,
+             col = pal[[f33_rows$group[i]]], border = NA)
+      }
+      text(-1.02, y, f33_rows$label[i], adj = 1, cex = 0.8)
+      text(-1.0 + f33_rows$n[i] / xmax + 0.02, y, f33_rows$n[i], adj = 0, cex = 0.8)
+      text(0.08, y, sprintf("%.1f%%", 100 * f33_rows$n[i] / n_all), adj = 0, cex = 0.8, col = "grey30")
+    }
+    legend("bottomright", legend = names(pal), fill = pal, border = NA, bty = "n", cex = 0.75)
+    title(main = "Figure 33: Nights with out-of-order times, by mechanism", cex.main = 1.1)
+    mtext(sub_txt, side = 3, line = 0.4, cex = 0.72)
+    dev.off()
+    counts <- f33_rows$n[f33_rows$n > 0]
+    cat(sprintf("  %d reversed nights across %d mechanisms\n", nrow(rev_tab), length(counts)))
+    cat("\u2713 Figure 33 completed\n\n")
+  } else if (!inherits(rev_tab, "try-error")) {
+    cat("\u26a0 no night has out-of-order times \u2014 skipping Figure 33\n\n")
+    .mark_skip("pipeline_cleaning/F33.png",
+               "No night has its four times out of order (nothing to classify).")
+  } else {
+    cat("\u26a0 classify_reversals() failed \u2014 skipping Figure 33\n\n")
+    .mark_skip("pipeline_cleaning/F33.png",
+               "classify_reversals() failed; its pre-correction time columns may be missing.")
+  }
+} else {
+  cat("\u26a0 corrected_ema_data missing \u2014 skipping Figure 33\n\n")
+  .mark_skip("pipeline_cleaning/F33.png", "corrected_ema_data is missing or empty.")
+}
+
 
 # ============================================================================
 # COMPLETE FIGURE SUMMARY
@@ -3228,7 +3316,8 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
 
 cat("ADDITIONAL PIPELINE CLEANING FIGURES:\n")
 cat("  Figure 19: FOLDED into Figure 6 (final-status split shown in Fig 13's flag table)\n")
-cat("  Figure 12: Per-Participant Final Flag Rate\n\n")
+cat("  Figure 12: Per-Participant Final Flag Rate\n")
+cat("  Figure 33: Out-of-order nights, by mechanism\n\n")
 
 cat("RESEARCH FIGURES F17-F32 (Sleep Perception + Substance Use):\n")
 cat("  Figure 29: SOL Perception Bias\n")
@@ -3467,6 +3556,7 @@ generate_appendix_ledger()
   "pipeline_cleaning/F14.png",
   "pipeline_cleaning/F15.png",
   "pipeline_cleaning/F16.png",
+  "pipeline_cleaning/F33.png",
   "research_ready/F17.png",
   "research_ready/F18.png",
   "research_ready/F19.png",

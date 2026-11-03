@@ -28,6 +28,7 @@ generate_figure_index <- function(viz_dir) {
     c("pipeline_cleaning/F12.png",         1, "Most frequent specific error patterns"),
     c("pipeline_cleaning/F13.png",        1, "Top participants by flag rate"),
     c("pipeline_cleaning/F14.png",       1, "Auto-detected issues dashboard"),
+    c("pipeline_cleaning/F33.png",       1, "Out-of-order nights by mechanism"),
     c("research_ready/F17.png",                3, "Correction impact (delta lollipops + scatter)"),
     c("research_ready/F18.png",    3, "Key sleep-variable distributions"),
     c("research_ready/F19.png",      3, "TST distribution"),
