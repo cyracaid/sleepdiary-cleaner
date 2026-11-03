@@ -40,6 +40,7 @@
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/assert_contract_columns.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/bland_altman.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/cfg_get.html</loc></url>
+<url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/classify_reversals.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/clean_sleep_diary.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/cleaning_chain.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/cleaning_report.html</loc></url>
@@ -81,6 +82,7 @@
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/print.summary.sleep_diary.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/print.threshold_validation.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/resolve_data_tag.html</loc></url>
+<url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/reversal_summary.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/review_rules.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/review_verdict.html</loc></url>
 <url><loc>https://cyracaid.github.io/sleepdiary-cleaner/reference/run_cleaning_chain.html</loc></url>

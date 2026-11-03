@@ -36,13 +36,13 @@ Contents
   - [9.1 Figure Index](#s-9-1)
     - [How figures are named](#s-9-1-naming)
 
-      Since 1.7.1 every figure uses one continuous scheme: `F01`-`F32`.
+      Since 1.7.1 every figure uses one continuous scheme: `F01`-`F33`.
       The number matches the file name (`pipeline_cleaning/F07.png`),
       the in-figure title, and this reference. Ranges by family: F01-F16
-      live in `pipeline_cleaning/` (the pipeline and detection families
-      interleave by build order), F17-F32 in `research_ready/`. Numbers
-      retired by the 1.6.0 reclassification were reassigned – there are
-      no gaps and no lettered suffixes.
+      and F33 live in `pipeline_cleaning/` (the pipeline and detection
+      families interleave by build order), F17-F32 in `research_ready/`.
+      Numbers retired by the 1.6.0 reclassification were reassigned –
+      there are no gaps and no lettered suffixes.
 
       Terminology and definitions
 
@@ -635,7 +635,7 @@ Contents
 
       | Item | What it is | When to open it |
       |----|----|----|
-      | `pipeline_cleaning/` | 16 diagnostic figures: what the pipeline found and changed (cards in §9.2) | Checking that cleaning behaved; the audit trail for a supplement |
+      | `pipeline_cleaning/` | 17 diagnostic figures: what the pipeline found and changed (cards in §9.2) | Checking that cleaning behaved; the audit trail for a supplement |
       | `research_ready/` | 16 publication-oriented figures: sleep metrics, perception bias, substance use (cards in §9.3) | Choosing figures for Results |
       | `figure_index.png` | One contact sheet of all figures. A red block at the top lists the figures that were skipped and why | First look after a run |
       | `all_figures_review.pdf` | Every figure, one per page, in generation order, at the same size as the PNGs | Flipping through all figures quickly or sharing with a collaborator on the study team |
@@ -689,6 +689,7 @@ Contents
       | **F29** | `research_ready/F29.png` | Supplement | `sleep_visualization.R:2979` | [§9.3 · Alcohol Consumption](#f29-alcohol-consumption) | 2026-09-25 |
       | **F15** | `pipeline_cleaning/F15.png` | Supplement | `figure12_step_flag_table.R:15` | [§9.2 · Step Flag Ledger](#f15-step-flag-ledger) | 2026-09-25 |
       | **F16** | `pipeline_cleaning/F16.png` | Supplement | `sleep_visualization.R:2579` | [§9.2 · Participants Worth a Second Look](#f16-participants-worth-a-second-look) | 2026-09-25 |
+      | **F33** | `pipeline_cleaning/F33.png` | Supplement | `sleep_visualization.R:3185` | [§9.2 · Out-of-Order Nights, by Mechanism](#f33-out-of-order-nights-by-mechanism) | 2026-11-03 |
       | **F30** | `research_ready/F30.png` | Results | `sleep_visualization.R:3043` | [§9.3 · Sleep Regularity — Weekday vs Weekend](#f30-sleep-regularity--weekday-vs-weekend) | 2026-09-25 |
       | **F31** | `research_ready/F31.png` | Results | `sleep_visualization.R:3096` | [§9.3 · Sleep Composition — TIB Breakdown](#f31-sleep-composition--tib-breakdown) | 2026-09-25 |
       | **F32** | `research_ready/F32.png` | Results | `sleep_visualization.R:3125` | [§9.3 · Sleep Metrics Correlation Matrix](#f32-sleep-metrics-correlation-matrix) | 2026-09-25 |
@@ -702,7 +703,7 @@ Contents
       to show (e.g. the review queue is empty because everything was
       already reviewed), the skip reason says so explicitly.
 
-      #### How figures are named (F01-F32, continuous since 1.7.1)
+      #### How figures are named (F01-F33, continuous since 1.7.1)
 
       - **The numbers follow the data source, not the folder.** Numbers
         01 to 24 come from the original single visualization script,
@@ -712,16 +713,17 @@ Contents
         plus the corrected data. They do not match the output folders:
         02 and 03 are in `research_ready/`, while 06 and 07 are in
         `pipeline_cleaning/`.
-      - **Since 1.7.1 the scheme is continuous: `F01`-`F32`.** The
+      - **Since 1.7.1 the scheme is continuous: `F01`-`F33`.** The
         number is the file name, the in-figure title and this reference.
         There are no lettered suffixes and no gaps: the numbers retired
         by earlier reorganisations (the old 08, 12 and 19) were
         reassigned rather than left empty.
-      - **Families by folder:** `pipeline_cleaning/` holds F01-F16
-        (pipeline and detection figures interleaved in build order);
-        `research_ready/` holds F17-F32. Build-order interleaving within
-        `pipeline_cleaning/` is why a detection figure (F06-F14) can
-        carry a higher number than a pipeline one.
+      - **Families by folder:** `pipeline_cleaning/` holds F01-F16 and
+        F33 (pipeline and detection figures interleaved in build order;
+        F33 was added last); `research_ready/` holds F17-F32.
+        Build-order interleaving within `pipeline_cleaning/` is why a
+        detection figure (F06-F14) can carry a higher number than a
+        pipeline one.
       - **File names are kept as they are.** Renaming touches the code,
         the figure index registry and any script of yours that reads
         these files. The proposal also suggests a hierarchical display
@@ -2006,6 +2008,79 @@ Contents
       > rate, for manual review prioritization. A high rate flags
       > records worth hand-checking; it is not a verdict that the data
       > are wrong.
+
+      #### F33 · Out-of-Order Nights, by Mechanism
+
+      **File** `pipeline_cleaning/F33.png` — generated at
+      `sleep_visualization.R:3185`
+
+      **Paper use** Supplement
+
+      **What each part means** One row per way a night’s four
+      self-reported times (bed, sleep onset, final awakening, get-up)
+      can fall out of order, from
+      [`classify_reversals()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/classify_reversals.md).
+      Every row is always drawn, empty ones included, so a mechanism
+      with no cases reads as 0 instead of vanishing. The bar is the
+      number of nights; the right column is its share of all
+      out-of-order nights. Rows that fit none of the listed forms are
+      pooled in “Other forms”.
+
+      | Colour | Meaning |
+      |----|----|
+      | Dark grey | Two times exchanged (bed and sleep onset, or wake and get-up) |
+      | Light blue | One time 12 h away (typically an AM/PM slip) |
+      | Dark blue | Two times moved together by 12 h (whole night) |
+      | Orange | Visibly wrong: awakening before bedtime, gaps within rounding, an impossible get-up value |
+      | Grey-blue | No simple explanation, or a form not listed |
+
+      **Healthy look** A small share of complete nights (a few percent),
+      most of it in the first rows: exchanged times and a sleep-onset
+      time 12 h early are the forms the correction step repairs on its
+      own.
+
+      **Anomaly →** A tall bar for “Bed time 12 h early” or “Whole night
+      shifted 12 h” is not a problem with the figure: the automatic
+      correction rarely repairs these, so those nights depend on the
+      review worksheets. A tall “No simple explanation” bar means the
+      reversals are not an AM/PM or ordering habit and deserve a look at
+      the raw entries.
+
+      **Precise rules**
+      - **What counts.** A night with all four times present whose order
+        violates bed ≤ sleep onset ≤ final awakening ≤ get-up. The
+        subtitle gives the count, the number of complete nights and the
+        percentage.
+      - **How a row is assigned.** The smallest edit that restores the
+        order and keeps the night plausible: exchange two fields, shift
+        one by 12 h, or shift two by 12 h. Nights no edit explains are
+        assigned by what is visibly wrong.
+      - **Get-up values that cannot be real.** These are counted in the
+        figure but reported apart in the subtitle, because they are a
+        field-value problem rather than a sequence problem.
+      - **Nothing is changed.** The figure reads the pre-correction
+        columns; it does not alter data.
+
+      **FAQ**
+
+      Is a reversed night the same as an error the pipeline flagged?
+      No. This figure classifies the order violation by its likely
+      mechanism. Whether the night was flagged, corrected by the
+      algorithm, or sent to review is shown in the other pipeline
+      figures.
+
+      Why show rows with zero nights?
+      So that two datasets can be compared row by row, and so that a
+      form you might expect (for example “Wake and rise times swapped”)
+      is visibly absent rather than silently missing.
+
+      **Paper caption**
+
+      > **Figure 33.** Nights whose self-reported times are out of order
+      > (bed ≤ sleep onset ≤ final awakening ≤ get-up), by most likely
+      > mechanism. One row per mechanism, bar = number of nights, right
+      > column = share of all out-of-order nights. N and the percentage
+      > of complete nights are in the subtitle.
 
       ### 9.3 Research-ready figure cards (`research_ready/`)
 

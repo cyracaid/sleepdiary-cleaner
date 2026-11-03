@@ -1,5 +1,27 @@
 # Changelog
 
+## sleepcleanr 1.9.0 (unreleased)
+
+### Added
+
+- [`classify_reversals()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/classify_reversals.md)
+  and
+  [`reversal_summary()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/reversal_summary.md)
+  describe nights whose self-reported times violate bed \<= sleep onset
+  \<= awakening \<= get-up. Each reversed night is classed by the
+  smallest edit that restores the order while keeping the night
+  plausible (two fields exchanged, one field 12 hours away, two fields
+  moved together); nights no edit explains are classed by what is
+  visibly wrong (an impossible get-up value, an awakening before
+  bedtime, a rounding-sized gap). `detail` names the field,
+  e.g. `swap:bed-sleep` or `pm12h:sleep-12h`. Nothing is changed by
+  these functions; they read the pre-correction columns a run already
+  keeps.
+- Figure F33 (`pipeline_cleaning/F33.png`) draws these classes: one row
+  per mechanism, empty rows included, with the number of nights and the
+  share of all out-of-order nights. There are now 33 figures (17
+  pipeline-cleaning, 16 research-ready).
+
 ## sleepcleanr 1.8.0
 
 ### Changed

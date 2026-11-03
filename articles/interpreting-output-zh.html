@@ -175,7 +175,7 @@ CSV、回归检查和快速检查卡；第 8–9 节讲怎么看图。</p>
 </li>
 <li>
 <details><summary><a href="#s-9-2">9.2
-管线清洗图卡片（<code>pipeline_cleaning/</code>）（16 张）</a>
+管线清洗图卡片（<code>pipeline_cleaning/</code>）（17 张）</a>
 </summary><ul>
 <li>
 <a href="#c-01">F01 · 管线记录流</a>
@@ -224,6 +224,9 @@ CSV、回归检查和快速检查卡；第 8–9 节讲怎么看图。</p>
 </li>
 <li>
 <a href="#c-p26">F16 · 值得二次检查的参与者</a>
+</li>
+<li>
+<a href="#c-f33">F33 · 时间顺序反了的夜晚，按机制</a>
 </li>
 </ul></details>
 </li>
@@ -1517,7 +1520,7 @@ gitignore，不要提交或外传。</p>
 <tbody>
 <tr class="odd">
 <td><code>pipeline_cleaning/</code></td>
-<td>16 张诊断图：流水线发现了什么、改了什么（卡片见 §9.2）</td>
+<td>17 张诊断图：流水线发现了什么、改了什么（卡片见 §9.2）</td>
 <td>检查清洗是否正常；补充材料的审计链</td>
 </tr>
 <tr class="even">
@@ -1858,6 +1861,14 @@ gitignore，不要提交或外传。</p>
 <td>2026-09-25</td>
 </tr>
 <tr class="even">
+<td><strong>F33</strong></td>
+<td><code>pipeline_cleaning/F33.png</code></td>
+<td>Supplement</td>
+<td><code>sleep_visualization.R:3185</code></td>
+<td><a href="#c-f33">§9.2 · 时间顺序反了的夜晚，按机制</a></td>
+<td>2026-11-03</td>
+</tr>
+<tr class="odd">
 <td><strong>F30</strong></td>
 <td><code>research_ready/F30.png</code></td>
 <td>Results</td>
@@ -1865,7 +1876,7 @@ gitignore，不要提交或外传。</p>
 <td><a href="#c-r25">§9.3 · 睡眠规律性——工作日 vs 周末</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>F31</strong></td>
 <td><code>research_ready/F31.png</code></td>
 <td>Results</td>
@@ -1873,7 +1884,7 @@ gitignore，不要提交或外传。</p>
 <td><a href="#c-r26">§9.3 · 睡眠构成——TIB 拆分</a></td>
 <td>2026-09-25</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong>F32</strong></td>
 <td><code>research_ready/F32.png</code></td>
 <td>Results</td>
@@ -1901,13 +1912,14 @@ gitignore，不要提交或外传。</p>
 <code>pipeline_cleaning/</code>。</li>
 <li>
 <strong>自 1.7.1
-起编号连续：<code>F01</code>-<code>F32</code>。</strong>
+起编号连续：<code>F01</code>-<code>F33</code>。</strong>
 编号就是文件名、图内标题和本页的引用。
 没有字母后缀、没有缺号：早期调整退役的旧号（08、12、19）已重新分配，而不是留空。</li>
 <li>
 <strong>按文件夹分族：</strong> <code>pipeline_cleaning/</code> 为
-F01-F16（管线图与检测图按生成顺序交错）； <code>research_ready/</code>
-为 F17-F32。检测图（F06-F14）编号高于部分管线图，就是交错所致。</li>
+F01-F16 和 F33（管线图与检测图按生成顺序交错，F33 最后加入）；
+<code>research_ready/</code> 为
+F17-F32。检测图（F06-F14）编号高于部分管线图，就是交错所致。</li>
 <li>
 <strong>文件名保持不变。</strong>
 重命名会牵动代码、图索引的登记表，以及你自己读取这些文件的脚本。提案还建议用分层的显示编号（例如
@@ -3024,6 +3036,86 @@ SOL 标记分不清是真的入睡很久，还是一般的报告分歧（见<a h
 <blockquote>
 <p><strong>Figure 12.</strong>
 按标记记录比率排序的参与者表格，供人工审查优先级参考。高比率标记出值得人工核查的记录；这不是数据有问题的结论。</p>
+</blockquote>
+<p><a id="c-f33"></a></p>
+</div>
+<div class="section level4">
+<h4 id="f33-时间顺序反了的夜晚按机制">F33 · 时间顺序反了的夜晚，按机制<a class="anchor" aria-label="anchor" href="#f33-%E6%97%B6%E9%97%B4%E9%A1%BA%E5%BA%8F%E5%8F%8D%E4%BA%86%E7%9A%84%E5%A4%9C%E6%99%9A%E6%8C%89%E6%9C%BA%E5%88%B6"></a>
+</h4>
+<p><strong>文件</strong> <code>pipeline_cleaning/F33.png</code> — 生成于
+<code>sleep_visualization.R:3185</code></p>
+<p><strong>论文用途</strong> Supplement</p>
+<p><strong>每部分是什么意思</strong>
+一晚的四个自报时间（上床、入睡、最终醒来、起床）可能以哪几种方式出现顺序错乱，每种方式一行，由
+<code><a href="../reference/classify_reversals.html">classify_reversals()</a></code>
+得出。每一行都会画出来，没有病例的也画，所以没有病例的机制显示为
+0，而不是消失。柱长是夜晚数，右列是它占全部顺序错乱夜晚的比例。不属于所列形态的归入”Other
+forms”。</p>
+<table class="table">
+<thead><tr class="header">
+<th>颜色</th>
+<th>含义</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>深灰</td>
+<td>两个时间互换（上床与入睡，或醒来与起床）</td>
+</tr>
+<tr class="even">
+<td>浅蓝</td>
+<td>一个时间差 12 小时（通常是 AM/PM 手滑）</td>
+</tr>
+<tr class="odd">
+<td>深蓝</td>
+<td>两个时间一起挪了 12 小时（整段）</td>
+</tr>
+<tr class="even">
+<td>橙色</td>
+<td>明显有问题：醒来早于上床、间隔在舍入范围内、起床值不可能</td>
+</tr>
+<tr class="odd">
+<td>灰蓝</td>
+<td>没有简单解释，或不在所列形态内</td>
+</tr>
+</tbody>
+</table>
+<p><strong>健康外观</strong>
+占完整夜晚的一小部分（几个百分点），大部分落在最上面几行：两个时间互换、入睡时间早了
+12 小时，是修正步骤自己能修好的形态。</p>
+<p><strong>异常 →</strong> “Bed time 12 h early”或”Whole night shifted
+12
+h”的柱很长，不是图的问题：自动修正很少能修好这两种，这些夜晚要靠审查表。“No
+simple explanation”的柱很长，说明这些顺序错乱不是 AM/PM
+或顺序上的习惯，值得回头看原始输入。</p>
+<details><summary><strong>精确规则</strong>
+</summary><ul>
+<li>
+<strong>算什么。</strong> 四个时间都齐全、且顺序违反 上床 ≤ 入睡 ≤
+最终醒来 ≤ 起床 的夜晚。副标题给出数量、完整夜晚数和百分比。</li>
+<li>
+<strong>一行怎么分配。</strong>
+取能恢复顺序、又让这一晚保持合理的最小改动：互换两个字段，把一个字段挪
+12 小时，或把两个字段都挪 12
+小时。没有改动能解释的夜晚，按它明显出了什么问题来归类。</li>
+<li>
+<strong>不可能是真的起床值。</strong>
+这些夜晚也计入图里，但在副标题里单独说明，因为它们是字段取值问题，不是顺序问题。</li>
+<li>
+<strong>不改任何数据。</strong>
+这张图读的是修正前的列，不会改动数据。</li>
+</ul></details><p><strong>常见问题</strong></p>
+<details><summary>
+顺序反了的夜晚，就是管线标记的错误吗？
+</summary><p>不是。这张图按可能的机制给顺序错乱分类。这一晚是否被标记、被算法修正，还是送去审查，要看其他管线图。</p>
+</details><details><summary>
+为什么要显示 0 晚的行？
+</summary><p>这样两份数据可以逐行对比，也能让你预期会有的形态（例如”Wake and rise
+times swapped”）明显地缺席，而不是悄悄不见。</p>
+</details><p><strong>论文图注</strong></p>
+<blockquote>
+<p><strong>Figure 33.</strong> 自报时间顺序错乱的夜晚（上床 ≤ 入睡 ≤
+最终醒来 ≤ 起床），按最可能的机制分类。每种机制一行，柱长 = 夜晚数，右列
+= 占全部顺序错乱夜晚的比例。N 和占完整夜晚的百分比见副标题。</p>
 </blockquote>
 <p><a id="s-9-3"></a></p>
 </div>

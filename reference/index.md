@@ -17,6 +17,8 @@
 - [`cfg_get()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/cfg_get.md)
   : Safe config_get – fetches pipeline_config from global env
   automatically
+- [`classify_reversals()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/classify_reversals.md)
+  : Classify nights whose self-reported times are out of order
 - [`clean_sleep_diary()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/clean_sleep_diary.md)
   : Clean a sleep diary: data-first entry point
 - [`cleaning_chain`](https://cyracaid.github.io/sleepdiary-cleaner/reference/cleaning_chain.md)
@@ -95,6 +97,8 @@
   : Print a threshold validation report
 - [`resolve_data_tag()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/resolve_data_tag.md)
   : Which kind of data a run is on: "real", "synth" or "unknown"
+- [`reversal_summary()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/reversal_summary.md)
+  : Summarise the reversals of a run
 - [`review_rules()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/review_rules.md)
   : The review rules in force for a config
 - [`review_verdict()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/review_verdict.md)
