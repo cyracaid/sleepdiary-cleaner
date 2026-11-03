@@ -43,6 +43,10 @@ insomnia. For clinical samples (insomnia, elderly, shift-work), revisit every ro
 | `classification.step5.unusual.awake_to_getup_max_hours` | `3` | Getup − awake > 3 h is unusual | Long time in bed after waking |
 | `review.clean_categories` | `clean`, `equal_time_ok`, `reasonable_unusual` | Final categories that count as "now passes" in the review status table | Yours to define. In our study a record with a missing time (`skipped_na`) is not counted as passing, so it stays listed as not passing |
 | `second_review.on_invalid_rows` | `skip` | `skip`: second-review rows whose `pid` or `day_num` is not a number are left out and listed in `output/second_review_rows_skipped.csv`; `stop`: stop the run | Such a row cannot identify a record |
+| `duration_clock_rule.enabled` | `true` | `false` switches off the Step 6.5 clock-time rule for reinterpreted SOL / WASO text | On by default; changes about a dozen delivered values on the study data; each decision is in `output/duration_clock_rule_log.csv` |
+| `duration_clock_rule.tolerance_min` | `5` | SOL: typed time must be within this many minutes of the recorded sleep onset (12-hour dial) | Chosen on the study's 35 flagged SOL entries (about 90% estimated precision); tune on your data |
+| `duration_clock_rule.window_min` | `60` | SOL: typed time must be 0 to this many minutes after the recorded bedtime | Normal self-reported SOL typed as 00:MM reached 55 minutes at most in the study data |
+| `duration_clock_rule.near_min` | `15` | A typed time within this many minutes of the bedtime or sleep onset counts as clock-like | Entries in this band that fail the two limits above are left for a person |
 | `manual_corrections.manual_overrides_parser` | `false` | `true`: a manual sleep-metric-duration row wins over the interval parser | Long-standing behaviour is that the parser wins; every skipped row is listed in `output/manual_corrections_not_applied.csv` |
 
 ## Suggested config comments

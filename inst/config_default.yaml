@@ -260,6 +260,31 @@ manual_corrections:
   manual_overrides_parser: false
 
 # =============================================================================
+# CLOCK-TIME RULE FOR SOL / WASO (Step 6.5)
+# =============================================================================
+# SOL and WASO were asked as a duration ("Format: HH:MM"). Some participants typed
+# a clock time instead (the time they fell asleep, or woke in the night). For text
+# the interval parser had to reinterpret (the MM:SS rule or the dd:00 rule):
+#   - minutes typed in the hours slot (text ending in :00): kept as the parser's minutes
+#   - SOL typed as the sleep onset time: SOL = typed time - recorded bedtime
+#   - SOL typed as the bedtime, or a WASO that looks like a clock time: set to missing
+#   - anything else: left as parsed and still flagged for review
+# Rows a person has corrected are never touched. Each decision is written to
+# output/duration_clock_rule_log.csv.
+duration_clock_rule:
+  # false switches the rule off (the parser's reading is kept for every row).
+  enabled: true
+  # SOL: the typed time must be within this many minutes of the recorded sleep
+  # onset (12-hour dial, because no AM/PM is typed) ...
+  tolerance_min: 5
+  # ... and 0 to this many minutes after the recorded bedtime.
+  window_min: 60
+  # A typed time within this many minutes of the bedtime or sleep onset still
+  # counts as clock-like (so a ":00" value is not read as minutes); such rows that
+  # fail the two limits above are left for a person.
+  near_min: 15
+
+# =============================================================================
 # NORMALIZE SETTINGS
 # =============================================================================
 # Minor order-error correction (Step 4, Section 5 of normalize_sleep_time_sequence)

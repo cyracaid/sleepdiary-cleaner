@@ -24,6 +24,10 @@
       "classification.flag_severity.high_sol_threshold_hours",
       "classification.flag_severity.high_waso_threshold_hours",
       "manual_corrections.manual_overrides_parser",
+      "duration_clock_rule.enabled",
+      "duration_clock_rule.tolerance_min",
+      "duration_clock_rule.window_min",
+      "duration_clock_rule.near_min",
       "second_review.on_invalid_rows"),
     meaning = c(
       "Step 4: a gap of at least this many hours between adjacent times triggers an AM/PM flip",
@@ -49,6 +53,10 @@
       "Flag severity: SOL above this many hours",
       "Flag severity: WASO above this many hours",
       "Manual sleep-metric-duration rows: TRUE = the manual row wins over the interval parser",
+      "Step 6.5: TRUE = SOL / WASO text the parser reinterpreted is checked for being a clock time",
+      "Step 6.5 SOL clock time: the typed time must be within this many minutes of the recorded sleep onset",
+      "Step 6.5 SOL clock time: the typed time must be 0 to this many minutes after the recorded bedtime",
+      "Step 6.5: a typed time this close (minutes) to the bedtime or sleep onset counts as clock-like, not as minutes",
       "Second-review rows whose pid or day_num is not a number: skip (list them) or stop"),
     stringsAsFactors = FALSE)
 }

@@ -98,6 +98,8 @@ process_interval<- function(df, varname, format) {
     # Make sure everything is treated as plain text (character strings)
     df[[varname]] = as.character(df[[varname]])
     interval_working_df[[varname]] = as.character(interval_working_df[[varname]])
+    # the text exactly as entered, before any format repair (the "raw_orig" snapshot below is taken after the repairs)
+    input_text_orig <- interval_working_df[[varname]]
     
     # -----------------------------------------------------------------------
     # MAIN LOOP: Process each value one at a time
@@ -487,6 +489,7 @@ process_interval<- function(df, varname, format) {
       # can overwrite the raw column. finalize_columns maps these to Dataset A.
       duration_calculations[[paste0(varname, "_raw_orig")]] <-
         duration_calculations[[paste0(varname, "_unsep")]]
+      duration_calculations[[paste0(varname, "_input_orig")]] <- input_text_orig
       duration_calculations[[paste0(varname, "_ambig")]] <- FALSE
 
       h_col <- paste0(varname, "_h_num")
@@ -548,16 +551,17 @@ process_interval<- function(df, varname, format) {
     }
 
     attach_mmss <- grepl("duration_totalmin_sol_estimate_am|duration_totalmin_waso_estimate_am", varname)
-    ro_col <- paste0(varname, "_raw_orig"); ab_col <- paste0(varname, "_ambig")
+    ro_col <- paste0(varname, "_raw_orig"); ab_col <- paste0(varname, "_ambig"); io_col <- paste0(varname, "_input_orig")
     if (dim(df)[1] == dim(duration_calculations)[1]) {
       data_with_interval_results = df %>%
         mutate(!!as.symbol(paste0(varname, "_mincalc")) := duration_calculations[, paste0(varname, "_mincalc")],
                !!as.symbol(paste0(varname, "_checkforerrors")) := review_flags,
                !!as.symbol(paste0(varname, "_correctionsmade")) := duration_calculations[, "corrections"])
-      if (attach_mmss && all(c(ro_col, ab_col) %in% names(duration_calculations)))
+      if (attach_mmss && all(c(ro_col, ab_col, io_col) %in% names(duration_calculations)))
         data_with_interval_results <- data_with_interval_results %>%
           mutate(!!as.symbol(ro_col) := duration_calculations[[ro_col]],
-                 !!as.symbol(ab_col) := duration_calculations[[ab_col]])
+                 !!as.symbol(ab_col) := duration_calculations[[ab_col]],
+                 !!as.symbol(io_col) := duration_calculations[[io_col]])
     } else {
       data_with_interval_results = df %>%
         mutate(!!as.symbol(paste0(varname, "_mincalc")) := NA_real_,
@@ -566,7 +570,8 @@ process_interval<- function(df, varname, format) {
       if (attach_mmss)
         data_with_interval_results <- data_with_interval_results %>%
           mutate(!!as.symbol(ro_col) := NA_character_,
-                 !!as.symbol(ab_col) := FALSE)
+                 !!as.symbol(ab_col) := FALSE,
+                 !!as.symbol(io_col) := NA_character_)
     }
     
     # Overwrite the original column with the cleaned-up values

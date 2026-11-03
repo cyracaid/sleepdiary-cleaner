@@ -177,8 +177,9 @@ step_apply_corrections <- function(x, corrections_df, manual_unusual_df) {
 
 #' Step 6.5 -- apply duration corrections
 #'
-#' Chains the three v1.2.0 correction appliers in their original order:
-#' nap/exercise, then sleep-metric durations, then human metric acceptances.
+#' Chains the correction appliers: nap/exercise, then sleep-metric durations
+#' (manual file), then the clock-time rule for reinterpreted SOL / WASO text,
+#' then human metric acceptances.
 #'
 #' @param x A \code{sleep_diary} object.
 #' @return A \code{sleep_diary} object.
@@ -187,6 +188,7 @@ step_apply_duration_corrections <- function(x) {
   .run_step(x, "6.5", "Duration corrections", function(df) {
     df <- apply_nap_exercise_corrections(df, cfg = x$cfg)
     df <- apply_sleep_metric_duration_corrections(df, cfg = x$cfg)
+    df <- apply_duration_clock_rule(df, cfg = x$cfg)
     df <- apply_metric_review_acceptances(df, cfg = x$cfg)
     df
   })
