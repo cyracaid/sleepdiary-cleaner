@@ -133,9 +133,10 @@ A4）增加了针对性检查，标记可疑的钟表时间形态时长条目供
 
 我们于 2026-09-02 对当前安装的 `sleepcleanr` 1.4.5（含 Part A4
 补丁）进行了完整端到端基准重跑——完整
-`corrupted_enrichment.rds`（n=7,000，全部 15
-类错误、按参与者聚类注入），用 `evaluate_detection.R`（v4）结合当前
-`ground_truth_enrichment.csv` 评估。这产生了该发现的首个真实补丁后数字：
+`corrupted_enrichment.rds`（n=7,000，全部 14
+类注入错误加干净对照（清单口径为 15 类）、按参与者聚类注入），用
+`evaluate_detection.R`（v4）结合当前 `ground_truth_enrichment.csv`
+评估。这产生了该发现的首个真实补丁后数字：
 
 |  | field_misentry_sol | field_misentry_waso |
 |----|----|----|

@@ -847,6 +847,14 @@ need them; [中文版请看下面 / Chinese articles below ↓](#chinese).
   Bland-Altman measurement characterization, real-data audit, and
   multiverse robustness.
 
+- [Error
+  Catalog](https://cyracaid.github.io/sleepdiary-cleaner/articles/error-catalog.md):
+
+  Every kind of entry error the sleepcleanr validation considers,
+  grouped by where it comes from (this project’s data, published
+  sleep-diary studies, or ordinary use of a diary form) and by what the
+  pipeline does with it.
+
 - [Testing
   Coverage](https://cyracaid.github.io/sleepdiary-cleaner/articles/testing-coverage.md):
 
@@ -893,6 +901,12 @@ need them; [中文版请看下面 / Chinese articles below ↓](#chinese).
   sleepcleanr
   清洗管线的验证方法：从干净输入特异度、注入错误基准、Bland-Altman
   测量特性描述、真实数据审计到 multiverse 鲁棒性分析的九步验证链。
+
+- [错误类型清单](https://cyracaid.github.io/sleepdiary-cleaner/articles/error-catalog-zh.md):
+
+  sleepcleanr
+  验证所考虑的全部录入错误，按来源（本项目数据、已发表的睡眠日记研究、
+  日常填表行为）和管线的处理方式分组。
 
 - [测试覆盖率（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/testing-coverage-zh.md):
 

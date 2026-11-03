@@ -46,6 +46,7 @@
     <li><a class="dropdown-item" href="../articles/troubleshooting.html">Troubleshooting</a></li>
     <li><a class="dropdown-item" href="../articles/pipeline-architecture.html">Pipeline Architecture</a></li>
     <li><a class="dropdown-item" href="../articles/validation-methodology.html">Validation Methodology</a></li>
+    <li><a class="dropdown-item" href="../articles/error-catalog.html">Error Catalog</a></li>
     <li><a class="dropdown-item" href="../articles/testing-coverage.html">Testing Coverage</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>中文</h6></li>
@@ -57,6 +58,7 @@
     <li><a class="dropdown-item" href="../articles/troubleshooting-zh.html">排错</a></li>
     <li><a class="dropdown-item" href="../articles/pipeline-architecture-zh.html">管线架构</a></li>
     <li><a class="dropdown-item" href="../articles/validation-methodology-zh.html">验证方法学</a></li>
+    <li><a class="dropdown-item" href="../articles/error-catalog-zh.html">错误类型清单</a></li>
     <li><a class="dropdown-item" href="../articles/testing-coverage-zh.html">测试覆盖率</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">All articles / 全部文章</a></li>
@@ -245,8 +247,8 @@ A4）增加了针对性检查，标记可疑的钟表时间形态时长条目供
 核查，并非重新生成的基准 CSV；仓库中当时不存在补丁后的 CSV。</p>
 <p>我们于 2026-09-02 对当前安装的 <code>sleepcleanr</code> 1.4.5（含
 Part A4 补丁）进行了完整端到端基准重跑——完整
-<code>corrupted_enrichment.rds</code>（n=7,000，全部 15
-类错误、按参与者聚类注入），用
+<code>corrupted_enrichment.rds</code>（n=7,000，全部 14
+类注入错误加干净对照（清单口径为 15 类）、按参与者聚类注入），用
 <code>evaluate_detection.R</code>（v4）结合当前
 <code>ground_truth_enrichment.csv</code>
 评估。这产生了该发现的首个真实补丁后数字：</p>

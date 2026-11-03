@@ -46,6 +46,7 @@
     <li><a class="dropdown-item" href="../articles/troubleshooting.html">Troubleshooting</a></li>
     <li><a class="dropdown-item" href="../articles/pipeline-architecture.html">Pipeline Architecture</a></li>
     <li><a class="dropdown-item" href="../articles/validation-methodology.html">Validation Methodology</a></li>
+    <li><a class="dropdown-item" href="../articles/error-catalog.html">Error Catalog</a></li>
     <li><a class="dropdown-item" href="../articles/testing-coverage.html">Testing Coverage</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>中文</h6></li>
@@ -57,6 +58,7 @@
     <li><a class="dropdown-item" href="../articles/troubleshooting-zh.html">排错</a></li>
     <li><a class="dropdown-item" href="../articles/pipeline-architecture-zh.html">管线架构</a></li>
     <li><a class="dropdown-item" href="../articles/validation-methodology-zh.html">验证方法学</a></li>
+    <li><a class="dropdown-item" href="../articles/error-catalog-zh.html">错误类型清单</a></li>
     <li><a class="dropdown-item" href="../articles/testing-coverage-zh.html">测试覆盖率</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">All articles / 全部文章</a></li>
@@ -310,9 +312,10 @@ check, not from a regenerated benchmark CSV; no post-patch CSV existed
 in the repository.</p>
 <p>We re-ran the full benchmark end-to-end on 2026-09-02 against the
 currently installed <code>sleepcleanr</code> 1.4.5 (Part A4 patch
-included) — full <code>corrupted_enrichment.rds</code> (n=7,000, all 15
-error categories together, participant-clustered injection), evaluated
-with <code>evaluate_detection.R</code> (v4) against the current
+included) — full <code>corrupted_enrichment.rds</code> (n=7,000, all 14
+injected error categories plus the clean control (15 in the catalog
+count), participant-clustered injection), evaluated with
+<code>evaluate_detection.R</code> (v4) against the current
 <code>ground_truth_enrichment.csv</code>. This produced the first real
 post-patch numbers for this finding:</p>
 <table class="table">
