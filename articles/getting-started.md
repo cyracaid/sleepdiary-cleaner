@@ -49,20 +49,20 @@ run_pipeline(config = "my_study.yaml", project_dir = "path/to/project",
              include_manual_corrections = TRUE)
 ```
 
-| Argument                     | What it does                                                                                                                     |
-|------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
-| `config`                     | Path to the config YAML. A relative path is read from `project_dir`, and if it is not there, from the directory you called from. |
-| `project_dir`                | The project folder. The run changes into it, so every relative path in the YAML (data, manual files) is relative to it.          |
-| `include_manual_corrections` | **Default `FALSE`.** Whether human-review files are applied. It is an argument of the call, not a YAML setting. See below.       |
-| `skip_visualization`         | `TRUE` skips the figures.                                                                                                        |
+| Argument | What it does |
+|----|----|
+| `config` | Path to the config YAML. A relative path is read from `project_dir`, and if it is not there, from the directory you called from. |
+| `project_dir` | The project folder. The run changes into it, so every relative path in the YAML (data, manual files) is relative to it. |
+| `include_manual_corrections` | **Default `FALSE`.** Whether human-review files are applied. It is an argument of the call, not a YAML setting. See below. |
+| `skip_visualization` | `TRUE` skips the figures. |
 
 ### The two modes
 
-|                    | `include_manual_corrections = FALSE` (default)                         | `= TRUE`                                              |
-|--------------------|------------------------------------------------------------------------|-------------------------------------------------------|
-| Human-review files | Treated as absent; the run is algorithmic-only and says so in a banner | Applied, if the files named in the YAML exist         |
-| Step 5 worksheets  | Written                                                                | Written                                               |
-| Use it for         | The first run on new data, to see what the rules flag                  | Applying the corrections your reviewers have recorded |
+|  | `include_manual_corrections = FALSE` (default) | `= TRUE` |
+|----|----|----|
+| Human-review files | Treated as absent; the run is algorithmic-only and says so in a banner | Applied, if the files named in the YAML exist |
+| Step 5 worksheets | Written | Written |
+| Use it for | The first run on new data, to see what the rules flag | Applying the corrections your reviewers have recorded |
 
 The default changed in version 1.4.7. Earlier versions applied the
 manual files without being asked, so the same call can give different

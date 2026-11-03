@@ -85,14 +85,14 @@ CSV、回归检查和快速检查卡；第 8–9 节讲怎么看图。
 
 它描述一条记录的*时间戳*长什么样。每条记录恰好属于下面某一类，按下表的优先级依次判断，先匹配到的生效。
 
-| 优先级 | 类别                 | 判定标准                                                                                                                                                           | 怎么处理                   |
-|:------:|----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|
-|   1    | `skipped_na`         | 四个修正后时间戳（bed、sleep、awake、getup）中有任何一个缺失                                                                                                       | 排除在顺序检查之外         |
-|   2    | `error`              | 顺序被破坏（不满足 `bed ≤ sleep ≤ awake ≤ getup`）；或 `sleep = awake`（零时长睡眠）；或 bed→sleep、awake→getup 的间隔超过 7 小时；或 sleep→awake 跨度超过 24 小时 | 一定会被审查，确认后修正   |
-|   3    | `equal_time_ok`      | 顺序完整，且 bed = sleep 和/或 awake = getup（差值小于 0.01 小时，约 36 秒）                                                                                       | 算有效记录，不进入人工审查 |
-|   4    | `unusual`            | 顺序完整、不是 equal-time，但 bed→sleep 或 awake→getup 有一段间隔超过 3 小时                                                                                       | 会被审查，通常原样保留     |
-|   5    | `clean`              | 以上都不是                                                                                                                                                         | 无需处理                   |
-|   —    | `reasonable_unusual` | 经人工看过并接受的 `unusual` 记录                                                                                                                                  | 单独计数，不丢掉人工的判断 |
+| 优先级 | 类别 | 判定标准 | 怎么处理 |
+|:--:|----|----|----|
+| 1 | `skipped_na` | 四个修正后时间戳（bed、sleep、awake、getup）中有任何一个缺失 | 排除在顺序检查之外 |
+| 2 | `error` | 顺序被破坏（不满足 `bed ≤ sleep ≤ awake ≤ getup`）；或 `sleep = awake`（零时长睡眠）；或 bed→sleep、awake→getup 的间隔超过 7 小时；或 sleep→awake 跨度超过 24 小时 | 一定会被审查，确认后修正 |
+| 3 | `equal_time_ok` | 顺序完整，且 bed = sleep 和/或 awake = getup（差值小于 0.01 小时，约 36 秒） | 算有效记录，不进入人工审查 |
+| 4 | `unusual` | 顺序完整、不是 equal-time，但 bed→sleep 或 awake→getup 有一段间隔超过 3 小时 | 会被审查，通常原样保留 |
+| 5 | `clean` | 以上都不是 | 无需处理 |
+| — | `reasonable_unusual` | 经人工看过并接受的 `unusual` 记录 | 单独计数，不丢掉人工的判断 |
 
 - **Equal Time 不算错误。**
   把”上床”和”睡着”（或”醒来”和”起床”）填成同一个钟点，是填写睡眠日记时常见、无害的方式。它被记为
@@ -130,12 +130,12 @@ run_pipeline(config = "my_study.yaml", include_manual_corrections = TRUE)  # 完
 run_pipeline(config = "my_study.yaml", skip_visualization = TRUE)          # 只清洗，不出图
 ```
 
-| 参数                         | 作用                                                                                                                                                                                                                      |
-|------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `config`                     | 你的配置 YAML 路径（复制 `inst/config_template.yaml`，改 `data` 部分）。                                                                                                                                                  |
+| 参数 | 作用 |
+|----|----|
+| `config` | 你的配置 YAML 路径（复制 `inst/config_template.yaml`，改 `data` 部分）。 |
 | `include_manual_corrections` | **默认 `FALSE`。** 为 `FALSE` 时只跑算法：所有人工审查 CSV 都当作不存在，并有横幅提示没有应用人工修正。设为 `TRUE` 才会应用配置里指定的人工修正文件。默认关闭，是为了让数据集永远不会被工作目录里遗留的审查文件悄悄改掉。 |
-| `skip_visualization`         | 设为 `TRUE` 跳过出图（Step 9 和 Step 11）。                                                                                                                                                                               |
-| `finalize`                   | 默认 `TRUE`：写出交付数据集（Step 10）。设为 `FALSE` 则清洗完就停。                                                                                                                                                       |
+| `skip_visualization` | 设为 `TRUE` 跳过出图（Step 9 和 Step 11）。 |
+| `finalize` | 默认 `TRUE`：写出交付数据集（Step 10）。设为 `FALSE` 则清洗完就停。 |
 
 **在配置里写明数据是什么：`data.tag`。** `real`（被试真实数据，图写进
 `output/`，不会上传 GitHub）或 `synth`（合成或测试数据，图写在 `output/`
@@ -185,15 +185,15 @@ source("validation/reproduce_fasttrack_chain.R")   # derive → disambiguate →
 在启动时检查它们是否存在并报告缺失文件）。每个文件都是*真实*参与者数据文件——要把它们排除在
 git 和发布构建之外（`.gitignore` + `.Rbuildignore` 已经覆盖了全部）。
 
-| CSV（配置键）                                  | 在何处被使用                                          | 为什么存在                                                  | 由谁创建                                                                                     |
-|------------------------------------------------|-------------------------------------------------------|-------------------------------------------------------------|----------------------------------------------------------------------------------------------|
-| `second_review_checklist.csv`                  | Step 4.75（`apply_second_review`）                    | 在应用修正之前，锁定此前已审查记录的二次审查共识            | 手动起草；`apply_second_review` 追加已路由的行                                               |
-| `manual_error_corrections.csv`                 | Step 6（`step_apply_corrections`）                    | 对分类为 `error` 的记录的人工修正决定                       | Step 5 写出 `[NEW]manual_error_correction_review.csv`；审查者填写 `new_value_*` 后另存为此名 |
-| `manual_unusual_corrections.csv`               | Step 6（`step_apply_corrections`）                    | 对分类为 `unusual` 的记录的人工决定                         | Step 5 写出 `[NEW]manual_unusual_review.csv`；同样的审查填写流程                             |
-| `manual_nap_exercise_corrections.csv`          | Step 6.5（`apply_nap_exercise_corrections`）          | 对小睡与运动时长的修正                                      | 手动创建；`apply_second_review` 可能追加                                                     |
-| `manual_sleep_metric_duration_corrections.csv` | Step 6.5（`apply_sleep_metric_duration_corrections`） | 修正派生睡眠时长里剩余的内部不一致                          | 手动创建                                                                                     |
-| `manual_metric_review_acceptances.csv`         | Step 6.5（`apply_metric_review_acceptances`）         | 对计算出的睡眠指标（TST、SOL、WASO、SE）的人工接受/拒绝决定 | 手动创建；`apply_second_review` 可能追加                                                     |
-| `audit_dispositions.csv`                       | Step 9 之后（`audit_data_integrity`）                 | 记录每条被改动记录处置结果的审计账本，用于可回溯性          | 由管线自身写出                                                                               |
+| CSV（配置键） | 在何处被使用 | 为什么存在 | 由谁创建 |
+|----|----|----|----|
+| `second_review_checklist.csv` | Step 4.75（`apply_second_review`） | 在应用修正之前，锁定此前已审查记录的二次审查共识 | 手动起草；`apply_second_review` 追加已路由的行 |
+| `manual_error_corrections.csv` | Step 6（`step_apply_corrections`） | 对分类为 `error` 的记录的人工修正决定 | Step 5 写出 `[NEW]manual_error_correction_review.csv`；审查者填写 `new_value_*` 后另存为此名 |
+| `manual_unusual_corrections.csv` | Step 6（`step_apply_corrections`） | 对分类为 `unusual` 的记录的人工决定 | Step 5 写出 `[NEW]manual_unusual_review.csv`；同样的审查填写流程 |
+| `manual_nap_exercise_corrections.csv` | Step 6.5（`apply_nap_exercise_corrections`） | 对小睡与运动时长的修正 | 手动创建；`apply_second_review` 可能追加 |
+| `manual_sleep_metric_duration_corrections.csv` | Step 6.5（`apply_sleep_metric_duration_corrections`） | 修正派生睡眠时长里剩余的内部不一致 | 手动创建 |
+| `manual_metric_review_acceptances.csv` | Step 6.5（`apply_metric_review_acceptances`） | 对计算出的睡眠指标（TST、SOL、WASO、SE）的人工接受/拒绝决定 | 手动创建；`apply_second_review` 可能追加 |
+| `audit_dispositions.csv` | Step 9 之后（`audit_data_integrity`） | 记录每条被改动记录处置结果的审计账本，用于可回溯性 | 由管线自身写出 |
 
 **审计账本路径：** 私有审计账本为可选项，在配置中以
 `data.files.audit_dispositions`
@@ -213,14 +213,14 @@ git 和发布构建之外（`.gitignore` + `.Rbuildignore` 已经覆盖了全部
 
 不必从空白文件开始，包里提供了模板和虚拟样例数据：
 
-| 是什么                    | 在哪里                                                              | 说明                                                                                                                                                                                                      |
-|---------------------------|---------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 六个审查 CSV 的仅表头模板 | `inst/extdata/stub_*.csv`（随包安装）                               | `stub_error_corrections.csv`、`stub_unusual_corrections.csv`、`stub_nap_exercise.csv`、`stub_metric_duration.csv`、`stub_metric_accept.csv`、`stub_second_review.csv`——列正确，没有数据行，也没有真实数据 |
-| 审计处置模板              | `inst/extdata/template_audit_dispositions.csv`                      | 仅表头                                                                                                                                                                                                    |
-| 填好示例行的模板          | GitHub 仓库里的 `templates/template_*.csv`                          | 虚构的示例行（例如 1001 号参与者）；**不**随安装包发布                                                                                                                                                    |
-| 虚拟样例数据集            | `inst/extdata/synthetic_sleep_data.rds` 和 `synthetic_ema_data.csv` | 280 行虚拟日记，没有真实参与者                                                                                                                                                                            |
-| 虚拟数据集的配置          | `inst/extdata/synthetic_config.yaml`                                | 演示怎么为一份新数据映射列名                                                                                                                                                                              |
-| 列字典                    | `inst/extdata/column_dictionary.csv`                                | 说明交付数据里每一列的含义                                                                                                                                                                                |
+| 是什么 | 在哪里 | 说明 |
+|----|----|----|
+| 六个审查 CSV 的仅表头模板 | `inst/extdata/stub_*.csv`（随包安装） | `stub_error_corrections.csv`、`stub_unusual_corrections.csv`、`stub_nap_exercise.csv`、`stub_metric_duration.csv`、`stub_metric_accept.csv`、`stub_second_review.csv`——列正确，没有数据行，也没有真实数据 |
+| 审计处置模板 | `inst/extdata/template_audit_dispositions.csv` | 仅表头 |
+| 填好示例行的模板 | GitHub 仓库里的 `templates/template_*.csv` | 虚构的示例行（例如 1001 号参与者）；**不**随安装包发布 |
+| 虚拟样例数据集 | `inst/extdata/synthetic_sleep_data.rds` 和 `synthetic_ema_data.csv` | 280 行虚拟日记，没有真实参与者 |
+| 虚拟数据集的配置 | `inst/extdata/synthetic_config.yaml` | 演示怎么为一份新数据映射列名 |
+| 列字典 | `inst/extdata/column_dictionary.csv` | 说明交付数据里每一列的含义 |
 
 在 R 里找到已安装的文件：
 
@@ -235,16 +235,16 @@ system.file("extdata", "stub_error_corrections.csv", package = "sleepcleanr")
 除了 `output/`，一次运行还会在**项目根目录**（你传给 `project_dir`
 的目录）写出若干工作文件。它们是审查循环的中间文件，不是最终结果。全部包含真实参与者行，不要提交。
 
-| 文件                                      | 何时写出                           | 是什么                                                                                                                                                                                                                                                             | 怎么用                                                                                   |
-|-------------------------------------------|------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
-| `[NEW]manual_error_correction_review.csv` | Step 5 写出，**Step 8.5 之后重写** | 一张状态表：Step 5 的每条 `error` 记录（与 `error_df_pre` 同一批行），加上修正之后才变成错误的记录。每行说明发生了什么（`status_after_corrections`）、是否在人工文件里（`in_manual_file`）、修正前后的类别，以及 Step 8 的标记。仍需人处理的行排在最前。审核列为空 | 读 `status_after_corrections`；处理 `..._still_fails` 和 `new_after_corrections` 的行    |
-| `[NEW]manual_unusual_review.csv`          | Step 5                             | 同上，针对 `unusual` 记录                                                                                                                                                                                                                                          | 填写后另存为 `manual_unusual_corrections.csv`                                            |
-| `review_status.csv`                       | Step 8.5 之后，每次运行覆盖        | **只需要看这一张表。** 两张 Step 5 待审表的每一行，加上修正之后才变成错误的记录；每行有一个 `review_state`（`needs_review`、`not_incorporated`、`incorporated`）和判定它的规则（`review_state_reason`）。`needs_review` 排在最前                                   | 处理 `needs_review` 的行；运行结束时会按你的规则打印审查是否完成                         |
-| `manual_error_correction_updated.csv`     | Step 6                             | 已应用修正的记录：**你填的** `manual_error_corrections.csv` 被流水线纳入之后的副本，`manually_corrected` 列标明哪些行真的被用上了。你自己的文件不会被改动，这是流水线的副本                                                                                        | 与你的输入对照。你填了但没标 `TRUE` 的行就是没生效，要查原因。它是记录，不是新的待办清单 |
-| `reasonable_unusual_records.csv`          | Step 6                             | 你标为”reasonable unusual record”（异常但合理，保持原样）的 `unusual` 行                                                                                                                                                                                           | 留档：哪些被接受了                                                                       |
-| `cross_participant_flagged_rows.csv`      | Step 8.5                           | SOL 或 WASO 明显偏离**此人自己**中位数的日子（例如多数天 5–30 分钟，某天 400 分钟）                                                                                                                                                                                | 当作可能的录入错误来审                                                                   |
-| `cross_participant_suspicious_slices.csv` | Step 8.5                           | 上一个文件中那些参与者的全部天数                                                                                                                                                                                                                                   | 看上下文：这一天是偶发，还是此人的一贯模式                                               |
-| `cross_participant_field_misentries.csv`  | Step 8.5                           | SOL 或 WASO 的数字像是填进了别的时间栏的行                                                                                                                                                                                                                         | 当作可能的栏位填错来审                                                                   |
+| 文件 | 何时写出 | 是什么 | 怎么用 |
+|----|----|----|----|
+| `[NEW]manual_error_correction_review.csv` | Step 5 写出，**Step 8.5 之后重写** | 一张状态表：Step 5 的每条 `error` 记录（与 `error_df_pre` 同一批行），加上修正之后才变成错误的记录。每行说明发生了什么（`status_after_corrections`）、是否在人工文件里（`in_manual_file`）、修正前后的类别，以及 Step 8 的标记。仍需人处理的行排在最前。审核列为空 | 读 `status_after_corrections`；处理 `..._still_fails` 和 `new_after_corrections` 的行 |
+| `[NEW]manual_unusual_review.csv` | Step 5 | 同上，针对 `unusual` 记录 | 填写后另存为 `manual_unusual_corrections.csv` |
+| `review_status.csv` | Step 8.5 之后，每次运行覆盖 | **只需要看这一张表。** 两张 Step 5 待审表的每一行，加上修正之后才变成错误的记录；每行有一个 `review_state`（`needs_review`、`not_incorporated`、`incorporated`）和判定它的规则（`review_state_reason`）。`needs_review` 排在最前 | 处理 `needs_review` 的行；运行结束时会按你的规则打印审查是否完成 |
+| `manual_error_correction_updated.csv` | Step 6 | 已应用修正的记录：**你填的** `manual_error_corrections.csv` 被流水线纳入之后的副本，`manually_corrected` 列标明哪些行真的被用上了。你自己的文件不会被改动，这是流水线的副本 | 与你的输入对照。你填了但没标 `TRUE` 的行就是没生效，要查原因。它是记录，不是新的待办清单 |
+| `reasonable_unusual_records.csv` | Step 6 | 你标为”reasonable unusual record”（异常但合理，保持原样）的 `unusual` 行 | 留档：哪些被接受了 |
+| `cross_participant_flagged_rows.csv` | Step 8.5 | SOL 或 WASO 明显偏离**此人自己**中位数的日子（例如多数天 5–30 分钟，某天 400 分钟） | 当作可能的录入错误来审 |
+| `cross_participant_suspicious_slices.csv` | Step 8.5 | 上一个文件中那些参与者的全部天数 | 看上下文：这一天是偶发，还是此人的一贯模式 |
+| `cross_participant_field_misentries.csv` | Step 8.5 | SOL 或 WASO 的数字像是填进了别的时间栏的行 | 当作可能的栏位填错来审 |
 
 ## 3. 人工审查循环（人话版）
 
@@ -299,29 +299,29 @@ Equal-time
 
 **一份 `[NEW]` 审查文件里有什么（列，按顺序）：**
 
-| 列组                         | 列                                                                                                                                 | 含义                                                                  |
-|------------------------------|------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------|
-| 身份                         | `pid`, `day_num`, `row_id`                                                                                                         | 哪个参与者、哪一天、哪一行                                            |
-| 原始录入                     | `time_bed/sleep/awake/getup_am_hhmm_ampm`                                                                                          | 参与者原样填写的内容（未改动）                                        |
-| 解析后时间                   | `time_bed/sleep/awake/getup_corrected`                                                                                             | 管线目前最好的猜测                                                    |
-| 差值                         | `bed_sleep_diff_h`, `sleep_awake_diff_h`, `awake_getup_diff_h`, `reasonable_temporal_order`                                        | 上面那些规则据以触发的数字                                            |
-| 机器判定                     | `error_type`, `corrected`, `correction_type`                                                                                       | 哪条规则触发了；算法是否已经修正                                      |
-| **人工填写**                 | `problem_humanidentified`, `solution_humanidentified`, `column_to_correct`, `correct_value`, `manually_corrected`                  | 空白列——写清楚哪一列错了、正确值是什么、你是否已经修正                |
-| **状态**（修正之后添加）     | `source`, `status_after_corrections`, `category_before_corrections`, `category_after_corrections`, `step8_flags_after_corrections` | 这一行从哪来、之后发生了什么（见下）。Step 8 标记单独报告，不改变状态 |
-| **在哪里处理过**（管线添加） | `in_manual_file`, `review_resolution`, `resolved_at`, `resolved_by`                                                                | 从你的人工文件里对应的那一行带过来。四列全空表示这条记录还没人处理过  |
+| 列组 | 列 | 含义 |
+|----|----|----|
+| 身份 | `pid`, `day_num`, `row_id` | 哪个参与者、哪一天、哪一行 |
+| 原始录入 | `time_bed/sleep/awake/getup_am_hhmm_ampm` | 参与者原样填写的内容（未改动） |
+| 解析后时间 | `time_bed/sleep/awake/getup_corrected` | 管线目前最好的猜测 |
+| 差值 | `bed_sleep_diff_h`, `sleep_awake_diff_h`, `awake_getup_diff_h`, `reasonable_temporal_order` | 上面那些规则据以触发的数字 |
+| 机器判定 | `error_type`, `corrected`, `correction_type` | 哪条规则触发了；算法是否已经修正 |
+| **人工填写** | `problem_humanidentified`, `solution_humanidentified`, `column_to_correct`, `correct_value`, `manually_corrected` | 空白列——写清楚哪一列错了、正确值是什么、你是否已经修正 |
+| **状态**（修正之后添加） | `source`, `status_after_corrections`, `category_before_corrections`, `category_after_corrections`, `step8_flags_after_corrections` | 这一行从哪来、之后发生了什么（见下）。Step 8 标记单独报告，不改变状态 |
+| **在哪里处理过**（管线添加） | `in_manual_file`, `review_resolution`, `resolved_at`, `resolved_by` | 从你的人工文件里对应的那一行带过来。四列全空表示这条记录还没人处理过 |
 
 **怎么读这张状态表。** Step 5
 先写出规则在*修正之前*的数据上标记的所有记录。Step 6–8.5 之后，管线把
 `[NEW]manual_error_correction_review.csv`
 重写成一张不丢任何行的表。`status_after_corrections` 取值：
 
-| `status_after_corrections`       | 含义                                       |
-|----------------------------------|--------------------------------------------|
-| `not_in_manual_file_still_fails` | 不在任何人工文件，修正之后仍不干净——要做   |
-| `in_manual_file_still_fails`     | 在人工文件里，但仍不干净——那次修正没有奏效 |
-| `new_after_corrections`          | 不在 Step 5 清单里，修正之后才变成错误     |
-| `not_in_manual_file_now_passes`  | 不在人工文件；规则已经修好                 |
-| `in_manual_file_now_passes`      | 在人工文件里，现在干净                     |
+| `status_after_corrections` | 含义 |
+|----|----|
+| `not_in_manual_file_still_fails` | 不在任何人工文件，修正之后仍不干净——要做 |
+| `in_manual_file_still_fails` | 在人工文件里，但仍不干净——那次修正没有奏效 |
+| `new_after_corrections` | 不在 Step 5 清单里，修正之后才变成错误 |
+| `not_in_manual_file_now_passes` | 不在人工文件；规则已经修好 |
+| `in_manual_file_now_passes` | 在人工文件里，现在干净 |
 
 “干净”指最终类别是 `clean`、`equal_time_ok` 或
 `reasonable_unusual`。管线只报告，不替你决定一行什么时候算做完。`step8_flags_after_corrections`
@@ -329,12 +329,12 @@ Equal-time
 过长），算不算问题由你判断。行的排列让仍需人处理的排在最前，每次运行顺序相同。`in_manual_file`、`review_resolution`、`resolved_at`、`resolved_by`
 四列仍然说明一行在哪里处理过：
 
-| 看到的情况                                          | 含义                                         |
-|-----------------------------------------------------|----------------------------------------------|
-| 四列全空                                            | 从没处理过——要做的                           |
-| `corrected` 加 `resolved_by`                        | 已处理并有记录                               |
-| `resolution_unknown_legacy` / `legacy`              | 处理过，但没人记录是谁、什么时候（可以补上） |
-| `flagged_unresolved`，或 `resolved_by` 为 `pending` | 等待确认                                     |
+| 看到的情况 | 含义 |
+|----|----|
+| 四列全空 | 从没处理过——要做的 |
+| `corrected` 加 `resolved_by` | 已处理并有记录 |
+| `resolution_unknown_legacy` / `legacy` | 处理过，但没人记录是谁、什么时候（可以补上） |
+| `flagged_unresolved`，或 `resolved_by` 为 `pending` | 等待确认 |
 
 每次运行结束时，管线会打印每张待审表里各状态的行数，以及有多少条**已处理的行在自动复查之后仍然有问题**（仍是
 error，或仍被标记）。改过的记录仍可能通不过复查，所以最后这个数很重要。什么时候算审查完成，由**你**在配置里写的规则决定，不由管线决定（见下面“审查状态与完成规则”）。在真实研究数据上，最终产出了
@@ -345,11 +345,11 @@ error，或仍被标记）。改过的记录仍可能通不过复查，所以最
 `review_state`。每行归入哪个状态，只由下表的规则和你配置里的 `review:`
 块决定；管线只执行这些规则，运行中从不修改它们。
 
-| `review_state`     | 规则（按顺序，第一条成立的生效）                                                                                                                                                                                                                                                                                   |
-|--------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `needs_review`     | 修正之后才变成错误；或在人工文件里标为待确认（`flagged_unresolved` / `resolved_by` = `pending`）；或复查仍不通过；或修正后仍缺某个时间、无法复查顺序（若它在人工文件里且 `review.missing_times_ok_after_manual: true`，则算 `incorporated`）；或——仅当 `review.step8_flags_need_review: true` 时——带有 Step 8 标记 |
-| `incorporated`     | 本次运行应用了针对它的人工决定，且复查通过                                                                                                                                                                                                                                                                         |
-| `not_incorporated` | 本次运行没有人工决定改动它，且复查通过（规则修好了它，或本次没有应用人工修正）                                                                                                                                                                                                                                     |
+| `review_state` | 规则（按顺序，第一条成立的生效） |
+|----|----|
+| `needs_review` | 修正之后才变成错误；或在人工文件里标为待确认（`flagged_unresolved` / `resolved_by` = `pending`）；或复查仍不通过；或修正后仍缺某个时间、无法复查顺序（若它在人工文件里且 `review.missing_times_ok_after_manual: true`，则算 `incorporated`）；或——仅当 `review.step8_flags_need_review: true` 时——带有 Step 8 标记 |
+| `incorporated` | 本次运行应用了针对它的人工决定，且复查通过 |
+| `not_incorporated` | 本次运行没有人工决定改动它，且复查通过（规则修好了它，或本次没有应用人工修正） |
 
 `review_state_reason` 写明每行用的是哪条规则。当 `needs_review`
 的行数不超过 `review.done_when.max_needs_review`（默认
@@ -387,20 +387,20 @@ output-files 的问答表）。
 read.csv("output/correction_status_final.csv")
 ```
 
-| 列                                             | 它告诉你…                                                                                                     | 检查这个                                                                                                                                           |
-|------------------------------------------------|---------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| `n_total`                                      | 总记录数                                                                                                      | 必须等于输入行数。若更小，某处丢了记录。                                                                                                           |
-| `run_id`、`timestamp`                          | 运行时间（`YYYYMMDD_HHMM` 与完整时间）                                                                        | 每次运行追加一行，用它们区分各次运行。                                                                                                             |
-| `checkpoint_first`、`checkpoint_last`          | 下面 `*_first`、`*_last` 取自哪两个检查点（见表后说明）                                                       | 通常是 `A` 和 `E`。                                                                                                                                |
-| `tst_mean_h`                                   | 平均总睡眠时间（小时）                                                                                        | 大多数成人研究 6.0–8.5 h 正常。若 \< 5 或 \> 10，时间戳解析或研究人群异常。                                                                        |
-| `sol_mean_min`                                 | 平均入睡潜伏期（分钟）                                                                                        | 10–45 min 正常。若 \> 60，人群失眠率高或 AM/PM 混淆未完全修正。                                                                                    |
-| `n_clean_first`、`n_clean_last`、`delta_clean` | 第一个和最后一个检查点上通过所有检查的记录数；`delta_clean = n_clean_last - n_clean_first`                    | `n_clean_last` 同数据多次运行应相同。`delta_clean` \> 0 表示清洗让更多记录变干净。                                                                 |
+| 列 | 它告诉你… | 检查这个 |
+|----|----|----|
+| `n_total` | 总记录数 | 必须等于输入行数。若更小，某处丢了记录。 |
+| `run_id`、`timestamp` | 运行时间（`YYYYMMDD_HHMM` 与完整时间） | 每次运行追加一行，用它们区分各次运行。 |
+| `checkpoint_first`、`checkpoint_last` | 下面 `*_first`、`*_last` 取自哪两个检查点（见表后说明） | 通常是 `A` 和 `E`。 |
+| `tst_mean_h` | 平均总睡眠时间（小时） | 大多数成人研究 6.0–8.5 h 正常。若 \< 5 或 \> 10，时间戳解析或研究人群异常。 |
+| `sol_mean_min` | 平均入睡潜伏期（分钟） | 10–45 min 正常。若 \> 60，人群失眠率高或 AM/PM 混淆未完全修正。 |
+| `n_clean_first`、`n_clean_last`、`delta_clean` | 第一个和最后一个检查点上通过所有检查的记录数；`delta_clean = n_clean_last - n_clean_first` | `n_clean_last` 同数据多次运行应相同。`delta_clean` \> 0 表示清洗让更多记录变干净。 |
 | `n_error_first`、`n_error_last`、`delta_error` | 第一个和最后一个检查点上时序不可能的记录数（如 getup 早于 bed）；`delta_error = n_error_last - n_error_first` | 看 `n_error_last`（清洗后剩余）：应 \< 总记录 1%，若 \> 5% 审查问卷设计。`n_error_first` 是清洗前，本来就偏高。`delta_error` \< 0 表示错误被消除。 |
-| `n_corrected`                                  | 经 CSV 人工修正的记录                                                                                         | 应与 `manual_error_corrections.csv` 行数一致。                                                                                                     |
-| `timestamp_issue`                              | 无法解析为有效时间的时间戳                                                                                    | 0 正常。\> 0 表示参与者填了非标准时间格式。                                                                                                        |
-| `duration_issue`                               | 超出配置阈值的睡眠指标                                                                                        | 少量正常。若很大，阈值太严或数据质量有问题。                                                                                                       |
-| `amount_flag`                                  | 异常物质使用条目                                                                                              | 应为 0 或很低。                                                                                                                                    |
-| `self_reported_flag`                           | 自报 SOL/WASO 与计算值分歧的记录                                                                              | 指示感知偏差。看图 20（SOL 感知偏差）。                                                                                                            |
+| `n_corrected` | 经 CSV 人工修正的记录 | 应与 `manual_error_corrections.csv` 行数一致。 |
+| `timestamp_issue` | 无法解析为有效时间的时间戳 | 0 正常。\> 0 表示参与者填了非标准时间格式。 |
+| `duration_issue` | 超出配置阈值的睡眠指标 | 少量正常。若很大，阈值太严或数据质量有问题。 |
+| `amount_flag` | 异常物质使用条目 | 应为 0 或很低。 |
+| `self_reported_flag` | 自报 SOL/WASO 与计算值分歧的记录 | 指示感知偏差。看图 20（SOL 感知偏差）。 |
 
 **`first` 和 `last` 指什么。**
 两者都是**同一次运行内**的快照，不是两次运行，也不是数据的首行和末行。流水线在五个检查点统计各类别（`data_category`）的记录数：
@@ -452,13 +452,13 @@ ledger %>% filter(!is.na(count)) %>% arrange(step_id, standard)
 
 ledger 用 5 个独立评估系统：
 
-| 标准               | 首个有数字的步骤 | 评估什么                                              | 关键类别                                                                       |
-|--------------------|:----------------:|-------------------------------------------------------|--------------------------------------------------------------------------------|
-| `field_misentry`   |       1.5        | 时长估计（SOL、WASO）是否恰好匹配时间戳——可能”填错框” | `none`, `SOL=time_sleep`, `SOL=time_bed`, `WASO=time_awake`, `WASO=time_getup` |
-| `data_category`    |        4         | bed → sleep → awake → getup 序列的时序与合理性        | `clean`, `error`, `unusual`, `equal_time_ok`, `skipped_na`                     |
-| `flag_severity`    |        7         | 每条记录触发多少派生指标标记                          | `Clean`, `Minor (1 flag)`, `Major (2+ flags)`                                  |
-| `duration_extreme` |        7         | 生理合理界外的总睡眠时间                              | `OK`, `Too short (< 3 h)`, `Too long (> 12 h)`                                 |
-| `checkforerrors`   |        8         | Step 8 汇总的自动检测标记                             | `TIMESTAMP_ISSUE`, `DURATION_ISSUE`, `AMOUNT_FLAG`, `SELF_REPORTED_FLAG`       |
+| 标准 | 首个有数字的步骤 | 评估什么 | 关键类别 |
+|----|:--:|----|----|
+| `field_misentry` | 1.5 | 时长估计（SOL、WASO）是否恰好匹配时间戳——可能”填错框” | `none`, `SOL=time_sleep`, `SOL=time_bed`, `WASO=time_awake`, `WASO=time_getup` |
+| `data_category` | 4 | bed → sleep → awake → getup 序列的时序与合理性 | `clean`, `error`, `unusual`, `equal_time_ok`, `skipped_na` |
+| `flag_severity` | 7 | 每条记录触发多少派生指标标记 | `Clean`, `Minor (1 flag)`, `Major (2+ flags)` |
+| `duration_extreme` | 7 | 生理合理界外的总睡眠时间 | `OK`, `Too short (< 3 h)`, `Too long (> 12 h)` |
+| `checkforerrors` | 8 | Step 8 汇总的自动检测标记 | `TIMESTAMP_ISSUE`, `DURATION_ISSUE`, `AMOUNT_FLAG`, `SELF_REPORTED_FLAG` |
 
 **概念规则**：标准只计算一次、从不重算。若某标准计数在其首次计算步骤后改变，就有问题。
 
@@ -502,16 +502,16 @@ identical(old$n_clean_last, new$n_clean_last)
 
 ## 7. 快速检查卡
 
-| 检查项                           | 如何验证                                                                              | 通过条件 |
-|----------------------------------|---------------------------------------------------------------------------------------|----------|
-| 管线完成                         | `file.exists("output/correction_status_final.csv")`                                   | `TRUE`   |
-| TST 合理                         | `tst_mean_h` 在 6–8.5                                                                 | 是       |
-| SOL 合理（原始时长，非感知偏差） | `sol_mean_min` 在 10–45                                                               | 是       |
-| 错误少                           | `n_error_last < 0.01 * n_total`                                                       | 是       |
-| data_category 稳定               | Steps 6–8.5 计数相同                                                                  | 是       |
-| flag_severity 稳定               | Steps 7–8.5 计数相同                                                                  | 是       |
-| 全记录有交代                     | `clean + unusual + reasonable_unusual + equal_time_ok + error + skipped_na = n_total` | 是       |
-| 确定性                           | 同输入 → 同输出，每次                                                                 | 是       |
+| 检查项 | 如何验证 | 通过条件 |
+|----|----|----|
+| 管线完成 | `file.exists("output/correction_status_final.csv")` | `TRUE` |
+| TST 合理 | `tst_mean_h` 在 6–8.5 | 是 |
+| SOL 合理（原始时长，非感知偏差） | `sol_mean_min` 在 10–45 | 是 |
+| 错误少 | `n_error_last < 0.01 * n_total` | 是 |
+| data_category 稳定 | Steps 6–8.5 计数相同 | 是 |
+| flag_severity 稳定 | Steps 7–8.5 计数相同 | 是 |
+| 全记录有交代 | `clean + unusual + reasonable_unusual + equal_time_ok + error + skipped_na = n_total` | 是 |
+| 确定性 | 同输入 → 同输出，每次 | 是 |
 
 ## 8. 如何看图
 
@@ -532,20 +532,20 @@ QC。这里出现的每个图号（比如 “F01”、“F09”）都对应 §9.
 
 **出版用图（Methods 部分）：**
 
-| 图                  | 文件                        | 显示什么                                                                |
-|---------------------|-----------------------------|-------------------------------------------------------------------------|
+| 图 | 文件 | 显示什么 |
+|----|----|----|
 | **图 1 — 管线流程** | `pipeline_cleaning/F01.png` | 垂直流程图：raw → 解析 → 算法修正 → 人工修正 → 最终有效，各阶段计数与 % |
-| **图 2 — 修正影响** | `research_ready/F17.png`    | A/B delta lollipop（仅修正记录，TST & SOL）+ 一致性散点 + 前后汇总表    |
+| **图 2 — 修正影响** | `research_ready/F17.png` | A/B delta lollipop（仅修正记录，TST & SOL）+ 一致性散点 + 前后汇总表 |
 
 **5 张必看检查图：**
 
-| 步骤 | 图（卡片）                   | 应该长这样                                                | 若不是？                                                  |
-|:----:|------------------------------|-----------------------------------------------------------|-----------------------------------------------------------|
-|  1   | **01 管线记录流** (§9.2)     | 流程平缓收窄；Clean 占主导；Error + Unusual 很小（\< 5%） | 0 处有尖峰或 Error/Unusual 占比巨大 → 上游解析/AM-PM 失败 |
-|  2   | **F15 逐步标记账本** (§9.2)  | Corrected 柱只在 Step 6.5 出现，之后持平                  | Step 6.5 之后再变化 = 不稳定                              |
-|  3   | **18 自动检测仪表板** (§9.2) | 标记计数与 `correction_status_final.csv` 一致             | 不一致 = 错位                                             |
-|  4   | **F18 睡眠变量分布** (§9.3)  | TST 峰值在 6–8 h，SOL 右偏，WASO \< 60，SE \> 85%         | SOL 平/双峰 = AM/PM 混淆未修正                            |
-|  5   | **13 错误类别分布** (§9.2)   | 多数记录 Clean/Minor；Error+Unusual \< 5%                 | 偏高 → 审查人工 CSV                                       |
+| 步骤 | 图（卡片） | 应该长这样 | 若不是？ |
+|:--:|----|----|----|
+| 1 | **01 管线记录流** (§9.2) | 流程平缓收窄；Clean 占主导；Error + Unusual 很小（\< 5%） | 0 处有尖峰或 Error/Unusual 占比巨大 → 上游解析/AM-PM 失败 |
+| 2 | **F15 逐步标记账本** (§9.2) | Corrected 柱只在 Step 6.5 出现，之后持平 | Step 6.5 之后再变化 = 不稳定 |
+| 3 | **18 自动检测仪表板** (§9.2) | 标记计数与 `correction_status_final.csv` 一致 | 不一致 = 错位 |
+| 4 | **F18 睡眠变量分布** (§9.3) | TST 峰值在 6–8 h，SOL 右偏，WASO \< 60，SE \> 85% | SOL 平/双峰 = AM/PM 混淆未修正 |
+| 5 | **13 错误类别分布** (§9.2) | 多数记录 Clean/Minor；Error+Unusual \< 5% | 偏高 → 审查人工 CSV |
 
 ## 9. 逐图参考
 
@@ -561,64 +561,64 @@ QC。这里出现的每个图号（比如 “F01”、“F09”）都对应 §9.
 条记录的一次运行）。每次可视化运行都会**从头重建**，是”最新”而不是”历史”，想保留的东西请在重跑前复制走。标签是
 `real` 时里面是由参与者数据生成的图：已被 gitignore，不要提交或外传。
 
-| 项目                         | 是什么                                                                                                                                                                                                                                                                                                                                                                                                                                      | 什么时候看                                                       |
-|------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------|
-| `pipeline_cleaning/`         | 16 张诊断图：流水线发现了什么、改了什么（卡片见 §9.2）                                                                                                                                                                                                                                                                                                                                                                                      | 检查清洗是否正常；补充材料的审计链                               |
-| `research_ready/`            | 16 张面向论文的图：睡眠指标、感知偏差、物质使用（卡片见 §9.3）                                                                                                                                                                                                                                                                                                                                                                              | 为 Results 选图                                                  |
-| `figure_index.png`           | 全部图的总览。顶部红色块列出被跳过的图及原因                                                                                                                                                                                                                                                                                                                                                                                                | 运行后先看这个                                                   |
-| `all_figures_review.pdf`     | 每页一张图，按生成顺序，与 PNG 同尺寸                                                                                                                                                                                                                                                                                                                                                                                                       | 快速翻看全部图，或发给研究团队内的合作者                         |
-| `figures_not_generated.csv`  | `file`、`reason`：**没有**生成的图及原因（如”完整数据的标记列不足 2 列”、或缺少某个验证文件）。与红色块同一份清单                                                                                                                                                                                                                                                                                                                           | 少了某张 PNG：先看这里，不要先怀疑有 bug                         |
-| `flag_distribution.csv`      | 每条日记一行（`pid`、`day_num`、`row_id`），含各类标记数（`timestamp_flags`、`duration_flags`、`amount_flags`、`review_flags`）、`flag_details`、`raw_category`、`final_status`、是否 `manually_corrected`，以及 `data_category_after_corrections`。人工修正过的行只有在 Step 8 检查和 `data_category` 都通过时才是 `CLEAN (Manually Fixed)`；带 Step 8 标记的保留该标记；`data_category` 仍不通过的标为 `STILL FAILS (Manually Corrected)` | 标记类图（07、13、17、18）背后的表；筛选它找到某根柱子对应的条目 |
-| `classification_summary.csv` | 各最终分类（clean / error / unusual …）的数量。仅当本次运行产生了最终分类才写出                                                                                                                                                                                                                                                                                                                                                             | 与 `correction_status_final.csv`（§4）对照                       |
-| `RUN_INFO.txt`               | 运行时间、数据集标签、记录数、输入文件名、包版本、验证文件位置                                                                                                                                                                                                                                                                                                                                                                              | 记录这批图来自哪次运行                                           |
+| 项目 | 是什么 | 什么时候看 |
+|----|----|----|
+| `pipeline_cleaning/` | 16 张诊断图：流水线发现了什么、改了什么（卡片见 §9.2） | 检查清洗是否正常；补充材料的审计链 |
+| `research_ready/` | 16 张面向论文的图：睡眠指标、感知偏差、物质使用（卡片见 §9.3） | 为 Results 选图 |
+| `figure_index.png` | 全部图的总览。顶部红色块列出被跳过的图及原因 | 运行后先看这个 |
+| `all_figures_review.pdf` | 每页一张图，按生成顺序，与 PNG 同尺寸 | 快速翻看全部图，或发给研究团队内的合作者 |
+| `figures_not_generated.csv` | `file`、`reason`：**没有**生成的图及原因（如”完整数据的标记列不足 2 列”、或缺少某个验证文件）。与红色块同一份清单 | 少了某张 PNG：先看这里，不要先怀疑有 bug |
+| `flag_distribution.csv` | 每条日记一行（`pid`、`day_num`、`row_id`），含各类标记数（`timestamp_flags`、`duration_flags`、`amount_flags`、`review_flags`）、`flag_details`、`raw_category`、`final_status`、是否 `manually_corrected`，以及 `data_category_after_corrections`。人工修正过的行只有在 Step 8 检查和 `data_category` 都通过时才是 `CLEAN (Manually Fixed)`；带 Step 8 标记的保留该标记；`data_category` 仍不通过的标为 `STILL FAILS (Manually Corrected)` | 标记类图（07、13、17、18）背后的表；筛选它找到某根柱子对应的条目 |
+| `classification_summary.csv` | 各最终分类（clean / error / unusual …）的数量。仅当本次运行产生了最终分类才写出 | 与 `correction_status_final.csv`（§4）对照 |
+| `RUN_INFO.txt` | 运行时间、数据集标签、记录数、输入文件名、包版本、验证文件位置 | 记录这批图来自哪次运行 |
 
 **同级的 `verification/<tag>_n<rows>/`**（与本文件夹并列，真实数据时在
 `output/`
 下）在图被重建时**不会被清空**。里面是检验流水线用的证据，不是论文用图：
 
-| 项目                                            | 是什么                                                                                  |
-|-------------------------------------------------|-----------------------------------------------------------------------------------------|
-| `bland_altman_sol.png`、`bland_altman_waso.png` | Bland-Altman 图：自报与计算的 SOL / WASO 的一致性                                       |
-| `threshold_validation.csv`                      | 每个标记阈值、测量噪声（`loa_half_width`）、两者之比与评估（如 “CONSERVATIVE”、“SAFE”） |
-| `snapshot_*.rds`                                | 在命名时点保存的数据副本，用于 §6 的回归对照                                            |
-| `PROVENANCE.txt`                                | 说明某个文件为何存在、何时生成                                                          |
+| 项目 | 是什么 |
+|----|----|
+| `bland_altman_sol.png`、`bland_altman_waso.png` | Bland-Altman 图：自报与计算的 SOL / WASO 的一致性 |
+| `threshold_validation.csv` | 每个标记阈值、测量噪声（`loa_half_width`）、两者之比与评估（如 “CONSERVATIVE”、“SAFE”） |
+| `snapshot_*.rds` | 在命名时点保存的数据副本，用于 §6 的回归对照 |
+| `PROVENANCE.txt` | 说明某个文件为何存在、何时生成 |
 
 ### 9.1 图索引
 
-| \#      | 文件                        | 论文用途    | 代码来源                        | 卡片                                        | 最后核对   |
-|---------|-----------------------------|-------------|---------------------------------|---------------------------------------------|------------|
-| **F01** | `pipeline_cleaning/F01.png` | Methods 图1 | `sleep_visualization.R:862`     | [§9.2 · 管线记录流](#c-01)                  | 2026-09-25 |
-| **F17** | `research_ready/F17.png`    | Methods 图2 | `sleep_visualization.R:1013`    | [§9.3 · 修正影响](#c-02)                    | 2026-09-25 |
-| **F18** | `research_ready/F18.png`    | Results     | `sleep_visualization.R:1057`    | [§9.3 · 睡眠变量分布](#c-02b)               | 2026-09-25 |
-| **F19** | `research_ready/F19.png`    | Results     | `sleep_visualization.R:1108`    | [§9.3 · TST 分布](#c-03)                    | 2026-09-25 |
-| **F20** | `research_ready/F20.png`    | Results     | `sleep_visualization.R:1163`    | [§9.3 · 睡眠时长 vs 卧床时间](#c-04)        | 2026-09-25 |
-| **F21** | `research_ready/F21.png`    | Results     | `sleep_visualization.R:1215`    | [§9.3 · SOL vs 睡眠时长](#c-04b)            | 2026-09-25 |
-| **F22** | `research_ready/F22.png`    | Results     | `sleep_visualization.R:1265`    | [§9.3 · 睡眠变量的变异性](#c-05)            | 2026-09-25 |
-| **F02** | `pipeline_cleaning/F02.png` | Supplement  | `sleep_visualization.R:1339`    | [§9.2 · 修正后睡眠时长](#c-06)              | 2026-09-25 |
-| **F03** | `pipeline_cleaning/F03.png` | Supplement  | `sleep_visualization.R:1404`    | [§9.2 · 标记构成堆叠图](#c-07)              | 2026-09-25 |
-| **F23** | `research_ready/F23.png`    | Results     | `sleep_visualization.R:1458`    | [§9.3 · 就寝 vs 起床时间分布](#c-09)        | 2026-09-25 |
-| **F04** | `pipeline_cleaning/F04.png` | Supplement  | `sleep_visualization.R:1514`    | [§9.2 · 极端睡眠时长](#c-10)                | 2026-09-25 |
-| **F05** | `pipeline_cleaning/F05.png` | Supplement  | `sleep_visualization.R:1571`    | [§9.2 · 标记共现图](#c-11)                  | 2026-10-23 |
-| **F06** | `pipeline_cleaning/F06.png` | Supplement  | `sleep_visualization.R:1794`    | [§9.2 · 错误类别分布](#c-13)                | 2026-09-25 |
-| **F07** | `pipeline_cleaning/F07.png` | Supplement  | `sleep_visualization.R:1877`    | [§9.2 · 相邻时间戳间隔](#c-13b)             | 2026-09-25 |
-| **F08** | `pipeline_cleaning/F08.png` | Supplement  | `sleep_visualization.R:1936`    | [§9.2 · 检测结果热力图](#c-13c)             | 2026-09-25 |
-| **F09** | `pipeline_cleaning/F09.png` | Supplement  | `sleep_visualization.R:1980`    | [§9.2 · 阈值 vs 测量噪声](#c-13d)           | 2026-09-25 |
-| **F10** | `pipeline_cleaning/F10.png` | Supplement  | `sleep_visualization.R:2051`    | [§9.2 · 修正前睡眠时长](#c-14)              | 2026-09-30 |
-| **F11** | `pipeline_cleaning/F11.png` | Supplement  | `sleep_visualization.R:2137`    | [§9.2 · 错误时间线](#c-15)                  | 2026-09-30 |
-| **F12** | `pipeline_cleaning/F12.png` | Supplement  | `sleep_visualization.R:2228`    | [§9.2 · 常见错误模式](#c-16)                | 2026-09-30 |
-| **F13** | `pipeline_cleaning/F13.png` | Supplement  | `sleep_visualization.R:2307`    | [§9.2 · 标记率最高的参与者](#c-17)          | 2026-09-25 |
-| **F14** | `pipeline_cleaning/F14.png` | Supplement  | `sleep_visualization.R:2409`    | [§9.2 · 自动检测仪表板](#c-18)              | 2026-09-25 |
-| **F24** | `research_ready/F24.png`    | Results     | `sleep_visualization.R:2637`    | [§9.3 · SOL 感知偏差](#c-20)                | 2026-09-25 |
-| **F25** | `research_ready/F25.png`    | Results     | `sleep_visualization.R:2695`    | [§9.3 · WASO 感知偏差](#c-20b)              | 2026-09-25 |
-| **F26** | `research_ready/F26.png`    | Supplement  | `sleep_visualization.R:2767`    | [§9.3 · 物质使用数据可得性](#c-21)          | 2026-09-25 |
-| **F27** | `research_ready/F27.png`    | Supplement  | `sleep_visualization.R:2870`    | [§9.3 · 物质使用数值分布](#c-22)            | 2026-09-25 |
-| **F28** | `research_ready/F28.png`    | Supplement  | `sleep_visualization.R:2944`    | [§9.3 · 咖啡因摄入](#c-23)                  | 2026-09-25 |
-| **F29** | `research_ready/F29.png`    | Supplement  | `sleep_visualization.R:2979`    | [§9.3 · 酒精摄入](#c-24)                    | 2026-09-25 |
-| **F15** | `pipeline_cleaning/F15.png` | Supplement  | `figure12_step_flag_table.R:15` | [§9.2 · 逐步标记账本](#c-a1)                | 2026-09-25 |
-| **F16** | `pipeline_cleaning/F16.png` | Supplement  | `sleep_visualization.R:2579`    | [§9.2 · 值得二次检查的参与者](#c-p26)       | 2026-09-25 |
-| **F30** | `research_ready/F30.png`    | Results     | `sleep_visualization.R:3043`    | [§9.3 · 睡眠规律性——工作日 vs 周末](#c-r25) | 2026-09-25 |
-| **F31** | `research_ready/F31.png`    | Results     | `sleep_visualization.R:3096`    | [§9.3 · 睡眠构成——TIB 拆分](#c-r26)         | 2026-09-25 |
-| **F32** | `research_ready/F32.png`    | Results     | `sleep_visualization.R:3125`    | [§9.3 · 睡眠指标相关矩阵](#c-r27)           | 2026-09-25 |
+| \# | 文件 | 论文用途 | 代码来源 | 卡片 | 最后核对 |
+|----|----|----|----|----|----|
+| **F01** | `pipeline_cleaning/F01.png` | Methods 图1 | `sleep_visualization.R:862` | [§9.2 · 管线记录流](#c-01) | 2026-09-25 |
+| **F17** | `research_ready/F17.png` | Methods 图2 | `sleep_visualization.R:1013` | [§9.3 · 修正影响](#c-02) | 2026-09-25 |
+| **F18** | `research_ready/F18.png` | Results | `sleep_visualization.R:1057` | [§9.3 · 睡眠变量分布](#c-02b) | 2026-09-25 |
+| **F19** | `research_ready/F19.png` | Results | `sleep_visualization.R:1108` | [§9.3 · TST 分布](#c-03) | 2026-09-25 |
+| **F20** | `research_ready/F20.png` | Results | `sleep_visualization.R:1163` | [§9.3 · 睡眠时长 vs 卧床时间](#c-04) | 2026-09-25 |
+| **F21** | `research_ready/F21.png` | Results | `sleep_visualization.R:1215` | [§9.3 · SOL vs 睡眠时长](#c-04b) | 2026-09-25 |
+| **F22** | `research_ready/F22.png` | Results | `sleep_visualization.R:1265` | [§9.3 · 睡眠变量的变异性](#c-05) | 2026-09-25 |
+| **F02** | `pipeline_cleaning/F02.png` | Supplement | `sleep_visualization.R:1339` | [§9.2 · 修正后睡眠时长](#c-06) | 2026-09-25 |
+| **F03** | `pipeline_cleaning/F03.png` | Supplement | `sleep_visualization.R:1404` | [§9.2 · 标记构成堆叠图](#c-07) | 2026-09-25 |
+| **F23** | `research_ready/F23.png` | Results | `sleep_visualization.R:1458` | [§9.3 · 就寝 vs 起床时间分布](#c-09) | 2026-09-25 |
+| **F04** | `pipeline_cleaning/F04.png` | Supplement | `sleep_visualization.R:1514` | [§9.2 · 极端睡眠时长](#c-10) | 2026-09-25 |
+| **F05** | `pipeline_cleaning/F05.png` | Supplement | `sleep_visualization.R:1571` | [§9.2 · 标记共现图](#c-11) | 2026-10-23 |
+| **F06** | `pipeline_cleaning/F06.png` | Supplement | `sleep_visualization.R:1794` | [§9.2 · 错误类别分布](#c-13) | 2026-09-25 |
+| **F07** | `pipeline_cleaning/F07.png` | Supplement | `sleep_visualization.R:1877` | [§9.2 · 相邻时间戳间隔](#c-13b) | 2026-09-25 |
+| **F08** | `pipeline_cleaning/F08.png` | Supplement | `sleep_visualization.R:1936` | [§9.2 · 检测结果热力图](#c-13c) | 2026-09-25 |
+| **F09** | `pipeline_cleaning/F09.png` | Supplement | `sleep_visualization.R:1980` | [§9.2 · 阈值 vs 测量噪声](#c-13d) | 2026-09-25 |
+| **F10** | `pipeline_cleaning/F10.png` | Supplement | `sleep_visualization.R:2051` | [§9.2 · 修正前睡眠时长](#c-14) | 2026-09-30 |
+| **F11** | `pipeline_cleaning/F11.png` | Supplement | `sleep_visualization.R:2137` | [§9.2 · 错误时间线](#c-15) | 2026-09-30 |
+| **F12** | `pipeline_cleaning/F12.png` | Supplement | `sleep_visualization.R:2228` | [§9.2 · 常见错误模式](#c-16) | 2026-09-30 |
+| **F13** | `pipeline_cleaning/F13.png` | Supplement | `sleep_visualization.R:2307` | [§9.2 · 标记率最高的参与者](#c-17) | 2026-09-25 |
+| **F14** | `pipeline_cleaning/F14.png` | Supplement | `sleep_visualization.R:2409` | [§9.2 · 自动检测仪表板](#c-18) | 2026-09-25 |
+| **F24** | `research_ready/F24.png` | Results | `sleep_visualization.R:2637` | [§9.3 · SOL 感知偏差](#c-20) | 2026-09-25 |
+| **F25** | `research_ready/F25.png` | Results | `sleep_visualization.R:2695` | [§9.3 · WASO 感知偏差](#c-20b) | 2026-09-25 |
+| **F26** | `research_ready/F26.png` | Supplement | `sleep_visualization.R:2767` | [§9.3 · 物质使用数据可得性](#c-21) | 2026-09-25 |
+| **F27** | `research_ready/F27.png` | Supplement | `sleep_visualization.R:2870` | [§9.3 · 物质使用数值分布](#c-22) | 2026-09-25 |
+| **F28** | `research_ready/F28.png` | Supplement | `sleep_visualization.R:2944` | [§9.3 · 咖啡因摄入](#c-23) | 2026-09-25 |
+| **F29** | `research_ready/F29.png` | Supplement | `sleep_visualization.R:2979` | [§9.3 · 酒精摄入](#c-24) | 2026-09-25 |
+| **F15** | `pipeline_cleaning/F15.png` | Supplement | `figure12_step_flag_table.R:15` | [§9.2 · 逐步标记账本](#c-a1) | 2026-09-25 |
+| **F16** | `pipeline_cleaning/F16.png` | Supplement | `sleep_visualization.R:2579` | [§9.2 · 值得二次检查的参与者](#c-p26) | 2026-09-25 |
+| **F30** | `research_ready/F30.png` | Results | `sleep_visualization.R:3043` | [§9.3 · 睡眠规律性——工作日 vs 周末](#c-r25) | 2026-09-25 |
+| **F31** | `research_ready/F31.png` | Results | `sleep_visualization.R:3096` | [§9.3 · 睡眠构成——TIB 拆分](#c-r26) | 2026-09-25 |
+| **F32** | `research_ready/F32.png` | Results | `sleep_visualization.R:3125` | [§9.3 · 睡眠指标相关矩阵](#c-r27) | 2026-09-25 |
 
 `11`（标记共现图，见[下方卡片](#c-11)）在完整数据的标记列少于两列、或没有任何一对标记同时出现时跳过，原因会写在
 `figure_index.png` 顶部的红色区块里。`14`、`15`、`16`
@@ -682,13 +682,13 @@ Load（全部日记条目）→ Parsed（有时间戳的条目）→ Auto-Correc
 
 右侧的注释把每条最终记录归入以下五类之一：
 
-| 类别               | 含义                                                                                                                                          |
-|--------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
-| Not Reported       | bed / sleep / awake / getup 任一时间缺失                                                                                                      |
-| Error (Reviewed)   | 顺序被破坏（不满足 `bed ≤ sleep ≤ awake ≤ getup`）、`sleep = awake`、某段间隔 \> 7 小时，或睡眠跨度 \> 24 小时——审查后已修正                  |
-| Equal Time         | `bed == sleep` 和/或 `awake == getup`（差值 \< 0.01 小时，约 36 秒）且顺序完整——一种良性的填表习惯。（`sleep == awake` 是 ERROR，不是这个。） |
-| Unusual (Accepted) | 顺序完整但有一段间隔 \> 3 小时（bed→sleep 或 awake→getup）——奇怪但可能，审查后原样保留                                                        |
-| Clean              | 顺序完整，没有超过 3 小时的间隔                                                                                                               |
+| 类别 | 含义 |
+|----|----|
+| Not Reported | bed / sleep / awake / getup 任一时间缺失 |
+| Error (Reviewed) | 顺序被破坏（不满足 `bed ≤ sleep ≤ awake ≤ getup`）、`sleep = awake`、某段间隔 \> 7 小时，或睡眠跨度 \> 24 小时——审查后已修正 |
+| Equal Time | `bed == sleep` 和/或 `awake == getup`（差值 \< 0.01 小时，约 36 秒）且顺序完整——一种良性的填表习惯。（`sleep == awake` 是 ERROR，不是这个。） |
+| Unusual (Accepted) | 顺序完整但有一段间隔 \> 3 小时（bed→sleep 或 awake→getup）——奇怪但可能，审查后原样保留 |
+| Clean | 顺序完整，没有超过 3 小时的间隔 |
 
 图上每一类旁边都印着这些标准（按上面的顺序，第一个匹配的生效），不看本页也能读懂。
 
@@ -942,12 +942,12 @@ TRUE
 的记录数，数字写在格子里，颜色随计数增大由浅变红（平方根刻度，图例为”Co-occurrence
 Count”）。
 
-| 轴标签                    | 标记                           | 触发条件                                                                               |
-|---------------------------|--------------------------------|----------------------------------------------------------------------------------------|
-| `poor_efficiency`         | `flag_poor_efficiency`         | 睡眠效率低于 `classification.flag_severity.poor_efficiency_threshold_pct`（默认 70%）  |
-| `high_sol`                | `flag_high_sol`                | 入睡潜伏期高于 `classification.flag_severity.high_sol_threshold_hours`（默认 1 小时）  |
-| `high_waso`               | `flag_high_waso`               | 睡后觉醒高于 `classification.flag_severity.high_waso_threshold_hours`（默认 1.5 小时） |
-| `sleep_calculation_issue` | `flag_sleep_calculation_issue` | 计算得到的入睡潜伏期与自评的入睡潜伏期相差超过 30 分钟                                 |
+| 轴标签 | 标记 | 触发条件 |
+|----|----|----|
+| `poor_efficiency` | `flag_poor_efficiency` | 睡眠效率低于 `classification.flag_severity.poor_efficiency_threshold_pct`（默认 70%） |
+| `high_sol` | `flag_high_sol` | 入睡潜伏期高于 `classification.flag_severity.high_sol_threshold_hours`（默认 1 小时） |
+| `high_waso` | `flag_high_waso` | 睡后觉醒高于 `classification.flag_severity.high_waso_threshold_hours`（默认 1.5 小时） |
+| `sleep_calculation_issue` | `flag_sleep_calculation_issue` | 计算得到的入睡潜伏期与自评的入睡潜伏期相差超过 30 分钟 |
 
 **数字从哪来** 并不是每个标记都基于同一类数值，读图时要注意：
 

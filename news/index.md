@@ -1,5 +1,33 @@
 # Changelog
 
+## sleepcleanr 1.8.0
+
+### Changed
+
+- SOL and WASO text that the interval parser had to reinterpret (the
+  MM:SS rule and the `dd:00` rule) is now checked for being a clock time
+  typed into a duration field, at Step 6.5, before the sleep metrics are
+  computed. Only rows the parser already reinterpreted are looked at,
+  and rows a person corrected are never touched. A SOL typed as the time
+  the participant fell asleep (within 5 minutes of the recorded sleep
+  onset and 0 to 60 minutes after the recorded bedtime, on a 12-hour
+  dial) is recomputed as that time minus the bedtime; a SOL typed as the
+  bedtime and a WASO that looks like a clock time are set to missing;
+  text ending in `:00` (for example `5:00`) stays as minutes; everything
+  else is left as parsed and still flagged. Each decision is written to
+  `output/duration_clock_rule_log.csv` and noted in the
+  `*_correctionsmade` column. The thresholds are
+  `duration_clock_rule.tolerance_min`, `window_min` and `near_min`;
+  `duration_clock_rule.enabled = FALSE` turns the rule off.
+- The new rule’s settings are listed with the other rules at the start
+  of every run (and in `output/effective_rules.csv`):
+  `duration_clock_rule.enabled`, `tolerance_min`, `window_min` and
+  `near_min`, with their defaults in the default config and in
+  `THRESHOLDS.md`.
+- The interval parser keeps the SOL / WASO text exactly as entered,
+  before any format repair, in `*_input_orig` (full archive only;
+  Dataset A is unchanged).
+
 ## sleepcleanr 1.7.3
 
 ### Fixed

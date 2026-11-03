@@ -137,11 +137,11 @@ A4）增加了针对性检查，标记可疑的钟表时间形态时长条目供
 类错误、按参与者聚类注入），用 `evaluate_detection.R`（v4）结合当前
 `ground_truth_enrichment.csv` 评估。这产生了该发现的首个真实补丁后数字：
 
-|                                            | field_misentry_sol | field_misentry_waso |
-|--------------------------------------------|--------------------|---------------------|
-| **CORRECT**（自动修正到真值）              | 7/400 (1.8%)       | 13/400 (3.2%)       |
-| **FLAGGED_UNRESOLVED**（捕获，转人工复核） | 393/400 (98.2%)    | 387/400 (96.8%)     |
-| **MISREPAIRED**（静默改错）                | **0/400 (0%)**     | **0/400 (0%)**      |
+|  | field_misentry_sol | field_misentry_waso |
+|----|----|----|
+| **CORRECT**（自动修正到真值） | 7/400 (1.8%) | 13/400 (3.2%) |
+| **FLAGGED_UNRESOLVED**（捕获，转人工复核） | 393/400 (98.2%) | 387/400 (96.8%) |
+| **MISREPAIRED**（静默改错） | **0/400 (0%)** | **0/400 (0%)** |
 
 静默误修 bug 对两字段**完全闭环**——0% 误修，实为比早期手工推导的 SOL
 3.5%
@@ -189,11 +189,11 @@ caught”表述混淆了自动修正与人工复核路由；管线真实作用�
 [`bland_altman()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/bland_altman.md)，跑在真实数据上（13,990
 行）：
 
-| \#  | 分析                  | 输入（自报 vs 计算）             | 输出                                                        |
-|-----|-----------------------|----------------------------------|-------------------------------------------------------------|
-| A1  | **SOL Bland-Altman**  | 自报 SOL vs 计算 SOL             | bias、95% LoA、半宽、界外百分比、比例偏差 p                 |
-| A2  | **WASO Bland-Altman** | 自报 WASO vs 计算 WASO           | 同 A1                                                       |
-| A3  | **阈值对噪声比**      | 每个 flag 阈值 ÷ 该指标 LoA 半宽 | 各阈值判定：CONSERVATIVE / SAFE / BORDERLINE / INSIDE NOISE |
+| \# | 分析 | 输入（自报 vs 计算） | 输出 |
+|----|----|----|----|
+| A1 | **SOL Bland-Altman** | 自报 SOL vs 计算 SOL | bias、95% LoA、半宽、界外百分比、比例偏差 p |
+| A2 | **WASO Bland-Altman** | 自报 WASO vs 计算 WASO | 同 A1 |
+| A3 | **阈值对噪声比** | 每个 flag 阈值 ÷ 该指标 LoA 半宽 | 各阈值判定：CONSERVATIVE / SAFE / BORDERLINE / INSIDE NOISE |
 
 **结果。**
 

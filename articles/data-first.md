@@ -25,14 +25,14 @@ clean_sleep_diary("my_diary.csv", dry_run = TRUE)
 
 ### Return value (6-field contract)
 
-| Field      | Contents                                                          |
-|------------|-------------------------------------------------------------------|
-| `cleaned`  | Cleaned Dataset A as a data.frame (`NULL` in dry-run)             |
-| `config`   | Full effective config used (defaults + overrides)                 |
-| `guesses`  | Per-column mapping decisions (recorded, never silent)             |
-| `ledger`   | Per-step row-count ledger (step_id, label, n_rows)                |
-| `outputs`  | Named output paths (`cleaned_csv`, `ledger_csv`, `manifest_json`) |
-| `manifest` | Provenance manifest (also written to `outputs$manifest_json`)     |
+| Field | Contents |
+|----|----|
+| `cleaned` | Cleaned Dataset A as a data.frame (`NULL` in dry-run) |
+| `config` | Full effective config used (defaults + overrides) |
+| `guesses` | Per-column mapping decisions (recorded, never silent) |
+| `ledger` | Per-step row-count ledger (step_id, label, n_rows) |
+| `outputs` | Named output paths (`cleaned_csv`, `ledger_csv`, `manifest_json`) |
+| `manifest` | Provenance manifest (also written to `outputs$manifest_json`) |
 
 ### Column auto-guessing
 

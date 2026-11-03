@@ -119,24 +119,24 @@ silently hidden.
 
 ### Terminology
 
-| Term                             | Meaning                                                                                                    |
-|----------------------------------|------------------------------------------------------------------------------------------------------------|
-| **Detection recall (L1)**        | Share of injected errors for which the pipeline *acted* (flagged or corrected)                             |
-| **Correction-level recall (L3)** | Share of injected errors for which the pipeline recovered the *correct value*                              |
-| **FCR**                          | False-correction rate: clean records that were altered                                                     |
-| **FAR**                          | False-alarm rate: clean records that were flagged                                                          |
-| **SPEC**                         | Specificity (clean records left untouched)                                                                 |
-| **M1 / M4 / M5**                 | Real-data audit rules: M1 order violations, M4 bed→sleep window violations, M5 silent-worsening candidates |
-| **AUTO_FIX**                     | A change applied automatically, with no human review                                                       |
+| Term | Meaning |
+|----|----|
+| **Detection recall (L1)** | Share of injected errors for which the pipeline *acted* (flagged or corrected) |
+| **Correction-level recall (L3)** | Share of injected errors for which the pipeline recovered the *correct value* |
+| **FCR** | False-correction rate: clean records that were altered |
+| **FAR** | False-alarm rate: clean records that were flagged |
+| **SPEC** | Specificity (clean records left untouched) |
+| **M1 / M4 / M5** | Real-data audit rules: M1 order violations, M4 bed→sleep window violations, M5 silent-worsening candidates |
+| **AUTO_FIX** | A change applied automatically, with no human review |
 
 ### Detection-threshold defaults
 
-| Rule                                                           | Default | Rationale                                              |
-|----------------------------------------------------------------|---------|--------------------------------------------------------|
-| `timestamp.sequence.max_gap_hours` (AM/PM flip)                | 12 h    | Assumes no legitimate interval ≥ 12 h                  |
-| adjacent-swap threshold                                        | 3 h     | Tuned on the development sample; see VALIDATION_REPORT |
-| `metric_validation.sol.excessive_minutes`                      | 120     | Gross-outlier catch, not a clinical marker             |
-| `metric_validation.se.min_valid_percent` / `max_valid_percent` | 0 / 100 | Structural impossibility → always flag                 |
+| Rule | Default | Rationale |
+|----|----|----|
+| `timestamp.sequence.max_gap_hours` (AM/PM flip) | 12 h | Assumes no legitimate interval ≥ 12 h |
+| adjacent-swap threshold | 3 h | Tuned on the development sample; see VALIDATION_REPORT |
+| `metric_validation.sol.excessive_minutes` | 120 | Gross-outlier catch, not a clinical marker |
+| `metric_validation.se.min_valid_percent` / `max_valid_percent` | 0 / 100 | Structural impossibility → always flag |
 
 Full rationale and change guidance:
 [THRESHOLDS.md](https://cyracaid.github.io/sleepdiary-cleaner/THRESHOLDS.md).
@@ -149,15 +149,15 @@ flags are **additive** (a record may carry several simultaneously) and
 **never silently cleared** — they persist until explicitly resolved by
 human action.
 
-| Flag / Column                 | Trigger                                                   | Meaning                                                             | Resolution                                                                                                        |
-|-------------------------------|-----------------------------------------------------------|---------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
-| `needs_review_flag`           | Any detection rule fires                                  | Record needs human attention                                        | Human reviews → sets `manually_corrected=TRUE` OR `human_metric_review_status=confirmed_not_error_do_not_correct` |
-| `auto_error_desc`             | Auto-detection logic                                      | Machine-readable description of why flagged                         | Reference for human reviewer                                                                                      |
-| `error_type` / `unusual_type` | Step 5 classification                                     | Categorized error type (TIMESTAMP, DURATION, SELF_REPORTED, etc.)   | Informs reviewer; drives Figure 6 classification                                                                  |
-| `manually_corrected`          | Human applied correction via `apply_manual_corrections.R` | Record was explicitly fixed by human                                | Set to `TRUE` by `apply_manual_corrections.R`                                                                     |
-| `human_metric_review_status`  | Human metric review decision                              | `confirmed_not_error_do_not_correct` = reviewed & confirmed correct | Set by `apply_metric_review_acceptances.R` / `apply_metric_review_acceptances()`                                  |
-| `human_metric_review_note`    | Reviewer’s free-text note                                 | Context for future auditors                                         | Free text                                                                                                         |
-| `correction_type`             | Applied correction type                                   | e.g., `bed_sleep_swap_3h`, `sleep_reduce_12h_loop`                  | Populated by correction engine                                                                                    |
+| Flag / Column | Trigger | Meaning | Resolution |
+|----|----|----|----|
+| `needs_review_flag` | Any detection rule fires | Record needs human attention | Human reviews → sets `manually_corrected=TRUE` OR `human_metric_review_status=confirmed_not_error_do_not_correct` |
+| `auto_error_desc` | Auto-detection logic | Machine-readable description of why flagged | Reference for human reviewer |
+| `error_type` / `unusual_type` | Step 5 classification | Categorized error type (TIMESTAMP, DURATION, SELF_REPORTED, etc.) | Informs reviewer; drives Figure 6 classification |
+| `manually_corrected` | Human applied correction via `apply_manual_corrections.R` | Record was explicitly fixed by human | Set to `TRUE` by `apply_manual_corrections.R` |
+| `human_metric_review_status` | Human metric review decision | `confirmed_not_error_do_not_correct` = reviewed & confirmed correct | Set by `apply_metric_review_acceptances.R` / `apply_metric_review_acceptances()` |
+| `human_metric_review_note` | Reviewer’s free-text note | Context for future auditors | Free text |
+| `correction_type` | Applied correction type | e.g., `bed_sleep_swap_3h`, `sleep_reduce_12h_loop` | Populated by correction engine |
 
 **Flag lifecycle:**
 
@@ -185,12 +185,12 @@ human action.
 **Current flag categories** (from `checkforerrors_processing.R` and
 METHODS Stage 7):
 
-| Category          | Sub-types                                               | Meaning                                                 |
-|-------------------|---------------------------------------------------------|---------------------------------------------------------|
-| **TIMESTAMP**     | Sequence/range violations (bed/sleep/awake/getup times) | e.g., hour\>23, malformed colon, inverted sequences     |
-| **DURATION**      | Interval/format errors (SOL, WASO)                      | e.g., MM:SS vs HH:MM confusion, plausibility violations |
-| **AMOUNT**        | Substance input anomalies                               | negative, excessive digits, filler codes (888/999)      |
-| **SELF_REPORTED** | SOL/WASO vs timestamp-window mismatch                   | SOL \> bed→sleep window, SE\>100%, etc.                 |
+| Category | Sub-types | Meaning |
+|----|----|----|
+| **TIMESTAMP** | Sequence/range violations (bed/sleep/awake/getup times) | e.g., hour\>23, malformed colon, inverted sequences |
+| **DURATION** | Interval/format errors (SOL, WASO) | e.g., MM:SS vs HH:MM confusion, plausibility violations |
+| **AMOUNT** | Substance input anomalies | negative, excessive digits, filler codes (888/999) |
+| **SELF_REPORTED** | SOL/WASO vs timestamp-window mismatch | SOL \> bed→sleep window, SE\>100%, etc. |
 
 **Flag statistics (snapshot at v1.4.5, 13,990 rows; each run prints the
 current review queue):** 1,048 records flagged (7.5%); 0 AUTO_FIX; 0
@@ -241,7 +241,7 @@ breakdown.
 
 ## Status and data availability
 
-**Status.** sleepcleanr 1.7.3 is research software under active
+**Status.** sleepcleanr 1.8.0 is research software under active
 development. It was built for one longitudinal sleep study, has not yet
 been peer reviewed, and is not on CRAN. Treat the shipped thresholds as
 references to check against your own data.
@@ -382,18 +382,18 @@ manual corrections, and diagnose issues.
 
 **10 steps** (source: `inst/steps.yaml`):
 
-| Step | Label                                | Description                                                                      |
-|------|--------------------------------------|----------------------------------------------------------------------------------|
-| 1    | Load data                            | .rds/.csv auto-detected; schema validated; optional supplementary file merged    |
-| 1.5  | Field-misentry check                 | SOL/WASO clock-time vs duration-field misentry detection on raw data             |
-| 2-4  | Parse & normalize (S3 chain)         | Parse timestamps → parse intervals → normalize sequence                          |
-| 5    | Classify records                     | Generate manual review CSVs for human approval                                   |
-| 5.75 | Second-review consensus              | Apply second-review checklist consensus                                          |
-| 6-7  | Correct & compute metrics (S3 chain) | Manual + duration corrections; TST/SOL/WASO/SE metrics; has_correction enum      |
-| 8    | Auto-detect remaining issues         | TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED flag classification                      |
-| 8.5  | Cross-participant consistency check  | Global consistency audit across participants                                     |
-| 9    | Generate diagnostic figures          | 32 figures (16 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt |
-| 10   | Build delivered datasets             | finalize_columns() selects/renames to Dataset A/B per column dictionary          |
+| Step | Label | Description |
+|----|----|----|
+| 1 | Load data | .rds/.csv auto-detected; schema validated; optional supplementary file merged |
+| 1.5 | Field-misentry check | SOL/WASO clock-time vs duration-field misentry detection on raw data |
+| 2-4 | Parse & normalize (S3 chain) | Parse timestamps → parse intervals → normalize sequence |
+| 5 | Classify records | Generate manual review CSVs for human approval |
+| 5.75 | Second-review consensus | Apply second-review checklist consensus |
+| 6-7 | Correct & compute metrics (S3 chain) | Manual + duration corrections; TST/SOL/WASO/SE metrics; has_correction enum |
+| 8 | Auto-detect remaining issues | TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED flag classification |
+| 8.5 | Cross-participant consistency check | Global consistency audit across participants |
+| 9 | Generate diagnostic figures | 32 figures (16 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt |
+| 10 | Build delivered datasets | finalize_columns() selects/renames to Dataset A/B per column dictionary |
 
 ## Sync Human Review Status
 
@@ -504,7 +504,7 @@ sleepcleanr 刻意**既非全自动、也非全部人工 flag**：
 
 ## 状态与数据可用性
 
-**状态。** sleepcleanr 1.7.3
+**状态。** sleepcleanr 1.8.0
 是仍在开发中的研究软件，为一项纵向睡眠研究而写，尚未经同行评审，也未上线
 CRAN。随包给出的阈值只是参考，请用你自己的数据核对。
 
@@ -618,18 +618,18 @@ skill：`.claude/skills/sleepcleanr-pipeline/SKILL.md`（`.agents/skills/`
 
 **10 个步骤**（来源：`inst/steps.yaml`）：
 
-| 步骤 | 名称                                 | 说明                                                                             |
-|------|--------------------------------------|----------------------------------------------------------------------------------|
-| 1    | Load data                            | .rds/.csv auto-detected; schema validated; optional supplementary file merged    |
-| 1.5  | Field-misentry check                 | SOL/WASO clock-time vs duration-field misentry detection on raw data             |
-| 2-4  | Parse & normalize (S3 chain)         | Parse timestamps → parse intervals → normalize sequence                          |
-| 5    | Classify records                     | Generate manual review CSVs for human approval                                   |
-| 5.75 | Second-review consensus              | Apply second-review checklist consensus                                          |
-| 6-7  | Correct & compute metrics (S3 chain) | Manual + duration corrections; TST/SOL/WASO/SE metrics; has_correction enum      |
-| 8    | Auto-detect remaining issues         | TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED flag classification                      |
-| 8.5  | Cross-participant consistency check  | Global consistency audit across participants                                     |
-| 9    | Generate diagnostic figures          | 32 figures (16 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt |
-| 10   | Build delivered datasets             | finalize_columns() selects/renames to Dataset A/B per column dictionary          |
+| 步骤 | 名称 | 说明 |
+|----|----|----|
+| 1 | Load data | .rds/.csv auto-detected; schema validated; optional supplementary file merged |
+| 1.5 | Field-misentry check | SOL/WASO clock-time vs duration-field misentry detection on raw data |
+| 2-4 | Parse & normalize (S3 chain) | Parse timestamps → parse intervals → normalize sequence |
+| 5 | Classify records | Generate manual review CSVs for human approval |
+| 5.75 | Second-review consensus | Apply second-review checklist consensus |
+| 6-7 | Correct & compute metrics (S3 chain) | Manual + duration corrections; TST/SOL/WASO/SE metrics; has_correction enum |
+| 8 | Auto-detect remaining issues | TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED flag classification |
+| 8.5 | Cross-participant consistency check | Global consistency audit across participants |
+| 9 | Generate diagnostic figures | 32 figures (16 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt |
+| 10 | Build delivered datasets | finalize_columns() selects/renames to Dataset A/B per column dictionary |
 
 # Package index
 

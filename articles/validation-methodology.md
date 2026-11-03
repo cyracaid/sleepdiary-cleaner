@@ -188,11 +188,11 @@ participant-clustered injection), evaluated with `evaluate_detection.R`
 (v4) against the current `ground_truth_enrichment.csv`. This produced
 the first real post-patch numbers for this finding:
 
-|                                                         | field_misentry_sol | field_misentry_waso |
-|---------------------------------------------------------|--------------------|---------------------|
-| **CORRECT** (auto-fixed to the true value)              | 7/400 (1.8%)       | 13/400 (3.2%)       |
-| **FLAGGED_UNRESOLVED** (caught, routed to human review) | 393/400 (98.2%)    | 387/400 (96.8%)     |
-| **MISREPAIRED** (silently wrong)                        | **0/400 (0%)**     | **0/400 (0%)**      |
+|  | field_misentry_sol | field_misentry_waso |
+|----|----|----|
+| **CORRECT** (auto-fixed to the true value) | 7/400 (1.8%) | 13/400 (3.2%) |
+| **FLAGGED_UNRESOLVED** (caught, routed to human review) | 393/400 (98.2%) | 387/400 (96.8%) |
+| **MISREPAIRED** (silently wrong) | **0/400 (0%)** | **0/400 (0%)** |
 
 The silent-misrepair bug is **fully closed** for both fields — 0%
 misrepaired, actually stronger than the earlier hand-derived claim of a
@@ -260,21 +260,21 @@ threshold must be judged against. Three analyses, all from
 [`bland_altman()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/bland_altman.md)
 on real data (13,990 rows):
 
-| \#  | Analysis                     | Inputs (reported vs computed)                                         | Output                                                                        |
-|-----|------------------------------|-----------------------------------------------------------------------|-------------------------------------------------------------------------------|
-| A1  | **SOL Bland-Altman**         | self-reported SOL vs computed SOL                                     | bias, **95% limits of agreement**, half-width, % outside, proportional-bias p |
-| A2  | **WASO Bland-Altman**        | self-reported WASO vs computed WASO                                   | same as A1                                                                    |
-| A3  | **Threshold vs noise ratio** | each flag threshold ÷ its metric’s **limits of agreement half-width** | per-threshold verdict: CONSERVATIVE / SAFE / BORDERLINE / INSIDE NOISE        |
+| \# | Analysis | Inputs (reported vs computed) | Output |
+|----|----|----|----|
+| A1 | **SOL Bland-Altman** | self-reported SOL vs computed SOL | bias, **95% limits of agreement**, half-width, % outside, proportional-bias p |
+| A2 | **WASO Bland-Altman** | self-reported WASO vs computed WASO | same as A1 |
+| A3 | **Threshold vs noise ratio** | each flag threshold ÷ its metric’s **limits of agreement half-width** | per-threshold verdict: CONSERVATIVE / SAFE / BORDERLINE / INSIDE NOISE |
 
 **Result.**
 
-|         | Bias     | **Limits of agreement half-width** | Threshold            | Ratio | Verdict                   |
-|---------|----------|------------------------------------|----------------------|-------|---------------------------|
-| A1 SOL  | +1.6 min | **75.4 min**                       | excessive 120 min    | 1.59  | ⚠️ INSIDE NOISE           |
-| A1 SOL  | —        | 75.4 min                           | high severity 60 min | 0.80  | ⚠️⚠️ INSIDE NOISE         |
-| A2 WASO | small    | **27.3 min**                       | high severity 90 min | 3.29  | ✅ SAFE                   |
-| A3      | —        | —                                  | SE poor (70%)        | —     | N/A (no self-report pair) |
-| A3      | —        | —                                  | TST/TIB ratio        | —     | N/A (no self-report pair) |
+|  | Bias | **Limits of agreement half-width** | Threshold | Ratio | Verdict |
+|----|----|----|----|----|----|
+| A1 SOL | +1.6 min | **75.4 min** | excessive 120 min | 1.59 | ⚠️ INSIDE NOISE |
+| A1 SOL | — | 75.4 min | high severity 60 min | 0.80 | ⚠️⚠️ INSIDE NOISE |
+| A2 WASO | small | **27.3 min** | high severity 90 min | 3.29 | ✅ SAFE |
+| A3 | — | — | SE poor (70%) | — | N/A (no self-report pair) |
+| A3 | — | — | TST/TIB ratio | — | N/A (no self-report pair) |
 
 **What this means (read carefully — this is a finding, not a bug).**
 

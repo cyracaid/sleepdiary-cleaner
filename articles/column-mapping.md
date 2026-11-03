@@ -129,27 +129,27 @@ needed.
 participant data are gitignored. Templates with synthetic data live in
 `templates/`.
 
-| Column group           | Variables                                                                                                                               | Description                                     |
-|------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|
-| Identifiers            | pid, day_num, row_id, participant                                                                                                       | Participant and record IDs                      |
-| Date                   | StartDate                                                                                                                               | Calendar date of the EMA session                |
-| Raw timestamps (HH:MM) | time_bed_am_hhmm, time_sleep_am_hhmm, time_awake_am_hhmm, time_getup_am_hhmm                                                            | Self-reported bed/sleep/awake/getup clock times |
-| Raw timestamps (AM/PM) | time_bed_am_ampm, time_sleep_am_ampm, time_awake_am_ampm, time_getup_am_ampm                                                            | AM/PM indicator for each timestamp              |
-| Raw durations          | duration_totalmin_sol_estimate_am, duration_totalmin_waso_estimate_am                                                                   | Self-reported SOL and WASO in minutes           |
-| Nap/Exercise           | duration_totalmin_napstoday_PM, exercise_PM_totalmin\_\[Light\|Moderate\|Vigorous\|Strength\]                                           | Self-reported nap and exercise durations        |
-| Substance use          | caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1, alcoholtoday_PM_NumAlcoholicDrinks_1, nicotine_amount_pm_doses, cannabis_amount_pm_doses | Self-reported substance use                     |
-| WASO count             | num_waso_estimate_am, num_waso_am                                                                                                       | Number of wake bouts                            |
+| Column group | Variables | Description |
+|----|----|----|
+| Identifiers | pid, day_num, row_id, participant | Participant and record IDs |
+| Date | StartDate | Calendar date of the EMA session |
+| Raw timestamps (HH:MM) | time_bed_am_hhmm, time_sleep_am_hhmm, time_awake_am_hhmm, time_getup_am_hhmm | Self-reported bed/sleep/awake/getup clock times |
+| Raw timestamps (AM/PM) | time_bed_am_ampm, time_sleep_am_ampm, time_awake_am_ampm, time_getup_am_ampm | AM/PM indicator for each timestamp |
+| Raw durations | duration_totalmin_sol_estimate_am, duration_totalmin_waso_estimate_am | Self-reported SOL and WASO in minutes |
+| Nap/Exercise | duration_totalmin_napstoday_PM, exercise_PM_totalmin\_\[Light\|Moderate\|Vigorous\|Strength\] | Self-reported nap and exercise durations |
+| Substance use | caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1, alcoholtoday_PM_NumAlcoholicDrinks_1, nicotine_amount_pm_doses, cannabis_amount_pm_doses | Self-reported substance use |
+| WASO count | num_waso_estimate_am, num_waso_am | Number of wake bouts |
 
 ## Manual correction CSV templates
 
-| Template File                                                     | Live File                                      | Purpose                              |
-|-------------------------------------------------------------------|------------------------------------------------|--------------------------------------|
-| `templates/template_manual_error_corrections.csv`                 | `manual_error_corrections.csv`                 | Timestamp corrections (AM/PM, order) |
-| `templates/template_manual_unusual_corrections.csv`               | `manual_unusual_corrections.csv`               | Accepted unusual patterns            |
-| `templates/template_manual_nap_exercise_corrections.csv`          | `manual_nap_exercise_corrections.csv`          | Nap/exercise duration corrections    |
-| `templates/template_manual_sleep_metric_duration_corrections.csv` | `manual_sleep_metric_duration_corrections.csv` | SOL/WASO metric corrections          |
-| `templates/template_manual_metric_review_acceptances.csv`         | `manual_metric_review_acceptances.csv`         | Human-accepted metric flags          |
-| `templates/template_second_review_checklist.csv`                  | `second_review_checklist.csv`                  | Second-person verification decisions |
+| Template File | Live File | Purpose |
+|----|----|----|
+| `templates/template_manual_error_corrections.csv` | `manual_error_corrections.csv` | Timestamp corrections (AM/PM, order) |
+| `templates/template_manual_unusual_corrections.csv` | `manual_unusual_corrections.csv` | Accepted unusual patterns |
+| `templates/template_manual_nap_exercise_corrections.csv` | `manual_nap_exercise_corrections.csv` | Nap/exercise duration corrections |
+| `templates/template_manual_sleep_metric_duration_corrections.csv` | `manual_sleep_metric_duration_corrections.csv` | SOL/WASO metric corrections |
+| `templates/template_manual_metric_review_acceptances.csv` | `manual_metric_review_acceptances.csv` | Human-accepted metric flags |
+| `templates/template_second_review_checklist.csv` | `second_review_checklist.csv` | Second-person verification decisions |
 
 ## Rules you can change
 
@@ -194,13 +194,13 @@ contained were never read by the code and have been removed.
 
 ## Output
 
-| File                                                           | Contents                                                                                                                                                                                                           |
-|----------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `output/correction_status_final.csv`                           | Per-run summary (one row appended per run): n_total; n_clean and n_error at the first and last checkpoint (`*_first`, `*_last`, `delta_*`; see interpreting-output §4); n_corrected; flag counts; mean TST and SOL |
-| `output/appendix_step_ledger.csv`                              | Per-step flag tracking ledger                                                                                                                                                                                      |
-| `output/flagged_records_self_reported.csv`                     | Records flagged as SELF_REPORTED_FLAG                                                                                                                                                                              |
-| `latest_visualization_*/figure_index.png`                      | Contact-sheet index of all generated figures                                                                                                                                                                       |
-| `output/verification/real_n13990/`, `verification/synth_n280/` | Stable, never-overwritten verification artifacts                                                                                                                                                                   |
+| File | Contents |
+|----|----|
+| `output/correction_status_final.csv` | Per-run summary (one row appended per run): n_total; n_clean and n_error at the first and last checkpoint (`*_first`, `*_last`, `delta_*`; see interpreting-output §4); n_corrected; flag counts; mean TST and SOL |
+| `output/appendix_step_ledger.csv` | Per-step flag tracking ledger |
+| `output/flagged_records_self_reported.csv` | Records flagged as SELF_REPORTED_FLAG |
+| `latest_visualization_*/figure_index.png` | Contact-sheet index of all generated figures |
+| `output/verification/real_n13990/`, `verification/synth_n280/` | Stable, never-overwritten verification artifacts |
 
 ### Working files in the project root (next to `output/`, not inside it)
 
@@ -208,16 +208,16 @@ These are written beside the `output/` folder during a run. They hold
 real participant rows; never commit them. Details: `interpreting-output`
 §2.2.
 
-| File                                      | Written at                       | Contents                                                                                                                                                                                         |
-|-------------------------------------------|----------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| File | Written at | Contents |
+|----|----|----|
 | `[NEW]manual_error_correction_review.csv` | Step 5, rewritten after Step 8.5 | One status table: every Step 5 `error` row plus records that became errors after the corrections, each with `status_after_corrections`, `in_manual_file`, category before/after and Step 8 flags |
-| `[NEW]manual_unusual_review.csv`          | Step 5                           | `unusual` records for a person to fill in                                                                                                                                                        |
-| `review_status.csv`                       | After Step 8.5                   | Both worksheets in one table, each row `needs_review` / `not_incorporated` / `incorporated` by the config’s `review:` rules                                                                      |
-| `manual_error_correction_updated.csv`     | Step 6                           | Record of the corrections applied: your `manual_error_corrections.csv` as the pipeline incorporated it, `manually_corrected` marks the rows actually used                                        |
-| `reasonable_unusual_records.csv`          | Step 6                           | `unusual` rows accepted as “reasonable unusual record”                                                                                                                                           |
-| `cross_participant_flagged_rows.csv`      | Step 8.5                         | Days far from the participant’s own median SOL/WASO                                                                                                                                              |
-| `cross_participant_suspicious_slices.csv` | Step 8.5                         | All days of the participants in the file above, for context                                                                                                                                      |
-| `cross_participant_field_misentries.csv`  | Step 8.5                         | Rows where SOL/WASO looks typed into another time field                                                                                                                                          |
+| `[NEW]manual_unusual_review.csv` | Step 5 | `unusual` records for a person to fill in |
+| `review_status.csv` | After Step 8.5 | Both worksheets in one table, each row `needs_review` / `not_incorporated` / `incorporated` by the config’s `review:` rules |
+| `manual_error_correction_updated.csv` | Step 6 | Record of the corrections applied: your `manual_error_corrections.csv` as the pipeline incorporated it, `manually_corrected` marks the rows actually used |
+| `reasonable_unusual_records.csv` | Step 6 | `unusual` rows accepted as “reasonable unusual record” |
+| `cross_participant_flagged_rows.csv` | Step 8.5 | Days far from the participant’s own median SOL/WASO |
+| `cross_participant_suspicious_slices.csv` | Step 8.5 | All days of the participants in the file above, for context |
+| `cross_participant_field_misentries.csv` | Step 8.5 | Rows where SOL/WASO looks typed into another time field |
 
 Key rules the output structure encodes: -
 `latest_visualization_<tag>_n<rows>/` is “latest”, not “history” — wiped

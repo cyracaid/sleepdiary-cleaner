@@ -28,31 +28,31 @@ This is a deliberate design choice, not incomplete cleaning.
 
 ## Validation chain (9 steps, three tiers)
 
-| Tier       | Step                                | Result                                                                               |
-|------------|-------------------------------------|--------------------------------------------------------------------------------------|
-| Synthetic  | 1\. Clean-input specificity         | FCR 0/9996 altered; FAR_flag 0/1609                                                  |
-| Synthetic  | 2\. Injected-error benchmark        | pooled recall 0.995 \[0.993, 0.997\]; specificity 1.0                                |
-| Synthetic  | 3\. Detection vs value-correctness  | L1/L3 gap, e.g. ampm_swap L1 1.0 / L3 0.565 (uncertain restorations → human)         |
-| Synthetic  | 4\. Controls                        | no_cleaning 0.000 / naive_rule 0.623 / pipeline 0.995                                |
-| Real       | 5\. Redundant-channel               | 80/81 corrections improved (98.8%); 1 bad rule found & guarded (v1.4.3)              |
-| Real       | 5.5 Bland-Altman                    | SOL ±75-min noise band → SOL flags INSIDE NOISE (descriptive, human); WASO 3.3× SAFE |
-| Real       | 6\. Report-only audit               | 0 AUTO_FIX, 1048 FLAG (922 window violations, 140 order violations)                  |
-| Real       | 7\. Co-review agreement             | 64.0% (n=75) / 89.2% (n=37), not κ                                                   |
-| Robustness | 8\. Multiverse + downstream + seeds | D2 = 46% of variation; TST robust, SOL sensitive; recall stable 0.994–0.995          |
+| Tier | Step | Result |
+|----|----|----|
+| Synthetic | 1\. Clean-input specificity | FCR 0/9996 altered; FAR_flag 0/1609 |
+| Synthetic | 2\. Injected-error benchmark | pooled recall 0.995 \[0.993, 0.997\]; specificity 1.0 |
+| Synthetic | 3\. Detection vs value-correctness | L1/L3 gap, e.g. ampm_swap L1 1.0 / L3 0.565 (uncertain restorations → human) |
+| Synthetic | 4\. Controls | no_cleaning 0.000 / naive_rule 0.623 / pipeline 0.995 |
+| Real | 5\. Redundant-channel | 80/81 corrections improved (98.8%); 1 bad rule found & guarded (v1.4.3) |
+| Real | 5.5 Bland-Altman | SOL ±75-min noise band → SOL flags INSIDE NOISE (descriptive, human); WASO 3.3× SAFE |
+| Real | 6\. Report-only audit | 0 AUTO_FIX, 1048 FLAG (922 window violations, 140 order violations) |
+| Real | 7\. Co-review agreement | 64.0% (n=75) / 89.2% (n=37), not κ |
+| Robustness | 8\. Multiverse + downstream + seeds | D2 = 46% of variation; TST robust, SOL sensitive; recall stable 0.994–0.995 |
 
 ## Synthetic benchmark
 
 Ground truth is recorded at injection time (self-consistent standard —
 no external gold standard exists for free-text diary entry).
 
-| Quantity                                 | Value                                    | Source file                |
-|------------------------------------------|------------------------------------------|----------------------------|
-| Pooled recall (L1 detection)             | 0.995 \[0.993, 0.997\]                   | recall_specificity_ci.csv  |
-| Specificity                              | 1.0                                      | recall_specificity_ci.csv  |
-| FCR (clean records altered)              | 0/9996                                   | fcr_pure_n10000_result.csv |
-| FAR flag / alter                         | 0/1609 both                              | far_flag_alter.csv         |
-| Controls: no_cleaning / naive / pipeline | 0.000 / 0.623 / 0.995                    | control_baselines.csv      |
-| Mis-repair rate (MRR)                    | see mrr_magnitude.csv (0 in current run) | mrr_magnitude.csv          |
+| Quantity | Value | Source file |
+|----|----|----|
+| Pooled recall (L1 detection) | 0.995 \[0.993, 0.997\] | recall_specificity_ci.csv |
+| Specificity | 1.0 | recall_specificity_ci.csv |
+| FCR (clean records altered) | 0/9996 | fcr_pure_n10000_result.csv |
+| FAR flag / alter | 0/1609 both | far_flag_alter.csv |
+| Controls: no_cleaning / naive / pipeline | 0.000 / 0.623 / 0.995 | control_baselines.csv |
+| Mis-repair rate (MRR) | see mrr_magnitude.csv (0 in current run) | mrr_magnitude.csv |
 
 ### Per-category benchmark (detection vs correction separated)
 
@@ -64,23 +64,23 @@ unflagged. The clean-control block is reported on its own line — the raw
 `correct_pct` 0, which read as “0% correct” when they simply carry no
 injected error; that miscompute is corrected here.
 
-| Category                                  | n    | detected | correctly detected | flagged unresolved | false correction | missed | recall | misrepair rate |
-|-------------------------------------------|------|----------|--------------------|--------------------|------------------|--------|--------|----------------|
-| adjacent_swap_large_gap_left_clean        | 400  | 400      | 243                | 157                | 0                | 0      | 1.000  | 0.000          |
-| adjacent_swap_time_awake_am_time_getup_am | 400  | 400      | 400                | 0                  | 0                | 0      | 1.000  | 0.000          |
-| adjacent_swap_time_bed_am_time_sleep_am   | 400  | 400      | 400                | 0                  | 0                | 0      | 1.000  | 0.000          |
-| adjacent_swap_time_sleep_am_time_awake_am | 400  | 400      | 0                  | 400                | 0                | 0      | 1.000  | 0.000          |
-| ampm_swap                                 | 400  | 400      | 226                | 174                | 0                | 0      | 1.000  | 0.000          |
-| compound_ampm_and_swap                    | 400  | 400      | 152                | 248                | 0                | 0      | 1.000  | 0.000          |
-| cross_participant_spike                   | 236  | 236      | 0                  | 214                | 22               | 0      | 1.000  | 0.093          |
-| field_misentry_sol                        | 400  | 400      | 7                  | 393                | 0                | 0      | 1.000  | 0.000          |
-| field_misentry_waso                       | 400  | 400      | 13                 | 387                | 0                | 0      | 1.000  | 0.000          |
-| format_malformed_colon                    | 400  | 400      | 400                | 0                  | 0                | 0      | 1.000  | 0.000          |
-| format_no_colon                           | 400  | 400      | 400                | 0                  | 0                | 0      | 1.000  | 0.000          |
-| implausible_duration                      | 400  | 400      | 0                  | 400                | 0                | 0      | 1.000  | 0.000          |
-| mmss_confusion                            | 400  | 400      | 378                | 18                 | 4                | 0      | 1.000  | 0.010          |
-| sol_window_contradiction                  | 355  | 355      | 0                  | 355                | 0                | 0      | 1.000  | 0.000          |
-| **CONTROL (no_error_control)**            | 1609 | —        | —                  | —                  | —                | —      | —      | —              |
+| Category | n | detected | correctly detected | flagged unresolved | false correction | missed | recall | misrepair rate |
+|----|----|----|----|----|----|----|----|----|
+| adjacent_swap_large_gap_left_clean | 400 | 400 | 243 | 157 | 0 | 0 | 1.000 | 0.000 |
+| adjacent_swap_time_awake_am_time_getup_am | 400 | 400 | 400 | 0 | 0 | 0 | 1.000 | 0.000 |
+| adjacent_swap_time_bed_am_time_sleep_am | 400 | 400 | 400 | 0 | 0 | 0 | 1.000 | 0.000 |
+| adjacent_swap_time_sleep_am_time_awake_am | 400 | 400 | 0 | 400 | 0 | 0 | 1.000 | 0.000 |
+| ampm_swap | 400 | 400 | 226 | 174 | 0 | 0 | 1.000 | 0.000 |
+| compound_ampm_and_swap | 400 | 400 | 152 | 248 | 0 | 0 | 1.000 | 0.000 |
+| cross_participant_spike | 236 | 236 | 0 | 214 | 22 | 0 | 1.000 | 0.093 |
+| field_misentry_sol | 400 | 400 | 7 | 393 | 0 | 0 | 1.000 | 0.000 |
+| field_misentry_waso | 400 | 400 | 13 | 387 | 0 | 0 | 1.000 | 0.000 |
+| format_malformed_colon | 400 | 400 | 400 | 0 | 0 | 0 | 1.000 | 0.000 |
+| format_no_colon | 400 | 400 | 400 | 0 | 0 | 0 | 1.000 | 0.000 |
+| implausible_duration | 400 | 400 | 0 | 400 | 0 | 0 | 1.000 | 0.000 |
+| mmss_confusion | 400 | 400 | 378 | 18 | 4 | 0 | 1.000 | 0.010 |
+| sol_window_contradiction | 355 | 355 | 0 | 355 | 0 | 0 | 1.000 | 0.000 |
+| **CONTROL (no_error_control)** | 1609 | — | — | — | — | — | — | — |
 
 Pooled precision = 1.000 (flagged injected / (flagged injected + flagged
 control)); control FAR_flag 0/1609, FAR_alter 0/1609. Source:
@@ -89,13 +89,13 @@ benchmark_table.csv. \## Real-data audit
 Report-only run over all 13990 real diary records. No data is modified
 (0 AUTO_FIX).
 
-| Quantity                                                             | Value                              |
-|----------------------------------------------------------------------|------------------------------------|
-| AUTO_FIX                                                             | 0                                  |
-| FLAG                                                                 | 1048                               |
-| M4 window violations                                                 | 922                                |
-| M1 order violations                                                  | 140                                |
-| M5 silent-worsening candidates                                       | 1                                  |
+| Quantity | Value |
+|----|----|
+| AUTO_FIX | 0 |
+| FLAG | 1048 |
+| M4 window violations | 922 |
+| M1 order violations | 140 |
+| M5 silent-worsening candidates | 1 |
 | Genuine mismatches flagged for review (extreme ≥60min + \>2× window) | 185 (76 extreme + 138 over-window) |
 
 **Human review outcome (local authoritative worksheet, aggregate):**
@@ -119,11 +119,11 @@ bias the sleep–affect associations the pipeline exists to serve.
 
 ## Bland-Altman measurement characterization
 
-| Metric       | LoA half-width | Threshold ratio | Verdict                                        |
-|--------------|----------------|-----------------|------------------------------------------------|
-| SOL          | ±75.4 min      | 1.59 / 0.80     | INSIDE NOISE → descriptive flags, human review |
-| WASO         | ±27.3 min      | 3.29            | SAFE                                           |
-| SE / TST-TIB | —              | —               | N/A (no self-report pair)                      |
+| Metric | LoA half-width | Threshold ratio | Verdict |
+|----|----|----|----|
+| SOL | ±75.4 min | 1.59 / 0.80 | INSIDE NOISE → descriptive flags, human review |
+| WASO | ±27.3 min | 3.29 | SAFE |
+| SE / TST-TIB | — | — | N/A (no self-report pair) |
 
 SOL thresholds sit inside the reporting-noise band; SOL flags are
 descriptive indicators routed to human review, not automated error

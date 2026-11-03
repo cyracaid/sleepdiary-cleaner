@@ -50,13 +50,13 @@ Contents
 
       ### Sleep metrics
 
-      | Term     | Meaning                                                                         |
-      |----------|---------------------------------------------------------------------------------|
-      | **TIB**  | Time in Bed — from lying down to getting up                                     |
-      | **SOL**  | Sleep Onset Latency — from lying down to actually falling asleep                |
-      | **TST**  | Total Sleep Time — time actually asleep                                         |
+      | Term | Meaning |
+      |----|----|
+      | **TIB** | Time in Bed — from lying down to getting up |
+      | **SOL** | Sleep Onset Latency — from lying down to actually falling asleep |
+      | **TST** | Total Sleep Time — time actually asleep |
       | **WASO** | Wake After Sleep Onset — time awake during the night after first falling asleep |
-      | **SE**   | Sleep Efficiency — the percentage of time in bed actually spent asleep          |
+      | **SE** | Sleep Efficiency — the percentage of time in bed actually spent asleep |
 
       They are tied together by an identity that holds throughout the
       figures: `TIB = TST + SOL + WASO`, and `SE = TST / TIB`.
@@ -67,14 +67,14 @@ Contents
       falls into exactly one class. The classes are checked in the
       priority order below — the first match wins.
 
-      | Priority | Class                | Rule                                                                                                                                                                                       | What happens to it                                    |
-      |:--------:|----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------|
-      |    1     | `skipped_na`         | any of the four corrected timestamps (bed, sleep, awake, getup) is missing                                                                                                                 | left out of the order checks                          |
-      |    2     | `error`              | the order is broken (not `bed ≤ sleep ≤ awake ≤ getup`); or `sleep = awake` (zero-length sleep); or a bed→sleep or awake→getup gap is longer than 7 h; or sleep→awake spans more than 24 h | always reviewed, and fixed once confirmed             |
-      |    3     | `equal_time_ok`      | order intact, and bed = sleep and/or awake = getup (difference under 0.01 h, about 36 seconds)                                                                                             | counts as valid; never queued for review              |
-      |    4     | `unusual`            | order intact and not equal-time, but a bed→sleep or awake→getup gap longer than 3 h                                                                                                        | reviewed; usually kept as reported                    |
-      |    5     | `clean`              | none of the above                                                                                                                                                                          | nothing to do                                         |
-      |    —     | `reasonable_unusual` | an `unusual` record that a human looked at and accepted                                                                                                                                    | counted separately so the human judgement is not lost |
+      | Priority | Class | Rule | What happens to it |
+      |:--:|----|----|----|
+      | 1 | `skipped_na` | any of the four corrected timestamps (bed, sleep, awake, getup) is missing | left out of the order checks |
+      | 2 | `error` | the order is broken (not `bed ≤ sleep ≤ awake ≤ getup`); or `sleep = awake` (zero-length sleep); or a bed→sleep or awake→getup gap is longer than 7 h; or sleep→awake spans more than 24 h | always reviewed, and fixed once confirmed |
+      | 3 | `equal_time_ok` | order intact, and bed = sleep and/or awake = getup (difference under 0.01 h, about 36 seconds) | counts as valid; never queued for review |
+      | 4 | `unusual` | order intact and not equal-time, but a bed→sleep or awake→getup gap longer than 3 h | reviewed; usually kept as reported |
+      | 5 | `clean` | none of the above | nothing to do |
+      | — | `reasonable_unusual` | an `unusual` record that a human looked at and accepted | counted separately so the human judgement is not lost |
 
       - **Equal Time is not an error.** Reporting “went to bed” and
         “fell asleep” (or “woke up” and “got up”) as the same clock time
@@ -119,12 +119,12 @@ Contents
       run_pipeline(config = "my_study.yaml", skip_visualization = TRUE)          # cleaning only, no figures
       ```
 
-      | Argument                     | What it does                                                                                                                                                                                                                                                                                                                                          |
-      |------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-      | `config`                     | Path to your config YAML (copy `inst/config_template.yaml` and edit the `data` section).                                                                                                                                                                                                                                                              |
+      | Argument | What it does |
+      |----|----|
+      | `config` | Path to your config YAML (copy `inst/config_template.yaml` and edit the `data` section). |
       | `include_manual_corrections` | **Default `FALSE`.** With `FALSE` the run is algorithmic-only: every human-review CSV is treated as absent, and a banner says no human corrections were applied. Set `TRUE` to apply the manual-correction files named in the config. It is off by default so a dataset can never be modified silently by review files left in the working directory. |
-      | `skip_visualization`         | `TRUE` skips the figures (Steps 9 and F05).                                                                                                                                                                                                                                                                                                           |
-      | `finalize`                   | Default `TRUE`: writes the delivered datasets (Step 10). `FALSE` stops after cleaning.                                                                                                                                                                                                                                                                |
+      | `skip_visualization` | `TRUE` skips the figures (Steps 9 and F05). |
+      | `finalize` | Default `TRUE`: writes the delivered datasets (Step 10). `FALSE` stops after cleaning. |
 
       **Say what the data is: `data.tag` in the config.** `real`
       (participant data; figures go under `output/`, which is
@@ -189,15 +189,15 @@ Contents
       participant-data file — keep it out of git and out of release
       builds (`.gitignore` + `.Rbuildignore` cover them all).
 
-      | CSV (config key)                               | Consumed at                                          | Why it exists                                                                                               | Created by                                                                                                            |
-      |------------------------------------------------|------------------------------------------------------|-------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|
-      | `second_review_checklist.csv`                  | Step 4.75 (`apply_second_review`)                    | Locks the second-review consensus for records that were previously reviewed, before corrections are applied | Started by hand; `apply_second_review` appends routed rows                                                            |
-      | `manual_error_corrections.csv`                 | Step 6 (`step_apply_corrections`)                    | Human correction decisions for records classified `error`                                                   | Step 5 writes `[NEW]manual_error_correction_review.csv`; reviewers fill `new_value_*` and it is saved under this name |
-      | `manual_unusual_corrections.csv`               | Step 6 (`step_apply_corrections`)                    | Human decisions for records classified `unusual`                                                            | Step 5 writes `[NEW]manual_unusual_review.csv`; same review-fill flow                                                 |
-      | `manual_nap_exercise_corrections.csv`          | Step 6.5 (`apply_nap_exercise_corrections`)          | Corrections to nap and exercise durations                                                                   | Hand-created; `apply_second_review` may append                                                                        |
-      | `manual_sleep_metric_duration_corrections.csv` | Step 6.5 (`apply_sleep_metric_duration_corrections`) | Fixes internal inconsistencies in derived sleep durations                                                   | Hand-created                                                                                                          |
-      | `manual_metric_review_acceptances.csv`         | Step 6.5 (`apply_metric_review_acceptances`)         | Manual accept/reject decisions for computed sleep metrics (TST, SOL, WASO, SE)                              | Hand-created; `apply_second_review` may append                                                                        |
-      | `audit_dispositions.csv`                       | After Step 9 (`audit_data_integrity`)                | Audit ledger recording the disposition of every changed record, for reversibility                           | Written by the pipeline itself                                                                                        |
+      | CSV (config key) | Consumed at | Why it exists | Created by |
+      |----|----|----|----|
+      | `second_review_checklist.csv` | Step 4.75 (`apply_second_review`) | Locks the second-review consensus for records that were previously reviewed, before corrections are applied | Started by hand; `apply_second_review` appends routed rows |
+      | `manual_error_corrections.csv` | Step 6 (`step_apply_corrections`) | Human correction decisions for records classified `error` | Step 5 writes `[NEW]manual_error_correction_review.csv`; reviewers fill `new_value_*` and it is saved under this name |
+      | `manual_unusual_corrections.csv` | Step 6 (`step_apply_corrections`) | Human decisions for records classified `unusual` | Step 5 writes `[NEW]manual_unusual_review.csv`; same review-fill flow |
+      | `manual_nap_exercise_corrections.csv` | Step 6.5 (`apply_nap_exercise_corrections`) | Corrections to nap and exercise durations | Hand-created; `apply_second_review` may append |
+      | `manual_sleep_metric_duration_corrections.csv` | Step 6.5 (`apply_sleep_metric_duration_corrections`) | Fixes internal inconsistencies in derived sleep durations | Hand-created |
+      | `manual_metric_review_acceptances.csv` | Step 6.5 (`apply_metric_review_acceptances`) | Manual accept/reject decisions for computed sleep metrics (TST, SOL, WASO, SE) | Hand-created; `apply_second_review` may append |
+      | `audit_dispositions.csv` | After Step 9 (`audit_data_integrity`) | Audit ledger recording the disposition of every changed record, for reversibility | Written by the pipeline itself |
 
       **Audit ledger path:** the private audit ledger is optional. Name
       it in the config as `data.files.audit_dispositions` (empty by
@@ -221,14 +221,14 @@ Contents
       You do not have to start from a blank file. Templates and virtual
       sample data are provided:
 
-      | What                                     | Where                                                                | Notes                                                                                                                                                                                                          |
-      |------------------------------------------|----------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-      | Header-only stubs of the six review CSVs | `inst/extdata/stub_*.csv` (installed with the package)               | `stub_error_corrections.csv`, `stub_unusual_corrections.csv`, `stub_nap_exercise.csv`, `stub_metric_duration.csv`, `stub_metric_accept.csv`, `stub_second_review.csv` — correct columns, no rows, no real data |
-      | Audit dispositions template              | `inst/extdata/template_audit_dispositions.csv`                       | header only                                                                                                                                                                                                    |
-      | Filled-in example templates              | `templates/template_*.csv` in the GitHub repository                  | fictional example rows (e.g. participant 1001); **not** included in the installed package                                                                                                                      |
-      | Virtual sample dataset                   | `inst/extdata/synthetic_sleep_data.rds` and `synthetic_ema_data.csv` | 280 virtual diary rows, no real participants                                                                                                                                                                   |
-      | Config for the virtual dataset           | `inst/extdata/synthetic_config.yaml`                                 | shows how to map column names for a new dataset                                                                                                                                                                |
-      | Column dictionary                        | `inst/extdata/column_dictionary.csv`                                 | describes the delivered columns                                                                                                                                                                                |
+      | What | Where | Notes |
+      |----|----|----|
+      | Header-only stubs of the six review CSVs | `inst/extdata/stub_*.csv` (installed with the package) | `stub_error_corrections.csv`, `stub_unusual_corrections.csv`, `stub_nap_exercise.csv`, `stub_metric_duration.csv`, `stub_metric_accept.csv`, `stub_second_review.csv` — correct columns, no rows, no real data |
+      | Audit dispositions template | `inst/extdata/template_audit_dispositions.csv` | header only |
+      | Filled-in example templates | `templates/template_*.csv` in the GitHub repository | fictional example rows (e.g. participant 1001); **not** included in the installed package |
+      | Virtual sample dataset | `inst/extdata/synthetic_sleep_data.rds` and `synthetic_ema_data.csv` | 280 virtual diary rows, no real participants |
+      | Config for the virtual dataset | `inst/extdata/synthetic_config.yaml` | shows how to map column names for a new dataset |
+      | Column dictionary | `inst/extdata/column_dictionary.csv` | describes the delivered columns |
 
       To find an installed file from R:
 
@@ -246,16 +246,16 @@ Contents
       are intermediate files for the review cycle, not final results.
       All of them contain real participant rows — do not commit them.
 
-      | File                                      | Written at                            | What it is                                                                                                                                                                                                                                                                                                                                                                                                                      | What to do with it                                                                                                                            |
-      |-------------------------------------------|---------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
-      | `[NEW]manual_error_correction_review.csv` | Step 5, **rewritten after Step 8.5**  | One status table: every `error` record from Step 5 (same rows as `error_df_pre`) plus every record that became an error only after the corrections. Each row says what happened to it (`status_after_corrections`), whether it is in a manual file (`in_manual_file`), its category before and after the corrections, and its Step 8 flags. Ordered so the rows that still need a person come first. Reviewer columns are blank | Read `status_after_corrections`; act on the `..._still_fails` and `new_after_corrections` rows                                                |
-      | `[NEW]manual_unusual_review.csv`          | Step 5                                | Same, for `unusual` records                                                                                                                                                                                                                                                                                                                                                                                                     | Fill it in, save as `manual_unusual_corrections.csv`                                                                                          |
-      | `review_status.csv`                       | After Step 8.5, overwritten every run | **The one table to read.** Every row of both Step 5 worksheets, plus every record that became an error after the corrections, with one `review_state` (`needs_review`, `not_incorporated`, `incorporated`) and the rule that put it there (`review_state_reason`). `needs_review` rows come first                                                                                                                               | Act on the `needs_review` rows; the run prints whether the review is DONE by your rule (“Review states and the done rule” below)              |
-      | `manual_error_correction_updated.csv`     | Step 6                                | The record of the corrections applied: **your** `manual_error_corrections.csv` after the pipeline incorporated it, with the `manually_corrected` column marking which rows were really used. Your own file is never edited; this is the pipeline’s copy                                                                                                                                                                         | Compare with your input. A row you filled in but that is not marked `TRUE` was not applied — find out why. It is a record, not a new worklist |
-      | `reasonable_unusual_records.csv`          | Step 6                                | The `unusual` rows you marked “reasonable unusual record” (odd but plausible, left as is)                                                                                                                                                                                                                                                                                                                                       | A record of what was accepted                                                                                                                 |
-      | `cross_participant_flagged_rows.csv`      | Step 8.5                              | Days whose SOL or WASO is far from that participant’s **own** median (for example 5–30 min on most days, 400 min on one)                                                                                                                                                                                                                                                                                                        | Review as a possible entry error                                                                                                              |
-      | `cross_participant_suspicious_slices.csv` | Step 8.5                              | All days of the participants in the file above                                                                                                                                                                                                                                                                                                                                                                                  | Context: is the day a one-off or the participant’s usual pattern?                                                                             |
-      | `cross_participant_field_misentries.csv`  | Step 8.5                              | Rows where the SOL or WASO number looks like it was typed into another time field                                                                                                                                                                                                                                                                                                                                               | Review as a possible mis-entered field                                                                                                        |
+      | File | Written at | What it is | What to do with it |
+      |----|----|----|----|
+      | `[NEW]manual_error_correction_review.csv` | Step 5, **rewritten after Step 8.5** | One status table: every `error` record from Step 5 (same rows as `error_df_pre`) plus every record that became an error only after the corrections. Each row says what happened to it (`status_after_corrections`), whether it is in a manual file (`in_manual_file`), its category before and after the corrections, and its Step 8 flags. Ordered so the rows that still need a person come first. Reviewer columns are blank | Read `status_after_corrections`; act on the `..._still_fails` and `new_after_corrections` rows |
+      | `[NEW]manual_unusual_review.csv` | Step 5 | Same, for `unusual` records | Fill it in, save as `manual_unusual_corrections.csv` |
+      | `review_status.csv` | After Step 8.5, overwritten every run | **The one table to read.** Every row of both Step 5 worksheets, plus every record that became an error after the corrections, with one `review_state` (`needs_review`, `not_incorporated`, `incorporated`) and the rule that put it there (`review_state_reason`). `needs_review` rows come first | Act on the `needs_review` rows; the run prints whether the review is DONE by your rule (“Review states and the done rule” below) |
+      | `manual_error_correction_updated.csv` | Step 6 | The record of the corrections applied: **your** `manual_error_corrections.csv` after the pipeline incorporated it, with the `manually_corrected` column marking which rows were really used. Your own file is never edited; this is the pipeline’s copy | Compare with your input. A row you filled in but that is not marked `TRUE` was not applied — find out why. It is a record, not a new worklist |
+      | `reasonable_unusual_records.csv` | Step 6 | The `unusual` rows you marked “reasonable unusual record” (odd but plausible, left as is) | A record of what was accepted |
+      | `cross_participant_flagged_rows.csv` | Step 8.5 | Days whose SOL or WASO is far from that participant’s **own** median (for example 5–30 min on most days, 400 min on one) | Review as a possible entry error |
+      | `cross_participant_suspicious_slices.csv` | Step 8.5 | All days of the participants in the file above | Context: is the day a one-off or the participant’s usual pattern? |
+      | `cross_participant_field_misentries.csv` | Step 8.5 | Rows where the SOL or WASO number looks like it was typed into another time field | Review as a possible mis-entered field |
 
       ## 3. The manual-review cycle (plain language)
 
@@ -322,16 +322,16 @@ Contents
 
       **What is inside a `[NEW]` review file** (columns, in order):
 
-      | Column group                                     | Columns                                                                                                                            | Meaning                                                                                                                        |
-      |--------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|
-      | Identity                                         | `pid`, `day_num`, `row_id`                                                                                                         | Which participant, which day, which row                                                                                        |
-      | Raw entries                                      | `time_bed/sleep/awake/getup_am_hhmm_ampm`                                                                                          | What the participant typed (unchanged)                                                                                         |
-      | Parsed times                                     | `time_bed/sleep/awake/getup_corrected`                                                                                             | Pipeline’s current best guess                                                                                                  |
-      | Diffs                                            | `bed_sleep_diff_h`, `sleep_awake_diff_h`, `awake_getup_diff_h`, `reasonable_temporal_order`                                        | The numbers the rules above fired on                                                                                           |
-      | Machine verdict                                  | `error_type`, `corrected`, `correction_type`                                                                                       | Which rule fired; whether the algorithm already fixed it                                                                       |
-      | **Human fills in**                               | `problem_humanidentified`, `solution_humanidentified`, `column_to_correct`, `correct_value`, `manually_corrected`                  | Blank columns — write which column is wrong, what the right value is, and whether you fixed it                                 |
-      | **Status** (added after the corrections)         | `source`, `status_after_corrections`, `category_before_corrections`, `category_after_corrections`, `step8_flags_after_corrections` | Where the row came from and what happened to it (see below). Step 8 flags are reported separately and do not change the status |
-      | **Where it was handled** (added by the pipeline) | `in_manual_file`, `review_resolution`, `resolved_at`, `resolved_by`                                                                | Copied from the matching row of your manual file. All four empty means nobody has handled this record yet                      |
+      | Column group | Columns | Meaning |
+      |----|----|----|
+      | Identity | `pid`, `day_num`, `row_id` | Which participant, which day, which row |
+      | Raw entries | `time_bed/sleep/awake/getup_am_hhmm_ampm` | What the participant typed (unchanged) |
+      | Parsed times | `time_bed/sleep/awake/getup_corrected` | Pipeline’s current best guess |
+      | Diffs | `bed_sleep_diff_h`, `sleep_awake_diff_h`, `awake_getup_diff_h`, `reasonable_temporal_order` | The numbers the rules above fired on |
+      | Machine verdict | `error_type`, `corrected`, `correction_type` | Which rule fired; whether the algorithm already fixed it |
+      | **Human fills in** | `problem_humanidentified`, `solution_humanidentified`, `column_to_correct`, `correct_value`, `manually_corrected` | Blank columns — write which column is wrong, what the right value is, and whether you fixed it |
+      | **Status** (added after the corrections) | `source`, `status_after_corrections`, `category_before_corrections`, `category_after_corrections`, `step8_flags_after_corrections` | Where the row came from and what happened to it (see below). Step 8 flags are reported separately and do not change the status |
+      | **Where it was handled** (added by the pipeline) | `in_manual_file`, `review_resolution`, `resolved_at`, `resolved_by` | Copied from the matching row of your manual file. All four empty means nobody has handled this record yet |
 
       **How to read the status table.** Step 5 first writes every record
       the rules flag on the data *before* corrections. After Steps 6–8.5
@@ -339,13 +339,13 @@ Contents
       one table in which no row is dropped. `status_after_corrections`
       is one of:
 
-      | `status_after_corrections`       | Meaning                                                             |
-      |----------------------------------|---------------------------------------------------------------------|
-      | `not_in_manual_file_still_fails` | Not in any manual file and not clean after the corrections — to do  |
-      | `in_manual_file_still_fails`     | In a manual file, but still not clean — the correction did not work |
-      | `new_after_corrections`          | Not on the Step 5 list; became an error only after the corrections  |
-      | `not_in_manual_file_now_passes`  | Not in a manual file; the rules fixed it                            |
-      | `in_manual_file_now_passes`      | In a manual file and now clean                                      |
+      | `status_after_corrections` | Meaning |
+      |----|----|
+      | `not_in_manual_file_still_fails` | Not in any manual file and not clean after the corrections — to do |
+      | `in_manual_file_still_fails` | In a manual file, but still not clean — the correction did not work |
+      | `new_after_corrections` | Not on the Step 5 list; became an error only after the corrections |
+      | `not_in_manual_file_now_passes` | Not in a manual file; the rules fixed it |
+      | `in_manual_file_now_passes` | In a manual file and now clean |
 
       “Clean” means the final category is `clean`, `equal_time_ok` or
       `reasonable_unusual`. The pipeline reports; it does not decide
@@ -356,12 +356,12 @@ Contents
       run. The four columns `in_manual_file`, `review_resolution`,
       `resolved_at`, `resolved_by` still say where a row was handled:
 
-      | What you see                                       | Meaning                                                         |
-      |----------------------------------------------------|-----------------------------------------------------------------|
-      | all four empty                                     | never handled — to do                                           |
-      | `corrected` with `resolved_by`                     | handled and recorded                                            |
-      | `resolution_unknown_legacy` / `legacy`             | handled, but nobody recorded who or when (you can fill that in) |
-      | `flagged_unresolved`, or `resolved_by` = `pending` | waiting for confirmation                                        |
+      | What you see | Meaning |
+      |----|----|
+      | all four empty | never handled — to do |
+      | `corrected` with `resolved_by` | handled and recorded |
+      | `resolution_unknown_legacy` / `legacy` | handled, but nobody recorded who or when (you can fill that in) |
+      | `flagged_unresolved`, or `resolved_by` = `pending` | waiting for confirmation |
 
       At the end of each run the pipeline prints how many rows of each
       worksheet are in each state, and how many handled rows are **still
@@ -380,11 +380,11 @@ Contents
       rules below and by the `review:` block of your config; the
       pipeline applies them and never changes them during a run.
 
-      | `review_state`     | Rule (first that applies)                                                                                                                                                                                                                                                                                                                                                                             |
-      |--------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-      | `needs_review`     | became an error after the corrections; or marked pending (`flagged_unresolved` / `resolved_by` = `pending`) in the manual file; or still fails the re-check; or has a time missing after the corrections, so the order cannot be re-checked (unless it is in a manual file and `review.missing_times_ok_after_manual: true`); or — only if `review.step8_flags_need_review: true` — has a Step 8 flag |
-      | `incorporated`     | a manual decision for it was applied in this run, and it passes the re-check                                                                                                                                                                                                                                                                                                                          |
-      | `not_incorporated` | no manual decision changed it in this run, and it passes the re-check (the rules fixed it, or manual corrections were not applied)                                                                                                                                                                                                                                                                    |
+      | `review_state` | Rule (first that applies) |
+      |----|----|
+      | `needs_review` | became an error after the corrections; or marked pending (`flagged_unresolved` / `resolved_by` = `pending`) in the manual file; or still fails the re-check; or has a time missing after the corrections, so the order cannot be re-checked (unless it is in a manual file and `review.missing_times_ok_after_manual: true`); or — only if `review.step8_flags_need_review: true` — has a Step 8 flag |
+      | `incorporated` | a manual decision for it was applied in this run, and it passes the re-check |
+      | `not_incorporated` | no manual decision changed it in this run, and it passes the re-check (the rules fixed it, or manual corrections were not applied) |
 
       `review_state_reason` names the rule for each row. The review is
       **DONE** when the number of `needs_review` rows is at most
@@ -434,20 +434,20 @@ Contents
       read.csv("output/correction_status_final.csv")
       ```
 
-      | Column                                         | It tells you…                                                                                                                                             | Check this                                                                                                                                                                                                                                          |
-      |------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-      | `n_total`                                      | Total records in your data                                                                                                                                | Must equal your input row count. If smaller, records were dropped somewhere.                                                                                                                                                                        |
-      | `run_id`, `timestamp`                          | When the run was made (`YYYYMMDD_HHMM` and full time)                                                                                                     | Rows are appended, so each run adds one row; use these to tell runs apart.                                                                                                                                                                          |
-      | `checkpoint_first`, `checkpoint_last`          | Which two checkpoints `*_first` and `*_last` below were read at (see the box after this table)                                                            | Usually `A` and `E`.                                                                                                                                                                                                                                |
-      | `tst_mean_h`                                   | Mean total sleep time in hours                                                                                                                            | 6.0–8.5 h is normal for most adult studies. If \< 5 or \> 10, something is off with the timestamp parsing or the study population is unusual.                                                                                                       |
-      | `sol_mean_min`                                 | Mean sleep onset latency in minutes                                                                                                                       | 10–45 min is normal. If \> 60, either the population has high insomnia or AM/PM confusion was not fully corrected.                                                                                                                                  |
-      | `n_clean_first`, `n_clean_last`, `delta_clean` | Records that passed every check at the first and at the last checkpoint; `delta_clean = n_clean_last - n_clean_first`                                     | `n_clean_last` should be stable across runs (same data = same count). `delta_clean` \> 0 means cleaning made records clean.                                                                                                                         |
+      | Column | It tells you… | Check this |
+      |----|----|----|
+      | `n_total` | Total records in your data | Must equal your input row count. If smaller, records were dropped somewhere. |
+      | `run_id`, `timestamp` | When the run was made (`YYYYMMDD_HHMM` and full time) | Rows are appended, so each run adds one row; use these to tell runs apart. |
+      | `checkpoint_first`, `checkpoint_last` | Which two checkpoints `*_first` and `*_last` below were read at (see the box after this table) | Usually `A` and `E`. |
+      | `tst_mean_h` | Mean total sleep time in hours | 6.0–8.5 h is normal for most adult studies. If \< 5 or \> 10, something is off with the timestamp parsing or the study population is unusual. |
+      | `sol_mean_min` | Mean sleep onset latency in minutes | 10–45 min is normal. If \> 60, either the population has high insomnia or AM/PM confusion was not fully corrected. |
+      | `n_clean_first`, `n_clean_last`, `delta_clean` | Records that passed every check at the first and at the last checkpoint; `delta_clean = n_clean_last - n_clean_first` | `n_clean_last` should be stable across runs (same data = same count). `delta_clean` \> 0 means cleaning made records clean. |
       | `n_error_first`, `n_error_last`, `delta_error` | Records with impossible temporal order (e.g., getup before bedtime) at the first and at the last checkpoint; `delta_error = n_error_last - n_error_first` | Judge `n_error_last` (what is left after cleaning): should be \< 1% of total; if \> 5%, review the survey design or data collection. `n_error_first` is before cleaning and is expected to be higher. `delta_error` \< 0 means errors were removed. |
-      | `n_corrected`                                  | Records manually corrected via your CSV files                                                                                                             | Should match the number of rows in your `manual_error_corrections.csv`.                                                                                                                                                                             |
-      | `timestamp_issue`                              | Timestamps that could not be parsed into a valid time                                                                                                     | 0 is normal. \> 0 means some participants entered non-standard time formats.                                                                                                                                                                        |
-      | `duration_issue`                               | Sleep metrics (SOL, SE, TST) outside configured thresholds                                                                                                | Small numbers are normal. If very large, your thresholds may be too strict or the data has quality problems.                                                                                                                                        |
-      | `amount_flag`                                  | Substance-use entries with unusual values                                                                                                                 | Should be 0 or very low.                                                                                                                                                                                                                            |
-      | `self_reported_flag`                           | Records where self-reported SOL/WASO disagrees with the computed value                                                                                    | Indicates perception bias. Check Figure 29 (SOL Perception Bias).                                                                                                                                                                                   |
+      | `n_corrected` | Records manually corrected via your CSV files | Should match the number of rows in your `manual_error_corrections.csv`. |
+      | `timestamp_issue` | Timestamps that could not be parsed into a valid time | 0 is normal. \> 0 means some participants entered non-standard time formats. |
+      | `duration_issue` | Sleep metrics (SOL, SE, TST) outside configured thresholds | Small numbers are normal. If very large, your thresholds may be too strict or the data has quality problems. |
+      | `amount_flag` | Substance-use entries with unusual values | Should be 0 or very low. |
+      | `self_reported_flag` | Records where self-reported SOL/WASO disagrees with the computed value | Indicates perception bias. Check Figure 29 (SOL Perception Bias). |
 
       **What `first` and `last` mean.** Both are snapshots taken inside
       the *same* run, not two runs and not the first and last row of the
@@ -495,25 +495,25 @@ Contents
 
       ### 5.1 Column layout
 
-      | Column        | What it is                                                              |
-      |---------------|-------------------------------------------------------------------------|
-      | `step_id`     | Pipeline step number                                                    |
-      | `label`       | Human-readable step name                                                |
-      | `n_total`     | Total records in the pipeline at this point                             |
-      | `standard`    | The evaluation system being tracked (see below)                         |
-      | `category`    | The specific category within that standard                              |
-      | `count`       | Number of records in this category (NA = not yet computed at this step) |
-      | `n_corrected` | Records manually corrected at this step                                 |
+      | Column | What it is |
+      |----|----|
+      | `step_id` | Pipeline step number |
+      | `label` | Human-readable step name |
+      | `n_total` | Total records in the pipeline at this point |
+      | `standard` | The evaluation system being tracked (see below) |
+      | `category` | The specific category within that standard |
+      | `count` | Number of records in this category (NA = not yet computed at this step) |
+      | `n_corrected` | Records manually corrected at this step |
 
       The ledger uses 5 independent evaluation systems:
 
-      | Standard           | First step with numbers | What it evaluates                                                                                       | Key categories                                                                 |
-      |--------------------|:-----------------------:|---------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
-      | `field_misentry`   |           1.5           | Whether a duration estimate (SOL, WASO) exactly matches a timestamp — may indicate “typed in wrong box” | `none`, `SOL=time_sleep`, `SOL=time_bed`, `WASO=time_awake`, `WASO=time_getup` |
-      | `data_category`    |            4            | Temporal order and plausibility of the bed → sleep → awake → getup sequence                             | `clean`, `error`, `unusual`, `equal_time_ok`, `skipped_na`                     |
-      | `flag_severity`    |            7            | How many derived-metric flags (low SE, high SOL, high WASO) each record triggered                       | `Clean`, `Minor (1 flag)`, `Major (2+ flags)`                                  |
-      | `duration_extreme` |            7            | Total sleep time outside physiologically plausible bounds                                               | `OK`, `Too short (< 3 h)`, `Too long (> 12 h)`                                 |
-      | `checkforerrors`   |            8            | Summary of all auto-detection flags assembled in Step 8                                                 | `TIMESTAMP_ISSUE`, `DURATION_ISSUE`, `AMOUNT_FLAG`, `SELF_REPORTED_FLAG`       |
+      | Standard | First step with numbers | What it evaluates | Key categories |
+      |----|:--:|----|----|
+      | `field_misentry` | 1.5 | Whether a duration estimate (SOL, WASO) exactly matches a timestamp — may indicate “typed in wrong box” | `none`, `SOL=time_sleep`, `SOL=time_bed`, `WASO=time_awake`, `WASO=time_getup` |
+      | `data_category` | 4 | Temporal order and plausibility of the bed → sleep → awake → getup sequence | `clean`, `error`, `unusual`, `equal_time_ok`, `skipped_na` |
+      | `flag_severity` | 7 | How many derived-metric flags (low SE, high SOL, high WASO) each record triggered | `Clean`, `Minor (1 flag)`, `Major (2+ flags)` |
+      | `duration_extreme` | 7 | Total sleep time outside physiologically plausible bounds | `OK`, `Too short (< 3 h)`, `Too long (> 12 h)` |
+      | `checkforerrors` | 8 | Summary of all auto-detection flags assembled in Step 8 | `TIMESTAMP_ISSUE`, `DURATION_ISSUE`, `AMOUNT_FLAG`, `SELF_REPORTED_FLAG` |
 
       **Conceptual rule:** Standards are computed once and never
       re-computed. If a standard’s counts change after its first
@@ -564,16 +564,16 @@ Contents
 
       ## 7. Quick Reference Card
 
-      | Check                                              | What to run                                                                           | Pass if |
-      |----------------------------------------------------|---------------------------------------------------------------------------------------|---------|
-      | Pipeline finished                                  | `file.exists("output/correction_status_final.csv")`                                   | `TRUE`  |
-      | Reasonable TST                                     | `tst_mean_h` between 6–8.5                                                            | Yes     |
-      | Reasonable SOL (raw duration, not perception bias) | `sol_mean_min` between 10–45                                                          | Yes     |
-      | Few errors                                         | `n_error_last < 0.01 * n_total`                                                       | Yes     |
-      | data_category stable                               | Counts identical across Steps 6–8.5                                                   | Yes     |
-      | flag_severity stable                               | Counts identical across Steps 7–8.5                                                   | Yes     |
-      | All records accounted                              | `clean + unusual + reasonable_unusual + equal_time_ok + error + skipped_na = n_total` | Yes     |
-      | Deterministic                                      | Same input → same output every time                                                   | Yes     |
+      | Check | What to run | Pass if |
+      |----|----|----|
+      | Pipeline finished | `file.exists("output/correction_status_final.csv")` | `TRUE` |
+      | Reasonable TST | `tst_mean_h` between 6–8.5 | Yes |
+      | Reasonable SOL (raw duration, not perception bias) | `sol_mean_min` between 10–45 | Yes |
+      | Few errors | `n_error_last < 0.01 * n_total` | Yes |
+      | data_category stable | Counts identical across Steps 6–8.5 | Yes |
+      | flag_severity stable | Counts identical across Steps 7–8.5 | Yes |
+      | All records accounted | `clean + unusual + reasonable_unusual + equal_time_ok + error + skipped_na = n_total` | Yes |
+      | Deterministic | Same input → same output every time | Yes |
 
       ## 8. How to Read the Figures
 
@@ -598,20 +598,20 @@ Contents
 
       **Publication figures (for a Methods section):**
 
-      | Figure                           | File                        | What it shows                                                                                                          |
-      |----------------------------------|-----------------------------|------------------------------------------------------------------------------------------------------------------------|
-      | **Figure 1 — Pipeline Flow**     | `pipeline_cleaning/F01.png` | Vertical flow diagram: raw → parsed → algo-corrected → manual-corrected → final valid, with counts and % at each stage |
-      | **Figure 2 — Correction Impact** | `research_ready/F17.png`    | A/B delta lollipops (only modified records, TST & SOL) + identity scatter + before/after summary table                 |
+      | Figure | File | What it shows |
+      |----|----|----|
+      | **Figure 1 — Pipeline Flow** | `pipeline_cleaning/F01.png` | Vertical flow diagram: raw → parsed → algo-corrected → manual-corrected → final valid, with counts and % at each stage |
+      | **Figure 2 — Correction Impact** | `research_ready/F17.png` | A/B delta lollipops (only modified records, TST & SOL) + identity scatter + before/after summary table |
 
       **Five must-check figures:**
 
-      | Step | Figure (card)                                  | Should look like                                                    | If not?                                                                 |
-      |:----:|------------------------------------------------|---------------------------------------------------------------------|-------------------------------------------------------------------------|
-      |  1   | **01 Pipeline Record Flow** (§9.2)             | Flow narrows gently; Clean dominates; Error + Unusual small (\< 5%) | Spike at 0 or huge Error/Unusual share → parsing/AM-PM failure upstream |
-      |  2   | **F15 Step Flag Ledger** (§9.2)                | Corrected bar appears ONLY at Step 6.5, flat after                  | Change after Step 6.5 = instability                                     |
-      |  3   | **18 Auto-Detected Dashboard** (§9.2)          | Flag counts match `correction_status_final.csv`                     | Mismatch = misalignment                                                 |
-      |  4   | **F18 Distribution of Sleep Variables** (§9.3) | TST peaks 6–8 h, SOL right-skewed, WASO \< 60, SE \> 85%            | SOL flat/bimodal = AM/PM confusion                                      |
-      |  5   | **13 Error Category Distribution** (§9.2)      | Most records Clean/Minor; Error+Unusual \< 5%                       | High = review manual CSVs                                               |
+      | Step | Figure (card) | Should look like | If not? |
+      |:--:|----|----|----|
+      | 1 | **01 Pipeline Record Flow** (§9.2) | Flow narrows gently; Clean dominates; Error + Unusual small (\< 5%) | Spike at 0 or huge Error/Unusual share → parsing/AM-PM failure upstream |
+      | 2 | **F15 Step Flag Ledger** (§9.2) | Corrected bar appears ONLY at Step 6.5, flat after | Change after Step 6.5 = instability |
+      | 3 | **18 Auto-Detected Dashboard** (§9.2) | Flag counts match `correction_status_final.csv` | Mismatch = misalignment |
+      | 4 | **F18 Distribution of Sleep Variables** (§9.3) | TST peaks 6–8 h, SOL right-skewed, WASO \< 60, SE \> 85% | SOL flat/bimodal = AM/PM confusion |
+      | 5 | **13 Error Category Distribution** (§9.2) | Most records Clean/Minor; Error+Unusual \< 5% | High = review manual CSVs |
 
       ## 9. Figure-by-Figure Reference
 
@@ -633,65 +633,65 @@ Contents
       figures derived from participant data: it is gitignored, do not
       commit or share it.
 
-      | Item                         | What it is                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | When to open it                                                                                |
-      |------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
-      | `pipeline_cleaning/`         | 16 diagnostic figures: what the pipeline found and changed (cards in §9.2)                                                                                                                                                                                                                                                                                                                                                                                                                                             | Checking that cleaning behaved; the audit trail for a supplement                               |
-      | `research_ready/`            | 16 publication-oriented figures: sleep metrics, perception bias, substance use (cards in §9.3)                                                                                                                                                                                                                                                                                                                                                                                                                         | Choosing figures for Results                                                                   |
-      | `figure_index.png`           | One contact sheet of all figures. A red block at the top lists the figures that were skipped and why                                                                                                                                                                                                                                                                                                                                                                                                                   | First look after a run                                                                         |
-      | `all_figures_review.pdf`     | Every figure, one per page, in generation order, at the same size as the PNGs                                                                                                                                                                                                                                                                                                                                                                                                                                          | Flipping through all figures quickly or sharing with a collaborator on the study team          |
-      | `figures_not_generated.csv`  | `file`, `reason`: each figure that was **not** produced and why (for example “fewer than 2 flag columns had complete data”, or a validation file that was not found). Same list as the red block                                                                                                                                                                                                                                                                                                                       | A missing PNG: look here before suspecting a bug                                               |
-      | `flag_distribution.csv`      | One row per diary entry (`pid`, `day_num`, `row_id`) with its flag counts (`timestamp_flags`, `duration_flags`, `amount_flags`, `review_flags`), `flag_details`, `raw_category` and `final_status`, whether it was `manually_corrected`, and `data_category_after_corrections`. A manually corrected row is `CLEAN (Manually Fixed)` only when its Step 8 checks and its `data_category` both pass; with a Step 8 flag it keeps that flag, and with a failing `data_category` it is `STILL FAILS (Manually Corrected)` | The table behind the flag figures (07, 13, 17, 18); filter it to find the entries behind a bar |
-      | `classification_summary.csv` | Counts per final classification (clean / error / unusual / …). Written only when the run produced a final classification                                                                                                                                                                                                                                                                                                                                                                                               | Cross-check with `correction_status_final.csv` (§4)                                            |
-      | `RUN_INFO.txt`               | When the run was made, dataset tag, number of records, input file names, package version, where the verification files are                                                                                                                                                                                                                                                                                                                                                                                             | Recording which run a set of figures came from                                                 |
+      | Item | What it is | When to open it |
+      |----|----|----|
+      | `pipeline_cleaning/` | 16 diagnostic figures: what the pipeline found and changed (cards in §9.2) | Checking that cleaning behaved; the audit trail for a supplement |
+      | `research_ready/` | 16 publication-oriented figures: sleep metrics, perception bias, substance use (cards in §9.3) | Choosing figures for Results |
+      | `figure_index.png` | One contact sheet of all figures. A red block at the top lists the figures that were skipped and why | First look after a run |
+      | `all_figures_review.pdf` | Every figure, one per page, in generation order, at the same size as the PNGs | Flipping through all figures quickly or sharing with a collaborator on the study team |
+      | `figures_not_generated.csv` | `file`, `reason`: each figure that was **not** produced and why (for example “fewer than 2 flag columns had complete data”, or a validation file that was not found). Same list as the red block | A missing PNG: look here before suspecting a bug |
+      | `flag_distribution.csv` | One row per diary entry (`pid`, `day_num`, `row_id`) with its flag counts (`timestamp_flags`, `duration_flags`, `amount_flags`, `review_flags`), `flag_details`, `raw_category` and `final_status`, whether it was `manually_corrected`, and `data_category_after_corrections`. A manually corrected row is `CLEAN (Manually Fixed)` only when its Step 8 checks and its `data_category` both pass; with a Step 8 flag it keeps that flag, and with a failing `data_category` it is `STILL FAILS (Manually Corrected)` | The table behind the flag figures (07, 13, 17, 18); filter it to find the entries behind a bar |
+      | `classification_summary.csv` | Counts per final classification (clean / error / unusual / …). Written only when the run produced a final classification | Cross-check with `correction_status_final.csv` (§4) |
+      | `RUN_INFO.txt` | When the run was made, dataset tag, number of records, input file names, package version, where the verification files are | Recording which run a set of figures came from |
 
       **The sibling folder `verification/<tag>_n<rows>/`** (next to this
       one, or under `output/` for real data) is **not** wiped when the
       figures are rebuilt. It holds the evidence used to check the
       pipeline, not figures for the paper:
 
-      | Item                                            | What it is                                                                                                                            |
-      |-------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
-      | `bland_altman_sol.png`, `bland_altman_waso.png` | Bland-Altman plots: agreement between self-reported and computed SOL / WASO                                                           |
-      | `threshold_validation.csv`                      | Each flagging threshold, the measurement noise (`loa_half_width`), their ratio and an assessment (for example “CONSERVATIVE”, “SAFE”) |
-      | `snapshot_*.rds`                                | Saved copies of the data at named points, used for the regression comparison in §6                                                    |
-      | `PROVENANCE.txt`                                | Why a file is there and when it was produced                                                                                          |
+      | Item | What it is |
+      |----|----|
+      | `bland_altman_sol.png`, `bland_altman_waso.png` | Bland-Altman plots: agreement between self-reported and computed SOL / WASO |
+      | `threshold_validation.csv` | Each flagging threshold, the measurement noise (`loa_half_width`), their ratio and an assessment (for example “CONSERVATIVE”, “SAFE”) |
+      | `snapshot_*.rds` | Saved copies of the data at named points, used for the regression comparison in §6 |
+      | `PROVENANCE.txt` | Why a file is there and when it was produced |
 
       ### 9.1 Figure Index
 
-      | \#      | File                        | Paper use     | Code source                     | Card                                                                                      | Last checked |
-      |---------|-----------------------------|---------------|---------------------------------|-------------------------------------------------------------------------------------------|--------------|
-      | **F01** | `pipeline_cleaning/F01.png` | Methods Fig 1 | `sleep_visualization.R:862`     | [§9.2 · Pipeline Record Flow](#f01-pipeline-record-flow)                                  | 2026-09-25   |
-      | **F17** | `research_ready/F17.png`    | Methods Fig 2 | `sleep_visualization.R:1013`    | [§9.3 · Correction Impact](#f17-correction-impact)                                        | 2026-09-25   |
-      | **F18** | `research_ready/F18.png`    | Results       | `sleep_visualization.R:1057`    | [§9.3 · Distribution of Sleep Variables](#f18-distribution-of-sleep-variables)            | 2026-09-25   |
-      | **F19** | `research_ready/F19.png`    | Results       | `sleep_visualization.R:1108`    | [§9.3 · TST Distribution](#f19-tst-distribution)                                          | 2026-09-25   |
-      | **F20** | `research_ready/F20.png`    | Results       | `sleep_visualization.R:1163`    | [§9.3 · Sleep Duration vs Time in Bed](#f20-sleep-duration-vs-time-in-bed)                | 2026-09-25   |
-      | **F21** | `research_ready/F21.png`    | Results       | `sleep_visualization.R:1215`    | [§9.3 · SOL vs Sleep Duration](#f21-sol-vs-sleep-duration)                                | 2026-09-25   |
-      | **F22** | `research_ready/F22.png`    | Results       | `sleep_visualization.R:1265`    | [§9.3 · Variability of Sleep Variables](#f22-variability-of-sleep-variables)              | 2026-09-25   |
-      | **F02** | `pipeline_cleaning/F02.png` | Supplement    | `sleep_visualization.R:1339`    | [§9.2 · Sleep Duration Post-Correction](#f02-sleep-duration-post-correction)              | 2026-09-25   |
-      | **F03** | `pipeline_cleaning/F03.png` | Supplement    | `sleep_visualization.R:1404`    | [§9.2 · Flag Composition Stacked](#f03-flag-composition-stacked)                          | 2026-09-25   |
-      | **F23** | `research_ready/F23.png`    | Results       | `sleep_visualization.R:1458`    | [§9.3 · Bedtime vs Get-up Distribution](#f23-bedtime-vs-get-up-distribution)              | 2026-09-25   |
-      | **F04** | `pipeline_cleaning/F04.png` | Supplement    | `sleep_visualization.R:1514`    | [§9.2 · Extreme Sleep Durations](#f04-extreme-sleep-durations)                            | 2026-09-25   |
-      | **F05** | `pipeline_cleaning/F05.png` | Supplement    | `sleep_visualization.R:1571`    | [§9.2 · Flag Co-occurrence Heatmap](#f05-flag-co-occurrence-heatmap)                      | 2026-10-23   |
-      | **F06** | `pipeline_cleaning/F06.png` | Supplement    | `sleep_visualization.R:1794`    | [§9.2 · Error Category Distribution](#f06-error-category-distribution)                    | 2026-09-25   |
-      | **F07** | `pipeline_cleaning/F07.png` | Supplement    | `sleep_visualization.R:1877`    | [§9.2 · Adjacent Timestamp Gaps](#f07-adjacent-timestamp-gaps)                            | 2026-09-25   |
-      | **F08** | `pipeline_cleaning/F08.png` | Supplement    | `sleep_visualization.R:1936`    | [§9.2 · Detection Outcomes Heatmap](#f08-detection-outcomes-heatmap)                      | 2026-09-25   |
-      | **F09** | `pipeline_cleaning/F09.png` | Supplement    | `sleep_visualization.R:1980`    | [§9.2 · Threshold vs Measurement Noise](#f09-threshold-vs-measurement-noise)              | 2026-09-25   |
-      | **F10** | `pipeline_cleaning/F10.png` | Supplement    | `sleep_visualization.R:2051`    | [§9.2 · Sleep Duration Pre-Correction](#f10-sleep-duration-pre-correction)                | 2026-09-30   |
-      | **F11** | `pipeline_cleaning/F11.png` | Supplement    | `sleep_visualization.R:2137`    | [§9.2 · Error Timeline](#f11-error-timeline)                                              | 2026-09-30   |
-      | **F12** | `pipeline_cleaning/F12.png` | Supplement    | `sleep_visualization.R:2228`    | [§9.2 · Common Error Patterns](#f12-common-error-patterns)                                | 2026-09-30   |
-      | **F13** | `pipeline_cleaning/F13.png` | Supplement    | `sleep_visualization.R:2307`    | [§9.2 · Top Participants by Flag Rate](#f13-top-participants-by-flag-rate)                | 2026-09-25   |
-      | **F14** | `pipeline_cleaning/F14.png` | Supplement    | `sleep_visualization.R:2409`    | [§9.2 · Auto-Detected Dashboard](#f14-auto-detected-dashboard)                            | 2026-09-25   |
-      | **F24** | `research_ready/F24.png`    | Results       | `sleep_visualization.R:2637`    | [§9.3 · SOL Perception Bias](#f24-sol-perception-bias)                                    | 2026-09-25   |
-      | **F25** | `research_ready/F25.png`    | Results       | `sleep_visualization.R:2695`    | [§9.3 · WASO Perception Bias](#f25-waso-perception-bias)                                  | 2026-09-25   |
-      | **F26** | `research_ready/F26.png`    | Supplement    | `sleep_visualization.R:2767`    | [§9.3 · Substance Use Availability](#f26-substance-use-availability)                      | 2026-09-25   |
-      | **F27** | `research_ready/F27.png`    | Supplement    | `sleep_visualization.R:2870`    | [§9.3 · Substance Use Value Distribution](#f27-substance-use-value-distribution)          | 2026-09-25   |
-      | **F28** | `research_ready/F28.png`    | Supplement    | `sleep_visualization.R:2944`    | [§9.3 · Caffeine Consumption](#f28-caffeine-consumption)                                  | 2026-09-25   |
-      | **F29** | `research_ready/F29.png`    | Supplement    | `sleep_visualization.R:2979`    | [§9.3 · Alcohol Consumption](#f29-alcohol-consumption)                                    | 2026-09-25   |
-      | **F15** | `pipeline_cleaning/F15.png` | Supplement    | `figure12_step_flag_table.R:15` | [§9.2 · Step Flag Ledger](#f15-step-flag-ledger)                                          | 2026-09-25   |
-      | **F16** | `pipeline_cleaning/F16.png` | Supplement    | `sleep_visualization.R:2579`    | [§9.2 · Participants Worth a Second Look](#f16-participants-worth-a-second-look)          | 2026-09-25   |
-      | **F30** | `research_ready/F30.png`    | Results       | `sleep_visualization.R:3043`    | [§9.3 · Sleep Regularity — Weekday vs Weekend](#f30-sleep-regularity--weekday-vs-weekend) | 2026-09-25   |
-      | **F31** | `research_ready/F31.png`    | Results       | `sleep_visualization.R:3096`    | [§9.3 · Sleep Composition — TIB Breakdown](#f31-sleep-composition--tib-breakdown)         | 2026-09-25   |
-      | **F32** | `research_ready/F32.png`    | Results       | `sleep_visualization.R:3125`    | [§9.3 · Sleep Metrics Correlation Matrix](#f32-sleep-metrics-correlation-matrix)          | 2026-09-25   |
+      | \# | File | Paper use | Code source | Card | Last checked |
+      |----|----|----|----|----|----|
+      | **F01** | `pipeline_cleaning/F01.png` | Methods Fig 1 | `sleep_visualization.R:862` | [§9.2 · Pipeline Record Flow](#f01-pipeline-record-flow) | 2026-09-25 |
+      | **F17** | `research_ready/F17.png` | Methods Fig 2 | `sleep_visualization.R:1013` | [§9.3 · Correction Impact](#f17-correction-impact) | 2026-09-25 |
+      | **F18** | `research_ready/F18.png` | Results | `sleep_visualization.R:1057` | [§9.3 · Distribution of Sleep Variables](#f18-distribution-of-sleep-variables) | 2026-09-25 |
+      | **F19** | `research_ready/F19.png` | Results | `sleep_visualization.R:1108` | [§9.3 · TST Distribution](#f19-tst-distribution) | 2026-09-25 |
+      | **F20** | `research_ready/F20.png` | Results | `sleep_visualization.R:1163` | [§9.3 · Sleep Duration vs Time in Bed](#f20-sleep-duration-vs-time-in-bed) | 2026-09-25 |
+      | **F21** | `research_ready/F21.png` | Results | `sleep_visualization.R:1215` | [§9.3 · SOL vs Sleep Duration](#f21-sol-vs-sleep-duration) | 2026-09-25 |
+      | **F22** | `research_ready/F22.png` | Results | `sleep_visualization.R:1265` | [§9.3 · Variability of Sleep Variables](#f22-variability-of-sleep-variables) | 2026-09-25 |
+      | **F02** | `pipeline_cleaning/F02.png` | Supplement | `sleep_visualization.R:1339` | [§9.2 · Sleep Duration Post-Correction](#f02-sleep-duration-post-correction) | 2026-09-25 |
+      | **F03** | `pipeline_cleaning/F03.png` | Supplement | `sleep_visualization.R:1404` | [§9.2 · Flag Composition Stacked](#f03-flag-composition-stacked) | 2026-09-25 |
+      | **F23** | `research_ready/F23.png` | Results | `sleep_visualization.R:1458` | [§9.3 · Bedtime vs Get-up Distribution](#f23-bedtime-vs-get-up-distribution) | 2026-09-25 |
+      | **F04** | `pipeline_cleaning/F04.png` | Supplement | `sleep_visualization.R:1514` | [§9.2 · Extreme Sleep Durations](#f04-extreme-sleep-durations) | 2026-09-25 |
+      | **F05** | `pipeline_cleaning/F05.png` | Supplement | `sleep_visualization.R:1571` | [§9.2 · Flag Co-occurrence Heatmap](#f05-flag-co-occurrence-heatmap) | 2026-10-23 |
+      | **F06** | `pipeline_cleaning/F06.png` | Supplement | `sleep_visualization.R:1794` | [§9.2 · Error Category Distribution](#f06-error-category-distribution) | 2026-09-25 |
+      | **F07** | `pipeline_cleaning/F07.png` | Supplement | `sleep_visualization.R:1877` | [§9.2 · Adjacent Timestamp Gaps](#f07-adjacent-timestamp-gaps) | 2026-09-25 |
+      | **F08** | `pipeline_cleaning/F08.png` | Supplement | `sleep_visualization.R:1936` | [§9.2 · Detection Outcomes Heatmap](#f08-detection-outcomes-heatmap) | 2026-09-25 |
+      | **F09** | `pipeline_cleaning/F09.png` | Supplement | `sleep_visualization.R:1980` | [§9.2 · Threshold vs Measurement Noise](#f09-threshold-vs-measurement-noise) | 2026-09-25 |
+      | **F10** | `pipeline_cleaning/F10.png` | Supplement | `sleep_visualization.R:2051` | [§9.2 · Sleep Duration Pre-Correction](#f10-sleep-duration-pre-correction) | 2026-09-30 |
+      | **F11** | `pipeline_cleaning/F11.png` | Supplement | `sleep_visualization.R:2137` | [§9.2 · Error Timeline](#f11-error-timeline) | 2026-09-30 |
+      | **F12** | `pipeline_cleaning/F12.png` | Supplement | `sleep_visualization.R:2228` | [§9.2 · Common Error Patterns](#f12-common-error-patterns) | 2026-09-30 |
+      | **F13** | `pipeline_cleaning/F13.png` | Supplement | `sleep_visualization.R:2307` | [§9.2 · Top Participants by Flag Rate](#f13-top-participants-by-flag-rate) | 2026-09-25 |
+      | **F14** | `pipeline_cleaning/F14.png` | Supplement | `sleep_visualization.R:2409` | [§9.2 · Auto-Detected Dashboard](#f14-auto-detected-dashboard) | 2026-09-25 |
+      | **F24** | `research_ready/F24.png` | Results | `sleep_visualization.R:2637` | [§9.3 · SOL Perception Bias](#f24-sol-perception-bias) | 2026-09-25 |
+      | **F25** | `research_ready/F25.png` | Results | `sleep_visualization.R:2695` | [§9.3 · WASO Perception Bias](#f25-waso-perception-bias) | 2026-09-25 |
+      | **F26** | `research_ready/F26.png` | Supplement | `sleep_visualization.R:2767` | [§9.3 · Substance Use Availability](#f26-substance-use-availability) | 2026-09-25 |
+      | **F27** | `research_ready/F27.png` | Supplement | `sleep_visualization.R:2870` | [§9.3 · Substance Use Value Distribution](#f27-substance-use-value-distribution) | 2026-09-25 |
+      | **F28** | `research_ready/F28.png` | Supplement | `sleep_visualization.R:2944` | [§9.3 · Caffeine Consumption](#f28-caffeine-consumption) | 2026-09-25 |
+      | **F29** | `research_ready/F29.png` | Supplement | `sleep_visualization.R:2979` | [§9.3 · Alcohol Consumption](#f29-alcohol-consumption) | 2026-09-25 |
+      | **F15** | `pipeline_cleaning/F15.png` | Supplement | `figure12_step_flag_table.R:15` | [§9.2 · Step Flag Ledger](#f15-step-flag-ledger) | 2026-09-25 |
+      | **F16** | `pipeline_cleaning/F16.png` | Supplement | `sleep_visualization.R:2579` | [§9.2 · Participants Worth a Second Look](#f16-participants-worth-a-second-look) | 2026-09-25 |
+      | **F30** | `research_ready/F30.png` | Results | `sleep_visualization.R:3043` | [§9.3 · Sleep Regularity — Weekday vs Weekend](#f30-sleep-regularity--weekday-vs-weekend) | 2026-09-25 |
+      | **F31** | `research_ready/F31.png` | Results | `sleep_visualization.R:3096` | [§9.3 · Sleep Composition — TIB Breakdown](#f31-sleep-composition--tib-breakdown) | 2026-09-25 |
+      | **F32** | `research_ready/F32.png` | Results | `sleep_visualization.R:3125` | [§9.3 · Sleep Metrics Correlation Matrix](#f32-sleep-metrics-correlation-matrix) | 2026-09-25 |
 
       `11` (flag co-occurrence, [card
       below](#f05-flag-co-occurrence-heatmap)) is skipped whenever fewer
@@ -785,13 +785,13 @@ Contents
       The right-side annotation classifies every final record into one
       of five classes:
 
-      | Class              | Meaning                                                                                                                                                           |
-      |--------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-      | Not Reported       | Any of bed / sleep / awake / getup time is missing                                                                                                                |
-      | Error (Reviewed)   | Order broken (not `bed ≤ sleep ≤ awake ≤ getup`), `sleep = awake`, a gap \> 7 h, or a sleep span \> 24 h — reviewed and fixed                                     |
-      | Equal Time         | `bed == sleep` and/or `awake == getup` (difference \< 0.01 h, about 36 s) with the order intact — a benign diary habit. (`sleep == awake` is an ERROR, not this.) |
-      | Unusual (Accepted) | Order intact but a gap \> 3 h (bed→sleep or awake→getup) — odd but possible, reviewed and kept as-is                                                              |
-      | Clean              | Order intact, no gap \> 3 h                                                                                                                                       |
+      | Class | Meaning |
+      |----|----|
+      | Not Reported | Any of bed / sleep / awake / getup time is missing |
+      | Error (Reviewed) | Order broken (not `bed ≤ sleep ≤ awake ≤ getup`), `sleep = awake`, a gap \> 7 h, or a sleep span \> 24 h — reviewed and fixed |
+      | Equal Time | `bed == sleep` and/or `awake == getup` (difference \< 0.01 h, about 36 s) with the order intact — a benign diary habit. (`sleep == awake` is an ERROR, not this.) |
+      | Unusual (Accepted) | Order intact but a gap \> 3 h (bed→sleep or awake→getup) — odd but possible, reviewed and kept as-is |
+      | Clean | Order intact, no gap \> 3 h |
 
       The figure prints these standards next to each class (first match
       wins, in the order above), so the diagram can be read without this
@@ -1087,12 +1087,12 @@ Contents
       the colour running from pale to red as the count grows
       (square-root scale, legend “Co-occurrence Count”).
 
-      | Axis label                | Flag                           | Raised when                                                                                              |
-      |---------------------------|--------------------------------|----------------------------------------------------------------------------------------------------------|
-      | `poor_efficiency`         | `flag_poor_efficiency`         | Sleep efficiency is below `classification.flag_severity.poor_efficiency_threshold_pct` (default 70%)     |
-      | `high_sol`                | `flag_high_sol`                | Sleep onset latency is above `classification.flag_severity.high_sol_threshold_hours` (default 1 h)       |
-      | `high_waso`               | `flag_high_waso`               | Wake after sleep onset is above `classification.flag_severity.high_waso_threshold_hours` (default 1.5 h) |
-      | `sleep_calculation_issue` | `flag_sleep_calculation_issue` | Calculated and self-reported sleep onset latency differ by more than 30 minutes                          |
+      | Axis label | Flag | Raised when |
+      |----|----|----|
+      | `poor_efficiency` | `flag_poor_efficiency` | Sleep efficiency is below `classification.flag_severity.poor_efficiency_threshold_pct` (default 70%) |
+      | `high_sol` | `flag_high_sol` | Sleep onset latency is above `classification.flag_severity.high_sol_threshold_hours` (default 1 h) |
+      | `high_waso` | `flag_high_waso` | Wake after sleep onset is above `classification.flag_severity.high_waso_threshold_hours` (default 1.5 h) |
+      | `sleep_calculation_issue` | `flag_sleep_calculation_issue` | Calculated and self-reported sleep onset latency differ by more than 30 minutes |
 
       **Where the numbers come from** Not every flag rests on the same
       kind of value, which matters when you read the figure:
@@ -2027,12 +2027,12 @@ Contents
       records); (D) summary table of TST/SOL mean ± SD before vs after.
       Caption states how many of how many records were modified.
 
-      | Mark                              | Meaning                                                                     |
-      |-----------------------------------|-----------------------------------------------------------------------------|
-      | ● Orange                          | Algorithmic correction                                                      |
-      | ● Blue                            | Manual correction                                                           |
+      | Mark | Meaning |
+      |----|----|
+      | ● Orange | Algorithmic correction |
+      | ● Blue | Manual correction |
       | ● Gray, 3% opacity (panel C only) | Unchanged record — an almost invisible backdrop behind the corrected points |
-      | Dotted diagonal (panel C)         | 1:1 “no change” reference line                                              |
+      | Dotted diagonal (panel C) | 1:1 “no change” reference line |
 
       **When nothing was corrected** If no record was changed (a clean
       dataset, or the manual-correction files were not applied), panels

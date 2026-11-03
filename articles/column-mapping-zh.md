@@ -117,27 +117,27 @@ run_pipeline(config = "my_study_config.yaml")
 **本仓库不含原始参与者数据。** 所有含参与者数据的 CSV 都被 gitignore。
 含合成数据的模板在 `templates/`。
 
-| 列组                | 变量                                                                                                                                    | 说明                            |
-|---------------------|-----------------------------------------------------------------------------------------------------------------------------------------|---------------------------------|
-| 标识符              | pid, day_num, row_id, participant                                                                                                       | 参与者和记录 ID                 |
-| 日期                | StartDate                                                                                                                               | EMA 会话的日历日期              |
-| 原始时间戳（HH:MM） | time_bed_am_hhmm, time_sleep_am_hhmm, time_awake_am_hhmm, time_getup_am_hhmm                                                            | 自报就寝/入睡/醒来/起床时钟时间 |
-| 原始时间戳（AM/PM） | time_bed_am_ampm, time_sleep_am_ampm, time_awake_am_ampm, time_getup_am_ampm                                                            | 每个时间戳的 AM/PM 指示         |
-| 原始时长            | duration_totalmin_sol_estimate_am, duration_totalmin_waso_estimate_am                                                                   | 自报 SOL 和 WASO（分钟）        |
-| 小睡/运动           | duration_totalmin_napstoday_PM, exercise_PM_totalmin\_\[Light\|Moderate\|Vigorous\|Strength\]                                           | 自报小睡和运动时长              |
-| 物质使用            | caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1, alcoholtoday_PM_NumAlcoholicDrinks_1, nicotine_amount_pm_doses, cannabis_amount_pm_doses | 自报物质使用                    |
-| WASO 次数           | num_waso_estimate_am, num_waso_am                                                                                                       | 醒来次数                        |
+| 列组 | 变量 | 说明 |
+|----|----|----|
+| 标识符 | pid, day_num, row_id, participant | 参与者和记录 ID |
+| 日期 | StartDate | EMA 会话的日历日期 |
+| 原始时间戳（HH:MM） | time_bed_am_hhmm, time_sleep_am_hhmm, time_awake_am_hhmm, time_getup_am_hhmm | 自报就寝/入睡/醒来/起床时钟时间 |
+| 原始时间戳（AM/PM） | time_bed_am_ampm, time_sleep_am_ampm, time_awake_am_ampm, time_getup_am_ampm | 每个时间戳的 AM/PM 指示 |
+| 原始时长 | duration_totalmin_sol_estimate_am, duration_totalmin_waso_estimate_am | 自报 SOL 和 WASO（分钟） |
+| 小睡/运动 | duration_totalmin_napstoday_PM, exercise_PM_totalmin\_\[Light\|Moderate\|Vigorous\|Strength\] | 自报小睡和运动时长 |
+| 物质使用 | caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1, alcoholtoday_PM_NumAlcoholicDrinks_1, nicotine_amount_pm_doses, cannabis_amount_pm_doses | 自报物质使用 |
+| WASO 次数 | num_waso_estimate_am, num_waso_am | 醒来次数 |
 
 ## 人工修正 CSV 模板
 
-| 模板文件                                                          | 正式文件                                       | 用途                      |
-|-------------------------------------------------------------------|------------------------------------------------|---------------------------|
-| `templates/template_manual_error_corrections.csv`                 | `manual_error_corrections.csv`                 | 时间戳修正（AM/PM、顺序） |
-| `templates/template_manual_unusual_corrections.csv`               | `manual_unusual_corrections.csv`               | 接受的异常模式            |
-| `templates/template_manual_nap_exercise_corrections.csv`          | `manual_nap_exercise_corrections.csv`          | 小睡/运动时长修正         |
-| `templates/template_manual_sleep_metric_duration_corrections.csv` | `manual_sleep_metric_duration_corrections.csv` | SOL/WASO 指标修正         |
-| `templates/template_manual_metric_review_acceptances.csv`         | `manual_metric_review_acceptances.csv`         | 人工接受的指标标记        |
-| `templates/template_second_review_checklist.csv`                  | `second_review_checklist.csv`                  | 第二人验证决定            |
+| 模板文件 | 正式文件 | 用途 |
+|----|----|----|
+| `templates/template_manual_error_corrections.csv` | `manual_error_corrections.csv` | 时间戳修正（AM/PM、顺序） |
+| `templates/template_manual_unusual_corrections.csv` | `manual_unusual_corrections.csv` | 接受的异常模式 |
+| `templates/template_manual_nap_exercise_corrections.csv` | `manual_nap_exercise_corrections.csv` | 小睡/运动时长修正 |
+| `templates/template_manual_sleep_metric_duration_corrections.csv` | `manual_sleep_metric_duration_corrections.csv` | SOL/WASO 指标修正 |
+| `templates/template_manual_metric_review_acceptances.csv` | `manual_metric_review_acceptances.csv` | 人工接受的指标标记 |
+| `templates/template_second_review_checklist.csv` | `second_review_checklist.csv` | 第二人验证决定 |
 
 ## 你可以修改的规则
 
@@ -175,29 +175,29 @@ second_review:
 
 ## 输出
 
-| 文件                                                           | 内容                                                                                                                                                                                      |
-|----------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `output/correction_status_final.csv`                           | 每次运行摘要（每次运行追加一行）：n_total；第一个与最后一个检查点上的 n_clean、n_error（`*_first`、`*_last`、`delta_*`，见 interpreting-output §4）；n_corrected；标记计数；平均 TST、SOL |
-| `output/appendix_step_ledger.csv`                              | 逐步标记追踪账本                                                                                                                                                                          |
-| `output/flagged_records_self_reported.csv`                     | 标为 SELF_REPORTED_FLAG 的记录                                                                                                                                                            |
-| `latest_visualization_*/figure_index.png`                      | 所有生成图的总览                                                                                                                                                                          |
-| `output/verification/real_n13990/`, `verification/synth_n280/` | 稳定、永不被覆盖的验证产物                                                                                                                                                                |
+| 文件 | 内容 |
+|----|----|
+| `output/correction_status_final.csv` | 每次运行摘要（每次运行追加一行）：n_total；第一个与最后一个检查点上的 n_clean、n_error（`*_first`、`*_last`、`delta_*`，见 interpreting-output §4）；n_corrected；标记计数；平均 TST、SOL |
+| `output/appendix_step_ledger.csv` | 逐步标记追踪账本 |
+| `output/flagged_records_self_reported.csv` | 标为 SELF_REPORTED_FLAG 的记录 |
+| `latest_visualization_*/figure_index.png` | 所有生成图的总览 |
+| `output/verification/real_n13990/`, `verification/synth_n280/` | 稳定、永不被覆盖的验证产物 |
 
 ### 项目根目录的工作文件（与 `output/` 同级，不在其中）
 
 这些文件在运行中写在 `output/`
 文件夹旁边。含真实参与者行，不要提交。详见 `interpreting-output` §2.2。
 
-| 文件                                      | 写出于                         | 内容                                                                                                                                                |
-|-------------------------------------------|--------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
+| 文件 | 写出于 | 内容 |
+|----|----|----|
 | `[NEW]manual_error_correction_review.csv` | Step 5 写出，Step 8.5 之后重写 | 一张状态表：Step 5 的每条 `error` 行，加上修正之后才变成错误的记录，每行有 `status_after_corrections`、`in_manual_file`、修正前后类别和 Step 8 标记 |
-| `[NEW]manual_unusual_review.csv`          | Step 5                         | 给人填写的 `unusual` 记录                                                                                                                           |
-| `review_status.csv`                       | Step 8.5 之后                  | 两张待审表合成一张，每行按配置里的 `review:` 规则标为 `needs_review` / `not_incorporated` / `incorporated`                                          |
-| `manual_error_correction_updated.csv`     | Step 6                         | 已应用修正的记录：你的 `manual_error_corrections.csv` 被流水线纳入后的副本，`manually_corrected` 标明实际用上的行                                   |
-| `reasonable_unusual_records.csv`          | Step 6                         | 被接受为”reasonable unusual record”的 `unusual` 行                                                                                                  |
-| `cross_participant_flagged_rows.csv`      | Step 8.5                       | SOL/WASO 偏离此人自己中位数的日子                                                                                                                   |
-| `cross_participant_suspicious_slices.csv` | Step 8.5                       | 上一个文件中参与者的全部天数，作上下文                                                                                                              |
-| `cross_participant_field_misentries.csv`  | Step 8.5                       | SOL/WASO 数字像填进别的时间栏的行                                                                                                                   |
+| `[NEW]manual_unusual_review.csv` | Step 5 | 给人填写的 `unusual` 记录 |
+| `review_status.csv` | Step 8.5 之后 | 两张待审表合成一张，每行按配置里的 `review:` 规则标为 `needs_review` / `not_incorporated` / `incorporated` |
+| `manual_error_correction_updated.csv` | Step 6 | 已应用修正的记录：你的 `manual_error_corrections.csv` 被流水线纳入后的副本，`manually_corrected` 标明实际用上的行 |
+| `reasonable_unusual_records.csv` | Step 6 | 被接受为”reasonable unusual record”的 `unusual` 行 |
+| `cross_participant_flagged_rows.csv` | Step 8.5 | SOL/WASO 偏离此人自己中位数的日子 |
+| `cross_participant_suspicious_slices.csv` | Step 8.5 | 上一个文件中参与者的全部天数，作上下文 |
+| `cross_participant_field_misentries.csv` | Step 8.5 | SOL/WASO 数字像填进别的时间栏的行 |
 
 输出结构的关键规则： - `latest_visualization_<tag>_n<rows>/`
 是”最新”而非”历史”——每次可视化运行清空重建。 -
