@@ -115,7 +115,7 @@ CI 为参与者级 cluster bootstrap（1,000 次），因为同一参与者的�
 
 修复（commit `5dd0e27`，2026-08-12，`checkforerrors_processing.R` 中的 Part A4）增加了针对性检查，标记可疑的钟表时间形态时长条目供人工复核，而非静默接受重新解释的值。然而，提交到仓库的合成基准结果文件（commit `18c3ed1`，补丁一小时后）是*发现 bug 时的 pre-patch 运行*——而非补丁后的重跑。项目文档中的"补丁验证"表引用了补丁后数字（SOL 95.8% → 3.5% 误修；WASO 95.8% → 0%），但这些数字源于当时的 ad-hoc 核查，并非重新生成的基准 CSV；仓库中当时不存在补丁后的 CSV。
 
-我们于 2026-09-02 对当前安装的 `sleepcleanr` 1.4.5（含 Part A4 补丁）进行了完整端到端基准重跑——完整 `corrupted_enrichment.rds`（n=7,000，全部 15 类错误、按参与者聚类注入），用 `evaluate_detection.R`（v4）结合当前 `ground_truth_enrichment.csv` 评估。这产生了该发现的首个真实补丁后数字：
+我们于 2026-09-02 对当前安装的 `sleepcleanr` 1.4.5（含 Part A4 补丁）进行了完整端到端基准重跑——完整 `corrupted_enrichment.rds`（n=7,000，全部 14 类注入错误加干净对照（清单口径为 15 类）、按参与者聚类注入），用 `evaluate_detection.R`（v4）结合当前 `ground_truth_enrichment.csv` 评估。这产生了该发现的首个真实补丁后数字：
 
 | | field_misentry_sol | field_misentry_waso |
 |---|---|---|

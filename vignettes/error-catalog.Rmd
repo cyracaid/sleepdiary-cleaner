@@ -1,0 +1,155 @@
+---
+title: "Error Catalog"
+description: >
+  Every kind of entry error the sleepcleanr validation considers, grouped by
+  where it comes from (this project's data, published sleep-diary studies, or
+  ordinary use of a diary form) and by what the pipeline does with it.
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Error Catalog}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+<p class="lang-switch" style="text-align:right;margin:0.2em 0 0.8em"><a href="error-catalog-zh.html">中文版 →</a></p>
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+This page lists the entry errors that the validation of the cleaning pipeline
+considers, so that a reader can see what was tested, where each error type comes
+from, and what the pipeline is expected to do with it. It holds counts and
+mechanisms only. It contains no participant identifiers and no row-level data.
+
+The machine-readable source is `validation/synthetic/error_catalog.yaml` in the
+repository. This page and that file are meant to agree; if they do not, the
+file is the record and this page is out of date.
+
+## How the catalog is counted
+
+The catalog has **17 entries**:
+
+- **1 negative control** (`no_error_control`): rows left untouched, used to
+  measure false alarms.
+- **16 error types.** Of these, **14 are injected in the committed synthetic
+  benchmark** (7,000 rows, 5,391 rows with an injected error, 1,609 clean
+  control rows). The other two are not in that run: `awake_misread_as_waso` is
+  documented but has no injector yet, and `awake_is_getup` is opt-in and was run
+  separately (see below).
+
+So "14 error categories" (README) and "15 categories" (the 2026-09-02
+re-run described in [Validation Methodology](validation-methodology.html)) are
+the same benchmark: 14 injected error types, and 15 when the clean control is
+counted as a category.
+
+## Where an error type comes from
+
+Each type carries one or more of three tags. The tags matter because a benchmark
+built only from errors the project has already seen would measure the rules
+against the errors they were written for.
+
+| Tag | Meaning |
+|---|---|
+| `observed` | Seen in this project's own data |
+| `literature` | Reported by a published sleep-diary study (SHUTi, RESTING) |
+| `blind_spot` | Possible in principle, and not caught by the pipeline until a dedicated check was added |
+
+The third source is the ordinary behaviour of someone filling in a form: a wrong
+AM/PM, a wake time given as the time of getting up, a clock time typed where a
+duration was asked for. Where a published study gives a rate, it is cited below.
+Where none does, the catalog says so and does not supply a number.
+
+## The error types
+
+### Clock times (bedtime, sleep onset, awakening, get-up)
+
+| Type | What happens | Source | What the pipeline does |
+|---|---|---|---|
+| `ampm_swap` | An evening time is entered with the wrong AM/PM, giving an apparent gap of 12 hours or more | observed, literature | Step 4 subtracts 12 hours when that restores a plausible order; otherwise the row goes to review |
+| `adjacent_swap_bed_sleep` | Bedtime and sleep onset entered in each other's field, gap under 3 hours | observed, literature | Swapped back in Step 4 |
+| `adjacent_swap_sleep_awake` | Sleep onset and final awakening exchanged, gap under 3 hours | observed, literature | Swapped back in Step 4 |
+| `adjacent_swap_awake_getup` | Awakening and get-up exchanged, gap under 3 hours | observed, literature | Swapped back in Step 4 |
+| `adjacent_swap_large_gap_left_clean` | An exchanged pair with a gap above 3 hours, which the swap rule deliberately leaves alone | observed, blind_spot | Left to the order check, which should flag it |
+| `compound_ampm_and_swap` | An AM/PM error and an exchanged pair on the same night | observed, blind_spot | The two rules each look at one pair, so the pipeline can blame the wrong field; this type measures that risk |
+| `awake_is_getup` | The rise time is typed in the wake-time field, so the two agree | literature | Equal times are valid, so this form cannot be told from a true entry. Opt-in; run as a stress test |
+| `awake_misread_as_waso` | A brief awakening in the night is given as the final awakening | observed, blind_spot | Documented only; no injector yet |
+
+### Durations (sleep-onset latency, wake after sleep onset)
+
+| Type | What happens | Source | What the pipeline does |
+|---|---|---|---|
+| `field_misentry_sol` | A clock time is typed where the sleep-onset latency was asked for | observed, blind_spot | Step 1.5 checks for it; since 1.8.0 Step 6.5 also recomputes the latency when the typed time is close to the recorded sleep onset |
+| `field_misentry_waso` | A clock time is typed where the wake-after-sleep-onset duration was asked for | blind_spot | Step 1.5 checks for it; since 1.8.0 the value is set to missing when it looks like a clock time |
+| `format_no_colon` | A duration typed without a colon | observed | Read by digit count in the interval parser |
+| `format_malformed_colon` | Colons in unusual places | observed | Regrouped by pattern in the interval parser |
+| `mmss_confusion` | A short duration whose text can be read as minutes and seconds | observed | The MM:SS rule can read it wrongly; the entry is flagged for review |
+| `implausible_duration` | A well-formed but extreme duration, whatever the person's own baseline | literature | Row-level thresholds in Step 8 |
+| `cross_participant_spike` | A well-formed value far outside that person's own usual range | observed | Step 8.5 |
+| `sol_window_contradiction` | The reported latency does not fit between bedtime and sleep onset | observed, blind_spot | Flagged in Step 8 |
+
+### Control
+
+| Type | What happens |
+|---|---|
+| `no_error_control` | Rows are left as they are, to count false alarms and altered clean rows |
+
+## Out-of-order nights, by mechanism
+
+The four times of a night should satisfy bedtime ≤ sleep onset ≤ awakening ≤
+get-up. A night that does not is out of order. Most of these are not two fields
+exchanged. In the study data, 140 of the 2,848 nights with all four times
+readable (4.9%) were out of order; 6 of the 140 have an unusable get-up value and
+are not an ordering problem, which leaves 134 (4.7%). By mechanism:
+
+| Mechanism | Nights |
+|---|---|
+| Two fields exchanged | 47 |
+| One field 12 hours from where it belongs | 57 |
+| Two fields moved together by 12 hours | 14 |
+| Awakening earlier than bedtime | 6 |
+| All gaps within rounding (10 minutes or less) | 3 |
+| Not explained by any single edit | 7 |
+| Get-up value unusable | 6 |
+
+The package function `classify_reversals()` assigns each night to one of these
+and `reversal_summary()` counts them; Figure 33 plots the result. See the
+function help for the exact classes and thresholds.
+
+In the study data the automatic rules repaired 89 of the 140 nights and human
+review the other 49. The rules handle a sleep-onset time 12 hours out and an
+exchanged pair almost every time. They handle almost none of the nights where
+the bedtime is 12 hours out or the whole night has moved; those need a person.
+
+## What the benchmark and the external rates show
+
+- With the committed synthetic benchmark, detection means "the row was flagged",
+  not "the value was recovered". Correction is reported separately per type in
+  the [validation report](validation-methodology.html).
+- Two published studies give rates that do not come from this project's data.
+  SHUTi reports 487 of 45,598 diaries (1.07%) needing a date or AM/PM
+  correction. RESTING (3,382 diary-days) reports confusing wake time with rise
+  time as its commonest entry error (150 diary-days) and 28 AM/PM errors. Two
+  error mixes were built from these at 5% of rows and injected into this
+  project's own synthetic diary data. In the first, wake and rise are exchanged;
+  every injected row was corrected. In the second, the rise time is typed in
+  both fields; none was detected, because equal times are valid. The mean total
+  sleep time that this could bias is bounded at about 0.8 minutes under stated
+  assumptions. Clean rows were not altered in either mix.
+
+## Types that have no external rate
+
+Most of the duration types (format slips, the MM:SS confusion, the spikes) have
+no published rate in sleep-diary studies. The catalog keeps the rate observed in
+this project's own audit as an anchor and labels it as such. It is not offered as
+the rate in other data.
+
+## Where the pieces are
+
+| What | Where |
+|---|---|
+| The catalog, machine-readable | `validation/synthetic/error_catalog.yaml` |
+| The injectors and the benchmark runs | `validation/synthetic/` |
+| The external-rate mixes | `validation/synthetic/prevalence_grid.R` |
+| The out-of-order classification | `classify_reversals()`, `reversal_summary()` |
+| The duration clock-time rule | Step 6.5, `duration_clock_rule` in `config_default.yaml` |

@@ -18,6 +18,12 @@
 # enriched independently per validation/benchmark_design.md §2-3). It is the
 # empirical prevalence anchor used to build the calibrated-mode PPV curve.
 
+# Counting: 17 entries = 1 negative control (no_error_control) + 16 error types.
+# 14 error types are injected in the committed benchmark; awake_misread_as_waso
+# has no injector and awake_is_getup is opt-in. "14 categories" (README) and
+# "15" (14 + the control) are the same benchmark. Readable version:
+# vignettes/error-catalog.Rmd.
+
 meta:
   anchors:
     shuti_2023_pct: 1.07        # 487/45598 needed date or AM/PM correction

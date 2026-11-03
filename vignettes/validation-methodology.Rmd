@@ -183,7 +183,7 @@ benchmark CSV; no post-patch CSV existed in the repository.
 
 We re-ran the full benchmark end-to-end on 2026-09-02 against the currently
 installed `sleepcleanr` 1.4.5 (Part A4 patch included) — full
-`corrupted_enrichment.rds` (n=7,000, all 15 error categories together,
+`corrupted_enrichment.rds` (n=7,000, all 14 injected error categories plus the clean control (15 in the catalog count),
 participant-clustered injection), evaluated with `evaluate_detection.R` (v4)
 against the current `ground_truth_enrichment.csv`. This produced the first
 real post-patch numbers for this finding:

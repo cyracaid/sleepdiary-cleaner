@@ -38,6 +38,8 @@ navbar:
           href: articles/pipeline-architecture.html
         - text: "Validation Methodology"
           href: articles/validation-methodology.html
+        - text: "Error Catalog"
+          href: articles/error-catalog.html
         - text: "Testing Coverage"
           href: articles/testing-coverage.html
         - text: "-------"
@@ -58,6 +60,8 @@ navbar:
           href: articles/pipeline-architecture-zh.html
         - text: "验证方法学"
           href: articles/validation-methodology-zh.html
+        - text: "错误类型清单"
+          href: articles/error-catalog-zh.html
         - text: "测试覆盖率"
           href: articles/testing-coverage-zh.html
         - text: "-------"
@@ -77,6 +81,7 @@ articles:
       - troubleshooting
       - pipeline-architecture
       - validation-methodology
+      - error-catalog
       - testing-coverage
   - title: "Chinese (中文)"
     desc: >
@@ -90,4 +95,5 @@ articles:
       - troubleshooting-zh
       - pipeline-architecture-zh
       - validation-methodology-zh
+      - error-catalog-zh
       - testing-coverage-zh
