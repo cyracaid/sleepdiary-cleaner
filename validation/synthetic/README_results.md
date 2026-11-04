@@ -137,6 +137,45 @@ numbers are:
 Quoting "L3 = 0.486" without this context misleads. Report L1 + MRR + the
 corrected-or-flagged safe outcome.
 
+## What the external mixes measure, and what they do not
+
+`prevalence_grid.csv` has two external-mix rows at 5% of rows. `external_inverted`
+injects wake and rise times exchanged and nothing else: 350 of 350 flagged or
+corrected, 100% (95% CI 98.95 to 100%). Read that as a statement about **one
+form of reversal**. In the study data, 140 of 2,848 nights with all four times
+(4.92%) have times out of order (134, or 4.71%, after setting aside 6 impossible
+get-up values), and wake and rise exchanged is 9 of the 140 (6.4%).
+
+`results/real_mix_outcome.csv` re-runs the benchmark with the forms in the
+study's own proportions (7,000 rows, 350 injected, seed 20260817):
+
+| Form of the reversal | Share of the 140 | Injected | Flagged or corrected | Wrong repairs |
+|---|---|---|---|---|
+| Wake and rise exchanged | 9 (6.4%) | 25 | 100% | 0 |
+| Bed and sleep onset exchanged | 38 (27.1%) | 106 | 100% | 0 |
+| Sleep onset 12 h off | 36 (25.7%) | 102 | 100% | 0 |
+| Rise time 12 h off | 6 (4.3%) | 17 | 100% | 0 |
+| Bed time 12 h off | 14 (10.0%) | 40 | 17.5% | 33 |
+| Whole night 12 h off | 14 (10.0%) | 40 | 5.0% | 38 |
+| Wake before bed time | 6 (4.3%) | 17 | 0% | 17 |
+| Wake time 12 h off | 1 (0.7%) | 3 | 0% | 3 |
+| All | 124 injectable | 350 | 74.0% | 91 |
+
+No clean row was flagged or altered (0 of 6,650). The benchmark has no reviewer,
+so a wrong repair here is a row that the real workflow sends to the review
+worksheets. In the study data 138 of the 140 reversed nights end with the order
+restored and a plausible duration (89 by the algorithm, 49 by hand); the forms
+the algorithm does not repair (bed time, whole night) are the ones fixed by hand.
+The script that produced `real_mix_outcome.csv` (`07_run_real_mix.R`) is held
+locally and is not yet in this repository, so this table is recorded, not
+re-runnable from here.
+
+The `external_same` row (22.4%, 95% CI 17.8 to 27.5%) is a different thing: it
+types the rise time into the wake field. Equal times are valid data (508 of the
+study's awakening and get-up pairs, 17.8%, are equal after correction), so a miss
+there is a limit of timestamp-only checks, not a detection gap that can be
+closed.
+
 ## FAR=0 wording (scope limitation)
 
 FAR_flag = 0/1,609 and FAR_alter = 0/1,609 mean: on **constructively-clean

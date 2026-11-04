@@ -41,6 +41,7 @@ not re-run for this check.
 | No-cleaning vs naive rule vs pipeline | `synthetic/results/control_baselines.csv` | `Rscript validation/synthetic/control_baselines.R` | no |
 | Recall stable across four seeds | `synthetic/results/seed_sensitivity.csv` | `Rscript validation/synthetic/seed_sensitivity.R` | no |
 | Operating point for the swap and flip thresholds | `synthetic/results/operating_point_sweep.csv` | `Rscript validation/synthetic/operating_point_sweep.R` | no |
+| Which reversal forms the pipeline repairs, in the study's proportions (74.0% of 350; 100% for exchanges and sleep-onset or rise shifts, 17.5% bed time, 5.0% whole night, 0% wake before bed) | `synthetic/results/real_mix_outcome.csv`; read with "What the external mixes measure" in `synthetic/README_results.md` | script held locally, not yet in the repo | no |
 | Threshold multiverse and its ablations | `synthetic/results/multiverse/`, `l2_tier.csv`, `leave_one_out.csv` | `multiverse.R`, `l2_tier_leave_one_out.R` | no |
 | Clock-time-in-duration-field cases are no longer silently repaired | `synthetic/results/detection_outcomes_v4_current.csv` | `Rscript validation/synthetic/evaluate_detection.R` | no |
 | Thresholds barely move real-data results | `synthetic/results/real_data_spec_curve.csv` | `Rscript validation/synthetic/real_data_spec_curve.R` | **yes** |
