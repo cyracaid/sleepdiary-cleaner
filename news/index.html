@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.8.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.8.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,12 +68,13 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="1.9.0" id="sleepcleanr-190-unreleased">sleepcleanr 1.9.0 (unreleased)<a class="anchor" aria-label="anchor" href="#sleepcleanr-190-unreleased"></a></h2>
+<h2 class="pkg-version" data-toc-text="development version" id="sleepcleanr-development-version">sleepcleanr (development version)<a class="anchor" aria-label="anchor" href="#sleepcleanr-development-version"></a></h2>
 <div class="section level3">
-<h3 id="added-1-9-0">Added<a class="anchor" aria-label="anchor" href="#added-1-9-0"></a></h3>
+<h3 id="added-development-version">Added<a class="anchor" aria-label="anchor" href="#added-development-version"></a></h3>
 <ul><li>
 <code><a href="../reference/classify_reversals.html">classify_reversals()</a></code> and <code><a href="../reference/reversal_summary.html">reversal_summary()</a></code> describe nights whose self-reported times violate bed &lt;= sleep onset &lt;= awakening &lt;= get-up. Each reversed night is classed by the smallest edit that restores the order while keeping the night plausible (two fields exchanged, one field 12 hours away, two fields moved together); nights no edit explains are classed by what is visibly wrong (an impossible get-up value, an awakening before bedtime, a rounding-sized gap). <code>detail</code> names the field, e.g. <code>swap:bed-sleep</code> or <code>pm12h:sleep-12h</code>. Nothing is changed by these functions; they read the pre-correction columns a run already keeps.</li>
-<li>Figure F33 (<code>pipeline_cleaning/F33.png</code>) draws these classes: one row per mechanism, empty rows included, with the number of nights and the share of all out-of-order nights. There are now 33 figures (17 pipeline-cleaning, 16 research-ready).</li>
+<li>Figure F33 (<code>pipeline_cleaning/F33.png</code>) draws these classes: one row per mechanism, empty rows included, with the number of nights and the share of all out-of-order nights.</li>
+<li>Figures F34 and F35 (<code>pipeline_cleaning/</code>) show what the Step 6.5 clock-time rule did: F34 counts the reinterpreted SOL / WASO entries by outcome (kept as minutes, recomputed, set to missing, left for review); F35 plots each SOL entry typed like a clock time against the person’s own bedtime and sleep onset. Both read <code>output/duration_clock_rule_log.csv</code> and are skipped when the rule saw no entry. There are now 35 figures (19 pipeline-cleaning, 16 research-ready).</li>
 </ul></div>
 </div>
     <div class="section level2">

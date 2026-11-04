@@ -1,6 +1,6 @@
 # Changelog
 
-## sleepcleanr 1.9.0 (unreleased)
+## sleepcleanr (development version)
 
 ### Added
 
@@ -19,8 +19,15 @@
   keeps.
 - Figure F33 (`pipeline_cleaning/F33.png`) draws these classes: one row
   per mechanism, empty rows included, with the number of nights and the
-  share of all out-of-order nights. There are now 33 figures (17
-  pipeline-cleaning, 16 research-ready).
+  share of all out-of-order nights.
+- Figures F34 and F35 (`pipeline_cleaning/`) show what the Step 6.5
+  clock-time rule did: F34 counts the reinterpreted SOL / WASO entries
+  by outcome (kept as minutes, recomputed, set to missing, left for
+  review); F35 plots each SOL entry typed like a clock time against the
+  person’s own bedtime and sleep onset. Both read
+  `output/duration_clock_rule_log.csv` and are skipped when the rule saw
+  no entry. There are now 35 figures (19 pipeline-cleaning, 16
+  research-ready).
 
 ## sleepcleanr 1.8.0
 

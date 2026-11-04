@@ -36,13 +36,13 @@ Contents
   - [9.1 Figure Index](#s-9-1)
     - [How figures are named](#s-9-1-naming)
 
-      Since 1.7.1 every figure uses one continuous scheme: `F01`-`F33`.
+      Since 1.7.1 every figure uses one continuous scheme: `F01`-`F35`.
       The number matches the file name (`pipeline_cleaning/F07.png`),
       the in-figure title, and this reference. Ranges by family: F01-F16
-      and F33 live in `pipeline_cleaning/` (the pipeline and detection
-      families interleave by build order), F17-F32 in `research_ready/`.
-      Numbers retired by the 1.6.0 reclassification were reassigned –
-      there are no gaps and no lettered suffixes.
+      and F33-F35 live in `pipeline_cleaning/` (the pipeline and
+      detection families interleave by build order), F17-F32 in
+      `research_ready/`. Numbers retired by the 1.6.0 reclassification
+      were reassigned – there are no gaps and no lettered suffixes.
 
       Terminology and definitions
 
@@ -635,7 +635,7 @@ Contents
 
       | Item | What it is | When to open it |
       |----|----|----|
-      | `pipeline_cleaning/` | 17 diagnostic figures: what the pipeline found and changed (cards in §9.2) | Checking that cleaning behaved; the audit trail for a supplement |
+      | `pipeline_cleaning/` | 19 diagnostic figures: what the pipeline found and changed (cards in §9.2) | Checking that cleaning behaved; the audit trail for a supplement |
       | `research_ready/` | 16 publication-oriented figures: sleep metrics, perception bias, substance use (cards in §9.3) | Choosing figures for Results |
       | `figure_index.png` | One contact sheet of all figures. A red block at the top lists the figures that were skipped and why | First look after a run |
       | `all_figures_review.pdf` | Every figure, one per page, in generation order, at the same size as the PNGs | Flipping through all figures quickly or sharing with a collaborator on the study team |
@@ -690,6 +690,8 @@ Contents
       | **F15** | `pipeline_cleaning/F15.png` | Supplement | `figure12_step_flag_table.R:15` | [§9.2 · Step Flag Ledger](#f15-step-flag-ledger) | 2026-09-25 |
       | **F16** | `pipeline_cleaning/F16.png` | Supplement | `sleep_visualization.R:2579` | [§9.2 · Participants Worth a Second Look](#f16-participants-worth-a-second-look) | 2026-09-25 |
       | **F33** | `pipeline_cleaning/F33.png` | Supplement | `sleep_visualization.R:3185` | [§9.2 · Out-of-Order Nights, by Mechanism](#f33-out-of-order-nights-by-mechanism) | 2026-11-03 |
+      | **F34** | `pipeline_cleaning/F34.png` | Supplement | `sleep_visualization.R:3283` | [§9.2 · Clock-Time Rule Outcomes (SOL / WASO)](#f34-clock-time-rule-outcomes) | 2026-11-03 |
+      | **F35** | `pipeline_cleaning/F35.png` | Supplement | `sleep_visualization.R:3309` | [§9.2 · SOL Clock-Like Entries vs Own Times](#f35-sol-clock-like-entries-vs-own-times) | 2026-11-03 |
       | **F30** | `research_ready/F30.png` | Results | `sleep_visualization.R:3043` | [§9.3 · Sleep Regularity — Weekday vs Weekend](#f30-sleep-regularity--weekday-vs-weekend) | 2026-09-25 |
       | **F31** | `research_ready/F31.png` | Results | `sleep_visualization.R:3096` | [§9.3 · Sleep Composition — TIB Breakdown](#f31-sleep-composition--tib-breakdown) | 2026-09-25 |
       | **F32** | `research_ready/F32.png` | Results | `sleep_visualization.R:3125` | [§9.3 · Sleep Metrics Correlation Matrix](#f32-sleep-metrics-correlation-matrix) | 2026-09-25 |
@@ -703,7 +705,7 @@ Contents
       to show (e.g. the review queue is empty because everything was
       already reviewed), the skip reason says so explicitly.
 
-      #### How figures are named (F01-F33, continuous since 1.7.1)
+      #### How figures are named (F01-F35, continuous since 1.7.1)
 
       - **The numbers follow the data source, not the folder.** Numbers
         01 to 24 come from the original single visualization script,
@@ -713,17 +715,17 @@ Contents
         plus the corrected data. They do not match the output folders:
         02 and 03 are in `research_ready/`, while 06 and 07 are in
         `pipeline_cleaning/`.
-      - **Since 1.7.1 the scheme is continuous: `F01`-`F33`.** The
+      - **Since 1.7.1 the scheme is continuous: `F01`-`F35`.** The
         number is the file name, the in-figure title and this reference.
         There are no lettered suffixes and no gaps: the numbers retired
         by earlier reorganisations (the old 08, 12 and 19) were
         reassigned rather than left empty.
       - **Families by folder:** `pipeline_cleaning/` holds F01-F16 and
-        F33 (pipeline and detection figures interleaved in build order;
-        F33 was added last); `research_ready/` holds F17-F32.
-        Build-order interleaving within `pipeline_cleaning/` is why a
-        detection figure (F06-F14) can carry a higher number than a
-        pipeline one.
+        F33-F35 (pipeline and detection figures interleaved in build
+        order; F33-F35 were added last); `research_ready/` holds
+        F17-F32. Build-order interleaving within `pipeline_cleaning/` is
+        why a detection figure (F06-F14) can carry a higher number than
+        a pipeline one.
       - **File names are kept as they are.** Renaming touches the code,
         the figure index registry and any script of yours that reads
         these files. The proposal also suggests a hierarchical display
@@ -2016,6 +2018,11 @@ Contents
 
       **Paper use** Supplement
 
+      **Title and subtitle** Title: *Nights with out-of-order times, by
+      mechanism*. Subtitle lines: what the figure answers (when the four
+      times fail bed ≤ sleep onset ≤ awakening ≤ get-up, which kind of
+      slip is it), how to read a bar, and the count N.
+
       **What each part means** One row per way a night’s four
       self-reported times (bed, sleep onset, final awakening, get-up)
       can fall out of order, from
@@ -2081,6 +2088,80 @@ Contents
       > mechanism. One row per mechanism, bar = number of nights, right
       > column = share of all out-of-order nights. N and the percentage
       > of complete nights are in the subtitle.
+
+      #### F34 · Clock-Time Rule Outcomes (SOL / WASO)
+
+      **File** `pipeline_cleaning/F34.png` — generated at
+      `sleep_visualization.R:3283`
+
+      **Paper use** Supplement
+
+      **Title and subtitle** Title: *SOL / WASO entries read as a clock
+      time or a mistyped duration*. Subtitle lines: what the figure
+      answers (what Step 6.5 did with each reinterpreted entry), how to
+      read a bar, and the count N.
+
+      **What each part means** One bar per outcome of the Step 6.5
+      clock-time rule, for the SOL and WASO entries the interval parser
+      had reinterpreted (read as minutes and seconds, or `dd:00`). The
+      number at the end of a bar is the count; colour is the field (blue
+      SOL, orange WASO). Source: `output/duration_clock_rule_log.csv`,
+      which lists every entry and what was done.
+
+      | Bar | What it means |
+      |----|----|
+      | Kept as minutes | Typed like `5:00` and read as 5 minutes; not changed |
+      | SOL recomputed from the clock time | The typed time was close to the person’s own sleep onset and after bedtime; SOL = typed time minus bedtime |
+      | Set to missing | The typed value was the bedtime (SOL), or WASO looks like a clock time; the original text is kept |
+      | Left for review | Clock-like but the rule does not decide; the value stays as parsed and is still flagged |
+
+      **Healthy look** Mostly “Kept as minutes”, a few recomputed, very
+      few set to missing.
+
+      **Anomaly →** A large “Left for review” bar means many entries sit
+      between the rule’s tolerance and its window; that is the list a
+      person has to read.
+
+      **Paper caption**
+
+      > **Figure 34.** SOL and WASO entries that looked like a clock
+      > time or a mistyped duration, by what the clock-time rule did
+      > with each. N is in the subtitle.
+
+      #### F35 · SOL Clock-Like Entries vs Own Times
+
+      **File** `pipeline_cleaning/F35.png` — generated at
+      `sleep_visualization.R:3309`
+
+      **Paper use** Supplement
+
+      **Title and subtitle** Title: *SOL entries typed like a clock
+      time, against the person’s own times*. Subtitle lines: what the
+      figure answers (was the typed time the sleep onset or the
+      bedtime), how to read a dot, and N with the rule’s tolerance and
+      window.
+
+      **What each part means** Each dot is a SOL entry typed like a
+      clock time. The x axis is the typed time minus the person’s own
+      bedtime, the y axis the typed time minus their own sleep onset,
+      both in minutes on a 12-hour dial (no AM/PM was typed). The dashed
+      box is the rule’s tolerance (vertical) and window (horizontal);
+      dots inside it are recomputed. Green = recomputed, red = set to
+      missing, grey = left for review.
+
+      **Healthy look** Dots near zero on the y axis and 0 to 60 on the x
+      axis: the person typed about when they fell asleep.
+
+      **Anomaly →** Dots near zero on the x axis and away from zero on
+      the y axis are people who typed their bedtime. Dots far from both
+      axes are not explained by either time.
+
+      **Paper caption**
+
+      > **Figure 35.** SOL entries typed like a clock time, as the
+      > distance (minutes, 12-hour dial) from the person’s own bedtime
+      > and sleep onset. The dashed box marks the clock-time rule’s
+      > tolerance and window.
 
       ### 9.3 Research-ready figure cards (`research_ready/`)
 

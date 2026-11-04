@@ -149,3 +149,9 @@ as such. It is not offered as the rate in other data.
 | The external-rate mixes | `validation/synthetic/prevalence_grid.R` |
 | The out-of-order classification | [`classify_reversals()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/classify_reversals.md), [`reversal_summary()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/reversal_summary.md) |
 | The duration clock-time rule | Step 6.5, `duration_clock_rule` in `config_default.yaml` |
+| Figures on real data | F33 (out-of-order nights by mechanism), F34 (what Step 6.5 did with each reinterpreted SOL / WASO entry), F35 (SOL entries typed like a clock time against the person’s own bedtime and sleep onset); cards in [Interpreting Output](https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output.md) |
+
+F34 and F35 read the Step 6.5 log, so they count the entries the
+pipeline actually acted on. A separate scan of the raw input, used while
+the rule was designed, counts every candidate in the raw text (72
+entries). The two counts answer different questions and need not match.

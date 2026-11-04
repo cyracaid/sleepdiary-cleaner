@@ -24,7 +24,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.8.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.8.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -465,8 +465,21 @@ as such. It is not offered as the rate in other data.</p>
 <code>config_default.yaml</code>
 </td>
 </tr>
+<tr class="even">
+<td>Figures on real data</td>
+<td>F33 (out-of-order nights by mechanism), F34 (what Step 6.5 did with
+each reinterpreted SOL / WASO entry), F35 (SOL entries typed like a
+clock time against the person’s own bedtime and sleep onset); cards in
+<a href="interpreting-output.html">Interpreting Output</a>
+</td>
+</tr>
 </tbody>
 </table>
+<p>F34 and F35 read the Step 6.5 log, so they count the entries the
+pipeline actually acted on. A separate scan of the raw input, used while
+the rule was designed, counts every candidate in the raw text (72
+entries). The two counts answer different questions and need not
+match.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

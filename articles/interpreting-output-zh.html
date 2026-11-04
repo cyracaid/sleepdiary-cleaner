@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.8.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.8.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -177,7 +177,7 @@ CSV、回归检查和快速检查卡；第 8–9 节讲怎么看图。</p>
 </li>
 <li>
 <details><summary><a href="#s-9-2">9.2
-管线清洗图卡片（<code>pipeline_cleaning/</code>）（17 张）</a>
+管线清洗图卡片（<code>pipeline_cleaning/</code>）（19 张）</a>
 </summary><ul>
 <li>
 <a href="#c-01">F01 · 管线记录流</a>
@@ -229,6 +229,12 @@ CSV、回归检查和快速检查卡；第 8–9 节讲怎么看图。</p>
 </li>
 <li>
 <a href="#c-f33">F33 · 时间顺序反了的夜晚，按机制</a>
+</li>
+<li>
+<a href="#c-f34">F34 · 钟点规则的处理结果（SOL / WASO）</a>
+</li>
+<li>
+<a href="#c-f35">F35 · 像钟点的 SOL 与本人时间</a>
 </li>
 </ul></details>
 </li>
@@ -1522,7 +1528,7 @@ gitignore，不要提交或外传。</p>
 <tbody>
 <tr class="odd">
 <td><code>pipeline_cleaning/</code></td>
-<td>17 张诊断图：流水线发现了什么、改了什么（卡片见 §9.2）</td>
+<td>19 张诊断图：流水线发现了什么、改了什么（卡片见 §9.2）</td>
 <td>检查清洗是否正常；补充材料的审计链</td>
 </tr>
 <tr class="even">
@@ -1871,6 +1877,22 @@ gitignore，不要提交或外传。</p>
 <td>2026-11-03</td>
 </tr>
 <tr class="odd">
+<td><strong>F34</strong></td>
+<td><code>pipeline_cleaning/F34.png</code></td>
+<td>Supplement</td>
+<td><code>sleep_visualization.R:3283</code></td>
+<td><a href="#c-f34">§9.2 · 钟点规则的处理结果</a></td>
+<td>2026-11-03</td>
+</tr>
+<tr class="even">
+<td><strong>F35</strong></td>
+<td><code>pipeline_cleaning/F35.png</code></td>
+<td>Supplement</td>
+<td><code>sleep_visualization.R:3309</code></td>
+<td><a href="#c-f35">§9.2 · 像钟点的 SOL 与本人时间</a></td>
+<td>2026-11-03</td>
+</tr>
+<tr class="odd">
 <td><strong>F30</strong></td>
 <td><code>research_ready/F30.png</code></td>
 <td>Results</td>
@@ -1914,12 +1936,12 @@ gitignore，不要提交或外传。</p>
 <code>pipeline_cleaning/</code>。</li>
 <li>
 <strong>自 1.7.1
-起编号连续：<code>F01</code>-<code>F33</code>。</strong>
+起编号连续：<code>F01</code>-<code>F35</code>。</strong>
 编号就是文件名、图内标题和本页的引用。
 没有字母后缀、没有缺号：早期调整退役的旧号（08、12、19）已重新分配，而不是留空。</li>
 <li>
 <strong>按文件夹分族：</strong> <code>pipeline_cleaning/</code> 为
-F01-F16 和 F33（管线图与检测图按生成顺序交错，F33 最后加入）；
+F01-F16 和 F33-F35（管线图与检测图按生成顺序交错，F33-F35 最后加入）；
 <code>research_ready/</code> 为
 F17-F32。检测图（F06-F14）编号高于部分管线图，就是交错所致。</li>
 <li>
@@ -3047,6 +3069,10 @@ SOL 标记分不清是真的入睡很久，还是一般的报告分歧（见<a h
 <p><strong>文件</strong> <code>pipeline_cleaning/F33.png</code> — 生成于
 <code>sleep_visualization.R:3185</code></p>
 <p><strong>论文用途</strong> Supplement</p>
+<p><strong>标题与副标题</strong>
+标题：<em>时间顺序反了的夜晚，按机制</em>。副标题几行：这张图回答什么（四个时间不满足
+就寝 ≤ 入睡 ≤ 醒来 ≤ 起床 时，是哪一种失误）、一根条怎么读、以及数量
+N。</p>
 <p><strong>每部分是什么意思</strong>
 一晚的四个自报时间（上床、入睡、最终醒来、起床）可能以哪几种方式出现顺序错乱，每种方式一行，由
 <code><a href="../reference/classify_reversals.html">classify_reversals()</a></code>
@@ -3118,6 +3144,86 @@ times swapped”）明显地缺席，而不是悄悄不见。</p>
 <p><strong>Figure 33.</strong> 自报时间顺序错乱的夜晚（上床 ≤ 入睡 ≤
 最终醒来 ≤ 起床），按最可能的机制分类。每种机制一行，柱长 = 夜晚数，右列
 = 占全部顺序错乱夜晚的比例。N 和占完整夜晚的百分比见副标题。</p>
+</blockquote>
+<p><a id="c-f34"></a></p>
+</div>
+<div class="section level4">
+<h4 id="f34-钟点规则的处理结果sol-waso">F34 · 钟点规则的处理结果（SOL / WASO）<a class="anchor" aria-label="anchor" href="#f34-%E9%92%9F%E7%82%B9%E8%A7%84%E5%88%99%E7%9A%84%E5%A4%84%E7%90%86%E7%BB%93%E6%9E%9Csol-waso"></a>
+</h4>
+<p><strong>文件</strong> <code>pipeline_cleaning/F34.png</code> — 生成于
+<code>sleep_visualization.R:3283</code></p>
+<p><strong>论文用途</strong> Supplement</p>
+<p><strong>标题与副标题</strong> 标题：<em>被读成钟点或误填时长的 SOL /
+WASO 条目</em>。副标题几行：这张图回答什么（第 6.5
+步对每条被重新解读的条目做了什么）、一根条怎么读、以及数量 N。</p>
+<p><strong>各部分含义</strong> 对区间解析器重新解读过的 SOL / WASO
+条目（按分:秒读，或 <code>dd:00</code>），每种第 6.5
+步钟点规则的处理结果一条横条。条末数字是条数；颜色是字段（蓝 SOL，橙
+WASO）。数据来自
+<code>output/duration_clock_rule_log.csv</code>，里面逐条列出了每条做了什么。</p>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th>横条</th>
+<th>含义</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>按分钟保留</td>
+<td>像 <code>5:00</code> 这样的填法，按 5 分钟读，不改</td>
+</tr>
+<tr class="even">
+<td>SOL 按钟点重算</td>
+<td>所填时间贴近本人入睡时间，且在上床之后；SOL = 所填时间 −
+上床时间</td>
+</tr>
+<tr class="odd">
+<td>置缺失</td>
+<td>所填的是上床钟点（SOL），或 WASO 像钟点；原文保留</td>
+</tr>
+<tr class="even">
+<td>留给人看</td>
+<td>像钟点但规则判不了；值保持解析结果，仍被标记</td>
+</tr>
+</tbody>
+</table>
+<p><strong>健康的样子</strong>
+大部分是”按分钟保留”，少数重算，置缺失很少。</p>
+<p><strong>异常 →</strong>
+“留给人看”很长，说明很多条目落在规则的容差和窗口之间；这就是要人读的清单。</p>
+<p><strong>论文图注</strong></p>
+<blockquote>
+<p><strong>Figure 34.</strong> 看起来像钟点或误填时长的 SOL 和 WASO
+条目，按钟点规则对每条的处理分类。N 见副标题。</p>
+</blockquote>
+<p><a id="c-f35"></a></p>
+</div>
+<div class="section level4">
+<h4 id="f35-像钟点的-sol-与本人时间">F35 · 像钟点的 SOL 与本人时间<a class="anchor" aria-label="anchor" href="#f35-%E5%83%8F%E9%92%9F%E7%82%B9%E7%9A%84-sol-%E4%B8%8E%E6%9C%AC%E4%BA%BA%E6%97%B6%E9%97%B4"></a>
+</h4>
+<p><strong>文件</strong> <code>pipeline_cleaning/F35.png</code> — 生成于
+<code>sleep_visualization.R:3309</code></p>
+<p><strong>论文用途</strong> Supplement</p>
+<p><strong>标题与副标题</strong> 标题：<em>像钟点的 SOL
+条目与本人时间的对照</em>。副标题几行：这张图回答什么（填的时间是入睡钟点还是上床钟点）、一个点怎么读、以及
+N 和规则的容差、窗口。</p>
+<p><strong>各部分含义</strong> 每个点是一条填得像钟点的
+SOL。横轴是所填时间减本人上床时间，纵轴是所填时间减本人入睡时间，单位分钟，按
+12 小时表盘算（没填
+AM/PM）。虚线框是规则的容差（纵向）和窗口（横向），框内的点被重算。绿 =
+重算，红 = 置缺失，灰 = 留给人看。</p>
+<p><strong>健康的样子</strong> 点落在纵轴 0 附近、横轴 0 到 60
+之间：此人填的大约是自己入睡的时间。</p>
+<p><strong>异常 →</strong> 点在横轴 0 附近、纵轴离 0
+很远，是把上床时间填进去了。离两条轴都远的点，两个时间都解释不了。</p>
+<p><strong>论文图注</strong></p>
+<blockquote>
+<p><strong>Figure 35.</strong> 填得像钟点的 SOL
+条目，用与本人上床时间和入睡时间的距离（分钟，12
+小时表盘）表示。虚线框标出钟点规则的容差和窗口。</p>
 </blockquote>
 <p><a id="s-9-3"></a></p>
 </div>
