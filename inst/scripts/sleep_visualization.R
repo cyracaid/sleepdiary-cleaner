@@ -1929,8 +1929,22 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
   # --------------------------------------------------------------------------
   if (cfg_get("visualization.detection_outcomes.enabled", TRUE, cfg = pipeline_config)) {
     cat("Generating Figure 8 (Detection Outcomes Heatmap)...\n")
-    det_path <- "validation/synthetic/results/detection_outcomes_v4_current.csv"
-    if (file.exists(det_path)) {
+    # This table is a benchmark result, not study data: it only exists after
+    # validation/synthetic/ has been run. Until 2026-11-04 the path was
+    # relative-only, so a run from an installed package could never produce
+    # F08 and the reason given was just "not found". Look in the installed
+    # package first (if the table is ever shipped in inst/extdata), then fall
+    # back to the repository-relative path, and name what was searched when
+    # neither exists.
+    det_rel <- "validation/synthetic/results/detection_outcomes_v4_current.csv"
+    det_candidates <- c(
+      system.file("extdata", "detection_outcomes_v4_current.csv", package = "sleepcleanr"),
+      det_rel
+    )
+    det_candidates <- det_candidates[nzchar(det_candidates)]
+    det_found <- det_candidates[file.exists(det_candidates)]
+    det_path <- if (length(det_found) > 0) det_found[[1]] else NA_character_
+    if (!is.na(det_path)) {
       det_raw <- read.csv(det_path, stringsAsFactors = FALSE)
       det <- det_raw %>% filter(category != "no_error_control")
       outcome_cols <- c("CORRECT", "FLAGGED_UNRESOLVED", "MISREPAIRED", "MISSED", "NO_MATCH")
@@ -1976,10 +1990,11 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
       cat(sprintf("✓ Figure 8 completed (%d categories, %s total injected rows)\n\n",
                   length(unique(det$category)), format(sum(det$n), big.mark = ",")))
     } else {
-      cat(sprintf("⚠ Cannot generate Figure 8: %s not found (run the validation/synthetic/ benchmark harness first)\n\n",
-                    det_path))
+      det_looked <- paste(det_candidates, collapse = ", ")
+      cat(sprintf("⚠ Cannot generate Figure 8: detection_outcomes_v4_current.csv not found (looked in %s; run the validation/synthetic/ benchmark harness first)\n\n",
+                    det_looked))
       .mark_skip("pipeline_cleaning/F08.png",
-                 sprintf("%s not found (run the validation/synthetic/ benchmark harness first).", det_path))
+                 sprintf("detection_outcomes_v4_current.csv not found (looked in %s); run the validation/synthetic/ benchmark harness first.", det_looked))
     }
   } else {
     cat("⊘ Figure 8 skipped (visualization.detection_outcomes.enabled = false)\n\n")

@@ -33,11 +33,19 @@ A \code{sleep_diary} object carrying the cleaned data and the full
 \description{
 Runs the pure data-in / data-out portion of the pipeline as a single
 composable chain. These are the six steps that take a data frame and return
-a data frame with no file I/O and no reliance on the global environment:
-timestamps, intervals, sequence normalisation, manual corrections, duration
-corrections and metric computation.
+a data frame without relying on the global environment: timestamps,
+intervals, sequence normalisation, manual corrections, duration corrections
+and metric computation.
 }
 \details{
+"Pure" is about the input and the return value, not about the file system:
+the duration-correction and correction steps still write audit files
+(\code{manual_error_correction_updated.csv},
+\code{output/corrected_ema_data.rds}, \code{output/duration_clock_rule_log.csv},
+\code{output/manual_corrections_not_applied.csv}) relative to the working
+directory, so run the chain inside a scratch directory and move what you
+need out of it.
+
 The remaining steps of \code{run_pipeline()} -- data loading (1), the
 field-misentry check (1.5), review-file generation (5), second-review
 consensus (5.75), auto-detection (8), the cross-participant check (8.5) and
