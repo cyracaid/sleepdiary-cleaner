@@ -7,13 +7,18 @@
 step_process_timestamps(
   x,
   vars = c("time_bed_am", "time_sleep_am", "time_awake_am", "time_getup_am",
-    "caffeinetoday_PM", "alcoholtoday_PM", "nicotine_amount_pm", "cannabis_amount_pm")
+    "caffeinetoday_PM", "alcoholtoday_PM", "nicotine_amount_pm", "cannabis_amount_pm"),
+  tz = NULL
 )
 }
 \arguments{
 \item{x}{A \code{sleep_diary} object.}
 
 \item{vars}{Character vector of timestamp variables to process.}
+
+\item{tz}{IANA time zone the diary times were written in. \code{NULL} (the
+default) uses the config value \code{data.timezone}, then
+\code{getOption("sleepcleanr.timezone", "America/Los_Angeles")}.}
 }
 \value{
 A \code{sleep_diary} object.

@@ -77,16 +77,23 @@ NULL
 #'
 #' @param x A \code{sleep_diary} object.
 #' @param vars Character vector of timestamp variables to process.
+#' @param tz IANA time zone the diary times were written in. \code{NULL} (the
+#'   default) uses the config value \code{data.timezone}, then
+#'   \code{getOption("sleepcleanr.timezone", "America/Los_Angeles")}.
 #' @return A \code{sleep_diary} object.
 #' @export
 step_process_timestamps <- function(x,
                                     vars = c("time_bed_am", "time_sleep_am",
                                              "time_awake_am", "time_getup_am",
                                              "caffeinetoday_PM", "alcoholtoday_PM",
-                                             "nicotine_amount_pm", "cannabis_amount_pm")) {
+                                             "nicotine_amount_pm", "cannabis_amount_pm"),
+                                    tz = NULL) {
+  if (is.null(tz) && !is.null(x$cfg)) {
+    tz <- config_get(x$cfg, "data.timezone", NULL)
+  }
   .run_step(x, "2", "Process timestamps", function(df) {
     for (varname in vars) {
-      df <- process_timestamp(df, varname = varname, format = "timestamp")
+      df <- process_timestamp(df, varname = varname, format = "timestamp", tz = tz)
     }
     df
   })

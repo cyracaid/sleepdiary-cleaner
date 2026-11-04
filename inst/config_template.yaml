@@ -17,6 +17,11 @@ data:
   #    under output/). If empty, an interactive run asks you and a
   #    non-interactive run stops with an error.
   tag: "real"
+  # -- IANA time zone the diary wall-clock times were written in. Every
+  #    timestamp is parsed in this zone; a study collected elsewhere must set
+  #    it here (the default is America/Los_Angeles). A time inside the
+  #    spring-forward gap is moved past the gap, not turned into a missing value.
+  timezone: "America/Los_Angeles"
   files:
     # -- Your main data file --
     main: "your_data.rds"

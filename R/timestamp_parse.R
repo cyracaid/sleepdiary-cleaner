@@ -46,8 +46,12 @@ NULL
 #   time_bed_am_checkforerrors — text description of any parsing issue
 # ============================================================================
 
-process_timestamp <- function(df, varname, format) {
+# tz: the IANA zone the diary wall-clock times are written in. Defaults to
+# getOption("sleepcleanr.timezone", "America/Los_Angeles"); run_pipeline() and
+# the step_* adapters pass the config value data.timezone.
+process_timestamp <- function(df, varname, format, tz = NULL) {
 
+  if (is.null(tz)) tz <- getOption("sleepcleanr.timezone", "America/Los_Angeles")
 
   if(format=="timestamp") {
     tstamp.varname <- paste0(varname, "_hhmm")
@@ -208,15 +212,34 @@ process_timestamp <- function(df, varname, format) {
     df_timeproc[tstamp.hhmmampm.varname.isna, paste0(varname, "_hhmm_ampm")] <- NA
 
     # Convert to proper date-time object
-    df_timeproc = df_timeproc %>%
-      mutate(!!as.symbol(paste0(varname, "_hhmm_ampm")) := lubridate::parse_date_time(!!as.symbol(paste0(varname, "_hhmm_ampm")), "%Y-%m-%d %H:%M %p", tz = "America/Los_Angeles"))
+    .stamp_col <- paste0(varname, "_hhmm_ampm")
+    .stamp_chr <- df_timeproc[[.stamp_col]]
+    df_timeproc[[.stamp_col]] <- lubridate::parse_date_time(.stamp_chr, "%Y-%m-%d %H:%M %p", tz = tz, quiet = TRUE)
+
+    # A wall time inside the spring-forward gap (02:00-02:59 on the US switch
+    # day) names no instant, so parse_date_time() returns NA for it. Left as NA
+    # the row is reported as "not reported" even though the person did enter a
+    # time, and the entry never reaches review. Retry those strings past the
+    # gap, which maps the entry to the first instant that exists (the rule
+    # RFC 5545 and most calendar libraries use). One hour covers US/Europe;
+    # the 30-minute second try covers zones such as Lord Howe.
+    .gap_rows <- is.na(df_timeproc[[.stamp_col]]) & !is.na(.stamp_chr) & nzchar(.stamp_chr)
+    if (any(.gap_rows)) {
+      .naive <- lubridate::parse_date_time(.stamp_chr[.gap_rows], "%Y-%m-%d %H:%M %p", tz = "UTC", quiet = TRUE)
+      .fixed <- lubridate::force_tz(.naive + 3600, tz = tz)
+      .still_na <- is.na(.fixed)
+      if (any(.still_na)) {
+        .fixed[.still_na] <- lubridate::force_tz(.naive[.still_na] + 1800, tz = tz)
+      }
+      df_timeproc[[.stamp_col]][.gap_rows] <- .fixed
+    }
 
     # Evening variables (bed/sleep): if parsed time > 15:00 (3 PM), subtract one day
     # so bedtimes after midnight map to the correct date
     if (varname %in% c("time_bed_am", "time_sleep_am")) {
       df_timeproc = df_timeproc %>%
         mutate_at(vars(one_of(paste0(varname, "_hhmm_ampm"))), ~ifelse(lubridate::hour(.) > 15, .-lubridate::days(1), .)) %>%
-        mutate_at(vars(one_of(paste0(varname, "_hhmm_ampm"))), ~as_datetime(., tz="America/Los_Angeles"))
+        mutate_at(vars(one_of(paste0(varname, "_hhmm_ampm"))), ~as_datetime(., tz = tz))
     }
 
     # Save parsing issues to *_checkforerrors column for downstream error detection

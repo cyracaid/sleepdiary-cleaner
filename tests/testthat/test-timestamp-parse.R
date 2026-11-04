@@ -43,3 +43,50 @@ test_that("NA ampm rows stay NA (no crash, no fake PM)", {
   out <- process_timestamp(df, "time_bed_am", format = "timestamp")
   expect_true(all(is.na(out$time_bed_am_hhmm_ampm)))
 })
+test_that("a time inside the spring-forward gap is kept, not silently dropped", {
+  # 2026-03-08 is a US switch day: 02:00-02:59 never happened, so
+  # parse_date_time() has no instant to return for "02:30" and gives NA. Left
+  # as NA the night is reported as "not reported" even though the person typed
+  # a time. The entry is mapped to the first instant that exists (03:30), which
+  # is what RFC 5545 and most calendar libraries do.
+  df <- data.frame(
+    StartDate = "2026-03-08 00:00:00",
+    time_bed_am_hhmm = c("02:30", "03:30"),
+    time_bed_am_ampm = c("AM", "AM"),
+    stringsAsFactors = FALSE
+  )
+  out <- process_timestamp(df, "time_bed_am", format = "timestamp")
+
+  expect_false(is.na(out$time_bed_am_hhmm_ampm[1]))
+  expect_equal(.fmt(out$time_bed_am_hhmm_ampm[1]), "2026-03-08 03:30")
+  # the control row is untouched
+  expect_equal(.fmt(out$time_bed_am_hhmm_ampm[2]), "2026-03-08 03:30")
+})
+
+test_that("process_timestamp() parses in the zone it is given", {
+  # Same wall clock, different zone: New York's gap is that day too, and the
+  # offset must be EDT, not the historical America/Los_Angeles default.
+  df <- data.frame(
+    StartDate = "2026-03-08 00:00:00",
+    time_bed_am_hhmm = "02:30",
+    time_bed_am_ampm = "AM",
+    stringsAsFactors = FALSE
+  )
+  out <- process_timestamp(df, "time_bed_am", format = "timestamp", tz = "America/New_York")
+  expect_equal(format(out$time_bed_am_hhmm_ampm, "%Y-%m-%d %H:%M %Z"),
+               "2026-03-08 03:30 EDT")
+})
+
+test_that("data.timezone in the config reaches the parser", {
+  df <- data.frame(
+    StartDate = "2026-03-08 00:00:00",
+    time_bed_am_hhmm = "23:30",
+    time_bed_am_ampm = "PM",
+    stringsAsFactors = FALSE
+  )
+  cfg <- list(data = list(timezone = "America/New_York"))
+  x <- new_sleep_diary(df, step_id = "1", step_label = "Load data", cfg = cfg)
+  out <- as.data.frame(step_process_timestamps(x, vars = "time_bed_am"))
+  expect_equal(format(out$time_bed_am_hhmm_ampm, "%Y-%m-%d %H:%M %Z"),
+               "2026-03-07 23:30 EST")
+})

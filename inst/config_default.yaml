@@ -20,6 +20,12 @@ data:
   # (r / s / n) and a non-interactive run that makes figures stops with an
   # error. Runs with skip_visualization = TRUE do not need it.
   tag: ""
+  # IANA time zone the diary wall-clock times are written in. Every timestamp
+  # is parsed in this zone, so a study collected elsewhere must set it here.
+  # Leaving it empty keeps the historical default, America/Los_Angeles.
+  # A time inside the spring-forward gap (e.g. 02:30 on the switch day) names
+  # no instant; it is moved past the gap instead of being treated as missing.
+  timezone: "America/Los_Angeles"
   files:
     main: "your_data.rds"
     # -- Your main sleep diary file. Accepts .rds (R data) or .csv (plain text).
