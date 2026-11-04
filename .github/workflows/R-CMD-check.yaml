@@ -14,6 +14,15 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+        # DESCRIPTION says R (>= 4.2). Until 2026-11-04 no job ever ran that
+        # floor: the matrix was OS-only and setup-r installs the release
+        # version. The floor is checked on one OS only -- 4.2 has no current
+        # binaries on the other two, so a full 3x2 matrix would spend most of
+        # its time compiling packages to test the platform we already cover.
+        r: [release]
+        include:
+          - os: ubuntu-latest
+            r: '4.2'
     runs-on: ${{ matrix.os }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -23,6 +32,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r@v2
         with:
+          r-version: ${{ matrix.r }}
           use-public-rspm: true
 
       - uses: r-lib/actions/setup-r-dependencies@v2

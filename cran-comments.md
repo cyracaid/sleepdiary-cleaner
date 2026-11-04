@@ -15,12 +15,11 @@ Psychophysiology Laboratory's intensive-longitudinal sleep study
 
 - Local: macOS (darwin), R 4.6.0 (2026-04-24), `R CMD check`
   - Manual (PDF) build passes (TinyTeX/TeX available locally).
-  - Test suite under `R CMD check` (the same on the three CI platforms,
-    2026-10-29): 858 testthat expectations pass, 0 fail, 9 skipped (48 test
-    files, 290 `test_that()` blocks). The skips are by design: tests that need
-    repository files that are not part of the installed package (`tools/`,
-    `README.md`, the agent skill file) or real study deliverables, which are
-    not in the tarball.
+  - Test suite under `R CMD check` (2026-11-04): 958 testthat expectations
+    pass, 0 fail, 6 skipped (52 test files, 322 `test_that()` blocks). The
+    skips are by design: tests that need repository files that are not part of
+    the installed package (`tools/`, `README.md`, the agent skill file) or real
+    study deliverables, which are not in the tarball.
 - GitHub Actions, `R CMD check` (`--as-cran`):
   - ubuntu-latest
   - windows-latest
@@ -28,13 +27,16 @@ Psychophysiology Laboratory's intensive-longitudinal sleep study
 
 ## R CMD check results
 
-0 errors | 0 warnings | 0 notes
+0 errors | 0 warnings | 1 note
+
+* This is a new submission.
 
 `R CMD check` on the source tarball with vignettes built: R 4.6.0 (2026-04-24),
-macOS (aarch64-apple-darwin23), `--no-manual`. `Status: OK`.
-
-Under `--as-cran` the only additional output is the expected "New submission"
-NOTE from `checking CRAN incoming feasibility`.
+macOS (aarch64-apple-darwin23), `--no-manual --as-cran`. The only output is the
+expected "New submission" NOTE from `checking CRAN incoming feasibility`
+(`Status: 1 NOTE`). That run was on the development version 1.8.0.9000, which
+also draws "Version contains large components"; the line disappears with a
+release version number and is not part of the submission.
 
 The check outputs present in earlier drafts are resolved in this version:
 

@@ -20,6 +20,32 @@
   Both read `output/duration_clock_rule_log.csv` and are skipped when the rule saw
   no entry. There are now 35 figures (19 pipeline-cleaning, 16 research-ready).
 
+## Changed
+* `data.timezone` (default `"America/Los_Angeles"`) now sets the IANA zone the
+  diary wall-clock times are parsed in; the zone used to be hard-coded, so a
+  study collected elsewhere had its times read as Pacific. `process_timestamp()`
+  and `step_process_timestamps()` also take a `tz` argument.
+
+## Fixed
+* `sync_human_review_status()` runs again. It called its own trace check with no
+  argument (`argument "row" is missing, with no default`), so every call raised
+  an error before writing anything; the check now uses the `has_human_trace`
+  column the same `mutate()` already computes. It also stops restamping
+  `resolved_at` / `resolved_by` over values a person already recorded: blanks are
+  filled, its own `pending` placeholder is still refreshed, and an ISO date
+  column is no longer mixed with character values on write-back.
+* A bed, sleep, awake or get-up time inside the spring-forward gap
+  (02:00-02:59 on the US switch day) is kept instead of becoming missing. Such
+  a wall time names no instant, so the parser returned `NA` and the night was
+  counted as "not reported" even though the person had entered a time; it now
+  maps to the first instant that exists (03:30), the RFC 5545 rule.
+* Figure F08 no longer depends on a repository-relative path. It looks for
+  `detection_outcomes_v4_current.csv` in the installed package
+  (`inst/extdata/`) first, then in `validation/synthetic/results/`; when neither
+  exists the skip reason names both locations, so "FIGURES NOT GENERATED" says
+  what was searched instead of repeating the path that is already known to be
+  missing.
+
 # sleepcleanr 1.8.0
 
 ## Changed
