@@ -29,6 +29,8 @@ generate_figure_index <- function(viz_dir) {
     c("pipeline_cleaning/F13.png",        1, "Top participants by flag rate"),
     c("pipeline_cleaning/F14.png",       1, "Auto-detected issues dashboard"),
     c("pipeline_cleaning/F33.png",       1, "Out-of-order nights by mechanism"),
+    c("pipeline_cleaning/F34.png",       1, "SOL/WASO clock-time rule outcomes"),
+    c("pipeline_cleaning/F35.png",       1, "SOL clock-like entries vs own times"),
     c("research_ready/F17.png",                3, "Correction impact (delta lollipops + scatter)"),
     c("research_ready/F18.png",    3, "Key sleep-variable distributions"),
     c("research_ready/F19.png",      3, "TST distribution"),

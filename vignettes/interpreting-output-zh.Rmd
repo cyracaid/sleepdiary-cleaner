@@ -32,7 +32,7 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 <li><a href="#s-6">6. 回归检查（对比上次运行）</a></li>
 <li><a href="#s-7">7. 快速检查卡</a></li>
 <li><a href="#s-8">8. 如何看图</a></li>
-<li><a href="#s-9">9. 逐图参考</a><ul><li><a href="#s-9-1">9.1 图索引</a><ul><li><a href="#s-9-1-naming">图是怎么编号的，为什么有些编号缺失</a></li></ul></li><li><details><summary><a href="#s-9-2">9.2 管线清洗图卡片（<code>pipeline_cleaning/</code>）（17 张）</a></summary><ul><li><a href="#c-01">F01 · 管线记录流</a></li><li><a href="#c-06">F02 · 修正后睡眠时长</a></li><li><a href="#c-07">F03 · 标记构成堆叠图</a></li><li><a href="#c-10">F04 · 极端睡眠时长</a></li><li><a href="#c-11">F05 · 标记共现图</a></li><li><a href="#c-13">F06 · 错误类别分布</a></li><li><a href="#c-13b">F07 · 相邻时间戳间隔</a></li><li><a href="#c-13c">F08 · 检测结果热力图</a></li><li><a href="#c-13d">F09 · 阈值 vs 测量噪声</a></li><li><a href="#c-14">F10 · 修正前睡眠时长</a></li><li><a href="#c-15">F11 · 错误时间线</a></li><li><a href="#c-16">F12 · 常见错误模式</a></li><li><a href="#c-17">F13 · 标记率最高的参与者</a></li><li><a href="#c-18">F14 · 自动检测仪表板</a></li><li><a href="#c-a1">F15 · 逐步标记账本</a></li><li><a href="#c-p26">F16 · 值得二次检查的参与者</a></li><li><a href="#c-f33">F33 · 时间顺序反了的夜晚，按机制</a></li></ul></details></li><li><details><summary><a href="#s-9-3">9.3 研究结果图卡片（<code>research_ready/</code>）（16 张）</a></summary><ul><li><a href="#c-02">F17 · 修正影响</a></li><li><a href="#c-02b">F18 · 睡眠变量分布</a></li><li><a href="#c-03">F19 · TST 分布</a></li><li><a href="#c-04">F20 · 睡眠时长 vs 卧床时间</a></li><li><a href="#c-04b">F21 · SOL vs 睡眠时长</a></li><li><a href="#c-05">F22 · 睡眠变量的变异性</a></li><li><a href="#c-09">F23 · 就寝 vs 起床时间分布</a></li><li><a href="#c-20">F24 · SOL 感知偏差</a></li><li><a href="#c-20b">F25 · WASO 感知偏差</a></li><li><a href="#c-21">F26 · 物质使用数据可得性</a></li><li><a href="#c-22">F27 · 物质使用数值分布</a></li><li><a href="#c-23">F28 · 咖啡因摄入</a></li><li><a href="#c-24">F29 · 酒精摄入</a></li><li><a href="#c-r25">F30 · 睡眠规律性——工作日 vs 周末</a></li><li><a href="#c-r26">F31 · 睡眠构成——TIB 拆分</a></li><li><a href="#c-r27">F32 · 睡眠指标相关矩阵</a></li></ul></details></li></ul></li>
+<li><a href="#s-9">9. 逐图参考</a><ul><li><a href="#s-9-1">9.1 图索引</a><ul><li><a href="#s-9-1-naming">图是怎么编号的，为什么有些编号缺失</a></li></ul></li><li><details><summary><a href="#s-9-2">9.2 管线清洗图卡片（<code>pipeline_cleaning/</code>）（19 张）</a></summary><ul><li><a href="#c-01">F01 · 管线记录流</a></li><li><a href="#c-06">F02 · 修正后睡眠时长</a></li><li><a href="#c-07">F03 · 标记构成堆叠图</a></li><li><a href="#c-10">F04 · 极端睡眠时长</a></li><li><a href="#c-11">F05 · 标记共现图</a></li><li><a href="#c-13">F06 · 错误类别分布</a></li><li><a href="#c-13b">F07 · 相邻时间戳间隔</a></li><li><a href="#c-13c">F08 · 检测结果热力图</a></li><li><a href="#c-13d">F09 · 阈值 vs 测量噪声</a></li><li><a href="#c-14">F10 · 修正前睡眠时长</a></li><li><a href="#c-15">F11 · 错误时间线</a></li><li><a href="#c-16">F12 · 常见错误模式</a></li><li><a href="#c-17">F13 · 标记率最高的参与者</a></li><li><a href="#c-18">F14 · 自动检测仪表板</a></li><li><a href="#c-a1">F15 · 逐步标记账本</a></li><li><a href="#c-p26">F16 · 值得二次检查的参与者</a></li><li><a href="#c-f33">F33 · 时间顺序反了的夜晚，按机制</a></li><li><a href="#c-f34">F34 · 钟点规则的处理结果（SOL / WASO）</a></li><li><a href="#c-f35">F35 · 像钟点的 SOL 与本人时间</a></li></ul></details></li><li><details><summary><a href="#s-9-3">9.3 研究结果图卡片（<code>research_ready/</code>）（16 张）</a></summary><ul><li><a href="#c-02">F17 · 修正影响</a></li><li><a href="#c-02b">F18 · 睡眠变量分布</a></li><li><a href="#c-03">F19 · TST 分布</a></li><li><a href="#c-04">F20 · 睡眠时长 vs 卧床时间</a></li><li><a href="#c-04b">F21 · SOL vs 睡眠时长</a></li><li><a href="#c-05">F22 · 睡眠变量的变异性</a></li><li><a href="#c-09">F23 · 就寝 vs 起床时间分布</a></li><li><a href="#c-20">F24 · SOL 感知偏差</a></li><li><a href="#c-20b">F25 · WASO 感知偏差</a></li><li><a href="#c-21">F26 · 物质使用数据可得性</a></li><li><a href="#c-22">F27 · 物质使用数值分布</a></li><li><a href="#c-23">F28 · 咖啡因摄入</a></li><li><a href="#c-24">F29 · 酒精摄入</a></li><li><a href="#c-r25">F30 · 睡眠规律性——工作日 vs 周末</a></li><li><a href="#c-r26">F31 · 睡眠构成——TIB 拆分</a></li><li><a href="#c-r27">F32 · 睡眠指标相关矩阵</a></li></ul></details></li></ul></li>
 </ul>
 </nav>
 
@@ -478,7 +478,7 @@ identical(old$n_clean_last, new$n_clean_last)
 
 | 项目 | 是什么 | 什么时候看 |
 |------|--------|------------|
-| `pipeline_cleaning/` | 17 张诊断图：流水线发现了什么、改了什么（卡片见 §9.2）| 检查清洗是否正常；补充材料的审计链 |
+| `pipeline_cleaning/` | 19 张诊断图：流水线发现了什么、改了什么（卡片见 §9.2）| 检查清洗是否正常；补充材料的审计链 |
 | `research_ready/` | 16 张面向论文的图：睡眠指标、感知偏差、物质使用（卡片见 §9.3）| 为 Results 选图 |
 | `figure_index.png` | 全部图的总览。顶部红色块列出被跳过的图及原因 | 运行后先看这个 |
 | `all_figures_review.pdf` | 每页一张图，按生成顺序，与 PNG 同尺寸 | 快速翻看全部图，或发给研究团队内的合作者 |
@@ -532,6 +532,8 @@ identical(old$n_clean_last, new$n_clean_last)
 | **F15** | `pipeline_cleaning/F15.png` | Supplement | `figure12_step_flag_table.R:15` | [§9.2 · 逐步标记账本](#c-a1) | 2026-09-25 |
 | **F16** | `pipeline_cleaning/F16.png` | Supplement | `sleep_visualization.R:2579` | [§9.2 · 值得二次检查的参与者](#c-p26) | 2026-09-25 |
 | **F33** | `pipeline_cleaning/F33.png` | Supplement | `sleep_visualization.R:3185` | [§9.2 · 时间顺序反了的夜晚，按机制](#c-f33) | 2026-11-03 |
+| **F34** | `pipeline_cleaning/F34.png` | Supplement | `sleep_visualization.R:3283` | [§9.2 · 钟点规则的处理结果](#c-f34) | 2026-11-03 |
+| **F35** | `pipeline_cleaning/F35.png` | Supplement | `sleep_visualization.R:3309` | [§9.2 · 像钟点的 SOL 与本人时间](#c-f35) | 2026-11-03 |
 | **F30** | `research_ready/F30.png` | Results | `sleep_visualization.R:3043` | [§9.3 · 睡眠规律性——工作日 vs 周末](#c-r25) | 2026-09-25 |
 | **F31** | `research_ready/F31.png` | Results | `sleep_visualization.R:3096` | [§9.3 · 睡眠构成——TIB 拆分](#c-r26) | 2026-09-25 |
 | **F32** | `research_ready/F32.png` | Results | `sleep_visualization.R:3125` | [§9.3 · 睡眠指标相关矩阵](#c-r27) | 2026-09-25 |
@@ -544,9 +546,9 @@ identical(old$n_clean_last, new$n_clean_last)
 #### 图是怎么编号的，为什么有些编号缺失
 
 - **编号跟着数据来源走，不跟文件夹走。** 01 到 24 的编号来自最初那一个可视化脚本，脚本开头按数据来源把它们分组：1 到 12 用修正后的数据，13 到 18 用修正前的自动检测结果，19 到 24 用检测汇总加修正后的数据。它们和输出文件夹对不上：02 和 03 在 `research_ready/`，06 和 07 在 `pipeline_cleaning/`。
-- **自 1.7.1 起编号连续：`F01`-`F33`。** 编号就是文件名、图内标题和本页的引用。
+- **自 1.7.1 起编号连续：`F01`-`F35`。** 编号就是文件名、图内标题和本页的引用。
   没有字母后缀、没有缺号：早期调整退役的旧号（08、12、19）已重新分配，而不是留空。
-- **按文件夹分族：** `pipeline_cleaning/` 为 F01-F16 和 F33（管线图与检测图按生成顺序交错，F33 最后加入）；
+- **按文件夹分族：** `pipeline_cleaning/` 为 F01-F16 和 F33-F35（管线图与检测图按生成顺序交错，F33-F35 最后加入）；
   `research_ready/` 为 F17-F32。检测图（F06-F14）编号高于部分管线图，就是交错所致。
 - **文件名保持不变。** 重命名会牵动代码、图索引的登记表，以及你自己读取这些文件的脚本。提案还建议用分层的显示编号（例如 "1.2-13"）作为图注前缀；那只是提案，没有实现：`figure_index.png` 给每张缩略图标的是文件名加一句简短说明，上面这些编号是唯一在用的编号。
 
@@ -1537,6 +1539,8 @@ Corrected 是数据被改动过的记录数。Suppressed 是经人看过并接�
 
 **论文用途** Supplement
 
+**标题与副标题** 标题：*时间顺序反了的夜晚，按机制*。副标题几行：这张图回答什么（四个时间不满足 就寝 ≤ 入睡 ≤ 醒来 ≤ 起床 时，是哪一种失误）、一根条怎么读、以及数量 N。
+
 **每部分是什么意思** 一晚的四个自报时间（上床、入睡、最终醒来、起床）可能以哪几种方式出现顺序错乱，每种方式一行，由 `classify_reversals()` 得出。每一行都会画出来，没有病例的也画，所以没有病例的机制显示为 0，而不是消失。柱长是夜晚数，右列是它占全部顺序错乱夜晚的比例。不属于所列形态的归入"Other forms"。
 
 | 颜色 | 含义 |
@@ -1580,6 +1584,53 @@ Corrected 是数据被改动过的记录数。Suppressed 是经人看过并接�
 **论文图注**
 
 > **Figure 33.** 自报时间顺序错乱的夜晚（上床 ≤ 入睡 ≤ 最终醒来 ≤ 起床），按最可能的机制分类。每种机制一行，柱长 = 夜晚数，右列 = 占全部顺序错乱夜晚的比例。N 和占完整夜晚的百分比见副标题。
+
+<a id="c-f34"></a>
+
+#### F34 · 钟点规则的处理结果（SOL / WASO）
+
+**文件** `pipeline_cleaning/F34.png` — 生成于 `sleep_visualization.R:3283`
+
+**论文用途** Supplement
+
+**标题与副标题** 标题：*被读成钟点或误填时长的 SOL / WASO 条目*。副标题几行：这张图回答什么（第 6.5 步对每条被重新解读的条目做了什么）、一根条怎么读、以及数量 N。
+
+**各部分含义** 对区间解析器重新解读过的 SOL / WASO 条目（按分:秒读，或 `dd:00`），每种第 6.5 步钟点规则的处理结果一条横条。条末数字是条数；颜色是字段（蓝 SOL，橙 WASO）。数据来自 `output/duration_clock_rule_log.csv`，里面逐条列出了每条做了什么。
+
+| 横条 | 含义 |
+|---|---|
+| 按分钟保留 | 像 `5:00` 这样的填法，按 5 分钟读，不改 |
+| SOL 按钟点重算 | 所填时间贴近本人入睡时间，且在上床之后；SOL = 所填时间 − 上床时间 |
+| 置缺失 | 所填的是上床钟点（SOL），或 WASO 像钟点；原文保留 |
+| 留给人看 | 像钟点但规则判不了；值保持解析结果，仍被标记 |
+
+**健康的样子** 大部分是"按分钟保留"，少数重算，置缺失很少。
+
+**异常 →** "留给人看"很长，说明很多条目落在规则的容差和窗口之间；这就是要人读的清单。
+
+**论文图注**
+
+> **Figure 34.** 看起来像钟点或误填时长的 SOL 和 WASO 条目，按钟点规则对每条的处理分类。N 见副标题。
+
+<a id="c-f35"></a>
+
+#### F35 · 像钟点的 SOL 与本人时间
+
+**文件** `pipeline_cleaning/F35.png` — 生成于 `sleep_visualization.R:3309`
+
+**论文用途** Supplement
+
+**标题与副标题** 标题：*像钟点的 SOL 条目与本人时间的对照*。副标题几行：这张图回答什么（填的时间是入睡钟点还是上床钟点）、一个点怎么读、以及 N 和规则的容差、窗口。
+
+**各部分含义** 每个点是一条填得像钟点的 SOL。横轴是所填时间减本人上床时间，纵轴是所填时间减本人入睡时间，单位分钟，按 12 小时表盘算（没填 AM/PM）。虚线框是规则的容差（纵向）和窗口（横向），框内的点被重算。绿 = 重算，红 = 置缺失，灰 = 留给人看。
+
+**健康的样子** 点落在纵轴 0 附近、横轴 0 到 60 之间：此人填的大约是自己入睡的时间。
+
+**异常 →** 点在横轴 0 附近、纵轴离 0 很远，是把上床时间填进去了。离两条轴都远的点，两个时间都解释不了。
+
+**论文图注**
+
+> **Figure 35.** 填得像钟点的 SOL 条目，用与本人上床时间和入睡时间的距离（分钟，12 小时表盘）表示。虚线框标出钟点规则的容差和窗口。
 
 <a id="s-9-3"></a>
 

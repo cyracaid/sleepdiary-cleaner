@@ -3232,7 +3232,7 @@ if (exists("corrected_ema_data") && nrow(corrected_ema_data) > 0) {
     }
     png(file.path(output_dir, "pipeline_cleaning", "F33.png"),
         width = 10, height = 6, units = "in", res = 150)
-    par(mar = c(1, 0.5, 4.6, 0.5))
+    par(mar = c(1, 0.5, 7, 0.5))
     plot(NA, xlim = c(-1.9, 1.3), ylim = c(0.4, k + 1.2), axes = FALSE, xlab = "", ylab = "")
     text(-1.02, k + 0.95, "Form of the reversal", adj = 1, font = 2, cex = 0.85)
     text(-0.5, k + 0.95, "Nights", font = 2, cex = 0.85)
@@ -3249,8 +3249,10 @@ if (exists("corrected_ema_data") && nrow(corrected_ema_data) > 0) {
       text(0.08, y, sprintf("%.1f%%", 100 * f33_rows$n[i] / n_all), adj = 0, cex = 0.8, col = "grey30")
     }
     legend("bottomright", legend = names(pal), fill = pal, border = NA, bty = "n", cex = 0.75)
-    title(main = "Figure 33: Nights with out-of-order times, by mechanism", cex.main = 1.1)
-    mtext(sub_txt, side = 3, line = 0.4, cex = 0.72)
+    title(main = "Figure 33: Nights with out-of-order times, by mechanism", cex.main = 1.1, line = 5.2)
+    mtext("WHAT THIS ANSWERS: when bedtime <= sleep onset <= awakening <= get-up fails, which kind of slip is it, and what can the rules do about it?", side = 3, line = 3.7, cex = 0.7)
+    mtext("Each bar = nights of one mechanism (two fields exchanged, one field 12 h out, a whole night moved, ...). Colour = family of mechanism.", side = 3, line = 2.7, cex = 0.7)
+    mtext(sub_txt, side = 3, line = 1.4, cex = 0.72)
     dev.off()
     counts <- f33_rows$n[f33_rows$n > 0]
     cat(sprintf("  %d reversed nights across %d mechanisms\n", nrow(rev_tab), length(counts)))
@@ -3267,6 +3269,88 @@ if (exists("corrected_ema_data") && nrow(corrected_ema_data) > 0) {
 } else {
   cat("\u26a0 corrected_ema_data missing \u2014 skipping Figure 33\n\n")
   .mark_skip("pipeline_cleaning/F33.png", "corrected_ema_data is missing or empty.")
+}
+
+# --------------------------------------------------------------------------
+# Figures 34-35: SOL / WASO entries the clock-time rule looked at (Step 6.5)
+# --------------------------------------------------------------------------
+cat("Generating FIGURES F34-F35 (clock-time rule for SOL / WASO text)...\n")
+
+.f34_log_file <- file.path(cfg_get("output.report.dir", "output", cfg = pipeline_config), "duration_clock_rule_log.csv")
+.f34_log <- if (file.exists(.f34_log_file)) try(utils::read.csv(.f34_log_file, stringsAsFactors = FALSE), silent = TRUE) else NULL
+
+if (is.data.frame(.f34_log) && nrow(.f34_log) > 0) {
+  # F34: what the rule did, one bar per outcome, coloured by field
+  f34_lab <- c("minutes typed in the hours slot"  = "Kept as minutes\n(e.g. typed 5:00, meant 5 minutes)",
+               "SOL typed sleep onset"            = "SOL recomputed from the clock time\n(typed time close to own sleep onset)",
+               "SOL typed bedtime"                = "Set to missing: typed the bedtime",
+               "WASO probable clock time"         = "Set to missing: WASO looks like a clock time",
+               "SOL clock-like, left for review"  = "Left for review\n(clock-like, rule does not decide)",
+               "SOL clock-like, own times unavailable" = "Left for review\n(own bed / sleep times missing)")
+  lg <- .f34_log
+  lg$label <- unname(ifelse(lg$class %in% names(f34_lab), f34_lab[lg$class], lg$class))
+  lg$field <- factor(lg$field, levels = c("SOL", "WASO"))
+  f34_tab <- table(lg$label, lg$field)
+  f34_tab <- f34_tab[order(rowSums(f34_tab)), , drop = FALSE]
+  png(file.path(output_dir, "pipeline_cleaning", "F34.png"), width = 10, height = 6, units = "in", res = 150)
+  par(mar = c(4.5, 15, 7, 2))
+  b <- barplot(t(f34_tab), horiz = TRUE, las = 1, border = "white", cex.names = 0.8,
+               col = c(SOL = "#1E88E5", WASO = "#E65100")[colnames(f34_tab)],
+               xlim = c(0, max(rowSums(f34_tab)) * 1.15), xlab = "entries",
+               legend.text = colnames(f34_tab), args.legend = list(x = "bottomright", bty = "n", title = "Field"))
+  text(rowSums(f34_tab), b, labels = rowSums(f34_tab), pos = 4, cex = 0.9, font = 2)
+  title(main = "Figure 34: SOL / WASO entries read as a clock time or a mistyped duration", cex.main = 1.0, line = 5.2)
+  mtext("WHAT THIS ANSWERS: of the SOL / WASO entries the interval parser had to reinterpret, what did the Step 6.5 rule do with each?", side = 3, line = 3.7, cex = 0.7)
+  mtext("Each bar = entries with one outcome (kept as minutes, recomputed, set to missing, left for a person). Colour = SOL or WASO.", side = 3, line = 2.7, cex = 0.7)
+  mtext(sprintf("N = %d reinterpreted entries (Step 6.5 log)", nrow(lg)), side = 3, line = 1.4, cex = 0.72)
+  dev.off()
+  cat("✓ Figure 34 completed\n")
+
+  # F35: SOL entries typed like a clock time, as a distance from the person's own bed and sleep-onset times
+  ok <- exists("corrected_ema_data") && all(c("pid", "day_num", "row_id", "time_bed_corrected", "time_sleep_corrected") %in% names(corrected_ema_data))
+  sol <- lg[lg$field == "SOL" & lg$class != "minutes typed in the hours slot", , drop = FALSE]
+  if (ok && nrow(sol) > 0) {
+    ce <- corrected_ema_data
+    ix <- match(paste(sol$pid, sol$day_num, sol$row_id), paste(ce$pid, ce$day_num, ce$row_id))
+    tod <- function(t) as.numeric(format(t, "%H")) * 60 + as.numeric(format(t, "%M"))
+    fold <- function(m) ((m + 360) %% 720) - 360
+    p <- strsplit(sol$raw_text, ":")
+    typed <- sapply(p, function(v) (as.numeric(v[1]) %% 12) * 60 + as.numeric(v[2]))
+    sol$from_bed   <- fold(typed - tod(ce$time_bed_corrected[ix]))
+    sol$from_onset <- fold(typed - tod(ce$time_sleep_corrected[ix]))
+    sol <- sol[is.finite(sol$from_bed) & is.finite(sol$from_onset), , drop = FALSE]
+  }
+  if (ok && nrow(sol) > 0) {
+    col <- ifelse(sol$action == "recomputed", "#2E7D32", ifelse(sol$action == "set to missing", "#C62828", "#757575"))
+    tol <- as.numeric(cfg_get("duration_clock_rule.tolerance_min", 5, cfg = pipeline_config))
+    win <- as.numeric(cfg_get("duration_clock_rule.window_min", 60, cfg = pipeline_config))
+    rng <- function(v, lo, hi) c(min(lo, floor(min(v) / 30) * 30), max(hi, ceiling(max(v) / 30) * 30))
+    png(file.path(output_dir, "pipeline_cleaning", "F35.png"), width = 8, height = 7, units = "in", res = 150)
+    par(mar = c(4.5, 4.5, 7, 1))
+    plot(sol$from_bed, sol$from_onset, pch = 16, cex = 1.3, col = adjustcolor(col, 0.7),
+         xlim = rng(sol$from_bed, -60, win + 60), ylim = rng(sol$from_onset, -60, 60),
+         xlab = "typed time minus own bedtime (min, 12-hour dial)",
+         ylab = "typed time minus own sleep onset (min, 12-hour dial)")
+    abline(h = 0, v = 0, col = "grey85")
+    rect(0, -tol, win, tol, border = "#2E7D32", lty = 2)
+    text(win / 2, tol + 4, "recompute zone", cex = 0.7, col = "#2E7D32")
+    legend("topright", bty = "n", cex = 0.8, pch = 16, col = c("#2E7D32", "#C62828", "#757575"),
+           legend = c("recomputed", "set to missing", "left for review"))
+    title(main = "Figure 35: SOL entries typed like a clock time, against the person's own times", cex.main = 1.0, line = 5.2)
+    mtext("WHAT THIS ANSWERS: when someone typed a clock time in the SOL field, was it their sleep onset or their bedtime?", side = 3, line = 3.7, cex = 0.7)
+    mtext("Each dot = one entry: typed time minus own bedtime (x) and minus own sleep onset (y), on a 12-hour dial. Near y = 0: sleep onset.", side = 3, line = 2.7, cex = 0.7)
+    mtext(sprintf("N = %d entries; the dashed box is the rule's tolerance (%g min) and window (%g min)", nrow(sol), tol, win),
+          side = 3, line = 1.4, cex = 0.72)
+    dev.off()
+    cat("✓ Figure 35 completed\n\n")
+  } else {
+    cat("⚠ no SOL entry typed like a clock time, or own times missing — skipping Figure 35\n\n")
+    .mark_skip("pipeline_cleaning/F35.png", "No SOL entry was read as a clock time, or the person's bed / sleep times are missing.")
+  }
+} else {
+  cat("⚠ no reinterpreted SOL / WASO entries — skipping Figures 34-35\n\n")
+  .mark_skip("pipeline_cleaning/F34.png", "The clock-time rule saw no reinterpreted SOL / WASO entry.")
+  .mark_skip("pipeline_cleaning/F35.png", "The clock-time rule saw no reinterpreted SOL / WASO entry.")
 }
 
 
@@ -3317,7 +3401,9 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
 cat("ADDITIONAL PIPELINE CLEANING FIGURES:\n")
 cat("  Figure 19: FOLDED into Figure 6 (final-status split shown in Fig 13's flag table)\n")
 cat("  Figure 12: Per-Participant Final Flag Rate\n")
-cat("  Figure 33: Out-of-order nights, by mechanism\n\n")
+cat("  Figure 33: Out-of-order nights, by mechanism\n")
+cat("  Figure 34: SOL / WASO entries read as a clock time (clock-time rule)\n")
+cat("  Figure 35: SOL entries typed like a clock time, against own times\n\n")
 
 cat("RESEARCH FIGURES F17-F32 (Sleep Perception + Substance Use):\n")
 cat("  Figure 29: SOL Perception Bias\n")
@@ -3559,6 +3645,8 @@ generate_appendix_ledger()
   "pipeline_cleaning/F15.png",
   "pipeline_cleaning/F16.png",
   "pipeline_cleaning/F33.png",
+  "pipeline_cleaning/F34.png",
+  "pipeline_cleaning/F35.png",
   "research_ready/F17.png",
   "research_ready/F18.png",
   "research_ready/F19.png",
