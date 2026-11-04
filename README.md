@@ -334,7 +334,11 @@ issues.
 
 sleepcleanr provides a utility to synchronize human review status fields in the metric review acceptance CSV file.
 
-> **Resolved (v1.4.5, commit 4812fcc):** The earlier known issue where `sync_human_review_status()` crashed on bootstrap runs and did not reproduce from clean state has been fixed. The function now correctly handles first-time runs and produces reproducible results.
+> **Fixed after 1.8.0:** the released build raised
+> `argument "row" is missing, with no default` on its first call, so no sync
+> ever completed. The trace check now uses the column computed in the same
+> `mutate()`, and the resolution rules are covered by
+> `tests/testthat/test-sync-human-review-status.R`.
 
 ### `sync_human_review_status()`
 

@@ -23,13 +23,11 @@ sync_human_review_status <- function(csv_path = "manual_metric_review_acceptance
     return(invisible(NULL))
   }
   
-  # Check if human review traces exist
-  has_human_trace <- function(row) {
-    has_note <- !is.na(row$human_metric_review_note) && row$human_metric_review_note != ""
-    has_resolved_at <- !is.na(row$resolved_at) && row$resolved_at != ""
-    has_resolved_by <- !is.na(row$resolved_by) && row$resolved_by != ""
-    has_note <- !is.na(row$human_metric_review_note) && row$human_metric_review_note != ""
-    any(has_note, has_resolved_at, has_resolved_by)
+  # read_csv() guesses types, so an ISO date column arrives as <date> while the
+  # values written below are <character>; case_when() refuses to mix the two.
+  # Keep the three synced columns as text.
+  for (col in c("review_resolution", "resolved_at", "resolved_by")) {
+    if (col %in% names(df)) df[[col]] <- as.character(df[[col]])
   }
   
   # Compute new fields
@@ -48,19 +46,25 @@ sync_human_review_status <- function(csv_path = "manual_metric_review_acceptance
         # If resolution exists and is not legacy, keep original (assume human confirmed)
         !is.na(review_resolution) & review_resolution != "legacy" ~ review_resolution,
         # Has traces but resolution is legacy/NA -> mark flagged_unresolved (pending human)
-        has_human_trace() & (is.na(review_resolution) | review_resolution == "legacy") ~ "flagged_unresolved",
+        has_human_trace & (is.na(review_resolution) | review_resolution == "legacy") ~ "flagged_unresolved",
         # No traces and is legacy -> keep legacy
         TRUE ~ "legacy"
       ),
       
-      # resolved_at: only populated for corrected records
+      # resolved_at: fill a blank only. A date a person already entered is
+      # evidence; replacing it with today loses when the review actually
+      # happened, and blanking it on non-corrected rows loses it entirely.
       resolved_at = dplyr::case_when(
+        !is.na(resolved_at) & resolved_at != "" ~ resolved_at,
         review_resolution == "corrected" ~ format(Sys.Date(), "%Y-%m-%d"),
         TRUE ~ NA_character_
       ),
       
-      # resolved_by
+      # resolved_by: same rule, except "pending" is this function's own
+      # placeholder and is refreshed, so a row resolved later stops saying
+      # pending.
       resolved_by = dplyr::case_when(
+        !is.na(resolved_by) & !resolved_by %in% c("", "pending") ~ resolved_by,
         review_resolution == "corrected" ~ "system",
         review_resolution == "legacy" ~ "legacy",
         # Has traces but not marked resolved -> pending
