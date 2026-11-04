@@ -1,0 +1,15 @@
+"detail","n"
+"swap:bed-sleep",38
+"pm12h:sleep-12h",35
+"pm12h:bed-12h",14
+"pm12h_x2:whole_night",14
+"swap:awake-getup",9
+"E_unexplained:value",7
+"D1_value_broken:getup",6
+"D2_awake_before_bed:awake",6
+"pm12h:getup+12h",6
+"D3_near_tie:clock",3
+"pm12h:awake+12h",1
+"pm12h:sleep+12h",1
+"ALL_REVERSALS",140
+"REPORTED_EXCL_VALUE_BROKEN",134

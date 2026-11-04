@@ -1,0 +1,8 @@
+"metric","direction","threshold","share_flagged","n","data"
+"tst","below",240,0.0075,1730,"output/cleaned_data_full.rds"
+"tst","below",300,0.0306,1730,"output/cleaned_data_full.rds"
+"tst","below",360,0.0809,1730,"output/cleaned_data_full.rds"
+"tst","below",420,0.241,1730,"output/cleaned_data_full.rds"
+"tst","below",480,0.589,1730,"output/cleaned_data_full.rds"
+"tst","below",540,0.8653,1730,"output/cleaned_data_full.rds"
+"tst","below",600,0.9682,1730,"output/cleaned_data_full.rds"

@@ -1,0 +1,7 @@
+"metric","threshold","share_flagged","n","data"
+"sol",30,0.2596,2850,"output/cleaned_data_full.rds"
+"sol",45,0.1818,2850,"output/cleaned_data_full.rds"
+"sol",60,0.1063,2850,"output/cleaned_data_full.rds"
+"sol",90,0.0463,2850,"output/cleaned_data_full.rds"
+"sol",120,0.0221,2850,"output/cleaned_data_full.rds"
+"sol",180,0.0067,2850,"output/cleaned_data_full.rds"

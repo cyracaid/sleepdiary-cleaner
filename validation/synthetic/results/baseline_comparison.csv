@@ -1,0 +1,5 @@
+"condition","handled","corrected_to_truth","clean_rows_lost"
+"no_cleaning",0,0,0
+"naive_rule",0.623075496197366,0,0
+"exclusion_only",0.933778519755147,0,0.897451833436917
+"pipeline",0.995177147097014,0.4858,0

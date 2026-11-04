@@ -1,0 +1,2 @@
+"r_version","sleepcleanr","seed","n_participants","n_days","rate","n_clean","n_injected","n_flagged_clean","n_altered_clean","run_time_local"
+"R version 4.6.0 (2026-04-24)","1.7.2",20260817,500,14,0.05,7000,350,0,0,"2026-11-04 13:58:38"

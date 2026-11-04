@@ -1,0 +1,10 @@
+"class","n_injected","flagged_or_corrected_pct","ci_low","ci_high","corrected_pct","flagged_only_pct","missed_pct","wrong_repairs"
+"awake_before_bed",17,0,0,18.4,0,0,0,17
+"night_block_12h",40,5,1.4,16.5,5,0,0,38
+"single_field_12h:上床",40,17.5,8.7,32,17.5,0,0,33
+"single_field_12h:入睡",102,100,96.4,100,100,0,0,0
+"single_field_12h:起床",17,100,81.6,100,100,0,0,0
+"single_field_12h:醒来",3,0,0,56.2,0,0,0,3
+"swap:上床-入睡",106,100,96.5,100,100,0,0,0
+"swap:醒来-起床",25,100,86.7,100,100,0,0,0
+"ALL",350,74,NA,NA,74,0,0,91

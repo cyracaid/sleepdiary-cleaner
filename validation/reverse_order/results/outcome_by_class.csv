@@ -1,0 +1,13 @@
+"class","n","fixed_total","fixed_pct","ci_low","ci_high","fixed_by_algorithm","fixed_by_human","still_inverted","implausible_after","no_post_value"
+"swap:bed-sleep",38,38,100,90.8,100,37,1,0,0,0
+"pm12h:sleep-12h",35,35,100,90.1,100,35,0,0,0,0
+"pm12h:bed-12h",14,14,100,78.5,100,0,14,0,0,0
+"pm12h_x2:whole_night",14,14,100,78.5,100,1,13,0,0,0
+"swap:awake-getup",9,9,100,70.1,100,8,1,0,0,0
+"E_unexplained:value",7,5,71.4,35.9,91.8,3,2,0,2,0
+"D1_value_broken:getup",6,6,100,61,100,0,6,0,0,0
+"D2_awake_before_bed:awake",6,6,100,61,100,1,5,0,0,0
+"pm12h:getup+12h",6,6,100,61,100,0,6,0,0,0
+"D3_near_tie:clock",3,3,100,43.8,100,3,0,0,0,0
+"pm12h:awake+12h",1,1,100,20.7,100,1,0,0,0,0
+"pm12h:sleep+12h",1,1,100,20.7,100,0,1,0,0,0

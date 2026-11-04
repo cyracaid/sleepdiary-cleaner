@@ -1,0 +1,9 @@
+group,parameter,value,unit,source,note
+insomnia,sol_mean,,min,,
+insomnia,sol_sd,,min,,
+insomnia,se_mean,,percent,,
+insomnia,tst_mean,,min,,
+older_adults,sol_mean,,min,,
+older_adults,se_mean,,percent,,
+shift_work,sol_mean,,min,,
+shift_work,se_mean,,percent,,
