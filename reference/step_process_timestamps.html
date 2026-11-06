@@ -77,7 +77,8 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">step_process_timestamps</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"time_bed_am"</span>, <span class="st">"time_sleep_am"</span>, <span class="st">"time_awake_am"</span>, <span class="st">"time_getup_am"</span>,</span>
-<span>    <span class="st">"caffeinetoday_PM"</span>, <span class="st">"alcoholtoday_PM"</span>, <span class="st">"nicotine_amount_pm"</span>, <span class="st">"cannabis_amount_pm"</span><span class="op">)</span></span>
+<span>    <span class="st">"caffeinetoday_PM"</span>, <span class="st">"alcoholtoday_PM"</span>, <span class="st">"nicotine_amount_pm"</span>, <span class="st">"cannabis_amount_pm"</span><span class="op">)</span>,</span>
+<span>  tz <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -91,6 +92,12 @@
 
 <dt id="arg-vars">vars<a class="anchor" aria-label="anchor" href="#arg-vars"></a></dt>
 <dd><p>Character vector of timestamp variables to process.</p></dd>
+
+
+<dt id="arg-tz">tz<a class="anchor" aria-label="anchor" href="#arg-tz"></a></dt>
+<dd><p>IANA time zone the diary times were written in. <code>NULL</code> (the
+default) uses the config value <code>data.timezone</code>, then
+<code>getOption("sleepcleanr.timezone", "America/Los_Angeles")</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

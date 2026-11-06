@@ -76,6 +76,18 @@
 <li>Figure F33 (<code>pipeline_cleaning/F33.png</code>) draws these classes: one row per mechanism, empty rows included, with the number of nights and the share of all out-of-order nights.</li>
 <li>Figures F34 and F35 (<code>pipeline_cleaning/</code>) show what the Step 6.5 clock-time rule did: F34 counts the reinterpreted SOL / WASO entries by outcome (kept as minutes, recomputed, set to missing, left for review); F35 plots each SOL entry typed like a clock time against the person’s own bedtime and sleep onset. Both read <code>output/duration_clock_rule_log.csv</code> and are skipped when the rule saw no entry. There are now 35 figures (19 pipeline-cleaning, 16 research-ready).</li>
 </ul></div>
+<div class="section level3">
+<h3 id="changed-development-version">Changed<a class="anchor" aria-label="anchor" href="#changed-development-version"></a></h3>
+<ul><li>
+<code>data.timezone</code> (default <code>"America/Los_Angeles"</code>) now sets the IANA zone the diary wall-clock times are parsed in; the zone used to be hard-coded, so a study collected elsewhere had its times read as Pacific. <code>process_timestamp()</code> and <code><a href="../reference/step_process_timestamps.html">step_process_timestamps()</a></code> also take a <code>tz</code> argument.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="fixed-development-version">Fixed<a class="anchor" aria-label="anchor" href="#fixed-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/sync_human_review_status.html">sync_human_review_status()</a></code> runs again. It called its own trace check with no argument (<code>argument "row" is missing, with no default</code>), so every call raised an error before writing anything; the check now uses the <code>has_human_trace</code> column the same <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code> already computes. It also stops restamping <code>resolved_at</code> / <code>resolved_by</code> over values a person already recorded: blanks are filled, its own <code>pending</code> placeholder is still refreshed, and an ISO date column is no longer mixed with character values on write-back.</li>
+<li>A bed, sleep, awake or get-up time inside the spring-forward gap (02:00-02:59 on the US switch day) is kept instead of becoming missing. Such a wall time names no instant, so the parser returned <code>NA</code> and the night was counted as “not reported” even though the person had entered a time; it now maps to the first instant that exists (03:30), the RFC 5545 rule.</li>
+<li>Figure F08 no longer depends on a repository-relative path. It looks for <code>detection_outcomes_v4_current.csv</code> in the installed package (<code>inst/extdata/</code>) first, then in <code>validation/synthetic/results/</code>; when neither exists the skip reason names both locations, so “FIGURES NOT GENERATED” says what was searched instead of repeating the path that is already known to be missing.</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.8.0" id="sleepcleanr-180">sleepcleanr 1.8.0<a class="anchor" aria-label="anchor" href="#sleepcleanr-180"></a></h2>

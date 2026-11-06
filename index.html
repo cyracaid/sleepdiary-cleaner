@@ -579,7 +579,7 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 </h2>
 <p>sleepcleanr provides a utility to synchronize human review status fields in the metric review acceptance CSV file.</p>
 <blockquote>
-<p><strong>Resolved (v1.4.5, commit 4812fcc):</strong> The earlier known issue where <code><a href="reference/sync_human_review_status.html">sync_human_review_status()</a></code> crashed on bootstrap runs and did not reproduce from clean state has been fixed. The function now correctly handles first-time runs and produces reproducible results.</p>
+<p><strong>Fixed after 1.8.0:</strong> the released build raised <code>argument "row" is missing, with no default</code> on its first call, so no sync ever completed. The trace check now uses the column computed in the same <code>mutate()</code>, and the resolution rules are covered by <code>tests/testthat/test-sync-human-review-status.R</code>.</p>
 </blockquote>
 <div class="section level3">
 <h3 id="sync_human_review_status">

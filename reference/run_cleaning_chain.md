@@ -2,9 +2,9 @@
 
 Runs the pure data-in / data-out portion of the pipeline as a single
 composable chain. These are the six steps that take a data frame and
-return a data frame with no file I/O and no reliance on the global
-environment: timestamps, intervals, sequence normalisation, manual
-corrections, duration corrections and metric computation.
+return a data frame without relying on the global environment:
+timestamps, intervals, sequence normalisation, manual corrections,
+duration corrections and metric computation.
 
 ## Usage
 
@@ -54,6 +54,14 @@ recover a plain data frame identical in shape to the v1.2.0
 `corrected_ema_data`.
 
 ## Details
+
+"Pure" is about the input and the return value, not about the file
+system: the duration-correction and correction steps still write audit
+files (`manual_error_correction_updated.csv`,
+`output/corrected_ema_data.rds`, `output/duration_clock_rule_log.csv`,
+`output/manual_corrections_not_applied.csv`) relative to the working
+directory, so run the chain inside a scratch directory and move what you
+need out of it.
 
 The remaining steps of
 [`run_pipeline()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_pipeline.md)
