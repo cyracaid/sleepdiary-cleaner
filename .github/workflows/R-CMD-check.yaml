@@ -14,15 +14,18 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        # DESCRIPTION says R (>= 4.2). Until 2026-11-04 no job ever ran that
+        # DESCRIPTION says R (>= 4.3). Until 2026-11-04 no job ever ran that
         # floor: the matrix was OS-only and setup-r installs the release
-        # version. The floor is checked on one OS only -- 4.2 has no current
-        # binaries on the other two, so a full 3x2 matrix would spend most of
-        # its time compiling packages to test the platform we already cover.
+        # version. The floor is checked on one OS only -- the oldest R has no
+        # current binaries on the other two, so a full 3x2 matrix would spend
+        # most of its time compiling packages to test the platform we already
+        # cover. 4.2 was tried first and dropped: it writes midnight times as
+        # "00:00:00" (4.3 and later write the date only) and resolves a time
+        # inside the spring-forward gap an hour earlier, so 8 tests failed.
         r: [release]
         include:
           - os: ubuntu-latest
-            r: '4.2'
+            r: '4.3'
     runs-on: ${{ matrix.os }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
