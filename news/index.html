@@ -80,7 +80,7 @@
 <h3 id="changed-development-version">Changed<a class="anchor" aria-label="anchor" href="#changed-development-version"></a></h3>
 <ul><li>
 <code>data.timezone</code> (default <code>"America/Los_Angeles"</code>) now sets the IANA zone the diary wall-clock times are parsed in; the zone used to be hard-coded, so a study collected elsewhere had its times read as Pacific. <code>process_timestamp()</code> and <code><a href="../reference/step_process_timestamps.html">step_process_timestamps()</a></code> also take a <code>tz</code> argument.</li>
-<li>The minimum R version is now 4.3. R 4.2 writes midnight times as “00:00:00” where 4.3 and later write the date only; 6 golden-table tests failed there. Separately, on R 4.3.3 a diary time inside a spring-forward gap is moved an hour earlier instead of being kept at the first instant that exists; the two tests for that are skipped below R 4.4 until it is known which version handles it.</li>
+<li>The minimum R version is now 4.4. R 4.2 writes midnight times as “00:00:00” where 4.3 and later write the date only (6 golden-table tests failed there), and on R 4.3.3 a diary time inside a spring-forward gap is moved an hour earlier instead of being kept at the first instant that exists (2 tests failed there). Both pass on R 4.4.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="fixed-development-version">Fixed<a class="anchor" aria-label="anchor" href="#fixed-development-version"></a></h3>
