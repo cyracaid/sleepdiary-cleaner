@@ -139,12 +139,27 @@ corrected-or-flagged safe outcome.
 
 ## What the external mixes measure, and what they do not
 
-`prevalence_grid.csv` has two external-mix rows at 5% of rows. `external_inverted`
-injects wake and rise times exchanged and nothing else: 350 of 350 flagged or
-corrected, 100% (95% CI 98.95 to 100%). Read that as a statement about **one
-form of reversal**. In the study data, 140 of 2,848 nights with all four times
-(4.92%) have times out of order (134, or 4.71%, after setting aside 6 impossible
-get-up values), and wake and rise exchanged is 9 of the 140 (6.4%).
+`prevalence_grid.csv` has two external-mix rows at 5% of rows, and each row
+scores the **whole mix**, not one error form. Both mixes hold only the types
+that have a published rate: AM/PM errors (1.07%) and wake-versus-rise confusion
+(4.4%), so at 5% of rows the 350 injected rows are about 19% AM/PM (68 rows) and
+81% the wake-versus-rise form.
+
+- `external_inverted`: the wake-versus-rise form is wake and rise times
+  exchanged (282 rows) plus 68 AM/PM rows. 350 of 350 flagged or corrected,
+  100% (95% CI 98.95 to 100%). By form, from the per-cell scoring output
+  (not committed; recorded in `work_logs/2026-10-29_validation_independent_error_model.md`,
+  ninth round): exchanged pairs 282 of 282 corrected to the true value (95% CI
+  98.7 to 100%); AM/PM 68 of 68 handled (40 corrected, 28 flagged).
+- `external_same`: the wake-versus-rise form is the rise time typed into the wake
+  field (236 rows) plus the same 68 AM/PM rows. The row's 22.4% (95% CI 17.8 to
+  27.5%) is the recall of the whole mix and equals the AM/PM share (68 of 304):
+  the typed-twice form itself is 0 of 236 (upper 95% bound 1.6%).
+
+Read the first row as a statement about **one form of reversal**: wake and rise
+exchanged. In the study data, 140 of 2,848 nights with all four times (4.92%)
+have times out of order (134, or 4.71%, after setting aside 6 impossible get-up
+values), and wake and rise exchanged is 9 of the 140 (6.4%).
 
 `results/real_mix_outcome.csv` re-runs the benchmark with the forms in the
 study's own proportions (7,000 rows, 350 injected, seed 20260817):
@@ -170,11 +185,10 @@ The script that produced `real_mix_outcome.csv` (`07_run_real_mix.R`) is held
 locally and is not yet in this repository, so this table is recorded, not
 re-runnable from here.
 
-The `external_same` row (22.4%, 95% CI 17.8 to 27.5%) is a different thing: it
-types the rise time into the wake field. Equal times are valid data (508 of the
-study's awakening and get-up pairs, 17.8%, are equal after correction), so a miss
-there is a limit of timestamp-only checks, not a detection gap that can be
-closed.
+The typed-twice form (0 of 236 above) is a different thing from a reversal. Equal
+times are valid data (508 of the study's awakening and get-up pairs, 17.8%, are
+equal after correction), so a miss there is a limit of timestamp-only checks, not
+a detection gap that can be closed.
 
 ## FAR=0 wording (scope limitation)
 

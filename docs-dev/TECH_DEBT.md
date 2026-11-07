@@ -219,4 +219,35 @@ two flag columns are silently missing.
 test-internalised-in-sync.R if the signature change requires it, and add a
 unit test asserting flag_severity appears when cfg is passed.
 
-**Last updated:** 2026-08-13
+---
+
+## 10. A diary time inside the spring-forward gap depends on the R version (2026-11-07)
+
+**What happens.** On the US spring-forward day the clock jumps from 02:00 to
+03:00, so a wall time of 02:30 names no instant. `process_timestamp()` handles
+it by retrying the string an hour later (03:30, the first instant that exists).
+That retry only runs when `parse_date_time()` returns `NA` for the time.
+
+R 4.3.3 does not return `NA`. It reads 02:30 with the post-jump offset (EDT),
+which displays as 01:30 EST, one hour earlier than anything the person could
+have seen on a clock. The retry never runs, no flag is raised, and the entry
+carries a time one hour off. R 4.4 and later return `NA` and the retry works
+(CI: `test-timestamp-parse.R:61` and `:76` failed on 4.3.3, passed on 4.4).
+
+**Who it touches.** Only an entry typed in 02:00-02:59 on the one switch day of
+a year, by a participant in a zone that observes daylight saving time. It
+shifts that night's bed, sleep, awake or get-up time by one hour, and so the
+computed duration for that night.
+
+**What was done.** The declared minimum R version is now 4.4 (`DESCRIPTION`,
+CI floor job, NEWS), so the affected R versions cannot install the package. The
+parser is unchanged.
+
+**Still open.** The retry maps the entry to 03:30. That is a convention (the
+one RFC 5545 uses), not a measurement of what the person meant; an entry of
+02:30 could as well have been 01:30 by a clock that had not yet been moved.
+The fallback also relies on a one-hour step, with a 30-minute second try for
+zones such as Lord Howe. Checking how many real entries fall in a gap would
+need a read of the study's raw time strings; it has not been done.
+
+**Last updated:** 2026-11-07
