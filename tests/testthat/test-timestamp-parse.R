@@ -44,10 +44,9 @@ test_that("NA ampm rows stay NA (no crash, no fake PM)", {
   expect_true(all(is.na(out$time_bed_am_hhmm_ampm)))
 })
 test_that("a time inside the spring-forward gap is kept, not silently dropped", {
-  # On R 4.3.3 parse_date_time() returns 01:30 EST for the gap time instead of
-  # NA, so the NA-triggered fallback never runs (seen in CI, 2026-11-07). The
-  # behaviour is unverified below R 4.4; the R 4.4 CI job tests that guess.
-  skip_if(getRversion() < "4.4.0", "gap-time handling not verified on R < 4.4")
+  # R 4.3.3 returns 01:30 EST for the gap time instead of NA, so the
+  # NA-triggered fallback never ran there (seen in CI, 2026-11-07); this is why
+  # the declared floor is R 4.4, where the CI job passes this test.
   # 2026-03-08 is a US switch day: 02:00-02:59 never happened, so
   # parse_date_time() has no instant to return for "02:30" and gives NA. Left
   # as NA the night is reported as "not reported" even though the person typed
@@ -68,7 +67,6 @@ test_that("a time inside the spring-forward gap is kept, not silently dropped", 
 })
 
 test_that("process_timestamp() parses in the zone it is given", {
-  skip_if(getRversion() < "4.4.0", "gap-time handling not verified on R < 4.4")
   # Same wall clock, different zone: New York's gap is that day too, and the
   # offset must be EDT, not the historical America/Los_Angeles default.
   df <- data.frame(

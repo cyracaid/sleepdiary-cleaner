@@ -25,12 +25,11 @@
   diary wall-clock times are parsed in; the zone used to be hard-coded, so a
   study collected elsewhere had its times read as Pacific. `process_timestamp()`
   and `step_process_timestamps()` also take a `tz` argument.
-* The minimum R version is now 4.3. R 4.2 writes midnight times as
-  "00:00:00" where 4.3 and later write the date only; 6 golden-table tests
-  failed there. Separately, on R 4.3.3 a diary time inside a spring-forward
-  gap is moved an hour earlier instead of being kept at the first instant that
-  exists; the two tests for that are skipped below R 4.4 until it is known
-  which version handles it.
+* The minimum R version is now 4.4. R 4.2 writes midnight times as
+  "00:00:00" where 4.3 and later write the date only (6 golden-table tests
+  failed there), and on R 4.3.3 a diary time inside a spring-forward gap is
+  moved an hour earlier instead of being kept at the first instant that exists
+  (2 tests failed there). Both pass on R 4.4.
 
 ## Fixed
 * `sync_human_review_status()` runs again. It called its own trace check with no
