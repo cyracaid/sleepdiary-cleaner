@@ -38,9 +38,11 @@
   [`step_process_timestamps()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/step_process_timestamps.md)
   also take a `tz` argument.
 - The minimum R version is now 4.3. R 4.2 writes midnight times as
-  “00:00:00” where 4.3 and later write the date only, and it resolves a
-  time inside a spring-forward gap an hour earlier; 8 tests failed
-  there.
+  “00:00:00” where 4.3 and later write the date only; 6 golden-table
+  tests failed there. Separately, on R 4.3.3 a diary time inside a
+  spring-forward gap is moved an hour earlier instead of being kept at
+  the first instant that exists; the two tests for that are skipped
+  below R 4.4 until it is known which version handles it.
 
 ### Fixed
 
