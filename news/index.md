@@ -46,6 +46,11 @@
 
 ### Fixed
 
+- The sleep/awake order swap in Step 4 no longer acts on an awake time
+  of exactly 00:00. Some participants type 0 (“none”) in that field, and
+  the swap turned such a night into a sleep time of 00:00 that nobody
+  wrote. The row is now left for the temporal-order check and human
+  review. In the study data this changes one row.
 - [`sync_human_review_status()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/sync_human_review_status.md)
   runs again. It called its own trace check with no argument
   (`argument "row" is missing, with no default`), so every call raised
