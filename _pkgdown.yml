@@ -34,6 +34,8 @@ navbar:
           href: articles/data-first.html
         - text: "Reading the Output and the Review Loop"
           href: articles/interpreting-output.html
+        - text: "Flags, terminology and the review workflow"
+          href: articles/review-flags.html
         - text: "Output files"
           href: articles/output-files.html
         - text: "Troubleshooting"
@@ -56,6 +58,8 @@ navbar:
           href: articles/data-first-zh.html
         - text: "读懂输出与审核循环"
           href: articles/interpreting-output-zh.html
+        - text: "Flag、术语与审核流程"
+          href: articles/review-flags-zh.html
         - text: "输出文件一览"
           href: articles/output-files-zh.html
         - text: "排错"
@@ -81,6 +85,7 @@ articles:
       - column-mapping
       - data-first
       - interpreting-output
+      - review-flags
       - output-files
       - troubleshooting
       - pipeline-architecture
@@ -95,6 +100,7 @@ articles:
       - column-mapping-zh
       - data-first-zh
       - interpreting-output-zh
+      - review-flags-zh
       - output-files-zh
       - troubleshooting-zh
       - pipeline-architecture-zh

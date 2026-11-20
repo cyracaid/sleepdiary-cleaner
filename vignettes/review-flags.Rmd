@@ -1,0 +1,114 @@
+---
+title: "Flags, Terminology and the Review Workflow"
+description: >
+  The flag columns and their lifecycle, the terms used in the validation tables, and sync_human_review_status().
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Flags, Terminology and the Review Workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+<p class="lang-switch" style="text-align:right;margin:0.2em 0 0.8em"><a href="review-flags-zh.html">中文版 →</a></p>
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+## Flag System & Human Review Workflow
+
+sleepcleanr uses a structured flag system to route records through the human-in-the-loop review process. Every record can carry multiple flags; flags are **additive** (a record may carry several simultaneously) and **never silently cleared** — they persist until explicitly resolved by human action.
+
+| Flag / Column | Trigger | Meaning | Resolution |
+|---|---|---|---|
+| `needs_review_flag` | Any detection rule fires | Record needs human attention | Human reviews → sets `manually_corrected=TRUE` OR `human_metric_review_status=confirmed_not_error_do_not_correct` |
+| `auto_error_desc` | Auto-detection logic | Machine-readable description of why flagged | Reference for human reviewer |
+| `error_type` / `unusual_type` | Step 5 classification | Categorized error type (TIMESTAMP, DURATION, SELF_REPORTED, etc.) | Informs reviewer; drives Figure 6 classification |
+| `manually_corrected` | Human applied correction via `apply_manual_corrections.R` | Record was explicitly fixed by human | Set to `TRUE` by `apply_manual_corrections.R` |
+| `human_metric_review_status` | Human metric review decision | `confirmed_not_error_do_not_correct` = reviewed & confirmed correct | Set by `apply_metric_review_acceptances.R` / `apply_metric_review_acceptances()` |
+| `human_metric_review_note` | Reviewer's free-text note | Context for future auditors | Free text |
+| `correction_type` | Applied correction type | e.g., `bed_sleep_swap_3h`, `sleep_reduce_12h_loop` | Populated by correction engine |
+
+**Flag lifecycle:**
+
+```
+Record flagged (needs_review_flag=TRUE)
+    ↓ Human reviews
+    ├── Confirmed error → apply_manual_corrections.R → manually_corrected=TRUE
+    ├── Confirmed OK → human_metric_review_status="confirmed_not_error_do_not_correct"
+    └── Deferred / unsure → needs_review_flag remains TRUE
+```
+
+**Key design principles:**
+
+1. **Flags are never silently cleared** — a flag persists until explicit human action (`manually_corrected=TRUE` or `human_metric_review_status=confirmed_not_error_do_not_correct`).
+2. **Flags are additive** — a record can carry multiple flags simultaneously (e.g., TIMESTAMP + DURATION + SELF_REPORTED).
+3. **Resolution is explicit** — a flag is "resolved" only by setting `manually_corrected=TRUE` or `human_metric_review_status=confirmed_not_error_do_not_correct`; there is no implicit "auto-resolve".
+4. **Flags persist in outputs** — Dataset A (full) retains all flags for audit; Dataset B (minimal) includes only `needs_review_flag` and `correction_type` for downstream analysis.
+
+**Current flag categories** (from `checkforerrors_processing.R` and METHODS Stage 7):
+
+| Category | Sub-types | Meaning |
+|---|---|---|
+| **TIMESTAMP** | Sequence/range violations (bed/sleep/awake/getup times) | e.g., hour>23, malformed colon, inverted sequences |
+| **DURATION** | Interval/format errors (SOL, WASO) | e.g., MM:SS vs HH:MM confusion, plausibility violations |
+| **AMOUNT** | Substance input anomalies | negative, excessive digits, filler codes (888/999) |
+| **SELF_REPORTED** | SOL/WASO vs timestamp-window mismatch | SOL > bed→sleep window, SE>100%, etc. |
+
+**Historical flag statistics (v1.4.5 report-only audit, 13,990 rows; the current review queue is in Evidence at a glance above, and each run prints its own):** 1,048 records flagged (7.5%); 0 AUTO_FIX; 0 silent corrections. Breakdown: 922 TIMESTAMP (window violations), 140 DURATION (order violations), 1 SELF_REPORTED (extreme), 1 redundancy-confirmed worsening. See `VALIDATION_REPORT.md` for full breakdown.
+
+
+## Terminology
+
+| Term | Meaning |
+|---|---|
+| **Detection recall (L1)** | Share of injected errors for which the pipeline *acted* (flagged or corrected) |
+| **Correction-level recall (L3)** | Share of injected errors for which the pipeline recovered the *correct value* |
+| **FCR** | False-correction rate: clean records that were altered |
+| **FAR** | False-alarm rate: clean records that were flagged |
+| **SPEC** | Specificity (clean records left untouched) |
+| **M1 / M4 / M5** | Real-data audit rules: M1 order violations, M4 bed→sleep window violations, M5 silent-worsening candidates |
+| **AUTO_FIX** | A change applied automatically, with no human review |
+
+
+## Sync Human Review Status
+
+sleepcleanr provides a utility to synchronize human review status fields in the metric review acceptance CSV file.
+
+### `sync_human_review_status()`
+
+Automatically synchronizes review status fields in `manual_metric_review_acceptances.csv` based on human review traces.
+
+```r
+library(sleepcleanr)
+sync_human_review_status("manual_metric_review_acceptances.csv")
+```
+
+**What it does:**
+
+1. **Detects human review traces** by checking:
+   - `human_metric_review_note` (non-empty reviewer notes)
+   - `resolved_at` (resolution timestamp)
+   - `resolved_by` (resolution actor)
+
+2. **Updates three columns** based on detected traces:
+   - `review_resolution`: `"corrected"` / `"flagged_unresolved"` / `"legacy"`
+   - `resolved_at`: Resolution date (only for `corrected`)
+   - `resolved_by`: `"system"` / `"pending"` / `"legacy"`
+
+**Resolution Logic:**
+
+| Condition | `review_resolution` | `resolved_at` | `resolved_by` |
+|-----------|---------------------|---------------|---------------|
+| Explicit `corrected` flag | `"corrected"` | Today | `"system"` |
+| Human traces + legacy/NA | `"flagged_unresolved"` | NA | `"pending"` |
+| No traces + legacy | `"legacy"` | NA | `"legacy"` |
+
+**Output:**
+```
+✓ Synced 161 rows: 1 corrected, 43 flagged, 117 legacy
+```
+
+**Running it:** `run_pipeline()` does not call this function; run it by hand
+after you edit the review CSV.
+
