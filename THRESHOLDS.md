@@ -1,5 +1,7 @@
 # Detection Thresholds — Defaults, Rationale, and When to Change
 
+English · [中文](THRESHOLDS-zh.html)
+
 Flag thresholds are **scientific judgments, not just config values.** Defaults
 are **deliberately lenient** — appropriate for a **general healthy-adult sample**
 where the goal is to catch data-entry errors and gross outliers, not to diagnose

@@ -14,7 +14,11 @@ navbar:
     # The detection thresholds, with their defaults and rationale
     thresholds:
       text: Thresholds
-      href: THRESHOLDS.html
+      menu:
+        - text: "English"
+          href: THRESHOLDS.html
+        - text: "中文"
+          href: THRESHOLDS-zh.html
     # The Articles entry opens a menu with the two languages kept apart,
     # each in the order a user needs them: start, inputs, run and read, outputs,
     # problems, then how it works and how it was checked.

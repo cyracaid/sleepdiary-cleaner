@@ -620,7 +620,7 @@ Bug、问题和功能建议：请开 [issue](https://github.com/cyracaid/sleepdi
 - vignette("interpreting-output-zh") — 读懂输出与审核循环（`correction_status_final.csv`、审核状态表、图）
 - vignette("output-files-zh") — 一次运行写出的每个文件：放哪里、哪一步写出、是什么
 - vignette("troubleshooting-zh") — 最常见问题的现象、原因和处理办法
-- [`THRESHOLDS.md`](THRESHOLDS.md) — 每个检测阈值的默认值与依据，以及如何设置你自己的（文档站点"Thresholds"页也有）
+- [`THRESHOLDS-zh.md`](THRESHOLDS-zh.md) — 每个检测阈值的默认值与依据，以及如何设置你自己的（文档站点"Thresholds"页也有）
 - vignette("pipeline-architecture-zh") — 结构、规则族、分类体系
 - vignette("validation-methodology-zh") — 规则如何验证（合成 + 真实数据）
 - vignette("testing-coverage-zh") — 测试覆盖
