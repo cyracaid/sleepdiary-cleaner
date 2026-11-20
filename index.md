@@ -102,9 +102,10 @@ all-manual-flag:
   must not be overwritten — a plausible large SOL is real psychological
   signal, and silently “fixing” it would bias the sleep–affect
   associations the pipeline exists to serve.
-- **Not all-flag:** a 1,048-row FLAG queue is unmanageable by hand.
-  High-confidence rules chew the deterministic cases; FLAG keeps only
-  the ambiguous ones for human review.
+- **Not all-flag:** a 1,048-row FLAG queue (the v1.4.5 report-only
+  audit) is unmanageable by hand. High-confidence rules chew the
+  deterministic cases; FLAG keeps only the ambiguous ones for human
+  review.
 
 The outcome is not “the pipeline makes a mess clean” — it makes the mess
 **explicit**: every candidate error is surfaced or logged, never
@@ -192,12 +193,12 @@ METHODS Stage 7):
 | **AMOUNT** | Substance input anomalies | negative, excessive digits, filler codes (888/999) |
 | **SELF_REPORTED** | SOL/WASO vs timestamp-window mismatch | SOL \> bed→sleep window, SE\>100%, etc. |
 
-**Flag statistics (snapshot at v1.4.5, 13,990 rows; each run prints the
-current review queue):** 1,048 records flagged (7.5%); 0 AUTO_FIX; 0
-silent corrections. Breakdown: 922 TIMESTAMP (window violations), 140
-DURATION (order violations), 1 SELF_REPORTED (extreme), 1
-redundancy-confirmed worsening. See `VALIDATION_REPORT.md` for full
-breakdown.
+**Historical flag statistics (v1.4.5 report-only audit, 13,990 rows; the
+current review queue is in Evidence at a glance above, and each run
+prints its own):** 1,048 records flagged (7.5%); 0 AUTO_FIX; 0 silent
+corrections. Breakdown: 922 TIMESTAMP (window violations), 140 DURATION
+(order violations), 1 SELF_REPORTED (extreme), 1 redundancy-confirmed
+worsening. See `VALIDATION_REPORT.md` for full breakdown.
 
 ### Validation Map
 
@@ -212,7 +213,7 @@ breakdown.
     ──────────────────────────────
     Step 5  Redundant-channel ── 80/81 corrections improve (98.8%)
     Step 5.5  Bland-Altman ── SOL ±75-min noise band; WASO 3.3× above noise
-    Step 6  Report-only audit ── 0 AUTO_FIX, 1,048 FLAG
+    Step 6  Report-only audit (v1.4.5) ── 0 AUTO_FIX, 1,048 FLAG
     Step 7  Human co-review ── 64–89% agreement
 
     ROBUSTNESS TIER
@@ -227,14 +228,14 @@ breakdown.
 
 > **Validation statistics source:** All validation statistics above
 > (recall 0.995, 99% improvement, 0% silent misrepair for SOL/WASO,
-> etc.) are derived from benchmarks run against the current
-> `sleepcleanr` v1.4.5+ codebase (commit fd6bbd0). The synthetic
+> etc.) are derived from benchmarks run against `sleepcleanr` as of the
+> v1.4.5 audit, except where a line says otherwise. The synthetic
 > benchmark
 > (`validation/synthetic/results/detection_outcomes_v4_current.csv`,
-> 5,391 injected rows) and real-data audit (13,990 rows) were executed
-> against the current codebase (commit fd6bbd0). These statistics
-> reflect the current pipeline behavior and supersede any earlier
-> pre-patch numbers cited in earlier documentation. See
+> 5,391 injected rows) regenerates from fixed seeds and can be re-run on
+> the current code (see `validation/README.md`); the real-data audit
+> (13,990 rows) cannot be re-run without the study data. These
+> statistics supersede any earlier pre-patch numbers. See
 > `VALIDATION_REPORT.md` and
 > `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md` for the full
 > evidence package.
@@ -292,23 +293,18 @@ cannot be re-run without access to those data.
 ``` r
 # From GitHub (not yet on CRAN)
 renv::install("cyracaid/sleepdiary-cleaner")
+# or: pak::pak("cyracaid/sleepdiary-cleaner")
 ```
 
 ## Quick start
 
+Shortest path: point
+[`clean_sleep_diary()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/clean_sleep_diary.md)
+at your file; no config needed.
+
 ``` r
 library(sleepcleanr)
 
-# Demo run on the bundled synthetic fixture
-run_pipeline()
-
-# Your own study: copy the config template, map your columns, run again
-file.copy(system.file("config_template.yaml", package = "sleepcleanr"),
-          "my_study.yaml")
-# edit my_study.yaml → run_pipeline(config = "my_study.yaml")
-
-# Data-first entry (no config file needed): column names are inferred and
-# every schema decision is recorded in the run manifest.
 res <- clean_sleep_diary("my_diary.csv")          # .csv / .rds / .xlsx / data.frame
 res$cleaned                                       # cleaned Dataset A
 res$guesses                                       # how each column was mapped
@@ -316,6 +312,22 @@ res$manifest                                      # provenance: input hash, conf
 # Preview the inferred mapping without running anything:
 clean_sleep_diary("my_diary.csv", dry_run = TRUE) # writes dry_run_manifest.json, no data written
 ```
+
+Other entries:
+
+``` r
+# Demo run on the bundled synthetic fixture
+run_pipeline()
+
+# Config-file route: copy the template, map your columns, run again
+file.copy(system.file("config_template.yaml", package = "sleepcleanr"),
+          "my_study.yaml")
+# edit my_study.yaml → run_pipeline(config = "my_study.yaml")
+```
+
+> **Shell note:** the review worksheets are named `[NEW]manual_*.csv`.
+> The square brackets are glob characters, so quote the name in a shell:
+> `open "[NEW]manual_error_correction_review.csv"`.
 
 ## Citation
 
@@ -400,12 +412,6 @@ manual corrections, and diagnose issues.
 sleepcleanr provides a utility to synchronize human review status fields
 in the metric review acceptance CSV file.
 
-> **Fixed after 1.8.0:** the released build raised
-> `argument "row" is missing, with no default` on its first call, so no
-> sync ever completed. The trace check now uses the column computed in
-> the same `mutate()`, and the resolution rules are covered by
-> `tests/testthat/test-sync-human-review-status.R`.
-
 ### `sync_human_review_status()`
 
 Automatically synchronizes review status fields in
@@ -428,38 +434,22 @@ sync_human_review_status("manual_metric_review_acceptances.csv")
     - `resolved_at`: Resolution date (only for `corrected`)
     - `resolved_by`: `"system"` / `"pending"` / `"legacy"`
 
-**Resolution Logic:** \| Condition \| `review_resolution` \|
-`resolved_at` \| `resolved_by` \| \|———–\|———————\|—————\|—————\| \|
-Explicit `corrected` flag \| `"corrected"` \| Today \| `"system"` \| \|
-Human traces + legacy/NA \| `"flagged_unresolved"` \| NA \| `"pending"`
-\| \| Human traces + legacy/NA \| `"flagged_unresolved"` \| NA \|
-`"pending"` \| \| No traces + legacy \| `"legacy"` \| NA \| `"legacy"`
-\|
+**Resolution Logic:**
 
-**Usage:**
-
-``` r
-library(sleepcleanr)
-sync_human_review_status("manual_metric_review_acceptances.csv")
-```
+| Condition | `review_resolution` | `resolved_at` | `resolved_by` |
+|----|----|----|----|
+| Explicit `corrected` flag | `"corrected"` | Today | `"system"` |
+| Human traces + legacy/NA | `"flagged_unresolved"` | NA | `"pending"` |
+| No traces + legacy | `"legacy"` | NA | `"legacy"` |
 
 **Output:**
 
     ✓ Synced 161 rows: 1 corrected, 43 flagged, 117 legacy
 
-**Integration in Pipeline:** Automatically runs at pipeline Step 11
-(after all corrections, before visualization):
-
-``` r
-run_pipeline(config = "my_study.yaml")  # Automatically runs sync_human_review_status() at Step 11
-```
-
-**Manual invocation:**
-
-``` r
-library(sleepcleanr)
-sync_human_review_status("manual_metric_review_acceptances.csv")
-```
+**Running it:**
+[`run_pipeline()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_pipeline.md)
+does not call this function; run it by hand after you edit the review
+CSV.
 
 ------------------------------------------------------------------------
 
@@ -473,6 +463,58 @@ CSV）检测并修正时序与时长错误，计算标准睡眠指标（TST、SO
 配置可将管线映射到你的数据集，无需改代码。
 为斯坦福心理生理学实验室的高强度纵向睡眠研究开发。
 
+### 管线一览
+
+    杂乱的睡眠日记数据 (CSV / RDS)
+             ↓
+       时间戳解析与规范化
+             ↓
+       错误检测（顺序、时长、时区）
+             ↓
+       人工审核（只看被标记的记录）
+             ↓
+       修正台账（完整审计轨迹）
+             ↓
+       睡眠指标 (TST, SOL, WASO, SE)
+             ↓
+       诊断图与科研图
+             ↓
+       数据集 A（最终清洗版）+ 数据集 B（审计台账）
+
+### 有何不同
+
+1.  **人工参与，而非自动修复。**
+    确定性规则只修正无歧义的顺序和格式错误；值级分歧交人工审核。一个看似偏大的
+    SOL 原样保留——它是信号，不是错误。
+2.  **没有静默修正。**
+    每次改动都带有记录在案的修正类型，标记会一直保留，直到人工明确解决。修正台账是输出的一部分（`correction_status_final.csv`、`step_flag_ledger.csv`），每轮运行都会在**项目根目录**（不是
+    `output/`）重新生成人工评审工作表（`[NEW]manual_error_correction_review.csv`、`[NEW]manual_unusual_review.csv`）。
+3.  **阈值可配置、有文档。** 规则阈值以 YAML 默认值给出并附依据（见
+    [THRESHOLDS.md](https://cyracaid.github.io/sleepdiary-cleaner/THRESHOLDS.md)），应按你自己的数据重新核对。
+4.  **可复现。** YAML 配置、`renv.lock`，以及在 CI
+    中运行的测试套件（R-CMD-check、Codecov）。
+
+### 证据一览
+
+完整证据包见
+[VALIDATION_REPORT.md](https://cyracaid.github.io/sleepdiary-cleaner/VALIDATION_REPORT.md)。摘要：
+
+- **合成真值**（14 类共 5,391 条注入错误，另有 1,609
+  行干净对照）：检出率 **0.995** \[0.993, 0.997\]，特异度
+  1.0。“检出”指记录被标记，不代表恢复了正确值——修正层面的召回率更低，验证报告里按错误类别分别给出。
+- **真实研究数据**（237 名参与者的 13,990 行）：在该研究的运行中，规则对
+  93 行做了自动的顺序或格式修正（其中 10
+  行也被审核者修正过），审核者另外修正了 75
+  行。一轮运行结束时的审核队列：应用人工文件后为 226 行，不应用则为 307
+  行。13,990 条提交中有 2,848 条四个时间都填了，因此每 1,000 条日记对应
+  79 和 108 行（占全部提交的 1.6% 和 2.2%）。v1.4.5 审计标记的 1,048
+  行来自只报告、不改数据的一次运行。
+- **外部公开数据集**：经一段简短的转换脚本，管线可在其他 schema
+  上运行。这些数据集没有已知错误，所以只是可行性检查，不是准确性验证。
+
+早期的自动化版本曾静默地误修条目；合成基准发现并堵住了这些缺陷，目前的基准显示
+SOL/WASO 的静默误修率为 0%。
+
 ### 为什么是”自动 + 人工”混合设计？
 
 sleepcleanr 刻意**既非全自动、也非全部人工 flag**：
@@ -481,8 +523,8 @@ sleepcleanr 刻意**既非全自动、也非全部人工 flag**：
   的规则才安全自动修正；但值级错误（如 SOL
   与就寝→入睡窗口的矛盾）绝不覆盖 — 一个看似偏大的 SOL
   是真实的心理信号，静默”修正”会破坏管线所服务的睡眠–情绪关联。
-- **不全 flag**：1048 行 FLAG
-  队列手动看不过来。高置信规则吃掉确定性个案；FLAG
+- **不全 flag**：1048 行 FLAG 队列（v1.4.5
+  只报告审计）手动看不过来。高置信规则吃掉确定性个案；FLAG
   只把歧义个案留给人审。
 
 结果不是”管线把 mess 洗干净”，而是把 mess
@@ -496,6 +538,104 @@ sleepcleanr 刻意**既非全自动、也非全部人工 flag**：
 > 小时相邻对调、12 小时 AM/PM 翻转）在我们的数据集上验证过 — 见
 > VALIDATION_REPORT。你的研究日记可能落在这区间内或外；它们都是 YAML
 > 可配置的，应按你自己的数据重新审视，而非盲抄。
+
+### 术语
+
+| 术语 | 含义 |
+|----|----|
+| **检出召回 (L1)** | 管线有所动作（标记或修正）的注入错误所占比例 |
+| **修正层召回 (L3)** | 管线恢复出*正确值*的注入错误所占比例 |
+| **FCR** | 误修率：被改动的干净记录 |
+| **FAR** | 误报率：被标记的干净记录 |
+| **SPEC** | 特异度（干净记录未被触动的比例） |
+| **M1 / M4 / M5** | 真实数据审计规则：M1 顺序违规，M4 就寝→入睡窗口违规，M5 静默恶化候选 |
+| **AUTO_FIX** | 自动应用、未经人工审核的改动 |
+
+### 检测阈值默认值
+
+| 规则 | 默认值 | 依据 |
+|----|----|----|
+| `timestamp.sequence.max_gap_hours`（AM/PM 翻转） | 12 h | 假设不存在 ≥ 12 h 的合理间隔 |
+| 相邻对调阈值 | 3 h | 在开发样本上调得；见 VALIDATION_REPORT |
+| `metric_validation.sol.excessive_minutes` | 120 | 抓严重离群值，不是临床标志 |
+| `metric_validation.se.min_valid_percent` / `max_valid_percent` | 0 / 100 | 结构上不可能 → 一律标记 |
+
+完整依据与修改指引：[THRESHOLDS.md](https://cyracaid.github.io/sleepdiary-cleaner/THRESHOLDS.md)。
+
+### Flag 系统与人工审核流程
+
+sleepcleanr 用一套结构化的 flag
+系统把记录送进人工审核流程。每条记录可同时带多个 flag；flag
+是**叠加**的，且**不会被静默清除**——直到人工明确处理才解除。
+
+| Flag / 列 | 触发 | 含义 | 解除方式 |
+|----|----|----|----|
+| `needs_review_flag` | 任一检测规则触发 | 记录需要人工关注 | 人工审核后设 `manually_corrected=TRUE` 或 `human_metric_review_status=confirmed_not_error_do_not_correct` |
+| `auto_error_desc` | 自动检测逻辑 | 机器可读的标记原因 | 供审核者参考 |
+| `error_type` / `unusual_type` | 步骤 5 分类 | 错误类别（TIMESTAMP、DURATION、SELF_REPORTED 等） | 供审核者参考；驱动图 6 的分类 |
+| `manually_corrected` | 人工经 `apply_manual_corrections.R` 修正 | 记录已被人工明确修正 | 由 `apply_manual_corrections.R` 设为 `TRUE` |
+| `human_metric_review_status` | 人工指标审核决定 | `confirmed_not_error_do_not_correct` = 已审核并确认无误 | 由 `apply_metric_review_acceptances.R` / `apply_metric_review_acceptances()` 设置 |
+| `human_metric_review_note` | 审核者的自由文本备注 | 给后来的审计者的背景 | 自由文本 |
+| `correction_type` | 已应用的修正类型 | 如 `bed_sleep_swap_3h`、`sleep_reduce_12h_loop` | 由修正引擎填写 |
+
+**Flag 生命周期：**
+
+    记录被标记 (needs_review_flag=TRUE)
+        ↓ 人工审核
+        ├── 确认是错误 → apply_manual_corrections.R → manually_corrected=TRUE
+        ├── 确认没问题 → human_metric_review_status="confirmed_not_error_do_not_correct"
+        └── 搁置 / 不确定 → needs_review_flag 保持 TRUE
+
+**设计原则：**
+
+1.  **Flag
+    不会被静默清除**——必须有明确的人工动作（`manually_corrected=TRUE` 或
+    `human_metric_review_status=confirmed_not_error_do_not_correct`）。
+2.  **Flag 可叠加**——一条记录可同时带多个 flag（如 TIMESTAMP +
+    DURATION + SELF_REPORTED）。
+3.  **解除是显式的**——只有设置 `manually_corrected=TRUE` 或
+    `human_metric_review_status=confirmed_not_error_do_not_correct`
+    才算“已解决”，不存在隐式的“自动解决”。
+4.  **Flag 保留在输出中**——数据集 A（完整版）保留全部 flag
+    供审计；数据集 B（精简版）只含 `needs_review_flag` 和
+    `correction_type`，供下游分析。
+
+**当前的 flag 类别**（来自 `checkforerrors_processing.R` 和 METHODS 第 7
+阶段）：
+
+| 类别 | 子类型 | 含义 |
+|----|----|----|
+| **TIMESTAMP** | 顺序/范围违规（就寝/入睡/醒来/起床时间） | 如小时 \> 23、冒号格式错误、顺序颠倒 |
+| **DURATION** | 间隔/格式错误（SOL、WASO） | 如 MM:SS 与 HH:MM 混淆、不合理的值 |
+| **AMOUNT** | 物质摄入量异常 | 负数、位数过多、占位码（888/999） |
+| **SELF_REPORTED** | SOL/WASO 与时间戳窗口不一致 | SOL 大于就寝→入睡窗口、SE\>100% 等 |
+
+**历史 flag 统计（v1.4.5 只报告审计，13,990
+行；当前审核队列见上文“证据一览”，每轮运行也会打印自己的）：** 1,048
+条记录被标记（7.5%）；0 条 AUTO_FIX；0 条静默修正。分布：922
+TIMESTAMP（窗口违规）、140 DURATION（顺序违规）、1
+SELF_REPORTED（极端值）、1 冗余确认的恶化。完整分布见
+`VALIDATION_REPORT.md`。
+
+### 验证地图
+
+    合成层（有真值）
+    ──────────────────────────────
+    步骤 1  干净输入特异度 ── 1 万条干净记录 → 0 改动/0 标记
+    步骤 2  注入错误基准 ── 检出召回 0.995 [0.993, 0.997]
+    步骤 3  检出 vs 正确性 ── L1 与 L3 的差距 → 交给人工
+    步骤 4  对照 ── no_cleaning 0 / naive_rule 0.623 / pipeline 0.995
+
+    真实数据层（13,990 行，237 名参与者）
+    ──────────────────────────────
+    步骤 5  冗余通道 ── 80/81 条修正使数据更好（98.8%）
+    步骤 5.5  Bland-Altman ── SOL 噪声带 ±75 分钟；WASO 高出噪声 3.3 倍
+    步骤 6  只报告审计 (v1.4.5) ── 0 AUTO_FIX，1,048 FLAG
+    步骤 7  人工共审 ── 一致率 64–89%
+
+    稳健性层
+    ──────────────────────────────
+    步骤 8  多重宇宙 + 多个种子 ── 召回稳定在 0.993–0.995
 
 > **命名说明：** R 包名为 **sleepcleanr**（CRAN 规范不允许连字符），
 > GitHub 仓库名为 **sleepdiary-cleaner**。两者是同一项目 — 安装用
@@ -544,21 +684,41 @@ CRAN。随包给出的阈值只是参考，请用你自己的数据核对。
 ``` r
 # 从 GitHub 安装（尚未上线 CRAN，包名 sleepcleanr）
 renv::install("cyracaid/sleepdiary-cleaner")
+# 或：pak::pak("cyracaid/sleepdiary-cleaner")
 ```
 
 ## 快速开始
 
+最短路径：把
+[`clean_sleep_diary()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/clean_sleep_diary.md)
+指向你的文件，无需配置。
+
 ``` r
 library(sleepcleanr)
 
+res <- clean_sleep_diary("my_diary.csv")          # .csv / .rds / .xlsx / data.frame
+res$cleaned                                       # 清洗后的数据集 A
+res$guesses                                       # 每一列是怎么映射的
+res$manifest                                      # 来源记录：输入哈希、配置、步骤台账
+# 只预览推断出的映射，不运行任何东西：
+clean_sleep_diary("my_diary.csv", dry_run = TRUE) # 写出 dry_run_manifest.json，不写数据
+```
+
+其他入口：
+
+``` r
 # 用内置合成数据跑演示
 run_pipeline()
 
-# 自己的研究数据：复制配置模板、映射列名、再跑
+# 配置文件路线：复制模板、映射列名、再跑
 file.copy(system.file("config_template.yaml", package = "sleepcleanr"),
           "my_study.yaml")
 # 编辑 my_study.yaml → run_pipeline(config = "my_study.yaml")
 ```
+
+> **Shell 提示：** 评审工作表的文件名是
+> `[NEW]manual_*.csv`。方括号是通配符， 在 shell
+> 里要给文件名加引号：`open "[NEW]manual_error_correction_review.csv"`。
 
 ## 引用
 
@@ -620,13 +780,52 @@ skill：`.claude/skills/sleepcleanr-pipeline/SKILL.md`（`.agents/skills/`
 
 | 步骤 | 名称 | 说明 |
 |----|----|----|
-| 1 | Load data | .rds/.csv auto-detected; schema validated; optional supplementary file merged |
-| 1.5 | Field-misentry check | SOL/WASO clock-time vs duration-field misentry detection on raw data |
-| 2-4 | Parse & normalize (S3 chain) | Parse timestamps → parse intervals → normalize sequence |
-| 5 | Classify records | Generate manual review CSVs for human approval |
-| 5.75 | Second-review consensus | Apply second-review checklist consensus |
-| 6-7 | Correct & compute metrics (S3 chain) | Manual + duration corrections; TST/SOL/WASO/SE metrics; has_correction enum |
-| 8 | Auto-detect remaining issues | TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED flag classification |
-| 8.5 | Cross-participant consistency check | Global consistency audit across participants |
-| 9 | Generate diagnostic figures | 35 figures (19 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt |
-| 10 | Build delivered datasets | finalize_columns() selects/renames to Dataset A/B per column dictionary |
+| 1 | 加载数据 | 自动识别 .rds/.csv；校验 schema；可合并补充文件 |
+| 1.5 | 字段误填检查 | 在原始数据上检测 SOL/WASO 的时刻与时长字段误填 |
+| 2-4 | 解析与规范化（S3 链） | 解析时间戳 → 解析时长 → 规范化顺序 |
+| 5 | 记录分类 | 生成供人工批准的审核 CSV |
+| 5.75 | 二次审核共识 | 应用二次审核清单的共识 |
+| 6-7 | 修正并计算指标（S3 链） | 人工与时长修正；TST/SOL/WASO/SE 指标；has_correction 枚举 |
+| 8 | 自动检测剩余问题 | TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED 标记分类 |
+| 8.5 | 跨参与者一致性检查 | 对全体参与者做全局一致性审计 |
+| 9 | 生成诊断图 | 35 张图（19 张质控 + 16 张科研）+ figure_index.png 总览图 + RUN_INFO.txt |
+| 10 | 构建交付数据集 | finalize_columns() 按列字典选列并重命名，得到数据集 A/B |
+
+## 同步人工审核状态
+
+[`sync_human_review_status()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/sync_human_review_status.md)
+根据人工审核留下的痕迹，同步 `manual_metric_review_acceptances.csv`
+里的审核状态列。
+
+``` r
+library(sleepcleanr)
+sync_human_review_status("manual_metric_review_acceptances.csv")
+```
+
+**它做什么：**
+
+1.  **检测人工审核痕迹**，依据：
+    - `human_metric_review_note`（非空的审核备注）
+    - `resolved_at`（解决时间）
+    - `resolved_by`（解决人）
+2.  **更新三列：**
+    - `review_resolution`：`"corrected"` / `"flagged_unresolved"` /
+      `"legacy"`
+    - `resolved_at`：解决日期（仅 `corrected`）
+    - `resolved_by`：`"system"` / `"pending"` / `"legacy"`
+
+**解决规则：**
+
+| 条件                    | `review_resolution`    | `resolved_at` | `resolved_by` |
+|-------------------------|------------------------|---------------|---------------|
+| 显式的 `corrected` 标记 | `"corrected"`          | 今天          | `"system"`    |
+| 有痕迹 + legacy/NA      | `"flagged_unresolved"` | NA            | `"pending"`   |
+| 无痕迹 + legacy         | `"legacy"`             | NA            | `"legacy"`    |
+
+**输出：**
+
+    ✓ Synced 161 rows: 1 corrected, 43 flagged, 117 legacy
+
+**运行方式：**
+[`run_pipeline()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_pipeline.md)
+不会调用这个函数；编辑完审核 CSV 后请手动运行。
