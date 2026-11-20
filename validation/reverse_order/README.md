@@ -16,8 +16,9 @@ is re-runnable rather than merely recorded.
 |---|---|---|
 | `class_counts.R` | the counts in the first column of the table (2,848 complete nights, 140 reversed, 134 after setting aside 6 impossible get-up values) and the per-mechanism split | a pipeline run's `output/cleaned_data_full.rds`, and a build with `classify_reversals()` |
 | `run_real_mix.R` | `results/real_mix_outcome.csv` — the injection table (350 injected, 74.0% flagged or corrected, 91 wrong repairs, no clean row altered) | the installed package and `validation/synthetic/` (it calls `generate_clean_data.R` and `run_one.R`) |
+| `figure_reverse_order.R` | `results/figure_reverse_order.png` (and a `.pdf`, which `.gitignore` keeps out) — the two-panel figure for the reversed-order section: panel (a) the study data by mechanism and who repaired each night, panel (b) the algorithm alone, study data next to the injection | `results/outcome_by_class.csv` and `results/real_mix_outcome.csv` (counts only) |
 
-Both write **counts only**. No participant identifiers, no timestamps: the
+All three write **counts only**. No participant identifiers, no timestamps: the
 row-level scoring stays in the scratch directory (`--work=`, or `tempdir()` by
 default) and is never written into the repository.
 
