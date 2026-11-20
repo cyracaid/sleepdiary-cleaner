@@ -141,6 +141,40 @@
 </ol>
 </div>
 <div class="section level2">
+<h2 id="install">Install<a class="anchor" aria-label="anchor" href="#install"></a>
+</h2>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># From GitHub (not yet on CRAN)</span></span>
+<span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner"</span><span class="op">)</span></span>
+<span><span class="co"># or: pak::pak("cyracaid/sleepdiary-cleaner")</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
+</h2>
+<p>Shortest path: point <code><a href="reference/clean_sleep_diary.html">clean_sleep_diary()</a></code> at your file; no config needed.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/clean_sleep_diary.html">clean_sleep_diary</a></span><span class="op">(</span><span class="st">"my_diary.csv"</span><span class="op">)</span>          <span class="co"># .csv / .rds / .xlsx / data.frame</span></span>
+<span><span class="va">res</span><span class="op">$</span><span class="va">cleaned</span>                                       <span class="co"># cleaned Dataset A</span></span>
+<span><span class="va">res</span><span class="op">$</span><span class="va">guesses</span>                                       <span class="co"># how each column was mapped</span></span>
+<span><span class="va">res</span><span class="op">$</span><span class="va">manifest</span>                                      <span class="co"># provenance: input hash, config, step ledger</span></span>
+<span><span class="co"># Preview the inferred mapping without running anything:</span></span>
+<span><span class="fu"><a href="reference/clean_sleep_diary.html">clean_sleep_diary</a></span><span class="op">(</span><span class="st">"my_diary.csv"</span>, dry_run <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># writes dry_run_manifest.json, no data written</span></span></code></pre></div>
+<p>Other entries:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Demo run on the bundled synthetic fixture</span></span>
+<span><span class="fu"><a href="reference/run_pipeline.html">run_pipeline</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Config-file route: copy the template, map your columns, run again</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"config_template.yaml"</span>, package <span class="op">=</span> <span class="st">"sleepcleanr"</span><span class="op">)</span>,</span>
+<span>          <span class="st">"my_study.yaml"</span><span class="op">)</span></span>
+<span><span class="co"># edit my_study.yaml → run_pipeline(config = "my_study.yaml")</span></span></code></pre></div>
+<blockquote>
+<p><strong>Shell note:</strong> the review worksheets are named <code>[NEW]manual_*.csv</code>. The square brackets are glob characters, so quote the name in a shell: <code>open "[NEW]manual_error_correction_review.csv"</code>.</p>
+</blockquote>
+</div>
+<div class="section level2">
 <h2 id="evidence-at-a-glance">Evidence at a glance<a class="anchor" aria-label="anchor" href="#evidence-at-a-glance"></a>
 </h2>
 <p>Full package in <a href="VALIDATION_REPORT.html">VALIDATION_REPORT.md</a>. Summary:</p>
@@ -165,7 +199,7 @@
 <li>
 <strong>Not fully auto:</strong> high-confidence, order/AM-PM-only rules correct harmlessly; but value-level errors (e.g. SOL vs the bed→sleep window) must not be overwritten — a plausible large SOL is real psychological signal, and silently “fixing” it would bias the sleep–affect associations the pipeline exists to serve.</li>
 <li>
-<strong>Not all-flag:</strong> a 1,048-row FLAG queue (the v1.4.5 report-only audit) is unmanageable by hand. High-confidence rules chew the deterministic cases; FLAG keeps only the ambiguous ones for human review.</li>
+<strong>Not all-flag:</strong> flagging every disagreement is unmanageable by hand (the v1.4.5 report-only audit flagged 1,048 rows; a current run leaves 226 rows to review, or 307 without the manual files). High-confidence rules take the deterministic cases; FLAG keeps only the ambiguous ones for human review.</li>
 </ul>
 <p>The outcome is not “the pipeline makes a mess clean” — it makes the mess <strong>explicit</strong>: every candidate error is surfaced or logged, never silently hidden.</p>
 <blockquote>
@@ -176,43 +210,20 @@
 <h3 id="flags-terminology-and-thresholds">Flags, terminology and thresholds<a class="anchor" aria-label="anchor" href="#flags-terminology-and-thresholds"></a>
 </h3>
 <p>The flag columns, the flag lifecycle, the terms used in the validation tables (L1/L3 recall, FCR, FAR, M1/M4/M5) and <code><a href="reference/sync_human_review_status.html">sync_human_review_status()</a></code> are in the article <code><a href="articles/review-flags.html">vignette("review-flags")</a></code> (Flags, terminology and the review workflow). The detection thresholds, with defaults and rationale, are on the <a href="THRESHOLDS.html">Thresholds</a> page.</p>
-</div>
-<div class="section level3">
-<h3 id="validation-map">Validation Map<a class="anchor" aria-label="anchor" href="#validation-map"></a>
-</h3>
-<pre><code>SYNTHETIC TIER (ground truth)
-──────────────────────────────
-Step 1  Clean-input specificity ── 10k clean records → 0 changes/flags
-Step 2  Injected-error benchmark ── detection recall 0.995 [0.993, 0.997]
-Step 3  Detection vs correctness ── L1 vs L3 gap → routes to human
-Step 4  Controls ── no_cleaning 0 / naive_rule 0.623 / pipeline 0.995
-
-REAL-DATA TIER (13,990 rows, 237 participants)
-──────────────────────────────
-Step 5  Redundant-channel ── 80/81 corrections improve (98.8%)
-Step 5.5  Bland-Altman ── SOL ±75-min noise band; WASO 3.3× above noise
-Step 6  Report-only audit (v1.4.5) ── 0 AUTO_FIX, 1,048 FLAG
-Step 7  Human co-review ── 64–89% agreement
-
-ROBUSTNESS TIER
-──────────────────────────────
-Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
+<p>The validation map (synthetic, real-data and robustness tiers) and where each number comes from are in <code><a href="articles/validation-methodology.html">vignette("validation-methodology")</a></code>.</p>
 <blockquote>
 <p><strong>Naming note:</strong> The R package is called <strong>sleepcleanr</strong> (CRAN convention: no hyphens). The GitHub repository is <strong>sleepdiary-cleaner</strong>. They are the same project — install via <code>renv::install("cyracaid/sleepdiary-cleaner")</code> and then <code><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">library(sleepcleanr)</a></code>.</p>
-</blockquote>
-<blockquote>
-<p><strong>Validation statistics source:</strong> All validation statistics above (recall 0.995, 99% improvement, 0% silent misrepair for SOL/WASO, etc.) are derived from benchmarks run against <code>sleepcleanr</code> as of the v1.4.5 audit, except where a line says otherwise. The synthetic benchmark (<code>validation/synthetic/results/detection_outcomes_v4_current.csv</code>, 5,391 injected rows) regenerates from fixed seeds and can be re-run on the current code (see <code>validation/README.md</code>); the real-data audit (13,990 rows) cannot be re-run without the study data. These statistics supersede any earlier pre-patch numbers. See <code>VALIDATION_REPORT.md</code> and <code>validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md</code> for the full evidence package.</p>
 </blockquote>
 </div>
 </div>
 <div class="section level2">
 <h2 id="status-and-data-availability">Status and data availability<a class="anchor" aria-label="anchor" href="#status-and-data-availability"></a>
 </h2>
-<p><strong>Status.</strong> sleepcleanr 1.8.0 is research software under active development. It was built for one longitudinal sleep study, has not yet been peer reviewed, and is not on CRAN. Treat the shipped thresholds as references to check against your own data.</p>
+<p><strong>Status.</strong> sleepcleanr (the development version after 1.8.0) is research software under active development. It was built for one longitudinal sleep study, has not yet been peer reviewed, and is not on CRAN. Treat the shipped thresholds as references to check against your own data.</p>
 <p><strong>Data availability.</strong> The study data are not public (participant privacy). What you can use without them:</p>
 <ul>
 <li>a bundled synthetic fixture (<code>inst/extdata/</code>, 280 rows, 20 participants) that <code><a href="reference/run_pipeline.html">run_pipeline()</a></code> runs on by default;</li>
-<li>the synthetic benchmark, which regenerates its own data from fixed seeds, so every benchmark number can be re-run (see <a href="validation/README.html"><code>validation/README.md</code></a>);</li>
+<li>the synthetic benchmark, which regenerates its own data from fixed seeds, so every benchmark number can be re-run (see <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/validation/README.md" class="external-link"><code>validation/README.md</code></a>);</li>
 <li>two public diary datasets with adaptation scripts (<code>validation/external/</code>).</li>
 </ul>
 <p>The few numbers that come from the study data (for example the redundant-channel check) are reported in <code>VALIDATION_REPORT.md</code> and cannot be re-run without access to those data.</p>
@@ -235,40 +246,6 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 </ul>
 </div>
 <div class="section level2">
-<h2 id="install">Install<a class="anchor" aria-label="anchor" href="#install"></a>
-</h2>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># From GitHub (not yet on CRAN)</span></span>
-<span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner"</span><span class="op">)</span></span>
-<span><span class="co"># or: pak::pak("cyracaid/sleepdiary-cleaner")</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
-</h2>
-<p>Shortest path: point <code><a href="reference/clean_sleep_diary.html">clean_sleep_diary()</a></code> at your file; no config needed.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/clean_sleep_diary.html">clean_sleep_diary</a></span><span class="op">(</span><span class="st">"my_diary.csv"</span><span class="op">)</span>          <span class="co"># .csv / .rds / .xlsx / data.frame</span></span>
-<span><span class="va">res</span><span class="op">$</span><span class="va">cleaned</span>                                       <span class="co"># cleaned Dataset A</span></span>
-<span><span class="va">res</span><span class="op">$</span><span class="va">guesses</span>                                       <span class="co"># how each column was mapped</span></span>
-<span><span class="va">res</span><span class="op">$</span><span class="va">manifest</span>                                      <span class="co"># provenance: input hash, config, step ledger</span></span>
-<span><span class="co"># Preview the inferred mapping without running anything:</span></span>
-<span><span class="fu"><a href="reference/clean_sleep_diary.html">clean_sleep_diary</a></span><span class="op">(</span><span class="st">"my_diary.csv"</span>, dry_run <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># writes dry_run_manifest.json, no data written</span></span></code></pre></div>
-<p>Other entries:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Demo run on the bundled synthetic fixture</span></span>
-<span><span class="fu"><a href="reference/run_pipeline.html">run_pipeline</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Config-file route: copy the template, map your columns, run again</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"config_template.yaml"</span>, package <span class="op">=</span> <span class="st">"sleepcleanr"</span><span class="op">)</span>,</span>
-<span>          <span class="st">"my_study.yaml"</span><span class="op">)</span></span>
-<span><span class="co"># edit my_study.yaml → run_pipeline(config = "my_study.yaml")</span></span></code></pre></div>
-<blockquote>
-<p><strong>Shell note:</strong> the review worksheets are named <code>[NEW]manual_*.csv</code>. The square brackets are glob characters, so quote the name in a shell: <code>open "[NEW]manual_error_correction_review.csv"</code>.</p>
-</blockquote>
-</div>
-<div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h2>
 <p>Cite the software with its Zenodo DOI (the concept DOI always resolves to the latest version; each release also has its own version DOI):</p>
@@ -280,7 +257,7 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <div class="section level2">
 <h2 id="run-the-tests-report-a-problem-contribute">Run the tests, report a problem, contribute<a class="anchor" aria-label="anchor" href="#run-the-tests-report-a-problem-contribute"></a>
 </h2>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span>   <span class="co"># from a clone of the repository; the same suite runs in CI</span></span></code></pre></div>
 <p>Bugs, questions and feature requests: open an <a href="https://github.com/cyracaid/sleepdiary-cleaner/issues" class="external-link">issue</a>. Contribution guidelines are in <a href="CONTRIBUTING.html"><code>CONTRIBUTING.md</code></a>.</p>
 </div>
@@ -425,6 +402,39 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <strong>可复现。</strong> YAML 配置、<code>renv.lock</code>，以及在 CI 中运行的测试套件（R-CMD-check、Codecov）。</li>
 </ol>
 </div>
+<div class="section level2">
+<h2 id="安装">安装<a class="anchor" aria-label="anchor" href="#%E5%AE%89%E8%A3%85"></a>
+</h2>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># 从 GitHub 安装（尚未上线 CRAN，包名 sleepcleanr）</span></span>
+<span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner"</span><span class="op">)</span></span>
+<span><span class="co"># 或：pak::pak("cyracaid/sleepdiary-cleaner")</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="快速开始">快速开始<a class="anchor" aria-label="anchor" href="#%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B"></a>
+</h2>
+<p>最短路径：把 <code><a href="reference/clean_sleep_diary.html">clean_sleep_diary()</a></code> 指向你的文件，无需配置。</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/clean_sleep_diary.html">clean_sleep_diary</a></span><span class="op">(</span><span class="st">"my_diary.csv"</span><span class="op">)</span>          <span class="co"># .csv / .rds / .xlsx / data.frame</span></span>
+<span><span class="va">res</span><span class="op">$</span><span class="va">cleaned</span>                                       <span class="co"># 清洗后的数据集 A</span></span>
+<span><span class="va">res</span><span class="op">$</span><span class="va">guesses</span>                                       <span class="co"># 每一列是怎么映射的</span></span>
+<span><span class="va">res</span><span class="op">$</span><span class="va">manifest</span>                                      <span class="co"># 来源记录：输入哈希、配置、步骤台账</span></span>
+<span><span class="co"># 只预览推断出的映射，不运行任何东西：</span></span>
+<span><span class="fu"><a href="reference/clean_sleep_diary.html">clean_sleep_diary</a></span><span class="op">(</span><span class="st">"my_diary.csv"</span>, dry_run <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># 写出 dry_run_manifest.json，不写数据</span></span></code></pre></div>
+<p>其他入口：</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># 用内置合成数据跑演示</span></span>
+<span><span class="fu"><a href="reference/run_pipeline.html">run_pipeline</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 配置文件路线：复制模板、映射列名、再跑</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"config_template.yaml"</span>, package <span class="op">=</span> <span class="st">"sleepcleanr"</span><span class="op">)</span>,</span>
+<span>          <span class="st">"my_study.yaml"</span><span class="op">)</span></span>
+<span><span class="co"># 编辑 my_study.yaml → run_pipeline(config = "my_study.yaml")</span></span></code></pre></div>
+<blockquote>
+<p><strong>Shell 提示：</strong> 评审工作表的文件名是 <code>[NEW]manual_*.csv</code>。方括号是通配符， 在 shell 里要给文件名加引号：<code>open "[NEW]manual_error_correction_review.csv"</code>。</p>
+</blockquote>
 <div class="section level3">
 <h3 id="证据一览">证据一览<a class="anchor" aria-label="anchor" href="#%E8%AF%81%E6%8D%AE%E4%B8%80%E8%A7%88"></a>
 </h3>
@@ -451,7 +461,7 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <li>
 <strong>不全自动：</strong> 高置信、仅涉时序/AM-PM 的规则才安全自动修正；但值级错误（如 SOL 与就寝→入睡窗口的矛盾）绝不覆盖 — 一个看似偏大的 SOL 是真实的心理信号，静默”修正”会破坏管线所服务的睡眠–情绪关联。</li>
 <li>
-<strong>不全 flag</strong>：1048 行 FLAG 队列（v1.4.5 只报告审计）手动看不过来。高置信规则吃掉确定性个案；FLAG 只把歧义个案留给人审。</li>
+<strong>不全 flag</strong>：把每个分歧都标出来，手动看不过来（v1.4.5 只报告审计标记了 1,048 行；当前一轮运行留下 226 行待审，不应用人工文件则为 307 行）。高置信规则处理确定性个案；FLAG 只把歧义个案留给人审。</li>
 </ul>
 <p>结果不是”管线把 mess 洗干净”，而是把 mess <strong>显式化</strong>：每个候选错误要么被呈现，要么被记录，永不被静默隐藏。每轮 run 会在<strong>项目根目录</strong>（不是 <code>output/</code>）重新生成两张人工评审工作表：<code>[NEW]manual_error_correction_review.csv</code> 与 <code>[NEW]manual_unusual_review.csv</code>——填好后以 <code>include_manual_corrections = TRUE</code> 重跑即应用。</p>
 <blockquote>
@@ -462,39 +472,20 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <h3 id="flag术语与阈值">Flag、术语与阈值<a class="anchor" aria-label="anchor" href="#flag%E6%9C%AF%E8%AF%AD%E4%B8%8E%E9%98%88%E5%80%BC"></a>
 </h3>
 <p>flag 各列、flag 生命周期、验证表里用到的术语（L1/L3 召回、FCR、FAR、M1/M4/M5）以及 <code><a href="reference/sync_human_review_status.html">sync_human_review_status()</a></code>，见文章 <code><a href="articles/review-flags-zh.html">vignette("review-flags-zh")</a></code>（Flag、术语与审核流程）。 检测阈值及其默认值与依据，见<a href="THRESHOLDS-zh.html">阈值</a>页。</p>
-</div>
-<div class="section level3">
-<h3 id="验证地图">验证地图<a class="anchor" aria-label="anchor" href="#%E9%AA%8C%E8%AF%81%E5%9C%B0%E5%9B%BE"></a>
-</h3>
-<pre><code>合成层（有真值）
-──────────────────────────────
-步骤 1  干净输入特异度 ── 1 万条干净记录 → 0 改动/0 标记
-步骤 2  注入错误基准 ── 检出召回 0.995 [0.993, 0.997]
-步骤 3  检出 vs 正确性 ── L1 与 L3 的差距 → 交给人工
-步骤 4  对照 ── no_cleaning 0 / naive_rule 0.623 / pipeline 0.995
-
-真实数据层（13,990 行，237 名参与者）
-──────────────────────────────
-步骤 5  冗余通道 ── 80/81 条修正使数据更好（98.8%）
-步骤 5.5  Bland-Altman ── SOL 噪声带 ±75 分钟；WASO 高出噪声 3.3 倍
-步骤 6  只报告审计 (v1.4.5) ── 0 AUTO_FIX，1,048 FLAG
-步骤 7  人工共审 ── 一致率 64–89%
-
-稳健性层
-──────────────────────────────
-步骤 8  多重宇宙 + 多个种子 ── 召回稳定在 0.993–0.995</code></pre>
+<p>验证地图（合成层、真实数据层、稳健性层）以及每个数字的来源，见 <code><a href="articles/validation-methodology-zh.html">vignette("validation-methodology-zh")</a></code>。</p>
 <blockquote>
 <p><strong>命名说明：</strong> R 包名为 <strong>sleepcleanr</strong>（CRAN 规范不允许连字符）， GitHub 仓库名为 <strong>sleepdiary-cleaner</strong>。两者是同一项目 — 安装用 <code>renv::install("cyracaid/sleepdiary-cleaner")</code>，加载用 <code><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">library(sleepcleanr)</a></code>。</p>
 </blockquote>
 </div>
+</div>
 <div class="section level2">
 <h2 id="状态与数据可用性">状态与数据可用性<a class="anchor" aria-label="anchor" href="#%E7%8A%B6%E6%80%81%E4%B8%8E%E6%95%B0%E6%8D%AE%E5%8F%AF%E7%94%A8%E6%80%A7"></a>
 </h2>
-<p><strong>状态。</strong> sleepcleanr 1.8.0 是仍在开发中的研究软件，为一项纵向睡眠研究而写，尚未经同行评审，也未上线 CRAN。随包给出的阈值只是参考，请用你自己的数据核对。</p>
+<p><strong>状态。</strong> sleepcleanr（1.8.0 之后的开发版）是仍在开发中的研究软件，为一项纵向睡眠研究而写，尚未经同行评审，也未上线 CRAN。随包给出的阈值只是参考，请用你自己的数据核对。</p>
 <p><strong>数据可用性。</strong> 研究数据不公开（参与者隐私）。不需要这些数据也能用到的东西：</p>
 <ul>
 <li>内置合成数据（<code>inst/extdata/</code>，280 行、20 名参与者），<code><a href="reference/run_pipeline.html">run_pipeline()</a></code> 默认就跑它；</li>
-<li>合成基准会按固定随机种子自己生成数据，所以基准里的每个数字都可以重跑（见 <a href="validation/README.html"><code>validation/README.md</code></a>）；</li>
+<li>合成基准会按固定随机种子自己生成数据，所以基准里的每个数字都可以重跑（见 <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/validation/README.md" class="external-link"><code>validation/README.md</code></a>）；</li>
 <li>两个公开日记数据集及其转换脚本（<code>validation/external/</code>）。</li>
 </ul>
 <p>少数来自研究数据的数字（例如冗余通道检查）记录在 <code>VALIDATION_REPORT.md</code> 里，没有数据访问权限就无法重跑。</p>
@@ -517,40 +508,6 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 </ul>
 </div>
 <div class="section level2">
-<h2 id="安装">安装<a class="anchor" aria-label="anchor" href="#%E5%AE%89%E8%A3%85"></a>
-</h2>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># 从 GitHub 安装（尚未上线 CRAN，包名 sleepcleanr）</span></span>
-<span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner"</span><span class="op">)</span></span>
-<span><span class="co"># 或：pak::pak("cyracaid/sleepdiary-cleaner")</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="快速开始">快速开始<a class="anchor" aria-label="anchor" href="#%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B"></a>
-</h2>
-<p>最短路径：把 <code><a href="reference/clean_sleep_diary.html">clean_sleep_diary()</a></code> 指向你的文件，无需配置。</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/clean_sleep_diary.html">clean_sleep_diary</a></span><span class="op">(</span><span class="st">"my_diary.csv"</span><span class="op">)</span>          <span class="co"># .csv / .rds / .xlsx / data.frame</span></span>
-<span><span class="va">res</span><span class="op">$</span><span class="va">cleaned</span>                                       <span class="co"># 清洗后的数据集 A</span></span>
-<span><span class="va">res</span><span class="op">$</span><span class="va">guesses</span>                                       <span class="co"># 每一列是怎么映射的</span></span>
-<span><span class="va">res</span><span class="op">$</span><span class="va">manifest</span>                                      <span class="co"># 来源记录：输入哈希、配置、步骤台账</span></span>
-<span><span class="co"># 只预览推断出的映射，不运行任何东西：</span></span>
-<span><span class="fu"><a href="reference/clean_sleep_diary.html">clean_sleep_diary</a></span><span class="op">(</span><span class="st">"my_diary.csv"</span>, dry_run <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># 写出 dry_run_manifest.json，不写数据</span></span></code></pre></div>
-<p>其他入口：</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># 用内置合成数据跑演示</span></span>
-<span><span class="fu"><a href="reference/run_pipeline.html">run_pipeline</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># 配置文件路线：复制模板、映射列名、再跑</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"config_template.yaml"</span>, package <span class="op">=</span> <span class="st">"sleepcleanr"</span><span class="op">)</span>,</span>
-<span>          <span class="st">"my_study.yaml"</span><span class="op">)</span></span>
-<span><span class="co"># 编辑 my_study.yaml → run_pipeline(config = "my_study.yaml")</span></span></code></pre></div>
-<blockquote>
-<p><strong>Shell 提示：</strong> 评审工作表的文件名是 <code>[NEW]manual_*.csv</code>。方括号是通配符， 在 shell 里要给文件名加引号：<code>open "[NEW]manual_error_correction_review.csv"</code>。</p>
-</blockquote>
-</div>
-<div class="section level2">
 <h2 id="引用">引用<a class="anchor" aria-label="anchor" href="#%E5%BC%95%E7%94%A8"></a>
 </h2>
 <p>请用 Zenodo DOI 引用本软件（总 DOI 永远指向最新版本，每个 release 另有自己的版本 DOI）：</p>
@@ -562,7 +519,7 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <div class="section level2">
 <h2 id="运行测试反馈问题参与贡献">运行测试、反馈问题、参与贡献<a class="anchor" aria-label="anchor" href="#%E8%BF%90%E8%A1%8C%E6%B5%8B%E8%AF%95%E5%8F%8D%E9%A6%88%E9%97%AE%E9%A2%98%E5%8F%82%E4%B8%8E%E8%B4%A1%E7%8C%AE"></a>
 </h2>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span>   <span class="co"># 在仓库克隆目录中运行；CI 里跑的是同一套测试</span></span></code></pre></div>
 <p>Bug、问题和功能建议：请开 <a href="https://github.com/cyracaid/sleepdiary-cleaner/issues" class="external-link">issue</a>。 贡献指南见 <a href="CONTRIBUTING.html"><code>CONTRIBUTING.md</code></a>。</p>
 </div>
