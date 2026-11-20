@@ -438,7 +438,7 @@
 <div class="section level3">
 <h3 id="证据一览">证据一览<a class="anchor" aria-label="anchor" href="#%E8%AF%81%E6%8D%AE%E4%B8%80%E8%A7%88"></a>
 </h3>
-<p>完整证据包见 <a href="VALIDATION_REPORT.html">VALIDATION_REPORT.md</a>。摘要：</p>
+<p>完整证据包见 <a href="VALIDATION_REPORT-zh.html">VALIDATION_REPORT-zh.md</a>（<a href="VALIDATION_REPORT.html">English</a>）。摘要：</p>
 <ul>
 <li>
 <strong>合成真值</strong>（14 类共 5,391 条注入错误，另有 1,609 行干净对照）：检出率 <strong>0.995</strong> [0.993, 0.997]，特异度 1.0。“检出”指记录被标记，不代表恢复了正确值——修正层面的召回率更低，验证报告里按错误类别分别给出。</li>
@@ -465,7 +465,7 @@
 </ul>
 <p>结果不是”管线把 mess 洗干净”，而是把 mess <strong>显式化</strong>：每个候选错误要么被呈现，要么被记录，永不被静默隐藏。每轮 run 会在<strong>项目根目录</strong>（不是 <code>output/</code>）重新生成两张人工评审工作表：<code>[NEW]manual_error_correction_review.csv</code> 与 <code>[NEW]manual_unusual_review.csv</code>——填好后以 <code>include_manual_corrections = TRUE</code> 重跑即应用。</p>
 <blockquote>
-<p><strong>阈值只是参考，不是教条。</strong> 这里的 swap/flip 阈值（如 3 小时相邻对调、12 小时 AM/PM 翻转）在我们的数据集上验证过 — 见 VALIDATION_REPORT。你的研究日记可能落在这区间内或外；它们都是 YAML 可配置的，应按你自己的数据重新审视，而非盲抄。</p>
+<p><strong>阈值只是参考，不是教条。</strong> 这里的 swap/flip 阈值（如 3 小时相邻对调、12 小时 AM/PM 翻转）在我们的数据集上验证过 — 见 VALIDATION_REPORT-zh。你的研究日记可能落在这区间内或外；它们都是 YAML 可配置的，应按你自己的数据重新审视，而非盲抄。</p>
 </blockquote>
 </div>
 <div class="section level3">
@@ -488,7 +488,7 @@
 <li>合成基准会按固定随机种子自己生成数据，所以基准里的每个数字都可以重跑（见 <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/validation/README.md" class="external-link"><code>validation/README.md</code></a>）；</li>
 <li>两个公开日记数据集及其转换脚本（<code>validation/external/</code>）。</li>
 </ul>
-<p>少数来自研究数据的数字（例如冗余通道检查）记录在 <code>VALIDATION_REPORT.md</code> 里，没有数据访问权限就无法重跑。</p>
+<p>少数来自研究数据的数字（例如冗余通道检查）记录在 <code>VALIDATION_REPORT-zh.md</code> 里，没有数据访问权限就无法重跑。</p>
 </div>
 <div class="section level2">
 <h2 id="局限">局限<a class="anchor" aria-label="anchor" href="#%E5%B1%80%E9%99%90"></a>
@@ -530,7 +530,7 @@
 <li>完整文档站（可检索函数参考 + 双语 vignette）： <a href="https://cyracaid.github.io/sleepdiary-cleaner/" class="uri">https://cyracaid.github.io/sleepdiary-cleaner/</a>
 </li>
 <li>
-<strong>验证报告</strong>（证据包，数字从结果 CSV 机器读取）： <a href="VALIDATION_REPORT.html"><code>VALIDATION_REPORT.md</code></a>
+<strong>验证报告</strong>（证据包，数字从结果 CSV 机器读取）： <a href="VALIDATION_REPORT-zh.html"><code>VALIDATION_REPORT-zh.md</code></a>
 </li>
 <li>vignette(“getting-started-zh”) — 安装、第一次运行、两种模式（<code>include_manual_corrections</code>）</li>
 <li>vignette(“column-mapping-zh”) — 输入数据与配置：用 YAML 映射你的数据集</li>

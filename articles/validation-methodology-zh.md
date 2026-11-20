@@ -348,5 +348,5 @@ D1-only，D2 作为已记录的 敏感性警示；(2) *哪些结论稳健？* �
 > 条注入行）按固定随机种子生成，可在当前代码上重跑（见
 > `validation/README.md`）；真实数据审计（13,990
 > 行）没有研究数据就无法重跑。这些统计取代更早的补丁前数字。完整证据包见
-> `VALIDATION_REPORT.md` 和
+> `VALIDATION_REPORT-zh.md` 和
 > `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md`。

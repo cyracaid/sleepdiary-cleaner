@@ -409,7 +409,7 @@ file.copy(system.file("config_template.yaml", package = "sleepcleanr"),
 ### 证据一览
 
 完整证据包见
-[VALIDATION_REPORT.md](https://cyracaid.github.io/sleepdiary-cleaner/VALIDATION_REPORT.md)。摘要：
+[VALIDATION_REPORT-zh.md](https://cyracaid.github.io/sleepdiary-cleaner/VALIDATION_REPORT-zh.md)（[English](https://cyracaid.github.io/sleepdiary-cleaner/VALIDATION_REPORT.md)）。摘要：
 
 - **合成真值**（14 类共 5,391 条注入错误，另有 1,609
   行干净对照）：检出率 **0.995** \[0.993, 0.997\]，特异度
@@ -458,7 +458,7 @@ sleepcleanr 刻意**既非全自动、也非全部人工 flag**：
 
 > **阈值只是参考，不是教条。** 这里的 swap/flip 阈值（如 3
 > 小时相邻对调、12 小时 AM/PM 翻转）在我们的数据集上验证过 — 见
-> VALIDATION_REPORT。你的研究日记可能落在这区间内或外；它们都是 YAML
+> VALIDATION_REPORT-zh。你的研究日记可能落在这区间内或外；它们都是 YAML
 > 可配置的，应按你自己的数据重新审视，而非盲抄。
 
 ### Flag、术语与阈值
@@ -493,8 +493,8 @@ CRAN。随包给出的阈值只是参考，请用你自己的数据核对。
   [`validation/README.md`](https://github.com/cyracaid/sleepdiary-cleaner/blob/main/validation/README.md)）；
 - 两个公开日记数据集及其转换脚本（`validation/external/`）。
 
-少数来自研究数据的数字（例如冗余通道检查）记录在 `VALIDATION_REPORT.md`
-里，没有数据访问权限就无法重跑。
+少数来自研究数据的数字（例如冗余通道检查）记录在
+`VALIDATION_REPORT-zh.md` 里，没有数据访问权限就无法重跑。
 
 ## 局限
 
@@ -541,7 +541,7 @@ Bug、问题和功能建议：请开
 - 完整文档站（可检索函数参考 + 双语 vignette）：
   <https://cyracaid.github.io/sleepdiary-cleaner/>
 - **验证报告**（证据包，数字从结果 CSV 机器读取）：
-  [`VALIDATION_REPORT.md`](https://cyracaid.github.io/sleepdiary-cleaner/VALIDATION_REPORT.md)
+  [`VALIDATION_REPORT-zh.md`](https://cyracaid.github.io/sleepdiary-cleaner/VALIDATION_REPORT-zh.md)
 - vignette(“getting-started-zh”) —
   安装、第一次运行、两种模式（`include_manual_corrections`）
 - vignette(“column-mapping-zh”) — 输入数据与配置：用 YAML 映射你的数据集

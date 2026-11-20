@@ -56,7 +56,7 @@ sleepcleanr 用一套结构化的 flag
 条记录被标记（7.5%）；0 条 AUTO_FIX；0 条静默修正。分布：922
 TIMESTAMP（窗口违规）、140 DURATION（顺序违规）、1
 SELF_REPORTED（极端值）、1 冗余确认的恶化。完整分布见
-`VALIDATION_REPORT.md`。
+`VALIDATION_REPORT-zh.md`。
 
 ## 术语
 
