@@ -24,6 +24,7 @@ Psychophysiology Laboratory's intensive-longitudinal sleep study
   - ubuntu-latest
   - windows-latest
   - macos-latest
+  - ubuntu-latest, R 4.4 (the declared minimum, `Depends: R (>= 4.4)`)
 
 ## R CMD check results
 
