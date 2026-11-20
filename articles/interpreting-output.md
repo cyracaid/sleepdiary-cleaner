@@ -660,41 +660,41 @@ Contents
 
       | \# | File | Paper use | Code source | Card | Last checked |
       |----|----|----|----|----|----|
-      | **F01** | `pipeline_cleaning/F01.png` | Methods Fig 1 | `sleep_visualization.R:862` | [§9.2 · Pipeline Record Flow](#f01-pipeline-record-flow) | 2026-09-25 |
-      | **F17** | `research_ready/F17.png` | Methods Fig 2 | `sleep_visualization.R:1013` | [§9.3 · Correction Impact](#f17-correction-impact) | 2026-09-25 |
-      | **F18** | `research_ready/F18.png` | Results | `sleep_visualization.R:1057` | [§9.3 · Distribution of Sleep Variables](#f18-distribution-of-sleep-variables) | 2026-09-25 |
-      | **F19** | `research_ready/F19.png` | Results | `sleep_visualization.R:1108` | [§9.3 · TST Distribution](#f19-tst-distribution) | 2026-09-25 |
-      | **F20** | `research_ready/F20.png` | Results | `sleep_visualization.R:1163` | [§9.3 · Sleep Duration vs Time in Bed](#f20-sleep-duration-vs-time-in-bed) | 2026-09-25 |
-      | **F21** | `research_ready/F21.png` | Results | `sleep_visualization.R:1215` | [§9.3 · SOL vs Sleep Duration](#f21-sol-vs-sleep-duration) | 2026-09-25 |
-      | **F22** | `research_ready/F22.png` | Results | `sleep_visualization.R:1265` | [§9.3 · Variability of Sleep Variables](#f22-variability-of-sleep-variables) | 2026-09-25 |
-      | **F02** | `pipeline_cleaning/F02.png` | Supplement | `sleep_visualization.R:1339` | [§9.2 · Sleep Duration Post-Correction](#f02-sleep-duration-post-correction) | 2026-09-25 |
-      | **F03** | `pipeline_cleaning/F03.png` | Supplement | `sleep_visualization.R:1404` | [§9.2 · Flag Composition Stacked](#f03-flag-composition-stacked) | 2026-09-25 |
-      | **F23** | `research_ready/F23.png` | Results | `sleep_visualization.R:1458` | [§9.3 · Bedtime vs Get-up Distribution](#f23-bedtime-vs-get-up-distribution) | 2026-09-25 |
-      | **F04** | `pipeline_cleaning/F04.png` | Supplement | `sleep_visualization.R:1514` | [§9.2 · Extreme Sleep Durations](#f04-extreme-sleep-durations) | 2026-09-25 |
-      | **F05** | `pipeline_cleaning/F05.png` | Supplement | `sleep_visualization.R:1571` | [§9.2 · Flag Co-occurrence Heatmap](#f05-flag-co-occurrence-heatmap) | 2026-10-23 |
-      | **F06** | `pipeline_cleaning/F06.png` | Supplement | `sleep_visualization.R:1794` | [§9.2 · Error Category Distribution](#f06-error-category-distribution) | 2026-09-25 |
-      | **F07** | `pipeline_cleaning/F07.png` | Supplement | `sleep_visualization.R:1877` | [§9.2 · Adjacent Timestamp Gaps](#f07-adjacent-timestamp-gaps) | 2026-09-25 |
-      | **F08** | `pipeline_cleaning/F08.png` | Supplement | `sleep_visualization.R:1936` | [§9.2 · Detection Outcomes Heatmap](#f08-detection-outcomes-heatmap) | 2026-09-25 |
-      | **F09** | `pipeline_cleaning/F09.png` | Supplement | `sleep_visualization.R:1980` | [§9.2 · Threshold vs Measurement Noise](#f09-threshold-vs-measurement-noise) | 2026-09-25 |
-      | **F10** | `pipeline_cleaning/F10.png` | Supplement | `sleep_visualization.R:2051` | [§9.2 · Sleep Duration Pre-Correction](#f10-sleep-duration-pre-correction) | 2026-09-30 |
-      | **F11** | `pipeline_cleaning/F11.png` | Supplement | `sleep_visualization.R:2137` | [§9.2 · Error Timeline](#f11-error-timeline) | 2026-09-30 |
-      | **F12** | `pipeline_cleaning/F12.png` | Supplement | `sleep_visualization.R:2228` | [§9.2 · Common Error Patterns](#f12-common-error-patterns) | 2026-09-30 |
-      | **F13** | `pipeline_cleaning/F13.png` | Supplement | `sleep_visualization.R:2307` | [§9.2 · Top Participants by Flag Rate](#f13-top-participants-by-flag-rate) | 2026-09-25 |
-      | **F14** | `pipeline_cleaning/F14.png` | Supplement | `sleep_visualization.R:2409` | [§9.2 · Auto-Detected Dashboard](#f14-auto-detected-dashboard) | 2026-09-25 |
-      | **F24** | `research_ready/F24.png` | Results | `sleep_visualization.R:2637` | [§9.3 · SOL Perception Bias](#f24-sol-perception-bias) | 2026-09-25 |
-      | **F25** | `research_ready/F25.png` | Results | `sleep_visualization.R:2695` | [§9.3 · WASO Perception Bias](#f25-waso-perception-bias) | 2026-09-25 |
-      | **F26** | `research_ready/F26.png` | Supplement | `sleep_visualization.R:2767` | [§9.3 · Substance Use Availability](#f26-substance-use-availability) | 2026-09-25 |
-      | **F27** | `research_ready/F27.png` | Supplement | `sleep_visualization.R:2870` | [§9.3 · Substance Use Value Distribution](#f27-substance-use-value-distribution) | 2026-09-25 |
-      | **F28** | `research_ready/F28.png` | Supplement | `sleep_visualization.R:2944` | [§9.3 · Caffeine Consumption](#f28-caffeine-consumption) | 2026-09-25 |
-      | **F29** | `research_ready/F29.png` | Supplement | `sleep_visualization.R:2979` | [§9.3 · Alcohol Consumption](#f29-alcohol-consumption) | 2026-09-25 |
+      | **F01** | `pipeline_cleaning/F01.png` | Methods Fig 1 | `sleep_visualization.R:896` | [§9.2 · Pipeline Record Flow](#f01-pipeline-record-flow) | 2026-09-25 |
+      | **F17** | `research_ready/F17.png` | Methods Fig 2 | `sleep_visualization.R:1047` | [§9.3 · Correction Impact](#f17-correction-impact) | 2026-09-25 |
+      | **F18** | `research_ready/F18.png` | Results | `sleep_visualization.R:1091` | [§9.3 · Distribution of Sleep Variables](#f18-distribution-of-sleep-variables) | 2026-09-25 |
+      | **F19** | `research_ready/F19.png` | Results | `sleep_visualization.R:1142` | [§9.3 · TST Distribution](#f19-tst-distribution) | 2026-09-25 |
+      | **F20** | `research_ready/F20.png` | Results | `sleep_visualization.R:1197` | [§9.3 · Sleep Duration vs Time in Bed](#f20-sleep-duration-vs-time-in-bed) | 2026-09-25 |
+      | **F21** | `research_ready/F21.png` | Results | `sleep_visualization.R:1249` | [§9.3 · SOL vs Sleep Duration](#f21-sol-vs-sleep-duration) | 2026-09-25 |
+      | **F22** | `research_ready/F22.png` | Results | `sleep_visualization.R:1299` | [§9.3 · Variability of Sleep Variables](#f22-variability-of-sleep-variables) | 2026-09-25 |
+      | **F02** | `pipeline_cleaning/F02.png` | Supplement | `sleep_visualization.R:1377` | [§9.2 · Sleep Duration Post-Correction](#f02-sleep-duration-post-correction) | 2026-09-25 |
+      | **F03** | `pipeline_cleaning/F03.png` | Supplement | `sleep_visualization.R:1446` | [§9.2 · Flag Composition Stacked](#f03-flag-composition-stacked) | 2026-09-25 |
+      | **F23** | `research_ready/F23.png` | Results | `sleep_visualization.R:1500` | [§9.3 · Bedtime vs Get-up Distribution](#f23-bedtime-vs-get-up-distribution) | 2026-09-25 |
+      | **F04** | `pipeline_cleaning/F04.png` | Supplement | `sleep_visualization.R:1556` | [§9.2 · Extreme Sleep Durations](#f04-extreme-sleep-durations) | 2026-09-25 |
+      | **F05** | `pipeline_cleaning/F05.png` | Supplement | `sleep_visualization.R:1643` | [§9.2 · Flag Co-occurrence Heatmap](#f05-flag-co-occurrence-heatmap) | 2026-10-23 |
+      | **F06** | `pipeline_cleaning/F06.png` | Supplement | `sleep_visualization.R:1833` | [§9.2 · Error Category Distribution](#f06-error-category-distribution) | 2026-09-25 |
+      | **F07** | `pipeline_cleaning/F07.png` | Supplement | `sleep_visualization.R:1916` | [§9.2 · Adjacent Timestamp Gaps](#f07-adjacent-timestamp-gaps) | 2026-09-25 |
+      | **F08** | `pipeline_cleaning/F08.png` | Supplement | `sleep_visualization.R:1989` | [§9.2 · Detection Outcomes Heatmap](#f08-detection-outcomes-heatmap) | 2026-09-25 |
+      | **F09** | `pipeline_cleaning/F09.png` | Supplement | `sleep_visualization.R:2036` | [§9.2 · Threshold vs Measurement Noise](#f09-threshold-vs-measurement-noise) | 2026-09-25 |
+      | **F10** | `pipeline_cleaning/F10.png` | Supplement | `sleep_visualization.R:2107` | [§9.2 · Sleep Duration Pre-Correction](#f10-sleep-duration-pre-correction) | 2026-09-30 |
+      | **F11** | `pipeline_cleaning/F11.png` | Supplement | `sleep_visualization.R:2193` | [§9.2 · Error Timeline](#f11-error-timeline) | 2026-09-30 |
+      | **F12** | `pipeline_cleaning/F12.png` | Supplement | `sleep_visualization.R:2284` | [§9.2 · Common Error Patterns](#f12-common-error-patterns) | 2026-09-30 |
+      | **F13** | `pipeline_cleaning/F13.png` | Supplement | `sleep_visualization.R:2363` | [§9.2 · Top Participants by Flag Rate](#f13-top-participants-by-flag-rate) | 2026-09-25 |
+      | **F14** | `pipeline_cleaning/F14.png` | Supplement | `sleep_visualization.R:2465` | [§9.2 · Auto-Detected Dashboard](#f14-auto-detected-dashboard) | 2026-09-25 |
+      | **F24** | `research_ready/F24.png` | Results | `sleep_visualization.R:2693` | [§9.3 · SOL Perception Bias](#f24-sol-perception-bias) | 2026-09-25 |
+      | **F25** | `research_ready/F25.png` | Results | `sleep_visualization.R:2751` | [§9.3 · WASO Perception Bias](#f25-waso-perception-bias) | 2026-09-25 |
+      | **F26** | `research_ready/F26.png` | Supplement | `sleep_visualization.R:2823` | [§9.3 · Substance Use Availability](#f26-substance-use-availability) | 2026-09-25 |
+      | **F27** | `research_ready/F27.png` | Supplement | `sleep_visualization.R:2926` | [§9.3 · Substance Use Value Distribution](#f27-substance-use-value-distribution) | 2026-09-25 |
+      | **F28** | `research_ready/F28.png` | Supplement | `sleep_visualization.R:3000` | [§9.3 · Caffeine Consumption](#f28-caffeine-consumption) | 2026-09-25 |
+      | **F29** | `research_ready/F29.png` | Supplement | `sleep_visualization.R:3035` | [§9.3 · Alcohol Consumption](#f29-alcohol-consumption) | 2026-09-25 |
       | **F15** | `pipeline_cleaning/F15.png` | Supplement | `figure12_step_flag_table.R:15` | [§9.2 · Step Flag Ledger](#f15-step-flag-ledger) | 2026-09-25 |
-      | **F16** | `pipeline_cleaning/F16.png` | Supplement | `sleep_visualization.R:2579` | [§9.2 · Participants Worth a Second Look](#f16-participants-worth-a-second-look) | 2026-09-25 |
-      | **F33** | `pipeline_cleaning/F33.png` | Supplement | `sleep_visualization.R:3185` | [§9.2 · Out-of-Order Nights, by Mechanism](#f33-out-of-order-nights-by-mechanism) | 2026-11-03 |
-      | **F34** | `pipeline_cleaning/F34.png` | Supplement | `sleep_visualization.R:3283` | [§9.2 · Clock-Time Rule Outcomes (SOL / WASO)](#f34-clock-time-rule-outcomes) | 2026-11-03 |
-      | **F35** | `pipeline_cleaning/F35.png` | Supplement | `sleep_visualization.R:3309` | [§9.2 · SOL Clock-Like Entries vs Own Times](#f35-sol-clock-like-entries-vs-own-times) | 2026-11-03 |
-      | **F30** | `research_ready/F30.png` | Results | `sleep_visualization.R:3043` | [§9.3 · Sleep Regularity — Weekday vs Weekend](#f30-sleep-regularity--weekday-vs-weekend) | 2026-09-25 |
-      | **F31** | `research_ready/F31.png` | Results | `sleep_visualization.R:3096` | [§9.3 · Sleep Composition — TIB Breakdown](#f31-sleep-composition--tib-breakdown) | 2026-09-25 |
-      | **F32** | `research_ready/F32.png` | Results | `sleep_visualization.R:3125` | [§9.3 · Sleep Metrics Correlation Matrix](#f32-sleep-metrics-correlation-matrix) | 2026-09-25 |
+      | **F16** | `pipeline_cleaning/F16.png` | Supplement | `sleep_visualization.R:2635` | [§9.2 · Participants Worth a Second Look](#f16-participants-worth-a-second-look) | 2026-09-25 |
+      | **F33** | `pipeline_cleaning/F33.png` | Supplement | `sleep_visualization.R:3248` | [§9.2 · Out-of-Order Nights, by Mechanism](#f33-out-of-order-nights-by-mechanism) | 2026-11-03 |
+      | **F34** | `pipeline_cleaning/F34.png` | Supplement | `sleep_visualization.R:3310` | [§9.2 · Clock-Time Rule Outcomes (SOL / WASO)](#f34-clock-time-rule-outcomes) | 2026-11-03 |
+      | **F35** | `pipeline_cleaning/F35.png` | Supplement | `sleep_visualization.R:3343` | [§9.2 · SOL Clock-Like Entries vs Own Times](#f35-sol-clock-like-entries-vs-own-times) | 2026-11-03 |
+      | **F30** | `research_ready/F30.png` | Results | `sleep_visualization.R:3099` | [§9.3 · Sleep Regularity — Weekday vs Weekend](#f30-sleep-regularity--weekday-vs-weekend) | 2026-09-25 |
+      | **F31** | `research_ready/F31.png` | Results | `sleep_visualization.R:3152` | [§9.3 · Sleep Composition — TIB Breakdown](#f31-sleep-composition--tib-breakdown) | 2026-09-25 |
+      | **F32** | `research_ready/F32.png` | Results | `sleep_visualization.R:3181` | [§9.3 · Sleep Metrics Correlation Matrix](#f32-sleep-metrics-correlation-matrix) | 2026-09-25 |
 
       `11` (flag co-occurrence, [card
       below](#f05-flag-co-occurrence-heatmap)) is skipped whenever fewer
@@ -775,7 +775,7 @@ Contents
       #### F01 · Pipeline Record Flow
 
       **File** `pipeline_cleaning/F01.png` — generated at
-      `sleep_visualization.R:862`
+      `sleep_visualization.R:896`
 
       **Paper use** Methods Fig 1
 
@@ -874,7 +874,7 @@ Contents
       #### F02 · Sleep Duration Post-Correction
 
       **File** `pipeline_cleaning/F02.png` — generated at
-      `sleep_visualization.R:1339`
+      `sleep_visualization.R:1377`
 
       **Paper use** Supplement
 
@@ -943,7 +943,7 @@ Contents
       #### F03 · Flag Composition Stacked
 
       **File** `pipeline_cleaning/F03.png` — generated at
-      `sleep_visualization.R:1404`
+      `sleep_visualization.R:1446`
 
       **Paper use** Supplement
 
@@ -1014,7 +1014,7 @@ Contents
       #### F04 · Extreme Sleep Durations
 
       **File** `pipeline_cleaning/F04.png` — generated at
-      `sleep_visualization.R:1514`
+      `sleep_visualization.R:1556`
 
       **Paper use** Supplement
 
@@ -1080,7 +1080,7 @@ Contents
       #### F05 · Flag Co-occurrence Heatmap
 
       **File** `pipeline_cleaning/F05.png` — generated at
-      `sleep_visualization.R:1571`
+      `sleep_visualization.R:1643`
 
       **Paper use** Supplement
 
@@ -1227,7 +1227,7 @@ Contents
       #### F06 · Error Category Distribution
 
       **File** `pipeline_cleaning/F06.png` — generated at
-      `sleep_visualization.R:1794`
+      `sleep_visualization.R:1833`
 
       **Paper use** Supplement
 
@@ -1297,7 +1297,7 @@ Contents
       #### F07 · Adjacent Timestamp Gaps
 
       **File** `pipeline_cleaning/F07.png` — generated at
-      `sleep_visualization.R:1877`
+      `sleep_visualization.R:1916`
 
       **Paper use** Supplement
 
@@ -1398,7 +1398,7 @@ Contents
       #### F08 · Detection Outcomes Heatmap
 
       **File** `pipeline_cleaning/F08.png` — generated at
-      `sleep_visualization.R:1936`
+      `sleep_visualization.R:1989`
 
       **Paper use** Supplement
 
@@ -1477,7 +1477,7 @@ Contents
       #### F09 · Threshold vs Measurement Noise
 
       **File** `pipeline_cleaning/F09.png` — generated at
-      `sleep_visualization.R:1980`
+      `sleep_visualization.R:2036`
 
       **Paper use** Supplement
 
@@ -1545,7 +1545,7 @@ Contents
       #### F10 · Sleep Duration Pre-Correction
 
       **File** `pipeline_cleaning/F10.png` — generated at
-      `sleep_visualization.R:2051`
+      `sleep_visualization.R:2107`
 
       **Paper use** Supplement
 
@@ -1598,7 +1598,7 @@ Contents
       #### F11 · Error Timeline
 
       **File** `pipeline_cleaning/F11.png` — generated at
-      `sleep_visualization.R:2137`
+      `sleep_visualization.R:2193`
 
       **Paper use** Supplement
 
@@ -1659,7 +1659,7 @@ Contents
       #### F12 · Common Error Patterns
 
       **File** `pipeline_cleaning/F12.png` — generated at
-      `sleep_visualization.R:2228`
+      `sleep_visualization.R:2284`
 
       **Paper use** Supplement
 
@@ -1721,7 +1721,7 @@ Contents
       #### F13 · Top Participants by Flag Rate
 
       **File** `pipeline_cleaning/F13.png` — generated at
-      `sleep_visualization.R:2307`
+      `sleep_visualization.R:2363`
 
       **Paper use** Supplement
 
@@ -1777,7 +1777,7 @@ Contents
       #### F14 · Auto-Detected Dashboard
 
       **File** `pipeline_cleaning/F14.png` — generated at
-      `sleep_visualization.R:2409`
+      `sleep_visualization.R:2465`
 
       **Paper use** Supplement
 
@@ -1914,7 +1914,7 @@ Contents
       #### F16 · Participants Worth a Second Look
 
       **File** `pipeline_cleaning/F16.png` — generated at
-      `sleep_visualization.R:2579`
+      `sleep_visualization.R:2635`
 
       **Paper use** Supplement
 
@@ -2014,7 +2014,7 @@ Contents
       #### F33 · Out-of-Order Nights, by Mechanism
 
       **File** `pipeline_cleaning/F33.png` — generated at
-      `sleep_visualization.R:3185`
+      `sleep_visualization.R:3248`
 
       **Paper use** Supplement
 
@@ -2092,7 +2092,7 @@ Contents
       #### F34 · Clock-Time Rule Outcomes (SOL / WASO)
 
       **File** `pipeline_cleaning/F34.png` — generated at
-      `sleep_visualization.R:3283`
+      `sleep_visualization.R:3310`
 
       **Paper use** Supplement
 
@@ -2131,7 +2131,7 @@ Contents
       #### F35 · SOL Clock-Like Entries vs Own Times
 
       **File** `pipeline_cleaning/F35.png` — generated at
-      `sleep_visualization.R:3309`
+      `sleep_visualization.R:3343`
 
       **Paper use** Supplement
 
@@ -2168,7 +2168,7 @@ Contents
       #### F17 · Correction Impact
 
       **File** `research_ready/F17.png` — generated at
-      `sleep_visualization.R:1013`
+      `sleep_visualization.R:1047`
 
       **Paper use** Methods Fig 2
 
@@ -2274,7 +2274,7 @@ Contents
       #### F18 · Distribution of Sleep Variables
 
       **File** `research_ready/F18.png` — generated at
-      `sleep_visualization.R:1057`
+      `sleep_visualization.R:1091`
 
       **Paper use** Results
 
@@ -2335,7 +2335,7 @@ Contents
       #### F19 · TST Distribution
 
       **File** `research_ready/F19.png` — generated at
-      `sleep_visualization.R:1108`
+      `sleep_visualization.R:1142`
 
       **Paper use** Results
 
@@ -2404,7 +2404,7 @@ Contents
       #### F20 · Sleep Duration vs Time in Bed
 
       **File** `research_ready/F20.png` — generated at
-      `sleep_visualization.R:1163`
+      `sleep_visualization.R:1197`
 
       **Paper use** Results
 
@@ -2466,7 +2466,7 @@ Contents
       #### F21 · SOL vs Sleep Duration
 
       **File** `research_ready/F21.png` — generated at
-      `sleep_visualization.R:1215`
+      `sleep_visualization.R:1249`
 
       **Paper use** Results
 
@@ -2524,7 +2524,7 @@ Contents
       #### F22 · Variability of Sleep Variables
 
       **File** `research_ready/F22.png` — generated at
-      `sleep_visualization.R:1265`
+      `sleep_visualization.R:1299`
 
       **Paper use** Results
 
@@ -2578,7 +2578,7 @@ Contents
       #### F23 · Bedtime vs Get-up Distribution
 
       **File** `research_ready/F23.png` — generated at
-      `sleep_visualization.R:1458`
+      `sleep_visualization.R:1500`
 
       **Paper use** Results
 
@@ -2629,7 +2629,7 @@ Contents
       #### F24 · SOL Perception Bias
 
       **File** `research_ready/F24.png` — generated at
-      `sleep_visualization.R:2637`
+      `sleep_visualization.R:2693`
 
       **Paper use** Results
 
@@ -2703,7 +2703,7 @@ Contents
       #### F25 · WASO Perception Bias
 
       **File** `research_ready/F25.png` — generated at
-      `sleep_visualization.R:2695`
+      `sleep_visualization.R:2751`
 
       **Paper use** Results
 
@@ -2764,7 +2764,7 @@ Contents
       #### F26 · Substance Use Availability
 
       **File** `research_ready/F26.png` — generated at
-      `sleep_visualization.R:2767`
+      `sleep_visualization.R:2823`
 
       **Paper use** Supplement
 
@@ -2816,7 +2816,7 @@ Contents
       #### F27 · Substance Use Value Distribution
 
       **File** `research_ready/F27.png` — generated at
-      `sleep_visualization.R:2870`
+      `sleep_visualization.R:2926`
 
       **Paper use** Supplement
 
@@ -2869,7 +2869,7 @@ Contents
       #### F28 · Caffeine Consumption
 
       **File** `research_ready/F28.png` — generated at
-      `sleep_visualization.R:2944`
+      `sleep_visualization.R:3000`
 
       **Paper use** Supplement
 
@@ -2931,7 +2931,7 @@ Contents
       #### F29 · Alcohol Consumption
 
       **File** `research_ready/F29.png` — generated at
-      `sleep_visualization.R:2979`
+      `sleep_visualization.R:3035`
 
       **Paper use** Supplement
 
@@ -2981,7 +2981,7 @@ Contents
       #### F30 · Sleep Regularity — Weekday vs Weekend
 
       **File** `research_ready/F30.png` — generated at
-      `sleep_visualization.R:3043`
+      `sleep_visualization.R:3099`
 
       **Paper use** Results
 
@@ -3054,7 +3054,7 @@ Contents
       #### F31 · Sleep Composition — TIB Breakdown
 
       **File** `research_ready/F31.png` — generated at
-      `sleep_visualization.R:3096`
+      `sleep_visualization.R:3152`
 
       **Paper use** Results
 
@@ -3112,7 +3112,7 @@ Contents
       #### F32 · Sleep Metrics Correlation Matrix
 
       **File** `research_ready/F32.png` — generated at
-      `sleep_visualization.R:3125`
+      `sleep_visualization.R:3181`
 
       **Paper use** Results
 
