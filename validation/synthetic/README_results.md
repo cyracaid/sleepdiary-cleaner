@@ -181,9 +181,9 @@ so a wrong repair here is a row that the real workflow sends to the review
 worksheets. In the study data 138 of the 140 reversed nights end with the order
 restored and a plausible duration (89 by the algorithm, 49 by hand); the forms
 the algorithm does not repair (bed time, whole night) are the ones fixed by hand.
-The script that produced `real_mix_outcome.csv` (`07_run_real_mix.R`) is held
-locally and is not yet in this repository, so this table is recorded, not
-re-runnable from here.
+The script that produced `real_mix_outcome.csv` is
+`validation/reverse_order/run_real_mix.R`; rerunning it reproduces this table
+byte for byte (checked 2026-11-20).
 
 The typed-twice form (0 of 236 above) is a different thing from a reversal. Equal
 times are valid data (508 of the study's awakening and get-up pairs, 17.8%, are
