@@ -244,7 +244,12 @@ normalize_sleep_time_sequence <- function(AM_rawdata, flip_gap_hours = 12,
       # downstream temporal-order check flags them for human review instead.
       # Before this guard, sleep_awake_swap_3h worsened 7/10 real cases
       # (work_logs/2026-08-12_week_work_log_summary_EN.md).
-      if (sleep > awake && abs(sleep_awake_diff) < swap_threshold_hours && bed <= awake) {
+      # An awake of exactly 00:00 is usually not a time: some participants type
+      # 0 ("none") in that field (a bare 0 is 8 of the 11 study rows with an
+      # awake of 00:00). Swapping it into sleep invents a sleep time of 00:00,
+      # so such rows are left for the temporal-order check and human review.
+      awake_is_midnight <- format(awake, "%H:%M") == "00:00"
+      if (sleep > awake && abs(sleep_awake_diff) < swap_threshold_hours && bed <= awake && !awake_is_midnight) {
         # Swap sleep and awake
         temp <- sleep
         cleaned_data$time_sleep_corrected[i] <- awake

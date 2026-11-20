@@ -138,3 +138,23 @@ test_that("bed-sleep >3h order violation NOT auto-corrected", {
   result <- normalize_sleep_time_sequence(df)
   expect_false(result$corrected[1])
 })
+
+test_that("an awake of exactly 00:00 is not swapped into sleep", {
+  # bed before midnight, sleep just after, awake typed as 0 (read as 00:00).
+  # The swap would turn this into sleep 00:00 / awake 00:30, a time nobody wrote.
+  p <- function(x) as.POSIXct(x, tz = "UTC")
+  df <- make_row("22:00", "22:30", "06:00", "06:30")
+  df$time_bed_am_hhmm_ampm   <- p("2026-01-01 23:30:00")
+  df$time_sleep_am_hhmm_ampm <- p("2026-01-02 00:30:00")
+  df$time_awake_am_hhmm_ampm <- p("2026-01-02 00:00:00")
+  df$time_getup_am_hhmm_ampm <- p("2026-01-02 06:50:00")
+  result <- normalize_sleep_time_sequence(df)
+  expect_false(grepl("sleep_awake_swap_3h", result$correction_type[1]))
+  expect_equal(format(result$time_awake_corrected[1], "%H:%M"), "00:00")
+
+  # the same slip with a real (non-midnight) awake is still swapped
+  df$time_awake_am_hhmm_ampm <- p("2026-01-02 00:10:00")
+  df$time_sleep_am_hhmm_ampm <- p("2026-01-02 00:40:00")
+  result2 <- normalize_sleep_time_sequence(df)
+  expect_true(grepl("sleep_awake_swap_3h", result2$correction_type[1]))
+})
