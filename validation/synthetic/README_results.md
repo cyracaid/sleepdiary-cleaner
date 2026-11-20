@@ -147,14 +147,14 @@ that have a published rate: AM/PM errors (1.07%) and wake-versus-rise confusion
 
 - `external_inverted`: the wake-versus-rise form is wake and rise times
   exchanged (282 rows) plus 68 AM/PM rows. 350 of 350 flagged or corrected,
-  100% (95% CI 98.95 to 100%). By form, from the per-cell scoring output
-  (not committed; recorded in `work_logs/2026-10-29_validation_independent_error_model.md`,
-  ninth round): exchanged pairs 282 of 282 corrected to the true value (95% CI
-  98.7 to 100%); AM/PM 68 of 68 handled (40 corrected, 28 flagged).
+  100% (95% CI 98.95 to 100%). By form (`results/external_mix_by_form.csv`, made by
+  `external_mix_by_form.R`): exchanged pairs 282 of 282 corrected to the true value
+  (exact 95% CI 98.7 to 100%); AM/PM 68 of 68 handled (40 corrected, 28 flagged;
+  CI 94.7 to 100%).
 - `external_same`: the wake-versus-rise form is the rise time typed into the wake
   field (236 rows) plus the same 68 AM/PM rows. The row's 22.4% (95% CI 17.8 to
   27.5%) is the recall of the whole mix and equals the AM/PM share (68 of 304):
-  the typed-twice form itself is 0 of 236 (upper 95% bound 1.6%).
+  the typed-twice form itself is 0 of 236 (exact upper 95% bound 1.6%; same table).
 
 Read the first row as a statement about **one form of reversal**: wake and rise
 exchanged. In the study data, 140 of 2,848 nights with all four times (4.92%)

@@ -1,0 +1,5 @@
+"mix","form","n_injected","corrected_to_true_value","flagged_only","repaired_wrongly","missed","handled_pct","ci_low","ci_high"
+"external_inverted","adjacent_swap_time_awake_am_time_getup_am",282,282,0,0,0,100,98.7,100
+"external_inverted","ampm_swap",68,40,28,0,0,100,94.7,100
+"external_same","ampm_swap",68,40,28,0,0,100,94.7,100
+"external_same","awake_is_getup",236,0,0,0,236,0,0,1.6
