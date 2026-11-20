@@ -88,6 +88,16 @@ Summary:
   a short conversion script. These datasets contain no known errors, so
   they are a feasibility check, not accuracy validation.
 
+![Flag dashboard from the bundled synthetic fixture: 23 of 280 records
+flagged for review, split by issue
+type](https://raw.githubusercontent.com/cyracaid/sleepdiary-cleaner/main/man/img/flag-dashboard-synthetic.png)
+
+Flag dashboard from the bundled synthetic fixture: 23 of 280 records
+flagged for review, split by issue type
+
+*Figure 14 from a run on the bundled synthetic fixture (280 rows): what
+the pipeline flags for review at the end of a run.*
+
 Earlier automated variants silently misrepaired entries; the synthetic
 benchmark found and closed those defects, and the current benchmark
 reports 0% silent misrepair for SOL/WASO.
@@ -118,87 +128,17 @@ silently hidden.
 > YAML-configurable and should be re-checked against your own data, not
 > copied blindly.
 
-### Terminology
+### Flags, terminology and thresholds
 
-| Term | Meaning |
-|----|----|
-| **Detection recall (L1)** | Share of injected errors for which the pipeline *acted* (flagged or corrected) |
-| **Correction-level recall (L3)** | Share of injected errors for which the pipeline recovered the *correct value* |
-| **FCR** | False-correction rate: clean records that were altered |
-| **FAR** | False-alarm rate: clean records that were flagged |
-| **SPEC** | Specificity (clean records left untouched) |
-| **M1 / M4 / M5** | Real-data audit rules: M1 order violations, M4 bed→sleep window violations, M5 silent-worsening candidates |
-| **AUTO_FIX** | A change applied automatically, with no human review |
-
-### Detection-threshold defaults
-
-| Rule | Default | Rationale |
-|----|----|----|
-| `timestamp.sequence.max_gap_hours` (AM/PM flip) | 12 h | Assumes no legitimate interval ≥ 12 h |
-| adjacent-swap threshold | 3 h | Tuned on the development sample; see VALIDATION_REPORT |
-| `metric_validation.sol.excessive_minutes` | 120 | Gross-outlier catch, not a clinical marker |
-| `metric_validation.se.min_valid_percent` / `max_valid_percent` | 0 / 100 | Structural impossibility → always flag |
-
-Full rationale and change guidance:
-[THRESHOLDS.md](https://cyracaid.github.io/sleepdiary-cleaner/THRESHOLDS.md).
-
-### Flag System & Human Review Workflow
-
-sleepcleanr uses a structured flag system to route records through the
-human-in-the-loop review process. Every record can carry multiple flags;
-flags are **additive** (a record may carry several simultaneously) and
-**never silently cleared** — they persist until explicitly resolved by
-human action.
-
-| Flag / Column | Trigger | Meaning | Resolution |
-|----|----|----|----|
-| `needs_review_flag` | Any detection rule fires | Record needs human attention | Human reviews → sets `manually_corrected=TRUE` OR `human_metric_review_status=confirmed_not_error_do_not_correct` |
-| `auto_error_desc` | Auto-detection logic | Machine-readable description of why flagged | Reference for human reviewer |
-| `error_type` / `unusual_type` | Step 5 classification | Categorized error type (TIMESTAMP, DURATION, SELF_REPORTED, etc.) | Informs reviewer; drives Figure 6 classification |
-| `manually_corrected` | Human applied correction via `apply_manual_corrections.R` | Record was explicitly fixed by human | Set to `TRUE` by `apply_manual_corrections.R` |
-| `human_metric_review_status` | Human metric review decision | `confirmed_not_error_do_not_correct` = reviewed & confirmed correct | Set by `apply_metric_review_acceptances.R` / `apply_metric_review_acceptances()` |
-| `human_metric_review_note` | Reviewer’s free-text note | Context for future auditors | Free text |
-| `correction_type` | Applied correction type | e.g., `bed_sleep_swap_3h`, `sleep_reduce_12h_loop` | Populated by correction engine |
-
-**Flag lifecycle:**
-
-    Record flagged (needs_review_flag=TRUE)
-        ↓ Human reviews
-        ├── Confirmed error → apply_manual_corrections.R → manually_corrected=TRUE
-        ├── Confirmed OK → human_metric_review_status="confirmed_not_error_do_not_correct"
-        └── Deferred / unsure → needs_review_flag remains TRUE
-
-**Key design principles:**
-
-1.  **Flags are never silently cleared** — a flag persists until
-    explicit human action (`manually_corrected=TRUE` or
-    `human_metric_review_status=confirmed_not_error_do_not_correct`).
-2.  **Flags are additive** — a record can carry multiple flags
-    simultaneously (e.g., TIMESTAMP + DURATION + SELF_REPORTED).
-3.  **Resolution is explicit** — a flag is “resolved” only by setting
-    `manually_corrected=TRUE` or
-    `human_metric_review_status=confirmed_not_error_do_not_correct`;
-    there is no implicit “auto-resolve”.
-4.  **Flags persist in outputs** — Dataset A (full) retains all flags
-    for audit; Dataset B (minimal) includes only `needs_review_flag` and
-    `correction_type` for downstream analysis.
-
-**Current flag categories** (from `checkforerrors_processing.R` and
-METHODS Stage 7):
-
-| Category | Sub-types | Meaning |
-|----|----|----|
-| **TIMESTAMP** | Sequence/range violations (bed/sleep/awake/getup times) | e.g., hour\>23, malformed colon, inverted sequences |
-| **DURATION** | Interval/format errors (SOL, WASO) | e.g., MM:SS vs HH:MM confusion, plausibility violations |
-| **AMOUNT** | Substance input anomalies | negative, excessive digits, filler codes (888/999) |
-| **SELF_REPORTED** | SOL/WASO vs timestamp-window mismatch | SOL \> bed→sleep window, SE\>100%, etc. |
-
-**Historical flag statistics (v1.4.5 report-only audit, 13,990 rows; the
-current review queue is in Evidence at a glance above, and each run
-prints its own):** 1,048 records flagged (7.5%); 0 AUTO_FIX; 0 silent
-corrections. Breakdown: 922 TIMESTAMP (window violations), 140 DURATION
-(order violations), 1 SELF_REPORTED (extreme), 1 redundancy-confirmed
-worsening. See `VALIDATION_REPORT.md` for full breakdown.
+The flag columns, the flag lifecycle, the terms used in the validation
+tables (L1/L3 recall, FCR, FAR, M1/M4/M5) and
+[`sync_human_review_status()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/sync_human_review_status.md)
+are in the article
+[`vignette("review-flags")`](https://cyracaid.github.io/sleepdiary-cleaner/articles/review-flags.md)
+(Flags, terminology and the review workflow). The detection thresholds,
+with defaults and rationale, are on the
+[Thresholds](https://cyracaid.github.io/sleepdiary-cleaner/THRESHOLDS.md)
+page.
 
 ### Validation Map
 
@@ -368,6 +308,9 @@ Contribution guidelines are in
   no-config entry, column auto-guess, run manifest
 - vignette(“interpreting-output”) — reading the output and the review
   loop (`correction_status_final.csv`, the review status table, figures)
+- vignette(“review-flags”) — flag columns and lifecycle, the terms in
+  the validation tables,
+  [`sync_human_review_status()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/sync_human_review_status.md)
 - vignette(“output-files”) — every file a run writes: where it goes,
   which step writes it, what it is
 - vignette(“troubleshooting”) — symptom, cause and fix for the problems
@@ -406,50 +349,6 @@ manual corrections, and diagnose issues.
 | 8.5 | Cross-participant consistency check | Global consistency audit across participants |
 | 9 | Generate diagnostic figures | 35 figures (19 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt |
 | 10 | Build delivered datasets | finalize_columns() selects/renames to Dataset A/B per column dictionary |
-
-## Sync Human Review Status
-
-sleepcleanr provides a utility to synchronize human review status fields
-in the metric review acceptance CSV file.
-
-### `sync_human_review_status()`
-
-Automatically synchronizes review status fields in
-`manual_metric_review_acceptances.csv` based on human review traces.
-
-``` r
-library(sleepcleanr)
-sync_human_review_status("manual_metric_review_acceptances.csv")
-```
-
-**What it does:**
-
-1.  **Detects human review traces** by checking:
-    - `human_metric_review_note` (non-empty reviewer notes)
-    - `resolved_at` (resolution timestamp)
-    - `resolved_by` (resolution actor)
-2.  **Updates three columns** based on detected traces:
-    - `review_resolution`: `"corrected"` / `"flagged_unresolved"` /
-      `"legacy"`
-    - `resolved_at`: Resolution date (only for `corrected`)
-    - `resolved_by`: `"system"` / `"pending"` / `"legacy"`
-
-**Resolution Logic:**
-
-| Condition | `review_resolution` | `resolved_at` | `resolved_by` |
-|----|----|----|----|
-| Explicit `corrected` flag | `"corrected"` | Today | `"system"` |
-| Human traces + legacy/NA | `"flagged_unresolved"` | NA | `"pending"` |
-| No traces + legacy | `"legacy"` | NA | `"legacy"` |
-
-**Output:**
-
-    ✓ Synced 161 rows: 1 corrected, 43 flagged, 117 legacy
-
-**Running it:**
-[`run_pipeline()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_pipeline.md)
-does not call this function; run it by hand after you edit the review
-CSV.
 
 ------------------------------------------------------------------------
 
@@ -512,6 +411,15 @@ CSV）检测并修正时序与时长错误，计算标准睡眠指标（TST、SO
 - **外部公开数据集**：经一段简短的转换脚本，管线可在其他 schema
   上运行。这些数据集没有已知错误，所以只是可行性检查，不是准确性验证。
 
+![内置合成数据的 flag 仪表盘：280 条记录中有 23
+条被标记待审，按问题类型划分](https://raw.githubusercontent.com/cyracaid/sleepdiary-cleaner/main/man/img/flag-dashboard-synthetic.png)
+
+内置合成数据的 flag 仪表盘：280 条记录中有 23
+条被标记待审，按问题类型划分
+
+*图 14，来自在内置合成数据（280
+行）上的一次运行：一轮运行结束时管线标记待审的内容。*
+
 早期的自动化版本曾静默地误修条目；合成基准发现并堵住了这些缺陷，目前的基准显示
 SOL/WASO 的静默误修率为 0%。
 
@@ -539,83 +447,13 @@ sleepcleanr 刻意**既非全自动、也非全部人工 flag**：
 > VALIDATION_REPORT。你的研究日记可能落在这区间内或外；它们都是 YAML
 > 可配置的，应按你自己的数据重新审视，而非盲抄。
 
-### 术语
+### Flag、术语与阈值
 
-| 术语 | 含义 |
-|----|----|
-| **检出召回 (L1)** | 管线有所动作（标记或修正）的注入错误所占比例 |
-| **修正层召回 (L3)** | 管线恢复出*正确值*的注入错误所占比例 |
-| **FCR** | 误修率：被改动的干净记录 |
-| **FAR** | 误报率：被标记的干净记录 |
-| **SPEC** | 特异度（干净记录未被触动的比例） |
-| **M1 / M4 / M5** | 真实数据审计规则：M1 顺序违规，M4 就寝→入睡窗口违规，M5 静默恶化候选 |
-| **AUTO_FIX** | 自动应用、未经人工审核的改动 |
-
-### 检测阈值默认值
-
-| 规则 | 默认值 | 依据 |
-|----|----|----|
-| `timestamp.sequence.max_gap_hours`（AM/PM 翻转） | 12 h | 假设不存在 ≥ 12 h 的合理间隔 |
-| 相邻对调阈值 | 3 h | 在开发样本上调得；见 VALIDATION_REPORT |
-| `metric_validation.sol.excessive_minutes` | 120 | 抓严重离群值，不是临床标志 |
-| `metric_validation.se.min_valid_percent` / `max_valid_percent` | 0 / 100 | 结构上不可能 → 一律标记 |
-
-完整依据与修改指引：[THRESHOLDS.md](https://cyracaid.github.io/sleepdiary-cleaner/THRESHOLDS.md)。
-
-### Flag 系统与人工审核流程
-
-sleepcleanr 用一套结构化的 flag
-系统把记录送进人工审核流程。每条记录可同时带多个 flag；flag
-是**叠加**的，且**不会被静默清除**——直到人工明确处理才解除。
-
-| Flag / 列 | 触发 | 含义 | 解除方式 |
-|----|----|----|----|
-| `needs_review_flag` | 任一检测规则触发 | 记录需要人工关注 | 人工审核后设 `manually_corrected=TRUE` 或 `human_metric_review_status=confirmed_not_error_do_not_correct` |
-| `auto_error_desc` | 自动检测逻辑 | 机器可读的标记原因 | 供审核者参考 |
-| `error_type` / `unusual_type` | 步骤 5 分类 | 错误类别（TIMESTAMP、DURATION、SELF_REPORTED 等） | 供审核者参考；驱动图 6 的分类 |
-| `manually_corrected` | 人工经 `apply_manual_corrections.R` 修正 | 记录已被人工明确修正 | 由 `apply_manual_corrections.R` 设为 `TRUE` |
-| `human_metric_review_status` | 人工指标审核决定 | `confirmed_not_error_do_not_correct` = 已审核并确认无误 | 由 `apply_metric_review_acceptances.R` / `apply_metric_review_acceptances()` 设置 |
-| `human_metric_review_note` | 审核者的自由文本备注 | 给后来的审计者的背景 | 自由文本 |
-| `correction_type` | 已应用的修正类型 | 如 `bed_sleep_swap_3h`、`sleep_reduce_12h_loop` | 由修正引擎填写 |
-
-**Flag 生命周期：**
-
-    记录被标记 (needs_review_flag=TRUE)
-        ↓ 人工审核
-        ├── 确认是错误 → apply_manual_corrections.R → manually_corrected=TRUE
-        ├── 确认没问题 → human_metric_review_status="confirmed_not_error_do_not_correct"
-        └── 搁置 / 不确定 → needs_review_flag 保持 TRUE
-
-**设计原则：**
-
-1.  **Flag
-    不会被静默清除**——必须有明确的人工动作（`manually_corrected=TRUE` 或
-    `human_metric_review_status=confirmed_not_error_do_not_correct`）。
-2.  **Flag 可叠加**——一条记录可同时带多个 flag（如 TIMESTAMP +
-    DURATION + SELF_REPORTED）。
-3.  **解除是显式的**——只有设置 `manually_corrected=TRUE` 或
-    `human_metric_review_status=confirmed_not_error_do_not_correct`
-    才算“已解决”，不存在隐式的“自动解决”。
-4.  **Flag 保留在输出中**——数据集 A（完整版）保留全部 flag
-    供审计；数据集 B（精简版）只含 `needs_review_flag` 和
-    `correction_type`，供下游分析。
-
-**当前的 flag 类别**（来自 `checkforerrors_processing.R` 和 METHODS 第 7
-阶段）：
-
-| 类别 | 子类型 | 含义 |
-|----|----|----|
-| **TIMESTAMP** | 顺序/范围违规（就寝/入睡/醒来/起床时间） | 如小时 \> 23、冒号格式错误、顺序颠倒 |
-| **DURATION** | 间隔/格式错误（SOL、WASO） | 如 MM:SS 与 HH:MM 混淆、不合理的值 |
-| **AMOUNT** | 物质摄入量异常 | 负数、位数过多、占位码（888/999） |
-| **SELF_REPORTED** | SOL/WASO 与时间戳窗口不一致 | SOL 大于就寝→入睡窗口、SE\>100% 等 |
-
-**历史 flag 统计（v1.4.5 只报告审计，13,990
-行；当前审核队列见上文“证据一览”，每轮运行也会打印自己的）：** 1,048
-条记录被标记（7.5%）；0 条 AUTO_FIX；0 条静默修正。分布：922
-TIMESTAMP（窗口违规）、140 DURATION（顺序违规）、1
-SELF_REPORTED（极端值）、1 冗余确认的恶化。完整分布见
-`VALIDATION_REPORT.md`。
+flag 各列、flag 生命周期、验证表里用到的术语（L1/L3
+召回、FCR、FAR、M1/M4/M5）以及
+[`sync_human_review_status()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/sync_human_review_status.md)，见文章
+[`vignette("review-flags-zh")`](https://cyracaid.github.io/sleepdiary-cleaner/articles/review-flags-zh.md)（Flag、术语与审核流程）。
+检测阈值及其默认值与依据，见[阈值](https://cyracaid.github.io/sleepdiary-cleaner/THRESHOLDS-zh.md)页。
 
 ### 验证地图
 
@@ -753,12 +591,14 @@ Bug、问题和功能建议：请开
 - vignette(“column-mapping-zh”) — 输入数据与配置：用 YAML 映射你的数据集
 - vignette(“data-first-zh”) —
   [`clean_sleep_diary()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/clean_sleep_diary.md)：免配置入口、列名自动推断、运行清单
+- vignette(“review-flags-zh”) — flag
+  各列与生命周期、验证表里的术语、[`sync_human_review_status()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/sync_human_review_status.md)
 - vignette(“interpreting-output-zh”) —
   读懂输出与审核循环（`correction_status_final.csv`、审核状态表、图）
 - vignette(“output-files-zh”) —
   一次运行写出的每个文件：放哪里、哪一步写出、是什么
 - vignette(“troubleshooting-zh”) — 最常见问题的现象、原因和处理办法
-- [`THRESHOLDS.md`](https://cyracaid.github.io/sleepdiary-cleaner/THRESHOLDS.md)
+- [`THRESHOLDS-zh.md`](https://cyracaid.github.io/sleepdiary-cleaner/THRESHOLDS-zh.md)
   —
   每个检测阈值的默认值与依据，以及如何设置你自己的（文档站点”Thresholds”页也有）
 - vignette(“pipeline-architecture-zh”) — 结构、规则族、分类体系
@@ -790,42 +630,3 @@ skill：`.claude/skills/sleepcleanr-pipeline/SKILL.md`（`.agents/skills/`
 | 8.5 | 跨参与者一致性检查 | 对全体参与者做全局一致性审计 |
 | 9 | 生成诊断图 | 35 张图（19 张质控 + 16 张科研）+ figure_index.png 总览图 + RUN_INFO.txt |
 | 10 | 构建交付数据集 | finalize_columns() 按列字典选列并重命名，得到数据集 A/B |
-
-## 同步人工审核状态
-
-[`sync_human_review_status()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/sync_human_review_status.md)
-根据人工审核留下的痕迹，同步 `manual_metric_review_acceptances.csv`
-里的审核状态列。
-
-``` r
-library(sleepcleanr)
-sync_human_review_status("manual_metric_review_acceptances.csv")
-```
-
-**它做什么：**
-
-1.  **检测人工审核痕迹**，依据：
-    - `human_metric_review_note`（非空的审核备注）
-    - `resolved_at`（解决时间）
-    - `resolved_by`（解决人）
-2.  **更新三列：**
-    - `review_resolution`：`"corrected"` / `"flagged_unresolved"` /
-      `"legacy"`
-    - `resolved_at`：解决日期（仅 `corrected`）
-    - `resolved_by`：`"system"` / `"pending"` / `"legacy"`
-
-**解决规则：**
-
-| 条件                    | `review_resolution`    | `resolved_at` | `resolved_by` |
-|-------------------------|------------------------|---------------|---------------|
-| 显式的 `corrected` 标记 | `"corrected"`          | 今天          | `"system"`    |
-| 有痕迹 + legacy/NA      | `"flagged_unresolved"` | NA            | `"pending"`   |
-| 无痕迹 + legacy         | `"legacy"`             | NA            | `"legacy"`    |
-
-**输出：**
-
-    ✓ Synced 161 rows: 1 corrected, 43 flagged, 117 legacy
-
-**运行方式：**
-[`run_pipeline()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_pipeline.md)
-不会调用这个函数；编辑完审核 CSV 后请手动运行。

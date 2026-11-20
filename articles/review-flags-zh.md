@@ -1,0 +1,110 @@
+# Flag、术语与审核流程
+
+[English version
+→](https://cyracaid.github.io/sleepdiary-cleaner/articles/review-flags.md)
+
+## Flag 系统与人工审核流程
+
+sleepcleanr 用一套结构化的 flag
+系统把记录送进人工审核流程。每条记录可同时带多个 flag；flag
+是**叠加**的，且**不会被静默清除**——直到人工明确处理才解除。
+
+| Flag / 列 | 触发 | 含义 | 解除方式 |
+|----|----|----|----|
+| `needs_review_flag` | 任一检测规则触发 | 记录需要人工关注 | 人工审核后设 `manually_corrected=TRUE` 或 `human_metric_review_status=confirmed_not_error_do_not_correct` |
+| `auto_error_desc` | 自动检测逻辑 | 机器可读的标记原因 | 供审核者参考 |
+| `error_type` / `unusual_type` | 步骤 5 分类 | 错误类别（TIMESTAMP、DURATION、SELF_REPORTED 等） | 供审核者参考；驱动图 6 的分类 |
+| `manually_corrected` | 人工经 `apply_manual_corrections.R` 修正 | 记录已被人工明确修正 | 由 `apply_manual_corrections.R` 设为 `TRUE` |
+| `human_metric_review_status` | 人工指标审核决定 | `confirmed_not_error_do_not_correct` = 已审核并确认无误 | 由 `apply_metric_review_acceptances.R` / `apply_metric_review_acceptances()` 设置 |
+| `human_metric_review_note` | 审核者的自由文本备注 | 给后来的审计者的背景 | 自由文本 |
+| `correction_type` | 已应用的修正类型 | 如 `bed_sleep_swap_3h`、`sleep_reduce_12h_loop` | 由修正引擎填写 |
+
+**Flag 生命周期：**
+
+    记录被标记 (needs_review_flag=TRUE)
+        ↓ 人工审核
+        ├── 确认是错误 → apply_manual_corrections.R → manually_corrected=TRUE
+        ├── 确认没问题 → human_metric_review_status="confirmed_not_error_do_not_correct"
+        └── 搁置 / 不确定 → needs_review_flag 保持 TRUE
+
+**设计原则：**
+
+1.  **Flag
+    不会被静默清除**——必须有明确的人工动作（`manually_corrected=TRUE` 或
+    `human_metric_review_status=confirmed_not_error_do_not_correct`）。
+2.  **Flag 可叠加**——一条记录可同时带多个 flag（如 TIMESTAMP +
+    DURATION + SELF_REPORTED）。
+3.  **解除是显式的**——只有设置 `manually_corrected=TRUE` 或
+    `human_metric_review_status=confirmed_not_error_do_not_correct`
+    才算“已解决”，不存在隐式的“自动解决”。
+4.  **Flag 保留在输出中**——数据集 A（完整版）保留全部 flag
+    供审计；数据集 B（精简版）只含 `needs_review_flag` 和
+    `correction_type`，供下游分析。
+
+**当前的 flag 类别**（来自 `checkforerrors_processing.R` 和 METHODS 第 7
+阶段）：
+
+| 类别 | 子类型 | 含义 |
+|----|----|----|
+| **TIMESTAMP** | 顺序/范围违规（就寝/入睡/醒来/起床时间） | 如小时 \> 23、冒号格式错误、顺序颠倒 |
+| **DURATION** | 间隔/格式错误（SOL、WASO） | 如 MM:SS 与 HH:MM 混淆、不合理的值 |
+| **AMOUNT** | 物质摄入量异常 | 负数、位数过多、占位码（888/999） |
+| **SELF_REPORTED** | SOL/WASO 与时间戳窗口不一致 | SOL 大于就寝→入睡窗口、SE\>100% 等 |
+
+**历史 flag 统计（v1.4.5 只报告审计，13,990
+行；当前审核队列见上文“证据一览”，每轮运行也会打印自己的）：** 1,048
+条记录被标记（7.5%）；0 条 AUTO_FIX；0 条静默修正。分布：922
+TIMESTAMP（窗口违规）、140 DURATION（顺序违规）、1
+SELF_REPORTED（极端值）、1 冗余确认的恶化。完整分布见
+`VALIDATION_REPORT.md`。
+
+## 术语
+
+| 术语 | 含义 |
+|----|----|
+| **检出召回 (L1)** | 管线有所动作（标记或修正）的注入错误所占比例 |
+| **修正层召回 (L3)** | 管线恢复出*正确值*的注入错误所占比例 |
+| **FCR** | 误修率：被改动的干净记录 |
+| **FAR** | 误报率：被标记的干净记录 |
+| **SPEC** | 特异度（干净记录未被触动的比例） |
+| **M1 / M4 / M5** | 真实数据审计规则：M1 顺序违规，M4 就寝→入睡窗口违规，M5 静默恶化候选 |
+| **AUTO_FIX** | 自动应用、未经人工审核的改动 |
+
+## 同步人工审核状态
+
+[`sync_human_review_status()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/sync_human_review_status.md)
+根据人工审核留下的痕迹，同步 `manual_metric_review_acceptances.csv`
+里的审核状态列。
+
+``` r
+library(sleepcleanr)
+sync_human_review_status("manual_metric_review_acceptances.csv")
+```
+
+**它做什么：**
+
+1.  **检测人工审核痕迹**，依据：
+    - `human_metric_review_note`（非空的审核备注）
+    - `resolved_at`（解决时间）
+    - `resolved_by`（解决人）
+2.  **更新三列：**
+    - `review_resolution`：`"corrected"` / `"flagged_unresolved"` /
+      `"legacy"`
+    - `resolved_at`：解决日期（仅 `corrected`）
+    - `resolved_by`：`"system"` / `"pending"` / `"legacy"`
+
+**解决规则：**
+
+| 条件                    | `review_resolution`    | `resolved_at` | `resolved_by` |
+|-------------------------|------------------------|---------------|---------------|
+| 显式的 `corrected` 标记 | `"corrected"`          | 今天          | `"system"`    |
+| 有痕迹 + legacy/NA      | `"flagged_unresolved"` | NA            | `"pending"`   |
+| 无痕迹 + legacy         | `"legacy"`             | NA            | `"legacy"`    |
+
+**输出：**
+
+    ✓ Synced 161 rows: 1 corrected, 43 flagged, 117 legacy
+
+**运行方式：**
+[`run_pipeline()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/run_pipeline.md)
+不会调用这个函数；编辑完审核 CSV 后请手动运行。

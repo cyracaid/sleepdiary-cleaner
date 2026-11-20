@@ -23,6 +23,7 @@
     <li><a class="dropdown-item" href="articles/column-mapping.html">Input Data and Configuration</a></li>
     <li><a class="dropdown-item" href="articles/data-first.html">Data-first entry: clean_sleep_diary()</a></li>
     <li><a class="dropdown-item" href="articles/interpreting-output.html">Reading the Output and the Review Loop</a></li>
+    <li><a class="dropdown-item" href="articles/review-flags.html">Flags, terminology and the review workflow</a></li>
     <li><a class="dropdown-item" href="articles/output-files.html">Output files</a></li>
     <li><a class="dropdown-item" href="articles/troubleshooting.html">Troubleshooting</a></li>
     <li><a class="dropdown-item" href="articles/pipeline-architecture.html">Pipeline Architecture</a></li>
@@ -35,6 +36,7 @@
     <li><a class="dropdown-item" href="articles/column-mapping-zh.html">输入数据与配置</a></li>
     <li><a class="dropdown-item" href="articles/data-first-zh.html">数据优先入口：clean_sleep_diary()</a></li>
     <li><a class="dropdown-item" href="articles/interpreting-output-zh.html">读懂输出与审核循环</a></li>
+    <li><a class="dropdown-item" href="articles/review-flags-zh.html">Flag、术语与审核流程</a></li>
     <li><a class="dropdown-item" href="articles/output-files-zh.html">输出文件一览</a></li>
     <li><a class="dropdown-item" href="articles/troubleshooting-zh.html">排错</a></li>
     <li><a class="dropdown-item" href="articles/pipeline-architecture-zh.html">管线架构</a></li>
@@ -44,7 +46,11 @@
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="articles/index.html">All articles / 全部文章</a></li>
   </ul></li>
-<li class="active nav-item"><a class="nav-link" href="THRESHOLDS.html">Thresholds</a></li>
+<li class="active nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-thresholds" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Thresholds</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-thresholds"><li><a class="dropdown-item" href="THRESHOLDS.html">English</a></li>
+    <li><a class="dropdown-item" href="THRESHOLDS-zh.html">中文</a></li>
+  </ul></li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json"></form></li>
@@ -69,6 +75,7 @@
 
 <div id="detection-thresholds--defaults-rationale-and-when-to-change" class="section level1">
 
+<p>English · <a href="THRESHOLDS-zh.html">中文</a></p>
 <p>Flag thresholds are <strong>scientific judgments, not just config values.</strong> Defaults are <strong>deliberately lenient</strong> — appropriate for a <strong>general healthy-adult sample</strong> where the goal is to catch data-entry errors and gross outliers, not to diagnose insomnia. For clinical samples (insomnia, elderly, shift-work), revisit every row.</p>
 <blockquote>
 <p><strong>Provenance:</strong> defaults tuned on healthy young-adult university EMA sample. Document your own study population here so downstream users know the reference.</p>

@@ -40,6 +40,7 @@
     <li><a class="dropdown-item" href="articles/column-mapping.html">Input Data and Configuration</a></li>
     <li><a class="dropdown-item" href="articles/data-first.html">Data-first entry: clean_sleep_diary()</a></li>
     <li><a class="dropdown-item" href="articles/interpreting-output.html">Reading the Output and the Review Loop</a></li>
+    <li><a class="dropdown-item" href="articles/review-flags.html">Flags, terminology and the review workflow</a></li>
     <li><a class="dropdown-item" href="articles/output-files.html">Output files</a></li>
     <li><a class="dropdown-item" href="articles/troubleshooting.html">Troubleshooting</a></li>
     <li><a class="dropdown-item" href="articles/pipeline-architecture.html">Pipeline Architecture</a></li>
@@ -52,6 +53,7 @@
     <li><a class="dropdown-item" href="articles/column-mapping-zh.html">输入数据与配置</a></li>
     <li><a class="dropdown-item" href="articles/data-first-zh.html">数据优先入口：clean_sleep_diary()</a></li>
     <li><a class="dropdown-item" href="articles/interpreting-output-zh.html">读懂输出与审核循环</a></li>
+    <li><a class="dropdown-item" href="articles/review-flags-zh.html">Flag、术语与审核流程</a></li>
     <li><a class="dropdown-item" href="articles/output-files-zh.html">输出文件一览</a></li>
     <li><a class="dropdown-item" href="articles/troubleshooting-zh.html">排错</a></li>
     <li><a class="dropdown-item" href="articles/pipeline-architecture-zh.html">管线架构</a></li>
@@ -62,7 +64,13 @@
     <li><a class="dropdown-item" href="articles/index.html">All articles / 全部文章</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="THRESHOLDS.html">Thresholds</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-thresholds" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Thresholds</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-thresholds">
+<li><a class="dropdown-item" href="THRESHOLDS.html">English</a></li>
+    <li><a class="dropdown-item" href="THRESHOLDS-zh.html">中文</a></li>
+  </ul>
+</li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -144,6 +152,10 @@
 <li>
 <strong>External public datasets</strong>: the pipeline runs on other schemas after a short conversion script. These datasets contain no known errors, so they are a feasibility check, not accuracy validation.</li>
 </ul>
+<div class="float">
+<img src="https://raw.githubusercontent.com/cyracaid/sleepdiary-cleaner/main/man/img/flag-dashboard-synthetic.png" alt="Flag dashboard from the bundled synthetic fixture: 23 of 280 records flagged for review, split by issue type"><div class="figcaption">Flag dashboard from the bundled synthetic fixture: 23 of 280 records flagged for review, split by issue type</div>
+</div>
+<p><em>Figure 14 from a run on the bundled synthetic fixture (280 rows): what the pipeline flags for review at the end of a run.</em></p>
 <p>Earlier automated variants silently misrepaired entries; the synthetic benchmark found and closed those defects, and the current benchmark reports 0% silent misrepair for SOL/WASO.</p>
 <div class="section level3">
 <h3 id="why-the-hybrid-automated--human-design">Why the hybrid (automated + human) design?<a class="anchor" aria-label="anchor" href="#why-the-hybrid-automated--human-design"></a>
@@ -161,215 +173,9 @@
 </blockquote>
 </div>
 <div class="section level3">
-<h3 id="terminology">Terminology<a class="anchor" aria-label="anchor" href="#terminology"></a>
+<h3 id="flags-terminology-and-thresholds">Flags, terminology and thresholds<a class="anchor" aria-label="anchor" href="#flags-terminology-and-thresholds"></a>
 </h3>
-<table class="table">
-<colgroup>
-<col width="50%">
-<col width="50%">
-</colgroup>
-<thead><tr>
-<th>Term</th>
-<th>Meaning</th>
-</tr></thead>
-<tbody>
-<tr>
-<td><strong>Detection recall (L1)</strong></td>
-<td>Share of injected errors for which the pipeline <em>acted</em> (flagged or corrected)</td>
-</tr>
-<tr>
-<td><strong>Correction-level recall (L3)</strong></td>
-<td>Share of injected errors for which the pipeline recovered the <em>correct value</em>
-</td>
-</tr>
-<tr>
-<td><strong>FCR</strong></td>
-<td>False-correction rate: clean records that were altered</td>
-</tr>
-<tr>
-<td><strong>FAR</strong></td>
-<td>False-alarm rate: clean records that were flagged</td>
-</tr>
-<tr>
-<td><strong>SPEC</strong></td>
-<td>Specificity (clean records left untouched)</td>
-</tr>
-<tr>
-<td><strong>M1 / M4 / M5</strong></td>
-<td>Real-data audit rules: M1 order violations, M4 bed→sleep window violations, M5 silent-worsening candidates</td>
-</tr>
-<tr>
-<td><strong>AUTO_FIX</strong></td>
-<td>A change applied automatically, with no human review</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section level3">
-<h3 id="detection-threshold-defaults">Detection-threshold defaults<a class="anchor" aria-label="anchor" href="#detection-threshold-defaults"></a>
-</h3>
-<table class="table">
-<colgroup>
-<col width="33%">
-<col width="33%">
-<col width="33%">
-</colgroup>
-<thead><tr>
-<th>Rule</th>
-<th>Default</th>
-<th>Rationale</th>
-</tr></thead>
-<tbody>
-<tr>
-<td>
-<code>timestamp.sequence.max_gap_hours</code> (AM/PM flip)</td>
-<td>12 h</td>
-<td>Assumes no legitimate interval ≥ 12 h</td>
-</tr>
-<tr>
-<td>adjacent-swap threshold</td>
-<td>3 h</td>
-<td>Tuned on the development sample; see VALIDATION_REPORT</td>
-</tr>
-<tr>
-<td><code>metric_validation.sol.excessive_minutes</code></td>
-<td>120</td>
-<td>Gross-outlier catch, not a clinical marker</td>
-</tr>
-<tr>
-<td>
-<code>metric_validation.se.min_valid_percent</code> / <code>max_valid_percent</code>
-</td>
-<td>0 / 100</td>
-<td>Structural impossibility → always flag</td>
-</tr>
-</tbody>
-</table>
-<p>Full rationale and change guidance: <a href="THRESHOLDS.html">THRESHOLDS.md</a>.</p>
-</div>
-<div class="section level3">
-<h3 id="flag-system--human-review-workflow">Flag System &amp; Human Review Workflow<a class="anchor" aria-label="anchor" href="#flag-system--human-review-workflow"></a>
-</h3>
-<p>sleepcleanr uses a structured flag system to route records through the human-in-the-loop review process. Every record can carry multiple flags; flags are <strong>additive</strong> (a record may carry several simultaneously) and <strong>never silently cleared</strong> — they persist until explicitly resolved by human action.</p>
-<table class="table">
-<colgroup>
-<col width="25%">
-<col width="25%">
-<col width="25%">
-<col width="25%">
-</colgroup>
-<thead><tr>
-<th>Flag / Column</th>
-<th>Trigger</th>
-<th>Meaning</th>
-<th>Resolution</th>
-</tr></thead>
-<tbody>
-<tr>
-<td><code>needs_review_flag</code></td>
-<td>Any detection rule fires</td>
-<td>Record needs human attention</td>
-<td>Human reviews → sets <code>manually_corrected=TRUE</code> OR <code>human_metric_review_status=confirmed_not_error_do_not_correct</code>
-</td>
-</tr>
-<tr>
-<td><code>auto_error_desc</code></td>
-<td>Auto-detection logic</td>
-<td>Machine-readable description of why flagged</td>
-<td>Reference for human reviewer</td>
-</tr>
-<tr>
-<td>
-<code>error_type</code> / <code>unusual_type</code>
-</td>
-<td>Step 5 classification</td>
-<td>Categorized error type (TIMESTAMP, DURATION, SELF_REPORTED, etc.)</td>
-<td>Informs reviewer; drives Figure 6 classification</td>
-</tr>
-<tr>
-<td><code>manually_corrected</code></td>
-<td>Human applied correction via <code>apply_manual_corrections.R</code>
-</td>
-<td>Record was explicitly fixed by human</td>
-<td>Set to <code>TRUE</code> by <code>apply_manual_corrections.R</code>
-</td>
-</tr>
-<tr>
-<td><code>human_metric_review_status</code></td>
-<td>Human metric review decision</td>
-<td>
-<code>confirmed_not_error_do_not_correct</code> = reviewed &amp; confirmed correct</td>
-<td>Set by <code>apply_metric_review_acceptances.R</code> / <code>apply_metric_review_acceptances()</code>
-</td>
-</tr>
-<tr>
-<td><code>human_metric_review_note</code></td>
-<td>Reviewer’s free-text note</td>
-<td>Context for future auditors</td>
-<td>Free text</td>
-</tr>
-<tr>
-<td><code>correction_type</code></td>
-<td>Applied correction type</td>
-<td>e.g., <code>bed_sleep_swap_3h</code>, <code>sleep_reduce_12h_loop</code>
-</td>
-<td>Populated by correction engine</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Flag lifecycle:</strong></p>
-<pre><code>Record flagged (needs_review_flag=TRUE)
-    ↓ Human reviews
-    ├── Confirmed error → apply_manual_corrections.R → manually_corrected=TRUE
-    ├── Confirmed OK → human_metric_review_status="confirmed_not_error_do_not_correct"
-    └── Deferred / unsure → needs_review_flag remains TRUE</code></pre>
-<p><strong>Key design principles:</strong></p>
-<ol style="list-style-type: decimal">
-<li>
-<strong>Flags are never silently cleared</strong> — a flag persists until explicit human action (<code>manually_corrected=TRUE</code> or <code>human_metric_review_status=confirmed_not_error_do_not_correct</code>).</li>
-<li>
-<strong>Flags are additive</strong> — a record can carry multiple flags simultaneously (e.g., TIMESTAMP + DURATION + SELF_REPORTED).</li>
-<li>
-<strong>Resolution is explicit</strong> — a flag is “resolved” only by setting <code>manually_corrected=TRUE</code> or <code>human_metric_review_status=confirmed_not_error_do_not_correct</code>; there is no implicit “auto-resolve”.</li>
-<li>
-<strong>Flags persist in outputs</strong> — Dataset A (full) retains all flags for audit; Dataset B (minimal) includes only <code>needs_review_flag</code> and <code>correction_type</code> for downstream analysis.</li>
-</ol>
-<p><strong>Current flag categories</strong> (from <code>checkforerrors_processing.R</code> and METHODS Stage 7):</p>
-<table class="table">
-<colgroup>
-<col width="33%">
-<col width="33%">
-<col width="33%">
-</colgroup>
-<thead><tr>
-<th>Category</th>
-<th>Sub-types</th>
-<th>Meaning</th>
-</tr></thead>
-<tbody>
-<tr>
-<td><strong>TIMESTAMP</strong></td>
-<td>Sequence/range violations (bed/sleep/awake/getup times)</td>
-<td>e.g., hour&gt;23, malformed colon, inverted sequences</td>
-</tr>
-<tr>
-<td><strong>DURATION</strong></td>
-<td>Interval/format errors (SOL, WASO)</td>
-<td>e.g., MM:SS vs HH:MM confusion, plausibility violations</td>
-</tr>
-<tr>
-<td><strong>AMOUNT</strong></td>
-<td>Substance input anomalies</td>
-<td>negative, excessive digits, filler codes (888/999)</td>
-</tr>
-<tr>
-<td><strong>SELF_REPORTED</strong></td>
-<td>SOL/WASO vs timestamp-window mismatch</td>
-<td>SOL &gt; bed→sleep window, SE&gt;100%, etc.</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Historical flag statistics (v1.4.5 report-only audit, 13,990 rows; the current review queue is in Evidence at a glance above, and each run prints its own):</strong> 1,048 records flagged (7.5%); 0 AUTO_FIX; 0 silent corrections. Breakdown: 922 TIMESTAMP (window violations), 140 DURATION (order violations), 1 SELF_REPORTED (extreme), 1 redundancy-confirmed worsening. See <code>VALIDATION_REPORT.md</code> for full breakdown.</p>
+<p>The flag columns, the flag lifecycle, the terms used in the validation tables (L1/L3 recall, FCR, FAR, M1/M4/M5) and <code><a href="reference/sync_human_review_status.html">sync_human_review_status()</a></code> are in the article <code><a href="articles/review-flags.html">vignette("review-flags")</a></code> (Flags, terminology and the review workflow). The detection thresholds, with defaults and rationale, are on the <a href="THRESHOLDS.html">Thresholds</a> page.</p>
 </div>
 <div class="section level3">
 <h3 id="validation-map">Validation Map<a class="anchor" aria-label="anchor" href="#validation-map"></a>
@@ -431,7 +237,7 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <div class="section level2">
 <h2 id="install">Install<a class="anchor" aria-label="anchor" href="#install"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># From GitHub (not yet on CRAN)</span></span>
 <span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner"</span><span class="op">)</span></span>
 <span><span class="co"># or: pak::pak("cyracaid/sleepdiary-cleaner")</span></span></code></pre></div>
@@ -440,7 +246,7 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
 </h2>
 <p>Shortest path: point <code><a href="reference/clean_sleep_diary.html">clean_sleep_diary()</a></code> at your file; no config needed.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/clean_sleep_diary.html">clean_sleep_diary</a></span><span class="op">(</span><span class="st">"my_diary.csv"</span><span class="op">)</span>          <span class="co"># .csv / .rds / .xlsx / data.frame</span></span>
@@ -450,7 +256,7 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <span><span class="co"># Preview the inferred mapping without running anything:</span></span>
 <span><span class="fu"><a href="reference/clean_sleep_diary.html">clean_sleep_diary</a></span><span class="op">(</span><span class="st">"my_diary.csv"</span>, dry_run <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># writes dry_run_manifest.json, no data written</span></span></code></pre></div>
 <p>Other entries:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Demo run on the bundled synthetic fixture</span></span>
 <span><span class="fu"><a href="reference/run_pipeline.html">run_pipeline</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -474,7 +280,7 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <div class="section level2">
 <h2 id="run-the-tests-report-a-problem-contribute">Run the tests, report a problem, contribute<a class="anchor" aria-label="anchor" href="#run-the-tests-report-a-problem-contribute"></a>
 </h2>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span>   <span class="co"># from a clone of the repository; the same suite runs in CI</span></span></code></pre></div>
 <p>Bugs, questions and feature requests: open an <a href="https://github.com/cyracaid/sleepdiary-cleaner/issues" class="external-link">issue</a>. Contribution guidelines are in <a href="CONTRIBUTING.html"><code>CONTRIBUTING.md</code></a>.</p>
 </div>
@@ -491,6 +297,8 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <li>vignette(“column-mapping”) — input data and configuration: mapping your dataset via YAML</li>
 <li>vignette(“data-first”) — <code><a href="reference/clean_sleep_diary.html">clean_sleep_diary()</a></code>: no-config entry, column auto-guess, run manifest</li>
 <li>vignette(“interpreting-output”) — reading the output and the review loop (<code>correction_status_final.csv</code>, the review status table, figures)</li>
+<li>vignette(“review-flags”) — flag columns and lifecycle, the terms in the validation tables, <code><a href="reference/sync_human_review_status.html">sync_human_review_status()</a></code>
+</li>
 <li>vignette(“output-files”) — every file a run writes: where it goes, which step writes it, what it is</li>
 <li>vignette(“troubleshooting”) — symptom, cause and fix for the problems seen most often</li>
 <li>
@@ -575,81 +383,7 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 </tr>
 </tbody>
 </table>
-<!-- AUTO:ARCH_END -->
-</div>
-</div>
-<div class="section level2">
-<h2 id="sync-human-review-status">Sync Human Review Status<a class="anchor" aria-label="anchor" href="#sync-human-review-status"></a>
-</h2>
-<p>sleepcleanr provides a utility to synchronize human review status fields in the metric review acceptance CSV file.</p>
-<div class="section level3">
-<h3 id="sync_human_review_status">
-<code>sync_human_review_status()</code><a class="anchor" aria-label="anchor" href="#sync_human_review_status"></a>
-</h3>
-<p>Automatically synchronizes review status fields in <code>manual_metric_review_acceptances.csv</code> based on human review traces.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/sync_human_review_status.html">sync_human_review_status</a></span><span class="op">(</span><span class="st">"manual_metric_review_acceptances.csv"</span><span class="op">)</span></span></code></pre></div>
-<p><strong>What it does:</strong></p>
-<ol style="list-style-type: decimal">
-<li>
-<strong>Detects human review traces</strong> by checking:
-<ul>
-<li>
-<code>human_metric_review_note</code> (non-empty reviewer notes)</li>
-<li>
-<code>resolved_at</code> (resolution timestamp)</li>
-<li>
-<code>resolved_by</code> (resolution actor)</li>
-</ul>
-</li>
-<li>
-<strong>Updates three columns</strong> based on detected traces:
-<ul>
-<li>
-<code>review_resolution</code>: <code>"corrected"</code> / <code>"flagged_unresolved"</code> / <code>"legacy"</code>
-</li>
-<li>
-<code>resolved_at</code>: Resolution date (only for <code>corrected</code>)</li>
-<li>
-<code>resolved_by</code>: <code>"system"</code> / <code>"pending"</code> / <code>"legacy"</code>
-</li>
-</ul>
-</li>
-</ol>
-<p><strong>Resolution Logic:</strong></p>
-<table class="table">
-<thead><tr>
-<th>Condition</th>
-<th><code>review_resolution</code></th>
-<th><code>resolved_at</code></th>
-<th><code>resolved_by</code></th>
-</tr></thead>
-<tbody>
-<tr>
-<td>Explicit <code>corrected</code> flag</td>
-<td><code>"corrected"</code></td>
-<td>Today</td>
-<td><code>"system"</code></td>
-</tr>
-<tr>
-<td>Human traces + legacy/NA</td>
-<td><code>"flagged_unresolved"</code></td>
-<td>NA</td>
-<td><code>"pending"</code></td>
-</tr>
-<tr>
-<td>No traces + legacy</td>
-<td><code>"legacy"</code></td>
-<td>NA</td>
-<td><code>"legacy"</code></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Output:</strong></p>
-<pre><code>✓ Synced 161 rows: 1 corrected, 43 flagged, 117 legacy</code></pre>
-<p><strong>Running it:</strong> <code><a href="reference/run_pipeline.html">run_pipeline()</a></code> does not call this function; run it by hand after you edit the review CSV.</p>
-<hr>
+<!-- AUTO:ARCH_END --><hr>
 <p><a name="%E4%B8%AD%E6%96%87"></a></p>
 </div>
 </div>
@@ -703,6 +437,10 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <li>
 <strong>外部公开数据集</strong>：经一段简短的转换脚本，管线可在其他 schema 上运行。这些数据集没有已知错误，所以只是可行性检查，不是准确性验证。</li>
 </ul>
+<div class="float">
+<img src="https://raw.githubusercontent.com/cyracaid/sleepdiary-cleaner/main/man/img/flag-dashboard-synthetic.png" alt="内置合成数据的 flag 仪表盘：280 条记录中有 23 条被标记待审，按问题类型划分"><div class="figcaption">内置合成数据的 flag 仪表盘：280 条记录中有 23 条被标记待审，按问题类型划分</div>
+</div>
+<p><em>图 14，来自在内置合成数据（280 行）上的一次运行：一轮运行结束时管线标记待审的内容。</em></p>
 <p>早期的自动化版本曾静默地误修条目；合成基准发现并堵住了这些缺陷，目前的基准显示 SOL/WASO 的静默误修率为 0%。</p>
 </div>
 <div class="section level3">
@@ -721,212 +459,9 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 </blockquote>
 </div>
 <div class="section level3">
-<h3 id="术语">术语<a class="anchor" aria-label="anchor" href="#%E6%9C%AF%E8%AF%AD"></a>
+<h3 id="flag术语与阈值">Flag、术语与阈值<a class="anchor" aria-label="anchor" href="#flag%E6%9C%AF%E8%AF%AD%E4%B8%8E%E9%98%88%E5%80%BC"></a>
 </h3>
-<table class="table">
-<colgroup>
-<col width="50%">
-<col width="50%">
-</colgroup>
-<thead><tr>
-<th>术语</th>
-<th>含义</th>
-</tr></thead>
-<tbody>
-<tr>
-<td><strong>检出召回 (L1)</strong></td>
-<td>管线有所动作（标记或修正）的注入错误所占比例</td>
-</tr>
-<tr>
-<td><strong>修正层召回 (L3)</strong></td>
-<td>管线恢复出<em>正确值</em>的注入错误所占比例</td>
-</tr>
-<tr>
-<td><strong>FCR</strong></td>
-<td>误修率：被改动的干净记录</td>
-</tr>
-<tr>
-<td><strong>FAR</strong></td>
-<td>误报率：被标记的干净记录</td>
-</tr>
-<tr>
-<td><strong>SPEC</strong></td>
-<td>特异度（干净记录未被触动的比例）</td>
-</tr>
-<tr>
-<td><strong>M1 / M4 / M5</strong></td>
-<td>真实数据审计规则：M1 顺序违规，M4 就寝→入睡窗口违规，M5 静默恶化候选</td>
-</tr>
-<tr>
-<td><strong>AUTO_FIX</strong></td>
-<td>自动应用、未经人工审核的改动</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section level3">
-<h3 id="检测阈值默认值">检测阈值默认值<a class="anchor" aria-label="anchor" href="#%E6%A3%80%E6%B5%8B%E9%98%88%E5%80%BC%E9%BB%98%E8%AE%A4%E5%80%BC"></a>
-</h3>
-<table class="table">
-<colgroup>
-<col width="33%">
-<col width="33%">
-<col width="33%">
-</colgroup>
-<thead><tr>
-<th>规则</th>
-<th>默认值</th>
-<th>依据</th>
-</tr></thead>
-<tbody>
-<tr>
-<td>
-<code>timestamp.sequence.max_gap_hours</code>（AM/PM 翻转）</td>
-<td>12 h</td>
-<td>假设不存在 ≥ 12 h 的合理间隔</td>
-</tr>
-<tr>
-<td>相邻对调阈值</td>
-<td>3 h</td>
-<td>在开发样本上调得；见 VALIDATION_REPORT</td>
-</tr>
-<tr>
-<td><code>metric_validation.sol.excessive_minutes</code></td>
-<td>120</td>
-<td>抓严重离群值，不是临床标志</td>
-</tr>
-<tr>
-<td>
-<code>metric_validation.se.min_valid_percent</code> / <code>max_valid_percent</code>
-</td>
-<td>0 / 100</td>
-<td>结构上不可能 → 一律标记</td>
-</tr>
-</tbody>
-</table>
-<p>完整依据与修改指引：<a href="THRESHOLDS.html">THRESHOLDS.md</a>。</p>
-</div>
-<div class="section level3">
-<h3 id="flag-系统与人工审核流程">Flag 系统与人工审核流程<a class="anchor" aria-label="anchor" href="#flag-%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%BA%BA%E5%B7%A5%E5%AE%A1%E6%A0%B8%E6%B5%81%E7%A8%8B"></a>
-</h3>
-<p>sleepcleanr 用一套结构化的 flag 系统把记录送进人工审核流程。每条记录可同时带多个 flag；flag 是<strong>叠加</strong>的，且<strong>不会被静默清除</strong>——直到人工明确处理才解除。</p>
-<table class="table">
-<colgroup>
-<col width="25%">
-<col width="25%">
-<col width="25%">
-<col width="25%">
-</colgroup>
-<thead><tr>
-<th>Flag / 列</th>
-<th>触发</th>
-<th>含义</th>
-<th>解除方式</th>
-</tr></thead>
-<tbody>
-<tr>
-<td><code>needs_review_flag</code></td>
-<td>任一检测规则触发</td>
-<td>记录需要人工关注</td>
-<td>人工审核后设 <code>manually_corrected=TRUE</code> 或 <code>human_metric_review_status=confirmed_not_error_do_not_correct</code>
-</td>
-</tr>
-<tr>
-<td><code>auto_error_desc</code></td>
-<td>自动检测逻辑</td>
-<td>机器可读的标记原因</td>
-<td>供审核者参考</td>
-</tr>
-<tr>
-<td>
-<code>error_type</code> / <code>unusual_type</code>
-</td>
-<td>步骤 5 分类</td>
-<td>错误类别（TIMESTAMP、DURATION、SELF_REPORTED 等）</td>
-<td>供审核者参考；驱动图 6 的分类</td>
-</tr>
-<tr>
-<td><code>manually_corrected</code></td>
-<td>人工经 <code>apply_manual_corrections.R</code> 修正</td>
-<td>记录已被人工明确修正</td>
-<td>由 <code>apply_manual_corrections.R</code> 设为 <code>TRUE</code>
-</td>
-</tr>
-<tr>
-<td><code>human_metric_review_status</code></td>
-<td>人工指标审核决定</td>
-<td>
-<code>confirmed_not_error_do_not_correct</code> = 已审核并确认无误</td>
-<td>由 <code>apply_metric_review_acceptances.R</code> / <code>apply_metric_review_acceptances()</code> 设置</td>
-</tr>
-<tr>
-<td><code>human_metric_review_note</code></td>
-<td>审核者的自由文本备注</td>
-<td>给后来的审计者的背景</td>
-<td>自由文本</td>
-</tr>
-<tr>
-<td><code>correction_type</code></td>
-<td>已应用的修正类型</td>
-<td>如 <code>bed_sleep_swap_3h</code>、<code>sleep_reduce_12h_loop</code>
-</td>
-<td>由修正引擎填写</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Flag 生命周期：</strong></p>
-<pre><code>记录被标记 (needs_review_flag=TRUE)
-    ↓ 人工审核
-    ├── 确认是错误 → apply_manual_corrections.R → manually_corrected=TRUE
-    ├── 确认没问题 → human_metric_review_status="confirmed_not_error_do_not_correct"
-    └── 搁置 / 不确定 → needs_review_flag 保持 TRUE</code></pre>
-<p><strong>设计原则：</strong></p>
-<ol style="list-style-type: decimal">
-<li>
-<strong>Flag 不会被静默清除</strong>——必须有明确的人工动作（<code>manually_corrected=TRUE</code> 或 <code>human_metric_review_status=confirmed_not_error_do_not_correct</code>）。</li>
-<li>
-<strong>Flag 可叠加</strong>——一条记录可同时带多个 flag（如 TIMESTAMP + DURATION + SELF_REPORTED）。</li>
-<li>
-<strong>解除是显式的</strong>——只有设置 <code>manually_corrected=TRUE</code> 或 <code>human_metric_review_status=confirmed_not_error_do_not_correct</code> 才算“已解决”，不存在隐式的“自动解决”。</li>
-<li>
-<strong>Flag 保留在输出中</strong>——数据集 A（完整版）保留全部 flag 供审计；数据集 B（精简版）只含 <code>needs_review_flag</code> 和 <code>correction_type</code>，供下游分析。</li>
-</ol>
-<p><strong>当前的 flag 类别</strong>（来自 <code>checkforerrors_processing.R</code> 和 METHODS 第 7 阶段）：</p>
-<table class="table">
-<colgroup>
-<col width="33%">
-<col width="33%">
-<col width="33%">
-</colgroup>
-<thead><tr>
-<th>类别</th>
-<th>子类型</th>
-<th>含义</th>
-</tr></thead>
-<tbody>
-<tr>
-<td><strong>TIMESTAMP</strong></td>
-<td>顺序/范围违规（就寝/入睡/醒来/起床时间）</td>
-<td>如小时 &gt; 23、冒号格式错误、顺序颠倒</td>
-</tr>
-<tr>
-<td><strong>DURATION</strong></td>
-<td>间隔/格式错误（SOL、WASO）</td>
-<td>如 MM:SS 与 HH:MM 混淆、不合理的值</td>
-</tr>
-<tr>
-<td><strong>AMOUNT</strong></td>
-<td>物质摄入量异常</td>
-<td>负数、位数过多、占位码（888/999）</td>
-</tr>
-<tr>
-<td><strong>SELF_REPORTED</strong></td>
-<td>SOL/WASO 与时间戳窗口不一致</td>
-<td>SOL 大于就寝→入睡窗口、SE&gt;100% 等</td>
-</tr>
-</tbody>
-</table>
-<p><strong>历史 flag 统计（v1.4.5 只报告审计，13,990 行；当前审核队列见上文“证据一览”，每轮运行也会打印自己的）：</strong> 1,048 条记录被标记（7.5%）；0 条 AUTO_FIX；0 条静默修正。分布：922 TIMESTAMP（窗口违规）、140 DURATION（顺序违规）、1 SELF_REPORTED（极端值）、1 冗余确认的恶化。完整分布见 <code>VALIDATION_REPORT.md</code>。</p>
+<p>flag 各列、flag 生命周期、验证表里用到的术语（L1/L3 召回、FCR、FAR、M1/M4/M5）以及 <code><a href="reference/sync_human_review_status.html">sync_human_review_status()</a></code>，见文章 <code><a href="articles/review-flags-zh.html">vignette("review-flags-zh")</a></code>（Flag、术语与审核流程）。 检测阈值及其默认值与依据，见<a href="THRESHOLDS-zh.html">阈值</a>页。</p>
 </div>
 <div class="section level3">
 <h3 id="验证地图">验证地图<a class="anchor" aria-label="anchor" href="#%E9%AA%8C%E8%AF%81%E5%9C%B0%E5%9B%BE"></a>
@@ -984,7 +519,7 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <div class="section level2">
 <h2 id="安装">安装<a class="anchor" aria-label="anchor" href="#%E5%AE%89%E8%A3%85"></a>
 </h2>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 从 GitHub 安装（尚未上线 CRAN，包名 sleepcleanr）</span></span>
 <span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner"</span><span class="op">)</span></span>
 <span><span class="co"># 或：pak::pak("cyracaid/sleepdiary-cleaner")</span></span></code></pre></div>
@@ -993,7 +528,7 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <h2 id="快速开始">快速开始<a class="anchor" aria-label="anchor" href="#%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B"></a>
 </h2>
 <p>最短路径：把 <code><a href="reference/clean_sleep_diary.html">clean_sleep_diary()</a></code> 指向你的文件，无需配置。</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/clean_sleep_diary.html">clean_sleep_diary</a></span><span class="op">(</span><span class="st">"my_diary.csv"</span><span class="op">)</span>          <span class="co"># .csv / .rds / .xlsx / data.frame</span></span>
@@ -1003,7 +538,7 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <span><span class="co"># 只预览推断出的映射，不运行任何东西：</span></span>
 <span><span class="fu"><a href="reference/clean_sleep_diary.html">clean_sleep_diary</a></span><span class="op">(</span><span class="st">"my_diary.csv"</span>, dry_run <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># 写出 dry_run_manifest.json，不写数据</span></span></code></pre></div>
 <p>其他入口：</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 用内置合成数据跑演示</span></span>
 <span><span class="fu"><a href="reference/run_pipeline.html">run_pipeline</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -1027,7 +562,7 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <div class="section level2">
 <h2 id="运行测试反馈问题参与贡献">运行测试、反馈问题、参与贡献<a class="anchor" aria-label="anchor" href="#%E8%BF%90%E8%A1%8C%E6%B5%8B%E8%AF%95%E5%8F%8D%E9%A6%88%E9%97%AE%E9%A2%98%E5%8F%82%E4%B8%8E%E8%B4%A1%E7%8C%AE"></a>
 </h2>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span>   <span class="co"># 在仓库克隆目录中运行；CI 里跑的是同一套测试</span></span></code></pre></div>
 <p>Bug、问题和功能建议：请开 <a href="https://github.com/cyracaid/sleepdiary-cleaner/issues" class="external-link">issue</a>。 贡献指南见 <a href="CONTRIBUTING.html"><code>CONTRIBUTING.md</code></a>。</p>
 </div>
@@ -1043,11 +578,13 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <li>vignette(“getting-started-zh”) — 安装、第一次运行、两种模式（<code>include_manual_corrections</code>）</li>
 <li>vignette(“column-mapping-zh”) — 输入数据与配置：用 YAML 映射你的数据集</li>
 <li>vignette(“data-first-zh”) — <code><a href="reference/clean_sleep_diary.html">clean_sleep_diary()</a></code>：免配置入口、列名自动推断、运行清单</li>
+<li>vignette(“review-flags-zh”) — flag 各列与生命周期、验证表里的术语、<code><a href="reference/sync_human_review_status.html">sync_human_review_status()</a></code>
+</li>
 <li>vignette(“interpreting-output-zh”) — 读懂输出与审核循环（<code>correction_status_final.csv</code>、审核状态表、图）</li>
 <li>vignette(“output-files-zh”) — 一次运行写出的每个文件：放哪里、哪一步写出、是什么</li>
 <li>vignette(“troubleshooting-zh”) — 最常见问题的现象、原因和处理办法</li>
 <li>
-<a href="THRESHOLDS.html"><code>THRESHOLDS.md</code></a> — 每个检测阈值的默认值与依据，以及如何设置你自己的（文档站点”Thresholds”页也有）</li>
+<a href="THRESHOLDS-zh.html"><code>THRESHOLDS-zh.md</code></a> — 每个检测阈值的默认值与依据，以及如何设置你自己的（文档站点”Thresholds”页也有）</li>
 <li>vignette(“pipeline-architecture-zh”) — 结构、规则族、分类体系</li>
 <li>vignette(“validation-methodology-zh”) — 规则如何验证（合成 + 真实数据）</li>
 <li>vignette(“testing-coverage-zh”) — 测试覆盖</li>
@@ -1130,73 +667,6 @@ Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 </table>
 <!-- AUTO:ARCH_ZH_END -->
 </div>
-</div>
-<div class="section level2">
-<h2 id="同步人工审核状态">同步人工审核状态<a class="anchor" aria-label="anchor" href="#%E5%90%8C%E6%AD%A5%E4%BA%BA%E5%B7%A5%E5%AE%A1%E6%A0%B8%E7%8A%B6%E6%80%81"></a>
-</h2>
-<p><code><a href="reference/sync_human_review_status.html">sync_human_review_status()</a></code> 根据人工审核留下的痕迹，同步 <code>manual_metric_review_acceptances.csv</code> 里的审核状态列。</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/sync_human_review_status.html">sync_human_review_status</a></span><span class="op">(</span><span class="st">"manual_metric_review_acceptances.csv"</span><span class="op">)</span></span></code></pre></div>
-<p><strong>它做什么：</strong></p>
-<ol style="list-style-type: decimal">
-<li>
-<strong>检测人工审核痕迹</strong>，依据：
-<ul>
-<li>
-<code>human_metric_review_note</code>（非空的审核备注）</li>
-<li>
-<code>resolved_at</code>（解决时间）</li>
-<li>
-<code>resolved_by</code>（解决人）</li>
-</ul>
-</li>
-<li>
-<strong>更新三列：</strong>
-<ul>
-<li>
-<code>review_resolution</code>：<code>"corrected"</code> / <code>"flagged_unresolved"</code> / <code>"legacy"</code>
-</li>
-<li>
-<code>resolved_at</code>：解决日期（仅 <code>corrected</code>）</li>
-<li>
-<code>resolved_by</code>：<code>"system"</code> / <code>"pending"</code> / <code>"legacy"</code>
-</li>
-</ul>
-</li>
-</ol>
-<p><strong>解决规则：</strong></p>
-<table class="table">
-<thead><tr>
-<th>条件</th>
-<th><code>review_resolution</code></th>
-<th><code>resolved_at</code></th>
-<th><code>resolved_by</code></th>
-</tr></thead>
-<tbody>
-<tr>
-<td>显式的 <code>corrected</code> 标记</td>
-<td><code>"corrected"</code></td>
-<td>今天</td>
-<td><code>"system"</code></td>
-</tr>
-<tr>
-<td>有痕迹 + legacy/NA</td>
-<td><code>"flagged_unresolved"</code></td>
-<td>NA</td>
-<td><code>"pending"</code></td>
-</tr>
-<tr>
-<td>无痕迹 + legacy</td>
-<td><code>"legacy"</code></td>
-<td>NA</td>
-<td><code>"legacy"</code></td>
-</tr>
-</tbody>
-</table>
-<p><strong>输出：</strong></p>
-<pre><code>✓ Synced 161 rows: 1 corrected, 43 flagged, 117 legacy</code></pre>
-<p><strong>运行方式：</strong> <code><a href="reference/run_pipeline.html">run_pipeline()</a></code> 不会调用这个函数；编辑完审核 CSV 后请手动运行。</p>
 </div>
 </div>
 
