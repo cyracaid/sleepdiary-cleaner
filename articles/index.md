@@ -28,12 +28,6 @@ need them; [中文版请看下面 / Chinese articles below ↓](#chinese).
   regression checks, and the diagnostic figures — what each output means
   and what to check for.
 
-- [Flags, Terminology and the Review
-  Workflow](https://cyracaid.github.io/sleepdiary-cleaner/articles/review-flags.md):
-
-  The flag columns and their lifecycle, the terms used in the validation
-  tables, and sync_human_review_status().
-
 - [Output
   files](https://cyracaid.github.io/sleepdiary-cleaner/articles/output-files.md):
 
@@ -95,11 +89,6 @@ need them; [中文版请看下面 / Chinese articles below ↓](#chinese).
 
   怎么读 correction_status_final.csv、step flag
   ledger、回归检查与诊断图表——每个输出的含义、检查要点，以及每张图的详细参考。
-
-- [Flag、术语与审核流程](https://cyracaid.github.io/sleepdiary-cleaner/articles/review-flags-zh.md):
-
-  flag 各列及其生命周期、验证表里用到的术语，以及
-  sync_human_review_status()。
 
 - [输出文件一览（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/output-files-zh.md):
 

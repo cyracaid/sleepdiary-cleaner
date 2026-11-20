@@ -1,11 +1,8 @@
 # sleepcleanr — Validation Report
 
-*Rendered 2026-11-20 by `validation/render_validation_report.R`. All
+*Rendered 2026-09-17 by `validation/render_validation_report.R`. All
 synthetic numbers are read directly from the result CSVs — nothing below
 is hand-typed.*
-
-English ·
-[中文](https://cyracaid.github.io/sleepdiary-cleaner/VALIDATION_REPORT-zh.md)
 
 ## Summary
 
@@ -87,9 +84,7 @@ injected error; that miscompute is corrected here.
 
 Pooled precision = 1.000 (flagged injected / (flagged injected + flagged
 control)); control FAR_flag 0/1609, FAR_alter 0/1609. Source:
-benchmark_table.csv.
-
-## Real-data audit
+benchmark_table.csv. \## Real-data audit
 
 Report-only run over all 13990 real diary records. No data is modified
 (0 AUTO_FIX).

@@ -40,7 +40,6 @@
     <li><a class="dropdown-item" href="articles/column-mapping.html">Input Data and Configuration</a></li>
     <li><a class="dropdown-item" href="articles/data-first.html">Data-first entry: clean_sleep_diary()</a></li>
     <li><a class="dropdown-item" href="articles/interpreting-output.html">Reading the Output and the Review Loop</a></li>
-    <li><a class="dropdown-item" href="articles/review-flags.html">Flags, terminology and the review workflow</a></li>
     <li><a class="dropdown-item" href="articles/output-files.html">Output files</a></li>
     <li><a class="dropdown-item" href="articles/troubleshooting.html">Troubleshooting</a></li>
     <li><a class="dropdown-item" href="articles/pipeline-architecture.html">Pipeline Architecture</a></li>
@@ -53,7 +52,6 @@
     <li><a class="dropdown-item" href="articles/column-mapping-zh.html">输入数据与配置</a></li>
     <li><a class="dropdown-item" href="articles/data-first-zh.html">数据优先入口：clean_sleep_diary()</a></li>
     <li><a class="dropdown-item" href="articles/interpreting-output-zh.html">读懂输出与审核循环</a></li>
-    <li><a class="dropdown-item" href="articles/review-flags-zh.html">Flag、术语与审核流程</a></li>
     <li><a class="dropdown-item" href="articles/output-files-zh.html">输出文件一览</a></li>
     <li><a class="dropdown-item" href="articles/troubleshooting-zh.html">排错</a></li>
     <li><a class="dropdown-item" href="articles/pipeline-architecture-zh.html">管线架构</a></li>
@@ -141,40 +139,6 @@
 </ol>
 </div>
 <div class="section level2">
-<h2 id="install">Install<a class="anchor" aria-label="anchor" href="#install"></a>
-</h2>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># From GitHub (not yet on CRAN)</span></span>
-<span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner"</span><span class="op">)</span></span>
-<span><span class="co"># or: pak::pak("cyracaid/sleepdiary-cleaner")</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
-</h2>
-<p>Shortest path: point <code><a href="reference/clean_sleep_diary.html">clean_sleep_diary()</a></code> at your file; no config needed.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/clean_sleep_diary.html">clean_sleep_diary</a></span><span class="op">(</span><span class="st">"my_diary.csv"</span><span class="op">)</span>          <span class="co"># .csv / .rds / .xlsx / data.frame</span></span>
-<span><span class="va">res</span><span class="op">$</span><span class="va">cleaned</span>                                       <span class="co"># cleaned Dataset A</span></span>
-<span><span class="va">res</span><span class="op">$</span><span class="va">guesses</span>                                       <span class="co"># how each column was mapped</span></span>
-<span><span class="va">res</span><span class="op">$</span><span class="va">manifest</span>                                      <span class="co"># provenance: input hash, config, step ledger</span></span>
-<span><span class="co"># Preview the inferred mapping without running anything:</span></span>
-<span><span class="fu"><a href="reference/clean_sleep_diary.html">clean_sleep_diary</a></span><span class="op">(</span><span class="st">"my_diary.csv"</span>, dry_run <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># writes dry_run_manifest.json, no data written</span></span></code></pre></div>
-<p>Other entries:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Demo run on the bundled synthetic fixture</span></span>
-<span><span class="fu"><a href="reference/run_pipeline.html">run_pipeline</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Config-file route: copy the template, map your columns, run again</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"config_template.yaml"</span>, package <span class="op">=</span> <span class="st">"sleepcleanr"</span><span class="op">)</span>,</span>
-<span>          <span class="st">"my_study.yaml"</span><span class="op">)</span></span>
-<span><span class="co"># edit my_study.yaml → run_pipeline(config = "my_study.yaml")</span></span></code></pre></div>
-<blockquote>
-<p><strong>Shell note:</strong> the review worksheets are named <code>[NEW]manual_*.csv</code>. The square brackets are glob characters, so quote the name in a shell: <code>open "[NEW]manual_error_correction_review.csv"</code>.</p>
-</blockquote>
-</div>
-<div class="section level2">
 <h2 id="evidence-at-a-glance">Evidence at a glance<a class="anchor" aria-label="anchor" href="#evidence-at-a-glance"></a>
 </h2>
 <p>Full package in <a href="VALIDATION_REPORT.html">VALIDATION_REPORT.md</a>. Summary:</p>
@@ -186,10 +150,6 @@
 <li>
 <strong>External public datasets</strong>: the pipeline runs on other schemas after a short conversion script. These datasets contain no known errors, so they are a feasibility check, not accuracy validation.</li>
 </ul>
-<div class="float">
-<img src="https://raw.githubusercontent.com/cyracaid/sleepdiary-cleaner/main/man/img/flag-dashboard-synthetic.png" alt="Flag dashboard from the bundled synthetic fixture: 23 of 280 records flagged for review, split by issue type"><div class="figcaption">Flag dashboard from the bundled synthetic fixture: 23 of 280 records flagged for review, split by issue type</div>
-</div>
-<p><em>Figure 14 from a run on the bundled synthetic fixture (280 rows): what the pipeline flags for review at the end of a run.</em></p>
 <p>Earlier automated variants silently misrepaired entries; the synthetic benchmark found and closed those defects, and the current benchmark reports 0% silent misrepair for SOL/WASO.</p>
 <div class="section level3">
 <h3 id="why-the-hybrid-automated--human-design">Why the hybrid (automated + human) design?<a class="anchor" aria-label="anchor" href="#why-the-hybrid-automated--human-design"></a>
@@ -199,7 +159,7 @@
 <li>
 <strong>Not fully auto:</strong> high-confidence, order/AM-PM-only rules correct harmlessly; but value-level errors (e.g. SOL vs the bed→sleep window) must not be overwritten — a plausible large SOL is real psychological signal, and silently “fixing” it would bias the sleep–affect associations the pipeline exists to serve.</li>
 <li>
-<strong>Not all-flag:</strong> flagging every disagreement is unmanageable by hand (the v1.4.5 report-only audit flagged 1,048 rows; a current run leaves 226 rows to review, or 307 without the manual files). High-confidence rules take the deterministic cases; FLAG keeps only the ambiguous ones for human review.</li>
+<strong>Not all-flag:</strong> a 1,048-row FLAG queue (the v1.4.5 report-only audit) is unmanageable by hand. High-confidence rules chew the deterministic cases; FLAG keeps only the ambiguous ones for human review.</li>
 </ul>
 <p>The outcome is not “the pipeline makes a mess clean” — it makes the mess <strong>explicit</strong>: every candidate error is surfaced or logged, never silently hidden.</p>
 <blockquote>
@@ -207,23 +167,252 @@
 </blockquote>
 </div>
 <div class="section level3">
-<h3 id="flags-terminology-and-thresholds">Flags, terminology and thresholds<a class="anchor" aria-label="anchor" href="#flags-terminology-and-thresholds"></a>
+<h3 id="terminology">Terminology<a class="anchor" aria-label="anchor" href="#terminology"></a>
 </h3>
-<p>The flag columns, the flag lifecycle, the terms used in the validation tables (L1/L3 recall, FCR, FAR, M1/M4/M5) and <code><a href="reference/sync_human_review_status.html">sync_human_review_status()</a></code> are in the article <code><a href="articles/review-flags.html">vignette("review-flags")</a></code> (Flags, terminology and the review workflow). The detection thresholds, with defaults and rationale, are on the <a href="THRESHOLDS.html">Thresholds</a> page.</p>
-<p>The validation map (synthetic, real-data and robustness tiers) and where each number comes from are in <code><a href="articles/validation-methodology.html">vignette("validation-methodology")</a></code>.</p>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><strong>Detection recall (L1)</strong></td>
+<td>Share of injected errors for which the pipeline <em>acted</em> (flagged or corrected)</td>
+</tr>
+<tr>
+<td><strong>Correction-level recall (L3)</strong></td>
+<td>Share of injected errors for which the pipeline recovered the <em>correct value</em>
+</td>
+</tr>
+<tr>
+<td><strong>FCR</strong></td>
+<td>False-correction rate: clean records that were altered</td>
+</tr>
+<tr>
+<td><strong>FAR</strong></td>
+<td>False-alarm rate: clean records that were flagged</td>
+</tr>
+<tr>
+<td><strong>SPEC</strong></td>
+<td>Specificity (clean records left untouched)</td>
+</tr>
+<tr>
+<td><strong>M1 / M4 / M5</strong></td>
+<td>Real-data audit rules: M1 order violations, M4 bed→sleep window violations, M5 silent-worsening candidates</td>
+</tr>
+<tr>
+<td><strong>AUTO_FIX</strong></td>
+<td>A change applied automatically, with no human review</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="detection-threshold-defaults">Detection-threshold defaults<a class="anchor" aria-label="anchor" href="#detection-threshold-defaults"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr>
+<th>Rule</th>
+<th>Default</th>
+<th>Rationale</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+<code>timestamp.sequence.max_gap_hours</code> (AM/PM flip)</td>
+<td>12 h</td>
+<td>Assumes no legitimate interval ≥ 12 h</td>
+</tr>
+<tr>
+<td>adjacent-swap threshold</td>
+<td>3 h</td>
+<td>Tuned on the development sample; see VALIDATION_REPORT</td>
+</tr>
+<tr>
+<td><code>metric_validation.sol.excessive_minutes</code></td>
+<td>120</td>
+<td>Gross-outlier catch, not a clinical marker</td>
+</tr>
+<tr>
+<td>
+<code>metric_validation.se.min_valid_percent</code> / <code>max_valid_percent</code>
+</td>
+<td>0 / 100</td>
+<td>Structural impossibility → always flag</td>
+</tr>
+</tbody>
+</table>
+<p>Full rationale and change guidance: <a href="THRESHOLDS.html">THRESHOLDS.md</a>.</p>
+</div>
+<div class="section level3">
+<h3 id="flag-system--human-review-workflow">Flag System &amp; Human Review Workflow<a class="anchor" aria-label="anchor" href="#flag-system--human-review-workflow"></a>
+</h3>
+<p>sleepcleanr uses a structured flag system to route records through the human-in-the-loop review process. Every record can carry multiple flags; flags are <strong>additive</strong> (a record may carry several simultaneously) and <strong>never silently cleared</strong> — they persist until explicitly resolved by human action.</p>
+<table class="table">
+<colgroup>
+<col width="25%">
+<col width="25%">
+<col width="25%">
+<col width="25%">
+</colgroup>
+<thead><tr>
+<th>Flag / Column</th>
+<th>Trigger</th>
+<th>Meaning</th>
+<th>Resolution</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code>needs_review_flag</code></td>
+<td>Any detection rule fires</td>
+<td>Record needs human attention</td>
+<td>Human reviews → sets <code>manually_corrected=TRUE</code> OR <code>human_metric_review_status=confirmed_not_error_do_not_correct</code>
+</td>
+</tr>
+<tr>
+<td><code>auto_error_desc</code></td>
+<td>Auto-detection logic</td>
+<td>Machine-readable description of why flagged</td>
+<td>Reference for human reviewer</td>
+</tr>
+<tr>
+<td>
+<code>error_type</code> / <code>unusual_type</code>
+</td>
+<td>Step 5 classification</td>
+<td>Categorized error type (TIMESTAMP, DURATION, SELF_REPORTED, etc.)</td>
+<td>Informs reviewer; drives Figure 6 classification</td>
+</tr>
+<tr>
+<td><code>manually_corrected</code></td>
+<td>Human applied correction via <code>apply_manual_corrections.R</code>
+</td>
+<td>Record was explicitly fixed by human</td>
+<td>Set to <code>TRUE</code> by <code>apply_manual_corrections.R</code>
+</td>
+</tr>
+<tr>
+<td><code>human_metric_review_status</code></td>
+<td>Human metric review decision</td>
+<td>
+<code>confirmed_not_error_do_not_correct</code> = reviewed &amp; confirmed correct</td>
+<td>Set by <code>apply_metric_review_acceptances.R</code> / <code>apply_metric_review_acceptances()</code>
+</td>
+</tr>
+<tr>
+<td><code>human_metric_review_note</code></td>
+<td>Reviewer’s free-text note</td>
+<td>Context for future auditors</td>
+<td>Free text</td>
+</tr>
+<tr>
+<td><code>correction_type</code></td>
+<td>Applied correction type</td>
+<td>e.g., <code>bed_sleep_swap_3h</code>, <code>sleep_reduce_12h_loop</code>
+</td>
+<td>Populated by correction engine</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Flag lifecycle:</strong></p>
+<pre><code>Record flagged (needs_review_flag=TRUE)
+    ↓ Human reviews
+    ├── Confirmed error → apply_manual_corrections.R → manually_corrected=TRUE
+    ├── Confirmed OK → human_metric_review_status="confirmed_not_error_do_not_correct"
+    └── Deferred / unsure → needs_review_flag remains TRUE</code></pre>
+<p><strong>Key design principles:</strong></p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>Flags are never silently cleared</strong> — a flag persists until explicit human action (<code>manually_corrected=TRUE</code> or <code>human_metric_review_status=confirmed_not_error_do_not_correct</code>).</li>
+<li>
+<strong>Flags are additive</strong> — a record can carry multiple flags simultaneously (e.g., TIMESTAMP + DURATION + SELF_REPORTED).</li>
+<li>
+<strong>Resolution is explicit</strong> — a flag is “resolved” only by setting <code>manually_corrected=TRUE</code> or <code>human_metric_review_status=confirmed_not_error_do_not_correct</code>; there is no implicit “auto-resolve”.</li>
+<li>
+<strong>Flags persist in outputs</strong> — Dataset A (full) retains all flags for audit; Dataset B (minimal) includes only <code>needs_review_flag</code> and <code>correction_type</code> for downstream analysis.</li>
+</ol>
+<p><strong>Current flag categories</strong> (from <code>checkforerrors_processing.R</code> and METHODS Stage 7):</p>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr>
+<th>Category</th>
+<th>Sub-types</th>
+<th>Meaning</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><strong>TIMESTAMP</strong></td>
+<td>Sequence/range violations (bed/sleep/awake/getup times)</td>
+<td>e.g., hour&gt;23, malformed colon, inverted sequences</td>
+</tr>
+<tr>
+<td><strong>DURATION</strong></td>
+<td>Interval/format errors (SOL, WASO)</td>
+<td>e.g., MM:SS vs HH:MM confusion, plausibility violations</td>
+</tr>
+<tr>
+<td><strong>AMOUNT</strong></td>
+<td>Substance input anomalies</td>
+<td>negative, excessive digits, filler codes (888/999)</td>
+</tr>
+<tr>
+<td><strong>SELF_REPORTED</strong></td>
+<td>SOL/WASO vs timestamp-window mismatch</td>
+<td>SOL &gt; bed→sleep window, SE&gt;100%, etc.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Historical flag statistics (v1.4.5 report-only audit, 13,990 rows; the current review queue is in Evidence at a glance above, and each run prints its own):</strong> 1,048 records flagged (7.5%); 0 AUTO_FIX; 0 silent corrections. Breakdown: 922 TIMESTAMP (window violations), 140 DURATION (order violations), 1 SELF_REPORTED (extreme), 1 redundancy-confirmed worsening. See <code>VALIDATION_REPORT.md</code> for full breakdown.</p>
+</div>
+<div class="section level3">
+<h3 id="validation-map">Validation Map<a class="anchor" aria-label="anchor" href="#validation-map"></a>
+</h3>
+<pre><code>SYNTHETIC TIER (ground truth)
+──────────────────────────────
+Step 1  Clean-input specificity ── 10k clean records → 0 changes/flags
+Step 2  Injected-error benchmark ── detection recall 0.995 [0.993, 0.997]
+Step 3  Detection vs correctness ── L1 vs L3 gap → routes to human
+Step 4  Controls ── no_cleaning 0 / naive_rule 0.623 / pipeline 0.995
+
+REAL-DATA TIER (13,990 rows, 237 participants)
+──────────────────────────────
+Step 5  Redundant-channel ── 80/81 corrections improve (98.8%)
+Step 5.5  Bland-Altman ── SOL ±75-min noise band; WASO 3.3× above noise
+Step 6  Report-only audit (v1.4.5) ── 0 AUTO_FIX, 1,048 FLAG
+Step 7  Human co-review ── 64–89% agreement
+
+ROBUSTNESS TIER
+──────────────────────────────
+Step 8  Multiverse + seeds ── recall stable 0.993–0.995</code></pre>
 <blockquote>
 <p><strong>Naming note:</strong> The R package is called <strong>sleepcleanr</strong> (CRAN convention: no hyphens). The GitHub repository is <strong>sleepdiary-cleaner</strong>. They are the same project — install via <code>renv::install("cyracaid/sleepdiary-cleaner")</code> and then <code><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">library(sleepcleanr)</a></code>.</p>
+</blockquote>
+<blockquote>
+<p><strong>Validation statistics source:</strong> All validation statistics above (recall 0.995, 99% improvement, 0% silent misrepair for SOL/WASO, etc.) are derived from benchmarks run against <code>sleepcleanr</code> as of the v1.4.5 audit, except where a line says otherwise. The synthetic benchmark (<code>validation/synthetic/results/detection_outcomes_v4_current.csv</code>, 5,391 injected rows) regenerates from fixed seeds and can be re-run on the current code (see <code>validation/README.md</code>); the real-data audit (13,990 rows) cannot be re-run without the study data. These statistics supersede any earlier pre-patch numbers. See <code>VALIDATION_REPORT.md</code> and <code>validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md</code> for the full evidence package.</p>
 </blockquote>
 </div>
 </div>
 <div class="section level2">
 <h2 id="status-and-data-availability">Status and data availability<a class="anchor" aria-label="anchor" href="#status-and-data-availability"></a>
 </h2>
-<p><strong>Status.</strong> sleepcleanr (the development version after 1.8.0) is research software under active development. It was built for one longitudinal sleep study, has not yet been peer reviewed, and is not on CRAN. Treat the shipped thresholds as references to check against your own data.</p>
+<p><strong>Status.</strong> sleepcleanr 1.8.0 is research software under active development. It was built for one longitudinal sleep study, has not yet been peer reviewed, and is not on CRAN. Treat the shipped thresholds as references to check against your own data.</p>
 <p><strong>Data availability.</strong> The study data are not public (participant privacy). What you can use without them:</p>
 <ul>
 <li>a bundled synthetic fixture (<code>inst/extdata/</code>, 280 rows, 20 participants) that <code><a href="reference/run_pipeline.html">run_pipeline()</a></code> runs on by default;</li>
-<li>the synthetic benchmark, which regenerates its own data from fixed seeds, so every benchmark number can be re-run (see <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/validation/README.md" class="external-link"><code>validation/README.md</code></a>);</li>
+<li>the synthetic benchmark, which regenerates its own data from fixed seeds, so every benchmark number can be re-run (see <a href="validation/README.html"><code>validation/README.md</code></a>);</li>
 <li>two public diary datasets with adaptation scripts (<code>validation/external/</code>).</li>
 </ul>
 <p>The few numbers that come from the study data (for example the redundant-channel check) are reported in <code>VALIDATION_REPORT.md</code> and cannot be re-run without access to those data.</p>
@@ -246,6 +435,40 @@
 </ul>
 </div>
 <div class="section level2">
+<h2 id="install">Install<a class="anchor" aria-label="anchor" href="#install"></a>
+</h2>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># From GitHub (not yet on CRAN)</span></span>
+<span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner"</span><span class="op">)</span></span>
+<span><span class="co"># or: pak::pak("cyracaid/sleepdiary-cleaner")</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
+</h2>
+<p>Shortest path: point <code><a href="reference/clean_sleep_diary.html">clean_sleep_diary()</a></code> at your file; no config needed.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/clean_sleep_diary.html">clean_sleep_diary</a></span><span class="op">(</span><span class="st">"my_diary.csv"</span><span class="op">)</span>          <span class="co"># .csv / .rds / .xlsx / data.frame</span></span>
+<span><span class="va">res</span><span class="op">$</span><span class="va">cleaned</span>                                       <span class="co"># cleaned Dataset A</span></span>
+<span><span class="va">res</span><span class="op">$</span><span class="va">guesses</span>                                       <span class="co"># how each column was mapped</span></span>
+<span><span class="va">res</span><span class="op">$</span><span class="va">manifest</span>                                      <span class="co"># provenance: input hash, config, step ledger</span></span>
+<span><span class="co"># Preview the inferred mapping without running anything:</span></span>
+<span><span class="fu"><a href="reference/clean_sleep_diary.html">clean_sleep_diary</a></span><span class="op">(</span><span class="st">"my_diary.csv"</span>, dry_run <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># writes dry_run_manifest.json, no data written</span></span></code></pre></div>
+<p>Other entries:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Demo run on the bundled synthetic fixture</span></span>
+<span><span class="fu"><a href="reference/run_pipeline.html">run_pipeline</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Config-file route: copy the template, map your columns, run again</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"config_template.yaml"</span>, package <span class="op">=</span> <span class="st">"sleepcleanr"</span><span class="op">)</span>,</span>
+<span>          <span class="st">"my_study.yaml"</span><span class="op">)</span></span>
+<span><span class="co"># edit my_study.yaml → run_pipeline(config = "my_study.yaml")</span></span></code></pre></div>
+<blockquote>
+<p><strong>Shell note:</strong> the review worksheets are named <code>[NEW]manual_*.csv</code>. The square brackets are glob characters, so quote the name in a shell: <code>open "[NEW]manual_error_correction_review.csv"</code>.</p>
+</blockquote>
+</div>
+<div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h2>
 <p>Cite the software with its Zenodo DOI (the concept DOI always resolves to the latest version; each release also has its own version DOI):</p>
@@ -257,7 +480,7 @@
 <div class="section level2">
 <h2 id="run-the-tests-report-a-problem-contribute">Run the tests, report a problem, contribute<a class="anchor" aria-label="anchor" href="#run-the-tests-report-a-problem-contribute"></a>
 </h2>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span>   <span class="co"># from a clone of the repository; the same suite runs in CI</span></span></code></pre></div>
 <p>Bugs, questions and feature requests: open an <a href="https://github.com/cyracaid/sleepdiary-cleaner/issues" class="external-link">issue</a>. Contribution guidelines are in <a href="CONTRIBUTING.html"><code>CONTRIBUTING.md</code></a>.</p>
 </div>
@@ -274,8 +497,6 @@
 <li>vignette(“column-mapping”) — input data and configuration: mapping your dataset via YAML</li>
 <li>vignette(“data-first”) — <code><a href="reference/clean_sleep_diary.html">clean_sleep_diary()</a></code>: no-config entry, column auto-guess, run manifest</li>
 <li>vignette(“interpreting-output”) — reading the output and the review loop (<code>correction_status_final.csv</code>, the review status table, figures)</li>
-<li>vignette(“review-flags”) — flag columns and lifecycle, the terms in the validation tables, <code><a href="reference/sync_human_review_status.html">sync_human_review_status()</a></code>
-</li>
 <li>vignette(“output-files”) — every file a run writes: where it goes, which step writes it, what it is</li>
 <li>vignette(“troubleshooting”) — symptom, cause and fix for the problems seen most often</li>
 <li>
@@ -360,7 +581,81 @@
 </tr>
 </tbody>
 </table>
-<!-- AUTO:ARCH_END --><hr>
+<!-- AUTO:ARCH_END -->
+</div>
+</div>
+<div class="section level2">
+<h2 id="sync-human-review-status">Sync Human Review Status<a class="anchor" aria-label="anchor" href="#sync-human-review-status"></a>
+</h2>
+<p>sleepcleanr provides a utility to synchronize human review status fields in the metric review acceptance CSV file.</p>
+<div class="section level3">
+<h3 id="sync_human_review_status">
+<code>sync_human_review_status()</code><a class="anchor" aria-label="anchor" href="#sync_human_review_status"></a>
+</h3>
+<p>Automatically synchronizes review status fields in <code>manual_metric_review_acceptances.csv</code> based on human review traces.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/sync_human_review_status.html">sync_human_review_status</a></span><span class="op">(</span><span class="st">"manual_metric_review_acceptances.csv"</span><span class="op">)</span></span></code></pre></div>
+<p><strong>What it does:</strong></p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>Detects human review traces</strong> by checking:
+<ul>
+<li>
+<code>human_metric_review_note</code> (non-empty reviewer notes)</li>
+<li>
+<code>resolved_at</code> (resolution timestamp)</li>
+<li>
+<code>resolved_by</code> (resolution actor)</li>
+</ul>
+</li>
+<li>
+<strong>Updates three columns</strong> based on detected traces:
+<ul>
+<li>
+<code>review_resolution</code>: <code>"corrected"</code> / <code>"flagged_unresolved"</code> / <code>"legacy"</code>
+</li>
+<li>
+<code>resolved_at</code>: Resolution date (only for <code>corrected</code>)</li>
+<li>
+<code>resolved_by</code>: <code>"system"</code> / <code>"pending"</code> / <code>"legacy"</code>
+</li>
+</ul>
+</li>
+</ol>
+<p><strong>Resolution Logic:</strong></p>
+<table class="table">
+<thead><tr>
+<th>Condition</th>
+<th><code>review_resolution</code></th>
+<th><code>resolved_at</code></th>
+<th><code>resolved_by</code></th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Explicit <code>corrected</code> flag</td>
+<td><code>"corrected"</code></td>
+<td>Today</td>
+<td><code>"system"</code></td>
+</tr>
+<tr>
+<td>Human traces + legacy/NA</td>
+<td><code>"flagged_unresolved"</code></td>
+<td>NA</td>
+<td><code>"pending"</code></td>
+</tr>
+<tr>
+<td>No traces + legacy</td>
+<td><code>"legacy"</code></td>
+<td>NA</td>
+<td><code>"legacy"</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output:</strong></p>
+<pre><code>✓ Synced 161 rows: 1 corrected, 43 flagged, 117 legacy</code></pre>
+<p><strong>Running it:</strong> <code><a href="reference/run_pipeline.html">run_pipeline()</a></code> does not call this function; run it by hand after you edit the review CSV.</p>
+<hr>
 <p><a name="%E4%B8%AD%E6%96%87"></a></p>
 </div>
 </div>
@@ -402,43 +697,10 @@
 <strong>可复现。</strong> YAML 配置、<code>renv.lock</code>，以及在 CI 中运行的测试套件（R-CMD-check、Codecov）。</li>
 </ol>
 </div>
-<div class="section level2">
-<h2 id="安装">安装<a class="anchor" aria-label="anchor" href="#%E5%AE%89%E8%A3%85"></a>
-</h2>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># 从 GitHub 安装（尚未上线 CRAN，包名 sleepcleanr）</span></span>
-<span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner"</span><span class="op">)</span></span>
-<span><span class="co"># 或：pak::pak("cyracaid/sleepdiary-cleaner")</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="快速开始">快速开始<a class="anchor" aria-label="anchor" href="#%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B"></a>
-</h2>
-<p>最短路径：把 <code><a href="reference/clean_sleep_diary.html">clean_sleep_diary()</a></code> 指向你的文件，无需配置。</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/clean_sleep_diary.html">clean_sleep_diary</a></span><span class="op">(</span><span class="st">"my_diary.csv"</span><span class="op">)</span>          <span class="co"># .csv / .rds / .xlsx / data.frame</span></span>
-<span><span class="va">res</span><span class="op">$</span><span class="va">cleaned</span>                                       <span class="co"># 清洗后的数据集 A</span></span>
-<span><span class="va">res</span><span class="op">$</span><span class="va">guesses</span>                                       <span class="co"># 每一列是怎么映射的</span></span>
-<span><span class="va">res</span><span class="op">$</span><span class="va">manifest</span>                                      <span class="co"># 来源记录：输入哈希、配置、步骤台账</span></span>
-<span><span class="co"># 只预览推断出的映射，不运行任何东西：</span></span>
-<span><span class="fu"><a href="reference/clean_sleep_diary.html">clean_sleep_diary</a></span><span class="op">(</span><span class="st">"my_diary.csv"</span>, dry_run <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># 写出 dry_run_manifest.json，不写数据</span></span></code></pre></div>
-<p>其他入口：</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># 用内置合成数据跑演示</span></span>
-<span><span class="fu"><a href="reference/run_pipeline.html">run_pipeline</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># 配置文件路线：复制模板、映射列名、再跑</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"config_template.yaml"</span>, package <span class="op">=</span> <span class="st">"sleepcleanr"</span><span class="op">)</span>,</span>
-<span>          <span class="st">"my_study.yaml"</span><span class="op">)</span></span>
-<span><span class="co"># 编辑 my_study.yaml → run_pipeline(config = "my_study.yaml")</span></span></code></pre></div>
-<blockquote>
-<p><strong>Shell 提示：</strong> 评审工作表的文件名是 <code>[NEW]manual_*.csv</code>。方括号是通配符， 在 shell 里要给文件名加引号：<code>open "[NEW]manual_error_correction_review.csv"</code>。</p>
-</blockquote>
 <div class="section level3">
 <h3 id="证据一览">证据一览<a class="anchor" aria-label="anchor" href="#%E8%AF%81%E6%8D%AE%E4%B8%80%E8%A7%88"></a>
 </h3>
-<p>完整证据包见 <a href="VALIDATION_REPORT-zh.html">VALIDATION_REPORT-zh.md</a>（<a href="VALIDATION_REPORT.html">English</a>）。摘要：</p>
+<p>完整证据包见 <a href="VALIDATION_REPORT.html">VALIDATION_REPORT.md</a>。摘要：</p>
 <ul>
 <li>
 <strong>合成真值</strong>（14 类共 5,391 条注入错误，另有 1,609 行干净对照）：检出率 <strong>0.995</strong> [0.993, 0.997]，特异度 1.0。“检出”指记录被标记，不代表恢复了正确值——修正层面的召回率更低，验证报告里按错误类别分别给出。</li>
@@ -447,10 +709,6 @@
 <li>
 <strong>外部公开数据集</strong>：经一段简短的转换脚本，管线可在其他 schema 上运行。这些数据集没有已知错误，所以只是可行性检查，不是准确性验证。</li>
 </ul>
-<div class="float">
-<img src="https://raw.githubusercontent.com/cyracaid/sleepdiary-cleaner/main/man/img/flag-dashboard-synthetic.png" alt="内置合成数据的 flag 仪表盘：280 条记录中有 23 条被标记待审，按问题类型划分"><div class="figcaption">内置合成数据的 flag 仪表盘：280 条记录中有 23 条被标记待审，按问题类型划分</div>
-</div>
-<p><em>图 14，来自在内置合成数据（280 行）上的一次运行：一轮运行结束时管线标记待审的内容。</em></p>
 <p>早期的自动化版本曾静默地误修条目；合成基准发现并堵住了这些缺陷，目前的基准显示 SOL/WASO 的静默误修率为 0%。</p>
 </div>
 <div class="section level3">
@@ -461,34 +719,256 @@
 <li>
 <strong>不全自动：</strong> 高置信、仅涉时序/AM-PM 的规则才安全自动修正；但值级错误（如 SOL 与就寝→入睡窗口的矛盾）绝不覆盖 — 一个看似偏大的 SOL 是真实的心理信号，静默”修正”会破坏管线所服务的睡眠–情绪关联。</li>
 <li>
-<strong>不全 flag</strong>：把每个分歧都标出来，手动看不过来（v1.4.5 只报告审计标记了 1,048 行；当前一轮运行留下 226 行待审，不应用人工文件则为 307 行）。高置信规则处理确定性个案；FLAG 只把歧义个案留给人审。</li>
+<strong>不全 flag</strong>：1048 行 FLAG 队列（v1.4.5 只报告审计）手动看不过来。高置信规则吃掉确定性个案；FLAG 只把歧义个案留给人审。</li>
 </ul>
 <p>结果不是”管线把 mess 洗干净”，而是把 mess <strong>显式化</strong>：每个候选错误要么被呈现，要么被记录，永不被静默隐藏。每轮 run 会在<strong>项目根目录</strong>（不是 <code>output/</code>）重新生成两张人工评审工作表：<code>[NEW]manual_error_correction_review.csv</code> 与 <code>[NEW]manual_unusual_review.csv</code>——填好后以 <code>include_manual_corrections = TRUE</code> 重跑即应用。</p>
 <blockquote>
-<p><strong>阈值只是参考，不是教条。</strong> 这里的 swap/flip 阈值（如 3 小时相邻对调、12 小时 AM/PM 翻转）在我们的数据集上验证过 — 见 VALIDATION_REPORT-zh。你的研究日记可能落在这区间内或外；它们都是 YAML 可配置的，应按你自己的数据重新审视，而非盲抄。</p>
+<p><strong>阈值只是参考，不是教条。</strong> 这里的 swap/flip 阈值（如 3 小时相邻对调、12 小时 AM/PM 翻转）在我们的数据集上验证过 — 见 VALIDATION_REPORT。你的研究日记可能落在这区间内或外；它们都是 YAML 可配置的，应按你自己的数据重新审视，而非盲抄。</p>
 </blockquote>
 </div>
 <div class="section level3">
-<h3 id="flag术语与阈值">Flag、术语与阈值<a class="anchor" aria-label="anchor" href="#flag%E6%9C%AF%E8%AF%AD%E4%B8%8E%E9%98%88%E5%80%BC"></a>
+<h3 id="术语">术语<a class="anchor" aria-label="anchor" href="#%E6%9C%AF%E8%AF%AD"></a>
 </h3>
-<p>flag 各列、flag 生命周期、验证表里用到的术语（L1/L3 召回、FCR、FAR、M1/M4/M5）以及 <code><a href="reference/sync_human_review_status.html">sync_human_review_status()</a></code>，见文章 <code><a href="articles/review-flags-zh.html">vignette("review-flags-zh")</a></code>（Flag、术语与审核流程）。 检测阈值及其默认值与依据，见<a href="THRESHOLDS-zh.html">阈值</a>页。</p>
-<p>验证地图（合成层、真实数据层、稳健性层）以及每个数字的来源，见 <code><a href="articles/validation-methodology-zh.html">vignette("validation-methodology-zh")</a></code>。</p>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr>
+<th>术语</th>
+<th>含义</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><strong>检出召回 (L1)</strong></td>
+<td>管线有所动作（标记或修正）的注入错误所占比例</td>
+</tr>
+<tr>
+<td><strong>修正层召回 (L3)</strong></td>
+<td>管线恢复出<em>正确值</em>的注入错误所占比例</td>
+</tr>
+<tr>
+<td><strong>FCR</strong></td>
+<td>误修率：被改动的干净记录</td>
+</tr>
+<tr>
+<td><strong>FAR</strong></td>
+<td>误报率：被标记的干净记录</td>
+</tr>
+<tr>
+<td><strong>SPEC</strong></td>
+<td>特异度（干净记录未被触动的比例）</td>
+</tr>
+<tr>
+<td><strong>M1 / M4 / M5</strong></td>
+<td>真实数据审计规则：M1 顺序违规，M4 就寝→入睡窗口违规，M5 静默恶化候选</td>
+</tr>
+<tr>
+<td><strong>AUTO_FIX</strong></td>
+<td>自动应用、未经人工审核的改动</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="检测阈值默认值">检测阈值默认值<a class="anchor" aria-label="anchor" href="#%E6%A3%80%E6%B5%8B%E9%98%88%E5%80%BC%E9%BB%98%E8%AE%A4%E5%80%BC"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr>
+<th>规则</th>
+<th>默认值</th>
+<th>依据</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+<code>timestamp.sequence.max_gap_hours</code>（AM/PM 翻转）</td>
+<td>12 h</td>
+<td>假设不存在 ≥ 12 h 的合理间隔</td>
+</tr>
+<tr>
+<td>相邻对调阈值</td>
+<td>3 h</td>
+<td>在开发样本上调得；见 VALIDATION_REPORT</td>
+</tr>
+<tr>
+<td><code>metric_validation.sol.excessive_minutes</code></td>
+<td>120</td>
+<td>抓严重离群值，不是临床标志</td>
+</tr>
+<tr>
+<td>
+<code>metric_validation.se.min_valid_percent</code> / <code>max_valid_percent</code>
+</td>
+<td>0 / 100</td>
+<td>结构上不可能 → 一律标记</td>
+</tr>
+</tbody>
+</table>
+<p>完整依据与修改指引：<a href="THRESHOLDS.html">THRESHOLDS.md</a>。</p>
+</div>
+<div class="section level3">
+<h3 id="flag-系统与人工审核流程">Flag 系统与人工审核流程<a class="anchor" aria-label="anchor" href="#flag-%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%BA%BA%E5%B7%A5%E5%AE%A1%E6%A0%B8%E6%B5%81%E7%A8%8B"></a>
+</h3>
+<p>sleepcleanr 用一套结构化的 flag 系统把记录送进人工审核流程。每条记录可同时带多个 flag；flag 是<strong>叠加</strong>的，且<strong>不会被静默清除</strong>——直到人工明确处理才解除。</p>
+<table class="table">
+<colgroup>
+<col width="25%">
+<col width="25%">
+<col width="25%">
+<col width="25%">
+</colgroup>
+<thead><tr>
+<th>Flag / 列</th>
+<th>触发</th>
+<th>含义</th>
+<th>解除方式</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code>needs_review_flag</code></td>
+<td>任一检测规则触发</td>
+<td>记录需要人工关注</td>
+<td>人工审核后设 <code>manually_corrected=TRUE</code> 或 <code>human_metric_review_status=confirmed_not_error_do_not_correct</code>
+</td>
+</tr>
+<tr>
+<td><code>auto_error_desc</code></td>
+<td>自动检测逻辑</td>
+<td>机器可读的标记原因</td>
+<td>供审核者参考</td>
+</tr>
+<tr>
+<td>
+<code>error_type</code> / <code>unusual_type</code>
+</td>
+<td>步骤 5 分类</td>
+<td>错误类别（TIMESTAMP、DURATION、SELF_REPORTED 等）</td>
+<td>供审核者参考；驱动图 6 的分类</td>
+</tr>
+<tr>
+<td><code>manually_corrected</code></td>
+<td>人工经 <code>apply_manual_corrections.R</code> 修正</td>
+<td>记录已被人工明确修正</td>
+<td>由 <code>apply_manual_corrections.R</code> 设为 <code>TRUE</code>
+</td>
+</tr>
+<tr>
+<td><code>human_metric_review_status</code></td>
+<td>人工指标审核决定</td>
+<td>
+<code>confirmed_not_error_do_not_correct</code> = 已审核并确认无误</td>
+<td>由 <code>apply_metric_review_acceptances.R</code> / <code>apply_metric_review_acceptances()</code> 设置</td>
+</tr>
+<tr>
+<td><code>human_metric_review_note</code></td>
+<td>审核者的自由文本备注</td>
+<td>给后来的审计者的背景</td>
+<td>自由文本</td>
+</tr>
+<tr>
+<td><code>correction_type</code></td>
+<td>已应用的修正类型</td>
+<td>如 <code>bed_sleep_swap_3h</code>、<code>sleep_reduce_12h_loop</code>
+</td>
+<td>由修正引擎填写</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Flag 生命周期：</strong></p>
+<pre><code>记录被标记 (needs_review_flag=TRUE)
+    ↓ 人工审核
+    ├── 确认是错误 → apply_manual_corrections.R → manually_corrected=TRUE
+    ├── 确认没问题 → human_metric_review_status="confirmed_not_error_do_not_correct"
+    └── 搁置 / 不确定 → needs_review_flag 保持 TRUE</code></pre>
+<p><strong>设计原则：</strong></p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>Flag 不会被静默清除</strong>——必须有明确的人工动作（<code>manually_corrected=TRUE</code> 或 <code>human_metric_review_status=confirmed_not_error_do_not_correct</code>）。</li>
+<li>
+<strong>Flag 可叠加</strong>——一条记录可同时带多个 flag（如 TIMESTAMP + DURATION + SELF_REPORTED）。</li>
+<li>
+<strong>解除是显式的</strong>——只有设置 <code>manually_corrected=TRUE</code> 或 <code>human_metric_review_status=confirmed_not_error_do_not_correct</code> 才算“已解决”，不存在隐式的“自动解决”。</li>
+<li>
+<strong>Flag 保留在输出中</strong>——数据集 A（完整版）保留全部 flag 供审计；数据集 B（精简版）只含 <code>needs_review_flag</code> 和 <code>correction_type</code>，供下游分析。</li>
+</ol>
+<p><strong>当前的 flag 类别</strong>（来自 <code>checkforerrors_processing.R</code> 和 METHODS 第 7 阶段）：</p>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr>
+<th>类别</th>
+<th>子类型</th>
+<th>含义</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><strong>TIMESTAMP</strong></td>
+<td>顺序/范围违规（就寝/入睡/醒来/起床时间）</td>
+<td>如小时 &gt; 23、冒号格式错误、顺序颠倒</td>
+</tr>
+<tr>
+<td><strong>DURATION</strong></td>
+<td>间隔/格式错误（SOL、WASO）</td>
+<td>如 MM:SS 与 HH:MM 混淆、不合理的值</td>
+</tr>
+<tr>
+<td><strong>AMOUNT</strong></td>
+<td>物质摄入量异常</td>
+<td>负数、位数过多、占位码（888/999）</td>
+</tr>
+<tr>
+<td><strong>SELF_REPORTED</strong></td>
+<td>SOL/WASO 与时间戳窗口不一致</td>
+<td>SOL 大于就寝→入睡窗口、SE&gt;100% 等</td>
+</tr>
+</tbody>
+</table>
+<p><strong>历史 flag 统计（v1.4.5 只报告审计，13,990 行；当前审核队列见上文“证据一览”，每轮运行也会打印自己的）：</strong> 1,048 条记录被标记（7.5%）；0 条 AUTO_FIX；0 条静默修正。分布：922 TIMESTAMP（窗口违规）、140 DURATION（顺序违规）、1 SELF_REPORTED（极端值）、1 冗余确认的恶化。完整分布见 <code>VALIDATION_REPORT.md</code>。</p>
+</div>
+<div class="section level3">
+<h3 id="验证地图">验证地图<a class="anchor" aria-label="anchor" href="#%E9%AA%8C%E8%AF%81%E5%9C%B0%E5%9B%BE"></a>
+</h3>
+<pre><code>合成层（有真值）
+──────────────────────────────
+步骤 1  干净输入特异度 ── 1 万条干净记录 → 0 改动/0 标记
+步骤 2  注入错误基准 ── 检出召回 0.995 [0.993, 0.997]
+步骤 3  检出 vs 正确性 ── L1 与 L3 的差距 → 交给人工
+步骤 4  对照 ── no_cleaning 0 / naive_rule 0.623 / pipeline 0.995
+
+真实数据层（13,990 行，237 名参与者）
+──────────────────────────────
+步骤 5  冗余通道 ── 80/81 条修正使数据更好（98.8%）
+步骤 5.5  Bland-Altman ── SOL 噪声带 ±75 分钟；WASO 高出噪声 3.3 倍
+步骤 6  只报告审计 (v1.4.5) ── 0 AUTO_FIX，1,048 FLAG
+步骤 7  人工共审 ── 一致率 64–89%
+
+稳健性层
+──────────────────────────────
+步骤 8  多重宇宙 + 多个种子 ── 召回稳定在 0.993–0.995</code></pre>
 <blockquote>
 <p><strong>命名说明：</strong> R 包名为 <strong>sleepcleanr</strong>（CRAN 规范不允许连字符）， GitHub 仓库名为 <strong>sleepdiary-cleaner</strong>。两者是同一项目 — 安装用 <code>renv::install("cyracaid/sleepdiary-cleaner")</code>，加载用 <code><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">library(sleepcleanr)</a></code>。</p>
 </blockquote>
 </div>
-</div>
 <div class="section level2">
 <h2 id="状态与数据可用性">状态与数据可用性<a class="anchor" aria-label="anchor" href="#%E7%8A%B6%E6%80%81%E4%B8%8E%E6%95%B0%E6%8D%AE%E5%8F%AF%E7%94%A8%E6%80%A7"></a>
 </h2>
-<p><strong>状态。</strong> sleepcleanr（1.8.0 之后的开发版）是仍在开发中的研究软件，为一项纵向睡眠研究而写，尚未经同行评审，也未上线 CRAN。随包给出的阈值只是参考，请用你自己的数据核对。</p>
+<p><strong>状态。</strong> sleepcleanr 1.8.0 是仍在开发中的研究软件，为一项纵向睡眠研究而写，尚未经同行评审，也未上线 CRAN。随包给出的阈值只是参考，请用你自己的数据核对。</p>
 <p><strong>数据可用性。</strong> 研究数据不公开（参与者隐私）。不需要这些数据也能用到的东西：</p>
 <ul>
 <li>内置合成数据（<code>inst/extdata/</code>，280 行、20 名参与者），<code><a href="reference/run_pipeline.html">run_pipeline()</a></code> 默认就跑它；</li>
-<li>合成基准会按固定随机种子自己生成数据，所以基准里的每个数字都可以重跑（见 <a href="https://github.com/cyracaid/sleepdiary-cleaner/blob/main/validation/README.md" class="external-link"><code>validation/README.md</code></a>）；</li>
+<li>合成基准会按固定随机种子自己生成数据，所以基准里的每个数字都可以重跑（见 <a href="validation/README.html"><code>validation/README.md</code></a>）；</li>
 <li>两个公开日记数据集及其转换脚本（<code>validation/external/</code>）。</li>
 </ul>
-<p>少数来自研究数据的数字（例如冗余通道检查）记录在 <code>VALIDATION_REPORT-zh.md</code> 里，没有数据访问权限就无法重跑。</p>
+<p>少数来自研究数据的数字（例如冗余通道检查）记录在 <code>VALIDATION_REPORT.md</code> 里，没有数据访问权限就无法重跑。</p>
 </div>
 <div class="section level2">
 <h2 id="局限">局限<a class="anchor" aria-label="anchor" href="#%E5%B1%80%E9%99%90"></a>
@@ -508,6 +988,40 @@
 </ul>
 </div>
 <div class="section level2">
+<h2 id="安装">安装<a class="anchor" aria-label="anchor" href="#%E5%AE%89%E8%A3%85"></a>
+</h2>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># 从 GitHub 安装（尚未上线 CRAN，包名 sleepcleanr）</span></span>
+<span><span class="fu">renv</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/renv/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cyracaid/sleepdiary-cleaner"</span><span class="op">)</span></span>
+<span><span class="co"># 或：pak::pak("cyracaid/sleepdiary-cleaner")</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="快速开始">快速开始<a class="anchor" aria-label="anchor" href="#%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B"></a>
+</h2>
+<p>最短路径：把 <code><a href="reference/clean_sleep_diary.html">clean_sleep_diary()</a></code> 指向你的文件，无需配置。</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/clean_sleep_diary.html">clean_sleep_diary</a></span><span class="op">(</span><span class="st">"my_diary.csv"</span><span class="op">)</span>          <span class="co"># .csv / .rds / .xlsx / data.frame</span></span>
+<span><span class="va">res</span><span class="op">$</span><span class="va">cleaned</span>                                       <span class="co"># 清洗后的数据集 A</span></span>
+<span><span class="va">res</span><span class="op">$</span><span class="va">guesses</span>                                       <span class="co"># 每一列是怎么映射的</span></span>
+<span><span class="va">res</span><span class="op">$</span><span class="va">manifest</span>                                      <span class="co"># 来源记录：输入哈希、配置、步骤台账</span></span>
+<span><span class="co"># 只预览推断出的映射，不运行任何东西：</span></span>
+<span><span class="fu"><a href="reference/clean_sleep_diary.html">clean_sleep_diary</a></span><span class="op">(</span><span class="st">"my_diary.csv"</span>, dry_run <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># 写出 dry_run_manifest.json，不写数据</span></span></code></pre></div>
+<p>其他入口：</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># 用内置合成数据跑演示</span></span>
+<span><span class="fu"><a href="reference/run_pipeline.html">run_pipeline</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 配置文件路线：复制模板、映射列名、再跑</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"config_template.yaml"</span>, package <span class="op">=</span> <span class="st">"sleepcleanr"</span><span class="op">)</span>,</span>
+<span>          <span class="st">"my_study.yaml"</span><span class="op">)</span></span>
+<span><span class="co"># 编辑 my_study.yaml → run_pipeline(config = "my_study.yaml")</span></span></code></pre></div>
+<blockquote>
+<p><strong>Shell 提示：</strong> 评审工作表的文件名是 <code>[NEW]manual_*.csv</code>。方括号是通配符， 在 shell 里要给文件名加引号：<code>open "[NEW]manual_error_correction_review.csv"</code>。</p>
+</blockquote>
+</div>
+<div class="section level2">
 <h2 id="引用">引用<a class="anchor" aria-label="anchor" href="#%E5%BC%95%E7%94%A8"></a>
 </h2>
 <p>请用 Zenodo DOI 引用本软件（总 DOI 永远指向最新版本，每个 release 另有自己的版本 DOI）：</p>
@@ -519,7 +1033,7 @@
 <div class="section level2">
 <h2 id="运行测试反馈问题参与贡献">运行测试、反馈问题、参与贡献<a class="anchor" aria-label="anchor" href="#%E8%BF%90%E8%A1%8C%E6%B5%8B%E8%AF%95%E5%8F%8D%E9%A6%88%E9%97%AE%E9%A2%98%E5%8F%82%E4%B8%8E%E8%B4%A1%E7%8C%AE"></a>
 </h2>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span>   <span class="co"># 在仓库克隆目录中运行；CI 里跑的是同一套测试</span></span></code></pre></div>
 <p>Bug、问题和功能建议：请开 <a href="https://github.com/cyracaid/sleepdiary-cleaner/issues" class="external-link">issue</a>。 贡献指南见 <a href="CONTRIBUTING.html"><code>CONTRIBUTING.md</code></a>。</p>
 </div>
@@ -530,13 +1044,11 @@
 <li>完整文档站（可检索函数参考 + 双语 vignette）： <a href="https://cyracaid.github.io/sleepdiary-cleaner/" class="uri">https://cyracaid.github.io/sleepdiary-cleaner/</a>
 </li>
 <li>
-<strong>验证报告</strong>（证据包，数字从结果 CSV 机器读取）： <a href="VALIDATION_REPORT-zh.html"><code>VALIDATION_REPORT-zh.md</code></a>
+<strong>验证报告</strong>（证据包，数字从结果 CSV 机器读取）： <a href="VALIDATION_REPORT.html"><code>VALIDATION_REPORT.md</code></a>
 </li>
 <li>vignette(“getting-started-zh”) — 安装、第一次运行、两种模式（<code>include_manual_corrections</code>）</li>
 <li>vignette(“column-mapping-zh”) — 输入数据与配置：用 YAML 映射你的数据集</li>
 <li>vignette(“data-first-zh”) — <code><a href="reference/clean_sleep_diary.html">clean_sleep_diary()</a></code>：免配置入口、列名自动推断、运行清单</li>
-<li>vignette(“review-flags-zh”) — flag 各列与生命周期、验证表里的术语、<code><a href="reference/sync_human_review_status.html">sync_human_review_status()</a></code>
-</li>
 <li>vignette(“interpreting-output-zh”) — 读懂输出与审核循环（<code>correction_status_final.csv</code>、审核状态表、图）</li>
 <li>vignette(“output-files-zh”) — 一次运行写出的每个文件：放哪里、哪一步写出、是什么</li>
 <li>vignette(“troubleshooting-zh”) — 最常见问题的现象、原因和处理办法</li>
@@ -624,6 +1136,73 @@
 </table>
 <!-- AUTO:ARCH_ZH_END -->
 </div>
+</div>
+<div class="section level2">
+<h2 id="同步人工审核状态">同步人工审核状态<a class="anchor" aria-label="anchor" href="#%E5%90%8C%E6%AD%A5%E4%BA%BA%E5%B7%A5%E5%AE%A1%E6%A0%B8%E7%8A%B6%E6%80%81"></a>
+</h2>
+<p><code><a href="reference/sync_human_review_status.html">sync_human_review_status()</a></code> 根据人工审核留下的痕迹，同步 <code>manual_metric_review_acceptances.csv</code> 里的审核状态列。</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cyracaid/sleepdiary-cleaner" class="external-link">sleepcleanr</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/sync_human_review_status.html">sync_human_review_status</a></span><span class="op">(</span><span class="st">"manual_metric_review_acceptances.csv"</span><span class="op">)</span></span></code></pre></div>
+<p><strong>它做什么：</strong></p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>检测人工审核痕迹</strong>，依据：
+<ul>
+<li>
+<code>human_metric_review_note</code>（非空的审核备注）</li>
+<li>
+<code>resolved_at</code>（解决时间）</li>
+<li>
+<code>resolved_by</code>（解决人）</li>
+</ul>
+</li>
+<li>
+<strong>更新三列：</strong>
+<ul>
+<li>
+<code>review_resolution</code>：<code>"corrected"</code> / <code>"flagged_unresolved"</code> / <code>"legacy"</code>
+</li>
+<li>
+<code>resolved_at</code>：解决日期（仅 <code>corrected</code>）</li>
+<li>
+<code>resolved_by</code>：<code>"system"</code> / <code>"pending"</code> / <code>"legacy"</code>
+</li>
+</ul>
+</li>
+</ol>
+<p><strong>解决规则：</strong></p>
+<table class="table">
+<thead><tr>
+<th>条件</th>
+<th><code>review_resolution</code></th>
+<th><code>resolved_at</code></th>
+<th><code>resolved_by</code></th>
+</tr></thead>
+<tbody>
+<tr>
+<td>显式的 <code>corrected</code> 标记</td>
+<td><code>"corrected"</code></td>
+<td>今天</td>
+<td><code>"system"</code></td>
+</tr>
+<tr>
+<td>有痕迹 + legacy/NA</td>
+<td><code>"flagged_unresolved"</code></td>
+<td>NA</td>
+<td><code>"pending"</code></td>
+</tr>
+<tr>
+<td>无痕迹 + legacy</td>
+<td><code>"legacy"</code></td>
+<td>NA</td>
+<td><code>"legacy"</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>输出：</strong></p>
+<pre><code>✓ Synced 161 rows: 1 corrected, 43 flagged, 117 legacy</code></pre>
+<p><strong>运行方式：</strong> <code><a href="reference/run_pipeline.html">run_pipeline()</a></code> 不会调用这个函数；编辑完审核 CSV 后请手动运行。</p>
 </div>
 </div>
 
