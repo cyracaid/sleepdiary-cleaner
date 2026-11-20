@@ -257,4 +257,4 @@ D2 的 44% 只在全因子网格内成立且 **seed 脆弱**：OAT 筛查在 see
 步骤 8  多重宇宙 + 多个种子 ── 召回稳定在 0.993–0.995
 ```
 
-> **验证统计的来源：** 以上所有验证统计（召回率 0.995、80/81 条修正使数据更好即 98.8%、SOL/WASO 的静默误修率 0% 等）来自在 v1.4.5 审计时的 `sleepcleanr` 上运行的基准，除非某行另有说明。合成基准（`validation/synthetic/results/detection_outcomes_v4_current.csv`，5,391 条注入行）按固定随机种子生成，可在当前代码上重跑（见 `validation/README.md`）；真实数据审计（13,990 行）没有研究数据就无法重跑。这些统计取代更早的补丁前数字。完整证据包见 `VALIDATION_REPORT.md` 和 `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md`。
+> **验证统计的来源：** 以上所有验证统计（召回率 0.995、80/81 条修正使数据更好即 98.8%、SOL/WASO 的静默误修率 0% 等）来自在 v1.4.5 审计时的 `sleepcleanr` 上运行的基准，除非某行另有说明。合成基准（`validation/synthetic/results/detection_outcomes_v4_current.csv`，5,391 条注入行）按固定随机种子生成，可在当前代码上重跑（见 `validation/README.md`）；真实数据审计（13,990 行）没有研究数据就无法重跑。这些统计取代更早的补丁前数字。完整证据包见 `VALIDATION_REPORT-zh.md` 和 `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md`。

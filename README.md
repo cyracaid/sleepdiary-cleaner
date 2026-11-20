@@ -345,7 +345,7 @@ file.copy(system.file("config_template.yaml", package = "sleepcleanr"),
 
 ### 证据一览
 
-完整证据包见 [VALIDATION_REPORT.md](VALIDATION_REPORT.md)。摘要：
+完整证据包见 [VALIDATION_REPORT-zh.md](VALIDATION_REPORT-zh.md)（[English](VALIDATION_REPORT.md)）。摘要：
 
 - **合成真值**（14 类共 5,391 条注入错误，另有 1,609 行干净对照）：检出率 **0.995** [0.993, 0.997]，特异度 1.0。“检出”指记录被标记，不代表恢复了正确值——修正层面的召回率更低，验证报告里按错误类别分别给出。
 - **真实研究数据**（237 名参与者的 13,990 行）：在该研究的运行中，规则对 93 行做了自动的顺序或格式修正（其中 10 行也被审核者修正过），审核者另外修正了 75 行。一轮运行结束时的审核队列：应用人工文件后为 226 行，不应用则为 307 行。13,990 条提交中有 2,848 条四个时间都填了，因此每 1,000 条日记对应 79 和 108 行（占全部提交的 1.6% 和 2.2%）。v1.4.5 审计标记的 1,048 行来自只报告、不改数据的一次运行。
@@ -366,7 +366,7 @@ sleepcleanr 刻意**既非全自动、也非全部人工 flag**：
 
 结果不是"管线把 mess 洗干净"，而是把 mess **显式化**：每个候选错误要么被呈现，要么被记录，永不被静默隐藏。每轮 run 会在**项目根目录**（不是 `output/`）重新生成两张人工评审工作表：`[NEW]manual_error_correction_review.csv` 与 `[NEW]manual_unusual_review.csv`——填好后以 `include_manual_corrections = TRUE` 重跑即应用。
 
-> **阈值只是参考，不是教条。** 这里的 swap/flip 阈值（如 3 小时相邻对调、12 小时 AM/PM 翻转）在我们的数据集上验证过 — 见 VALIDATION_REPORT。你的研究日记可能落在这区间内或外；它们都是 YAML 可配置的，应按你自己的数据重新审视，而非盲抄。
+> **阈值只是参考，不是教条。** 这里的 swap/flip 阈值（如 3 小时相邻对调、12 小时 AM/PM 翻转）在我们的数据集上验证过 — 见 VALIDATION_REPORT-zh。你的研究日记可能落在这区间内或外；它们都是 YAML 可配置的，应按你自己的数据重新审视，而非盲抄。
 
 ### Flag、术语与阈值
 
@@ -390,7 +390,7 @@ flag 各列、flag 生命周期、验证表里用到的术语（L1/L3 召回、F
 - 合成基准会按固定随机种子自己生成数据，所以基准里的每个数字都可以重跑（见 [`validation/README.md`](https://github.com/cyracaid/sleepdiary-cleaner/blob/main/validation/README.md)）；
 - 两个公开日记数据集及其转换脚本（`validation/external/`）。
 
-少数来自研究数据的数字（例如冗余通道检查）记录在 `VALIDATION_REPORT.md` 里，没有数据访问权限就无法重跑。
+少数来自研究数据的数字（例如冗余通道检查）记录在 `VALIDATION_REPORT-zh.md` 里，没有数据访问权限就无法重跑。
 
 ## 局限
 
@@ -424,7 +424,7 @@ Bug、问题和功能建议：请开 [issue](https://github.com/cyracaid/sleepdi
 - 完整文档站（可检索函数参考 + 双语 vignette）：
   <https://cyracaid.github.io/sleepdiary-cleaner/>
 - **验证报告**（证据包，数字从结果 CSV 机器读取）：
-  [`VALIDATION_REPORT.md`](VALIDATION_REPORT.md)
+  [`VALIDATION_REPORT-zh.md`](VALIDATION_REPORT-zh.md)
 - vignette("getting-started-zh") — 安装、第一次运行、两种模式（`include_manual_corrections`）
 - vignette("column-mapping-zh") — 输入数据与配置：用 YAML 映射你的数据集
 - vignette("data-first-zh") — `clean_sleep_diary()`：免配置入口、列名自动推断、运行清单
