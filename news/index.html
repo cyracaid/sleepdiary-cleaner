@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sleepcleanr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.8.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.9.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -23,6 +23,7 @@
     <li><a class="dropdown-item" href="../articles/column-mapping.html">Input Data and Configuration</a></li>
     <li><a class="dropdown-item" href="../articles/data-first.html">Data-first entry: clean_sleep_diary()</a></li>
     <li><a class="dropdown-item" href="../articles/interpreting-output.html">Reading the Output and the Review Loop</a></li>
+    <li><a class="dropdown-item" href="../articles/review-flags.html">Flags, terminology and the review workflow</a></li>
     <li><a class="dropdown-item" href="../articles/output-files.html">Output files</a></li>
     <li><a class="dropdown-item" href="../articles/troubleshooting.html">Troubleshooting</a></li>
     <li><a class="dropdown-item" href="../articles/pipeline-architecture.html">Pipeline Architecture</a></li>
@@ -35,6 +36,7 @@
     <li><a class="dropdown-item" href="../articles/column-mapping-zh.html">输入数据与配置</a></li>
     <li><a class="dropdown-item" href="../articles/data-first-zh.html">数据优先入口：clean_sleep_diary()</a></li>
     <li><a class="dropdown-item" href="../articles/interpreting-output-zh.html">读懂输出与审核循环</a></li>
+    <li><a class="dropdown-item" href="../articles/review-flags-zh.html">Flag、术语与审核流程</a></li>
     <li><a class="dropdown-item" href="../articles/output-files-zh.html">输出文件一览</a></li>
     <li><a class="dropdown-item" href="../articles/troubleshooting-zh.html">排错</a></li>
     <li><a class="dropdown-item" href="../articles/pipeline-architecture-zh.html">管线架构</a></li>
@@ -72,22 +74,22 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="sleepcleanr-development-version">sleepcleanr (development version)<a class="anchor" aria-label="anchor" href="#sleepcleanr-development-version"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.9.0" id="sleepcleanr-190">sleepcleanr 1.9.0<a class="anchor" aria-label="anchor" href="#sleepcleanr-190"></a></h2>
 <div class="section level3">
-<h3 id="added-development-version">Added<a class="anchor" aria-label="anchor" href="#added-development-version"></a></h3>
+<h3 id="added-1-9-0">Added<a class="anchor" aria-label="anchor" href="#added-1-9-0"></a></h3>
 <ul><li>
 <code><a href="../reference/classify_reversals.html">classify_reversals()</a></code> and <code><a href="../reference/reversal_summary.html">reversal_summary()</a></code> describe nights whose self-reported times violate bed &lt;= sleep onset &lt;= awakening &lt;= get-up. Each reversed night is classed by the smallest edit that restores the order while keeping the night plausible (two fields exchanged, one field 12 hours away, two fields moved together); nights no edit explains are classed by what is visibly wrong (an impossible get-up value, an awakening before bedtime, a rounding-sized gap). <code>detail</code> names the field, e.g. <code>swap:bed-sleep</code> or <code>pm12h:sleep-12h</code>. Nothing is changed by these functions; they read the pre-correction columns a run already keeps.</li>
 <li>Figure F33 (<code>pipeline_cleaning/F33.png</code>) draws these classes: one row per mechanism, empty rows included, with the number of nights and the share of all out-of-order nights.</li>
 <li>Figures F34 and F35 (<code>pipeline_cleaning/</code>) show what the Step 6.5 clock-time rule did: F34 counts the reinterpreted SOL / WASO entries by outcome (kept as minutes, recomputed, set to missing, left for review); F35 plots each SOL entry typed like a clock time against the person’s own bedtime and sleep onset. Both read <code>output/duration_clock_rule_log.csv</code> and are skipped when the rule saw no entry. There are now 35 figures (19 pipeline-cleaning, 16 research-ready).</li>
 </ul></div>
 <div class="section level3">
-<h3 id="changed-development-version">Changed<a class="anchor" aria-label="anchor" href="#changed-development-version"></a></h3>
+<h3 id="changed-1-9-0">Changed<a class="anchor" aria-label="anchor" href="#changed-1-9-0"></a></h3>
 <ul><li>
 <code>data.timezone</code> (default <code>"America/Los_Angeles"</code>) now sets the IANA zone the diary wall-clock times are parsed in; the zone used to be hard-coded, so a study collected elsewhere had its times read as Pacific. <code>process_timestamp()</code> and <code><a href="../reference/step_process_timestamps.html">step_process_timestamps()</a></code> also take a <code>tz</code> argument.</li>
 <li>The minimum R version is now 4.4. R 4.2 writes midnight times as “00:00:00” where 4.3 and later write the date only (6 golden-table tests failed there), and on R 4.3.3 a diary time inside a spring-forward gap is moved an hour earlier instead of being kept at the first instant that exists (2 tests failed there). Both pass on R 4.4.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="fixed-development-version">Fixed<a class="anchor" aria-label="anchor" href="#fixed-development-version"></a></h3>
+<h3 id="fixed-1-9-0">Fixed<a class="anchor" aria-label="anchor" href="#fixed-1-9-0"></a></h3>
 <ul><li>The sleep/awake order swap in Step 4 no longer acts on an awake time of exactly 00:00. Some participants type 0 (“none”) in that field, and the swap turned such a night into a sleep time of 00:00 that nobody wrote. The row is now left for the temporal-order check and human review. In the study data this changes one row.</li>
 <li>
 <code><a href="../reference/sync_human_review_status.html">sync_human_review_status()</a></code> runs again. It called its own trace check with no argument (<code>argument "row" is missing, with no default</code>), so every call raised an error before writing anything; the check now uses the <code>has_human_trace</code> column the same <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code> already computes. It also stops restamping <code>resolved_at</code> / <code>resolved_by</code> over values a person already recorded: blanks are filled, its own <code>pending</code> placeholder is still refreshed, and an ISO date column is no longer mixed with character values on write-back.</li>

@@ -430,3 +430,37 @@ hidden.
     inflates the flag count) — the ablation table is reported as
     supplementary with a footnote; the primary evidence is the
     multiverse variance decomposition.
+
+## Validation map
+
+    SYNTHETIC TIER (ground truth)
+    ──────────────────────────────
+    Step 1  Clean-input specificity ── 10k clean records → 0 changes/flags
+    Step 2  Injected-error benchmark ── detection recall 0.995 [0.993, 0.997]
+    Step 3  Detection vs correctness ── L1 vs L3 gap → routes to human
+    Step 4  Controls ── no_cleaning 0 / naive_rule 0.623 / pipeline 0.995
+
+    REAL-DATA TIER (13,990 rows, 237 participants)
+    ──────────────────────────────
+    Step 5  Redundant-channel ── 80/81 corrections improve (98.8%)
+    Step 5.5  Bland-Altman ── SOL ±75-min noise band; WASO 3.3× above noise
+    Step 6  Report-only audit (v1.4.5) ── 0 AUTO_FIX, 1,048 FLAG
+    Step 7  Human co-review ── 64–89% agreement
+
+    ROBUSTNESS TIER
+    ──────────────────────────────
+    Step 8  Multiverse + seeds ── recall stable 0.993–0.995
+
+> **Validation statistics source:** All validation statistics above
+> (recall 0.995, 98.8% of corrections improved (80/81), 0% silent
+> misrepair for SOL/WASO, etc.) are derived from benchmarks run against
+> `sleepcleanr` as of the v1.4.5 audit, except where a line says
+> otherwise. The synthetic benchmark
+> (`validation/synthetic/results/detection_outcomes_v4_current.csv`,
+> 5,391 injected rows) regenerates from fixed seeds and can be re-run on
+> the current code (see `validation/README.md`); the real-data audit
+> (13,990 rows) cannot be re-run without the study data. These
+> statistics supersede any earlier pre-patch numbers. See
+> `VALIDATION_REPORT.md` and
+> `validation/synthetic/SYNTHETIC_BENCHMARK_RESULTS.md` for the full
+> evidence package.
