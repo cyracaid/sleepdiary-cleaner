@@ -1,6 +1,8 @@
 # sleepcleanr — Validation Report
 
-_Rendered 2026-09-17 by `validation/render_validation_report.R`. All synthetic numbers are read directly from the result CSVs — nothing below is hand-typed._
+_Rendered 2026-11-20 by `validation/render_validation_report.R`. All synthetic numbers are read directly from the result CSVs — nothing below is hand-typed._
+
+English · [中文](VALIDATION_REPORT-zh.md)
 
 ## Summary
 
@@ -67,6 +69,7 @@ Detection ("the pipeline acted") and correction ("it got the right value") are r
 | **CONTROL (no_error_control)** | 1609 | — | — | — | — | — | — | — |
 
 Pooled precision = 1.000 (flagged injected / (flagged injected + flagged control)); control FAR_flag 0/1609, FAR_alter 0/1609. Source: benchmark_table.csv.
+
 ## Real-data audit
 
 Report-only run over all 13990 real diary records. No data is modified (0 AUTO_FIX).
@@ -116,6 +119,7 @@ SOL thresholds sit inside the reporting-noise band; SOL flags are descriptive in
 | B1 TST shift / B2 n shift | 29.6 min / 1131 records | | |
 
 Seed sensitivity: pooled recall 0.994–0.995 across 4 seeds; control FAR 0 in all.
+
 
 ## Threshold operating-point analysis
 

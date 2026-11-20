@@ -116,6 +116,7 @@ Rplots\.pdf$
 ^AGENTS\.md$
 ^real_data_config\.yaml$
 ^VALIDATION_REPORT\.md$
+^VALIDATION_REPORT-zh\.md$
 ^CITATION\.cff$
 ^\.zenodo\.json$
 ^fasttrack_review\.csv$
