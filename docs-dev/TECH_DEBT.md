@@ -247,7 +247,18 @@ parser is unchanged.
 one RFC 5545 uses), not a measurement of what the person meant; an entry of
 02:30 could as well have been 01:30 by a clock that had not yet been moved.
 The fallback also relies on a one-hour step, with a 30-minute second try for
-zones such as Lord Howe. Checking how many real entries fall in a gap would
-need a read of the study's raw time strings; it has not been done.
+zones such as Lord Howe.
+
+**In the study data (checked 2026-11-20).** The data runs from 2020-08-26 to
+2022-03-24: two spring-forward Sundays (2021-03-14, 2022-03-13) and two fall-back
+Sundays (2020-11-01, 2021-11-07). On the spring-forward days 8 rows have that
+morning date and none has a time typed in 02:00-02:59, so the gap changed no row.
+On the fall-back days 13 rows have that morning date and 3 have a sleep time typed
+in the repeated 01:00-01:59 hour; `process_timestamp()` resolves such a time to the
+later occurrence (standard time). For the two of those rows that have a TST, it
+equals the wall-clock difference less WASO, so no one-hour shift shows there.
+Dates come from the cleaned file (the raw file has none, and its rows line up with
+the cleaned file by position); the zone is the default America/Los_Angeles and the
+data has no zone column, so a participant in another zone is not covered.
 
 **Last updated:** 2026-11-07
