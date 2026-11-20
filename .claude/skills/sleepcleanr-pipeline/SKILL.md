@@ -7,7 +7,7 @@ description: Run, review and maintain the sleepcleanr sleep EMA diary cleaning p
 
 <!-- AUTO:SKILL_FACTS_START -->
 
-**Version:** 1.8.0.9000
+**Version:** 1.9.0
 **Pipeline steps:** 10
 
 | Step | Label | Description |

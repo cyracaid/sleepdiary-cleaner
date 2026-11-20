@@ -1,4 +1,4 @@
-# sleepcleanr (development version)
+# sleepcleanr 1.9.0
 
 ## Added
 * `classify_reversals()` and `reversal_summary()` describe nights whose
