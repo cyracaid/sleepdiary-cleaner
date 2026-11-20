@@ -97,6 +97,9 @@ render_skill_facts <- function(steps, columns, version, n_imports) {
   ))
 }
 
+# zh fields are optional per step; fall back to the English text
+`%||%` <- function(a, b) if (is.null(a)) b else a
+
 render_readme_steps_zh <- function(steps) {
   enc2utf8(unname(c(
     sprintf("**%d 个步骤**（来源：`inst/steps.yaml`）：", length(steps)),
@@ -104,7 +107,8 @@ render_readme_steps_zh <- function(steps) {
     "| 步骤 | 名称 | 说明 |",
     "|------|------|------|",
     vapply(steps, function(s) {
-      sprintf("| %s | %s | %s |", s$id, s$label, s$description)
+      sprintf("| %s | %s | %s |", s$id,
+              s$label_zh %||% s$label, s$description_zh %||% s$description)
     }, character(1))
   )))
 }
