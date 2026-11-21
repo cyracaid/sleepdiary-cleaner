@@ -53,9 +53,15 @@ committed at `validation/synthetic/results/real_mix_outcome.csv`.
 `results/real_mix_outcome.csv` is a byte-identical mirror of
 `validation/synthetic/results/real_mix_outcome.csv`, the copy the results section
 quotes. Keep them identical: if you re-run the script, diff the two.
-`real_mix_run_info.csv` records the package version the table came from
-(1.7.2 at the time of writing, while the source tree is on the 1.8.0
-development version); re-run and compare if the version changes.
+`real_mix_run_info.csv` records the package version the table came from.
+It was first produced with 1.7.2 and re-run with 1.9.0 on 2026-11-21 (in a
+temporary library, outside the repository): `real_mix_outcome.csv` and
+`real_mix_clean_rows.csv` came out byte-identical, so only the run-info row
+changed. Re-run and compare if the version changes again.
+
+Figure F36 (`pipeline_cleaning/F36.png`) draws the eight forms of this table;
+its data file is `inst/extdata/reversal_injection_outcomes.csv`, the same
+numbers with English form names.
 
 The study is healthy young adults on one protocol. These numbers describe that
 sample; they are not a claim about clinical, older-adult or shift-work diaries.
