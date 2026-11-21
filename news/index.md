@@ -13,6 +13,10 @@
   out-of-order nights before and after the corrections, by family of
   mechanism. There are now 37 figures (21 pipeline-cleaning, 16
   research-ready).
+- `detection_outcomes_v4_current.csv`, the table Figure F08 reads, is
+  now shipped in `inst/extdata/`. Before, F08 could only be drawn when
+  the run started in a repository checkout, and was skipped from an
+  installed package.
 
 ## sleepcleanr 1.9.0
 
