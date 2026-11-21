@@ -185,9 +185,9 @@ Per-Step Flag Tracker (Open Second)</a>
 <ul><li>
 <p><a href="#s-9-1-naming">How figures are named</a></p>
 <p>Since 1.7.1 every figure uses one continuous scheme:
-<code>F01</code>-<code>F35</code>. The number matches the file name
+<code>F01</code>-<code>F37</code>. The number matches the file name
 (<code>pipeline_cleaning/F07.png</code>), the in-figure title, and this
-reference. Ranges by family: F01-F16 and F33-F35 live in
+reference. Ranges by family: F01-F16 and F33-F37 live in
 <code>pipeline_cleaning/</code> (the pipeline and detection families
 interleave by build order), F17-F32 in <code>research_ready/</code>.
 Numbers retired by the 1.6.0 reclassification were reassigned – there
@@ -1576,7 +1576,7 @@ or share it.</p>
 <tbody>
 <tr class="odd">
 <td><code>pipeline_cleaning/</code></td>
-<td>19 diagnostic figures: what the pipeline found and changed (cards in
+<td>21 diagnostic figures: what the pipeline found and changed (cards in
 §9.2)</td>
 <td>Checking that cleaning behaved; the audit trail for a
 supplement</td>
@@ -1988,6 +1988,24 @@ Clock-Like Entries vs Own Times</a></td>
 <td>2026-11-03</td>
 </tr>
 <tr class="odd">
+<td><strong>F36</strong></td>
+<td><code>pipeline_cleaning/F36.png</code></td>
+<td>Supplement</td>
+<td><code>sleep_visualization.R:3440</code></td>
+<td><a href="#f36-reversal-forms-synthetic-test">§9.2 · Reversal Forms
+in a Synthetic Test</a></td>
+<td>2026-11-21</td>
+</tr>
+<tr class="even">
+<td><strong>F37</strong></td>
+<td><code>pipeline_cleaning/F37.png</code></td>
+<td>Supplement</td>
+<td><code>sleep_visualization.R:3527</code></td>
+<td><a href="#f37-out-of-order-before-after">§9.2 · Out-of-Order Nights,
+Before and After</a></td>
+<td>2026-11-21</td>
+</tr>
+<tr class="odd">
 <td><strong>F30</strong></td>
 <td><code>research_ready/F30.png</code></td>
 <td>Results</td>
@@ -2026,7 +2044,7 @@ because everything was already reviewed), the skip reason says so
 explicitly.</p>
 <p><a id="s-9-1-naming"></a></p>
 <div class="section level4">
-<h4 id="how-figures-are-named-f01-f35-continuous-since-1-7-1">How figures are named (F01-F35, continuous since 1.7.1)<a class="anchor" aria-label="anchor" href="#how-figures-are-named-f01-f35-continuous-since-1-7-1"></a>
+<h4 id="how-figures-are-named-f01-f37-continuous-since-1-7-1">How figures are named (F01-F37, continuous since 1.7.1)<a class="anchor" aria-label="anchor" href="#how-figures-are-named-f01-f37-continuous-since-1-7-1"></a>
 </h4>
 <ul>
 <li>
@@ -2039,14 +2057,14 @@ output folders: 02 and 03 are in <code>research_ready/</code>, while 06
 and 07 are in <code>pipeline_cleaning/</code>.</li>
 <li>
 <strong>Since 1.7.1 the scheme is continuous:
-<code>F01</code>-<code>F35</code>.</strong> The number is the file name,
+<code>F01</code>-<code>F37</code>.</strong> The number is the file name,
 the in-figure title and this reference. There are no lettered suffixes
 and no gaps: the numbers retired by earlier reorganisations (the old 08,
 12 and 19) were reassigned rather than left empty.</li>
 <li>
 <strong>Families by folder:</strong> <code>pipeline_cleaning/</code>
-holds F01-F16 and F33-F35 (pipeline and detection figures interleaved in
-build order; F33-F35 were added last); <code>research_ready/</code>
+holds F01-F16 and F33-F37 (pipeline and detection figures interleaved in
+build order; F33-F37 were added last); <code>research_ready/</code>
 holds F17-F32. Build-order interleaving within
 <code>pipeline_cleaning/</code> is why a detection figure (F06-F14) can
 carry a higher number than a pipeline one.</li>
@@ -3642,6 +3660,75 @@ both axes are not explained by either time.</p>
 the distance (minutes, 12-hour dial) from the person’s own bedtime and
 sleep onset. The dashed box marks the clock-time rule’s tolerance and
 window.</p>
+</blockquote>
+<p><a id="f36-reversal-forms-synthetic-test"></a></p>
+</div>
+<div class="section level4">
+<h4 id="f36-reversal-forms-in-a-synthetic-test">F36 · Reversal Forms in a Synthetic Test<a class="anchor" aria-label="anchor" href="#f36-reversal-forms-in-a-synthetic-test"></a>
+</h4>
+<p><strong>File</strong> <code>pipeline_cleaning/F36.png</code> —
+generated at <code>sleep_visualization.R:3440</code></p>
+<p><strong>Paper use</strong> Supplement</p>
+<p><strong>Title and subtitle</strong> Title: <em>Out-of-order nights in
+a synthetic test, by form</em>. Subtitle lines: what the figure answers
+(for each kind of reversed night, how often the rules put the time back
+to the true value and how often they change it to something else), how
+the test was built, and the overall rate.</p>
+<p><strong>What each part means</strong> One row per form of reversal,
+sorted from best to worst handled. The bar is the share of injected rows
+put back to the true value (blue at 99% or more, vermillion below), the
+line is the Wilson 95% interval, and the right-hand column counts rows
+the rules changed to a value that is not the true one. These are
+synthetic diaries with known truth: the forms were injected into clean
+rows in the proportions seen in one real study, and the clean rows were
+checked for changes. Source:
+<code>reversal_injection_outcomes.csv</code> (shipped in
+<code>inst/extdata/</code>; produced with sleepcleanr 1.9.0).</p>
+<p><strong>Healthy look</strong> Exchanged times and a single
+sleep-onset or rise time 12 hours out sit at 100% with no wrong
+repairs.</p>
+<p><strong>Anomaly →</strong> A short bar with many “changed, but not to
+the truth” is a form the rules cannot repair: a bed time 12 hours out, a
+whole night shifted, an awakening before bed time. Those nights reach a
+person through the review worksheets; they do not fix themselves.</p>
+<p><strong>Paper caption</strong></p>
+<blockquote>
+<p><strong>Figure 36.</strong> Share of injected out-of-order nights put
+back to the true value, by form, in a synthetic test with the form mix
+of one real study. Bars: percent; lines: Wilson 95% intervals; right
+column: rows changed to a wrong value. Clean rows altered: 0 of
+6,650.</p>
+</blockquote>
+<p><a id="f37-out-of-order-before-after"></a></p>
+</div>
+<div class="section level4">
+<h4 id="f37-out-of-order-nights-before-and-after">F37 · Out-of-Order Nights, Before and After<a class="anchor" aria-label="anchor" href="#f37-out-of-order-nights-before-and-after"></a>
+</h4>
+<p><strong>File</strong> <code>pipeline_cleaning/F37.png</code> —
+generated at <code>sleep_visualization.R:3527</code></p>
+<p><strong>Paper use</strong> Supplement</p>
+<p><strong>Title and subtitle</strong> Title: <em>Out-of-order nights in
+this study, before and after the corrections</em>. Subtitle: how many
+nights were out of order before (the bar length), how many are in order
+and plausible after, and what “plausible” means (SOL 0-300 min, time in
+bed 2-16 h, TST 0.5-12 h).</p>
+<p><strong>What each part means</strong> One bar per family of mechanism
+(the same classes as F33, grouped). The bar length is the number of
+nights out of order before the corrections; its colours are what the
+final data looks like for those nights: in order and plausible, in order
+but implausible, still out of order, or no corrected value. It reads the
+final <code>time_*_corrected</code> columns of this run. It does not say
+whether a night was fixed by the algorithm or by a person, and “in
+order” does not prove the value is the true one.</p>
+<p><strong>Healthy look</strong> Almost all of each bar is blue.</p>
+<p><strong>Anomaly →</strong> Vermillion at the end of a bar: those
+nights are still out of order in the final data and need a person.</p>
+<p><strong>Paper caption</strong></p>
+<blockquote>
+<p><strong>Figure 37.</strong> Nights whose self-reported times were out
+of order before correction, by family of mechanism, coloured by the
+state of the same night in the final data. Plausible: SOL 0-300 min,
+time in bed 2-16 h, TST 0.5-12 h.</p>
 </blockquote>
 <p><a id="s-9-3"></a></p>
 </div>

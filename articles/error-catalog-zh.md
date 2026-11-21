@@ -129,7 +129,7 @@
 | 外部比率的混合 | `validation/synthetic/prevalence_grid.R` |
 | 顺序颠倒的分类 | [`classify_reversals()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/classify_reversals.md)、[`reversal_summary()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/reversal_summary.md) |
 | 时长的钟点规则 | 第 6.5 步，`config_default.yaml` 里的 `duration_clock_rule` |
-| 真实数据上的图 | F33（顺序颠倒的夜晚，按机制）、F34（第 6.5 步对每条被重新解读的 SOL / WASO 条目做了什么）、F35（像钟点的 SOL 条目与本人上床、入睡时间的对照）；卡片见[如何解读输出](https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output-zh.md) |
+| 真实数据上的图 | F33（顺序颠倒的夜晚，按机制）、F34（第 6.5 步对每条被重新解读的 SOL / WASO 条目做了什么）、F35（像钟点的 SOL 条目与本人上床、入睡时间的对照）、F37（顺序颠倒的夜晚，改正前后）；F36 是同样几种反序形态在合成测试里的结果；卡片见[如何解读输出](https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output-zh.md) |
 
 F34 和 F35 读的是第 6.5
 步的日志，数的是管线实际处理过的条目。设计规则时另做过一次对原始输入的扫描，

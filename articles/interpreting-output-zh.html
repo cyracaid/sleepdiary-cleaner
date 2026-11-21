@@ -185,7 +185,7 @@ CSV、回归检查和快速检查卡；第 8–9 节讲怎么看图。</p>
 </li>
 <li>
 <details><summary><a href="#s-9-2">9.2
-管线清洗图卡片（<code>pipeline_cleaning/</code>）（19 张）</a>
+管线清洗图卡片（<code>pipeline_cleaning/</code>）（21 张）</a>
 </summary><ul>
 <li>
 <a href="#c-01">F01 · 管线记录流</a>
@@ -243,6 +243,12 @@ CSV、回归检查和快速检查卡；第 8–9 节讲怎么看图。</p>
 </li>
 <li>
 <a href="#c-f35">F35 · 像钟点的 SOL 与本人时间</a>
+</li>
+<li>
+<a href="#c-f36">F36 · 合成测试里的反序形态</a>
+</li>
+<li>
+<a href="#c-f37">F37 · 顺序颠倒的夜晚，改正前后</a>
 </li>
 </ul></details>
 </li>
@@ -1536,7 +1542,7 @@ gitignore，不要提交或外传。</p>
 <tbody>
 <tr class="odd">
 <td><code>pipeline_cleaning/</code></td>
-<td>19 张诊断图：流水线发现了什么、改了什么（卡片见 §9.2）</td>
+<td>21 张诊断图：流水线发现了什么、改了什么（卡片见 §9.2）</td>
 <td>检查清洗是否正常；补充材料的审计链</td>
 </tr>
 <tr class="even">
@@ -1901,6 +1907,22 @@ gitignore，不要提交或外传。</p>
 <td>2026-11-03</td>
 </tr>
 <tr class="odd">
+<td><strong>F36</strong></td>
+<td><code>pipeline_cleaning/F36.png</code></td>
+<td>Supplement</td>
+<td><code>sleep_visualization.R:3440</code></td>
+<td><a href="#c-f36">§9.2 · 合成测试里的反序形态</a></td>
+<td>2026-11-21</td>
+</tr>
+<tr class="even">
+<td><strong>F37</strong></td>
+<td><code>pipeline_cleaning/F37.png</code></td>
+<td>Supplement</td>
+<td><code>sleep_visualization.R:3527</code></td>
+<td><a href="#c-f37">§9.2 · 顺序颠倒的夜晚，改正前后</a></td>
+<td>2026-11-21</td>
+</tr>
+<tr class="odd">
 <td><strong>F30</strong></td>
 <td><code>research_ready/F30.png</code></td>
 <td>Results</td>
@@ -1944,12 +1966,12 @@ gitignore，不要提交或外传。</p>
 <code>pipeline_cleaning/</code>。</li>
 <li>
 <strong>自 1.7.1
-起编号连续：<code>F01</code>-<code>F35</code>。</strong>
+起编号连续：<code>F01</code>-<code>F37</code>。</strong>
 编号就是文件名、图内标题和本页的引用。
 没有字母后缀、没有缺号：早期调整退役的旧号（08、12、19）已重新分配，而不是留空。</li>
 <li>
 <strong>按文件夹分族：</strong> <code>pipeline_cleaning/</code> 为
-F01-F16 和 F33-F35（管线图与检测图按生成顺序交错，F33-F35 最后加入）；
+F01-F16 和 F33-F37（管线图与检测图按生成顺序交错，F33-F37 最后加入）；
 <code>research_ready/</code> 为
 F17-F32。检测图（F06-F14）编号高于部分管线图，就是交错所致。</li>
 <li>
@@ -3233,6 +3255,56 @@ AM/PM）。虚线框是规则的容差（纵向）和窗口（横向），框内
 <p><strong>Figure 35.</strong> 填得像钟点的 SOL
 条目，用与本人上床时间和入睡时间的距离（分钟，12
 小时表盘）表示。虚线框标出钟点规则的容差和窗口。</p>
+</blockquote>
+<p><a id="c-f36"></a></p>
+</div>
+<div class="section level4">
+<h4 id="f36-合成测试里的反序形态">F36 · 合成测试里的反序形态<a class="anchor" aria-label="anchor" href="#f36-%E5%90%88%E6%88%90%E6%B5%8B%E8%AF%95%E9%87%8C%E7%9A%84%E5%8F%8D%E5%BA%8F%E5%BD%A2%E6%80%81"></a>
+</h4>
+<p><strong>文件</strong> <code>pipeline_cleaning/F36.png</code> — 生成于
+<code>sleep_visualization.R:3440</code></p>
+<p><strong>论文用途</strong> Supplement</p>
+<p><strong>标题与副标题</strong>
+标题：<em>合成测试里顺序颠倒的夜晚，按形态</em>。副标题几行：这张图回答什么（每种顺序颠倒，规则多常把时间改回真值，多常改成别的值）、测试怎么做的、总体比例。</p>
+<p><strong>各部分含义</strong>
+每行一种形态，从处理得最好排到最差。条形是被改回真值的注入行占比（99%
+以上为蓝，以下为朱红），线是 Wilson 95%
+区间，右列是规则改了、但改的不是真值的行数。这是有已知真值的合成日记：各形态按一项真实研究里的比例注入干净行，并检查干净行有没有被动。数据来源：<code>reversal_injection_outcomes.csv</code>（随包发在
+<code>inst/extdata/</code>，用 sleepcleanr 1.9.0 跑出）。</p>
+<p><strong>健康的样子</strong> 两栏对调、入睡或起床单栏差 12 小时，都在
+100%，没有改错。</p>
+<p><strong>异常 →</strong> 条短、右列数字大的是规则修不了的形态：上床差
+12
+小时、整夜平移、醒来早于上床。这些夜晚要靠人工复核表处理，不会自己变对。</p>
+<p><strong>论文图注</strong></p>
+<blockquote>
+<p><strong>Figure 36.</strong>
+在一项真实研究的形态比例下做的合成测试中，注入的顺序颠倒夜晚按形态被改回真值的比例。条形：百分比；线：Wilson
+95% 区间；右列：被改成错误值的行数。干净行被改：0/6,650。</p>
+</blockquote>
+<p><a id="c-f37"></a></p>
+</div>
+<div class="section level4">
+<h4 id="f37-顺序颠倒的夜晚改正前后">F37 · 顺序颠倒的夜晚，改正前后<a class="anchor" aria-label="anchor" href="#f37-%E9%A1%BA%E5%BA%8F%E9%A2%A0%E5%80%92%E7%9A%84%E5%A4%9C%E6%99%9A%E6%94%B9%E6%AD%A3%E5%89%8D%E5%90%8E"></a>
+</h4>
+<p><strong>文件</strong> <code>pipeline_cleaning/F37.png</code> — 生成于
+<code>sleep_visualization.R:3527</code></p>
+<p><strong>论文用途</strong> Supplement</p>
+<p><strong>标题与副标题</strong>
+标题：<em>本研究里顺序颠倒的夜晚，改正前后</em>。副标题：改正前有多少夜晚顺序颠倒（条的长度）、改正后有多少顺序对且合理，以及”合理”的含义（SOL
+0–300 分钟、卧床 2–16 小时、TST 0.5–12 小时）。</p>
+<p><strong>各部分含义</strong> 每个机制族一条（分类同
+F33，合并成族）。条的长度是改正前顺序颠倒的夜晚数；颜色是这些夜晚在最终数据里的状态：顺序对且合理、顺序对但不合理、仍然颠倒、没有改后值。读的是本次运行最终的
+<code>time_*_corrected</code>
+列。它不区分是算法改的还是人改的，“顺序对”也不等于改成了真值。</p>
+<p><strong>健康的样子</strong> 每条几乎全是蓝色。</p>
+<p><strong>异常 →</strong>
+条末的朱红：这些夜晚在最终数据里仍然颠倒，需要人看。</p>
+<p><strong>论文图注</strong></p>
+<blockquote>
+<p><strong>Figure 37.</strong>
+改正前自报时间顺序颠倒的夜晚，按机制族分组，颜色是同一夜晚在最终数据中的状态。合理：SOL
+0–300 分钟、卧床 2–16 小时、TST 0.5–12 小时。</p>
 </blockquote>
 <p><a id="s-9-3"></a></p>
 </div>
