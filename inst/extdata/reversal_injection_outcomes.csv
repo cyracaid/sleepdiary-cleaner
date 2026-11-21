@@ -1,0 +1,9 @@
+form,n_injected,flagged_or_corrected_pct,ci_low,ci_high,corrected_pct,wrong_repairs,n_clean,n_clean_altered
+awake_before_bed,17,0,0,18.4,0,17,6650,0
+shift_night_12h,40,5,1.4,16.5,5,38,6650,0
+shift_bed_12h,40,17.5,8.7,32,17.5,33,6650,0
+shift_sleep_12h,102,100,96.4,100,100,0,6650,0
+shift_getup_12h,17,100,81.6,100,100,0,6650,0
+shift_awake_12h,3,0,0,56.2,0,3,6650,0
+swap_bed_sleep,106,100,96.5,100,100,0,6650,0
+swap_awake_getup,25,100,86.7,100,100,0,6650,0

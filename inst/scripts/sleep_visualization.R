@@ -3414,6 +3414,131 @@ if (is.data.frame(.f34_log) && nrow(.f34_log) > 0) {
 }
 
 
+# --------------------------------------------------------------------------
+# Figure 36: What the rules do with each form of a reversed night (synthetic test)
+# --------------------------------------------------------------------------
+if (cfg_get("visualization.detection_outcomes.enabled", TRUE, cfg = pipeline_config)) {
+  cat("Generating FIGURE F36 (reversal forms: share put back to the true value)...\n")
+  rv_rel <- "validation/synthetic/results/reversal_injection_outcomes.csv"
+  rv_candidates <- c(system.file("extdata", "reversal_injection_outcomes.csv", package = "sleepcleanr"), rv_rel)
+  rv_candidates <- rv_candidates[nzchar(rv_candidates)]
+  rv_found <- rv_candidates[file.exists(rv_candidates)]
+  if (length(rv_found) > 0) {
+    rv <- read.csv(rv_found[[1]], stringsAsFactors = FALSE)
+    rv_lab <- c(swap_awake_getup = "Wake and rise times swapped",
+                swap_bed_sleep = "Bed and sleep-onset times swapped",
+                shift_sleep_12h = "Sleep-onset time 12 h out",
+                shift_getup_12h = "Rise time 12 h out",
+                shift_bed_12h = "Bed time 12 h out",
+                shift_night_12h = "Whole night shifted 12 h",
+                awake_before_bed = "Wake time before bed time",
+                shift_awake_12h = "Wake time 12 h out")
+    rv <- rv[rv$form %in% names(rv_lab), , drop = FALSE]
+    rv <- rv[order(-rv$flagged_or_corrected_pct, -rv$n_injected), , drop = FALSE]
+    k <- nrow(rv)
+    ys <- rev(seq_len(k))
+    png(file.path(output_dir, "pipeline_cleaning", "F36.png"),
+        width = 11, height = 5.6, units = "in", res = 150)
+    par(mar = c(1, 0.5, 6.5, 0.5))
+    plot(NA, xlim = c(-2.1, 1.75), ylim = c(0.4, k + 1.2), axes = FALSE, xlab = "", ylab = "")
+    text(-1.02, k + 0.95, "Form of the reversal", adj = 1, font = 2, cex = 0.8)
+    text(-0.5, k + 0.95, "Put back to the true value", font = 2, cex = 0.8)
+    text(0.08, k + 0.95, "Rate (95% CI)", adj = 0, font = 2, cex = 0.8)
+    text(1.5, k + 0.95, "Changed, but\nnot to the truth", adj = 0, font = 2, cex = 0.8)
+    for (i in seq_len(k)) {
+      y <- ys[i]; p <- rv$flagged_or_corrected_pct[i]
+      rect(-1.0, y - 0.32, 0, y + 0.32, col = sc_col("grey_light"), border = NA)
+      rect(-1.0, y - 0.32, -1.0 + p / 100, y + 0.32,
+           col = if (p >= 99) sc_col("blue") else sc_col("vermillion"), border = NA)
+      segments(-1.0 + rv$ci_low[i] / 100, y, -1.0 + rv$ci_high[i] / 100, y, lwd = 1.5)
+      text(-1.02, y, sprintf("%s (n = %d)", rv_lab[[rv$form[i]]], rv$n_injected[i]), adj = 1, cex = 0.78)
+      text(0.08, y, sprintf("%.1f%%  (%.1f to %.1f)", p, rv$ci_low[i], rv$ci_high[i]), adj = 0, cex = 0.78)
+      w <- rv$wrong_repairs[i]
+      text(1.5, y, if (w > 0) sprintf("%d of %d", w, rv$n_injected[i]) else "0", adj = 0, cex = 0.78,
+           col = if (w > 0) sc_col("vermillion") else sc_col("grey_dark"), font = if (w > 0) 2 else 1)
+    }
+    title(main = "Figure 36: Out-of-order nights in a synthetic test, by form", cex.main = 1.1, line = 4.6)
+    mtext("WHAT THIS ANSWERS: for each kind of reversed night, how often do the rules put the time back to the true value, and how often do they change it to something else?",
+          side = 3, line = 3.1, cex = 0.66)
+    mtext(sprintf("Each form injected into clean synthetic diaries in the proportions seen in one real study (%s injected rows). Clean rows altered: %d of %s. Wilson 95%% CI.",
+                  format(sum(rv$n_injected), big.mark = ","), rv$n_clean_altered[1],
+                  format(rv$n_clean[1], big.mark = ",")), side = 3, line = 1.9, cex = 0.66)
+    mtext(sprintf("Overall %.1f%% put back; %d rows changed to a wrong value. Forms are sorted from best to worst handled.",
+                  100 * sum(rv$n_injected * rv$flagged_or_corrected_pct / 100) / sum(rv$n_injected),
+                  sum(rv$wrong_repairs)), side = 3, line = 0.8, cex = 0.66)
+    dev.off()
+    cat("✓ Figure 36 completed\n\n")
+  } else {
+    cat(sprintf("⚠ Cannot generate Figure 36: reversal_injection_outcomes.csv not found (looked in %s)\n\n",
+                paste(rv_candidates, collapse = ", ")))
+    .mark_skip("pipeline_cleaning/F36.png",
+               sprintf("reversal_injection_outcomes.csv not found (looked in %s).", paste(rv_candidates, collapse = ", ")))
+  }
+} else {
+  cat("⊘ Figure 36 skipped (visualization.detection_outcomes.enabled = false)\n\n")
+}
+
+# --------------------------------------------------------------------------
+# Figure 37: Out-of-order nights in this study, before and after the corrections
+# --------------------------------------------------------------------------
+cat("Generating FIGURE F37 (out-of-order nights: before and after correction)...\n")
+.f37_cols <- c("time_bed_corrected", "time_sleep_corrected", "time_awake_corrected", "time_getup_corrected")
+if (exists("corrected_ema_data") && nrow(corrected_ema_data) > 0 && all(.f37_cols %in% names(corrected_ema_data))) {
+  rev37 <- try(classify_reversals(corrected_ema_data), silent = TRUE)
+  if (!inherits(rev37, "try-error") && nrow(rev37) > 0) {
+    cd37 <- corrected_ema_data[match(rev37$row_id, corrected_ema_data$row_id), ]
+    hrs <- function(a, b) as.numeric(difftime(a, b, units = "hours"))
+    sol <- hrs(cd37$time_sleep_corrected, cd37$time_bed_corrected) * 60
+    tib <- hrs(cd37$time_getup_corrected, cd37$time_bed_corrected) * 60
+    tst <- hrs(cd37$time_awake_corrected, cd37$time_sleep_corrected) * 60
+    have <- !is.na(sol) & !is.na(tib) & !is.na(tst) & !is.na(cd37$time_awake_corrected) & !is.na(cd37$time_getup_corrected)
+    in_order <- have & sol >= 0 & tst >= 0 & hrs(cd37$time_getup_corrected, cd37$time_awake_corrected) >= 0
+    plaus <- in_order & sol <= 300 & tib >= 120 & tib <= 960 & tst >= 30 & tst <= 720
+    after <- ifelse(!have, "No corrected value",
+             ifelse(plaus, "In order and plausible",
+             ifelse(in_order, "In order but implausible", "Still out of order")))
+    fam <- ifelse(grepl("^swap", rev37$class), "Two times exchanged",
+           ifelse(rev37$class == "pm12h", "One time 12 h away",
+           ifelse(rev37$class == "pm12h_x2", "Two times moved together",
+           ifelse(grepl("^(D|E)", rev37$class), "Visibly wrong or unexplained", "Ambiguous"))))
+    lv_after <- c("In order and plausible", "In order but implausible", "Still out of order", "No corrected value")
+    tab37 <- as.data.frame(table(family = fam, after = factor(after, levels = lv_after)), stringsAsFactors = FALSE)
+    tab37 <- tab37[tab37$Freq > 0, , drop = FALSE]
+    tot <- tapply(tab37$Freq, tab37$family, sum)
+    tab37$family <- factor(tab37$family, levels = names(sort(tot)))
+    tab37$after <- factor(tab37$after, levels = rev(lv_after))
+    pal37 <- c("In order and plausible" = sc_col("blue"), "In order but implausible" = sc_col("orange"),
+               "Still out of order" = sc_col("vermillion"), "No corrected value" = sc_col("grey"))
+    n_ok <- sum(after == "In order and plausible")
+    p37 <- ggplot(tab37, aes(x = Freq, y = family, fill = after)) +
+      geom_col(width = 0.7) +
+      geom_text(data = data.frame(family = factor(names(tot), levels = levels(tab37$family)), n = as.integer(tot)),
+                aes(x = n, y = family, label = paste0(" ", n)), inherit.aes = FALSE, hjust = 0, size = 3.3) +
+      scale_fill_manual(values = pal37, breaks = lv_after, name = "After the corrections") +
+      scale_x_continuous(expand = expansion(mult = c(0, 0.1))) +
+      labs(title = "Figure 37: Out-of-order nights in this study, before and after the corrections",
+           subtitle = sprintf("Before: %d nights with the four times out of order (the bar length). After: %d (%.1f%%) in order and plausible. Plausible: SOL 0-300 min, time in bed 2-16 h, TST 0.5-12 h.",
+                              nrow(rev37), n_ok, 100 * n_ok / nrow(rev37)),
+           x = "Nights", y = NULL) +
+      theme_minimal(base_size = 12) +
+      theme(legend.position = "bottom", panel.grid.major.y = element_blank(),
+            plot.subtitle = element_text(size = 9))
+    print(p37)
+    save_png(p37, "F37", subdir = "pipeline_cleaning")
+    cat(sprintf("✓ Figure 37 completed (%d reversed nights; %d in order and plausible after)\n\n", nrow(rev37), n_ok))
+  } else if (!inherits(rev37, "try-error")) {
+    cat("⚠ no night has out-of-order times — skipping Figure 37\n\n")
+    .mark_skip("pipeline_cleaning/F37.png", "No night has its four times out of order (nothing to compare).")
+  } else {
+    cat("⚠ classify_reversals() failed — skipping Figure 37\n\n")
+    .mark_skip("pipeline_cleaning/F37.png", "classify_reversals() failed; its pre-correction time columns may be missing.")
+  }
+} else {
+  cat("⚠ corrected_ema_data or its *_corrected time columns missing — skipping Figure 37\n\n")
+  .mark_skip("pipeline_cleaning/F37.png", "corrected_ema_data or its time_*_corrected columns are missing.")
+}
+
+
 # ============================================================================
 # COMPLETE FIGURE SUMMARY
 # ============================================================================
@@ -3463,7 +3588,9 @@ cat("  Figure 19: FOLDED into Figure 6 (final-status split shown in Fig 13's fla
 cat("  Figure 12: Per-Participant Final Flag Rate\n")
 cat("  Figure 33: Out-of-order nights, by mechanism\n")
 cat("  Figure 34: SOL / WASO entries read as a clock time (clock-time rule)\n")
-cat("  Figure 35: SOL entries typed like a clock time, against own times\n\n")
+cat("  Figure 35: SOL entries typed like a clock time, against own times\n")
+cat("  Figure 36: Out-of-order nights in a synthetic test, by form\n")
+cat("  Figure 37: Out-of-order nights in this study, before and after the corrections\n\n")
 
 cat("RESEARCH FIGURES F17-F32 (Sleep Perception + Substance Use):\n")
 cat("  Figure 29: SOL Perception Bias\n")
@@ -3707,6 +3834,8 @@ generate_appendix_ledger()
   "pipeline_cleaning/F33.png",
   "pipeline_cleaning/F34.png",
   "pipeline_cleaning/F35.png",
+  "pipeline_cleaning/F36.png",
+  "pipeline_cleaning/F37.png",
   "research_ready/F17.png",
   "research_ready/F18.png",
   "research_ready/F19.png",
