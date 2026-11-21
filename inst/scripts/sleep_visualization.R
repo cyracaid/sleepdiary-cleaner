@@ -42,6 +42,24 @@ library(grid)
 # Set global theme
 theme_set(theme_minimal(base_size = 14))
 
+# --------------------------------------------------------------------------
+# Colour palette: Okabe-Ito (colour-blind safe). One place to change colours.
+# Roles used across figures (kept from the earlier colours, only the values moved):
+#   green = clean / no change       orange = algorithm fixed / minor issue
+#   blue  = fixed by hand / "other"  vermillion = error / major issue
+#   pink  = accepted unusual / amount flags   grey = neutral / not applicable
+# --------------------------------------------------------------------------
+sc_palette <- c(
+  green = "#009E73", green_light = "#7FCDB6", orange = "#E69F00", blue = "#0072B2",
+  sky = "#56B4E9", vermillion = "#D55E00", vermillion_tint = "#F6D3BF", pink = "#CC79A7",
+  yellow = "#F0E442", grey = "#7F7F7F", grey_dark = "#4D4D4D", grey_light = "#BFBFBF",
+  ink = "#1A1A1A")
+sc_col <- function(...) unname(sc_palette[c(...)])
+# Categorical fill for a factor with no fixed meaning (replaces RColorBrewer "Set2")
+scale_fill_sc <- function(...) {
+  ggplot2::scale_fill_manual(values = sc_col("blue", "orange", "green", "pink", "sky", "vermillion", "grey"), ...)
+}
+
 # Config: use defaults if not running inside run_pipeline()
 if (!exists("pipeline_config")) { pipeline_config <- list() }
 if (!exists(".sc_step5_thresholds", mode = "function")) {
@@ -833,7 +851,7 @@ if(all(c("data_category", "manually_corrected", "corrected") %in% names(correcte
                "Final Valid (usable for analysis)"),
     count  = c(n_total, n_parsed, n_algo, n_manual, n_valid),
     pid_n  = c(NA, NA, n_pid_algo, n_pid_manual, NA),
-    color  = c("#2E7D32", "#4CAF50", "#FF8C00", "#2196F3", "#2E7D32"),
+    color  = c(sc_col("green"), sc_col("green_light"), sc_col("orange"), sc_col("blue"), sc_col("green")),
     stringsAsFactors = FALSE
   )
   flow$pct  <- round(flow$count / n_total * 100, 1)
@@ -853,12 +871,12 @@ if(all(c("data_category", "manually_corrected", "corrected") %in% names(correcte
     geom_rect(aes(xmin = 0.05, xmax = 0.95,
                   ymin = y - 0.38, ymax = y + 0.38),
               fill = flow$color, alpha = 0.12, color = flow$color, linewidth = 0.6) +
-    geom_text(aes(label = label), size = 3.2, fontface = "bold", color = "#212121") +
+    geom_text(aes(label = label), size = 3.2, fontface = "bold", color = sc_col("ink")) +
     geom_segment(data = flow[flow$y > min(flow$y), ],
                  aes(x = 0.5, xend = 0.5,
                      y = y - 0.38, yend = y - 0.62),
                  arrow = arrow(length = unit(0.10, "inches"), type = "closed"),
-                 color = "#616161", linewidth = 0.6) +
+                 color = sc_col("grey_dark"), linewidth = 0.6) +
     annotate("text", x = 1.05, y = max(flow$y) - 0.6, hjust = 0, size = 3.2, lineheight = 1.15,
              label = paste(
                vapply(c(
@@ -876,7 +894,7 @@ if(all(c("data_category", "manually_corrected", "corrected") %in% names(correcte
                ), function(l) paste(strwrap(l, width = 68, exdent = 3), collapse = "\n"), character(1)),
                collapse = "\n")) +
     annotate("text", x = 1.05, y = min(flow$y), hjust = 0, size = 3,
-             color = "#757575",
+             color = sc_col("grey"),
              label = sprintf("%s%% of raw records enter analysis",
                              round(n_valid / n_total * 100, 1))) +
     xlim(0, 2.3) + ylim(0.5, length(flow$stage) + 0.5) +
@@ -889,7 +907,7 @@ if(all(c("data_category", "manually_corrected", "corrected") %in% names(correcte
     theme_void() +
     theme(
       plot.title    = element_text(hjust = 0.5, size = 14, face = "bold"),
-      plot.subtitle = element_text(hjust = 0.5, size = 10, color = "#616161")
+      plot.subtitle = element_text(hjust = 0.5, size = 10, color = sc_col("grey_dark"))
     )
 
   print(p1)
@@ -972,10 +990,10 @@ if (has_raw_times && has_metrics) {
       arrange(desc(abs(delta_tst))) %>%
       mutate(id = row_number()) %>%
       ggplot(aes(x = delta_tst, y = id, color = status)) +
-      geom_vline(xintercept = 0, linetype = "dashed", linewidth = 0.3, color = "#757575") +
+      geom_vline(xintercept = 0, linetype = "dashed", linewidth = 0.3, color = sc_col("grey")) +
       geom_segment(aes(xend = 0), linewidth = 0.5) +
       geom_point(size = 1.8) +
-      scale_color_manual(values = c(algorithmic = "#FF8C00", manual = "#2196F3")) +
+      scale_color_manual(values = c(algorithmic = sc_col("orange"), manual = sc_col("blue"))) +
       labs(x = expression(Delta ~ "TST (min)"), y = "Record",
            subtitle = sprintf("TST corrections (n = %d)", nrow(mod))) +
       theme(legend.position = "none")
@@ -984,10 +1002,10 @@ if (has_raw_times && has_metrics) {
       arrange(desc(abs(delta_sol))) %>%
       mutate(id = row_number()) %>%
       ggplot(aes(x = delta_sol, y = id, color = status)) +
-      geom_vline(xintercept = 0, linetype = "dashed", linewidth = 0.3, color = "#757575") +
+      geom_vline(xintercept = 0, linetype = "dashed", linewidth = 0.3, color = sc_col("grey")) +
       geom_segment(aes(xend = 0), linewidth = 0.5) +
       geom_point(size = 1.8) +
-      scale_color_manual(values = c(algorithmic = "#FF8C00", manual = "#2196F3")) +
+      scale_color_manual(values = c(algorithmic = sc_col("orange"), manual = sc_col("blue"))) +
       labs(x = expression(Delta ~ "SOL (min)"), y = "",
            subtitle = sprintf("SOL corrections (n = %d)", nrow(mod))) +
       theme(legend.position = "none")
@@ -999,13 +1017,13 @@ if (has_raw_times && has_metrics) {
 
   # --- Panel C: Identity scatter (unchanged as faint backdrop) ---
   p2c <- ggplot(pre_post, aes(x = tst_before, y = tst_after, color = status)) +
-    geom_abline(slope = 1, linetype = "dotted", linewidth = 0.3, color = "#BDBDBD") +
+    geom_abline(slope = 1, linetype = "dotted", linewidth = 0.3, color = sc_col("grey_light")) +
     geom_point(data = pre_post %>% filter(status == "none"),
                alpha = 0.03, size = 0.5, color = "gray60") +
     geom_point(data = pre_post %>% filter(status != "none"),
                alpha = 0.85, size = 1.5) +
     scale_color_manual(
-      values = c(algorithmic = "#FF8C00", manual = "#2196F3", none = "gray60"),
+      values = c(algorithmic = sc_col("orange"), manual = sc_col("blue"), none = "gray60"),
       name = "Correction"
     ) +
     labs(x = "TST before (min)", y = "TST after (min)",
@@ -1039,8 +1057,8 @@ if (has_raw_times && has_metrics) {
       subtitle = if (!is.null(p2_subtitle)) p2_subtitle else "Purpose: an audit of how much, and in which direction, corrections changed the data.\nTop panels: one row per corrected record; line length = change in TST or SOL (min, after minus before).\nBottom panel: TST before (x) vs after (y); orange = algorithmic, blue = manual; a dot on the dotted diagonal did not change.\nCorrection is non-destructive: only clear input errors are corrected; self-report/measured discrepancies stay as data.",
       caption  = .anno,
       theme    = theme(plot.title    = element_text(hjust = 0.5, size = 14, face = "bold"),
-                       plot.subtitle = element_text(hjust = 0.5, size = 9, color = "#424242"),
-                       plot.caption  = element_text(hjust = 0.5, size = 9, color = "#616161", margin = margin(t = 10)))
+                       plot.subtitle = element_text(hjust = 0.5, size = 9, color = sc_col("grey_dark")),
+                       plot.caption  = element_text(hjust = 0.5, size = 9, color = sc_col("grey_dark"), margin = margin(t = 10)))
     )
 
   print(p2)
@@ -1081,8 +1099,8 @@ if(length(vars_to_plot) > 0) {
     filter(!is.na(value))
   
   p2 <- ggplot(long_df, aes(x = value)) +
-    geom_histogram(na.rm = TRUE, aes(y = after_stat(density)), bins = 40, fill = "#2E7D32", alpha = 0.5) +
-    geom_density(na.rm = TRUE, color = "#D32F2F", linewidth = 1) +
+    geom_histogram(na.rm = TRUE, aes(y = after_stat(density)), bins = 40, fill = sc_col("green"), alpha = 0.5) +
+    geom_density(na.rm = TRUE, color = sc_col("vermillion"), linewidth = 1) +
     facet_wrap(~variable, scales = "free") +
     labs(title = "Figure 18: Distribution of Sleep Variables",
          subtitle = "Histograms with density curves for key sleep metrics (based on final corrected data)",
@@ -1122,13 +1140,13 @@ if("sleep_duration_h" %in% names(clean_df)) {
     stringsAsFactors = FALSE
   )
   p3 <- ggplot(clean_df, aes(x = sleep_duration_h)) +
-    geom_histogram(na.rm = TRUE, aes(y = after_stat(density)), bins = 40, fill = "#2E7D32", alpha = 0.5) +
+    geom_histogram(na.rm = TRUE, aes(y = after_stat(density)), bins = 40, fill = sc_col("green"), alpha = 0.5) +
     geom_density(na.rm = TRUE, aes(color = "Density curve (red, smoothed)"), linewidth = 1, show.legend = TRUE) +
     geom_vline(data = .reflines, aes(xintercept = x, color = lab,
                                      linetype = ifelse(grepl("Median", lab), "dashed", "solid")),
                linewidth = 1, show.legend = TRUE) +
     scale_color_manual(values = setNames(
-      c("#D32F2F", "#1976D2", "#FF8C00"),
+      c(sc_col("vermillion"), sc_col("blue"), sc_col("orange")),
       c("Density curve (red, smoothed)", .reflines$lab[1], .reflines$lab[2])), name = "Line shown") +
     scale_linetype_identity() +
     labs(title = "Figure 3: Distribution of Total Sleep Time (TST)",
@@ -1182,9 +1200,9 @@ if(all(c("time_in_bed_h", "sleep_duration_h", "flag_severity") %in% names(clean_
       geom_point(alpha = 0.25, size = 2) +
       geom_smooth(aes(group = 1), method = "lm", se = TRUE, color = "black", linewidth = 0.8) +
       geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "gray50", alpha = 0.5) +
-      scale_color_manual(values = c("Clean" = "#2E7D32",
-                                    "Minor issues (1 flag)" = "#FF8C00",
-                                    "Major issues (2+ flags)" = "#D32F2F"),
+      scale_color_manual(values = c("Clean" = sc_col("green"),
+                                    "Minor issues (1 flag)" = sc_col("orange"),
+                                    "Major issues (2+ flags)" = sc_col("vermillion")),
                          name = "Data Quality") +
       labs(title = "Figure 4: Sleep Duration vs Time in Bed",
            subtitle = sprintf("TIME IN BED = from getting into bed to getting out. SLEEP DURATION = time actually asleep (TIB minus SOL minus WASO). | COLOR-CODED by data quality | r = %.3f (all records) / %.3f (clean only) | Black line = linear trend; gray band around it = uncertainty range of the trend | Dashed diagonal = TIB == TST (impossible to sleep all of TIB) (based on final corrected data)", overall_cor, clean_cor),
@@ -1232,9 +1250,9 @@ if(all(c("sol_h", "sleep_duration_h", "flag_severity") %in% names(clean_df))) {
                                   color = flag_severity)) +
       geom_point(alpha = 0.25, size = 2) +
       geom_smooth(aes(group = 1), method = "lm", se = TRUE, color = "black", linewidth = 0.8) +
-      scale_color_manual(values = c("Clean" = "#2E7D32", 
-                                    "Minor issues (1 flag)" = "#FF8C00",
-                                    "Major issues (2+ flags)" = "#D32F2F"),
+      scale_color_manual(values = c("Clean" = sc_col("green"), 
+                                    "Minor issues (1 flag)" = sc_col("orange"),
+                                    "Major issues (2+ flags)" = sc_col("vermillion")),
                          name = "Data Quality") +
       labs(title = "Figure 4B: Sleep Onset Latency vs Sleep Duration",
            subtitle = "SOL = how long it took to fall asleep after getting into bed. Each dot = one diary night. | Black line = linear trend; gray band around it = uncertainty range of the trend. | SOL > 3h filtered for clarity (based on final corrected data)",
@@ -1288,7 +1306,7 @@ if(length(available_vars) > 0) {
     geom_violin(trim = FALSE, alpha = 0.5) +
     geom_boxplot(width = 0.1, outlier.shape = NA, fill = "white") +
     facet_wrap(vars(variable), scales = "free_y", ncol = 3) +
-    scale_fill_brewer(palette = "Set2") +
+    scale_fill_sc() +
     labs(title = "Figure 5: Variability of Sleep Variables",
          subtitle = "Violin plots with free Y-axis per variable (based on final corrected data)",
          x = "", y = "") +
@@ -1350,11 +1368,11 @@ if (exists("clean_df") && exists("corrected_ema_data") &&
   if (nrow(p6_data) > 0) {
     
     color_map <- c(
-      "Clean" = "#2E7D32",
-      "Unusual" = "#FF8C00",
-      "Reasonable Unusual (accepted)" = "#8E6BBF",
-      "Manually Corrected" = "#4CAF50",
-      "Error" = "#D32F2F"
+      "Clean" = sc_col("green"),
+      "Unusual" = sc_col("orange"),
+      "Reasonable Unusual (accepted)" = sc_col("pink"),
+      "Manually Corrected" = sc_col("green_light"),
+      "Error" = sc_col("vermillion")
     )
     
     p6 <- ggplot(p6_data, aes(x = sleep_duration_h, fill = status, color = status)) +
@@ -1428,9 +1446,9 @@ if(all(c("sleep_duration_h", "flag_severity") %in% names(clean_df))) {
 
     p7 <- ggplot(plot_df_7, aes(x = sleep_duration_h, fill = flag_severity)) +
       geom_histogram(na.rm = TRUE, bins = 50, alpha = 0.7, position = "stack") +
-      scale_fill_manual(values = c("Clean" = "#2E7D32", 
-                                   "Minor issues (1 flag)" = "#FF8C00",
-                                   "Major issues (2+ flags)" = "#D32F2F"),
+      scale_fill_manual(values = c("Clean" = sc_col("green"), 
+                                   "Minor issues (1 flag)" = sc_col("orange"),
+                                   "Major issues (2+ flags)" = sc_col("vermillion")),
                         name = "Data Quality") +
       labs(title = "Figure 7: Data Quality Composition Across Sleep Durations",
            subtitle = "Each bar = number of records in that sleep-duration range. Colors = per-record quality class. Shows whether quality problems cluster at extreme durations (based on final corrected data)",
@@ -1494,7 +1512,7 @@ if(all(c("time_bed_corrected", "time_getup_corrected") %in% names(clean_df))) {
     labs(title = "Figure 9: Bedtime vs Get-up Time Distribution",
          subtitle = "Circadian pattern of sleep timing (based on final corrected data)",
          x = "Hour of Day", y = "Density", fill = "Time") +
-    scale_fill_manual(values = c("Bedtime" = "#2E7D32", "Get-up Time" = "#FF8C00")) +
+    scale_fill_manual(values = c("Bedtime" = sc_col("green"), "Get-up Time" = sc_col("orange"))) +
     scale_x_continuous(breaks = seq(0, 24, 2))
   print(p9)
   save_png(p9, "F23", subdir = "research_ready")
@@ -1540,9 +1558,9 @@ if(all(c("sleep_duration_h", "sleep_efficiency_pct", "flag_severity") %in% names
     p10 <- ggplot(extreme_df, aes(x = sleep_duration_h, y = sleep_efficiency_pct,
                                   color = flag_severity, shape = extreme_type)) +
       geom_point(size = 3, alpha = 0.7) +
-      scale_color_manual(values = c("Clean" = "#2E7D32", 
-                                    "Minor issues (1 flag)" = "#FF8C00",
-                                    "Major issues (2+ flags)" = "#D32F2F"),
+      scale_color_manual(values = c("Clean" = sc_col("green"), 
+                                    "Minor issues (1 flag)" = sc_col("orange"),
+                                    "Major issues (2+ flags)" = sc_col("vermillion")),
                          name = "Data Quality") +
       labs(title = "Figure 4: Extreme Sleep Durations with Efficiency Context",
            subtitle = "COLOR-CODED by data quality | SHAPE indicates short vs long sleep (based on final corrected data)",
@@ -1627,7 +1645,7 @@ if(length(flag_columns) >= 2) {
       p11_heatmap <- ggplot(heatmap_df, aes(x = Flag1, y = Flag2, fill = Count)) +
         geom_tile(color = "white", linewidth = 1) +
         geom_text(aes(label = Count), size = 4, fontface = "bold") +
-        scale_fill_gradient(low = "#FEE5D9", high = "#D32F2F", 
+        scale_fill_gradient(low = sc_col("vermillion_tint"), high = sc_col("vermillion"), 
                             name = "Co-occurrence\nCount",
                             trans = "sqrt") +
         labs(title = "Figure 5: Data Quality Flag Co-occurrence Heatmap",
@@ -1716,7 +1734,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
     geom_bar(na.rm = TRUE, stat = "identity", alpha = 0.8) +
     geom_text(aes(label = paste0(format(count, big.mark=","), "\n(", round(percentage, 1), "%)")), 
               vjust = -0.3, size = 3) +
-    scale_fill_brewer(palette = "Set2") +
+    scale_fill_sc() +
     # Headroom above the tallest bar: without it the count line of its label
     # sat outside the panel and was clipped (only "(82.7%)" showed).
     scale_y_continuous(expand = expansion(mult = c(0.02, 0.18))) +
@@ -1887,8 +1905,8 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
         filter(gap_hours < 0, abs(gap_hours) >= 3, abs(gap_hours) <= 6) %>%
         count(pair_label, name = "n_candidates", .drop = FALSE)
 
-      flagged_color <- "#D32F2F"  # house convention: flagged/problematic data
-      clean_color   <- "#1976D2"  # house convention: clean/acceptable data
+      flagged_color <- sc_col("vermillion")  # house convention: flagged/problematic data
+      clean_color   <- sc_col("blue")  # house convention: clean/acceptable data
 
       p13b <- ggplot(gaps, aes(x = gap_hours)) +
         annotate("rect", xmin = -6, xmax = -3, ymin = 0, ymax = Inf,
@@ -1967,7 +1985,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
         geom_tile(color = "white", linewidth = 0.6) +
         geom_text(aes(label = ifelse(pct > 0, sprintf("%.0f%%", pct), "")),
                    size = 3.2, color = "grey15") +
-        scale_fill_gradient(low = "white", high = "#1976D2", limits = c(0, 100),
+        scale_fill_gradient(low = "white", high = sc_col("blue"), limits = c(0, 100),
                              name = "% of n") +
         labs(
           title = "Figure 8: Synthetic Error-Injection Detection Outcomes",
@@ -2017,7 +2035,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
           geom_col(na.rm = TRUE, width = 0.6) +
           geom_text(aes(label = sprintf("%.1fx", ratio_to_noise)),
                     hjust = -0.15, size = 3.4, color = "grey20") +
-          scale_fill_gradient2(low = "#D32F2F", mid = "grey85", high = "#1976D2",
+          scale_fill_gradient2(low = sc_col("vermillion"), mid = "grey85", high = sc_col("blue"),
                                 midpoint = 3, guide = "none") +
           labs(
             title = "Figure 9: Cleaning Thresholds vs Bland-Altman Measurement Noise",
@@ -2089,10 +2107,10 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
       
       p14 <- ggplot(comparison_df, aes(x = sleep_duration_h, fill = status, color = status)) +
         geom_density(na.rm = TRUE, alpha = 0.4, linewidth = 0.8) +
-        scale_fill_manual(values = c("No Issues (Clean) - No _checkforerrors flags" = "#2E7D32", 
-                                     "Needs Review (Auto-detected) - Has _checkforerrors flags" = "#D32F2F")) +
-        scale_color_manual(values = c("No Issues (Clean) - No _checkforerrors flags" = "#2E7D32", 
-                                      "Needs Review (Auto-detected) - Has _checkforerrors flags" = "#D32F2F")) +
+        scale_fill_manual(values = c("No Issues (Clean) - No _checkforerrors flags" = sc_col("green"), 
+                                     "Needs Review (Auto-detected) - Has _checkforerrors flags" = sc_col("vermillion"))) +
+        scale_color_manual(values = c("No Issues (Clean) - No _checkforerrors flags" = sc_col("green"), 
+                                      "Needs Review (Auto-detected) - Has _checkforerrors flags" = sc_col("vermillion"))) +
         labs(title = "Figure 10: Sleep Duration Distribution (Pre-Correction / Auto-Detection)",
              subtitle = paste0("Based on _checkforerrors flags (algorithm only, no manual corrections) | ",
                                "Clean sample: ", clean_count, " records | ",
@@ -2180,7 +2198,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
       p15 <- ggplot(timeline_data, aes(x = date, y = count, fill = pattern_type)) +
         geom_col(na.rm = TRUE, position = "stack", alpha = 0.85, width = 25) +
         scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
-        scale_fill_brewer(palette = "Set2", name = "Pattern Type") +
+        scale_fill_sc(name = "Pattern Type") +
         labs(title = "Figure 11: Timing of Flagged Temporal Patterns Over the Study Period",
              subtitle = paste0("Records with a timestamp-order or awake/getup/bed-sleep pattern flag (Step 6 classification), counted per month. ",
                                "A flag is not a verdict that the record is wrong -- most were reviewed and kept unchanged (see Figure 2)."),
@@ -2272,7 +2290,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
         scale_x_discrete(labels = function(x) {
           sapply(x, function(s) paste(strwrap(s, width = 35), collapse = "\n"))
         }) +
-        scale_fill_gradient(low = "#FF8C00", high = "#D32F2F", name = "Count") +
+        scale_fill_gradient(low = sc_col("orange"), high = sc_col("vermillion"), name = "Count") +
         labs(title = "Figure 12: Most Common Error/Review Patterns (Auto-Detection)",
              x = "", y = "Count") +
         coord_flip() +
@@ -2349,7 +2367,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
         geom_text(aes(label = sprintf("%.0f%% (%d/%d)", flag_rate_pct, error_count, total_days)),
                   vjust = -0.3, size = 2.8) +
         scale_y_continuous(expand = expansion(mult = c(0, 0.10))) +
-        scale_fill_gradient(low = "#FF8C00", high = "#D32F2F", name = "Flag Rate (%)") +
+        scale_fill_gradient(low = sc_col("orange"), high = sc_col("vermillion"), name = "Flag Rate (%)") +
         labs(title = "Figure 13: Top 15 Participants by Flag Rate (Auto-Detection)",
              subtitle = sprintf("Flags as %% of each participant's own total observed days. Total participants with algorithm-detected issues: %d", length(unique(checkforerrors_processed$pid))),
              x = "Participant ID",
@@ -2434,12 +2452,12 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
         geom_text(aes(label = sprintf("%s\n%.1f%%", count, percentage)), 
                   position = position_stack(vjust = 0.5), size = 3) +
         scale_fill_manual(
-          values = c("Temporal Issues" = "#D32F2F",
-                     "Metrics Issues" = "#FF8C00",
-                     "Amount/Input Flags" = "#7B1FA2",
-                     "Interval Format Errors" = "#1976D2",
-                     "Timestamp Format Errors" = "#388E3C",
-                     "Other Issues" = "#9E9E9E"),
+          values = c("Temporal Issues" = sc_col("vermillion"),
+                     "Metrics Issues" = sc_col("orange"),
+                     "Amount/Input Flags" = sc_col("pink"),
+                     "Interval Format Errors" = sc_col("blue"),
+                     "Timestamp Format Errors" = sc_col("green"),
+                     "Other Issues" = sc_col("grey")),
           name = "Issue Type"
         ) +
         labs(title = "Auto-Detected Issues Breakdown",
@@ -2596,8 +2614,8 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
     # identity as the Clean/Minor/Major legend below, just lightened. This
     # is a "worth a look first" ranking aid, not a judgment that the row
     # is bad data (see the non-destructive note above).
-    row_fill <- ifelse(worst_n$flagged_pct >= 50, scales::alpha("#D32F2F", 0.15),
-                 ifelse(worst_n$flagged_pct >= 20, scales::alpha("#FF8C00", 0.15), NA))
+    row_fill <- ifelse(worst_n$flagged_pct >= 50, scales::alpha(sc_col("vermillion"), 0.15),
+                 ifelse(worst_n$flagged_pct >= 20, scales::alpha(sc_col("orange"), 0.15), NA))
     core_bg <- matrix(rep(row_fill, ncol(display_tbl)), ncol = ncol(display_tbl))
 
     p26_tab <- tableGrob(display_tbl, rows = NULL,
@@ -2627,7 +2645,7 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
              cfg_get("classification.flag_severity.high_sol_threshold_hours", 1, cfg = pipeline_config),
              cfg_get("classification.flag_severity.high_waso_threshold_hours", 1.5, cfg = pipeline_config))) +
       theme(plot.title = element_text(hjust = 0.5, size = 15, face = "bold"),
-            plot.subtitle = element_text(hjust = 0.5, size = 10, color = "#424242"))
+            plot.subtitle = element_text(hjust = 0.5, size = 10, color = sc_col("grey_dark")))
 
     p_p26 <- (p26_title / p26_tab) + plot_layout(heights = c(0.14, 1))
 
@@ -2674,7 +2692,7 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
         "mean =", round(mean(bias_sol), 2), "\n")
     
     p20 <- ggplot(bias_counts, aes(x = bias, y = count)) +
-      geom_col(na.rm = TRUE, fill = "#1976D2", alpha = 0.8, width = 1) +
+      geom_col(na.rm = TRUE, fill = sc_col("blue"), alpha = 0.8, width = 1) +
       geom_vline(xintercept = c(15, 60), linetype = "dashed", color = c("orange", "red"), linewidth = 1) +
       annotate("text", x = c(15, 60), y = Inf, vjust = 2, hjust = -0.05,
                color = c("orange", "red"), size = 3.1,
@@ -2731,7 +2749,7 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
         waso_df <- data.frame(bias = bias_waso)
         
         p20b <- ggplot(waso_df, aes(x = bias)) +
-          geom_histogram(na.rm = TRUE, binwidth = 5, fill = "#FF8C00", alpha = 0.7, boundary = 0) +
+          geom_histogram(na.rm = TRUE, binwidth = 5, fill = sc_col("orange"), alpha = 0.7, boundary = 0) +
           geom_vline(xintercept = c(15, 60), linetype = "dashed", color = c("orange", "red"), linewidth = 1) +
           annotate("text", x = c(15, 60), y = Inf, vjust = 2, hjust = -0.05,
                    color = c("orange", "red"), size = 3.1,
@@ -2813,7 +2831,7 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
     labs(title = "Figure 26: Substance Use Data Availability",
          subtitle = paste("Non-NA entries and value range for each substance variable (total N =", total_n, ")"),
          x = "", y = "% of records with data") +
-    scale_fill_brewer(palette = "Set2") +
+    scale_fill_sc() +
     scale_y_continuous(limits = c(0, max(10, subst_summary$pct + 5))) +
     theme_minimal(base_size = 12) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1),
@@ -2918,7 +2936,7 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
         y = "Reported Value", 
         x = ""
       ) +
-      scale_fill_brewer(palette = "Set2") +
+      scale_fill_sc() +
       theme_minimal(base_size = 12) +
       theme(legend.position = "none")
     
@@ -2987,7 +3005,7 @@ if (exists("corrected_ema_data") && caf_col %in% names(corrected_ema_data)) {
 
     p23 <- ggplot(caf_summary, aes(x = factor(caffeine_cups), y = n)) +
       scale_x_discrete(labels = .frac_label) +
-      geom_col(na.rm = TRUE, alpha = 0.85, width = 0.7, fill = "#1976D2") +
+      geom_col(na.rm = TRUE, alpha = 0.85, width = 0.7, fill = sc_col("blue")) +
       geom_text(aes(label = paste0(n, " (", round(pct, 1), "%)")),
                 vjust = -0.3, size = 3) +
       labs(title = "Figure 28: Caffeine Consumption Distribution",
@@ -3022,7 +3040,7 @@ if (exists("corrected_ema_data") && alc_col %in% names(corrected_ema_data)) {
 
     p24 <- ggplot(alc_summary, aes(x = factor(alcohol_drinks), y = n)) +
       scale_x_discrete(labels = .frac_label) +
-      geom_col(na.rm = TRUE, alpha = 0.85, width = 0.7, fill = "#FF8C00") +
+      geom_col(na.rm = TRUE, alpha = 0.85, width = 0.7, fill = sc_col("orange")) +
       geom_text(aes(label = paste0(n, " (", round(pct, 1), "%)")),
                 vjust = -0.3, size = 3) +
       labs(title = "Figure 29: Alcohol Consumption Distribution",
@@ -3087,7 +3105,7 @@ if (all(c("time_bed_corrected", "time_getup_corrected") %in% names(corrected_ema
       geom_boxplot(width = 0.2, outlier.alpha = 0.3, outlier.size = 0.5) +
       stat_summary(fun = median, geom = "point", size = 2, color = "black") +
       facet_wrap(~event, scales = "free_y") +
-      scale_fill_manual(values = c("Weekday" = "#1976D2", "Weekend" = "#FF8C00")) +
+      scale_fill_manual(values = c("Weekday" = sc_col("blue"), "Weekend" = sc_col("orange"))) +
       labs(title = "Figure 30: Sleep Regularity - Weekday vs Weekend",
            subtitle = paste0("Violin + boxplot of bedtime and get-up time by day type (weekend = Sat/Sun); N = ", nrow(sr), " records.\n",
                              "Bedtime = time_bed_corrected, get-up = time_getup_corrected. Bedtime hours above 24 are after midnight (26 = 02:00)."),
@@ -3139,9 +3157,9 @@ if (all(c("self_diffcalc_totalsleeptime_minutes", "self_diffcalc_sol_minutes",
     geom_text(aes(label = sprintf("%.1f%%", pct)), position = position_stack(vjust = 0.5, reverse = TRUE),
               size = 4.5, color = "white", fontface = "bold") +
     scale_x_continuous(limits = c(0, 100), expand = c(0, 0)) +
-    scale_fill_manual(name = NULL, values = c("Total Sleep Time (TST)" = "#2E7D32",
-                                 "Sleep Onset Latency (SOL)" = "#FF8C00",
-                                 "Wake After Sleep Onset (WASO)" = "#D32F2F")) +
+    scale_fill_manual(name = NULL, values = c("Total Sleep Time (TST)" = sc_col("green"),
+                                 "Sleep Onset Latency (SOL)" = sc_col("orange"),
+                                 "Wake After Sleep Onset (WASO)" = sc_col("vermillion"))) +
     labs(title = "Figure 31: Sleep Composition - TIB Breakdown",
          subtitle = paste0("Average proportion of Time in Bed (TIB) spent in each stage (N=", nrow(sc),
                            " valid records after pipeline correction). TIB = TST (Total Sleep Time, asleep) + SOL (Sleep Onset Latency, falling asleep) + WASO (Wake After Sleep Onset, awake in the night)."),
@@ -3184,11 +3202,11 @@ if (requireNamespace("corrplot", quietly = TRUE) &&
     corrplot::corrplot(M, method = "color", type = "upper",
                        tl.col = "black", tl.cex = 0.8,
                        addCoef.col = "black", number.cex = 0.7,
-                       col = colorRampPalette(c("#D32F2F", "white", "#2E7D32"))(200),
+                       col = colorRampPalette(c(sc_col("vermillion"), "white", sc_col("blue")))(200),
                        title = "", mar = c(2, 2, 1, 2))
     mtext("Figure 32: Sleep Metrics Correlation Matrix", side = 3, outer = TRUE, line = 2.4, cex = 1.3, font = 2)
     mtext(side = 3, outer = TRUE, line = 0.9, cex = 0.8,
-          sprintf("Pairwise Pearson correlations (N=%d valid records after pipeline correction). Red = negative, Green = positive.", nrow(cor_data)))
+          sprintf("Pairwise Pearson correlations (N=%d valid records after pipeline correction). Vermillion = negative, Blue = positive.", nrow(cor_data)))
     dev.off()
     # No flat top-level copy: subfolders are the single location for figures
     # (see save_png above).
@@ -3234,9 +3252,9 @@ if (exists("corrected_ema_data") && nrow(corrected_ema_data) > 0) {
         detail = "other", label = "Other forms", group = "Unexplained",
         n = nrow(rev_tab) - sum(f33_rows$n), stringsAsFactors = FALSE))
     }
-    pal <- c("Two times exchanged" = "#37474F", "One time 12 h away" = "#1E88E5",
-             "Two times moved together" = "#0D47A1", "Visibly wrong" = "#E65100",
-             "Unexplained" = "#90A4AE")
+    pal <- c("Two times exchanged" = sc_col("blue"), "One time 12 h away" = sc_col("orange"),
+             "Two times moved together" = sc_col("green"), "Visibly wrong" = sc_col("vermillion"),
+             "Unexplained" = sc_col("grey"))
     k <- nrow(f33_rows)
     ys <- rev(seq_len(k))
     xmax <- max(f33_rows$n, 1)
@@ -3310,7 +3328,7 @@ if (is.data.frame(.f34_log) && nrow(.f34_log) > 0) {
   png(file.path(output_dir, "pipeline_cleaning", "F34.png"), width = 10, height = 6, units = "in", res = 150)
   par(mar = c(4.5, 15, 7, 2))
   b <- barplot(t(f34_tab), horiz = TRUE, las = 1, border = "white", cex.names = 0.8,
-               col = c(SOL = "#1E88E5", WASO = "#E65100")[colnames(f34_tab)],
+               col = c(SOL = sc_col("blue"), WASO = sc_col("vermillion"))[colnames(f34_tab)],
                xlim = c(0, max(rowSums(f34_tab)) * 1.15), xlab = "entries",
                legend.text = colnames(f34_tab), args.legend = list(x = "bottomright", bty = "n", title = "Field"))
   text(rowSums(f34_tab), b, labels = rowSums(f34_tab), pos = 4, cex = 0.9, font = 2)
@@ -3336,7 +3354,7 @@ if (is.data.frame(.f34_log) && nrow(.f34_log) > 0) {
     sol <- sol[is.finite(sol$from_bed) & is.finite(sol$from_onset), , drop = FALSE]
   }
   if (ok && nrow(sol) > 0) {
-    col <- ifelse(sol$action == "recomputed", "#2E7D32", ifelse(sol$action == "set to missing", "#C62828", "#757575"))
+    col <- ifelse(sol$action == "recomputed", sc_col("green"), ifelse(sol$action == "set to missing", sc_col("vermillion"), sc_col("grey")))
     tol <- as.numeric(cfg_get("duration_clock_rule.tolerance_min", 5, cfg = pipeline_config))
     win <- as.numeric(cfg_get("duration_clock_rule.window_min", 60, cfg = pipeline_config))
     rng <- function(v, lo, hi) c(min(lo, floor(min(v) / 30) * 30), max(hi, ceiling(max(v) / 30) * 30))
@@ -3347,9 +3365,9 @@ if (is.data.frame(.f34_log) && nrow(.f34_log) > 0) {
          xlab = "typed time minus own bedtime (min, 12-hour dial)",
          ylab = "typed time minus own sleep onset (min, 12-hour dial)")
     abline(h = 0, v = 0, col = "grey85")
-    rect(0, -tol, win, tol, border = "#2E7D32", lty = 2)
-    text(win / 2, tol + 4, "recompute zone", cex = 0.7, col = "#2E7D32")
-    legend("topright", bty = "n", cex = 0.8, pch = 16, col = c("#2E7D32", "#C62828", "#757575"),
+    rect(0, -tol, win, tol, border = sc_col("green"), lty = 2)
+    text(win / 2, tol + 4, "recompute zone", cex = 0.7, col = sc_col("green"))
+    legend("topright", bty = "n", cex = 0.8, pch = 16, col = c(sc_col("green"), sc_col("vermillion"), sc_col("grey")),
            legend = c("recomputed", "set to missing", "left for review"))
     title(main = "Figure 35: SOL entries typed like a clock time, against the person's own times", cex.main = 1.0, line = 5.2)
     mtext("WHAT THIS ANSWERS: when someone typed a clock time in the SOL field, was it their sleep onset or their bedtime?", side = 3, line = 3.7, cex = 0.7)
