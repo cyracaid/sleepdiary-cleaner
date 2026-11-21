@@ -60,6 +60,29 @@ scale_fill_sc <- function(...) {
   ggplot2::scale_fill_manual(values = sc_col("blue", "orange", "green", "pink", "sky", "vermillion", "grey"), ...)
 }
 
+# Journal-style theme for figures drawn at final print size (183 mm wide): Helvetica,
+# 9 pt bold title, 8 pt labels, 7 pt tick labels and notes, no grid, thin axis lines,
+# bold lower-case panel tags. The figure title stays on the figure. Used by the figures
+# that have been redrawn at that size (F01, F17); the others keep the global theme above.
+theme_nature <- function(base_size = 8) {
+  ggplot2::theme_classic(base_size = base_size, base_family = "Helvetica") %+replace%
+    ggplot2::theme(
+      axis.line   = ggplot2::element_line(linewidth = 0.25, colour = sc_col("ink")),
+      axis.ticks  = ggplot2::element_line(linewidth = 0.25, colour = sc_col("ink")),
+      axis.text   = ggplot2::element_text(size = base_size - 1, colour = sc_col("ink")),
+      axis.title  = ggplot2::element_text(size = base_size),
+      plot.title    = ggplot2::element_text(size = base_size + 1, face = "bold", hjust = 0, margin = ggplot2::margin(b = 2)),
+      plot.subtitle = ggplot2::element_text(size = base_size - 1, colour = sc_col("grey_dark"), hjust = 0,
+                                            margin = ggplot2::margin(b = 4)),
+      plot.caption  = ggplot2::element_text(size = base_size - 1, colour = sc_col("grey_dark"), hjust = 0),
+      plot.tag    = ggplot2::element_text(size = base_size + 2, face = "bold"),
+      legend.title = ggplot2::element_text(size = base_size),
+      legend.text  = ggplot2::element_text(size = base_size - 1),
+      legend.key.size = grid::unit(3, "mm"),
+      plot.margin = ggplot2::margin(3, 4, 3, 3), complete = TRUE)
+}
+.sc_mm <- function(pt) pt / ggplot2::.pt   # ggplot text size (mm) for a font size in pt
+
 # Config: use defaults if not running inside run_pipeline()
 if (!exists("pipeline_config")) { pipeline_config <- list() }
 if (!exists(".sc_step5_thresholds", mode = "function")) {
@@ -236,10 +259,10 @@ if (!interactive()) {
 # became ~90 files. Nothing referenced the flat copy: make_figure_index.R
 # addresses every figure as "<subdir>/<name>.png", and the README links to the
 # folders rather than to individual files.
-save_png <- function(plot, name, w = NULL, h = NULL, subdir = NULL) {
+save_png <- function(plot, name, w = NULL, h = NULL, subdir = NULL, chars_per_inch = 9.5, dpi = NULL) {
   w  <- if (is.null(w)) cfg_get("output.figure.width_inches", 14, cfg = pipeline_config) else w
   h  <- if (is.null(h)) cfg_get("output.figure.height_inches", 9, cfg = pipeline_config) else h
-  dpi <- cfg_get("output.figure.dpi", 150, cfg = pipeline_config)
+  if (is.null(dpi)) dpi <- cfg_get("output.figure.dpi", 150, cfg = pipeline_config)
   rel  <- if (is.null(subdir)) paste0(name, ".png") else file.path(subdir, paste0(name, ".png"))
   path <- file.path(output_dir, rel)
   dir.create(dirname(path), showWarnings = FALSE, recursive = TRUE)
@@ -262,7 +285,7 @@ save_png <- function(plot, name, w = NULL, h = NULL, subdir = NULL) {
     if (!is.character(x) || length(x) != 1 || is.na(x)) return(x)
     x <- .fig_ascii(x)
     paste(vapply(strsplit(x, "\n", fixed = TRUE)[[1]],
-                 function(l) paste(strwrap(l, width = floor(w * 9.5)), collapse = "\n"),
+                 function(l) paste(strwrap(l, width = floor(w * chars_per_inch)), collapse = "\n"),
                  character(1)), collapse = "\n")
   }
   if (inherits(plot, "patchwork")) {
@@ -867,51 +890,52 @@ if(all(c("data_category", "manually_corrected", "corrected") %in% names(correcte
   )
   flow$y <- seq(length(flow$stage), 1, by = -1)
 
-  p1 <- ggplot(flow, aes(x = 0.5, y = y)) +
-    geom_rect(aes(xmin = 0.05, xmax = 0.95,
-                  ymin = y - 0.38, ymax = y + 0.38),
-              fill = flow$color, alpha = 0.12, color = flow$color, linewidth = 0.6) +
-    geom_text(aes(label = label), size = 3.2, fontface = "bold", color = sc_col("ink")) +
+  # Right-hand key: one row per final record class (full definitions are in the
+  # vignette and the figure caption, not on the figure).
+  cls <- data.frame(
+    cls = c("Not reported", "Error (reviewed)", "Equal time", "Unusual (accepted)",
+            "Reasonable unusual", "Clean"),
+    n   = c(n_not_rpt, n_error, n_equal, n_unusual, n_reasonable, n_clean),
+    col = sc_col("grey", "vermillion", "grey_light", "orange", "pink", "green"),
+    def = c("a time is missing",
+            sprintf("order broken, or gap > %s h / span > %s h", .thr5$bed_sleep_error, .thr5$sleep_awake_error),
+            "bed = sleep or awake = get-up",
+            sprintf("order intact, gap > %s h", .thr5$bed_sleep_unusual),
+            "unusual pattern marked reasonable",
+            sprintf("order intact, no gap > %s h", .thr5$bed_sleep_unusual)),
+    stringsAsFactors = FALSE)
+  cls$y <- seq(max(flow$y) - 0.6, min(flow$y) + 0.4, length.out = nrow(cls))
+
+  p1 <- ggplot() +
+    geom_rect(data = flow, aes(xmin = 0.02, xmax = 0.52, ymin = y - 0.36, ymax = y + 0.36),
+              fill = scales::alpha(flow$color, 0.14), colour = flow$color, linewidth = 0.4) +
+    geom_text(data = flow, aes(x = 0.27, y = y, label = label), size = .sc_mm(8),
+              lineheight = 0.95, colour = sc_col("ink")) +
     geom_segment(data = flow[flow$y > min(flow$y), ],
-                 aes(x = 0.5, xend = 0.5,
-                     y = y - 0.38, yend = y - 0.62),
-                 arrow = arrow(length = unit(0.10, "inches"), type = "closed"),
-                 color = sc_col("grey_dark"), linewidth = 0.6) +
-    annotate("text", x = 1.05, y = max(flow$y) - 0.6, hjust = 0, size = 3.2, lineheight = 1.15,
-             label = paste(
-               vapply(c(
-                 "FINAL RECORD CLASSES (each record gets exactly one; first match wins):",
-                 sprintf("Not Reported: %s (%s%%) = any of bed / sleep / awake / getup time is missing",
-                         format(n_not_rpt, big.mark = ","), round(n_not_rpt / n_total * 100, 1)),
-                 sprintf("Error (Reviewed): %s = order broken (not bed <= sleep <= awake <= getup), sleep = awake, a gap > %s h, or sleep span > %s h; reviewed; fixed or kept flagged per review", n_error, .thr5$bed_sleep_error, .thr5$sleep_awake_error),
-                 sprintf("Equal Time: %s = bed = sleep and/or awake = getup (difference < 0.01 h, about 36 s), order intact; benign diary habit, not an error", n_equal),
-                 sprintf("Unusual (Accepted): %s = order intact but a gap > %s h (bed->sleep or awake->getup); odd but possible, reviewed and kept as-is", n_unusual, .thr5$bed_sleep_unusual),
-                 sprintf("Reasonable unusual (accepted): %s = an unusual pattern a reviewer marked as reasonable; counts as valid (1.6.0 reclassification)", n_reasonable),
-                 sprintf("Clean: %s (%s%%) = order intact, no gap > %s h",
-                         format(n_clean, big.mark = ","), round(n_clean / n_total * 100, 1), .thr5$bed_sleep_unusual),
-                 sprintf("Participants w/ >=1 correction: %s / %s (%s%%)",
-                         n_pid_any_corr, n_pid_total, round(n_pid_any_corr / n_pid_total * 100, 1))
-               ), function(l) paste(strwrap(l, width = 68, exdent = 3), collapse = "\n"), character(1)),
-               collapse = "\n")) +
-    annotate("text", x = 1.05, y = min(flow$y), hjust = 0, size = 3,
-             color = sc_col("grey"),
-             label = sprintf("%s%% of raw records enter analysis",
-                             round(n_valid / n_total * 100, 1))) +
-    xlim(0, 2.3) + ylim(0.5, length(flow$stage) + 0.5) +
-    labs(
-      title = "Figure 1: Pipeline Record Flow Diagram",
-      subtitle = sprintf("N = %s raw diary entries | %s records with computed sleep metrics",
-                         format(n_total, big.mark = ","),
-                         format(n_valid, big.mark = ","))
-    ) +
-    theme_void() +
-    theme(
-      plot.title    = element_text(hjust = 0.5, size = 14, face = "bold"),
-      plot.subtitle = element_text(hjust = 0.5, size = 10, color = sc_col("grey_dark"))
-    )
+                 aes(x = 0.27, xend = 0.27, y = y - 0.36, yend = y - 0.64),
+                 arrow = arrow(length = unit(1.4, "mm"), type = "closed"),
+                 colour = sc_col("grey_dark"), linewidth = 0.3) +
+    annotate("text", x = 0.62, y = max(flow$y) + 0.25, label = "Final record class",
+             hjust = 0, fontface = "bold", size = .sc_mm(8)) +
+    geom_point(data = cls, aes(x = 0.63, y = y), colour = cls$col, size = 2.2) +
+    geom_text(data = cls, aes(x = 0.67, y = y + 0.13, label = sprintf("%s: %s", cls, format(n, big.mark = ","))),
+              hjust = 0, size = .sc_mm(8), colour = sc_col("ink")) +
+    geom_text(data = cls, aes(x = 0.67, y = y - 0.17, label = def),
+              hjust = 0, size = .sc_mm(7), colour = sc_col("grey_dark")) +
+    xlim(0, 1.0) + ylim(min(flow$y) - 0.45, max(flow$y) + 0.5) +
+    labs(title = "Figure 1: Pipeline Record Flow Diagram",
+         subtitle = sprintf("N = %s raw diary entries; %s records enter analysis (%s%%). Participants with at least one correction: %s of %s (%s%%).",
+                            format(n_total, big.mark = ","), format(n_valid, big.mark = ","),
+                            round(n_valid / n_total * 100, 1), n_pid_any_corr, n_pid_total,
+                            round(n_pid_any_corr / n_pid_total * 100, 1))) +
+    theme_void(base_size = 8, base_family = "Helvetica") +
+    theme(plot.title = element_text(size = 9, face = "bold", hjust = 0, margin = margin(b = 2)),
+          plot.subtitle = element_text(size = 7, colour = sc_col("grey_dark"), hjust = 0, margin = margin(b = 4)),
+          plot.margin = margin(3, 4, 3, 3))
 
   print(p1)
-  save_png(p1, "F01", subdir = "pipeline_cleaning")
+  save_png(p1, "F01", w = 183 / 25.4, h = 105 / 25.4, subdir = "pipeline_cleaning",
+           chars_per_inch = 18, dpi = 300)
   cat("✓ Figure 1 completed (pipeline flow diagram)\n\n")
 
 } else {
@@ -991,44 +1015,41 @@ if (has_raw_times && has_metrics) {
       mutate(id = row_number()) %>%
       ggplot(aes(x = delta_tst, y = id, color = status)) +
       geom_vline(xintercept = 0, linetype = "dashed", linewidth = 0.3, color = sc_col("grey")) +
-      geom_segment(aes(xend = 0), linewidth = 0.5) +
-      geom_point(size = 1.8) +
+      geom_segment(aes(xend = 0), linewidth = 0.3) +
+      geom_point(size = 0.9) +
       scale_color_manual(values = c(algorithmic = sc_col("orange"), manual = sc_col("blue"))) +
-      labs(x = expression(Delta ~ "TST (min)"), y = "Record",
-           subtitle = sprintf("TST corrections (n = %d)", nrow(mod))) +
-      theme(legend.position = "none")
+      labs(x = expression(Delta ~ "TST (min)"), y = "Record") +
+      theme_nature() + theme(legend.position = "none")
 
     p2b <- mod %>%
       arrange(desc(abs(delta_sol))) %>%
       mutate(id = row_number()) %>%
       ggplot(aes(x = delta_sol, y = id, color = status)) +
       geom_vline(xintercept = 0, linetype = "dashed", linewidth = 0.3, color = sc_col("grey")) +
-      geom_segment(aes(xend = 0), linewidth = 0.5) +
-      geom_point(size = 1.8) +
+      geom_segment(aes(xend = 0), linewidth = 0.3) +
+      geom_point(size = 0.9) +
       scale_color_manual(values = c(algorithmic = sc_col("orange"), manual = sc_col("blue"))) +
-      labs(x = expression(Delta ~ "SOL (min)"), y = "",
-           subtitle = sprintf("SOL corrections (n = %d)", nrow(mod))) +
-      theme(legend.position = "none")
+      labs(x = expression(Delta ~ "SOL (min)"), y = "") +
+      theme_nature() + theme(legend.position = "none", axis.title.y = element_blank())
   } else {
     .none_msg <- "No record was changed by a correction in this run\n(none needed, or the manual-correction files were not applied)"
-    p2a <- ggplot() + annotate("text", x = 0, y = 0, label = .none_msg, size = 3.6) + theme_void()
-    p2b <- ggplot() + annotate("text", x = 0, y = 0, label = .none_msg, size = 3.6) + theme_void()
+    p2a <- ggplot() + annotate("text", x = 0, y = 0, label = .none_msg, size = .sc_mm(8)) + theme_void()
+    p2b <- ggplot() + annotate("text", x = 0, y = 0, label = .none_msg, size = .sc_mm(8)) + theme_void()
   }
 
   # --- Panel C: Identity scatter (unchanged as faint backdrop) ---
   p2c <- ggplot(pre_post, aes(x = tst_before, y = tst_after, color = status)) +
     geom_abline(slope = 1, linetype = "dotted", linewidth = 0.3, color = sc_col("grey_light")) +
     geom_point(data = pre_post %>% filter(status == "none"),
-               alpha = 0.03, size = 0.5, color = "gray60") +
+               alpha = 0.03, size = 0.4, color = "gray60") +
     geom_point(data = pre_post %>% filter(status != "none"),
-               alpha = 0.85, size = 1.5) +
+               alpha = 0.85, size = 1) +
     scale_color_manual(
       values = c(algorithmic = sc_col("orange"), manual = sc_col("blue"), none = "gray60"),
       name = "Correction"
     ) +
-    labs(x = "TST before (min)", y = "TST after (min)",
-         subtitle = "Each dot = one record. Unchanged records shown at 3% opacity.") +
-    coord_fixed()
+    labs(x = "TST before (min)", y = "TST after (min)") +
+    coord_fixed() + theme_nature()
 
   # --- Summary table ---
   sum_tbl <- data.frame(
@@ -1040,29 +1061,35 @@ if (has_raw_times && has_metrics) {
                round(sd(pre_post$sol_before), 1), round(sd(pre_post$sol_after), 1)),
     stringsAsFactors = FALSE
   )
-  tbl_grob <- tableGrob(sum_tbl, rows = NULL, theme = ttheme_minimal(base_size = 9))
+  tbl_grob <- tableGrob(sum_tbl, rows = NULL, theme = ttheme_minimal(base_size = 7))
 
   # When nothing was corrected (e.g. a clean dataset, or the manual-correction
   # files were not applied) the lollipop panels and the all-on-the-diagonal
   # scatter are empty -- show one plain message plus the before/after table.
-  p2_body <- if (nrow(mod) > 0) (p2a | p2b) / p2c / tbl_grob else p2a / tbl_grob
-  p2_heights <- if (nrow(mod) > 0) c(2, 2, 0.9) else c(1, 1)
+  p2_body <- if (nrow(mod) > 0) (p2a | p2b | p2c) / tbl_grob else p2a / tbl_grob
+  p2_heights <- if (nrow(mod) > 0) c(3, 0.9) else c(1, 1)
   p2_subtitle <- if (nrow(mod) > 0) NULL else
     "Purpose: an audit of how much, and in which direction, corrections changed the data.\nNo record was changed in this run, so there is nothing to plot; the table shows the data are identical before and after."
 
+  # Title and "how to read" text live in the caption and the vignette, not on the figure.
   p2 <- p2_body +
-    plot_layout(heights = p2_heights) +
+    plot_layout(heights = p2_heights, guides = "collect") +
     plot_annotation(
+      tag_levels = if (nrow(mod) > 0) "a" else NULL,
       title    = "Figure 2: Impact of Corrections on Sleep Metrics",
-      subtitle = if (!is.null(p2_subtitle)) p2_subtitle else "Purpose: an audit of how much, and in which direction, corrections changed the data.\nTop panels: one row per corrected record; line length = change in TST or SOL (min, after minus before).\nBottom panel: TST before (x) vs after (y); orange = algorithmic, blue = manual; a dot on the dotted diagonal did not change.\nCorrection is non-destructive: only clear input errors are corrected; self-report/measured discrepancies stay as data.",
-      caption  = .anno,
-      theme    = theme(plot.title    = element_text(hjust = 0.5, size = 14, face = "bold"),
-                       plot.subtitle = element_text(hjust = 0.5, size = 9, color = sc_col("grey_dark")),
-                       plot.caption  = element_text(hjust = 0.5, size = 9, color = sc_col("grey_dark"), margin = margin(t = 10)))
-    )
+      subtitle = if (!is.null(p2_subtitle)) p2_subtitle else paste(strwrap(paste(
+        "Purpose: how much, and in which direction, corrections changed the data.",
+        "a, b: one row per corrected record; line length = change in TST or SOL (min, after minus before).",
+        "c: TST before (x) against after (y); orange = algorithmic, blue = manual; a dot on the dotted diagonal did not change.",
+        "Correction is non-destructive: only clear input errors are corrected; self-report/measured discrepancies stay as data."),
+        width = 140), collapse = "\n"),
+      caption  = paste0(.anno, if (nrow(mod) > 0) ". Unchanged records in c are drawn at 3% opacity." else ""),
+      theme    = theme_nature()
+    ) & theme(legend.position = "bottom")
 
   print(p2)
-  save_png(p2, "F17", subdir = "research_ready")
+  save_png(p2, "F17", w = 183 / 25.4, h = 108 / 25.4, subdir = "research_ready",
+           chars_per_inch = 18, dpi = 300)
   cat("✓ Figure 2 completed (before/after delta)\n\n")
 
 } else {
