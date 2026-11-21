@@ -159,7 +159,7 @@ number comes from are in `vignette("validation-methodology")`.
 
 ## Status and data availability
 
-**Status.** sleepcleanr (the development version after 1.8.0) is research software under active development. It
+**Status.** sleepcleanr (version 1.9.0) is research software under active development. It
 was built for one longitudinal sleep study, has not yet been peer reviewed, and
 is not on CRAN. Treat the shipped thresholds as references to check against your
 own data.
@@ -382,7 +382,7 @@ flag 各列、flag 生命周期、验证表里用到的术语（L1/L3 召回、F
 
 ## 状态与数据可用性
 
-**状态。** sleepcleanr（1.8.0 之后的开发版）是仍在开发中的研究软件，为一项纵向睡眠研究而写，尚未经同行评审，也未上线 CRAN。随包给出的阈值只是参考，请用你自己的数据核对。
+**状态。** sleepcleanr（1.9.0 版）是仍在开发中的研究软件，为一项纵向睡眠研究而写，尚未经同行评审，也未上线 CRAN。随包给出的阈值只是参考，请用你自己的数据核对。
 
 **数据可用性。** 研究数据不公开（参与者隐私）。不需要这些数据也能用到的东西：
 
