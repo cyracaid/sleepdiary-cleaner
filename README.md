@@ -261,7 +261,7 @@ issues.
 | 6-7 | Correct & compute metrics (S3 chain) | Manual + duration corrections; TST/SOL/WASO/SE metrics; has_correction enum |
 | 8 | Auto-detect remaining issues | TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED flag classification |
 | 8.5 | Cross-participant consistency check | Global consistency audit across participants |
-| 9 | Generate diagnostic figures | 35 figures (19 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt |
+| 9 | Generate diagnostic figures | 37 figures (21 QC + 16 research) + figure_index.png contact sheet + RUN_INFO.txt |
 | 10 | Build delivered datasets | finalize_columns() selects/renames to Dataset A/B per column dictionary |
 
 <!-- AUTO:ARCH_END -->
@@ -459,7 +459,7 @@ Bug、问题和功能建议：请开 [issue](https://github.com/cyracaid/sleepdi
 | 6-7 | 修正并计算指标（S3 链） | 人工与时长修正；TST/SOL/WASO/SE 指标；has_correction 枚举 |
 | 8 | 自动检测剩余问题 | TIMESTAMP/DURATION/AMOUNT/SELF-REPORTED 标记分类 |
 | 8.5 | 跨参与者一致性检查 | 对全体参与者做全局一致性审计 |
-| 9 | 生成诊断图 | 35 张图（19 张质控 + 16 张科研）+ figure_index.png 总览图 + RUN_INFO.txt |
+| 9 | 生成诊断图 | 37 张图（21 张质控 + 16 张科研）+ figure_index.png 总览图 + RUN_INFO.txt |
 | 10 | 构建交付数据集 | finalize_columns() 按列字典选列并重命名，得到数据集 A/B |
 
 <!-- AUTO:ARCH_ZH_END -->
