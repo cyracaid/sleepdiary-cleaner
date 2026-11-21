@@ -7,7 +7,7 @@ these rows, 2,860 were morning sleep diaries, one per participant per study day,
 had all four diary times. Each diary recorded, as free text, the times the participant went to bed,
 fell asleep, woke up and got out of bed, plus self-reported sleep onset latency (SOL), wake after
 sleep onset (WASO) and time in bed. To ensure data validity we built a structured, auditable
-correction pipeline (R package sleepcleanr, version 1.7.2) that addresses timestamp formatting,
+correction pipeline (R package sleepcleanr, version 1.7.1, the version run on the study data) that addresses timestamp formatting,
 internal consistency and derived sleep metrics. Its rule is that a value is changed automatically
 only when a documented rule can show that it is a data-entry error; anything that needs a judgment
 about whether an unusual value is a mistake or a real night is written to a worksheet for a person
@@ -65,7 +65,8 @@ repeatedly, until the gap is under 12 hours; if sleep onset is 12 hours or more 
 same is done to sleep onset. Stage two corrects minor inversions: if two adjacent times (bed–sleep,
 sleep–awake, awake–get-up) are in reverse order by less than 3 hours, which suggests they were typed
 in the wrong fields, the two values are exchanged. Identical adjacent times (for example bedtime equal
-to sleep onset) are not errors. Every automated correction is labeled with its type.
+to sleep onset) are not errors, and an awakening of exactly 00:00 is never exchanged with sleep
+onset (a guard added in version 1.9.0). Every automated correction is labeled with its type.
 
 **Step 5: Record classification and review worksheets.** After Step 4, each row is classified. A row
 is an *error*, and is written to the review worksheet, if at least one of the following holds: the
@@ -201,7 +202,7 @@ published sources report error rates in sleep diaries: SHUTi (Shaffer et al., 20
 diary in an insomnia trial, with 487 of 45,598 diaries (1.07%) corrected for date or AM/PM errors;
 and RESTING (Tully et al., 2024; conference abstract only), with 3,382 diary-days, of which AM/PM
 confusion accounted for 28 errors (about 0.8%) and confusing wake time with rise time for 150 (about
-4.4%), the commonest error there. The abstract does not describe the confusion, but one of its post hoc flags was a rise time earlier than the wake time, so we modelled it as wake and rise times in reversed order, which the existing swap injector produces. We injected this and AM/PM errors, in the published proportions and no other type, into the synthetic data (the two studies supply only the rates; none of their data was used), at four overall rates (2, 5, 10 and 20% of rows). At 5% of rows, all 282 reversed pairs were corrected to the true value (95% CI 98.7 to 100%) and all 68 AM/PM errors were handled (40 corrected, 28 flagged); there were no wrong repairs and no clean row was altered.
+4.4%), the commonest error there. The abstract does not describe the confusion, but one of its post hoc flags was a rise time earlier than the wake time, so we modelled it as wake and rise times in reversed order, which the existing swap injector produces. We injected this and AM/PM errors, in the published proportions and no other type, into the synthetic data (the two studies supply only the rates; none of their data was used), at four overall rates (2, 5, 10 and 20% of rows). At 5% of rows, all 282 reversed pairs were corrected to the true value (95% CI 98.7 to 100%) (per-form counts: `validation/synthetic/results/external_mix_by_form.csv`) and all 68 AM/PM errors were handled (40 corrected, 28 flagged); there were no wrong repairs and no clean row was altered.
 
 *Scope of the reversed-pair result.* The 100% applies to the one reversal the benchmark injected, wake and rise times exchanged. In the study data, 140 of 2,848 nights with all four times (4.92%) have times out of order (134, or 4.71%, after setting aside 6 impossible get-up values); an exchanged wake and rise pair accounts for 9 of the 140 (6.4%). The rest are one time 12 hours away (57), bed and sleep-onset times exchanged (38), the whole night 12 hours away (14), and forms with no simple explanation. We re-ran the benchmark with the forms in these proportions (350 reversals in 7,000 rows). The pipeline corrected every exchange and every sleep-onset or rise-time shift, but only 17.5% of bed-time shifts and 5.0% of whole-night shifts, and none of the rows with wake time before bedtime or a wake time 12 hours away; overall 74.0% were flagged or corrected, with 91 wrong repairs, because this benchmark has no reviewer to catch them, and no clean row was altered (0 of 6,650). In the study data the forms the algorithm does not repair were fixed from the review worksheets.
 
@@ -236,12 +237,13 @@ times are known. Materials and scoring scripts are in `validation/blind_audit/` 
 
 ### Software and reproducibility
 
-The package (R, version 1.7.2) is configured by a YAML column mapping and keeps its working objects in
+The package (R) is configured by a YAML column mapping and keeps its working objects in
 a package-private environment; it does not write to the user's global environment. It is tested with
-758 expectations in 290 test blocks across 48 files, including a snapshot test that compares the
-delivered tables of a synthetic run with committed copies [CHECK: re-run the full suite and re-read
-the counts before submission], and is checked on Linux, Windows and macOS in continuous integration
-[CHECK: confirm on the release commit]. `validation/run_all.R` regenerates the benchmark tables from
+327 test blocks across 54 files [CHECK: re-run the full suite and report the expectation count for 1.9.0], including a snapshot test that compares the
+delivered tables of a synthetic run with committed copies and is checked on Linux, Windows and macOS in continuous integration (all four workflows passed on the 1.9.0
+release commit, a9058bb). The study data were cleaned with version 1.7.1; the released version 1.9.0
+differs from it in one Step 4 rule (the 00:00 guard above). Rerunning Step 4 of both versions on the
+pre-correction times of the 2,848 complete nights, the two differ on one night. `validation/run_all.R` regenerates the benchmark tables from
 fixed seeds in a temporary copy and compares each with the committed one; all 11 regenerate
 identically [CHECK: re-run]. The repository is archived at Zenodo (DOI 10.5281/zenodo.23077702).
 
