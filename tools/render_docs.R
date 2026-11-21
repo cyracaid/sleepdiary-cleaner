@@ -135,7 +135,9 @@ regenerate_region <- function(path, start_marker, end_marker, lines) {
                  start_marker, end_marker, path))
   }
   block <- c(start_marker, "", lines, "", end_marker)
-  out <- c(txt[seq_len(i_start - 1)], block, txt[seq((i_end + 1), length(txt))])
+  # seq(i_end + 1, length(txt)) counts down when the end marker is the last line,
+  # which appended NA and a copy of that line; index by position instead.
+  out <- c(txt[seq_len(i_start - 1)], block, txt[seq_along(txt) > i_end])
   writeLines(out, path, useBytes = TRUE)
   invisible(length(out))
 }

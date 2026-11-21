@@ -107,3 +107,14 @@ test_that("steps.yaml step ids match run_pipeline step markers", {
   expect_true(all(used %in% ids),
               paste("steps.yaml missing step ids used in code:", paste(setdiff(used, ids), collapse = ", ")))
 })
+
+test_that("regenerate_region does not append anything when the end marker is the last line", {
+  root <- if (basename(getwd()) == "testthat") dirname(dirname(getwd())) else getwd()
+  rdr <- file.path(root, "tools", "render_docs.R")
+  skip_if_not(file.exists(rdr), "tools/render_docs.R not found")
+  source(rdr, local = TRUE)
+  f <- tempfile(fileext = ".md")
+  writeLines(c("head", "<!-- S -->", "old", "<!-- E -->"), f)
+  regenerate_region(f, "<!-- S -->", "<!-- E -->", c("new1", "new2"))
+  expect_identical(readLines(f), c("head", "<!-- S -->", "", "new1", "new2", "", "<!-- E -->"))
+})
