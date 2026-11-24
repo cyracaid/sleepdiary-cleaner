@@ -2,6 +2,17 @@
 
 ## sleepcleanr (development version)
 
+### Fixed
+
+- The duration comparison columns added to the review data frames
+  (`duration_from_data_min`, `duration_calculated_min`,
+  `duration_difference_min`, `duration_difference_h`, `duration_match`)
+  no longer compare the time-derived sleep period with a self-reported
+  SOL, WASO or nap duration. `find_duration_columns()` now accepts only
+  a total-sleep-duration column and returns `NULL` otherwise, in which
+  case the comparison columns are not added. They are not written to any
+  delivered file; no flag or correction used them.
+
 ### Added
 
 - Figures F36 and F37 (`pipeline_cleaning/`). F36 shows, for each form

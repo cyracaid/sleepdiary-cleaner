@@ -76,6 +76,10 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="sleepcleanr-development-version">sleepcleanr (development version)<a class="anchor" aria-label="anchor" href="#sleepcleanr-development-version"></a></h2>
 <div class="section level3">
+<h3 id="fixed-development-version">Fixed<a class="anchor" aria-label="anchor" href="#fixed-development-version"></a></h3>
+<ul><li>The duration comparison columns added to the review data frames (<code>duration_from_data_min</code>, <code>duration_calculated_min</code>, <code>duration_difference_min</code>, <code>duration_difference_h</code>, <code>duration_match</code>) no longer compare the time-derived sleep period with a self-reported SOL, WASO or nap duration. <code>find_duration_columns()</code> now accepts only a total-sleep-duration column and returns <code>NULL</code> otherwise, in which case the comparison columns are not added. They are not written to any delivered file; no flag or correction used them.</li>
+</ul></div>
+<div class="section level3">
 <h3 id="added-development-version">Added<a class="anchor" aria-label="anchor" href="#added-development-version"></a></h3>
 <ul><li>Figures F36 and F37 (<code>pipeline_cleaning/</code>). F36 shows, for each form of an out-of-order night, how often the rules put the time back to the true value in a synthetic test (with the number of rows changed to a wrong value); it reads <code>reversal_injection_outcomes.csv</code>, shipped in <code>inst/extdata/</code>, and is switched by <code>visualization.detection_outcomes.enabled</code>. F37 shows this study’s out-of-order nights before and after the corrections, by family of mechanism. There are now 37 figures (21 pipeline-cleaning, 16 research-ready).</li>
 <li>
