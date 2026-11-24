@@ -4,23 +4,26 @@
 # 
 # DATA SOURCE HIERARCHY:
 # ============================================================================
-# Figures 1-12:  Based on `corrected_ema_data` (post-correction final data)
-#                Uses: data_category, manually_corrected, sleep metrics
-#                Shows: Final classification after all corrections applied
+# Figure numbers are F numbers: the number in the file name, the in-figure
+# title and the card heading in vignettes/figure-reference.Rmd are the same.
+# They follow the two sections of that page:
 #
-# Figures 13-18: Based on `review_output` from checkforerrors_processing.R (auto-detection)
-#                Uses: checkforerrors_df from algorithm detection
-#                Shows: Potential issues needing human review
+#   F01-F16:  pipeline-cleaning figures on `corrected_ema_data`
+#             (post-correction final data). F06-F14 read the auto-detection
+#             output from checkforerrors_processing.R instead.
+#   F17-F21:  reversal and clock-time families, on `corrected_ema_data`;
+#             F20 reads the synthetic injection table in inst/extdata instead
+#   F22-F37:  research-ready figures, on `corrected_ema_data`
 #
-# Figure F01:    Pipeline record flow diagram (post-correction)
-# Figure F14:    Auto-detected issues dashboard (raw algorithm output)
+# F01: pipeline record flow diagram (post-correction)
+# F14: auto-detected issues dashboard (raw algorithm output)
 # ============================================================================
 # OVERVIEW
 # ============================================================================
 # Data sources:
-#   - Figures 1-12: corrected_ema_data (post-correction final data)
-#   - Figures 13-18: checkforerrors_processed (pre-correction auto-detection flags)
-#   - Figures 19-24: checkforerrors_summary + corrected_ema_data
+#   - F01-F16, F17-F21, F22-F37: corrected_ema_data (post-correction final data)
+#   - F06-F14 also read checkforerrors_processed (pre-correction auto-detection)
+#   - F31-F34 also read the substance-use columns of corrected_ema_data
 # 
 # File output: All figures saved as PNG files in the working directory
 # 
