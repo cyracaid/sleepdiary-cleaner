@@ -3483,6 +3483,9 @@ if (cfg_get("visualization.detection_outcomes.enabled", TRUE, cfg = pipeline_con
 
 # --------------------------------------------------------------------------
 # Figure F21: Out-of-order nights in this study, before and after the corrections
+#   A  every out-of-order night, by mechanism family, and who put it right
+#      (the algorithm, or a person reviewing it)
+#   B  the share of nights that were out of order, on each study day
 # --------------------------------------------------------------------------
 cat("Generating F21 (out-of-order nights: before and after correction)...\n")
 .f37_cols <- c("time_bed_corrected", "time_sleep_corrected", "time_awake_corrected", "time_getup_corrected")
@@ -3497,35 +3500,70 @@ if (exists("corrected_ema_data") && nrow(corrected_ema_data) > 0 && all(.f37_col
     have <- !is.na(sol) & !is.na(tib) & !is.na(tst) & !is.na(cd37$time_awake_corrected) & !is.na(cd37$time_getup_corrected)
     in_order <- have & sol >= 0 & tst >= 0 & hrs(cd37$time_getup_corrected, cd37$time_awake_corrected) >= 0
     plaus <- in_order & sol <= 300 & tib >= 120 & tib <= 960 & tst >= 30 & tst <= 720
+    # Who put the night right: a rule ran on it (correction_type is set), or only a person
+    # changed it (manually_corrected). A night both touched counts as the algorithm's.
+    has_who <- all(c("correction_type", "manually_corrected") %in% names(cd37))
+    by_rule <- if (has_who) !is.na(cd37$correction_type) & nzchar(cd37$correction_type) else rep(FALSE, nrow(cd37))
     after <- ifelse(!have, "No corrected value",
+             ifelse(plaus & has_who & by_rule, "Put right by the algorithm",
+             ifelse(plaus & has_who, "Put right after human review",
              ifelse(plaus, "In order and plausible",
-             ifelse(in_order, "In order but implausible", "Still out of order")))
+             ifelse(in_order, "In order but implausible", "Still out of order")))))
     fam <- ifelse(grepl("^swap", rev37$class), "Two times exchanged",
            ifelse(rev37$class == "pm12h", "One time 12 h away",
            ifelse(rev37$class == "pm12h_x2", "Two times moved together",
            ifelse(grepl("^(D|E)", rev37$class), "Visibly wrong or unexplained", "Ambiguous"))))
-    lv_after <- c("In order and plausible", "In order but implausible", "Still out of order", "No corrected value")
+    lv_after <- c("Put right by the algorithm", "Put right after human review", "In order and plausible",
+                  "In order but implausible", "Still out of order", "No corrected value")
+    lv_after <- lv_after[lv_after %in% after]
     tab37 <- as.data.frame(table(family = fam, after = factor(after, levels = lv_after)), stringsAsFactors = FALSE)
     tab37 <- tab37[tab37$Freq > 0, , drop = FALSE]
     tot <- tapply(tab37$Freq, tab37$family, sum)
     tab37$family <- factor(tab37$family, levels = names(sort(tot)))
     tab37$after <- factor(tab37$after, levels = rev(lv_after))
-    pal37 <- c("In order and plausible" = sc_col("blue"), "In order but implausible" = sc_col("orange"),
+    pal37 <- c("Put right by the algorithm" = sc_col("blue"), "Put right after human review" = sc_col("orange"),
+               "In order and plausible" = sc_col("sky"), "In order but implausible" = sc_col("yellow"),
                "Still out of order" = sc_col("vermillion"), "No corrected value" = sc_col("grey"))
-    n_ok <- sum(after == "In order and plausible")
-    p37 <- ggplot(tab37, aes(x = Freq, y = family, fill = after)) +
+    n_ok <- sum(grepl("^(Put right|In order and plausible)", after))
+    n_alg <- sum(after == "Put right by the algorithm"); n_hum <- sum(after == "Put right after human review")
+    pA37 <- ggplot(tab37, aes(x = Freq, y = family, fill = after)) +
       geom_col(width = 0.7) +
       geom_text(data = data.frame(family = factor(names(tot), levels = levels(tab37$family)), n = as.integer(tot)),
                 aes(x = n, y = family, label = paste0(" ", n)), inherit.aes = FALSE, hjust = 0, size = 3.3) +
       scale_fill_manual(values = pal37, breaks = lv_after, name = "After the corrections") +
-      scale_x_continuous(expand = expansion(mult = c(0, 0.1))) +
-      labs(title = "Figure F21: Out-of-order nights in this study, before and after the corrections",
-           subtitle = sprintf("Before: %d nights with the four times out of order (the bar length). After: %d (%.1f%%) in order and plausible. Plausible: SOL 0-300 min, time in bed 2-16 h, TST 0.5-12 h.",
-                              nrow(rev37), n_ok, 100 * n_ok / nrow(rev37)),
+      scale_x_continuous(expand = expansion(mult = c(0, 0.12))) +
+      labs(title = "A. Every out-of-order night, and who put it right",
+           subtitle = if (has_who)
+             sprintf("Before: %d nights with the four times out of order. After: %d put right by the algorithm, %d after human review, %d not.",
+                     nrow(rev37), n_alg, n_hum, nrow(rev37) - n_ok)
+           else sprintf("Before: %d nights with the four times out of order. After: %d in order and plausible.", nrow(rev37), n_ok),
            x = "Nights", y = NULL) +
-      theme_minimal(base_size = 12) +
+      theme_minimal(base_size = 11) +
       theme(legend.position = "bottom", panel.grid.major.y = element_blank(),
-            plot.subtitle = element_text(size = 9))
+            plot.subtitle = element_text(size = 8.5)) +
+      guides(fill = guide_legend(nrow = 2, reverse = FALSE))
+    # B: nights out of order, by study day. A night is "complete" when it has all four corrected times;
+    # "out of order" means classify_reversals() listed it. Counts only; no test is drawn.
+    day_all <- corrected_ema_data$day_num[complete.cases(corrected_ema_data[, .f37_cols])]
+    day_rev <- corrected_ema_data$day_num[match(rev37$row_id, corrected_ema_data$row_id)]
+    dd <- data.frame(day = sort(unique(day_all)))
+    dd$complete <- as.integer(table(factor(day_all, levels = dd$day)))
+    dd$reversed <- as.integer(table(factor(day_rev, levels = dd$day)))
+    dd$pct <- ifelse(dd$complete > 0, 100 * dd$reversed / dd$complete, NA_real_)
+    overall <- 100 * nrow(rev37) / length(day_all)
+    pB37 <- ggplot(dd, aes(x = factor(day), y = pct)) +
+      geom_col(width = 0.7, fill = sc_col("vermillion")) +
+      geom_hline(yintercept = overall, linetype = "dashed", colour = "grey40") +
+      geom_text(aes(label = reversed), vjust = -0.4, size = 3) +
+      scale_y_continuous(expand = expansion(mult = c(0, 0.12))) +
+      labs(title = "B. Share of nights out of order, by study day",
+           subtitle = sprintf("Labels: nights out of order. Dashed line: %.1f%% over all %d complete nights. Days 1-3 hold %.0f%% of them.",
+                              overall, length(day_all), 100 * mean(day_all <= 3)),
+           x = "Study day", y = "% of complete nights") +
+      theme_minimal(base_size = 11) + theme(panel.grid.major.x = element_blank(),
+                                            plot.subtitle = element_text(size = 8.5))
+    p37 <- (pA37 + pB37 + patchwork::plot_layout(ncol = 2, widths = c(1.15, 1))) +
+      patchwork::plot_annotation(title = "Figure F21: Out-of-order nights in this study, before and after the corrections")
     print(p37)
     save_png(p37, "F21", subdir = "pipeline_cleaning")
     cat(sprintf("✓ Figure F21 completed (%d reversed nights; %d in order and plausible after)\n\n", nrow(rev37), n_ok))
