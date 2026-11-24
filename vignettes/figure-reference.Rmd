@@ -114,43 +114,43 @@ All 37 figures, in F order. "Card" jumps to the full explanation in §4 or §5;
 
 | # | Paper figure | Use | File | Code source | Card | Last checked |
 |---|:------------:|-----|------|-------------|------|--------------|
-| **F01** | Figure 1 | Methods | `pipeline_cleaning/F01.png` | `sleep_visualization.R:937` | [§4 · Pipeline Record Flow](#f01-pipeline-record-flow) | 2026-09-25 |
-| **F02** | Figure S1 | Supplement | `pipeline_cleaning/F02.png` | `sleep_visualization.R:1422` | [§4 · Sleep Duration Post-Correction](#f02-sleep-duration-post-correction) | 2026-09-25 |
-| **F03** | Figure S2 | Supplement | `pipeline_cleaning/F03.png` | `sleep_visualization.R:1491` | [§4 · Flag Composition Stacked](#f03-flag-composition-stacked) | 2026-09-25 |
-| **F04** | Figure S3 | Supplement | `pipeline_cleaning/F04.png` | `sleep_visualization.R:1601` | [§4 · Extreme Sleep Durations](#f04-extreme-sleep-durations) | 2026-09-25 |
-| **F05** | Figure S4 | Supplement | `pipeline_cleaning/F05.png` | `sleep_visualization.R:1688` | [§4 · Flag Co-occurrence Heatmap](#f05-flag-co-occurrence-heatmap) | 2026-10-23 |
-| **F06** | Figure S5 | Supplement | `pipeline_cleaning/F06.png` | `sleep_visualization.R:1878` | [§4 · Error Category Distribution](#f06-error-category-distribution) | 2026-09-25 |
-| **F07** | Figure S6 | Supplement | `pipeline_cleaning/F07.png` | `sleep_visualization.R:1961` | [§4 · Adjacent Timestamp Gaps](#f07-adjacent-timestamp-gaps) | 2026-09-25 |
-| **F08** | Figure S7 | Supplement | `pipeline_cleaning/F08.png` | `sleep_visualization.R:2034` | [§4 · Detection Outcomes Heatmap](#f08-detection-outcomes-heatmap) | 2026-09-25 |
-| **F09** | Figure S8 | Supplement | `pipeline_cleaning/F09.png` | `sleep_visualization.R:2081` | [§4 · Threshold vs Measurement Noise](#f09-threshold-vs-measurement-noise) | 2026-09-25 |
-| **F10** | Figure S9 | Supplement | `pipeline_cleaning/F10.png` | `sleep_visualization.R:2152` | [§4 · Sleep Duration Pre-Correction](#f10-sleep-duration-pre-correction) | 2026-09-30 |
-| **F11** | Figure S10 | Supplement | `pipeline_cleaning/F11.png` | `sleep_visualization.R:2238` | [§4 · Error Timeline](#f11-error-timeline) | 2026-09-30 |
-| **F12** | Figure S11 | Supplement | `pipeline_cleaning/F12.png` | `sleep_visualization.R:2329` | [§4 · Common Error Patterns](#f12-common-error-patterns) | 2026-09-30 |
-| **F13** | Figure S12 | Supplement | `pipeline_cleaning/F13.png` | `sleep_visualization.R:2408` | [§4 · Top Participants by Flag Rate](#f13-top-participants-by-flag-rate) | 2026-09-25 |
-| **F14** | Figure S13 | Supplement | `pipeline_cleaning/F14.png` | `sleep_visualization.R:2510` | [§4 · Auto-Detected Dashboard](#f14-auto-detected-dashboard) | 2026-09-25 |
-| **F15** | Figure S14 | Supplement | `pipeline_cleaning/F15.png` | `figure12_step_flag_table.R:15` | [§4 · Step Flag Ledger](#f15-step-flag-ledger) | 2026-09-25 |
-| **F16** | Figure S15 | Supplement | `pipeline_cleaning/F16.png` | `sleep_visualization.R:2680` | [§4 · Participants Worth a Second Look](#f16-participants-worth-a-second-look) | 2026-09-25 |
-| **F17** | Figure 2 | Methods | `research_ready/F17.png` | `sleep_visualization.R:1091` | [§5 · Correction Impact](#f17-correction-impact) | 2026-09-25 |
-| **F18** | Figure 3 | Results | `research_ready/F18.png` | `sleep_visualization.R:1136` | [§5 · Distribution of Sleep Variables](#f18-distribution-of-sleep-variables) | 2026-09-25 |
-| **F19** | Figure 4 | Results | `research_ready/F19.png` | `sleep_visualization.R:1187` | [§5 · TST Distribution](#f19-tst-distribution) | 2026-09-25 |
-| **F20** | Figure 5 | Results | `research_ready/F20.png` | `sleep_visualization.R:1242` | [§5 · Sleep Duration vs Time in Bed](#f20-sleep-duration-vs-time-in-bed) | 2026-09-25 |
-| **F21** | Figure 6 | Results | `research_ready/F21.png` | `sleep_visualization.R:1294` | [§5 · SOL vs Sleep Duration](#f21-sol-vs-sleep-duration) | 2026-09-25 |
-| **F22** | Figure 7 | Results | `research_ready/F22.png` | `sleep_visualization.R:1344` | [§5 · Variability of Sleep Variables](#f22-variability-of-sleep-variables) | 2026-09-25 |
-| **F23** | Figure 8 | Results | `research_ready/F23.png` | `sleep_visualization.R:1545` | [§5 · Bedtime vs Get-up Distribution](#f23-bedtime-vs-get-up-distribution) | 2026-09-25 |
-| **F24** | Figure 9 | Results | `research_ready/F24.png` | `sleep_visualization.R:2738` | [§5 · SOL Perception Bias](#f24-sol-perception-bias) | 2026-09-25 |
-| **F25** | Figure 10 | Results | `research_ready/F25.png` | `sleep_visualization.R:2796` | [§5 · WASO Perception Bias](#f25-waso-perception-bias) | 2026-09-25 |
-| **F26** | Figure S16 | Supplement | `research_ready/F26.png` | `sleep_visualization.R:2868` | [§5 · Substance Use Availability](#f26-substance-use-availability) | 2026-09-25 |
-| **F27** | Figure S17 | Supplement | `research_ready/F27.png` | `sleep_visualization.R:2971` | [§5 · Substance Use Value Distribution](#f27-substance-use-value-distribution) | 2026-09-25 |
-| **F28** | Figure S18 | Supplement | `research_ready/F28.png` | `sleep_visualization.R:3045` | [§5 · Caffeine Consumption](#f28-caffeine-consumption) | 2026-09-25 |
-| **F29** | Figure S19 | Supplement | `research_ready/F29.png` | `sleep_visualization.R:3080` | [§5 · Alcohol Consumption](#f29-alcohol-consumption) | 2026-09-25 |
-| **F30** | Figure 11 | Results | `research_ready/F30.png` | `sleep_visualization.R:3144` | [§5 · Sleep Regularity — Weekday vs Weekend](#f30-sleep-regularity--weekday-vs-weekend) | 2026-09-25 |
-| **F31** | Figure 12 | Results | `research_ready/F31.png` | `sleep_visualization.R:3197` | [§5 · Sleep Composition — TIB Breakdown](#f31-sleep-composition--tib-breakdown) | 2026-09-25 |
-| **F32** | Figure 13 | Results | `research_ready/F32.png` | `sleep_visualization.R:3226` | [§5 · Sleep Metrics Correlation Matrix](#f32-sleep-metrics-correlation-matrix) | 2026-09-25 |
-| **F33** | Figure S20 | Supplement | `pipeline_cleaning/F33.png` | `sleep_visualization.R:3293` | [§4 · Out-of-Order Nights, by Mechanism](#f33-out-of-order-nights-by-mechanism) | 2026-11-03 |
-| **F34** | Figure S21 | Supplement | `pipeline_cleaning/F34.png` | `sleep_visualization.R:3355` | [§4 · Clock-Time Rule Outcomes (SOL / WASO)](#f34-clock-time-rule-outcomes) | 2026-11-03 |
-| **F35** | Figure S22 | Supplement | `pipeline_cleaning/F35.png` | `sleep_visualization.R:3388` | [§4 · SOL Clock-Like Entries vs Own Times](#f35-sol-clock-like-entries-vs-own-times) | 2026-11-03 |
-| **F36** | Figure S23 | Supplement | `pipeline_cleaning/F36.png` | `sleep_visualization.R:3440` | [§4 · Reversal Forms in a Synthetic Test](#f36-reversal-forms-synthetic-test) | 2026-11-21 |
-| **F37** | Figure S24 | Supplement | `pipeline_cleaning/F37.png` | `sleep_visualization.R:3527` | [§4 · Out-of-Order Nights, Before and After](#f37-out-of-order-before-after) | 2026-11-21 |
+| **F01** | Figure 1 | Methods | `pipeline_cleaning/F01.png` | `sleep_visualization.R:937` | [§4 · Pipeline Record Flow](#f01-pipeline-record-flow) | 2026-11-24 |
+| **F02** | Figure S1 | Supplement | `pipeline_cleaning/F02.png` | `sleep_visualization.R:1422` | [§4 · Sleep Duration Post-Correction](#f02-sleep-duration-post-correction) | 2026-11-24 |
+| **F03** | Figure S2 | Supplement | `pipeline_cleaning/F03.png` | `sleep_visualization.R:1491` | [§4 · Flag Composition Stacked](#f03-flag-composition-stacked) | 2026-11-24 |
+| **F04** | Figure S3 | Supplement | `pipeline_cleaning/F04.png` | `sleep_visualization.R:1601` | [§4 · Extreme Sleep Durations](#f04-extreme-sleep-durations) | 2026-11-24 |
+| **F05** | Figure S4 | Supplement | `pipeline_cleaning/F05.png` | `sleep_visualization.R:1688` | [§4 · Flag Co-occurrence Heatmap](#f05-flag-co-occurrence-heatmap) | 2026-11-24 |
+| **F06** | Figure S5 | Supplement | `pipeline_cleaning/F06.png` | `sleep_visualization.R:1878` | [§4 · Error Category Distribution](#f06-error-category-distribution) | 2026-11-24 |
+| **F07** | Figure S6 | Supplement | `pipeline_cleaning/F07.png` | `sleep_visualization.R:1961` | [§4 · Adjacent Timestamp Gaps](#f07-adjacent-timestamp-gaps) | 2026-11-24 |
+| **F08** | Figure S7 | Supplement | `pipeline_cleaning/F08.png` | `sleep_visualization.R:2034` | [§4 · Detection Outcomes Heatmap](#f08-detection-outcomes-heatmap) | 2026-11-24 |
+| **F09** | Figure S8 | Supplement | `pipeline_cleaning/F09.png` | `sleep_visualization.R:2081` | [§4 · Threshold vs Measurement Noise](#f09-threshold-vs-measurement-noise) | 2026-11-24 |
+| **F10** | Figure S9 | Supplement | `pipeline_cleaning/F10.png` | `sleep_visualization.R:2152` | [§4 · Sleep Duration Pre-Correction](#f10-sleep-duration-pre-correction) | 2026-11-24 |
+| **F11** | Figure S10 | Supplement | `pipeline_cleaning/F11.png` | `sleep_visualization.R:2238` | [§4 · Error Timeline](#f11-error-timeline) | 2026-11-24 |
+| **F12** | Figure S11 | Supplement | `pipeline_cleaning/F12.png` | `sleep_visualization.R:2329` | [§4 · Common Error Patterns](#f12-common-error-patterns) | 2026-11-24 |
+| **F13** | Figure S12 | Supplement | `pipeline_cleaning/F13.png` | `sleep_visualization.R:2408` | [§4 · Top Participants by Flag Rate](#f13-top-participants-by-flag-rate) | 2026-11-24 |
+| **F14** | Figure S13 | Supplement | `pipeline_cleaning/F14.png` | `sleep_visualization.R:2510` | [§4 · Auto-Detected Dashboard](#f14-auto-detected-dashboard) | 2026-11-24 |
+| **F15** | Figure S14 | Supplement | `pipeline_cleaning/F15.png` | `figure12_step_flag_table.R:15` | [§4 · Step Flag Ledger](#f15-step-flag-ledger) | 2026-11-24 |
+| **F16** | Figure S15 | Supplement | `pipeline_cleaning/F16.png` | `sleep_visualization.R:2680` | [§4 · Participants Worth a Second Look](#f16-participants-worth-a-second-look) | 2026-11-24 |
+| **F17** | Figure 2 | Methods | `research_ready/F17.png` | `sleep_visualization.R:1091` | [§5 · Correction Impact](#f17-correction-impact) | 2026-11-24 |
+| **F18** | Figure 3 | Results | `research_ready/F18.png` | `sleep_visualization.R:1136` | [§5 · Distribution of Sleep Variables](#f18-distribution-of-sleep-variables) | 2026-11-24 |
+| **F19** | Figure 4 | Results | `research_ready/F19.png` | `sleep_visualization.R:1187` | [§5 · TST Distribution](#f19-tst-distribution) | 2026-11-24 |
+| **F20** | Figure 5 | Results | `research_ready/F20.png` | `sleep_visualization.R:1242` | [§5 · Sleep Duration vs Time in Bed](#f20-sleep-duration-vs-time-in-bed) | 2026-11-24 |
+| **F21** | Figure 6 | Results | `research_ready/F21.png` | `sleep_visualization.R:1294` | [§5 · SOL vs Sleep Duration](#f21-sol-vs-sleep-duration) | 2026-11-24 |
+| **F22** | Figure 7 | Results | `research_ready/F22.png` | `sleep_visualization.R:1344` | [§5 · Variability of Sleep Variables](#f22-variability-of-sleep-variables) | 2026-11-24 |
+| **F23** | Figure 8 | Results | `research_ready/F23.png` | `sleep_visualization.R:1545` | [§5 · Bedtime vs Get-up Distribution](#f23-bedtime-vs-get-up-distribution) | 2026-11-24 |
+| **F24** | Figure 9 | Results | `research_ready/F24.png` | `sleep_visualization.R:2738` | [§5 · SOL Perception Bias](#f24-sol-perception-bias) | 2026-11-24 |
+| **F25** | Figure 10 | Results | `research_ready/F25.png` | `sleep_visualization.R:2796` | [§5 · WASO Perception Bias](#f25-waso-perception-bias) | 2026-11-24 |
+| **F26** | Figure S16 | Supplement | `research_ready/F26.png` | `sleep_visualization.R:2868` | [§5 · Substance Use Availability](#f26-substance-use-availability) | 2026-11-24 |
+| **F27** | Figure S17 | Supplement | `research_ready/F27.png` | `sleep_visualization.R:2971` | [§5 · Substance Use Value Distribution](#f27-substance-use-value-distribution) | 2026-11-24 |
+| **F28** | Figure S18 | Supplement | `research_ready/F28.png` | `sleep_visualization.R:3045` | [§5 · Caffeine Consumption](#f28-caffeine-consumption) | 2026-11-24 |
+| **F29** | Figure S19 | Supplement | `research_ready/F29.png` | `sleep_visualization.R:3080` | [§5 · Alcohol Consumption](#f29-alcohol-consumption) | 2026-11-24 |
+| **F30** | Figure 11 | Results | `research_ready/F30.png` | `sleep_visualization.R:3144` | [§5 · Sleep Regularity — Weekday vs Weekend](#f30-sleep-regularity--weekday-vs-weekend) | 2026-11-24 |
+| **F31** | Figure 12 | Results | `research_ready/F31.png` | `sleep_visualization.R:3197` | [§5 · Sleep Composition — TIB Breakdown](#f31-sleep-composition--tib-breakdown) | 2026-11-24 |
+| **F32** | Figure 13 | Results | `research_ready/F32.png` | `sleep_visualization.R:3226` | [§5 · Sleep Metrics Correlation Matrix](#f32-sleep-metrics-correlation-matrix) | 2026-11-24 |
+| **F33** | Figure S20 | Supplement | `pipeline_cleaning/F33.png` | `sleep_visualization.R:3293` | [§4 · Out-of-Order Nights, by Mechanism](#f33-out-of-order-nights-by-mechanism) | 2026-11-24 |
+| **F34** | Figure S21 | Supplement | `pipeline_cleaning/F34.png` | `sleep_visualization.R:3355` | [§4 · Clock-Time Rule Outcomes (SOL / WASO)](#f34-clock-time-rule-outcomes) | 2026-11-24 |
+| **F35** | Figure S22 | Supplement | `pipeline_cleaning/F35.png` | `sleep_visualization.R:3388` | [§4 · SOL Clock-Like Entries vs Own Times](#f35-sol-clock-like-entries-vs-own-times) | 2026-11-24 |
+| **F36** | Figure S23 | Supplement | `pipeline_cleaning/F36.png` | `sleep_visualization.R:3440` | [§4 · Reversal Forms in a Synthetic Test](#f36-reversal-forms-synthetic-test) | 2026-11-24 |
+| **F37** | Figure S24 | Supplement | `pipeline_cleaning/F37.png` | `sleep_visualization.R:3527` | [§4 · Out-of-Order Nights, Before and After](#f37-out-of-order-before-after) | 2026-11-24 |
 
 F05 (flag co-occurrence) is skipped whenever fewer than two flag columns have
 complete data or no pair of flags co-occurs, and the reason is printed on the
@@ -1233,6 +1233,33 @@ So that two datasets can be compared row by row, and so that a form you might ex
 
 **Anomaly →** A large "Left for review" bar means many entries sit between the rule's tolerance and its window; that is the list a person has to read.
 
+<details>
+<summary><strong>Precise rules</strong></summary>
+
+- **What is counted.** Only entries the interval parser had already reinterpreted — the ones it read under the MM:SS rule or the `dd:00` rule, recorded in `*_correctionsmade` or `*_ambig`. Rows a person had already corrected are never included, and every counted row gets a line in `output/duration_clock_rule_log.csv`.
+- **Order of the checks.** Text not ending in `:00` cannot be minutes in the hours slot, so it falls through to the WASO or SOL branch. For SOL the rule compares the typed time with the person's own bedtime and sleep onset on a 12-hour dial (no AM/PM was typed), in this order: recompute when the typed time is within 5 min of the sleep onset and 0-60 min after the bedtime; set to missing when it is closer to the bedtime than to the sleep onset and within 15 min of it; otherwise leave it for a person.
+- **WASO is never recomputed.** A clock time can be turned into an SOL (typed time minus bedtime) but not into a duration, so a WASO that looks like a clock time is set to missing and kept in the review queue.
+- **Defaults.** `duration_clock_rule.tolerance_min` = 5, `.window_min` = 60, `.near_min` = 15. All three are configuration keys.
+- **Nothing is deleted.** "Set to missing" clears the computed minutes only: the typed text stays in the input columns, the change is written to `*_correctionsmade`, and Step 8 still flags the row.
+
+</details>
+
+**FAQ**
+
+<details>
+<summary>Why does the same typed value land in different bars on different nights?</summary>
+
+Because the class depends on the person's own times for that night, not on the text alone: `23:30` is a plausible sleep onset on one night and a bedtime on another.
+
+</details>
+
+<details>
+<summary>Does "set to missing" throw the person's answer away?</summary>
+
+No. The text stays in the raw input columns and the change is logged row by row; the night simply has no computed SOL or WASO, and the review worksheets list it.
+
+</details>
+
 **Paper caption**
 
 > **Figure S21.** SOL and WASO entries that looked like a clock time or a mistyped duration, by what the clock-time rule did with each. N is in the subtitle.
@@ -1252,6 +1279,33 @@ So that two datasets can be compared row by row, and so that a form you might ex
 **Healthy look** Dots near zero on the y axis and 0 to 60 on the x axis: the person typed about when they fell asleep.
 
 **Anomaly →** Dots near zero on the x axis and away from zero on the y axis are people who typed their bedtime. Dots far from both axes are not explained by either time.
+
+<details>
+<summary><strong>Precise rules</strong></summary>
+
+- **Which entries.** SOL entries the clock-time rule saw, minus the "minutes typed in the hours slot" class (those were never clock times). Entries whose own bed or sleep-onset time is missing cannot be placed on the dial; they appear in F34 only.
+- **The two axes.** The typed text is read as a 12-hour clock (`H:MM`, hours modulo 12) and folded onto a +/-360-minute dial. x = typed minus the person's bedtime, y = typed minus their sleep onset. `y ~ 0` means the person typed the sleep onset; `x ~ 0` means they typed the bedtime.
+- **The dashed box.** The recompute zone: x from 0 to `window_min` (60) and y within +/-`tolerance_min` (5). A dot inside it was recomputed as SOL = x.
+- **Colour.** The action actually logged for that row: green = recomputed, vermillion = set to missing, grey = left for review. No dot is coloured by what the value "should" have been.
+- **Overplotting.** Dots are drawn with transparency, so two entries on the same point read as one darker dot. Counts are in F34 and in the log file, not in the dot density.
+
+</details>
+
+**FAQ**
+
+<details>
+<summary>Why a 12-hour dial instead of a real clock?</summary>
+
+Because no AM/PM was typed. `23:30` and `11:30` are the same text as far as the rule can tell, so it can only measure the 12-hour distance to the person's own times.
+
+</details>
+
+<details>
+<summary>Are dots outside the box mistakes?</summary>
+
+Not necessarily: they are entries the rule declined to touch. Dots near x = 0 are people who typed their bedtime; the rest are clock-like values that neither own time explains, and they go to a person.
+
+</details>
 
 **Paper caption**
 
@@ -1273,6 +1327,33 @@ So that two datasets can be compared row by row, and so that a form you might ex
 
 **Anomaly →** A short bar with many "changed, but not to the truth" is a form the rules cannot repair: a bed time 12 hours out, a whole night shifted, an awakening before bed time. Those nights reach a person through the review worksheets; they do not fix themselves.
 
+<details>
+<summary><strong>Precise rules</strong></summary>
+
+- **Where the numbers come from.** `reversal_injection_outcomes.csv`, shipped in `inst/extdata/` and produced by `validation/reverse_order/run_real_mix.R` with sleepcleanr 1.9.0. Each form was injected into clean synthetic diaries in the proportions seen in one real study, which is why the row widths differ.
+- **What the bar counts.** The share of injected rows whose four times were either put back to the true value or flagged for a person (`flagged_or_corrected_pct`). In the shipped run every counted row was put back to the truth, so the bar and the repaired rate (`corrected_pct`) coincide; the two can differ only when a night is flagged and left unrepaired.
+- **The right-hand column.** Rows the rules changed to a value that is *not* the true one (`wrong_repairs`). A repaired night is never counted here.
+- **Order and interval.** Forms are sorted by the bar, then by the number injected. The line is a Wilson 95% interval for the share, which is why a 3-row form spans almost the whole axis.
+- **Clean rows.** 6,650 clean nights, none altered; the same run reports it in the subtitle.
+
+</details>
+
+**FAQ**
+
+<details>
+<summary>Why do the small forms have such wide intervals?</summary>
+
+Because they have 3 to 40 nights each. `shift_awake_12h` has 3 rows, so its interval runs from 0 to 56%: at that sample size the figure cannot separate "the rules miss it" from "the rules catch it".
+
+</details>
+
+<details>
+<summary>A form shows 0% — does that mean nothing happened to those nights?</summary>
+
+No: 0% means no injected row was put back to the true value, and the right-hand column shows how many were changed to something else. `awake_before_bed` has all 17 of 17 changed to a wrong value, so the honest reading is "the corrections make this form worse", not "the corrections ignore it".
+
+</details>
+
 **Paper caption**
 
 > **Figure S23.** Share of injected out-of-order nights put back to the true value, by form, in a synthetic test with the form mix of one real study. Bars: percent; lines: Wilson 95% intervals; right column: rows changed to a wrong value. Clean rows altered: 0 of 6,650.
@@ -1292,6 +1373,33 @@ So that two datasets can be compared row by row, and so that a form you might ex
 **Healthy look** Almost all of each bar is blue.
 
 **Anomaly →** Vermillion at the end of a bar: those nights are still out of order in the final data and need a person.
+
+<details>
+<summary><strong>Precise rules</strong></summary>
+
+- **Before.** `classify_reversals()` reads the pre-correction columns (`time_*_am_hhmm_ampm`); a night counts when all four times are present and bed <= sleep onset <= final awakening <= get-up fails. That count is the bar length.
+- **After.** The same night in the final columns (`time_*_corrected`), in one of four states. In order means SOL >= 0, TST >= 0 and get-up >= final awakening. Plausible adds SOL <= 300 min, time in bed 120-960 min, TST 30-720 min — the lenient limits `classify_reversals()` uses, which is why a night can be in order and still implausible.
+- **Families.** The mechanism classes of F33, grouped: `swap*` = two times exchanged; `pm12h` = one time 12 h away; `pm12h_x2` = two times moved together; classes starting D or E = visibly wrong or unexplained; the rest = ambiguous. Bars are sorted by the number of nights.
+- **One night, one state.** A night with any missing corrected time is "no corrected value" and is not also counted as still out of order.
+- **What it does not say.** Whether the algorithm or a person made the change, and whether the corrected time is the true one. "In order and plausible" means plausible, not verified.
+
+</details>
+
+**FAQ**
+
+<details>
+<summary>Can the blue share be read as the pipeline's success rate?</summary>
+
+Only for the nights it repaired: it also includes nights a person fixed in review, and the figure cannot separate the two. The synthetic injection test (F36) is where the two are separated.
+
+</details>
+
+<details>
+<summary>Why do the families differ so much in how much blue they have?</summary>
+
+Because the automatic correction only has rules for some forms: exchanged times and a single field 12 h out. A bed time 12 h out, a whole night shifted, or a wake time before the bedtime stay out of order until a person reads the worksheets.
+
+</details>
 
 **Paper caption**
 

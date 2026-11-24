@@ -21,6 +21,10 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(sleepcleanr)
 ```
 
+## 术语
+
+下面覆盖率表里引用的睡眠日记指标缩写：**SOL**（入睡潜伏期）、**SE**（睡眠效率）、**TST**（总睡眠时间）、**TIB**（卧床时间，Time in Bed）。下文的 **CI** 指持续集成（每次提交都自动跑测试）。
+
 ## 测试文件与覆盖
 
 | 测试文件 | 覆盖 |

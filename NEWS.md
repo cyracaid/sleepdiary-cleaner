@@ -10,6 +10,7 @@
 ## Changed
 * The figure documentation is now two pages, in both languages. `interpreting-output` keeps the terminology and the reading/review guide (§1–§7); the new `figure-reference` article holds the figure index and all 37 figure cards (§1–§5). Card captions are numbered in paper order — Methods 1–2, Results 3–13, Supplement S1–S24 — and the index maps each paper number onto the `F` number used everywhere else.
 * Every figure writes its `F` number into the in-figure title (`Figure F05: …` where it used to say `Figure 11: …`), so the file name, the in-figure title and the card heading now agree. Line numbers and file names are unchanged.
+* The four newest figure cards (F34–F37) now carry the same two sections as the other 33 — the folded *Precise rules* and an *FAQ* — and the Chinese cards use one set of section names throughout. The four Chinese articles whose English original defines its abbreviations (`column-mapping`, `pipeline-architecture`, `testing-coverage`, `validation-methodology`) gained the matching 术语 section; the two language versions now have the same section list everywhere.
 
 # sleepcleanr 1.9.0
 
