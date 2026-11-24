@@ -126,7 +126,7 @@ bias the sleep–affect associations the pipeline exists to serve.
 
 | Metric | LoA half-width | Threshold ratio | Verdict |
 |----|----|----|----|
-| SOL | ±74.4 min | 1.61 / 0.81 | INSIDE NOISE → descriptive flags, human review |
+| SOL | ±75.4 min | 1.59 / 0.80 | INSIDE NOISE → descriptive flags, human review |
 | WASO | ±27.3 min | 3.29 | SAFE |
 | SE / TST-TIB | — | — | N/A (no self-report pair) |
 

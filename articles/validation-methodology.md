@@ -271,8 +271,8 @@ on real data (13,990 rows):
 
 |  | Bias | **Limits of agreement half-width** | Threshold | Ratio | Verdict |
 |----|----|----|----|----|----|
-| A1 SOL | +13.2 min | **74.4 min** | excessive 120 min | 1.61 | ⚠️ INSIDE NOISE |
-| A1 SOL | — | 74.4 min | high severity 60 min | 0.81 | ⚠️⚠️ INSIDE NOISE |
+| A1 SOL | +1.6 min | **75.4 min** | excessive 120 min | 1.59 | ⚠️ INSIDE NOISE |
+| A1 SOL | — | 75.4 min | high severity 60 min | 0.80 | ⚠️⚠️ INSIDE NOISE |
 | A2 WASO | small | **27.3 min** | high severity 90 min | 3.29 | ✅ SAFE |
 | A3 | — | — | SE poor (70%) | — | N/A (no self-report pair) |
 | A3 | — | — | TST/TIB ratio | — | N/A (no self-report pair) |

@@ -150,10 +150,8 @@ for the paper:
 
 ## 3. Figure Index
 
-All 37 figures, grouped by the folder they live in: the 21
-pipeline-cleaning figures first, then the 16 research-ready figures; F
-order inside each group. “Card” jumps to the full explanation in §4 or
-§5; “File” is the PNG inside `latest_visualization_<tag>_n<rows>/`.
+All 37 figures, in F order. “Card” jumps to the full explanation in §4
+or §5; “File” is the PNG inside `latest_visualization_<tag>_n<rows>/`.
 
 | \# | Paper figure | Use | File | Code source | Card | Last checked |
 |----|:--:|----|----|----|----|----|
@@ -173,11 +171,6 @@ order inside each group. “Card” jumps to the full explanation in §4 or
 | **F14** | Figure S13 | Supplement | `pipeline_cleaning/F14.png` | `sleep_visualization.R:2510` | [§4 · Auto-Detected Dashboard](#f14-auto-detected-dashboard) | 2026-11-24 |
 | **F15** | Figure S14 | Supplement | `pipeline_cleaning/F15.png` | `figure12_step_flag_table.R:15` | [§4 · Step Flag Ledger](#f15-step-flag-ledger) | 2026-11-24 |
 | **F16** | Figure S15 | Supplement | `pipeline_cleaning/F16.png` | `sleep_visualization.R:2680` | [§4 · Participants Worth a Second Look](#f16-participants-worth-a-second-look) | 2026-11-24 |
-| **F33** | Figure S20 | Supplement | `pipeline_cleaning/F33.png` | `sleep_visualization.R:3293` | [§4 · Out-of-Order Nights, by Mechanism](#f33-out-of-order-nights-by-mechanism) | 2026-11-24 |
-| **F34** | Figure S21 | Supplement | `pipeline_cleaning/F34.png` | `sleep_visualization.R:3355` | [§4 · Clock-Time Rule Outcomes (SOL / WASO)](#f34-clock-time-rule-outcomes) | 2026-11-24 |
-| **F35** | Figure S22 | Supplement | `pipeline_cleaning/F35.png` | `sleep_visualization.R:3388` | [§4 · SOL Clock-Like Entries vs Own Times](#f35-sol-clock-like-entries-vs-own-times) | 2026-11-24 |
-| **F36** | Figure S23 | Supplement | `pipeline_cleaning/F36.png` | `sleep_visualization.R:3440` | [§4 · Reversal Forms in a Synthetic Test](#f36-reversal-forms-synthetic-test) | 2026-11-24 |
-| **F37** | Figure S24 | Supplement | `pipeline_cleaning/F37.png` | `sleep_visualization.R:3527` | [§4 · Out-of-Order Nights, Before and After](#f37-out-of-order-before-after) | 2026-11-24 |
 | **F17** | Figure 2 | Methods | `research_ready/F17.png` | `sleep_visualization.R:1091` | [§5 · Correction Impact](#f17-correction-impact) | 2026-11-24 |
 | **F18** | Figure 3 | Results | `research_ready/F18.png` | `sleep_visualization.R:1136` | [§5 · Distribution of Sleep Variables](#f18-distribution-of-sleep-variables) | 2026-11-24 |
 | **F19** | Figure 4 | Results | `research_ready/F19.png` | `sleep_visualization.R:1187` | [§5 · TST Distribution](#f19-tst-distribution) | 2026-11-24 |
@@ -194,6 +187,11 @@ order inside each group. “Card” jumps to the full explanation in §4 or
 | **F30** | Figure 11 | Results | `research_ready/F30.png` | `sleep_visualization.R:3144` | [§5 · Sleep Regularity — Weekday vs Weekend](#f30-sleep-regularity--weekday-vs-weekend) | 2026-11-24 |
 | **F31** | Figure 12 | Results | `research_ready/F31.png` | `sleep_visualization.R:3197` | [§5 · Sleep Composition — TIB Breakdown](#f31-sleep-composition--tib-breakdown) | 2026-11-24 |
 | **F32** | Figure 13 | Results | `research_ready/F32.png` | `sleep_visualization.R:3226` | [§5 · Sleep Metrics Correlation Matrix](#f32-sleep-metrics-correlation-matrix) | 2026-11-24 |
+| **F33** | Figure S20 | Supplement | `pipeline_cleaning/F33.png` | `sleep_visualization.R:3293` | [§4 · Out-of-Order Nights, by Mechanism](#f33-out-of-order-nights-by-mechanism) | 2026-11-24 |
+| **F34** | Figure S21 | Supplement | `pipeline_cleaning/F34.png` | `sleep_visualization.R:3355` | [§4 · Clock-Time Rule Outcomes (SOL / WASO)](#f34-clock-time-rule-outcomes) | 2026-11-24 |
+| **F35** | Figure S22 | Supplement | `pipeline_cleaning/F35.png` | `sleep_visualization.R:3388` | [§4 · SOL Clock-Like Entries vs Own Times](#f35-sol-clock-like-entries-vs-own-times) | 2026-11-24 |
+| **F36** | Figure S23 | Supplement | `pipeline_cleaning/F36.png` | `sleep_visualization.R:3440` | [§4 · Reversal Forms in a Synthetic Test](#f36-reversal-forms-synthetic-test) | 2026-11-24 |
+| **F37** | Figure S24 | Supplement | `pipeline_cleaning/F37.png` | `sleep_visualization.R:3527` | [§4 · Out-of-Order Nights, Before and After](#f37-out-of-order-before-after) | 2026-11-24 |
 
 F05 (flag co-occurrence) is skipped whenever fewer than two flag columns
 have complete data or no pair of flags co-occurs, and the reason is
@@ -1799,9 +1797,9 @@ through the review worksheets; they do not fix themselves.
 
 Why do the small forms have such wide intervals?
 
-Because the small forms have 3 to 40 nights each. `shift_awake_12h` has
-3 rows, so its interval runs from 0 to 56%: at that sample size the
-figure cannot separate “the rules miss it” from “the rules catch it”.
+Because they have 3 to 40 nights each. `shift_awake_12h` has 3 rows, so
+its interval runs from 0 to 56%: at that sample size the figure cannot
+separate “the rules miss it” from “the rules catch it”.
 
 A form shows 0% — does that mean nothing happened to those nights?
 
@@ -1855,8 +1853,7 @@ of order in the final data and need a person.
 - **After.** The same night in the final columns (`time_*_corrected`),
   in one of four states. In order means SOL \>= 0, TST \>= 0 and get-up
   \>= final awakening. Plausible adds SOL \<= 300 min, time in bed
-  120-960 min, TST 30-720 min and wake-to-rise 0-300 min — the lenient
-  limits
+  120-960 min, TST 30-720 min — the lenient limits
   [`classify_reversals()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/classify_reversals.md)
   uses, which is why a night can be in order and still implausible.
 - **Families.** The mechanism classes of F33, grouped: `swap*` = two
