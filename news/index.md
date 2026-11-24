@@ -39,8 +39,9 @@
   index maps each paper number onto the `F` number used everywhere else.
 - Every figure writes its `F` number into the in-figure title
   (`Figure F05: …` where it used to say `Figure 11: …`), so the file
-  name, the in-figure title and the card heading now agree. Line numbers
-  and file names are unchanged.
+  name, the in-figure title and the card heading now agree. That pass
+  touched titles only; the numbering change below moved the file names
+  too.
 - The four newest figure cards (F18–F21) now carry the same two sections
   as the other 33 — the folded *Precise rules* and an *FAQ* — and the
   Chinese cards use one set of section names throughout. The four
