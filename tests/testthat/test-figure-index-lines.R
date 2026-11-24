@@ -1,4 +1,4 @@
-# The figure index in the interpreting-output vignettes cites the line of
+# The figure index in the figure-reference vignettes cites the line of
 # inst/scripts/sleep_visualization.R where each figure is saved. Those numbers
 # go stale whenever the script is edited (they were refreshed by hand on
 # 2026-11-20). This test fails when a cited line no longer holds that figure,
@@ -18,7 +18,7 @@ test_that("figure-index line numbers point at the line that saves the figure", {
   skip_if(is.na(root), "package source root not found (installed-package run)")
   script <- readLines(file.path(root, "inst", "scripts", "sleep_visualization.R"), warn = FALSE)
   docs <- file.path(root, "vignettes",
-                    c("interpreting-output.Rmd", "interpreting-output-zh.Rmd"))
+                    c("figure-reference.Rmd", "figure-reference-zh.Rmd"))
   n_checked <- 0
   for (d in docs[file.exists(docs)]) {
     for (ln in readLines(d, warn = FALSE, encoding = "UTF-8")) {

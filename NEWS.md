@@ -7,6 +7,10 @@
 * Figures F36 and F37 (`pipeline_cleaning/`). F36 shows, for each form of an out-of-order night, how often the rules put the time back to the true value in a synthetic test (with the number of rows changed to a wrong value); it reads `reversal_injection_outcomes.csv`, shipped in `inst/extdata/`, and is switched by `visualization.detection_outcomes.enabled`. F37 shows this study's out-of-order nights before and after the corrections, by family of mechanism. There are now 37 figures (21 pipeline-cleaning, 16 research-ready).
 * `detection_outcomes_v4_current.csv`, the table Figure F08 reads, is now shipped in `inst/extdata/`. Before, F08 could only be drawn when the run started in a repository checkout, and was skipped from an installed package.
 
+## Changed
+* The figure documentation is now two pages, in both languages. `interpreting-output` keeps the terminology and the reading/review guide (§1–§7); the new `figure-reference` article holds the figure index and all 37 figure cards (§1–§5). Card captions are numbered in paper order — Methods 1–2, Results 3–13, Supplement S1–S24 — and the index maps each paper number onto the `F` number used everywhere else.
+* Every figure writes its `F` number into the in-figure title (`Figure F05: …` where it used to say `Figure 11: …`), so the file name, the in-figure title and the card heading now agree. Line numbers and file names are unchanged.
+
 # sleepcleanr 1.9.0
 
 ## Added
