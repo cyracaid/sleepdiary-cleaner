@@ -8,10 +8,10 @@
 # title and the card heading in vignettes/figure-reference.Rmd are the same.
 # They follow the two sections of that page:
 #
-#   F01-F16:  pipeline-cleaning figures on `corrected_ema_data`
+#   F01-F16:  pipeline-cleaning figures (records kept) on `corrected_ema_data`
 #             (post-correction final data). F06-F14 read the auto-detection
 #             output from checkforerrors_processing.R instead.
-#   F17-F21:  reversal and clock-time families, on `corrected_ema_data`;
+#   F17-F21:  pipeline-cleaning reversal/clock-time families, on `corrected_ema_data`;
 #             F20 reads the synthetic injection table in inst/extdata instead
 #   F22-F37:  research-ready figures, on `corrected_ema_data`
 #
@@ -445,8 +445,8 @@ add_quality_flags <- function(data) {
 # ============================================================================
 # STEP 1: DATA PREPARATION
 # ============================================================================
-# NOTE: Figures 1-12 use `corrected_ema_data` (final corrected data, post-correction)
-#       Figures 13-18 use `checkforerrors_df` from checkforerrors_processing.R (auto-detection, pre-correction)
+# NOTE: F01-F05, F17-F21 and F22-F37 use `corrected_ema_data` (final corrected data, post-correction)
+#       F06 and F10-F14 use `checkforerrors_df` from checkforerrors_processing.R (auto-detection, pre-correction)
 # ============================================================================
 
 cat("\n")
@@ -608,7 +608,7 @@ if (exists("review_output") && is.list(review_output) &&
   checkforerrors_df <- data.frame()
 }
 
-# Explains, in one place, WHY Figures 13-18 are absent. Two situations produce
+# Explains, in one place, WHY F06 and F10-F14 are absent. Two situations produce
 # an identical-looking output directory but mean opposite things:
 #
 #   (a) the detector raised candidates and a human cleared every one -> finished
@@ -631,7 +631,7 @@ if (exists("review_output") && is.list(review_output) &&
   if (aud$n_flagged == 0) {
     cat("  Why: auto-detection raised no candidate records on this dataset.\n")
     cat("  Meaning: nothing was suspicious enough to queue for human review.\n")
-    cat("  Figures 13-18 plot that queue, so there is nothing to draw.\n")
+    cat("  F06 and F10-F14 plot that queue, so there is nothing to draw.\n")
   } else if (aud$n_pending == 0) {
     # n_flagged and n_accepted are NOT nested: n_flagged counts distinct rows
     # raised by THIS run, n_accepted counts rows cleared by the standing
@@ -645,7 +645,7 @@ if (exists("review_output") && is.list(review_output) &&
     cat("       That list is broader than this run's candidates, so the two\n")
     cat("       counts are not nested -- every candidate was covered by it.\n")
     cat("  Records still awaiting human review: 0\n")
-    cat("  Meaning: THE REVIEW IS COMPLETE. Figures 13-18 plot the outstanding\n")
+    cat("  Meaning: THE REVIEW IS COMPLETE. F06 and F10-F14 plot the outstanding\n")
     cat("  review queue; an empty queue is the finished state, not a missing figure.\n")
     cat(sprintf("  What to report: 'auto-detection proposed %d candidates, all\n",
                 aud$n_flagged))
@@ -675,7 +675,7 @@ if (is.data.frame(checkforerrors_df) && nrow(checkforerrors_df) > 0) {
   checkforerrors_exists <- TRUE
   cat(sprintf("\n✓ checkforerrors_df has %d rows\n", nrow(checkforerrors_df)))
 } else {
-  cat("\nℹ checkforerrors_df is empty -- Figures 13-18 will not be generated.\n")
+  cat("\nℹ checkforerrors_df is empty -- F06 and F10-F14 will not be generated.\n")
   .explain_no_review_figures()
 }
 
@@ -799,7 +799,7 @@ if (checkforerrors_exists) {
 
 cat("\n")
 cat(paste(rep("=", 80), collapse = ""))
-cat("\nSTEP 6: GENERATING PIPELINE FIGURES F01-F16 (Final Corrected Data)\n")
+cat("\nSTEP 6: GENERATING FIGURES F01-F05, F22-F28 (Final Corrected Data)\n")
 cat(paste(rep("=", 80), collapse = ""))
 cat("\n\n")
 
@@ -2190,7 +2190,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
   # every record regardless of later human review, so this plots the full
   # study period rather than only whatever is still queued (34 real rows on
   # the N=237 dataset). If this is still empty, print the same explanation
-  # used for Figures 13-18 instead of silently writing nothing.
+  # used for F06 and F10-F14 instead of silently writing nothing.
   #
   # WHAT THIS FIGURE SHOWS:
   # Stacked area chart of when timestamp-order and awake/getup/bed-sleep
@@ -2552,7 +2552,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
 
 cat("\n")
 cat(paste(rep("=", 80), collapse = ""))
-cat("\nSTEP 8: GENERATING RESEARCH FIGURES F22-F37 (Unified Classification)\n")
+cat("\nSTEP 8: GENERATING FIGURES F16, F17-F21, F29-F37 (Unified Classification)\n")
 cat(paste(rep("=", 80), collapse = ""))
 cat("\n\n")
 
@@ -2598,10 +2598,10 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
   # Non-destructive framing: a high flag rate does NOT mean the data is
   # "bad" or "wrong". A flag marks a record that differs from an automatic
   # expectation, including self-report vs. measured discrepancies that
-  # this pipeline deliberately preserves rather than corrects (see Figure
-  # 2 / 20 / 20B). "Worth a second look," not "discard."
+  # this pipeline deliberately preserves rather than corrects (see
+  # F02 and F29/F30). "Worth a second look," not "discard."
   # --------------------------------------------------------------------------
-  cat("Generating FIGURE P26 (Per-Participant Flag Rate - Ranked Table)...\n")
+  cat("Generating F16 (Per-Participant Flag Rate - Ranked Table)...\n")
 
   if ("flag_severity" %in% names(clean_df) && "pid" %in% names(clean_df)) {
     pid_flags <- clean_df %>%
@@ -2985,7 +2985,7 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
 }
 
 # ============================================================================
-# FIGURES 23-24: SUBSTANCE CONSUMPTION DISTRIBUTIONS
+# FIGURES F33-F34: SUBSTANCE CONSUMPTION DISTRIBUTIONS
 # ============================================================================
 # DATA SOURCE: corrected_ema_data
 # WHAT THEY SHOW: Distribution of caffeine and alcohol self-report values
@@ -2993,7 +2993,7 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
 
 cat("\n")
 cat(paste(rep("=", 80), collapse = ""))
-cat("\nSTEP 9: GENERATING FIGURES 23-24 (Substance Consumption Distributions)\n")
+cat("\nSTEP 9: GENERATING FIGURES F33-F34 (Substance Consumption Distributions)\n")
 cat(paste(rep("=", 80), collapse = ""))
 cat("\n\n")
 
@@ -3335,7 +3335,7 @@ if (exists("corrected_ema_data") && nrow(corrected_ema_data) > 0) {
 }
 
 # --------------------------------------------------------------------------
-# Figures 34-35: SOL / WASO entries the clock-time rule looked at (Step 6.5)
+# F18-F19: SOL / WASO entries the clock-time rule looked at (Step 6.5)
 # --------------------------------------------------------------------------
 cat("Generating FIGURES F18-F19 (clock-time rule for SOL / WASO text)...\n")
 
@@ -3411,7 +3411,7 @@ if (is.data.frame(.f34_log) && nrow(.f34_log) > 0) {
     .mark_skip("pipeline_cleaning/F19.png", "No SOL entry was read as a clock time, or the person's bed / sleep times are missing.")
   }
 } else {
-  cat("⚠ no reinterpreted SOL / WASO entries — skipping Figures 34-35\n\n")
+  cat("⚠ no reinterpreted SOL / WASO entries — skipping F18-F19\n\n")
   .mark_skip("pipeline_cleaning/F18.png", "The clock-time rule saw no reinterpreted SOL / WASO entry.")
   .mark_skip("pipeline_cleaning/F19.png", "The clock-time rule saw no reinterpreted SOL / WASO entry.")
 }
@@ -3609,8 +3609,8 @@ cat("FOLDER STRUCTURE:\n")
 cat(sprintf("  %s/pipeline_cleaning/  — Data cleaning pipeline progress & quality control\n", output_dir))
 cat(sprintf("  %s/research_ready/     — Sleep metrics, substance use & perception for analysis\n\n", output_dir))
 
-cat("NOTE: Figures 1-12 show the FINAL corrected data (after manual fixes)\n")
-cat("      Figures 13-18 show AUTO-DETECTED issues (before manual review)\n")
+cat("NOTE: F01-F05, F17-F21 and F22-F37 show the FINAL corrected data (after manual fixes)\n")
+cat("      F06 and F10-F14 show AUTO-DETECTED issues (before manual review)\n")
 cat("      These two sets serve different purposes and are not directly comparable.\n")
 
 # ============================================================================
@@ -3712,8 +3712,8 @@ if (identical(.data_tag, "unknown")) {
   )
 }
 
-# ── Figures 13-18 audit (explain WHY the auto-detection queue may be empty) ──
-# When checkforerrors_df is 0-row, Figures 13-18 are absent. That is the
+# ── F06 and F10-F14 audit (explain WHY the auto-detection queue may be empty) ──
+# When checkforerrors_df is 0-row, F06 and F10-F14 are absent. That is the
 # COMPLETED state (everything reviewed), not a bug. Write the audit trail
 # into RUN_INFO.txt so the folder answers the question itself.
 .ro <- get0("review_output", ifnotfound = NULL)
@@ -3723,21 +3723,21 @@ if (is.list(.ro) && is.list(.ro$review_audit)) {
   if (.aud$n_flagged == 0) {
     .fig13 <- c(
       "",
-      "Figures 13-18: NOT GENERATED",
+      "F06 and F10-F14: NOT GENERATED",
       "  Auto-detection raised no candidate records on this dataset.",
       "  The pipeline found nothing suspicious enough to queue for human review."
     )
   } else if (.aud$n_pending == 0) {
     .fig13 <- c(
       "",
-      "Figures 13-18: NOT GENERATED - Auto-Detection Review Queue Empty",
+      "F06 and F10-F14: NOT GENERATED - Auto-Detection Review Queue Empty",
       sprintf("  The auto-detection system (Parts A/B/C) raised %d candidate record(s).",
               .aud$n_flagged),
       sprintf("  All %d were reviewed by a human and marked as 'not an error'", .aud$n_accepted),
       "  (decisions archived in manual_metric_review_acceptances.csv).",
       "  Current pending review queue: 0 records.",
       "",
-      "  Figures 13-18 plot the outstanding review queue. An empty queue is the",
+      "  F06 and F10-F14 plot the outstanding review queue. An empty queue is the",
       "  COMPLETED state - the human review is finished, not missing.",
       "",
       "  What to report in Methods:",

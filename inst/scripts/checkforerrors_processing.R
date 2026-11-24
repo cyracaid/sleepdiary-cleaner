@@ -896,7 +896,7 @@ review_output <- list(
   data_with_flags   = data,
   checkforerrors_df = checkforerrors_df,
   # Audit trail explaining how many candidates the detector raised and how many
-  # a human had already cleared. Figures 13-18 are built from checkforerrors_df,
+  # a human had already cleared. F06 and F10-F14 are built from checkforerrors_df,
   # so when it is empty this is the only thing that can say WHY.
   review_audit = list(
     n_flagged   = n_flagged_before_acceptance,  # raised by Parts A/B/C
