@@ -142,6 +142,23 @@ participant whose median is under 15 minutes is also flagged, without the other 
 participant who is above the floor on at least 3 days and on at least half of their days is treated
 as consistently high, not as spiking, and is not flagged by either rule. The check reports and does not change records.
 
+**Report-only audit.** The logical checks can also be run over the whole dataset without writing
+anything, which separates what the rules could see from what a delivered run leaves. Seven checks are
+applied. Order: the raw times are rebuilt and the chain bed ≤ sleep ≤ wake ≤ get-up is tested.
+String shape: a latency string such as "23:30" is a clock time, and one such as "10:30" with a first
+field of 4 or more is a duration that can also be read as a clock time. Self-report deviation: the
+computed latency differs from the reported one by more than an hour. Window: the computed latency
+exceeds the corrected bed-to-sleep window, or that window is negative. Direction: a correction moved
+the gap further from the self-reported latency rather than closer. Cross-day jump: latency or time
+awake differs from the previous day by more than five times the participant's own MAD. Notes: an
+inventory of every note the parser can emit, checked against the known strings so that a note outside
+the list shows up as a blind spot; the 14,338 notes present all matched a known mechanism. A row is
+flagged when a check hits and the automatic-fix conditions do not hold, that is, an order violation
+that a swap repairs while keeping the window legal and landing closer to the self-report. No row in
+the study data met all three, so the audit wrote nothing; its 1,048 flags are counts of checks that
+fired, reported in the Results apart from the review queue because the two answer different
+questions.
+
 **Step 9 and 10: Figures and delivered data.** The pipeline draws diagnostic figures and writes two
 datasets from a pre-specified column dictionary: one with all intermediate columns, so that every
 change can be audited, and one with the columns needed for analysis. Each run saves the rules in
@@ -175,16 +192,64 @@ file; a run prints the list and saves it as `effective_rules.csv`.
 | 8.5 | participant days needed; MADs from median; multiple of median | 3; 5; 4 | `cross_participant_global_check.R` |
 | 8.5 | absolute floor SOL / WASO / nap / light / moderate / vigorous / strength | 120 / 60 / 360 / 240 / 180 / 120 / 120 min | `cross_participant_global_check.R` |
 
+**Rule families and the three decision states.** The rules fall into eight families, and each is
+assigned one of three outcomes rather than being written as a single "clean or keep" switch. The
+three states are: automatic fix, which writes a value and is reversible because the entry as typed
+is kept beside it; flag, which writes the row to the review queue and changes nothing; and report
+only, which records a count or a note for the analyst and never touches the data. A proposed fix is
+additionally subject to a veto: the redundancy-confirmation check compares the gap after the fix
+with the gap before it and drops the fix if the value moved further from the self-reported duration,
+which is how the one bad rule described under Validation 2 was caught. Table 2 gives the family, what
+it decides and its state.
+
+**Table 2. Rule families and their decision state.**
+
+| Family | What it decides | State |
+|---|---|---|
+| Timestamp standardization | free text to HH:MM, type-safe, separators normalized | flag |
+| Temporal order validation | chain rebuilt from raw times, order violations found | automatic fix when a swap repairs it, keeps the window legal and lands closer to the self-report; otherwise flag |
+| Free-text duration parsing | three-branch parse of SOL and WASO | flag; a full clock time typed into a duration field is flagged at the misentry screen and never converted, and an `h:mm` above the threshold is read as minutes and seconds and marked ambiguous |
+| Internal consistency | derived against reported duration, latency against the logical window | component of the automatic fix, or report only |
+| Redundancy confirmation | gap after a fix against the gap before it | **veto over any automatic fix** |
+| Cross-day stability screening | day-to-day jump beyond 5× the participant's own MAD | report only |
+| Correction provenance | every correction note matched to a known mechanism | report only |
+| Post-correction verification | 6-minute check against reported duration, protection of "reasonable unusual" rows | flag or pass |
+
 ### Validation 1: synthetic benchmark
 
 *Data.* 500 simulated participants with 14 days each (7,000 rows) were generated with a fixed seed
 from a model of a healthy adult. Errors were injected with logged truth: 400 per type, 5,391 rows in
 14 types after eligibility, and 1,609 rows were left untouched as controls. A subset of participants
 (12%) received six times the injection probability, to reproduce the clustering seen in real data.
-*Outcomes.* Each injected row is scored as corrected to the true value, flagged (held for a person),
-repaired wrongly or missed; "handled" means corrected to the true value or flagged. The false-alarm
-rate is the share of clean rows flagged or altered, and a participant-level cluster bootstrap gives
-the interval for recall. *Comparators.* No cleaning, and a naive rule that resolves midnight and swaps
+*Outcomes.* Each injected row is scored on three levels that are reported separately. First, detection:
+the rule flagged, corrected or wrongly repaired the row, as against missing it. Second, the error type:
+does the pipeline's own record of what it did name the injected type, matched against a fixed pattern
+per type? This is the account a reviewer reads, and it can be wrong while the value still ends right.
+Third, the value: after the pipeline has run, does the field hold the true value? The three do not coincide, so a row has four fates at the value
+level — corrected to the true value, flagged and held for a person, repaired wrongly, missed — and
+"handled" means corrected to the true value or flagged. The separation is a design output rather than a
+reporting detail: a pipeline can rewrite a value without ever detecting an error, and a score that
+counts only detections cannot see the difference — this benchmark found exactly that in the pipeline's
+own history, where 95.8% of clock times typed into the latency field and 96.0% into the time-awake
+field were rewritten to plausible wrong values without being detected at all, and after the fix are
+detected and flagged with none rewritten. The distances between the levels are therefore reported as
+their own quantities, because they are the work the pipeline hands to a person rather than the work it
+finishes; and where a rule stops at flagging by design, the unchanged value is the intended end state
+rather than a failure at the value level. The false-alarm rate is the share of clean rows flagged or
+altered, and a participant-level cluster bootstrap gives the interval for recall.
+
+*Multiplicity.* The fourteen type-identification rates answer the same question fourteen times, so they
+are tested as one family: an exact binomial test per type against a fixed reference of 0.90, with
+Benjamini–Hochberg control of the false discovery rate at 5%. The reference is fixed rather than the
+pooled rate because testing each category against a pooled value that contains it is circular; the
+reference decides which categories cross the line, while the ordering and the intervals do not depend
+on it, and both are reported. Two other quantities here are deliberately not corrected in this way. The
+audit layer's 1,048 flags are counts of logical-consistency violations, not p-values from tests: there
+is no null hypothesis per flag, and correcting counts would claim a rigour the analysis does not have,
+so they are reported as counts with the rule that produced them. The recall intervals are
+participant-level cluster bootstrap intervals, which estimate a distribution rather than test a single
+hypothesis. Where a correction would be decoration it is not applied, and the choice is stated rather
+than left implicit. *Comparators.* No cleaning, and a naive rule that resolves midnight and swaps
 any adjacent pair that is out of order. *Sensitivity.* Four seeds; a 20-point grid of the swap (1 to 5
 hours) and flip (8 to 14 hours) thresholds; and a grid of four overall error rates (2, 5, 10 and 20%
 of rows) by four error-type mixes (equal numbers per type; the real-world proportions in the catalog;
@@ -219,12 +284,89 @@ cases, described above; because they worked on one worksheet this is agreement, 
 reliability estimate. *Threshold sensitivity.* The same pipeline was run over a grid of thresholds on
 the real data.
 
+*A rule this step rejected.* The redundant channel does not only confirm repairs; it also examined a
+rule that reverses a sleep-and-awake transposition. In the first analysis that rule moved 7 of its 10
+applicable rows further from the self-report, while the set as a whole read 81 of 88. It was diagnosed
+and guarded in version 1.4.3 with a `bed ≤ awake` condition rather than removed, so the correction is
+still available where it is consistent. On the current pipeline the rule applies to 3 rows with a
+self-report: 2 improve and 1 worsens, the other two families are unchanged, and the three together read
+80 of 81 (98.8%). The counts differ because the pipeline changed, not because the comparison did.
+
+*How many flags, and of what.* Three counts in this paper are all "flagged rows" and none of them is
+the number of errors in the data, so each is named with the population and the run that produced it.
+The report-only audit, which changes nothing, flags 1,048 of the 13,990 submissions: 922 window
+violations, 140 order violations, 35 latency strings whose shape supports a second reading, one
+silent-worsening candidate and one cross-day jump, with 50 rows carrying more than one of these. A
+delivered run leaves a review queue of 226 rows with the reviewers' files applied and 307 without,
+which is 79 and 108 per 1,000 of the 2,848 entries that carry all four times, or 16 and 22 per 1,000
+submissions. The worksheet a person actually worked through holds 112 records — 75 flagged errors plus
+37 atypical cases drawn by a different route — of which 85 were corrected and 27 left as written. The
+three are not nested: the 112 is not a subset of the 1,048, and the queue comes from a later version
+with a different rule set.
+
+### Validation 2b: how far the two reports of the same night disagree (Bland–Altman)
+
+*What we do.* A diary measures latency and time awake twice: as a duration the participant typed, and as the difference between the times they typed. Before asking whether a correction moved one of them closer to the other, we need the size of the disagreement that exists when nothing has gone wrong. We therefore took every night with both a reported and a computed value in the delivered data and summarized the difference (computed minus reported) in the Bland–Altman form: the mean difference, the 95% limits of agreement, and the half-width of those limits. Each flag threshold is then divided by that half-width. A threshold that lies inside the limits of agreement cannot separate a genuinely long night from ordinary disagreement between two reports of the same night, whatever the flag is called.
+
+*Result.* 2,848 nights carry both a reported and a computed latency, and 1,730 both a reported and a computed time awake. For latency the computed value exceeds the reported one by 13.2 minutes on average, with 95% limits of agreement of −61.1 to +87.6, a half-width of 74.4 minutes. The two latency flag thresholds, 120 and 60 minutes, are 1.61 and 0.81 times that half-width: both lie inside the band. For time awake the bias is −6.6 minutes, the limits −33.9 to +20.7, the half-width 27.3 minutes, and the 90-minute severity threshold is 3.3 times the half-width, well outside it. Efficiency and the total-sleep-time to time-in-bed ratio have no self-reported counterpart in the diary, so no such comparison exists for them and none is claimed.
+
+*What it means.* The latency thresholds are descriptive. A latency flag says that the two reports of the same night disagree, which is what a genuinely long latency and an ordinary reporting difference both look like; it is not read as evidence of an entry error. Nothing is corrupted by this: the severity column feeds no correction path, verified in the code. The time-awake threshold clears the same noise by a factor of three and can be read as a signal. Two limits are stated with the result. Limits of agreement bound consistency between two reports, never accuracy against sleep itself, which would need actigraphy or polysomnography that this data set does not have. And the half-width is a property of these participants on these instruments, so another study should compute its own band before adopting a default threshold; we report the band rather than present 60, 90 and 120 minutes as universal values.
+
 ### Validation 3: public datasets
 
 Two public diary datasets not used in development were converted to the diary layout with scripts in
 the repository and run with no threshold changed: 1,372 entries from 49 adults [CITE Baigutanova et
 al., 2025] and 478 entries from 59 adults [CITE Didikoglu et al., 2023]. Conversion changed 24-hour or
 numeric-hour times to 12-hour entries and set get-up equal to wake-up where there was no get-up field.
+
+### Validation 4: whether the answers depend on our own choices
+
+*Why.* Every threshold here is a judgement: the 12-hour flip trigger, the 3-hour adjacent-swap
+window, the 4× MAD spike cutoff, the latency and time-awake flags, the 6-minute verification
+tolerance. If the delivered quantities move with any reasonable value of these, the cleaning is
+manufacturing the findings rather than measuring them.
+
+*What we do.* Three analyses. First, a specification curve over the choices that are genuinely open —
+continuous thresholds plus discrete branches (which rows are trusted, whether the cross-participant
+layer runs, whether the review layer is applied); hard constraints are excluded because they are logic
+rather than choice. The open choices are screened one at a time against the base specification, then
+run as a full factorial grid, each cell running the real pipeline and recording the same outputs, with
+the variation decomposed by dimension. Second, the quantities a study actually delivers — mean total
+sleep time, mean latency and the number of analysable nights — recorded over the same grid, together
+with two branch deltas (which rows are trusted; a wider time-awake trust gate). Third, the whole
+benchmark regenerated under four seeds, with the share of injected errors handled and the false-alarm
+rate compared across them. Scripts `multiverse.R`, `downstream_sensitivity.R` and
+`seed_sensitivity.R`; results in `validation/synthetic/results/`.
+
+*Decision rule, and when it was applied.* A dimension is reported in the main specification curve only
+if it survives one-at-a-time screening under more than one seed; a dimension that survives under one
+seed and not another is reported as a documented sensitivity warning. This rule was applied after the
+full grid had been read, which is why the main curve we report is the conservative one and the entire
+grid is also given, so that a reader can apply a stricter or a looser rule.
+
+### Pre-registration and exploratory status
+
+The pipeline and its validation plan were built on this project's own data from the outset, and no
+analysis plan was registered in advance: the analysis reported here is exploratory rather than
+confirmatory, and no part of it is described as otherwise. Three mitigations of the risks that follow
+are in place, and each is checkable rather than asserted. First, every number is produced by a script
+in the public repository at a recorded version: eleven of the benchmark tables are regenerated
+end-to-end from fixed seeds by a single entry point and compared with the committed copies, and the
+remaining analyses — the Bland–Altman band, the multiverse grid, the seed runs and the downstream
+sensitivities — have their own scripts, listed under Sources of the numbers. Second, the benchmark's
+ground truth is a self-consistent standard rather than an external gold standard: clean inputs are
+generated to pass, errors are injected with logged truth, a redundant channel confirms the repair, and
+the specificity of the clean layer is reported so that a reader can see what "no false alarm" was
+measured against. Third, where a result could have been chosen after the fact, the choice is disclosed:
+the specification curve reports the rule for including a dimension together with the statement that
+the rule was applied after the whole grid had been read, and the main curve is the intersection across
+four seeds rather than the base specification.
+
+Steps added while the work was already under way are named as additions rather than folded into a
+protocol that never existed. The Bland–Altman band, the specification curve and the audit of which
+error types the pipeline names were all designed after the benchmark results were known; each is
+reported with the question it answers, so a reader can judge whether the question was worth asking
+independently of when it was asked.
 
 ### Checks that need people (not yet run)
 
@@ -239,17 +381,20 @@ times are known. Materials and scoring scripts are in `validation/blind_audit/` 
 
 The package (R) is configured by a YAML column mapping and keeps its working objects in
 a package-private environment; it does not write to the user's global environment. It is tested with
-327 test blocks across 54 files [CHECK: re-run the full suite and report the expectation count for 1.9.0], including a snapshot test that compares the
-delivered tables of a synthetic run with committed copies and is checked on Linux, Windows and macOS in continuous integration (all four workflows passed on the 1.9.0
+332 `test_that` blocks across 56 files, including a snapshot test that compares the
+delivered tables of a synthetic run with committed copies, and is checked on Linux, Windows and macOS in continuous integration (all four workflows passed on the 1.9.0
 release commit, a9058bb). The study data were cleaned with version 1.7.1; the released version 1.9.0
 differs from it in one Step 4 rule (the 00:00 guard above). Rerunning Step 4 of both versions on the
-pre-correction times of the 2,848 complete nights, the two differ on one night. `validation/run_all.R` regenerates the benchmark tables from
-fixed seeds in a temporary copy and compares each with the committed one; all 11 regenerate
-identically [CHECK: re-run]. The repository is archived at Zenodo (DOI 10.5281/zenodo.23077702).
+pre-correction times of the 2,848 complete nights, the two differ on one night. `validation/run_all.R` regenerates eleven of the benchmark tables from
+fixed seeds in a temporary copy and compares each with the committed one, all eleven identically. The
+remaining tables are produced by their own scripts and are not part of `run_all.R`: the Bland–Altman
+band (`R/bland_altman.R`, needs the study data), the multiverse grid (`multiverse.R`), the seed runs
+(`seed_sensitivity.R`) and the downstream sensitivities (`downstream_sensitivity.R`). The repository
+is archived at Zenodo (DOI 10.5281/zenodo.23077702).
 
 ## Design principles (for the Discussion)
 
-Four principles shaped the pipeline, and each can be checked in the code or the outputs. First, a value is
+Five principles shaped the pipeline, and each can be checked in the code or the outputs. First, a value is
 changed automatically only when a documented rule can show that it is an entry error; an unusual value that might be
 a real night is held for a person and left as typed. This matters here because variability in reported sleep is
 itself the signal in studies of sleep and daily affect, so a pipeline that smoothed it away would remove what the
@@ -260,4 +405,4 @@ a status table records which flagged records are still waiting, were reviewed bu
 incorporated, until none is left to review. Fourth, the limits are stated where they were found. Checks that
 rely on timestamps alone cannot tell a true entry from a wrong one when the two agree, as when the rise time is
 typed in both fields; in the benchmark none of 236 such cases was caught, against all 282 for the one reversed form injected (wake and rise exchanged),
-and in the study data 17.8% of awakening and get-up pairs are equal. We do not claim that the pipeline finds these cases.
+and in the study data 17.8% of awakening and get-up pairs are equal. We do not claim that the pipeline finds these cases. Fifth, a threshold is a claim about the data as much as about the errors, so it has to be read against the sample's own measurement noise: a limit smaller than the disagreement that exists when nothing has gone wrong names a distinction the instrument cannot resolve. We therefore report the band next to each limit rather than the limit alone.
