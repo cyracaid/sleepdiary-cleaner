@@ -12,6 +12,23 @@
 library(sleepcleanr)
 ```
 
+## 术语
+
+本页用的都是睡眠日记领域的标准指标缩写，在这里一次定义，后文不再重复展开：
+
+- **SOL** — 入睡潜伏期（Sleep Onset
+  Latency），从躺上床到睡着的时间，单位分钟
+- **WASO** — 睡后觉醒（Wake After Sleep
+  Onset），睡着之后到最终醒来之间醒着的总分钟数
+- **TST** — 总睡眠时间（Total Sleep Time）
+- **TIB** — 卧床时间（Time in Bed）
+- **SE** — 睡眠效率（Sleep Efficiency），TST / TIB，按百分比
+- **PSG** —
+  多导睡眠图（Polysomnography），睡眠实验室的金标准，本数据集没有
+- **EMA** — 生态瞬时评估（Ecological Momentary
+  Assessment），本数据集用来替代 PSG 的自报日记法
+- **MAD** — 中位数绝对偏差（Median Absolute Deviation）
+
 ## 为什么要验证
 
 睡眠日记清洗没有 ground
@@ -259,12 +276,13 @@ Cohen’s κ——审阅是协作式的（共用一张表），κ
 
 1.  **Multiverse 分析（规格曲线）。**
     定义真正开放的清洗选择（连续阈值——12h、3h、midnight 6、mmss 60、SOL
-    120/180、SE 70、WASO 1.5、TST/TIB 0.5、CP
-    4×——加上离散分支：信任哪些行、跨参与者层开关、人工审查层开关）。硬约束排除（那是逻辑，不是选择）。先用
-    one-at-a-time（OAT）筛选，再跑全因子网格；每个规格跑真实管线并记录相同输出。两个输出契约：**规格曲线**与**方差分解**。脚本：`validation/synthetic/multiverse.R`；结果在
+    120/180、SE 70、WASO 1.5、TST/TIB 0.5、跨参与者尖峰切点 4×
+    **中位数绝对偏差（MAD）**——加上离散分支：信任哪些行、跨参与者层开关、人工审查层开关）。硬约束排除（那是逻辑，不是选择）。先用
+    one-at-a-time（OAT）筛选，再跑全因子网格；每个规格跑真实管线并记录相同输出。两个输出契约：**规格曲线**（Simonsohn
+    式，把指标画在全部规格上）与**方差分解**（每个维度解释了多少变异）。脚本：`validation/synthetic/multiverse.R`；结果在
     `results/multiverse/`。
 2.  **下游敏感性。** 同一网格，但测量研究团队实际使用的*交付量*：平均
-    TST、平均 SOL、可分析 n。
+    TST、平均 SOL、可分析 n（清洗决策后仍保留的记录）。
 3.  **Seed 敏感性。**
     在不同随机种子下重新生成整个基准，确认头版数字不动。
 

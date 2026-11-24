@@ -11,6 +11,11 @@ sleepcleanr 通过 YAML
 library(sleepcleanr)
 ```
 
+## 术语
+
+下文的列映射表与阈值表里用到两个睡眠日记指标缩写：**SOL**（入睡潜伏期，Sleep
+Onset Latency）、**WASO**（睡后觉醒，Wake After Sleep Onset）。
+
 ## 安装与运行
 
 ``` r

@@ -11,6 +11,12 @@
 library(sleepcleanr)
 ```
 
+## 术语
+
+本页全篇使用的睡眠日记指标缩写：**SOL**（入睡潜伏期）、**WASO**（睡后觉醒）、**TST**（总睡眠时间，Total
+Sleep Time）、**SE**（睡眠效率，Sleep Efficiency）。下文的 **QC**
+指质量控制。
+
 ## 管线步骤
 
     原始数据 ──→ Step 1: 加载数据 ──→ Step 2: 解析时间戳 ──→ Step 3: 解析区间 ──→ Step 4: 序列标准化
