@@ -1,4 +1,4 @@
-# F36 reads reversal_injection_outcomes.csv. Keep the table, its two copies and
+# F20 reads reversal_injection_outcomes.csv. Keep the table, its two copies and
 # the form labels in sleep_visualization.R in step.
 
 .rio_root <- function() {
@@ -9,7 +9,7 @@
   NA_character_
 }
 
-test_that("F36 table has the columns the figure reads and a label for every form", {
+test_that("F20 table has the columns the figure reads and a label for every form", {
   root <- .rio_root()
   skip_if(is.na(root), "package source root not found (installed-package run)")
   tab <- read.csv(file.path(root, "inst", "extdata", "reversal_injection_outcomes.csv"),
@@ -24,7 +24,7 @@ test_that("F36 table has the columns the figure reads and a label for every form
   expect_true(all(tab$ci_low <= tab$flagged_or_corrected_pct & tab$flagged_or_corrected_pct <= tab$ci_high))
 })
 
-test_that("the two copies of the F36 table are identical", {
+test_that("the two copies of the F20 table are identical", {
   root <- .rio_root()
   skip_if(is.na(root), "package source root not found (installed-package run)")
   a <- file.path(root, "inst", "extdata", "reversal_injection_outcomes.csv")

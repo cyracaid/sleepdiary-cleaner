@@ -63,7 +63,7 @@ scale_fill_sc <- function(...) {
 # Journal-style theme for figures drawn at final print size (183 mm wide): Helvetica,
 # 9 pt bold title, 8 pt labels, 7 pt tick labels and notes, no grid, thin axis lines,
 # bold lower-case panel tags. The figure title stays on the figure. Used by the figures
-# that have been redrawn at that size (F01, F17); the others keep the global theme above.
+# that have been redrawn at that size (F01, F22); the others keep the global theme above.
 theme_nature <- function(base_size = 8) {
   ggplot2::theme_classic(base_size = base_size, base_family = "Helvetica") %+replace%
     ggplot2::theme(
@@ -822,7 +822,7 @@ cat("\n\n")
 # lost to "Not Reported" or ending in "Error (Reviewed)" suggests
 # systematic issues in data collection or entry. This figure shows how
 # much was corrected and how -- it does not mean corrected records are
-# "less trustworthy": see Figure F17 for what correction changed and did
+# "less trustworthy": see Figure F22 for what correction changed and did
 # not change.
 # ============================================================================
 # NOTE (2026-09-17): earlier revisions of this file described Figure 1 as
@@ -943,7 +943,7 @@ if(all(c("data_category", "manually_corrected", "corrected") %in% names(correcte
 }
 
 # ----------------------------------------------------------------------------
-# Figure F17: Impact of Corrections on Sleep Metrics
+# Figure F22: Impact of Corrections on Sleep Metrics
 # ============================================================================
 # (Note: the stray duplicate "Figure 2: Distribution of Sleep Variables" header
 # that used to sit directly above this one has been removed -- that section is
@@ -958,7 +958,7 @@ if(all(c("data_category", "manually_corrected", "corrected") %in% names(correcte
 # Panel C: Identity scatter with unchanged mass as faint backdrop
 # Summary table: Mean/SD before and after
 # ============================================================================
-cat("Generating Figure F17 (Before/After Cleaning Impact)...\n")
+cat("Generating Figure F22 (Before/After Cleaning Impact)...\n")
 
 has_raw_times <- all(c("time_bed_am_hhmm_ampm", "time_sleep_am_hhmm_ampm",
                         "time_awake_am_hhmm_ampm") %in% names(corrected_ema_data))
@@ -1076,7 +1076,7 @@ if (has_raw_times && has_metrics) {
     plot_layout(heights = p2_heights, guides = "collect") +
     plot_annotation(
       tag_levels = if (nrow(mod) > 0) "a" else NULL,
-      title    = "Figure F17: Impact of Corrections on Sleep Metrics",
+      title    = "Figure F22: Impact of Corrections on Sleep Metrics",
       subtitle = if (!is.null(p2_subtitle)) p2_subtitle else paste(strwrap(paste(
         "Purpose: how much, and in which direction, corrections changed the data.",
         "a, b: one row per corrected record; line length = change in TST or SOL (min, after minus before).",
@@ -1088,12 +1088,12 @@ if (has_raw_times && has_metrics) {
     ) & theme(legend.position = "bottom")
 
   print(p2)
-  save_png(p2, "F17", w = 183 / 25.4, h = 108 / 25.4, subdir = "research_ready",
+  save_png(p2, "F22", w = 183 / 25.4, h = 108 / 25.4, subdir = "research_ready",
            chars_per_inch = 18, dpi = 300)
-  cat("✓ Figure F17 completed (before/after delta)\n\n")
+  cat("✓ Figure F22 completed (before/after delta)\n\n")
 
 } else {
-  cat("⚠ Missing raw timestamp or metric columns for Figure F17\n\n")
+  cat("⚠ Missing raw timestamp or metric columns for Figure F22\n\n")
 }
 #                - WASO (hours)
 #                - SOL (hours)
@@ -1109,7 +1109,7 @@ if (has_raw_times && has_metrics) {
 # subpopulations with different sleep patterns or data quality issues. Long
 # tails in WASO or SOL suggest problematic records worth investigating.
 # ============================================================================
-cat("Generating Figure F18...\n")
+cat("Generating Figure F23...\n")
 
 vars_to_plot <- c()
 if("sleep_duration_h" %in% names(clean_df)) vars_to_plot <- c(vars_to_plot, sleep_duration = "sleep_duration_h")
@@ -1129,16 +1129,16 @@ if(length(vars_to_plot) > 0) {
     geom_histogram(na.rm = TRUE, aes(y = after_stat(density)), bins = 40, fill = sc_col("green"), alpha = 0.5) +
     geom_density(na.rm = TRUE, color = sc_col("vermillion"), linewidth = 1) +
     facet_wrap(~variable, scales = "free") +
-    labs(title = "Figure F18: Distribution of Sleep Variables",
+    labs(title = "Figure F23: Distribution of Sleep Variables",
          subtitle = "Histograms with density curves for key sleep metrics (based on final corrected data)",
          x = "Value", y = "Density")
   print(p2)
-  save_png(p2, "F18", subdir = "research_ready")
-  cat("✓ Figure F18 completed\n\n")
+  save_png(p2, "F23", subdir = "research_ready")
+  cat("✓ Figure F23 completed\n\n")
 }
 
 # ----------------------------------------------------------------------------
-# Figure F19: Sleep Duration Distribution
+# Figure F24: Sleep Duration Distribution
 # ----------------------------------------------------------------------------
 # DATA SOURCE: clean_df
 # WHAT IT SHOWS: Distribution of Total Sleep Time (TST) with mean/median lines
@@ -1154,7 +1154,7 @@ if(length(vars_to_plot) > 0) {
 # errors or an unusual study population. A large gap between mean and median
 # indicates skew from extreme values that may need correction.
 # ============================================================================
-cat("Generating Figure F19...\n")
+cat("Generating Figure F24...\n")
 
 if("sleep_duration_h" %in% names(clean_df)) {
   .mean_h   <- round(mean(clean_df$sleep_duration_h, na.rm = TRUE), 2)
@@ -1176,7 +1176,7 @@ if("sleep_duration_h" %in% names(clean_df)) {
       c(sc_col("vermillion"), sc_col("blue"), sc_col("orange")),
       c("Density curve (red, smoothed)", .reflines$lab[1], .reflines$lab[2])), name = "Line shown") +
     scale_linetype_identity() +
-    labs(title = "Figure F19: Distribution of Total Sleep Time (TST)",
+    labs(title = "Figure F24: Distribution of Total Sleep Time (TST)",
          subtitle = "TST = Total Sleep Time, i.e. how long participants were actually asleep (final corrected data). Histogram = each bar counts records falling in that duration range.",
          x = "Sleep Duration (hours)", y = "Density") +
     theme(legend.position = "bottom") +
@@ -1184,12 +1184,12 @@ if("sleep_duration_h" %in% names(clean_df)) {
              label = paste("n =", sum(!is.na(clean_df$sleep_duration_h))),
              hjust = 1.1, vjust = 1.5, size = 3.5)
   print(p3)
-  save_png(p3, "F19", subdir = "research_ready")
-  cat("✓ Figure F19 completed\n\n")
+  save_png(p3, "F24", subdir = "research_ready")
+  cat("✓ Figure F24 completed\n\n")
 }
 
 # ----------------------------------------------------------------------------
-# Figure F20: Sleep Duration vs Time in Bed (COLOR-CODED BY SEVERITY)
+# Figure F25: Sleep Duration vs Time in Bed (COLOR-CODED BY SEVERITY)
 # ----------------------------------------------------------------------------
 # DATA SOURCE: clean_df
 # WHAT IT SHOWS: Scatter plot of TST vs Time in Bed
@@ -1207,7 +1207,7 @@ if("sleep_duration_h" %in% names(clean_df)) {
 # records (orange/red) are in a specific region of the plot, this reveals
 # systematic bias in how flags are assigned.
 # ============================================================================
-cat("Generating F20 (Sleep Duration vs Time in Bed)...\n")
+cat("Generating F25 (Sleep Duration vs Time in Bed)...\n")
 
 if(all(c("time_in_bed_h", "sleep_duration_h", "flag_severity") %in% names(clean_df))) {
   
@@ -1231,7 +1231,7 @@ if(all(c("time_in_bed_h", "sleep_duration_h", "flag_severity") %in% names(clean_
                                     "Minor issues (1 flag)" = sc_col("orange"),
                                     "Major issues (2+ flags)" = sc_col("vermillion")),
                          name = "Data Quality") +
-      labs(title = "Figure F20: Sleep Duration vs Time in Bed",
+      labs(title = "Figure F25: Sleep Duration vs Time in Bed",
            subtitle = sprintf("TIME IN BED = from getting into bed to getting out. SLEEP DURATION = time actually asleep (TIB minus SOL minus WASO). | COLOR-CODED by data quality | r = %.3f (all records) / %.3f (clean only) | Black line = linear trend; gray band around it = uncertainty range of the trend | Dashed diagonal = TIB == TST (impossible to sleep all of TIB) (based on final corrected data)", overall_cor, clean_cor),
            x = "Time in Bed (hours)",
            y = "Total Sleep Time (hours)") +
@@ -1239,13 +1239,13 @@ if(all(c("time_in_bed_h", "sleep_duration_h", "flag_severity") %in% names(clean_
       coord_cartesian(xlim = c(0, 16), ylim = c(0, 16))
     
     print(p4)
-  save_png(p4, "F20", subdir = "research_ready")
-    cat("✓ Figure F20 completed\n\n")
+  save_png(p4, "F25", subdir = "research_ready")
+    cat("✓ Figure F25 completed\n\n")
   }
 }
 
 # ----------------------------------------------------------------------------
-# Figure F21: SOL vs Sleep Duration (COLOR-CODED)
+# Figure F26: SOL vs Sleep Duration (COLOR-CODED)
 # ----------------------------------------------------------------------------
 # DATA SOURCE: clean_df
 # WHAT IT SHOWS: Scatter plot of Sleep Onset Latency vs TST
@@ -1263,7 +1263,7 @@ if(all(c("time_in_bed_h", "sleep_duration_h", "flag_severity") %in% names(clean_
 # hours often reflects data entry errors (e.g., mis-typed bedtimes). If
 # flagged points cluster at high SOL, focus correction efforts on those records.
 # ============================================================================
-cat("Generating F21 (SOL vs Sleep Duration)...\n")
+cat("Generating F26 (SOL vs Sleep Duration)...\n")
 
 if(all(c("sol_h", "sleep_duration_h", "flag_severity") %in% names(clean_df))) {
   
@@ -1281,7 +1281,7 @@ if(all(c("sol_h", "sleep_duration_h", "flag_severity") %in% names(clean_df))) {
                                     "Minor issues (1 flag)" = sc_col("orange"),
                                     "Major issues (2+ flags)" = sc_col("vermillion")),
                          name = "Data Quality") +
-      labs(title = "Figure F21: Sleep Onset Latency vs Sleep Duration",
+      labs(title = "Figure F26: Sleep Onset Latency vs Sleep Duration",
            subtitle = "SOL = how long it took to fall asleep after getting into bed. Each dot = one diary night. | Black line = linear trend; gray band around it = uncertainty range of the trend. | SOL > 3h filtered for clarity (based on final corrected data)",
            x = "Sleep Onset Latency (hours)", 
            y = "Total Sleep Time (hours)") +
@@ -1291,13 +1291,13 @@ if(all(c("sol_h", "sleep_duration_h", "flag_severity") %in% names(clean_df))) {
                color = "red", alpha = 0.7)
     
     print(p4b)
-  save_png(p4b, "F21", subdir = "research_ready")
-    cat("✓ Figure F21 completed\n\n")
+  save_png(p4b, "F26", subdir = "research_ready")
+    cat("✓ Figure F26 completed\n\n")
   }
 }
 
 # ----------------------------------------------------------------------------
-# Figure F22: Variability of Sleep Variables (Violin Plot)
+# Figure F27: Variability of Sleep Variables (Violin Plot)
 # ----------------------------------------------------------------------------
 # DATA SOURCE: clean_df
 # WHAT IT SHOWS: Violin plots with internal box plots showing distribution shape
@@ -1313,7 +1313,7 @@ if(all(c("sol_h", "sleep_duration_h", "flag_severity") %in% names(clean_df))) {
 # extreme outliers suggest data quality problems. Variables with unusually
 # shaped distributions (e.g., bimodal, flat) may need further investigation.
 # ============================================================================
-cat("Generating Figure F22...\n")
+cat("Generating Figure F27...\n")
 
 available_vars <- c()
 if("sleep_duration_h" %in% names(clean_df)) available_vars <- c(available_vars, `Sleep Duration` = "sleep_duration_h")
@@ -1334,15 +1334,15 @@ if(length(available_vars) > 0) {
     geom_boxplot(width = 0.1, outlier.shape = NA, fill = "white") +
     facet_wrap(vars(variable), scales = "free_y", ncol = 3) +
     scale_fill_sc() +
-    labs(title = "Figure F22: Variability of Sleep Variables",
+    labs(title = "Figure F27: Variability of Sleep Variables",
          subtitle = "Violin plots with free Y-axis per variable (based on final corrected data)",
          x = "", y = "") +
     theme(axis.text.x = element_blank(),
           axis.ticks.x = element_blank(),
           legend.position = "none")
   print(p5)
-  save_png(p5, "F22", subdir = "research_ready")
-  cat("✓ Figure F22 completed\n\n")
+  save_png(p5, "F27", subdir = "research_ready")
+  cat("✓ Figure F27 completed\n\n")
 }
 
 # ----------------------------------------------------------------------------
@@ -1506,7 +1506,7 @@ if(all(c("sleep_duration_h", "flag_severity") %in% names(clean_df))) {
 # violin/box shapes.
 
 # ----------------------------------------------------------------------------
-# Figure F23: Bedtime vs Get-up Time Distribution
+# Figure F28: Bedtime vs Get-up Time Distribution
 # ----------------------------------------------------------------------------
 # DATA SOURCE: clean_df
 # WHAT IT SHOWS: Density plots of bedtime and get-up time across the day
@@ -1523,7 +1523,7 @@ if(all(c("sleep_duration_h", "flag_severity") %in% names(clean_df))) {
 # clustered near midnight with get-up times near noon could indicate a
 # night-owl population or shift workers.
 # ============================================================================
-cat("Generating Figure F23...\n")
+cat("Generating Figure F28...\n")
 
 if(all(c("time_bed_corrected", "time_getup_corrected") %in% names(clean_df))) {
   clean_df_timing <- clean_df %>%
@@ -1536,14 +1536,14 @@ if(all(c("time_bed_corrected", "time_getup_corrected") %in% names(clean_df))) {
   p9 <- ggplot(clean_df_timing) +
     geom_density(na.rm = TRUE, aes(x = bedtime_hour, fill = "Bedtime"), alpha = 0.4) +
     geom_density(na.rm = TRUE, aes(x = getup_hour, fill = "Get-up Time"), alpha = 0.4) +
-    labs(title = "Figure F23: Bedtime vs Get-up Time Distribution",
+    labs(title = "Figure F28: Bedtime vs Get-up Time Distribution",
          subtitle = "Circadian pattern of sleep timing (based on final corrected data)",
          x = "Hour of Day", y = "Density", fill = "Time") +
     scale_fill_manual(values = c("Bedtime" = sc_col("green"), "Get-up Time" = sc_col("orange"))) +
     scale_x_continuous(breaks = seq(0, 24, 2))
   print(p9)
-  save_png(p9, "F23", subdir = "research_ready")
-  cat("✓ Figure F23 completed\n\n")
+  save_png(p9, "F28", subdir = "research_ready")
+  cat("✓ Figure F28 completed\n\n")
 }
 
 # ----------------------------------------------------------------------------
@@ -2195,7 +2195,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
   #
   # INTERPRETATION (non-destructive framing): a flag here does not mean the
   # record was wrong. Most flagged records were manually reviewed and kept
-  # unchanged (see Figure F17) -- self-report/measured mismatches are
+  # unchanged (see Figure F22) -- self-report/measured mismatches are
   # preserved as data, not corrected toward an assumed ground truth. This
   # figure shows WHEN patterns worth a look occurred, not a defect count.
   # Patterns concentrated at the study start suggest a learning curve or
@@ -2228,7 +2228,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
         scale_fill_sc(name = "Pattern Type") +
         labs(title = "Figure F11: Timing of Flagged Temporal Patterns Over the Study Period",
              subtitle = paste0("Records with a timestamp-order or awake/getup/bed-sleep pattern flag (Step 6 classification), counted per month. ",
-                               "A flag is not a verdict that the record is wrong -- most were reviewed and kept unchanged (see Figure F17)."),
+                               "A flag is not a verdict that the record is wrong -- most were reviewed and kept unchanged (see Figure F22)."),
              x = "Month",
              y = "Number of Records") +
         theme(legend.position = "bottom",
@@ -2365,7 +2365,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
   # lower data quality on the days they did report). A flag does not mean
   # the record is wrong -- many flags mark a self-report vs. measured
   # discrepancy that this pipeline deliberately preserves as data, not an
-  # error to correct (see Figure F17 / F24 / F25). High-rate participants are
+  # error to correct (see Figure F22 / F29 / F30). High-rate participants are
   # worth a manual look, not automatic exclusion.
   # ==========================================================================
   cat("Generating F13 (Flagged records by participant - Auto-detection, rate-normalized)...\n")
@@ -2549,7 +2549,7 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
 
 cat("\n")
 cat(paste(rep("=", 80), collapse = ""))
-cat("\nSTEP 8: GENERATING RESEARCH FIGURES F17-F32 (Unified Classification)\n")
+cat("\nSTEP 8: GENERATING RESEARCH FIGURES F22-F37 (Unified Classification)\n")
 cat(paste(rep("=", 80), collapse = ""))
 cat("\n\n")
 
@@ -2666,7 +2666,7 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
                     "(Minor + Major). Overall %.0f%% of all records are Clean; %d participant(s) are at or ",
                     "above 20%% flagged.\nA high rate marks records worth a manual look -- not data that is ",
                     "wrong. Self-report/measured discrepancies are preserved by design, not corrected ",
-                    "(see Figure F17).\nMinor = 1 flag, Major = 2+ flags from {SE<%s%%, SOL>%sh, WASO>%sh}."),
+                    "(see Figure F22).\nMinor = 1 flag, Major = 2+ flags from {SE<%s%%, SOL>%sh, WASO>%sh}."),
              n_show, n_participants, overall_clean_pct, n_high_flag,
              cfg_get("classification.flag_severity.poor_efficiency_threshold_pct", 70, cfg = pipeline_config),
              cfg_get("classification.flag_severity.high_sol_threshold_hours", 1, cfg = pipeline_config),
@@ -2684,11 +2684,11 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
   }
   
   # --------------------------------------------------------------------------
-  # Figure F24: SOL Perception Bias (主观 vs 客观)
+  # Figure F29: SOL Perception Bias (主观 vs 客观)
   # 客观 SOL = time_sleep_corrected - time_bed_corrected
   # 主观 SOL = duration_totalmin_sol_estimate_am
   # --------------------------------------------------------------------------
-  cat("Generating Figure F24 (SOL bias: subjective vs objective)...\n")
+  cat("Generating Figure F29 (SOL bias: subjective vs objective)...\n")
   
   # 客观 SOL（基于校正后的时间戳）
   obj_sol <- as.numeric(difftime(corrected_ema_data$time_sleep_corrected, 
@@ -2726,7 +2726,7 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
                label = c("15 min: small mismatch (minor)",
                          "60 min: large mismatch (notable)")) +
       labs(caption = "bias = |computed - self-reported|  (minutes)") +
-      labs(title = "Figure F24: SOL Perception Bias (Subjective vs Objective)",
+      labs(title = "Figure F29: SOL Perception Bias (Subjective vs Objective)",
       subtitle = paste0("Absolute difference: subjective SOL (self-reported) vs objective SOL (time_sleep - time_bed). N=", length(valid_rows), ".\n",
                         "This gap is preserved, not corrected -- perception/measurement mismatch is signal, not error. ",
                         "The >60min line flags cases worth a manual look for a possible input error, not a discrepancy to \"fix.\""),
@@ -2735,19 +2735,19 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
       theme_minimal(base_size = 12)
     
     print(p20)
-  save_png(p20, "F24", subdir = "research_ready")
-    cat("✓ Figure F24 completed\n\n")
+  save_png(p20, "F29", subdir = "research_ready")
+    cat("✓ Figure F29 completed\n\n")
   } else {
     cat("⚠ No valid SOL bias data.\n\n")
   }
   
   # --------------------------------------------------------------------------
-  # Figure F25: WASO Perception Bias (with same thresholds as SOL)
+  # Figure F30: WASO Perception Bias (with same thresholds as SOL)
   # 客观 WASO = time_getup_corrected - time_awake_corrected
   # 主观 WASO = duration_totalmin_waso_estimate_am
   # Thresholds: Minor = 15min, Red Line = 60min (same as SOL)
   # --------------------------------------------------------------------------
-  cat("Generating Figure F25 (WASO bias: subjective vs objective)...\n")
+  cat("Generating Figure F30 (WASO bias: subjective vs objective)...\n")
   
   if (exists("corrected_ema_data")) {
     
@@ -2783,7 +2783,7 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
                    label = c("15 min: small mismatch (minor)",
                              "60 min: large mismatch (notable)")) +
           labs(caption = "bias = |computed - self-reported|  (minutes)") +
-           labs(title = "Figure F25: Self-Reported Nighttime Wakefulness vs Post-Awakening Time in Bed",
+           labs(title = "Figure F30: Self-Reported Nighttime Wakefulness vs Post-Awakening Time in Bed",
             subtitle = paste0("Note: self-reported WASO (within sleep period) and post-awakening interval (getup - awake) are different time windows. ",
                               "The latter captures time spent in bed after final awakening, not wakefulness during sleep. N=", length(valid_waso_rows), ".\n",
                               "This gap is preserved, not corrected -- perception/measurement mismatch is signal, not error. ",
@@ -2793,8 +2793,8 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
           theme_minimal(base_size = 12)
         
         print(p20b)
-  save_png(p20b, "F25", subdir = "research_ready")
-        cat("✓ Figure F25 completed\n\n")
+  save_png(p20b, "F30", subdir = "research_ready")
+        cat("✓ Figure F30 completed\n\n")
         
         cat("  Objective WASO non-NA:", sum(!is.na(obj_waso)), "\n")
         cat("  Subjective WASO parsed:", sum(!is.na(subj_waso)), "\n")
@@ -2804,17 +2804,17 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
         cat("⚠ No valid WASO bias data.\n\n")
       }
     } else {
-      cat("⚠ Missing WASO columns. Skipping Figure F25.\n\n")
+      cat("⚠ Missing WASO columns. Skipping Figure F30.\n\n")
     }
   } else {
-    cat("⚠ corrected_ema_data not found. Skipping Figure F25.\n\n")
+    cat("⚠ corrected_ema_data not found. Skipping Figure F30.\n\n")
   }
   
   
   # --------------------------------------------------------------------------
-  # Figure F26: Substance Use Data Availability
+  # Figure F31: Substance Use Data Availability
   # --------------------------------------------------------------------------
-  cat("Generating Figure F26...\n")
+  cat("Generating Figure F31...\n")
   
   subst_cols <- list(
     Caffeine = "caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1",
@@ -2855,7 +2855,7 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
     geom_col(na.rm = TRUE, alpha = 0.8, width = 0.7) +
     geom_text(aes(label = paste0(n_non_na, "/", total_n, " (", pct, "%)  range: ", range)),
               vjust = -0.3, size = 3.5) +
-    labs(title = "Figure F26: Substance Use Data Availability",
+    labs(title = "Figure F31: Substance Use Data Availability",
          subtitle = paste("Non-NA entries and value range for each substance variable (total N =", total_n, ")"),
          x = "", y = "% of records with data") +
     scale_fill_sc() +
@@ -2865,13 +2865,13 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
           legend.position = "none")
   
   print(p21)
-  save_png(p21, "F26", subdir = "research_ready")
-  cat("✓ Figure F26 completed\n\n")
+  save_png(p21, "F31", subdir = "research_ready")
+  cat("✓ Figure F31 completed\n\n")
   
   # --------------------------------------------------------------------------
-  # Figure F27: Substance Use Value Distribution (Detailed Statistics)
+  # Figure F32: Substance Use Value Distribution (Detailed Statistics)
   # --------------------------------------------------------------------------
-  cat("Generating Figure F27 (Substance Use Value Distribution)...\n")
+  cat("Generating Figure F32 (Substance Use Value Distribution)...\n")
   
   # Define substance columns and units
   subst_list <- list(
@@ -2958,7 +2958,7 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
       geom_boxplot(alpha = 0.7, outlier.shape = NA) +
       geom_jitter(width = 0.2, alpha = 0.3, size = 0.8, color = "gray30") +
       labs(
-        title = "Figure F27: Substance Use Value Distribution",
+        title = "Figure F32: Substance Use Value Distribution",
         subtitle = "Box = middle 50% of reports with the median line inside; each gray dot = one participant's report (jittered sideways to avoid overlap)",
         y = "Reported Value", 
         x = ""
@@ -2968,16 +2968,16 @@ if (exists("checkforerrors_summary") && is.list(checkforerrors_summary) &&
       theme(legend.position = "none")
     
     print(p22)
-  save_png(p22, "F27", subdir = "research_ready")
-    cat("✓ Figure F27 completed\n\n")
+  save_png(p22, "F32", subdir = "research_ready")
+    cat("✓ Figure F32 completed\n\n")
     
     # Print statistics table to console
-    cat("--- Substance Use Statistics (Figure F27 data) ---\n")
+    cat("--- Substance Use Statistics (Figure F32 data) ---\n")
     print(stats_table)
     cat("\n")
     
   } else {
-    cat("⚠ No substance use data available for Figure F27\n\n")
+    cat("⚠ No substance use data available for Figure F32\n\n")
   }
 }
 
@@ -2995,9 +2995,9 @@ cat(paste(rep("=", 80), collapse = ""))
 cat("\n\n")
 
 # --------------------------------------------------------------------------
-# Figure F28: Caffeine Consumption Distribution
+# Figure F33: Caffeine Consumption Distribution
 # --------------------------------------------------------------------------
-# Non-NA/non-Inf numeric filter (defined defensively here: the Figure F27
+# Non-NA/non-Inf numeric filter (defined defensively here: the Figure F32
 # block that usually carries it may be skipped entirely).
 .finite_values <- function(x) {
   xv <- suppressWarnings(as.numeric(x))
@@ -3015,7 +3015,7 @@ cat("\n\n")
   out[!is.na(x) & abs(x - 0.25) < 1e-9] <- "1/4"
   out
 }
-cat("Generating Figure F28 (Caffeine consumption)...\n")
+cat("Generating Figure F33 (Caffeine consumption)...\n")
 
 caf_col <- "caffeinetoday_PM_NumCaffeinatedDrinksSnacks_1"
 if (exists("corrected_ema_data") && caf_col %in% names(corrected_ema_data)) {
@@ -3035,22 +3035,22 @@ if (exists("corrected_ema_data") && caf_col %in% names(corrected_ema_data)) {
       geom_col(na.rm = TRUE, alpha = 0.85, width = 0.7, fill = sc_col("blue")) +
       geom_text(aes(label = paste0(n, " (", round(pct, 1), "%)")),
                 vjust = -0.3, size = 3) +
-      labs(title = "Figure F28: Caffeine Consumption Distribution",
+      labs(title = "Figure F33: Caffeine Consumption Distribution",
            subtitle = sprintf("Based on %d non-NA records | Median: %s cups | Range: %s - %s | Fractional answers (e.g. half a cup) are kept as reported",
                               length(caf_non_na), format(median(caf_non_na)), format(min(caf_non_na)), format(max(caf_non_na))),
            x = "Caffeine (cups/day)", y = "Number of records") +
       theme_minimal(base_size = 12)
 
     print(p23)
-  save_png(p23, "F28", subdir = "research_ready")
-    cat(sprintf("✓ Figure F28 completed (%d non-NA records)\n\n", length(caf_non_na)))
+  save_png(p23, "F33", subdir = "research_ready")
+    cat(sprintf("✓ Figure F33 completed (%d non-NA records)\n\n", length(caf_non_na)))
   }
 }
 
 # --------------------------------------------------------------------------
-# Figure F29: Alcohol Consumption Distribution
+# Figure F34: Alcohol Consumption Distribution
 # --------------------------------------------------------------------------
-cat("Generating Figure F29 (Alcohol consumption)...\n")
+cat("Generating Figure F34 (Alcohol consumption)...\n")
 
 alc_col <- "alcoholtoday_PM_NumAlcoholicDrinks_1"
 if (exists("corrected_ema_data") && alc_col %in% names(corrected_ema_data)) {
@@ -3070,22 +3070,22 @@ if (exists("corrected_ema_data") && alc_col %in% names(corrected_ema_data)) {
       geom_col(na.rm = TRUE, alpha = 0.85, width = 0.7, fill = sc_col("orange")) +
       geom_text(aes(label = paste0(n, " (", round(pct, 1), "%)")),
                 vjust = -0.3, size = 3) +
-      labs(title = "Figure F29: Alcohol Consumption Distribution",
+      labs(title = "Figure F34: Alcohol Consumption Distribution",
            subtitle = sprintf("Based on %d non-NA records | Median: %s drinks | Range: %s - %s | Fractional answers are kept as reported",
                               length(alc_non_na), format(median(alc_non_na)), format(min(alc_non_na)), format(max(alc_non_na))),
            x = "Alcohol (drinks/day)", y = "Number of records") +
       theme_minimal(base_size = 12)
 
     print(p24)
-  save_png(p24, "F29", subdir = "research_ready")
-    cat(sprintf("✓ Figure F29 completed (%d non-NA records)\n\n", length(alc_non_na)))
+  save_png(p24, "F34", subdir = "research_ready")
+    cat(sprintf("✓ Figure F34 completed (%d non-NA records)\n\n", length(alc_non_na)))
   }
 }
 
 # --------------------------------------------------------------------------
-# Figure F30: Sleep Regularity — Weekday vs Weekend
+# Figure F35: Sleep Regularity — Weekday vs Weekend
 # --------------------------------------------------------------------------
-cat("Generating F30 (Sleep Regularity: Weekday vs Weekend)...\n")
+cat("Generating F35 (Sleep Regularity: Weekday vs Weekend)...\n")
 
 if (all(c("time_bed_corrected", "time_getup_corrected") %in% names(corrected_ema_data))) {
   cat("  R25: columns found, processing...\n")
@@ -3133,7 +3133,7 @@ if (all(c("time_bed_corrected", "time_getup_corrected") %in% names(corrected_ema
       stat_summary(fun = median, geom = "point", size = 2, color = "black") +
       facet_wrap(~event, scales = "free_y") +
       scale_fill_manual(values = c("Weekday" = sc_col("blue"), "Weekend" = sc_col("orange"))) +
-      labs(title = "Figure F30: Sleep Regularity - Weekday vs Weekend",
+      labs(title = "Figure F35: Sleep Regularity - Weekday vs Weekend",
            subtitle = paste0("Violin + boxplot of bedtime and get-up time by day type (weekend = Sat/Sun); N = ", nrow(sr), " records.\n",
                              "Bedtime = time_bed_corrected, get-up = time_getup_corrected. Bedtime hours above 24 are after midnight (26 = 02:00)."),
            x = "", y = "Clock Hour") +
@@ -3141,19 +3141,19 @@ if (all(c("time_bed_corrected", "time_getup_corrected") %in% names(corrected_ema
       theme(legend.position = "bottom",
             strip.text = element_text(face = "bold", size = 13))
     print(p_r25)
-    save_png(p_r25, "F30", subdir = "research_ready")
-    cat("✓ Figure F30 completed\n\n")
+    save_png(p_r25, "F35", subdir = "research_ready")
+    cat("✓ Figure F35 completed\n\n")
   } else {
     cat("  R25: no non-NA records found — skipping\n\n")
   }
 } else {
-  cat("⚠ Missing required columns (time_bed_corrected, time_getup_corrected) — skipping Figure F30\n\n")
+  cat("⚠ Missing required columns (time_bed_corrected, time_getup_corrected) — skipping Figure F35\n\n")
 }
 
 # --------------------------------------------------------------------------
-# Figure F31: Sleep Composition — TIB = TST + SOL + WASO
+# Figure F36: Sleep Composition — TIB = TST + SOL + WASO
 # --------------------------------------------------------------------------
-cat("Generating F31 (Sleep Composition)...\n")
+cat("Generating F36 (Sleep Composition)...\n")
 
 if (all(c("self_diffcalc_totalsleeptime_minutes", "self_diffcalc_sol_minutes",
           "duration_totalmin_waso_estimate_am_mincalc_used") %in% names(corrected_ema_data))) {
@@ -3187,23 +3187,23 @@ if (all(c("self_diffcalc_totalsleeptime_minutes", "self_diffcalc_sol_minutes",
     scale_fill_manual(name = NULL, values = c("Total Sleep Time (TST)" = sc_col("green"),
                                  "Sleep Onset Latency (SOL)" = sc_col("orange"),
                                  "Wake After Sleep Onset (WASO)" = sc_col("vermillion"))) +
-    labs(title = "Figure F31: Sleep Composition - TIB Breakdown",
+    labs(title = "Figure F36: Sleep Composition - TIB Breakdown",
          subtitle = paste0("Average proportion of Time in Bed (TIB) spent in each stage (N=", nrow(sc),
                            " valid records after pipeline correction). TIB = TST (Total Sleep Time, asleep) + SOL (Sleep Onset Latency, falling asleep) + WASO (Wake After Sleep Onset, awake in the night)."),
          x = "", y = "") +
     theme_void(base_size = 12) +
     theme(legend.position = "bottom", plot.margin = margin(10, 30, 10, 30))
   print(p_r26)
-  save_png(p_r26, "F31", subdir = "research_ready")
-  cat("✓ Figure F31 completed\n\n")
+  save_png(p_r26, "F36", subdir = "research_ready")
+  cat("✓ Figure F36 completed\n\n")
 } else {
-  cat("⚠ Missing required columns — skipping Figure F31\n\n")
+  cat("⚠ Missing required columns — skipping Figure F36\n\n")
 }
 
 # --------------------------------------------------------------------------
-# Figure F32: Sleep Metrics Correlation Matrix
+# Figure F37: Sleep Metrics Correlation Matrix
 # --------------------------------------------------------------------------
-cat("Generating F32 (Sleep Metrics Correlation Matrix)...\n")
+cat("Generating F37 (Sleep Metrics Correlation Matrix)...\n")
 
 if (requireNamespace("corrplot", quietly = TRUE) &&
     all(c("self_diffcalc_totalsleeptime_minutes", "self_diffcalc_sol_minutes",
@@ -3223,7 +3223,7 @@ if (requireNamespace("corrplot", quietly = TRUE) &&
   if (nrow(cor_data) > 50) {
     M <- cor(cor_data, use = "pairwise.complete.obs")
 
-    png(file.path(output_dir, "research_ready", "F32.png"),
+    png(file.path(output_dir, "research_ready", "F37.png"),
         width = 8, height = 7, units = "in", res = 150)
     par(oma = c(0, 0, 4.5, 0))  # outer top margin holds the title/subtitle clear of the rotated labels
     corrplot::corrplot(M, method = "color", type = "upper",
@@ -3231,24 +3231,24 @@ if (requireNamespace("corrplot", quietly = TRUE) &&
                        addCoef.col = "black", number.cex = 0.7,
                        col = colorRampPalette(c(sc_col("vermillion"), "white", sc_col("blue")))(200),
                        title = "", mar = c(2, 2, 1, 2))
-    mtext("Figure F32: Sleep Metrics Correlation Matrix", side = 3, outer = TRUE, line = 2.4, cex = 1.3, font = 2)
+    mtext("Figure F37: Sleep Metrics Correlation Matrix", side = 3, outer = TRUE, line = 2.4, cex = 1.3, font = 2)
     mtext(side = 3, outer = TRUE, line = 0.9, cex = 0.8,
           sprintf("Pairwise Pearson correlations (N=%d valid records after pipeline correction). Vermillion = negative, Blue = positive.", nrow(cor_data)))
     dev.off()
     # No flat top-level copy: subfolders are the single location for figures
     # (see save_png above).
-    cat("✓ Figure F32 completed\n\n")
+    cat("✓ Figure F37 completed\n\n")
   } else {
-    cat("⚠ Too few records for correlation matrix — skipping Figure F32\n\n")
+    cat("⚠ Too few records for correlation matrix — skipping Figure F37\n\n")
   }
 } else {
-  cat("⚠ corrplot package or required columns missing — skipping Figure F32\n\n")
+  cat("⚠ corrplot package or required columns missing — skipping Figure F37\n\n")
 }
 
 # --------------------------------------------------------------------------
-# Figure F33: Nights whose self-reported times are out of order
+# Figure F17: Nights whose self-reported times are out of order
 # --------------------------------------------------------------------------
-cat("Generating F33 (Out-of-order nights, by mechanism)...\n")
+cat("Generating F17 (Out-of-order nights, by mechanism)...\n")
 
 if (exists("corrected_ema_data") && nrow(corrected_ema_data) > 0) {
   rev_tab <- try(classify_reversals(corrected_ema_data), silent = TRUE)
@@ -3290,7 +3290,7 @@ if (exists("corrected_ema_data") && nrow(corrected_ema_data) > 0) {
     if (n_broken > 0) {
       sub_txt <- paste0(sub_txt, sprintf("; %d of them an impossible get-up value, reported separately", n_broken))
     }
-    png(file.path(output_dir, "pipeline_cleaning", "F33.png"),
+    png(file.path(output_dir, "pipeline_cleaning", "F17.png"),
         width = 10, height = 6, units = "in", res = 150)
     par(mar = c(1, 0.5, 7, 0.5))
     plot(NA, xlim = c(-1.9, 1.3), ylim = c(0.4, k + 1.2), axes = FALSE, xlab = "", ylab = "")
@@ -3309,38 +3309,38 @@ if (exists("corrected_ema_data") && nrow(corrected_ema_data) > 0) {
       text(0.08, y, sprintf("%.1f%%", 100 * f33_rows$n[i] / n_all), adj = 0, cex = 0.8, col = "grey30")
     }
     legend("bottomright", legend = names(pal), fill = pal, border = NA, bty = "n", cex = 0.75)
-    title(main = "Figure F33: Nights with out-of-order times, by mechanism", cex.main = 1.1, line = 5.2)
+    title(main = "Figure F17: Nights with out-of-order times, by mechanism", cex.main = 1.1, line = 5.2)
     mtext("WHAT THIS ANSWERS: when bedtime <= sleep onset <= awakening <= get-up fails, which kind of slip is it, and what can the rules do about it?", side = 3, line = 3.7, cex = 0.7)
     mtext("Each bar = nights of one mechanism (two fields exchanged, one field 12 h out, a whole night moved, ...). Colour = family of mechanism.", side = 3, line = 2.7, cex = 0.7)
     mtext(sub_txt, side = 3, line = 1.4, cex = 0.72)
     dev.off()
     counts <- f33_rows$n[f33_rows$n > 0]
     cat(sprintf("  %d reversed nights across %d mechanisms\n", nrow(rev_tab), length(counts)))
-    cat("\u2713 Figure F33 completed\n\n")
+    cat("\u2713 Figure F17 completed\n\n")
   } else if (!inherits(rev_tab, "try-error")) {
-    cat("\u26a0 no night has out-of-order times \u2014 skipping Figure F33\n\n")
-    .mark_skip("pipeline_cleaning/F33.png",
+    cat("\u26a0 no night has out-of-order times \u2014 skipping Figure F17\n\n")
+    .mark_skip("pipeline_cleaning/F17.png",
                "No night has its four times out of order (nothing to classify).")
   } else {
-    cat("\u26a0 classify_reversals() failed \u2014 skipping Figure F33\n\n")
-    .mark_skip("pipeline_cleaning/F33.png",
+    cat("\u26a0 classify_reversals() failed \u2014 skipping Figure F17\n\n")
+    .mark_skip("pipeline_cleaning/F17.png",
                "classify_reversals() failed; its pre-correction time columns may be missing.")
   }
 } else {
-  cat("\u26a0 corrected_ema_data missing \u2014 skipping Figure F33\n\n")
-  .mark_skip("pipeline_cleaning/F33.png", "corrected_ema_data is missing or empty.")
+  cat("\u26a0 corrected_ema_data missing \u2014 skipping Figure F17\n\n")
+  .mark_skip("pipeline_cleaning/F17.png", "corrected_ema_data is missing or empty.")
 }
 
 # --------------------------------------------------------------------------
 # Figures 34-35: SOL / WASO entries the clock-time rule looked at (Step 6.5)
 # --------------------------------------------------------------------------
-cat("Generating FIGURES F34-F35 (clock-time rule for SOL / WASO text)...\n")
+cat("Generating FIGURES F18-F19 (clock-time rule for SOL / WASO text)...\n")
 
 .f34_log_file <- file.path(cfg_get("output.report.dir", "output", cfg = pipeline_config), "duration_clock_rule_log.csv")
 .f34_log <- if (file.exists(.f34_log_file)) try(utils::read.csv(.f34_log_file, stringsAsFactors = FALSE), silent = TRUE) else NULL
 
 if (is.data.frame(.f34_log) && nrow(.f34_log) > 0) {
-  # F34: what the rule did, one bar per outcome, coloured by field
+  # F18: what the rule did, one bar per outcome, coloured by field
   f34_lab <- c("minutes typed in the hours slot"  = "Kept as minutes\n(e.g. typed 5:00, meant 5 minutes)",
                "SOL typed sleep onset"            = "SOL recomputed from the clock time\n(typed time close to own sleep onset)",
                "SOL typed bedtime"                = "Set to missing: typed the bedtime",
@@ -3352,21 +3352,21 @@ if (is.data.frame(.f34_log) && nrow(.f34_log) > 0) {
   lg$field <- factor(lg$field, levels = c("SOL", "WASO"))
   f34_tab <- table(lg$label, lg$field)
   f34_tab <- f34_tab[order(rowSums(f34_tab)), , drop = FALSE]
-  png(file.path(output_dir, "pipeline_cleaning", "F34.png"), width = 10, height = 6, units = "in", res = 150)
+  png(file.path(output_dir, "pipeline_cleaning", "F18.png"), width = 10, height = 6, units = "in", res = 150)
   par(mar = c(4.5, 15, 7, 2))
   b <- barplot(t(f34_tab), horiz = TRUE, las = 1, border = "white", cex.names = 0.8,
                col = c(SOL = sc_col("blue"), WASO = sc_col("vermillion"))[colnames(f34_tab)],
                xlim = c(0, max(rowSums(f34_tab)) * 1.15), xlab = "entries",
                legend.text = colnames(f34_tab), args.legend = list(x = "bottomright", bty = "n", title = "Field"))
   text(rowSums(f34_tab), b, labels = rowSums(f34_tab), pos = 4, cex = 0.9, font = 2)
-  title(main = "Figure F34: SOL / WASO entries read as a clock time or a mistyped duration", cex.main = 1.0, line = 5.2)
+  title(main = "Figure F18: SOL / WASO entries read as a clock time or a mistyped duration", cex.main = 1.0, line = 5.2)
   mtext("WHAT THIS ANSWERS: of the SOL / WASO entries the interval parser had to reinterpret, what did the Step 6.5 rule do with each?", side = 3, line = 3.7, cex = 0.7)
   mtext("Each bar = entries with one outcome (kept as minutes, recomputed, set to missing, left for a person). Colour = SOL or WASO.", side = 3, line = 2.7, cex = 0.7)
   mtext(sprintf("N = %d reinterpreted entries (Step 6.5 log)", nrow(lg)), side = 3, line = 1.4, cex = 0.72)
   dev.off()
-  cat("✓ Figure F34 completed\n")
+  cat("✓ Figure F18 completed\n")
 
-  # F35: SOL entries typed like a clock time, as a distance from the person's own bed and sleep-onset times
+  # F19: SOL entries typed like a clock time, as a distance from the person's own bed and sleep-onset times
   ok <- exists("corrected_ema_data") && all(c("pid", "day_num", "row_id", "time_bed_corrected", "time_sleep_corrected") %in% names(corrected_ema_data))
   sol <- lg[lg$field == "SOL" & lg$class != "minutes typed in the hours slot", , drop = FALSE]
   if (ok && nrow(sol) > 0) {
@@ -3385,7 +3385,7 @@ if (is.data.frame(.f34_log) && nrow(.f34_log) > 0) {
     tol <- as.numeric(cfg_get("duration_clock_rule.tolerance_min", 5, cfg = pipeline_config))
     win <- as.numeric(cfg_get("duration_clock_rule.window_min", 60, cfg = pipeline_config))
     rng <- function(v, lo, hi) c(min(lo, floor(min(v) / 30) * 30), max(hi, ceiling(max(v) / 30) * 30))
-    png(file.path(output_dir, "pipeline_cleaning", "F35.png"), width = 8, height = 7, units = "in", res = 150)
+    png(file.path(output_dir, "pipeline_cleaning", "F19.png"), width = 8, height = 7, units = "in", res = 150)
     par(mar = c(4.5, 4.5, 7, 1))
     plot(sol$from_bed, sol$from_onset, pch = 16, cex = 1.3, col = adjustcolor(col, 0.7),
          xlim = rng(sol$from_bed, -60, win + 60), ylim = rng(sol$from_onset, -60, 60),
@@ -3396,29 +3396,29 @@ if (is.data.frame(.f34_log) && nrow(.f34_log) > 0) {
     text(win / 2, tol + 4, "recompute zone", cex = 0.7, col = sc_col("green"))
     legend("topright", bty = "n", cex = 0.8, pch = 16, col = c(sc_col("green"), sc_col("vermillion"), sc_col("grey")),
            legend = c("recomputed", "set to missing", "left for review"))
-    title(main = "Figure F35: SOL entries typed like a clock time, against the person's own times", cex.main = 1.0, line = 5.2)
+    title(main = "Figure F19: SOL entries typed like a clock time, against the person's own times", cex.main = 1.0, line = 5.2)
     mtext("WHAT THIS ANSWERS: when someone typed a clock time in the SOL field, was it their sleep onset or their bedtime?", side = 3, line = 3.7, cex = 0.7)
     mtext("Each dot = one entry: typed time minus own bedtime (x) and minus own sleep onset (y), on a 12-hour dial. Near y = 0: sleep onset.", side = 3, line = 2.7, cex = 0.7)
     mtext(sprintf("N = %d entries; the dashed box is the rule's tolerance (%g min) and window (%g min)", nrow(sol), tol, win),
           side = 3, line = 1.4, cex = 0.72)
     dev.off()
-    cat("✓ Figure F35 completed\n\n")
+    cat("✓ Figure F19 completed\n\n")
   } else {
-    cat("⚠ no SOL entry typed like a clock time, or own times missing — skipping Figure F35\n\n")
-    .mark_skip("pipeline_cleaning/F35.png", "No SOL entry was read as a clock time, or the person's bed / sleep times are missing.")
+    cat("⚠ no SOL entry typed like a clock time, or own times missing — skipping Figure F19\n\n")
+    .mark_skip("pipeline_cleaning/F19.png", "No SOL entry was read as a clock time, or the person's bed / sleep times are missing.")
   }
 } else {
   cat("⚠ no reinterpreted SOL / WASO entries — skipping Figures 34-35\n\n")
-  .mark_skip("pipeline_cleaning/F34.png", "The clock-time rule saw no reinterpreted SOL / WASO entry.")
-  .mark_skip("pipeline_cleaning/F35.png", "The clock-time rule saw no reinterpreted SOL / WASO entry.")
+  .mark_skip("pipeline_cleaning/F18.png", "The clock-time rule saw no reinterpreted SOL / WASO entry.")
+  .mark_skip("pipeline_cleaning/F19.png", "The clock-time rule saw no reinterpreted SOL / WASO entry.")
 }
 
 
 # --------------------------------------------------------------------------
-# Figure F36: What the rules do with each form of a reversed night (synthetic test)
+# Figure F20: What the rules do with each form of a reversed night (synthetic test)
 # --------------------------------------------------------------------------
 if (cfg_get("visualization.detection_outcomes.enabled", TRUE, cfg = pipeline_config)) {
-  cat("Generating F36 (reversal forms: share put back to the true value)...\n")
+  cat("Generating F20 (reversal forms: share put back to the true value)...\n")
   rv_rel <- "validation/synthetic/results/reversal_injection_outcomes.csv"
   rv_candidates <- c(system.file("extdata", "reversal_injection_outcomes.csv", package = "sleepcleanr"), rv_rel)
   rv_candidates <- rv_candidates[nzchar(rv_candidates)]
@@ -3437,7 +3437,7 @@ if (cfg_get("visualization.detection_outcomes.enabled", TRUE, cfg = pipeline_con
     rv <- rv[order(-rv$flagged_or_corrected_pct, -rv$n_injected), , drop = FALSE]
     k <- nrow(rv)
     ys <- rev(seq_len(k))
-    png(file.path(output_dir, "pipeline_cleaning", "F36.png"),
+    png(file.path(output_dir, "pipeline_cleaning", "F20.png"),
         width = 11, height = 5.6, units = "in", res = 150)
     par(mar = c(1, 0.5, 6.5, 0.5))
     plot(NA, xlim = c(-2.1, 1.75), ylim = c(0.4, k + 1.2), axes = FALSE, xlab = "", ylab = "")
@@ -3457,7 +3457,7 @@ if (cfg_get("visualization.detection_outcomes.enabled", TRUE, cfg = pipeline_con
       text(1.5, y, if (w > 0) sprintf("%d of %d", w, rv$n_injected[i]) else "0", adj = 0, cex = 0.78,
            col = if (w > 0) sc_col("vermillion") else sc_col("grey_dark"), font = if (w > 0) 2 else 1)
     }
-    title(main = "Figure F36: Out-of-order nights in a synthetic test, by form", cex.main = 1.1, line = 4.6)
+    title(main = "Figure F20: Out-of-order nights in a synthetic test, by form", cex.main = 1.1, line = 4.6)
     mtext("WHAT THIS ANSWERS: for each kind of reversed night, how often do the rules put the time back to the true value, and how often do they change it to something else?",
           side = 3, line = 3.1, cex = 0.66)
     mtext(sprintf("Each form injected into clean synthetic diaries in the proportions seen in one real study (%s injected rows). Clean rows altered: %d of %s. Wilson 95%% CI.",
@@ -3467,21 +3467,21 @@ if (cfg_get("visualization.detection_outcomes.enabled", TRUE, cfg = pipeline_con
                   100 * sum(rv$n_injected * rv$flagged_or_corrected_pct / 100) / sum(rv$n_injected),
                   sum(rv$wrong_repairs)), side = 3, line = 0.8, cex = 0.66)
     dev.off()
-    cat("✓ Figure F36 completed\n\n")
+    cat("✓ Figure F20 completed\n\n")
   } else {
-    cat(sprintf("⚠ Cannot generate Figure F36: reversal_injection_outcomes.csv not found (looked in %s)\n\n",
+    cat(sprintf("⚠ Cannot generate Figure F20: reversal_injection_outcomes.csv not found (looked in %s)\n\n",
                 paste(rv_candidates, collapse = ", ")))
-    .mark_skip("pipeline_cleaning/F36.png",
+    .mark_skip("pipeline_cleaning/F20.png",
                sprintf("reversal_injection_outcomes.csv not found (looked in %s).", paste(rv_candidates, collapse = ", ")))
   }
 } else {
-  cat("⊘ Figure F36 skipped (visualization.detection_outcomes.enabled = false)\n\n")
+  cat("⊘ Figure F20 skipped (visualization.detection_outcomes.enabled = false)\n\n")
 }
 
 # --------------------------------------------------------------------------
-# Figure F37: Out-of-order nights in this study, before and after the corrections
+# Figure F21: Out-of-order nights in this study, before and after the corrections
 # --------------------------------------------------------------------------
-cat("Generating F37 (out-of-order nights: before and after correction)...\n")
+cat("Generating F21 (out-of-order nights: before and after correction)...\n")
 .f37_cols <- c("time_bed_corrected", "time_sleep_corrected", "time_awake_corrected", "time_getup_corrected")
 if (exists("corrected_ema_data") && nrow(corrected_ema_data) > 0 && all(.f37_cols %in% names(corrected_ema_data))) {
   rev37 <- try(classify_reversals(corrected_ema_data), silent = TRUE)
@@ -3516,7 +3516,7 @@ if (exists("corrected_ema_data") && nrow(corrected_ema_data) > 0 && all(.f37_col
                 aes(x = n, y = family, label = paste0(" ", n)), inherit.aes = FALSE, hjust = 0, size = 3.3) +
       scale_fill_manual(values = pal37, breaks = lv_after, name = "After the corrections") +
       scale_x_continuous(expand = expansion(mult = c(0, 0.1))) +
-      labs(title = "Figure F37: Out-of-order nights in this study, before and after the corrections",
+      labs(title = "Figure F21: Out-of-order nights in this study, before and after the corrections",
            subtitle = sprintf("Before: %d nights with the four times out of order (the bar length). After: %d (%.1f%%) in order and plausible. Plausible: SOL 0-300 min, time in bed 2-16 h, TST 0.5-12 h.",
                               nrow(rev37), n_ok, 100 * n_ok / nrow(rev37)),
            x = "Nights", y = NULL) +
@@ -3524,18 +3524,18 @@ if (exists("corrected_ema_data") && nrow(corrected_ema_data) > 0 && all(.f37_col
       theme(legend.position = "bottom", panel.grid.major.y = element_blank(),
             plot.subtitle = element_text(size = 9))
     print(p37)
-    save_png(p37, "F37", subdir = "pipeline_cleaning")
-    cat(sprintf("✓ Figure F37 completed (%d reversed nights; %d in order and plausible after)\n\n", nrow(rev37), n_ok))
+    save_png(p37, "F21", subdir = "pipeline_cleaning")
+    cat(sprintf("✓ Figure F21 completed (%d reversed nights; %d in order and plausible after)\n\n", nrow(rev37), n_ok))
   } else if (!inherits(rev37, "try-error")) {
-    cat("⚠ no night has out-of-order times — skipping Figure F37\n\n")
-    .mark_skip("pipeline_cleaning/F37.png", "No night has its four times out of order (nothing to compare).")
+    cat("⚠ no night has out-of-order times — skipping Figure F21\n\n")
+    .mark_skip("pipeline_cleaning/F21.png", "No night has its four times out of order (nothing to compare).")
   } else {
-    cat("⚠ classify_reversals() failed — skipping Figure F37\n\n")
-    .mark_skip("pipeline_cleaning/F37.png", "classify_reversals() failed; its pre-correction time columns may be missing.")
+    cat("⚠ classify_reversals() failed — skipping Figure F21\n\n")
+    .mark_skip("pipeline_cleaning/F21.png", "classify_reversals() failed; its pre-correction time columns may be missing.")
   }
 } else {
-  cat("⚠ corrected_ema_data or its *_corrected time columns missing — skipping Figure F37\n\n")
-  .mark_skip("pipeline_cleaning/F37.png", "corrected_ema_data or its time_*_corrected columns are missing.")
+  cat("⚠ corrected_ema_data or its *_corrected time columns missing — skipping Figure F21\n\n")
+  .mark_skip("pipeline_cleaning/F21.png", "corrected_ema_data or its time_*_corrected columns are missing.")
 }
 
 
@@ -3577,30 +3577,30 @@ if(checkforerrors_exists && nrow(checkforerrors_processed) > 0) {
   cat("\n")
 }
 
-cat("REVERSAL AND CLOCK-TIME FIGURES F33-F37 (pipeline_cleaning/):\n")
-cat("  F33  Out-of-order nights, by mechanism\n")
-cat("  F34  SOL / WASO entries read as a clock time (clock-time rule)\n")
-cat("  F35  SOL entries typed like a clock time, against own times\n")
-cat("  F36  Out-of-order nights in a synthetic test, by form\n")
-cat("  F37  Out-of-order nights in this study, before and after the corrections\n\n")
+cat("REVERSAL AND CLOCK-TIME FIGURES F17-F21 (pipeline_cleaning/):\n")
+cat("  F17  Out-of-order nights, by mechanism\n")
+cat("  F18  SOL / WASO entries read as a clock time (clock-time rule)\n")
+cat("  F19  SOL entries typed like a clock time, against own times\n")
+cat("  F20  Out-of-order nights in a synthetic test, by form\n")
+cat("  F21  Out-of-order nights in this study, before and after the corrections\n\n")
 
-cat("RESEARCH FIGURES F17-F32 (research_ready/):\n")
-cat("  F17  Impact of corrections on sleep metrics\n")
-cat("  F18  Distribution of sleep variables\n")
-cat("  F19  Total sleep time distribution\n")
-cat("  F20  Sleep duration vs time in bed\n")
-cat("  F21  Sleep onset latency vs sleep duration\n")
-cat("  F22  Variability of sleep variables\n")
-cat("  F23  Bedtime vs get-up time distribution\n")
-cat("  F24  SOL perception bias (self-reported vs calculated)\n")
-cat("  F25  WASO perception bias (self-reported vs calculated)\n")
-cat("  F26  Substance use data availability\n")
-cat("  F27  Substance use value distribution\n")
-cat("  F28  Caffeine consumption distribution\n")
-cat("  F29  Alcohol consumption distribution\n")
-cat("  F30  Sleep regularity -- weekday vs weekend\n")
-cat("  F31  Sleep composition -- TIB = TST + SOL + WASO\n")
-cat("  F32  Sleep metrics correlation matrix\n\n")
+cat("RESEARCH FIGURES F22-F37 (research_ready/):\n")
+cat("  F22  Impact of corrections on sleep metrics\n")
+cat("  F23  Distribution of sleep variables\n")
+cat("  F24  Total sleep time distribution\n")
+cat("  F25  Sleep duration vs time in bed\n")
+cat("  F26  Sleep onset latency vs sleep duration\n")
+cat("  F27  Variability of sleep variables\n")
+cat("  F28  Bedtime vs get-up time distribution\n")
+cat("  F29  SOL perception bias (self-reported vs calculated)\n")
+cat("  F30  WASO perception bias (self-reported vs calculated)\n")
+cat("  F31  Substance use data availability\n")
+cat("  F32  Substance use value distribution\n")
+cat("  F33  Caffeine consumption distribution\n")
+cat("  F34  Alcohol consumption distribution\n")
+cat("  F35  Sleep regularity -- weekday vs weekend\n")
+cat("  F36  Sleep composition -- TIB = TST + SOL + WASO\n")
+cat("  F37  Sleep metrics correlation matrix\n\n")
 
 cat("FOLDER STRUCTURE:\n")
 cat(sprintf("  %s/pipeline_cleaning/  — Data cleaning pipeline progress & quality control\n", output_dir))
@@ -3828,16 +3828,11 @@ generate_appendix_ledger()
   "pipeline_cleaning/F14.png",
   "pipeline_cleaning/F15.png",
   "pipeline_cleaning/F16.png",
-  "pipeline_cleaning/F33.png",
-  "pipeline_cleaning/F34.png",
-  "pipeline_cleaning/F35.png",
-  "pipeline_cleaning/F36.png",
-  "pipeline_cleaning/F37.png",
-  "research_ready/F17.png",
-  "research_ready/F18.png",
-  "research_ready/F19.png",
-  "research_ready/F20.png",
-  "research_ready/F21.png",
+  "pipeline_cleaning/F17.png",
+  "pipeline_cleaning/F18.png",
+  "pipeline_cleaning/F19.png",
+  "pipeline_cleaning/F20.png",
+  "pipeline_cleaning/F21.png",
   "research_ready/F22.png",
   "research_ready/F23.png",
   "research_ready/F24.png",
@@ -3848,7 +3843,12 @@ generate_appendix_ledger()
   "research_ready/F29.png",
   "research_ready/F30.png",
   "research_ready/F31.png",
-  "research_ready/F32.png"
+  "research_ready/F32.png",
+  "research_ready/F33.png",
+  "research_ready/F34.png",
+  "research_ready/F35.png",
+  "research_ready/F36.png",
+  "research_ready/F37.png"
 )
 .missing_figures <- .expected_figures[!file.exists(file.path(output_dir, .expected_figures))]
 
