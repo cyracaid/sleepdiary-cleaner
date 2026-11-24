@@ -1215,24 +1215,26 @@ ensure_marking_columns <- function(data) {
 
 # Find duration column
 find_duration_columns <- function(data) {
-  
-  duration_cols <- names(data)[grepl("duration", names(data), ignore.case = TRUE)]
-  
+
+  # The column compared with the time-derived sleep period (sleep -> awake) must
+  # be a TOTAL SLEEP DURATION in minutes. Until 1.9.0 the candidate list also
+  # held the SOL estimate and the search fell back to "the first column whose
+  # name contains 'duration'", so a study with no total-sleep-duration question
+  # compared the sleep period with SOL (or WASO, or nap) minutes. Those columns
+  # are never used now; with no suitable column the duration comparison columns
+  # (duration_from_data_min, duration_calculated_min, duration_difference_min,
+  # duration_difference_h, duration_match) are simply not added.
   possible_duration_cols <- c(
     "duration", "Duration", "DURATION",
     "sleep_duration", "sleep_duration_corrected",
-    "time_in_bed", "time_in_bed_corrected",
-    "duration_totalmin_sol_estimate_am",
     "total_sleep_duration_minutes",
     "sleep_duration_minutes"
   )
-  
+
   for (col in possible_duration_cols) {
     if (col %in% names(data)) return(col)
   }
-  
-  if (length(duration_cols) > 0) return(duration_cols[1])
-  
+
   return(NULL)
 }
 

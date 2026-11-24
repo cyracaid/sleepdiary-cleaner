@@ -1,5 +1,8 @@
 # sleepcleanr (development version)
 
+## Fixed
+* The duration comparison columns added to the review data frames (`duration_from_data_min`, `duration_calculated_min`, `duration_difference_min`, `duration_difference_h`, `duration_match`) no longer compare the time-derived sleep period with a self-reported SOL, WASO or nap duration. `find_duration_columns()` now accepts only a total-sleep-duration column and returns `NULL` otherwise, in which case the comparison columns are not added. They are not written to any delivered file; no flag or correction used them.
+
 ## Added
 * Figures F36 and F37 (`pipeline_cleaning/`). F36 shows, for each form of an out-of-order night, how often the rules put the time back to the true value in a synthetic test (with the number of rows changed to a wrong value); it reads `reversal_injection_outcomes.csv`, shipped in `inst/extdata/`, and is switched by `visualization.detection_outcomes.enabled`. F37 shows this study's out-of-order nights before and after the corrections, by family of mechanism. There are now 37 figures (21 pipeline-cleaning, 16 research-ready).
 * `detection_outcomes_v4_current.csv`, the table Figure F08 reads, is now shipped in `inst/extdata/`. Before, F08 could only be drawn when the run started in a repository checkout, and was skipped from an installed package.
