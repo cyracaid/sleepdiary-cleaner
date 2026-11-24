@@ -169,8 +169,8 @@ CI 为参与者级 cluster bootstrap（1,000 次），因为同一参与者的�
 
 | | 偏差 | LoA 半宽 | 阈值 | 比值 | 判定 |
 |---|---|---|---|---|---|
-| A1 SOL | +1.6 分钟 | **75.4 分钟** | excessive 120 分钟 | 1.59 | ⚠️ INSIDE NOISE |
-| A1 SOL | — | 75.4 分钟 | high severity 60 分钟 | 0.80 | ⚠️⚠️ INSIDE NOISE |
+| A1 SOL | +13.2 分钟 | **74.4 分钟** | excessive 120 分钟 | 1.61 | ⚠️ INSIDE NOISE |
+| A1 SOL | — | 74.4 分钟 | high severity 60 分钟 | 0.81 | ⚠️⚠️ INSIDE NOISE |
 | A2 WASO | 小 | **27.3 分钟** | high severity 90 分钟 | 3.29 | ✅ SAFE |
 | A3 | — | — | SE poor（70%） | — | N/A（无自报对） |
 | A3 | — | — | TST/TIB 比 | — | N/A（无自报对） |
