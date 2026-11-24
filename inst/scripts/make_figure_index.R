@@ -181,6 +181,6 @@ generate_figure_index <- function(viz_dir) {
   invisible(TRUE)
 }
 
-if (interactive() || !exists("sleepcleanr_loaded")) {
-  cat("[debug mode] make_figure_index.R loaded but not auto-executing\n")
+if (interactive()) {
+  cat("make_figure_index.R sourced: call generate_figure_index(<viz_dir>) to build the contact sheet\n")
 }
