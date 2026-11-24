@@ -59,7 +59,7 @@ temporary library, outside the repository): `real_mix_outcome.csv` and
 `real_mix_clean_rows.csv` came out byte-identical, so only the run-info row
 changed. Re-run and compare if the version changes again.
 
-Figure F36 (`pipeline_cleaning/F36.png`) draws the eight forms of this table;
+Figure F20 (`pipeline_cleaning/F20.png`) draws the eight forms of this table;
 its data file is `inst/extdata/reversal_injection_outcomes.csv`, the same
 numbers with English form names.
 

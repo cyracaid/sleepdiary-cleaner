@@ -360,7 +360,7 @@ read.csv("output/correction_status_final.csv")
 | `timestamp_issue` | Timestamps that could not be parsed into a valid time | 0 is normal. > 0 means some participants entered non-standard time formats. |
 | `duration_issue` | Sleep metrics (SOL, SE, TST) outside configured thresholds | Small numbers are normal. If very large, your thresholds may be too strict or the data has quality problems. |
 | `amount_flag` | Substance-use entries with unusual values | Should be 0 or very low. |
-| `self_reported_flag` | Records where self-reported SOL/WASO disagrees with the computed value | Indicates perception bias. Check F24 (SOL Perception Bias) in the [figure reference](figure-reference.html). |
+| `self_reported_flag` | Records where self-reported SOL/WASO disagrees with the computed value | Indicates perception bias. Check F29 (SOL Perception Bias) in the [figure reference](figure-reference.html). |
 
 **What `first` and `last` mean.** Both are snapshots taken inside the *same*
 run, not two runs and not the first and last row of the data. The pipeline
@@ -384,7 +384,7 @@ data you will analyse, and the `delta` values for what the cleaning did.
 identical. If not, something is non-deterministic.
 
 **A note on SOL:** `sol_mean_min` above is the **raw SOL duration**. This is
-a different quantity from the "SOL perception bias" checked by F24
+a different quantity from the "SOL perception bias" checked by F29
 (the gap between self-reported and computed SOL, in figure reference §5) — the two use
 different reference numbers (10–45 min here vs. 15/60 min there) because
 they measure different things. Don't read one against the other.
