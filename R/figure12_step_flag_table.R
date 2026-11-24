@@ -118,7 +118,7 @@ figure12_step_flag_table <- function(cfg = NULL, output_dir = ".", save_png = NU
                                  l = rep(seq_len(nc), nr), z = 1)
 
   # -- Vertical stack: title / subtitle / table / legend -----------------------
-  title <- grid::textGrob("1.1 - Step Flag Ledger",
+  title <- grid::textGrob("Figure F15: Step Flag Ledger",
                     gp = grid::gpar(fontsize = 14, fontface = "bold"))
   sub <- grid::textGrob(paste0("Records in each final-standard flag category at every pipeline step. ",
                          "- = not yet computable at that step (first number = generation point)."),
