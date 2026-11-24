@@ -1343,7 +1343,7 @@ Not necessarily: they are entries the rule declined to touch. Dots near x = 0 ar
 <details>
 <summary>Why do the small forms have such wide intervals?</summary>
 
-Because they have 3 to 40 nights each. `shift_awake_12h` has 3 rows, so its interval runs from 0 to 56%: at that sample size the figure cannot separate "the rules miss it" from "the rules catch it".
+Because the small forms have 3 to 40 nights each. `shift_awake_12h` has 3 rows, so its interval runs from 0 to 56%: at that sample size the figure cannot separate "the rules miss it" from "the rules catch it".
 
 </details>
 
@@ -1378,7 +1378,7 @@ No: 0% means no injected row was put back to the true value, and the right-hand 
 <summary><strong>Precise rules</strong></summary>
 
 - **Before.** `classify_reversals()` reads the pre-correction columns (`time_*_am_hhmm_ampm`); a night counts when all four times are present and bed <= sleep onset <= final awakening <= get-up fails. That count is the bar length.
-- **After.** The same night in the final columns (`time_*_corrected`), in one of four states. In order means SOL >= 0, TST >= 0 and get-up >= final awakening. Plausible adds SOL <= 300 min, time in bed 120-960 min, TST 30-720 min — the lenient limits `classify_reversals()` uses, which is why a night can be in order and still implausible.
+- **After.** The same night in the final columns (`time_*_corrected`), in one of four states. In order means SOL >= 0, TST >= 0 and get-up >= final awakening. Plausible adds SOL <= 300 min, time in bed 120-960 min, TST 30-720 min and wake-to-rise 0-300 min — the lenient limits `classify_reversals()` uses, which is why a night can be in order and still implausible.
 - **Families.** The mechanism classes of F33, grouped: `swap*` = two times exchanged; `pm12h` = one time 12 h away; `pm12h_x2` = two times moved together; classes starting D or E = visibly wrong or unexplained; the rest = ambiguous. Bars are sorted by the number of nights.
 - **One night, one state.** A night with any missing corrected time is "no corrected value" and is not also counted as still out of order.
 - **What it does not say.** Whether the algorithm or a person made the change, and whether the corrected time is the true one. "In order and plausible" means plausible, not verified.
