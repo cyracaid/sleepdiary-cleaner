@@ -23,6 +23,7 @@
     <li><a class="dropdown-item" href="../articles/column-mapping.html">Input Data and Configuration</a></li>
     <li><a class="dropdown-item" href="../articles/data-first.html">Data-first entry: clean_sleep_diary()</a></li>
     <li><a class="dropdown-item" href="../articles/interpreting-output.html">Reading the Output and the Review Loop</a></li>
+    <li><a class="dropdown-item" href="../articles/figure-reference.html">Figure Reference (F01-F37)</a></li>
     <li><a class="dropdown-item" href="../articles/review-flags.html">Flags, terminology and the review workflow</a></li>
     <li><a class="dropdown-item" href="../articles/output-files.html">Output files</a></li>
     <li><a class="dropdown-item" href="../articles/troubleshooting.html">Troubleshooting</a></li>
@@ -36,6 +37,7 @@
     <li><a class="dropdown-item" href="../articles/column-mapping-zh.html">输入数据与配置</a></li>
     <li><a class="dropdown-item" href="../articles/data-first-zh.html">数据优先入口：clean_sleep_diary()</a></li>
     <li><a class="dropdown-item" href="../articles/interpreting-output-zh.html">读懂输出与审核循环</a></li>
+    <li><a class="dropdown-item" href="../articles/figure-reference-zh.html">逐图参考（F01-F37）</a></li>
     <li><a class="dropdown-item" href="../articles/review-flags-zh.html">Flag、术语与审核流程</a></li>
     <li><a class="dropdown-item" href="../articles/output-files-zh.html">输出文件一览</a></li>
     <li><a class="dropdown-item" href="../articles/troubleshooting-zh.html">排错</a></li>
@@ -84,6 +86,11 @@
 <ul><li>Figures F36 and F37 (<code>pipeline_cleaning/</code>). F36 shows, for each form of an out-of-order night, how often the rules put the time back to the true value in a synthetic test (with the number of rows changed to a wrong value); it reads <code>reversal_injection_outcomes.csv</code>, shipped in <code>inst/extdata/</code>, and is switched by <code>visualization.detection_outcomes.enabled</code>. F37 shows this study’s out-of-order nights before and after the corrections, by family of mechanism. There are now 37 figures (21 pipeline-cleaning, 16 research-ready).</li>
 <li>
 <code>detection_outcomes_v4_current.csv</code>, the table Figure F08 reads, is now shipped in <code>inst/extdata/</code>. Before, F08 could only be drawn when the run started in a repository checkout, and was skipped from an installed package.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="changed-development-version">Changed<a class="anchor" aria-label="anchor" href="#changed-development-version"></a></h3>
+<ul><li>The figure documentation is now two pages, in both languages. <code>interpreting-output</code> keeps the terminology and the reading/review guide (§1–§7); the new <code>figure-reference</code> article holds the figure index and all 37 figure cards (§1–§5). Card captions are numbered in paper order — Methods 1–2, Results 3–13, Supplement S1–S24 — and the index maps each paper number onto the <code>F</code> number used everywhere else.</li>
+<li>Every figure writes its <code>F</code> number into the in-figure title (<code>Figure F05: …</code> where it used to say <code>Figure 11: …</code>), so the file name, the in-figure title and the card heading now agree. Line numbers and file names are unchanged.</li>
 </ul></div>
 </div>
     <div class="section level2">

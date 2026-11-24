@@ -24,9 +24,17 @@ need them; [中文版请看下面 / Chinese articles below ↓](#chinese).
 - [Reading the Output and the Review
   Loop](https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output.md):
 
-  How to read correction_status_final.csv, the step flag ledger,
-  regression checks, and the diagnostic figures — what each output means
-  and what to check for.
+  How to read correction_status_final.csv, the step flag ledger, the
+  manual review loop, regression checks and the quick reference card —
+  what each output means and what to check for.
+
+- [Figure Reference
+  (F01-F37)](https://cyracaid.github.io/sleepdiary-cleaner/articles/figure-reference.md):
+
+  Every figure the pipeline draws: what each part means, the rules it is
+  built from, what healthy data look like, what anomalies mean, and a
+  paper-ready caption — plus the figure index and advice on which
+  figures to publish.
 
 - [Flags, Terminology and the Review
   Workflow](https://cyracaid.github.io/sleepdiary-cleaner/articles/review-flags.md):
@@ -94,7 +102,11 @@ need them; [中文版请看下面 / Chinese articles below ↓](#chinese).
 - [读懂输出与审核循环（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/interpreting-output-zh.md):
 
   怎么读 correction_status_final.csv、step flag
-  ledger、回归检查与诊断图表——每个输出的含义、检查要点，以及每张图的详细参考。
+  ledger、人工审查循环、回归检查与快速检查卡——每个输出的含义与检查要点。
+
+- [逐图参考（F01-F37）（中文）](https://cyracaid.github.io/sleepdiary-cleaner/articles/figure-reference-zh.md):
+
+  管线画的每一张图：每个部分什么意思、依据的规则、健康数据长什么样、异常意味着什么，以及一段可直接用的论文图注。另含图索引与选图建议。
 
 - [Flag、术语与审核流程](https://cyracaid.github.io/sleepdiary-cleaner/articles/review-flags-zh.md):
 
