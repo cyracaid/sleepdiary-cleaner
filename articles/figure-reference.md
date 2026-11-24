@@ -1827,21 +1827,26 @@ corrections ignore it”.
 **Paper use** Supplement, Figure S24
 
 **Title and subtitle** Title: *Out-of-order nights in this study, before
-and after the corrections*. Subtitle: how many nights were out of order
-before (the bar length), how many are in order and plausible after, and
-what “plausible” means (SOL 0-300 min, time in bed 2-16 h, TST 0.5-12
-h).
+and after the corrections*. Two panels. Panel A subtitle: how many
+nights were out of order before (the bar length), and how many were put
+right by the algorithm, put right after human review, or not. Panel B
+subtitle: the share of nights out of order, by study day, against the
+overall share.
 
-**What each part means** One bar per family of mechanism (the same
-classes as F17, grouped). The bar length is the number of nights out of
-order before the corrections; its colours are what the final data looks
-like for those nights: in order and plausible, in order but implausible,
-still out of order, or no corrected value. It reads the final
-`time_*_corrected` columns of this run. It does not say whether a night
-was fixed by the algorithm or by a person, and “in order” does not prove
-the value is the true one.
+**What each part means** *Panel A:* one bar per family of mechanism (the
+same classes as F17, grouped). The bar length is the number of nights
+out of order before the corrections; its colours are what the final data
+looks like for those nights: put right by the algorithm, put right after
+human review, in order but implausible, still out of order, or no
+corrected value. It reads the final `time_*_corrected` columns of this
+run, and `correction_type` and `manually_corrected` to tell who made the
+change. “In order” does not prove the value is the true one. *Panel B:*
+one bar per study day: the percentage of that day’s complete nights that
+were out of order, with the number of such nights as the label, and a
+dashed line for the overall percentage. No statistical test is drawn.
 
-**Healthy look** Almost all of each bar is blue.
+**Healthy look** Panel A: almost all of each bar is blue or orange.
+Panel B: bars near the dashed line.
 
 **Anomaly →** Vermillion at the end of a bar: those nights are still out
 of order in the final data and need a person.
@@ -1854,10 +1859,10 @@ of order in the final data and need a person.
   counts when all four times are present and bed \<= sleep onset \<=
   final awakening \<= get-up fails. That count is the bar length.
 - **After.** The same night in the final columns (`time_*_corrected`),
-  in one of four states. In order means SOL \>= 0, TST \>= 0 and get-up
-  \>= final awakening. Plausible adds SOL \<= 300 min, time in bed
-  120-960 min, TST 30-720 min and wake-to-rise 0-300 min — the lenient
-  limits
+  in one of the states below. In order means SOL \>= 0, TST \>= 0 and
+  get-up \>= final awakening. Plausible adds SOL \<= 300 min, time in
+  bed 120-960 min, TST 30-720 min and wake-to-rise 0-300 min — the
+  lenient limits
   [`classify_reversals()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/classify_reversals.md)
   uses, which is why a night can be in order and still implausible.
 - **Families.** The mechanism classes of F17, grouped: `swap*` = two
@@ -1867,17 +1872,29 @@ of order in the final data and need a person.
   nights.
 - **One night, one state.** A night with any missing corrected time is
   “no corrected value” and is not also counted as still out of order.
-- **What it does not say.** Whether the algorithm or a person made the
-  change, and whether the corrected time is the true one. “In order and
-  plausible” means plausible, not verified.
+- **Who put it right.** A night that is in order and plausible counts as
+  the algorithm’s when a rule ran on it (`correction_type` is set),
+  including when a person also changed it; it counts as human review
+  when only a person changed it (`manually_corrected`). If those two
+  columns are missing the figure falls back to a single “in order and
+  plausible” colour.
+- **Panel B.** A night is complete when all four corrected times are
+  present; it is out of order when
+  [`classify_reversals()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/classify_reversals.md)
+  lists it. A bar high on days 1-3 is a pattern to look at, not a
+  result: the figure draws no test.
+- **What it does not say.** Whether the corrected time is the true one.
+  “Put right” means in order and plausible, not verified.
 
 **FAQ**
 
 Can the blue share be read as the pipeline’s success rate?
 
-Only for the nights it repaired: it also includes nights a person fixed
-in review, and the figure cannot separate the two. The synthetic
-injection test (F20) is where the two are separated.
+Blue is what the algorithm put right on its own; orange is what a person
+put right in review. Blue is therefore the algorithm’s share of the work
+in this study, not a rate of finding the true value: “put right” means
+in order and plausible, not verified. How often the rules recover the
+true value is measured on known truth in the synthetic test (F20).
 
 Why do the families differ so much in how much blue they have?
 

@@ -31,6 +31,14 @@
 
 ### Changed
 
+- Figure F21 now has two panels. Panel A splits the nights put right
+  into those the algorithm put right and those put right only after
+  human review (it reads `correction_type` and `manually_corrected`,
+  which `corrected_ema_data` does carry; the earlier note that the data
+  had no such column was wrong). Panel B shows, for each study day, the
+  share of complete nights that were out of order, against the overall
+  share; it draws counts only and no test. The figure number, file name
+  and the 37-figure count are unchanged.
 - The figure documentation is now two pages, in both languages.
   `interpreting-output` keeps the terminology and the reading/review
   guide (§1–§7); the new `figure-reference` article holds the figure
