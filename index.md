@@ -119,12 +119,14 @@ Summary:
 - **Real study data** (13,990 rows from 237 participants): in the
   study’s run, the rules applied an automatic order or format correction
   to 93 rows (10 of them were also corrected by a reviewer) and
-  reviewers corrected 75 further rows. The review queue at the end of a
-  run is 226 rows with the manual files applied and 307 without. Of the
-  13,990 submissions, 2,848 have all four times, so that is 79 and 108
-  rows per 1,000 diary entries (1.6% and 2.2% of all submissions). The
-  1,048 rows flagged in the v1.4.5 audit came from a report-only pass
-  that modified no data.
+  reviewers corrected 75 further rows. At the end of a run, the rows
+  still labelled `waiting` (a Step 8 flag that no reviewer has accepted
+  as a non-error) number 227 of the 13,990 with the manual files applied
+  and 307 without (1.6% and 2.2% of all submissions). Of the 13,990
+  submissions, 2,848 have all four times; among those the counts are 226
+  and 297, which is 79 and 104 rows per 1,000 diary entries. The 1,048
+  rows flagged in the v1.4.5 audit came from a report-only pass that
+  modified no data.
 - **External public datasets**: the pipeline runs on other schemas after
   a short conversion script. These datasets contain no known errors, so
   they are a feasibility check, not accuracy validation.
@@ -155,9 +157,9 @@ all-manual-flag:
   associations the pipeline exists to serve.
 - **Not all-flag:** flagging every disagreement is unmanageable by hand
   (the v1.4.5 report-only audit flagged 1,048 rows; a current run leaves
-  226 rows to review, or 307 without the manual files). High-confidence
-  rules take the deterministic cases; FLAG keeps only the ambiguous ones
-  for human review.
+  227 rows with an unresolved flag, or 307 without the manual files).
+  High-confidence rules take the deterministic cases; FLAG keeps only
+  the ambiguous ones for human review.
 
 The outcome is not “the pipeline makes a mess clean” — it makes the mess
 **explicit**: every candidate error is surfaced or logged, never
@@ -415,10 +417,12 @@ file.copy(system.file("config_template.yaml", package = "sleepcleanr"),
   1.0。“检出”指记录被标记，不代表恢复了正确值——修正层面的召回率更低，验证报告里按错误类别分别给出。
 - **真实研究数据**（237 名参与者的 13,990 行）：在该研究的运行中，规则对
   93 行做了自动的顺序或格式修正（其中 10
-  行也被审核者修正过），审核者另外修正了 75
-  行。一轮运行结束时的审核队列：应用人工文件后为 226 行，不应用则为 307
-  行。13,990 条提交中有 2,848 条四个时间都填了，因此每 1,000 条日记对应
-  79 和 108 行（占全部提交的 1.6% 和 2.2%）。v1.4.5 审计标记的 1,048
+  行也被审核者修正过），审核者另外修正了 75 行。一轮运行结束时仍带
+  `waiting` 标签的行（第 8
+  步的标记，尚未被审核者接受为非错误），应用人工文件后为 13,990 行中的
+  227 行，不应用则为 307 行（占全部提交的 1.6% 和
+  2.2%）。其中四个时间都填了的 2,848 行里，这两个数是 226 和 297，即每
+  1,000 条日记 79 和 104 行。v1.4.5 审计标记的 1,048
   行来自只报告、不改数据的一次运行。
 - **外部公开数据集**：经一段简短的转换脚本，管线可在其他 schema
   上运行。这些数据集没有已知错误，所以只是可行性检查，不是准确性验证。
@@ -444,9 +448,9 @@ sleepcleanr 刻意**既非全自动、也非全部人工 flag**：
   与就寝→入睡窗口的矛盾）绝不覆盖 — 一个看似偏大的 SOL
   是真实的心理信号，静默”修正”会破坏管线所服务的睡眠–情绪关联。
 - **不全 flag**：把每个分歧都标出来，手动看不过来（v1.4.5
-  只报告审计标记了 1,048 行；当前一轮运行留下 226
-  行待审，不应用人工文件则为 307 行）。高置信规则处理确定性个案；FLAG
-  只把歧义个案留给人审。
+  只报告审计标记了 1,048 行；当前一轮运行有 227
+  行带未解决的标记，不应用人工文件则为 307
+  行）。高置信规则处理确定性个案；FLAG 只把歧义个案留给人审。
 
 结果不是”管线把 mess 洗干净”，而是把 mess
 **显式化**：每个候选错误要么被呈现，要么被记录，永不被静默隐藏。每轮 run
