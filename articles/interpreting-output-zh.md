@@ -368,7 +368,7 @@ read.csv("output/correction_status_final.csv")
 | `timestamp_issue` | 无法解析为有效时间的时间戳 | 0 正常。\> 0 表示参与者填了非标准时间格式。 |
 | `duration_issue` | 超出配置阈值的睡眠指标 | 少量正常。若很大，阈值太严或数据质量有问题。 |
 | `amount_flag` | 异常物质使用条目 | 应为 0 或很低。 |
-| `self_reported_flag` | 自报 SOL/WASO 与计算值分歧的记录 | 指示感知偏差。看图 F24（SOL 感知偏差），见[逐图参考](https://cyracaid.github.io/sleepdiary-cleaner/articles/figure-reference-zh.md)。 |
+| `self_reported_flag` | 自报 SOL/WASO 与计算值分歧的记录 | 指示感知偏差。看图 F29（SOL 感知偏差），见[逐图参考](https://cyracaid.github.io/sleepdiary-cleaner/articles/figure-reference-zh.md)。 |
 
 **`first` 和 `last` 指什么。**
 两者都是**同一次运行内**的快照，不是两次运行，也不是数据的首行和末行。流水线在五个检查点统计各类别（`data_category`）的记录数：
@@ -390,7 +390,7 @@ read.csv("output/correction_status_final.csv")
 **稳定性规则**：同一数据跑两次 → 每个数字必须相同。否则非确定性。
 
 **关于 SOL 的说明**：上面的 `sol_mean_min` 是**原始 SOL 时长**。这和图
-F24 检查的”SOL
+F29 检查的”SOL
 感知偏差”（自报值与计算值之间的差距，见[逐图参考](https://cyracaid.github.io/sleepdiary-cleaner/articles/figure-reference-zh.md)
 §5）是不同的量——两处用的参考数字不一样（这里是 10–45 分钟，那边是 15/60
 分钟），因为它们衡量的根本不是同一件事。不要拿这两组数字互相对照。

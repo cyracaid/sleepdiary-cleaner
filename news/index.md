@@ -15,12 +15,12 @@
 
 ### Added
 
-- Figures F36 and F37 (`pipeline_cleaning/`). F36 shows, for each form
+- Figures F20 and F21 (`pipeline_cleaning/`). F20 shows, for each form
   of an out-of-order night, how often the rules put the time back to the
   true value in a synthetic test (with the number of rows changed to a
   wrong value); it reads `reversal_injection_outcomes.csv`, shipped in
   `inst/extdata/`, and is switched by
-  `visualization.detection_outcomes.enabled`. F37 shows this study’s
+  `visualization.detection_outcomes.enabled`. F21 shows this study’s
   out-of-order nights before and after the corrections, by family of
   mechanism. There are now 37 figures (21 pipeline-cleaning, 16
   research-ready).
@@ -41,13 +41,22 @@
   (`Figure F05: …` where it used to say `Figure 11: …`), so the file
   name, the in-figure title and the card heading now agree. Line numbers
   and file names are unchanged.
-- The four newest figure cards (F34–F37) now carry the same two sections
+- The four newest figure cards (F18–F21) now carry the same two sections
   as the other 33 — the folded *Precise rules* and an *FAQ* — and the
   Chinese cards use one set of section names throughout. The four
   Chinese articles whose English original defines its abbreviations
   (`column-mapping`, `pipeline-architecture`, `testing-coverage`,
   `validation-methodology`) gained the matching 术语 section; the two
   language versions now have the same section list everywhere.
+- The `F` numbers now follow the two sections: `F01`–`F21` are the
+  pipeline-cleaning figures and `F22`–`F37` the research-ready ones.
+  Before, the five figures added last (out-of-order nights, the Step 6.5
+  clock-time rule, the before/after view) carried `F33`–`F37` while
+  sitting in the pipeline-cleaning section, so the figure index jumped
+  from §5 back to §4 at `F33`. File names, in-figure titles, card
+  headings, anchors and every cross-reference moved together; what used
+  to be `F17`–`F32` is now `F22`–`F37`. Figure PNGs already on disk keep
+  their old names and titles until the next run rewrites them.
 
 ## sleepcleanr 1.9.0
 
@@ -66,13 +75,13 @@
   e.g. `swap:bed-sleep` or `pm12h:sleep-12h`. Nothing is changed by
   these functions; they read the pre-correction columns a run already
   keeps.
-- Figure F33 (`pipeline_cleaning/F33.png`) draws these classes: one row
+- Figure F17 (`pipeline_cleaning/F17.png`) draws these classes: one row
   per mechanism, empty rows included, with the number of nights and the
   share of all out-of-order nights.
-- Figures F34 and F35 (`pipeline_cleaning/`) show what the Step 6.5
-  clock-time rule did: F34 counts the reinterpreted SOL / WASO entries
+- Figures F18 and F19 (`pipeline_cleaning/`) show what the Step 6.5
+  clock-time rule did: F18 counts the reinterpreted SOL / WASO entries
   by outcome (kept as minutes, recomputed, set to missing, left for
-  review); F35 plots each SOL entry typed like a clock time against the
+  review); F19 plots each SOL entry typed like a clock time against the
   person’s own bedtime and sleep onset. Both read
   `output/duration_clock_rule_log.csv` and are skipped when the rule saw
   no entry. There are now 35 figures (19 pipeline-cleaning, 16
@@ -189,7 +198,7 @@
 
 ### Changed
 
-- All 32 figure files use one continuous scheme, `F01`-`F32` (was a mix
+- All 32 figure files use one continuous scheme, `F01`-`F37` (was a mix
   of `01`-`12`, `13B`-`13D`, `A1`, `P26`, `R25`-`R27` with gaps). Files
   keep their folder (`pipeline_cleaning/`, `research_ready/`); in-figure
   titles, the expected-figures list, the figure index, README and the

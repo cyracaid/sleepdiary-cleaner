@@ -42,41 +42,41 @@ Contents
   - [F15 · Step Flag Ledger](#f15-step-flag-ledger)
   - [F16 · Participants Worth a Second
     Look](#f16-participants-worth-a-second-look)
-  - [F33 · Out-of-Order Nights, by
-    Mechanism](#f33-out-of-order-nights-by-mechanism)
-  - [F34 · Clock-Time Rule Outcomes (SOL /
-    WASO)](#f34-clock-time-rule-outcomes)
-  - [F35 · SOL Clock-Like Entries vs Own
-    Times](#f35-sol-clock-like-entries-vs-own-times)
-  - [F36 · Reversal Forms in a Synthetic
-    Test](#f36-reversal-forms-synthetic-test)
-  - [F37 · Out-of-Order Nights, Before and
-    After](#f37-out-of-order-before-after)
+  - [F17 · Out-of-Order Nights, by
+    Mechanism](#f17-out-of-order-nights-by-mechanism)
+  - [F18 · Clock-Time Rule Outcomes (SOL /
+    WASO)](#f18-clock-time-rule-outcomes)
+  - [F19 · SOL Clock-Like Entries vs Own
+    Times](#f19-sol-clock-like-entries-vs-own-times)
+  - [F20 · Reversal Forms in a Synthetic
+    Test](#f20-reversal-forms-synthetic-test)
+  - [F21 · Out-of-Order Nights, Before and
+    After](#f21-out-of-order-before-after)
 - [5. Research-ready figure cards (`research_ready/`)](#fr-5)
-  - [F17 · Correction Impact](#f17-correction-impact)
-  - [F18 · Distribution of Sleep
-    Variables](#f18-distribution-of-sleep-variables)
-  - [F19 · TST Distribution](#f19-tst-distribution)
-  - [F20 · Sleep Duration vs Time in
-    Bed](#f20-sleep-duration-vs-time-in-bed)
-  - [F21 · SOL vs Sleep Duration](#f21-sol-vs-sleep-duration)
-  - [F22 · Variability of Sleep
-    Variables](#f22-variability-of-sleep-variables)
-  - [F23 · Bedtime vs Get-up
-    Distribution](#f23-bedtime-vs-get-up-distribution)
-  - [F24 · SOL Perception Bias](#f24-sol-perception-bias)
-  - [F25 · WASO Perception Bias](#f25-waso-perception-bias)
-  - [F26 · Substance Use Availability](#f26-substance-use-availability)
-  - [F27 · Substance Use Value
-    Distribution](#f27-substance-use-value-distribution)
-  - [F28 · Caffeine Consumption](#f28-caffeine-consumption)
-  - [F29 · Alcohol Consumption](#f29-alcohol-consumption)
-  - [F30 · Sleep Regularity — Weekday vs
-    Weekend](#f30-sleep-regularity--weekday-vs-weekend)
-  - [F31 · Sleep Composition — TIB
-    Breakdown](#f31-sleep-composition--tib-breakdown)
-  - [F32 · Sleep Metrics Correlation
-    Matrix](#f32-sleep-metrics-correlation-matrix)
+  - [F22 · Correction Impact](#f22-correction-impact)
+  - [F23 · Distribution of Sleep
+    Variables](#f23-distribution-of-sleep-variables)
+  - [F24 · TST Distribution](#f24-tst-distribution)
+  - [F25 · Sleep Duration vs Time in
+    Bed](#f25-sleep-duration-vs-time-in-bed)
+  - [F26 · SOL vs Sleep Duration](#f26-sol-vs-sleep-duration)
+  - [F27 · Variability of Sleep
+    Variables](#f27-variability-of-sleep-variables)
+  - [F28 · Bedtime vs Get-up
+    Distribution](#f28-bedtime-vs-get-up-distribution)
+  - [F29 · SOL Perception Bias](#f29-sol-perception-bias)
+  - [F30 · WASO Perception Bias](#f30-waso-perception-bias)
+  - [F31 · Substance Use Availability](#f31-substance-use-availability)
+  - [F32 · Substance Use Value
+    Distribution](#f32-substance-use-value-distribution)
+  - [F33 · Caffeine Consumption](#f33-caffeine-consumption)
+  - [F34 · Alcohol Consumption](#f34-alcohol-consumption)
+  - [F35 · Sleep Regularity — Weekday vs
+    Weekend](#f35-sleep-regularity--weekday-vs-weekend)
+  - [F36 · Sleep Composition — TIB
+    Breakdown](#f36-sleep-composition--tib-breakdown)
+  - [F37 · Sleep Metrics Correlation
+    Matrix](#f37-sleep-metrics-correlation-matrix)
 
 ## 1. How to Read the Figures
 
@@ -91,13 +91,13 @@ sheet lists each one with its reason. Stable verification artifacts
 **New to these figures?** Start with the `figure_index.png` contact
 sheet for an overview, then work through the five “must-check” figures
 below in order — together they are a sleep-quality QC pass in miniature.
-Every number below (`F01`-`F37`) is the same number as the file name,
+Every number below (`F01`-`F21`) is the same number as the file name,
 the in-figure title and the card in §4 or §5. The folder split
 (`pipeline_cleaning/` = QC/audit figures, `research_ready/` = built for
 a paper) only matters once you are deciding what to put in a manuscript
 — for just checking your data, ignore it and go by number.
 
-**Figure numbering, two systems.** `F01`-`F37` is the pipeline’s own
+**Figure numbering, two systems.** `F01`-`F21` is the pipeline’s own
 numbering: file name, in-figure title, card heading and every
 cross-reference in this documentation. The *paper* numbering is separate
 and exists only for a manuscript: Methods Figure 1-2, Results Figure
@@ -112,7 +112,7 @@ number so it can be pasted into a manuscript unchanged.
 | 1 | **F01** Pipeline Record Flow (§4) | Flow narrows gently; Clean dominates; Error + Unusual small (\< 5%) | Spike at 0 or huge Error/Unusual share → parsing/AM-PM failure upstream |
 | 2 | **F15** Step Flag Ledger (§4) | Corrected bar appears ONLY at Step 6.5, flat after | Change after Step 6.5 = instability |
 | 3 | **F14** Auto-Detected Dashboard (§4) | Flag counts match `correction_status_final.csv` | Mismatch = misalignment |
-| 4 | **F18** Distribution of Sleep Variables (§5) | TST peaks 6–8 h, SOL right-skewed, WASO \< 60, SE \> 85% | SOL flat/bimodal = AM/PM confusion |
+| 4 | **F23** Distribution of Sleep Variables (§5) | TST peaks 6–8 h, SOL right-skewed, WASO \< 60, SE \> 85% | SOL flat/bimodal = AM/PM confusion |
 | 5 | **F06** Error Category Distribution (§4) | Most records Clean/Minor; Error+Unusual \< 5% | High = review the manual CSVs |
 
 ## 2. What is in the output folder
@@ -150,8 +150,11 @@ for the paper:
 
 ## 3. Figure Index
 
-All 37 figures, in F order. “Card” jumps to the full explanation in §4
-or §5; “File” is the PNG inside `latest_visualization_<tag>_n<rows>/`.
+All 37 figures in F order. The numbers follow the two sections:
+`F01`–`F21` are the pipeline-cleaning figures (§4) and `F22`–`F37` the
+research-ready ones (§5), so both the number column and the section
+column read straight down. “Card” jumps to the full explanation; “File”
+is the PNG inside `latest_visualization_<tag>_n<rows>/`.
 
 | \# | Paper figure | Use | File | Code source | Card | Last checked |
 |----|:--:|----|----|----|----|----|
@@ -171,27 +174,27 @@ or §5; “File” is the PNG inside `latest_visualization_<tag>_n<rows>/`.
 | **F14** | Figure S13 | Supplement | `pipeline_cleaning/F14.png` | `sleep_visualization.R:2510` | [§4 · Auto-Detected Dashboard](#f14-auto-detected-dashboard) | 2026-11-24 |
 | **F15** | Figure S14 | Supplement | `pipeline_cleaning/F15.png` | `figure12_step_flag_table.R:15` | [§4 · Step Flag Ledger](#f15-step-flag-ledger) | 2026-11-24 |
 | **F16** | Figure S15 | Supplement | `pipeline_cleaning/F16.png` | `sleep_visualization.R:2680` | [§4 · Participants Worth a Second Look](#f16-participants-worth-a-second-look) | 2026-11-24 |
-| **F17** | Figure 2 | Methods | `research_ready/F17.png` | `sleep_visualization.R:1091` | [§5 · Correction Impact](#f17-correction-impact) | 2026-11-24 |
-| **F18** | Figure 3 | Results | `research_ready/F18.png` | `sleep_visualization.R:1136` | [§5 · Distribution of Sleep Variables](#f18-distribution-of-sleep-variables) | 2026-11-24 |
-| **F19** | Figure 4 | Results | `research_ready/F19.png` | `sleep_visualization.R:1187` | [§5 · TST Distribution](#f19-tst-distribution) | 2026-11-24 |
-| **F20** | Figure 5 | Results | `research_ready/F20.png` | `sleep_visualization.R:1242` | [§5 · Sleep Duration vs Time in Bed](#f20-sleep-duration-vs-time-in-bed) | 2026-11-24 |
-| **F21** | Figure 6 | Results | `research_ready/F21.png` | `sleep_visualization.R:1294` | [§5 · SOL vs Sleep Duration](#f21-sol-vs-sleep-duration) | 2026-11-24 |
-| **F22** | Figure 7 | Results | `research_ready/F22.png` | `sleep_visualization.R:1344` | [§5 · Variability of Sleep Variables](#f22-variability-of-sleep-variables) | 2026-11-24 |
-| **F23** | Figure 8 | Results | `research_ready/F23.png` | `sleep_visualization.R:1545` | [§5 · Bedtime vs Get-up Distribution](#f23-bedtime-vs-get-up-distribution) | 2026-11-24 |
-| **F24** | Figure 9 | Results | `research_ready/F24.png` | `sleep_visualization.R:2738` | [§5 · SOL Perception Bias](#f24-sol-perception-bias) | 2026-11-24 |
-| **F25** | Figure 10 | Results | `research_ready/F25.png` | `sleep_visualization.R:2796` | [§5 · WASO Perception Bias](#f25-waso-perception-bias) | 2026-11-24 |
-| **F26** | Figure S16 | Supplement | `research_ready/F26.png` | `sleep_visualization.R:2868` | [§5 · Substance Use Availability](#f26-substance-use-availability) | 2026-11-24 |
-| **F27** | Figure S17 | Supplement | `research_ready/F27.png` | `sleep_visualization.R:2971` | [§5 · Substance Use Value Distribution](#f27-substance-use-value-distribution) | 2026-11-24 |
-| **F28** | Figure S18 | Supplement | `research_ready/F28.png` | `sleep_visualization.R:3045` | [§5 · Caffeine Consumption](#f28-caffeine-consumption) | 2026-11-24 |
-| **F29** | Figure S19 | Supplement | `research_ready/F29.png` | `sleep_visualization.R:3080` | [§5 · Alcohol Consumption](#f29-alcohol-consumption) | 2026-11-24 |
-| **F30** | Figure 11 | Results | `research_ready/F30.png` | `sleep_visualization.R:3144` | [§5 · Sleep Regularity — Weekday vs Weekend](#f30-sleep-regularity--weekday-vs-weekend) | 2026-11-24 |
-| **F31** | Figure 12 | Results | `research_ready/F31.png` | `sleep_visualization.R:3197` | [§5 · Sleep Composition — TIB Breakdown](#f31-sleep-composition--tib-breakdown) | 2026-11-24 |
-| **F32** | Figure 13 | Results | `research_ready/F32.png` | `sleep_visualization.R:3226` | [§5 · Sleep Metrics Correlation Matrix](#f32-sleep-metrics-correlation-matrix) | 2026-11-24 |
-| **F33** | Figure S20 | Supplement | `pipeline_cleaning/F33.png` | `sleep_visualization.R:3293` | [§4 · Out-of-Order Nights, by Mechanism](#f33-out-of-order-nights-by-mechanism) | 2026-11-24 |
-| **F34** | Figure S21 | Supplement | `pipeline_cleaning/F34.png` | `sleep_visualization.R:3355` | [§4 · Clock-Time Rule Outcomes (SOL / WASO)](#f34-clock-time-rule-outcomes) | 2026-11-24 |
-| **F35** | Figure S22 | Supplement | `pipeline_cleaning/F35.png` | `sleep_visualization.R:3388` | [§4 · SOL Clock-Like Entries vs Own Times](#f35-sol-clock-like-entries-vs-own-times) | 2026-11-24 |
-| **F36** | Figure S23 | Supplement | `pipeline_cleaning/F36.png` | `sleep_visualization.R:3440` | [§4 · Reversal Forms in a Synthetic Test](#f36-reversal-forms-synthetic-test) | 2026-11-24 |
-| **F37** | Figure S24 | Supplement | `pipeline_cleaning/F37.png` | `sleep_visualization.R:3527` | [§4 · Out-of-Order Nights, Before and After](#f37-out-of-order-before-after) | 2026-11-24 |
+| **F17** | Figure S20 | Supplement | `pipeline_cleaning/F17.png` | `sleep_visualization.R:3293` | [§4 · Out-of-Order Nights, by Mechanism](#f17-out-of-order-nights-by-mechanism) | 2026-11-24 |
+| **F18** | Figure S21 | Supplement | `pipeline_cleaning/F18.png` | `sleep_visualization.R:3355` | [§4 · Clock-Time Rule Outcomes (SOL / WASO)](#f18-clock-time-rule-outcomes) | 2026-11-24 |
+| **F19** | Figure S22 | Supplement | `pipeline_cleaning/F19.png` | `sleep_visualization.R:3388` | [§4 · SOL Clock-Like Entries vs Own Times](#f19-sol-clock-like-entries-vs-own-times) | 2026-11-24 |
+| **F20** | Figure S23 | Supplement | `pipeline_cleaning/F20.png` | `sleep_visualization.R:3440` | [§4 · Reversal Forms in a Synthetic Test](#f20-reversal-forms-synthetic-test) | 2026-11-24 |
+| **F21** | Figure S24 | Supplement | `pipeline_cleaning/F21.png` | `sleep_visualization.R:3527` | [§4 · Out-of-Order Nights, Before and After](#f21-out-of-order-before-after) | 2026-11-24 |
+| **F22** | Figure 2 | Methods | `research_ready/F22.png` | `sleep_visualization.R:1091` | [§5 · Correction Impact](#f22-correction-impact) | 2026-11-24 |
+| **F23** | Figure 3 | Results | `research_ready/F23.png` | `sleep_visualization.R:1136` | [§5 · Distribution of Sleep Variables](#f23-distribution-of-sleep-variables) | 2026-11-24 |
+| **F24** | Figure 4 | Results | `research_ready/F24.png` | `sleep_visualization.R:1187` | [§5 · TST Distribution](#f24-tst-distribution) | 2026-11-24 |
+| **F25** | Figure 5 | Results | `research_ready/F25.png` | `sleep_visualization.R:1242` | [§5 · Sleep Duration vs Time in Bed](#f25-sleep-duration-vs-time-in-bed) | 2026-11-24 |
+| **F26** | Figure 6 | Results | `research_ready/F26.png` | `sleep_visualization.R:1294` | [§5 · SOL vs Sleep Duration](#f26-sol-vs-sleep-duration) | 2026-11-24 |
+| **F27** | Figure 7 | Results | `research_ready/F27.png` | `sleep_visualization.R:1344` | [§5 · Variability of Sleep Variables](#f27-variability-of-sleep-variables) | 2026-11-24 |
+| **F28** | Figure 8 | Results | `research_ready/F28.png` | `sleep_visualization.R:1545` | [§5 · Bedtime vs Get-up Distribution](#f28-bedtime-vs-get-up-distribution) | 2026-11-24 |
+| **F29** | Figure 9 | Results | `research_ready/F29.png` | `sleep_visualization.R:2738` | [§5 · SOL Perception Bias](#f29-sol-perception-bias) | 2026-11-24 |
+| **F30** | Figure 10 | Results | `research_ready/F30.png` | `sleep_visualization.R:2796` | [§5 · WASO Perception Bias](#f30-waso-perception-bias) | 2026-11-24 |
+| **F31** | Figure S16 | Supplement | `research_ready/F31.png` | `sleep_visualization.R:2868` | [§5 · Substance Use Availability](#f31-substance-use-availability) | 2026-11-24 |
+| **F32** | Figure S17 | Supplement | `research_ready/F32.png` | `sleep_visualization.R:2971` | [§5 · Substance Use Value Distribution](#f32-substance-use-value-distribution) | 2026-11-24 |
+| **F33** | Figure S18 | Supplement | `research_ready/F33.png` | `sleep_visualization.R:3045` | [§5 · Caffeine Consumption](#f33-caffeine-consumption) | 2026-11-24 |
+| **F34** | Figure S19 | Supplement | `research_ready/F34.png` | `sleep_visualization.R:3080` | [§5 · Alcohol Consumption](#f34-alcohol-consumption) | 2026-11-24 |
+| **F35** | Figure 11 | Results | `research_ready/F35.png` | `sleep_visualization.R:3144` | [§5 · Sleep Regularity — Weekday vs Weekend](#f35-sleep-regularity--weekday-vs-weekend) | 2026-11-24 |
+| **F36** | Figure 12 | Results | `research_ready/F36.png` | `sleep_visualization.R:3197` | [§5 · Sleep Composition — TIB Breakdown](#f36-sleep-composition--tib-breakdown) | 2026-11-24 |
+| **F37** | Figure 13 | Results | `research_ready/F37.png` | `sleep_visualization.R:3226` | [§5 · Sleep Metrics Correlation Matrix](#f37-sleep-metrics-correlation-matrix) | 2026-11-24 |
 
 F05 (flag co-occurrence) is skipped whenever fewer than two flag columns
 have complete data or no pair of flags co-occurs, and the reason is
@@ -203,17 +206,17 @@ explicitly.
 
 ### 3.1 How figures are named
 
-- **One continuous scheme: `F01`-`F37`.** Since 1.7.1 the number in the
+- **One continuous scheme: `F01`-`F21`.** Since 1.7.1 the number in the
   file name, the in-figure title, the card heading and this index is the
   same number. There are no gaps and no lettered suffixes: numbers
   retired by the 1.6.0 reclassification were reassigned.
 - **Families by folder.** `pipeline_cleaning/` holds F01-F16 (pipeline
-  and detection figures, interleaved in build order) and F33-F37 (the
+  and detection figures, interleaved in build order) and F17-F21 (the
   reversal and clock-time families, added last); `research_ready/` holds
-  F17-F32. Within `pipeline_cleaning/`, a detection figure (F06-F14) can
+  F22-F37. Within `pipeline_cleaning/`, a detection figure (F06-F14) can
   therefore carry a higher number than a pipeline figure — generation
   order, not importance.
-- **Two numbering systems, kept apart.** `F01`-`F37` is the pipeline’s
+- **Two numbering systems, kept apart.** `F01`-`F21` is the pipeline’s
   own numbering and is the only one used in prose and cross-references.
   The paper numbering (Methods 1-2, Results 3-13, Supplement S1-S24) is
   a default suggestion for a manuscript, mapped in the index above; the
@@ -232,29 +235,29 @@ explicitly.
 The index’s “Paper figure” column already reflects this default:
 
 - **Methods, main text (2 figures).** F01 (Figure 1) — shows what the
-  pipeline IS: stages, counts, the final classification breakdown. F17
+  pipeline IS: stages, counts, the final classification breakdown. F22
   (Figure 2) — shows what cleaning DID: non-destructive, only confirmed
   input errors modified. These two answer the reviewer’s first two
   questions (“what did you do?” and “how invasive was it?”) with no
   clutter.
-- **Results, main text (pick 3–5 of the 11).** F19 (Figure 4, TST
-  distribution) as the data-quality anchor; F24/F25 (Figures 9-10,
+- **Results, main text (pick 3–5 of the 11).** F24 (Figure 4, TST
+  distribution) as the data-quality anchor; F29/F30 (Figures 9-10,
   perception bias) if subjective-versus-computed agreement is part of
-  your story; F30 (Figure 11, weekday vs weekend) or F31 (Figure 12, TIB
-  composition) if timing regularity or composition matters; F32 (Figure
+  your story; F35 (Figure 11, weekday vs weekend) or F36 (Figure 12, TIB
+  composition) if timing regularity or composition matters; F37 (Figure
   13, correlation matrix) if you reference metric interrelationships.
   Resist putting more than five in the main text — the rest reads better
   as supplement.
 - **Supplement (everything else).** All `pipeline_cleaning/` figures
-  (F02-F16, F33-F37) form the audit trail: put them in a supplement
+  (F02-F16, F17-F21) form the audit trail: put them in a supplement
   titled “Data quality and cleaning audit” and cite the set collectively
   from Methods with one sentence (“see Supplement S1 for the full audit
-  trail”). The substance-use figures (F26-F29) belong with whatever
+  trail”). The substance-use figures (F31-F34) belong with whatever
   substance-use analysis the paper reports, or in the supplement if
   none.
 
-A minimal working set if page limits are tight: **F01 + F17 in Methods,
-F19 + F24 + F32 in Results, the audit trail as a supplement.** Captions
+A minimal working set if page limits are tight: **F01 + F22 in Methods,
+F24 + F29 + F37 in Results, the audit trail as a supplement.** Captions
 for every one of these are at the end of its card in §4 or §5.
 
 ## 4. Pipeline-cleaning figure cards (`pipeline_cleaning/`)
@@ -345,11 +348,11 @@ example, the diary was not completed that day). The pipeline never
 guesses a missing time. Whether it is a problem depends on your study
 design and expected response rate — compare it with what you expected.
 
-Only 3 records are “Error (Reviewed)”, but F17 shows 77 corrected
+Only 3 records are “Error (Reviewed)”, but F22 shows 77 corrected
 records. Which is right?
 
 Both. F01 classifies the FINAL data: errors that were fixed are no
-longer errors, so only 3 remain in that class. F17 counts the records
+longer errors, so only 3 remain in that class. F22 counts the records
 that were changed along the way.
 
 **Paper caption**
@@ -1128,7 +1131,7 @@ curve or unclear instructions.
   `clean_df` is the earlier frame from before the classification, so it
   does not have these columns.
 - **A flag is not a verdict.** Most of these records were reviewed and
-  kept as reported (see F17).
+  kept as reported (see F22).
 
 **FAQ**
 
@@ -1324,7 +1327,7 @@ What should I do if a slice is large?
 
 Open the matching card: a large Metrics slice points to F09 (are the
 thresholds above the noise?), a large Amount/Input slice points to the
-substance-use coding (F26–F29), a large Temporal slice points to F07 and
+substance-use coding (F31–F34), a large Temporal slice points to F07 and
 F11.
 
 Why is there a pie when pies are hard to read?
@@ -1517,9 +1520,9 @@ data.
 > for manual review prioritization. A high rate flags records worth
 > hand-checking; it is not a verdict that the data are wrong.
 
-#### F33 · Out-of-Order Nights, by Mechanism
+#### F17 · Out-of-Order Nights, by Mechanism
 
-**File** `pipeline_cleaning/F33.png` — generated at
+**File** `pipeline_cleaning/F17.png` — generated at
 `sleep_visualization.R:3293`
 
 **Paper use** Supplement, Figure S20
@@ -1593,9 +1596,9 @@ absent rather than silently missing.
 > all out-of-order nights. N and the percentage of complete nights are
 > in the subtitle.
 
-#### F34 · Clock-Time Rule Outcomes (SOL / WASO)
+#### F18 · Clock-Time Rule Outcomes (SOL / WASO)
 
-**File** `pipeline_cleaning/F34.png` — generated at
+**File** `pipeline_cleaning/F18.png` — generated at
 `sleep_visualization.R:3355`
 
 **Paper use** Supplement, Figure S21
@@ -1672,9 +1675,9 @@ worksheets list it.
 > a mistyped duration, by what the clock-time rule did with each. N is
 > in the subtitle.
 
-#### F35 · SOL Clock-Like Entries vs Own Times
+#### F19 · SOL Clock-Like Entries vs Own Times
 
-**File** `pipeline_cleaning/F35.png` — generated at
+**File** `pipeline_cleaning/F19.png` — generated at
 `sleep_visualization.R:3388`
 
 **Paper use** Supplement, Figure S22
@@ -1704,7 +1707,7 @@ explained by either time.
 - **Which entries.** SOL entries the clock-time rule saw, minus the
   “minutes typed in the hours slot” class (those were never clock
   times). Entries whose own bed or sleep-onset time is missing cannot be
-  placed on the dial; they appear in F34 only.
+  placed on the dial; they appear in F18 only.
 - **The two axes.** The typed text is read as a 12-hour clock (`H:MM`,
   hours modulo 12) and folded onto a +/-360-minute dial. x = typed minus
   the person’s bedtime, y = typed minus their sleep onset. `y ~ 0` means
@@ -1717,7 +1720,7 @@ explained by either time.
   recomputed, vermillion = set to missing, grey = left for review. No
   dot is coloured by what the value “should” have been.
 - **Overplotting.** Dots are drawn with transparency, so two entries on
-  the same point read as one darker dot. Counts are in F34 and in the
+  the same point read as one darker dot. Counts are in F18 and in the
   log file, not in the dot density.
 
 **FAQ**
@@ -1740,9 +1743,9 @@ that neither own time explains, and they go to a person.
 > (minutes, 12-hour dial) from the person’s own bedtime and sleep onset.
 > The dashed box marks the clock-time rule’s tolerance and window.
 
-#### F36 · Reversal Forms in a Synthetic Test
+#### F20 · Reversal Forms in a Synthetic Test
 
-**File** `pipeline_cleaning/F36.png` — generated at
+**File** `pipeline_cleaning/F20.png` — generated at
 `sleep_visualization.R:3440`
 
 **Paper use** Supplement, Figure S23
@@ -1797,9 +1800,9 @@ through the review worksheets; they do not fix themselves.
 
 Why do the small forms have such wide intervals?
 
-Because they have 3 to 40 nights each. `shift_awake_12h` has 3 rows, so
-its interval runs from 0 to 56%: at that sample size the figure cannot
-separate “the rules miss it” from “the rules catch it”.
+Because the small forms have 3 to 40 nights each. `shift_awake_12h` has
+3 rows, so its interval runs from 0 to 56%: at that sample size the
+figure cannot separate “the rules miss it” from “the rules catch it”.
 
 A form shows 0% — does that mean nothing happened to those nights?
 
@@ -1816,9 +1819,9 @@ corrections ignore it”.
 > study. Bars: percent; lines: Wilson 95% intervals; right column: rows
 > changed to a wrong value. Clean rows altered: 0 of 6,650.
 
-#### F37 · Out-of-Order Nights, Before and After
+#### F21 · Out-of-Order Nights, Before and After
 
-**File** `pipeline_cleaning/F37.png` — generated at
+**File** `pipeline_cleaning/F21.png` — generated at
 `sleep_visualization.R:3527`
 
 **Paper use** Supplement, Figure S24
@@ -1830,7 +1833,7 @@ what “plausible” means (SOL 0-300 min, time in bed 2-16 h, TST 0.5-12
 h).
 
 **What each part means** One bar per family of mechanism (the same
-classes as F33, grouped). The bar length is the number of nights out of
+classes as F17, grouped). The bar length is the number of nights out of
 order before the corrections; its colours are what the final data looks
 like for those nights: in order and plausible, in order but implausible,
 still out of order, or no corrected value. It reads the final
@@ -1853,10 +1856,11 @@ of order in the final data and need a person.
 - **After.** The same night in the final columns (`time_*_corrected`),
   in one of four states. In order means SOL \>= 0, TST \>= 0 and get-up
   \>= final awakening. Plausible adds SOL \<= 300 min, time in bed
-  120-960 min, TST 30-720 min — the lenient limits
+  120-960 min, TST 30-720 min and wake-to-rise 0-300 min — the lenient
+  limits
   [`classify_reversals()`](https://cyracaid.github.io/sleepdiary-cleaner/reference/classify_reversals.md)
   uses, which is why a night can be in order and still implausible.
-- **Families.** The mechanism classes of F33, grouped: `swap*` = two
+- **Families.** The mechanism classes of F17, grouped: `swap*` = two
   times exchanged; `pm12h` = one time 12 h away; `pm12h_x2` = two times
   moved together; classes starting D or E = visibly wrong or
   unexplained; the rest = ambiguous. Bars are sorted by the number of
@@ -1873,7 +1877,7 @@ Can the blue share be read as the pipeline’s success rate?
 
 Only for the nights it repaired: it also includes nights a person fixed
 in review, and the figure cannot separate the two. The synthetic
-injection test (F36) is where the two are separated.
+injection test (F20) is where the two are separated.
 
 Why do the families differ so much in how much blue they have?
 
@@ -1891,9 +1895,9 @@ until a person reads the worksheets.
 
 ## 5. Research-ready figure cards (`research_ready/`)
 
-#### F17 · Correction Impact
+#### F22 · Correction Impact
 
-**File** `research_ready/F17.png` — generated at
+**File** `research_ready/F22.png` — generated at
 `sleep_visualization.R:1091`
 
 **Paper use** Methods, Figure 2
@@ -1994,9 +1998,9 @@ whole.
 > after correction. Corrections are non-destructive: only confirmed
 > input errors were modified.
 
-#### F18 · Distribution of Sleep Variables
+#### F23 · Distribution of Sleep Variables
 
-**File** `research_ready/F18.png` — generated at
+**File** `research_ready/F23.png` — generated at
 `sleep_visualization.R:1136`
 
 **Paper use** Results, Figure 3
@@ -2047,10 +2051,10 @@ many nights with no waking and no delay come out at or near 100%. A tall
 spike at exactly 100% is common; it is worth a look only if it is very
 large.
 
-How is this different from F22?
+How is this different from F27?
 
 This figure shows the shape of each distribution (how common each value
-is). F22 shows the spread in a violin-and-box form, which makes the
+is). F27 shows the spread in a violin-and-box form, which makes the
 median and the spread easier to compare at a glance.
 
 **Paper caption**
@@ -2059,9 +2063,9 @@ median and the spread easier to compare at a glance.
 > (TST), sleep onset latency (SOL), wake after sleep onset (WASO), and
 > sleep efficiency (SE) on the final corrected data.
 
-#### F19 · TST Distribution
+#### F24 · TST Distribution
 
-**File** `research_ready/F19.png` — generated at
+**File** `research_ready/F24.png` — generated at
 `sleep_visualization.R:1187`
 
 **Paper use** Results, Figure 4
@@ -2102,9 +2106,9 @@ long sleepers; a spike at 0 means zero-duration records.
 
 **FAQ**
 
-Why two distribution figures (F18 and F19)?
+Why two distribution figures (F23 and F24)?
 
-F18 is a five-metric dashboard in small panels. F19 isolates TST and
+F23 is a five-metric dashboard in small panels. F24 isolates TST and
 marks the mean and median, which is the usual first figure for a paper.
 
 Why is TST not just the time between falling asleep and waking?
@@ -2131,9 +2135,9 @@ their corrected values.
 > (blue) and median (orange) marked. TST is computed as the sleep period
 > minus WASO (TST = TIB − SOL − WASO).
 
-#### F20 · Sleep Duration vs Time in Bed
+#### F25 · Sleep Duration vs Time in Bed
 
-**File** `research_ready/F20.png` — generated at
+**File** `research_ready/F25.png` — generated at
 `sleep_visualization.R:1242`
 
 **Paper use** Results, Figure 5
@@ -2197,9 +2201,9 @@ are still in the statistics.
 > construction, points above the identity line are physically
 > impossible.
 
-#### F21 · SOL vs Sleep Duration
+#### F26 · SOL vs Sleep Duration
 
-**File** `research_ready/F21.png` — generated at
+**File** `research_ready/F26.png` — generated at
 `sleep_visualization.R:1294`
 
 **Paper use** Results, Figure 6
@@ -2257,9 +2261,9 @@ uncertain the slope is.
 > association (long onset latency, shorter sleep) is the expected
 > clinical pattern.
 
-#### F22 · Variability of Sleep Variables
+#### F27 · Variability of Sleep Variables
 
-**File** `research_ready/F22.png` — generated at
+**File** `research_ready/F27.png` — generated at
 `sleep_visualization.R:1344`
 
 **Paper use** Results, Figure 7
@@ -2300,7 +2304,7 @@ of the data.
 A violin has two bulges. What does that mean?
 
 Two groups of behaviour are mixed together — for example weekday versus
-weekend, or a mix of 12-hour and 24-hour time entries. Check F30 or the
+weekend, or a mix of 12-hour and 24-hour time entries. Check F35 or the
 parsing before trusting a single summary number.
 
 Why is there a long thin line at the top or bottom?
@@ -2314,9 +2318,9 @@ they are worth checking in F04.
 > variable; each panel uses its own y-axis scale, so panels are compared
 > by distribution shape, not absolute values.
 
-#### F23 · Bedtime vs Get-up Distribution
+#### F28 · Bedtime vs Get-up Distribution
 
-**File** `research_ready/F23.png` — generated at
+**File** `research_ready/F28.png` — generated at
 `sleep_visualization.R:1545`
 
 **Paper use** Results, Figure 8
@@ -2358,7 +2362,7 @@ turned an evening time into a morning time. Compare with F07.
 
 Is this the same as the weekday/weekend figure?
 
-No. This figure pools all days; F30 splits by weekday and weekend.
+No. This figure pools all days; F35 splits by weekday and weekend.
 
 **Paper caption**
 
@@ -2366,9 +2370,9 @@ No. This figure pools all days; F30 splits by weekday and weekend.
 > times) across the day. Peak separation (evening bedtimes, morning
 > get-ups) is the healthy circadian signature.
 
-#### F24 · SOL Perception Bias
+#### F29 · SOL Perception Bias
 
-**File** `research_ready/F24.png` — generated at
+**File** `research_ready/F29.png` — generated at
 `sleep_visualization.R:2738`
 
 **Paper use** Results, Figure 9
@@ -2441,9 +2445,9 @@ signed difference from the two columns.
 > SOL (derived from corrected bed and sleep timestamps) and subjective
 > SOL (participant’s reported onset latency), in minutes.
 
-#### F25 · WASO Perception Bias
+#### F30 · WASO Perception Bias
 
-**File** `research_ready/F25.png` — generated at
+**File** `research_ready/F30.png` — generated at
 `sleep_visualization.R:2796`
 
 **Paper use** Results, Figure 10
@@ -2453,7 +2457,7 @@ two different quantities: the self-reported nighttime wakefulness (WASO)
 and the time the diary shows between the final awakening and getting up
 (`getup − awake`). The figure’s caption prints
 `bias = |computed − self-reported|` (minutes), with the same 15 min / 60
-min reference lines as F24.
+min reference lines as F29.
 
 **Healthy look** Most of the mass is near 0 with a small tail. Because
 the two quantities are different windows, this mostly tells you how
@@ -2476,7 +2480,7 @@ entry problem.
 - **So the gap is not a pure reporting error.** The two numbers cover
   different time windows; the figure’s subtitle says so. The mismatch is
   informative, not something to fix.
-- **Same construction as F24.** `bias = |objective − subjective|`,
+- **Same construction as F29.** `bias = |objective − subjective|`,
   records with both values, x axis 0–200 min, dashed references at 15
   and 60 min.
 
@@ -2495,7 +2499,7 @@ No. A participant can be awake for long stretches at night and still get
 up quickly, or wake once and linger in bed. Both give a large gap
 without any error in either number.
 
-Why are fewer records used than in F24?
+Why are fewer records used than in F29?
 
 Only rows where the self-reported WASO is written as hours:minutes can
 be read, so some rows drop out.
@@ -2506,9 +2510,9 @@ be read, so some rows drop out.
 > wake-after-sleep-onset and the participant’s self-reported nighttime
 > wakefulness, in minutes.
 
-#### F26 · Substance Use Availability
+#### F31 · Substance Use Availability
 
-**File** `research_ready/F26.png` — generated at
+**File** `research_ready/F31.png` — generated at
 `sleep_visualization.R:2868`
 
 **Paper use** Supplement, Figure S16
@@ -2554,7 +2558,7 @@ data export.
 What does the range in the label tell me?
 
 The smallest and largest reported values. A very large maximum suggests
-a units mix-up; see F27–F29.
+a units mix-up; see F32–F34.
 
 **Paper caption**
 
@@ -2562,9 +2566,9 @@ a units mix-up; see F27–F29.
 > substance (caffeine, alcohol, nicotine, cannabis), indicating how
 > completely each substance domain was reported.
 
-#### F27 · Substance Use Value Distribution
+#### F32 · Substance Use Value Distribution
 
-**File** `research_ready/F27.png` — generated at
+**File** `research_ready/F32.png` — generated at
 `sleep_visualization.R:2971`
 
 **Paper use** Supplement, Figure S17
@@ -2618,9 +2622,9 @@ real heavy day. Check the record.
 > substance. Units: caffeine = cups, alcohol = standard drinks, nicotine
 > and cannabis = doses.
 
-#### F28 · Caffeine Consumption
+#### F33 · Caffeine Consumption
 
-**File** `research_ready/F28.png` — generated at
+**File** `research_ready/F33.png` — generated at
 `sleep_visualization.R:3045`
 
 **Paper use** Supplement, Figure S18
@@ -2681,15 +2685,15 @@ servings were entered as cups; such records get an amount flag.
 > (cups/day). Right-skewed with a mode of 0–1 cups is expected; spikes
 > at implausible values indicate unit confusion.
 
-#### F29 · Alcohol Consumption
+#### F34 · Alcohol Consumption
 
-**File** `research_ready/F29.png` — generated at
+**File** `research_ready/F34.png` — generated at
 `sleep_visualization.R:3080`
 
 **Paper use** Supplement, Figure S19
 
 **What each part means** Bar chart, one bar per distinct reported value
-(drinks/day), same discrete construction as F28; fractional answers
+(drinks/day), same discrete construction as F33; fractional answers
 (e.g. 1 1/4 drinks) are kept and labeled as fractions.
 
 **Healthy look** Right-skewed, with most reports at the lowest counts.
@@ -2699,7 +2703,7 @@ caffeine; verify how `alcoholtoday_PM` was coded.
 
 **Precise rules**
 
-- **Same construction as F28.** One bar per distinct reported value on a
+- **Same construction as F33.** One bar per distinct reported value on a
   discrete axis, in numeric order; fractional answers are kept and
   labelled as fractions.
 - **Unit and column.** Standard drinks per day, from
@@ -2733,9 +2737,9 @@ definition, treat large values with care.
 > **Figure S19.** Count of records by reported alcohol consumption
 > (standard drinks/day).
 
-#### F30 · Sleep Regularity — Weekday vs Weekend
+#### F35 · Sleep Regularity — Weekday vs Weekend
 
-**File** `research_ready/F30.png` — generated at
+**File** `research_ready/F35.png` — generated at
 `sleep_visualization.R:3144`
 
 **Paper use** Results, Figure 11
@@ -2805,9 +2809,9 @@ finding.
 > Saturday–Sunday, derived from the corrected bedtime date). A modest (≤
 > 1 h) weekend delay is expected; a large shift indicates social jetlag.
 
-#### F31 · Sleep Composition — TIB Breakdown
+#### F36 · Sleep Composition — TIB Breakdown
 
-**File** `research_ready/F31.png` — generated at
+**File** `research_ready/F36.png` — generated at
 `sleep_visualization.R:3197`
 
 **Paper use** Results, Figure 12
@@ -2862,9 +2866,9 @@ slices stay readable, which a pie would crowd.
 > wake after sleep onset (WASO), with TIB = TST + SOL + WASO by
 > construction. Healthy composition places TST at 80–90% of TIB.
 
-#### F32 · Sleep Metrics Correlation Matrix
+#### F37 · Sleep Metrics Correlation Matrix
 
-**File** `research_ready/F32.png` — generated at
+**File** `research_ready/F37.png` — generated at
 `sleep_visualization.R:3226`
 
 **Paper use** Results, Figure 13
