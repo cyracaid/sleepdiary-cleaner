@@ -128,7 +128,8 @@ QC。这里出现的每个图号（比如 “F01”、“F09”）都是文件�
 
 ## 3. 图索引
 
-全部 37 张图，按 F 号排列。“卡片”跳到 §4 或 §5 的完整说明；“文件”是
+全部 37 张图，按所在文件夹分组：管线清洗 21 张在前，研究结果 16
+张在后，组内按 F 号排列。“卡片”跳到 §4 或 §5 的完整说明；“文件”是
 `latest_visualization_<tag>_n<rows>/` 里的 PNG。
 
 | \# | 论文图 | 用途 | 文件 | 代码来源 | 卡片 | 最后核对 |
@@ -149,6 +150,11 @@ QC。这里出现的每个图号（比如 “F01”、“F09”）都是文件�
 | **F14** | 图 S13 | Supplement | `pipeline_cleaning/F14.png` | `sleep_visualization.R:2510` | [§4 · 自动检测仪表板](#c-18) | 2026-11-24 |
 | **F15** | 图 S14 | Supplement | `pipeline_cleaning/F15.png` | `figure12_step_flag_table.R:15` | [§4 · 逐步标记账本](#c-a1) | 2026-11-24 |
 | **F16** | 图 S15 | Supplement | `pipeline_cleaning/F16.png` | `sleep_visualization.R:2680` | [§4 · 值得二次检查的参与者](#c-p26) | 2026-11-24 |
+| **F33** | 图 S20 | Supplement | `pipeline_cleaning/F33.png` | `sleep_visualization.R:3293` | [§4 · 时间顺序反了的夜晚，按机制](#c-f33) | 2026-11-24 |
+| **F34** | 图 S21 | Supplement | `pipeline_cleaning/F34.png` | `sleep_visualization.R:3355` | [§4 · 钟点规则的处理结果](#c-f34) | 2026-11-24 |
+| **F35** | 图 S22 | Supplement | `pipeline_cleaning/F35.png` | `sleep_visualization.R:3388` | [§4 · 像钟点的 SOL 与本人时间](#c-f35) | 2026-11-24 |
+| **F36** | 图 S23 | Supplement | `pipeline_cleaning/F36.png` | `sleep_visualization.R:3440` | [§4 · 合成测试里的反序形态](#c-f36) | 2026-11-24 |
+| **F37** | 图 S24 | Supplement | `pipeline_cleaning/F37.png` | `sleep_visualization.R:3527` | [§4 · 顺序颠倒的夜晚，改正前后](#c-f37) | 2026-11-24 |
 | **F17** | 图 2 | Methods | `research_ready/F17.png` | `sleep_visualization.R:1091` | [§5 · 修正影响](#c-02) | 2026-11-24 |
 | **F18** | 图 3 | Results | `research_ready/F18.png` | `sleep_visualization.R:1136` | [§5 · 睡眠变量分布](#c-02b) | 2026-11-24 |
 | **F19** | 图 4 | Results | `research_ready/F19.png` | `sleep_visualization.R:1187` | [§5 · TST 分布](#c-03) | 2026-11-24 |
@@ -165,11 +171,6 @@ QC。这里出现的每个图号（比如 “F01”、“F09”）都是文件�
 | **F30** | 图 11 | Results | `research_ready/F30.png` | `sleep_visualization.R:3144` | [§5 · 睡眠规律性——工作日 vs 周末](#c-r25) | 2026-11-24 |
 | **F31** | 图 12 | Results | `research_ready/F31.png` | `sleep_visualization.R:3197` | [§5 · 睡眠构成——TIB 拆分](#c-r26) | 2026-11-24 |
 | **F32** | 图 13 | Results | `research_ready/F32.png` | `sleep_visualization.R:3226` | [§5 · 睡眠指标相关矩阵](#c-r27) | 2026-11-24 |
-| **F33** | 图 S20 | Supplement | `pipeline_cleaning/F33.png` | `sleep_visualization.R:3293` | [§4 · 时间顺序反了的夜晚，按机制](#c-f33) | 2026-11-24 |
-| **F34** | 图 S21 | Supplement | `pipeline_cleaning/F34.png` | `sleep_visualization.R:3355` | [§4 · 钟点规则的处理结果](#c-f34) | 2026-11-24 |
-| **F35** | 图 S22 | Supplement | `pipeline_cleaning/F35.png` | `sleep_visualization.R:3388` | [§4 · 像钟点的 SOL 与本人时间](#c-f35) | 2026-11-24 |
-| **F36** | 图 S23 | Supplement | `pipeline_cleaning/F36.png` | `sleep_visualization.R:3440` | [§4 · 合成测试里的反序形态](#c-f36) | 2026-11-24 |
-| **F37** | 图 S24 | Supplement | `pipeline_cleaning/F37.png` | `sleep_visualization.R:3527` | [§4 · 顺序颠倒的夜晚，改正前后](#c-f37) | 2026-11-24 |
 
 F05（标记共现图）在完整数据的标记列少于两列、或没有任何一对标记同时出现时跳过，原因会写在
 `figure_index.png` 顶部的红色区块里。F14、F15 和 F16
