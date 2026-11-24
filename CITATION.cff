@@ -29,6 +29,9 @@ url: "https://github.com/cyracaid/sleepdiary-cleaner"
 doi: 10.5281/zenodo.23077702
 identifiers:
   - type: doi
+    value: 10.5281/zenodo.24408732
+    description: "Archived version 1.9.0"
+  - type: doi
     value: 10.5281/zenodo.23902663
     description: "Archived version 1.8.0"
   - type: doi
